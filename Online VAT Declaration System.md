@@ -5,7 +5,7 @@
 
 ### 1. Executive Summary & Core Mission
 
-The **Online VAT Declaration System (OVDS)** is an enterprise-grade, hybrid-cloud SaaS platform designed specifically for the **Ethiopian business ecosystem**. It bridges corporate internal Resource Planning (ERP) systems with government tax portals, fully automating **Value Added Tax (VAT) preparation, compliance tracking, and e-filing**. 
+The **Online VAT Declaration System (https://ovds.com.et)** is an enterprise-grade, hybrid-cloud SaaS platform designed specifically for the **Ethiopian business ecosystem**. It bridges corporate internal Resource Planning (ERP) systems with government tax portals, fully automating **Value Added Tax (VAT) preparation, compliance tracking, and e-filing**. 
 
 OVDS enforces strict compliance with the **Accounting and Auditing Board of Ethiopia (AABE)**, **International Financial Reporting Standards (IFRS)**, and local VAT proclamations. By supporting unified communications across entire enterprise modules, the platform serves small to large enterprises with dual-mode **Cloud and On-Premise** deployments, including comprehensive **offline capabilities** for environments with limited network coverage.
 
