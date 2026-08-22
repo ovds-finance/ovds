@@ -1,8 +1,8 @@
+## OVDS
+
+
 # Modern SaaS Architecture & Specification Document
-## Online VAT Declaration System (OVDS)
-
 ---
-
 ### 1. Executive Summary & Core Mission
 
 The **Online VAT Declaration System (https://ovds.com.et)** is an enterprise-grade, hybrid-cloud SaaS platform designed specifically for the **Ethiopian business ecosystem**. It bridges corporate internal Resource Planning (ERP) systems with government tax portals, fully automating **Value Added Tax (VAT) preparation, compliance tracking, and e-filing**. 
