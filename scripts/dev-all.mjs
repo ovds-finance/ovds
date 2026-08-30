@@ -30,9 +30,9 @@ async function main () {
 
   // Use `nx dev` so Nx's dependency graph is honoured and the target
   // picks up the NODE_OPTIONS + SWC builder flags from project.json.
+  // Pass a single command string (not an array) when shell:true to avoid DEP0190.
   const backend = spawn(
-    'npx',
-    ['nx', 'dev', 'backend'],
+    'npx nx dev backend',
     {
       shell: true,
       stdio: 'inherit',
@@ -51,15 +51,17 @@ async function main () {
 
   // Wait for the backend port to be ready before starting the frontend
   // so Vite's proxy target is available on first HMR connection.
+  // Small initial delay so the port can't be a false-positive from a
+  // just-freed socket that hasn't fully closed yet.
   console.log(`[dev-all] Waiting for backend on port ${BACKEND_PORT}...`)
+  await new Promise(r => setTimeout(r, 500))
   await waitForPort(BACKEND_PORT).catch(() => {
     console.warn('[dev-all] Backend did not become ready within timeout — starting frontend anyway')
   })
   console.log('[dev-all] Backend ready — starting frontend')
 
   const frontend = spawn(
-    'npx',
-    ['nx', 'dev', 'frontend'],
+    'npx nx dev frontend',
     {
       shell: true,
       stdio: 'inherit',

@@ -220,7 +220,9 @@ if (looseRanges.length === 0) {
 console.log('\n🔍  Checking for duplicate package versions...');
 let duplicateVersions = [];
 try {
-  const raw = run('pnpm list --json --depth=1 2>/dev/null', { timeout: 60_000 });
+  // Use stdio pipe so pnpm stderr (progress/warnings) doesn't corrupt the JSON output.
+  // The '2>/dev/null' redirect is bash-only and silently breaks on Windows cmd/pwsh.
+  const raw = run('pnpm list --json --depth=1', { timeout: 60_000, stdio: ['pipe', 'pipe', 'pipe'] });
   // pnpm list --json returns an array per workspace package
   const tree = JSON.parse(raw);
   const seen = new Map(); // pkgName -> Set of versions

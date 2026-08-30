@@ -11,10 +11,12 @@ import { CostCentersController } from './cost-centers/cost-centers.controller';
 import { OnboardingController } from './onboarding/onboarding.controller';
 import { BusinessRegistrationController } from './business-registration/business-registration.controller';
 import { LicensingController } from './licensing/licensing.controller';
+import { SetupController } from './setup/setup.controller';
+import { SetupService } from './setup/setup.service';
 
 @Module({
-  providers: [ConfigService, PrismaService, SettingsService],
-  exports: [ConfigService, PrismaService, SettingsService],
+  providers: [ConfigService, PrismaService, SettingsService, SetupService],
+  exports: [ConfigService, PrismaService, SettingsService, SetupService],
   controllers: [
     SettingsController,
     CurrencyController,
@@ -25,6 +27,7 @@ import { LicensingController } from './licensing/licensing.controller';
     OnboardingController,
     BusinessRegistrationController,
     LicensingController,
+    SetupController,
   ],
 })
 export class SettingsModule {}
