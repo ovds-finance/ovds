@@ -1,0 +1,459 @@
+name: Dependency Optimization Pipeline
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Runs on every push/PR (affected-only) and nightly (full workspace scan).
+#
+# Behavior by branch:
+#   feature branches  → warnings only, never blocks merge
+#   main / develop    → hard failure on regressions + dep issues
+#
+# Jobs:
+#   dep-check         Knip, pnpm dedupe, version ranges, duplicate versions
+#   bundle-analyze    Vite chunk breakdown + oversized chunk detection
+#   size-regression   Bundle size delta vs stored baseline
+#   prisma-audit      Prisma client config & sideEffects hygiene
+#   report            Consolidate all sub-reports, upload as artifact
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      # Only run when dependency-affecting files change (affected-only on PRs)
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.npmrc'
+      - 'apps/**/package.json'
+      - 'packages/**/package.json'
+      - 'packages/database/prisma/schema.prisma'
+      - 'vite.config.ts'
+      - 'apps/frontend/vite.config.ts'
+      - 'nx.json'
+      - 'scripts/bundle-analyze.mjs'
+      - 'scripts/dep-check.mjs'
+      - 'scripts/size-check.mjs'
+      - 'scripts/optimize-report.mjs'
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Nightly full scan at 02:00 UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      fail_on_warn:
+        description: 'Fail on warnings (mirrors main branch behavior)'
+        type: boolean
+        default: false
+      update_baseline:
+        description: 'Update bundle size baseline after the run'
+        type: boolean
+        default: false
+      skip_knip:
+        description: 'Skip knip scan (faster, use when investigating other issues)'
+        type: boolean
+        default: false
+
+# Only one run per ref at a time; cancel in-progress on new push
+concurrency:
+  group: optimize-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  # Strict mode: fail on warnings only for main/develop or when explicitly requested
+  STRICT_MODE: ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || github.event.inputs.fail_on_warn == 'true') && 'true' || 'false' }}
+
+jobs:
+  # ────────────────────────────────────────────────────────────────────────────
+  dep-check:
+    name: Dependency Health Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run dependency health check
+        id: dep-check
+        run: |
+          SKIP_KNIP=""
+          if [ "${{ github.event.inputs.skip_knip }}" = "true" ] || [ "${{ github.event_name }}" = "push" ]; then
+            # Skip knip on regular pushes (too slow); run on nightly and PRs
+            SKIP_KNIP="--skip-knip"
+          fi
+
+          FAIL_FLAG=""
+          if [ "${{ env.STRICT_MODE }}" = "true" ]; then
+            FAIL_FLAG="--fail-on-warn"
+          fi
+
+          node scripts/dep-check.mjs \
+            --output .reports/deps \
+            $SKIP_KNIP \
+            $FAIL_FLAG
+
+      - name: Upload dep-check report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dep-check-report-${{ github.run_number }}
+          path: .reports/deps/
+          retention-days: 30
+
+      - name: Post dep-check summary to job
+        if: always()
+        run: |
+          if [ -f ".reports/deps/dep-check.md" ]; then
+            echo "### Dependency Health Check" >> $GITHUB_STEP_SUMMARY
+            cat .reports/deps/dep-check.md >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # ────────────────────────────────────────────────────────────────────────────
+  bundle-analyze:
+    name: Bundle Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Restore Nx build cache to speed up the build step
+      - name: Restore Nx cache
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: nx-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            nx-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            nx-${{ runner.os }}-
+
+      - name: Build dependent packages
+        run: npx nx run-many --target=build --projects=contracts,shared,database,ui,core,design-system --parallel=8
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+
+      - name: Build frontend (production)
+        run: npx nx build frontend
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+          NODE_ENV: production
+
+      - name: Run bundle analysis
+        id: bundle-analyze
+        run: |
+          FAIL_FLAG=""
+          if [ "${{ env.STRICT_MODE }}" = "true" ]; then
+            FAIL_FLAG="--fail-on-warn"
+          fi
+
+          node scripts/bundle-analyze.mjs \
+            --output .reports/bundle \
+            --threshold 500 \
+            $FAIL_FLAG
+
+      - name: Upload bundle reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-report-${{ github.run_number }}
+          path: .reports/bundle/
+          retention-days: 30
+
+      - name: Post bundle summary to job
+        if: always()
+        run: |
+          if [ -f ".reports/bundle/bundle-summary.md" ]; then
+            echo "### Bundle Analysis" >> $GITHUB_STEP_SUMMARY
+            cat .reports/bundle/bundle-summary.md >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # ────────────────────────────────────────────────────────────────────────────
+  size-regression:
+    name: Bundle Size Regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: bundle-analyze
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Download the bundle stats produced in the bundle-analyze job
+      - name: Download bundle report
+        uses: actions/download-artifact@v4
+        with:
+          name: bundle-report-${{ github.run_number }}
+          path: .reports/bundle/
+
+      # Restore size baseline from cache (keyed to main branch baseline)
+      - name: Restore size baseline
+        uses: actions/cache@v4
+        id: baseline-cache
+        with:
+          path: .reports/bundle/baseline.json
+          key: size-baseline-${{ github.event.repository.default_branch }}
+          restore-keys: |
+            size-baseline-
+
+      - name: Run size regression check
+        id: size-check
+        run: |
+          FAIL_FLAG=""
+          if [ "${{ env.STRICT_MODE }}" = "true" ]; then
+            FAIL_FLAG="--fail-on-warn"
+          fi
+
+          node scripts/size-check.mjs \
+            --output .reports/bundle \
+            --delta 10 \
+            $FAIL_FLAG
+
+      # Update baseline on main/develop merges or when explicitly requested
+      - name: Update size baseline
+        if: |
+          (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') ||
+          github.event.inputs.update_baseline == 'true'
+        run: node scripts/size-check.mjs --update-baseline
+
+      - name: Save updated baseline
+        if: |
+          (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') ||
+          github.event.inputs.update_baseline == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .reports/bundle/baseline.json
+          key: size-baseline-${{ github.event.repository.default_branch }}
+
+      - name: Post size-check summary to job
+        if: always()
+        run: |
+          if [ -f ".reports/bundle/size-check.md" ]; then
+            echo "### Bundle Size Regression" >> $GITHUB_STEP_SUMMARY
+            cat .reports/bundle/size-check.md >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload size-check report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: size-check-report-${{ github.run_number }}
+          path: .reports/bundle/size-check.*
+          retention-days: 30
+
+  # ────────────────────────────────────────────────────────────────────────────
+  prisma-audit:
+    name: Prisma Configuration Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Audit Prisma configuration
+        id: prisma-audit
+        run: |
+          ISSUES=0
+
+          echo "### Prisma Configuration Audit" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # 1. Check sideEffects: false in @ovds/database
+          DB_PKG="packages/database/package.json"
+          if [ -f "$DB_PKG" ]; then
+            SIDE_EFFECTS=$(node -e "const p=require('./$DB_PKG'); console.log(p.sideEffects)")
+            if [ "$SIDE_EFFECTS" = "false" ]; then
+              echo "- ✅ \`packages/database\` has \`sideEffects: false\`" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- ⚠️  \`packages/database\` is missing \`\"sideEffects\": false\` — add it for tree-shaking" >> $GITHUB_STEP_SUMMARY
+              ISSUES=$((ISSUES + 1))
+            fi
+          fi
+
+          # 2. Check sideEffects: false in @ovds/contracts  
+          CONTRACTS_PKG="packages/contracts/package.json"
+          if [ -f "$CONTRACTS_PKG" ]; then
+            SIDE_EFFECTS=$(node -e "const p=require('./$CONTRACTS_PKG'); console.log(p.sideEffects)")
+            if [ "$SIDE_EFFECTS" = "false" ]; then
+              echo "- ✅ \`packages/contracts\` has \`sideEffects: false\`" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- ⚠️  \`packages/contracts\` is missing \`\"sideEffects\": false\` — add it for Zod schema tree-shaking" >> $GITHUB_STEP_SUMMARY
+              ISSUES=$((ISSUES + 1))
+            fi
+          fi
+
+          # 3. Check no binaryTargets (Prisma 7 = WASM engine)
+          SCHEMA="packages/database/prisma/schema.prisma"
+          if grep -q "binaryTargets" "$SCHEMA" 2>/dev/null; then
+            echo "- ⚠️  \`schema.prisma\` still has \`binaryTargets\` — Prisma 7 uses WASM engine, remove it" >> $GITHUB_STEP_SUMMARY
+            ISSUES=$((ISSUES + 1))
+          else
+            echo "- ✅ No unnecessary \`binaryTargets\` in schema.prisma" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # 4. Check for explicit output path in prisma-client-js generator
+          if grep -q 'output\s*=' "$SCHEMA" 2>/dev/null; then
+            echo "- ✅ Prisma client has explicit \`output\` path configured" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- 💡 Consider adding an explicit \`output\` path to the prisma-client-js generator" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Total Prisma issues: $ISSUES" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ env.STRICT_MODE }}" = "true" ] && [ "$ISSUES" -gt 0 ]; then
+            echo "❌ $ISSUES Prisma configuration issue(s) found in strict mode"
+            exit 1
+          fi
+
+  # ────────────────────────────────────────────────────────────────────────────
+  report:
+    name: Consolidate Optimization Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [dep-check, bundle-analyze, size-regression, prisma-audit]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Download all sub-reports
+      - name: Download dep-check report
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: dep-check-report-${{ github.run_number }}
+          path: .reports/deps/
+
+      - name: Download bundle report
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: bundle-report-${{ github.run_number }}
+          path: .reports/bundle/
+
+      - name: Download size-check report
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: size-check-report-${{ github.run_number }}
+          path: .reports/bundle/
+
+      - name: Generate consolidated report
+        run: |
+          FAIL_FLAG=""
+          if [ "${{ env.STRICT_MODE }}" = "true" ]; then
+            FAIL_FLAG="--fail-on-warn"
+          fi
+          node scripts/optimize-report.mjs --output .reports $FAIL_FLAG
+
+      - name: Post consolidated summary
+        if: always()
+        run: |
+          if [ -f ".reports/optimize-summary.md" ]; then
+            echo "---" >> $GITHUB_STEP_SUMMARY
+            echo "## 📊 Full Optimization Summary" >> $GITHUB_STEP_SUMMARY
+            cat .reports/optimize-summary.md >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload full optimization report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: optimization-report-${{ github.run_number }}
+          path: .reports/
+          retention-days: 30
+
+      # Post a PR comment with the summary on pull requests
+      - name: Comment on PR
+        if: github.event_name == 'pull_request' && always()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: optimization-report
+          path: .reports/optimize-summary.md
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Nightly: full knip scan + pnpm dedupe (included in dep-check --skip-knip=false)
+  nightly-full-scan:
+    name: Nightly Full Workspace Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Full dependency check (with knip)
+        run: |
+          node scripts/dep-check.mjs \
+            --output .reports/deps
+          # knip is NOT skipped on nightly runs
+
+      - name: Upload nightly dep report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-dep-report-${{ github.run_number }}
+          path: .reports/deps/
+          retention-days: 90
+
+      - name: Post nightly summary
+        if: always()
+        run: |
+          echo "## 🌙 Nightly Full Workspace Scan" >> $GITHUB_STEP_SUMMARY
+          if [ -f ".reports/deps/dep-check.md" ]; then
+            cat .reports/deps/dep-check.md >> $GITHUB_STEP_SUMMARY
+          fi
