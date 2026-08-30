@@ -13,7 +13,7 @@
     "@ovds/design-system": "*",
     "@ovds/shared": "*",
     "@ovds/ui": "*",
-    "lucide-react": "^0.473.0",
-    "react-hot-toast": "^2.6.0"
+    "lucide-react": "0.473.0",
+    "react-hot-toast": "2.6.0"
   }
 }

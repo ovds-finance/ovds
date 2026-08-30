@@ -72,7 +72,8 @@ function checkPrisma() {
   }
 
   // Prisma 7 uses WASM engine by default — binaryTargets not needed
-  if (/binaryTargets/.test(schema)) {
+  // Match only actual assignments, not comments mentioning binaryTargets
+  if (/^\s*binaryTargets\s*=/m.test(schema)) {
     recommendations.push({
       severity: 'info',
       message: 'Prisma 7 uses the WASM client engine by default — `binaryTargets` is unnecessary and can be removed from the generator block.',

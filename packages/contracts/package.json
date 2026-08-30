@@ -46,8 +46,8 @@
     "typecheck": "node ../../scripts/bin-run.mjs --max-old-space-size=4096 typescript/bin/tsc --noEmit"
   },
   "dependencies": {
-    "@orpc/contract": "^1.15.0",
-    "@orpc/zod": "^1.15.0",
-    "zod": "^4.4.3"
+    "@orpc/contract": "1.15.0",
+    "@orpc/zod": "1.15.0",
+    "zod": "4.4.3"
   }
 }

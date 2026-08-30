@@ -25,11 +25,11 @@
     "@ovds/core": "*",
     "@ovds/database": "*",
     "@ovds/shared": "*",
-    "@tanstack/react-query": "^5.102.8",
-    "lucide-react": "^0.473.0",
-    "react-hot-toast": "^2.6.0"
+    "@tanstack/react-query": "5.102.4",
+    "lucide-react": "0.473.0",
+    "react-hot-toast": "2.6.0"
   },
   "devDependencies": {
-    "vitest": "^3.0.0"
+    "vitest": "3.2.7"
   }
 }

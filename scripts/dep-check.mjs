@@ -169,6 +169,70 @@ const WORKSPACE_EXEMPT = /^\*/;
 /** @type {Array<{file:string, pkg:string, range:string, section:string}>} */
 const looseRanges = [];
 
+// If --fix-ranges is requested, build a name→version map from the pnpm lockfile
+// (pnpm-lock.yaml). This is far more reliable than `pnpm list` on Windows:
+//   - no subprocess → no ENOBUFS, no bash-redirect issues
+//   - covers ALL packages (prod + dev) across all workspace importers
+//   - the `version:` field in the importers section gives the resolved version
+//
+// We read two sections:
+//   1. importers: each workspace dep's `version:` (best — direct resolved version)
+//   2. packages:  top-level package keys like `workbox-window@7.4.1:` (fallback)
+let installedVersionMap = new Map();
+if (fixRanges) {
+  try {
+    const lockfilePath = join(ROOT, 'pnpm-lock.yaml');
+    if (existsSync(lockfilePath)) {
+      const lockRaw = readFileSync(lockfilePath, 'utf8');
+      const lines = lockRaw.split(/\r?\n/);
+
+      // Pass 1 — importers section: state-machine over indented dep entries
+      //   '      <name>:\n        specifier: ...\n        version: X.Y.Z...'
+      let currentName = null;
+      let awaitingVersion = false;
+      for (const line of lines) {
+        const nameMatch = line.match(/^      '?(@?[a-z0-9][a-z0-9@/_.-]*)'?:\s*$/i);
+        if (nameMatch) {
+          currentName = nameMatch[1];
+          awaitingVersion = true;
+          continue;
+        }
+        if (awaitingVersion && currentName) {
+          const verMatch = line.match(/^\s+version:\s+(.+)/);
+          if (verMatch) {
+            const resolved = verMatch[1].trim().split('(')[0].trim();
+            if (/^\d/.test(resolved) && !installedVersionMap.has(currentName)) {
+              installedVersionMap.set(currentName, resolved);
+            }
+            awaitingVersion = false;
+            currentName = null;
+          } else if (!line.match(/^\s+specifier:/)) {
+            awaitingVersion = false;
+            currentName = null;
+          }
+        }
+      }
+
+      // Pass 2 — packages section: top-level keys like `  workbox-window@7.4.1:`
+      // This catches packages that appear only as transitive/peer deps in importers
+      for (const line of lines) {
+        const pkgKeyMatch = line.match(/^  '?(@?[a-z0-9][a-z0-9@/_.-]*)@(\d[^'(\s]*)['(]?\s*:/i);
+        if (pkgKeyMatch) {
+          const name = pkgKeyMatch[1];
+          const version = pkgKeyMatch[2].replace(/[^0-9.a-zA-Z-]/g, '');
+          if (!installedVersionMap.has(name)) {
+            installedVersionMap.set(name, version);
+          }
+        }
+      }
+
+      console.log(`   📋  Loaded ${installedVersionMap.size} resolved versions from pnpm-lock.yaml`);
+    }
+  } catch (e) {
+    console.warn(`   ⚠️  Could not read pnpm-lock.yaml for --fix-ranges: ${e.message}`);
+  }
+}
+
 const pkgFiles = findPackageJsons();
 for (const pkgFile of pkgFiles) {
   const rel = relative(ROOT, pkgFile);
@@ -179,6 +243,7 @@ for (const pkgFile of pkgFiles) {
     continue;
   }
 
+  let changed = false;
   for (const section of ['dependencies', 'devDependencies', 'peerDependencies']) {
     const deps = pkg[section] ?? {};
     for (const [name, range] of Object.entries(deps)) {
@@ -188,21 +253,17 @@ for (const pkgFile of pkgFiles) {
       if (LOOSE_RANGE.test(range)) {
         looseRanges.push({ file: rel, pkg: name, range, section });
         if (fixRanges) {
-          // Resolve current installed version and pin it
-          try {
-            const installed = run(`pnpm list ${name} --json 2>/dev/null`, { timeout: 10_000 });
-            const parsed = JSON.parse(installed);
-            const version = parsed?.[0]?.dependencies?.[name]?.version;
-            if (version) {
-              deps[name] = version;
-            }
-          } catch { /* best effort */ }
+          const version = installedVersionMap.get(name);
+          if (version) {
+            deps[name] = version;
+            changed = true;
+          }
         }
       }
     }
   }
 
-  if (fixRanges) {
+  if (fixRanges && changed) {
     writeFileSync(pkgFile, JSON.stringify(pkg, null, 2) + '\n');
   }
 }
@@ -210,9 +271,17 @@ for (const pkgFile of pkgFiles) {
 if (looseRanges.length === 0) {
   console.log('   ✅  All versions are pinned');
 } else {
-  console.warn(`   ⚠️  ${looseRanges.length} loose range(s) found`);
   if (fixRanges) {
-    console.log('   🔧  --fix-ranges applied (best-effort)');
+    const pinned = looseRanges.filter(({ pkg: name }) => installedVersionMap.has(name)).length;
+    console.log(`   🔧  --fix-ranges: pinned ${pinned}/${looseRanges.length} range(s) to installed versions`);
+  }
+  const remaining = fixRanges
+    ? looseRanges.filter(({ pkg: name }) => !installedVersionMap.has(name)).length
+    : looseRanges.length;
+  if (remaining > 0) {
+    console.warn(`   ⚠️  ${remaining} loose range(s) could not be resolved (package not in pnpm list tree)`);
+  } else if (!fixRanges) {
+    console.warn(`   ⚠️  ${looseRanges.length} loose range(s) found`);
   }
 }
 

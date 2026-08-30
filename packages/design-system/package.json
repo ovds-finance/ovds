@@ -23,6 +23,6 @@
     "typecheck": "node ../../scripts/bin-run.mjs typescript/bin/tsc --noEmit"
   },
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "typescript": "5.9.3"
   }
 }
