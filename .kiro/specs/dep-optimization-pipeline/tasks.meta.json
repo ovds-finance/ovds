@@ -181,6 +181,11 @@
         "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
         "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
         "timestamp": 1788080584538
+      },
+      {
+        "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788081142017
       }
     ],
     "5.3 Verify strict-mode gate on main/develop": [
@@ -188,6 +193,11 @@
         "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
         "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
         "timestamp": 1788073917159
+      },
+      {
+        "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788081148758
       }
     ],
     "5.4 Verify knip is skipped on regular pushes and included on nightly / PRs": [
@@ -195,6 +205,11 @@
         "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
         "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
         "timestamp": 1788073917655
+      },
+      {
+        "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788081158986
       }
     ],
     "6.1 Append optimization pipeline section to scripts/README.md": [
@@ -219,6 +234,11 @@
         "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
         "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
         "timestamp": 1788073918122
+      },
+      {
+        "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788081149359
       }
     ],
     "7.1 Create PostFileSave hook for bundle analysis on vite.config.ts save": [
@@ -226,6 +246,16 @@
         "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
         "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
         "timestamp": 1788073918490
+      },
+      {
+        "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788081174575
+      },
+      {
+        "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788081388293
       }
     ],
     "7.2 Test the hook fires after saving vite.config.ts": [
@@ -233,6 +263,16 @@
         "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
         "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
         "timestamp": 1788073918738
+      },
+      {
+        "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788081395010
+      },
+      {
+        "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788081437178
       }
     ],
     "8. Checkpoint — ensure all checks pass end-to-end": [
@@ -240,6 +280,11 @@
         "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
         "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
         "timestamp": 1788073919141
+      },
+      {
+        "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788081450706
       }
     ],
     "3. Fix: establish baseline and resolve first-run issues": [
@@ -254,6 +299,27 @@
         "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
         "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
         "timestamp": 1788078742339
+      }
+    ],
+    "6. Documentation — add usage notes to scripts/README.md": [
+      {
+        "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788081149978
+      }
+    ],
+    "5. CI smoke test — confirm GitHub Actions workflow triggers correctly": [
+      {
+        "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788081161242
+      }
+    ],
+    "7. (Optional) Set up Kiro PostFileSave hook for vite.config.ts changes": [
+      {
+        "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788081437360
       }
     ]
   }

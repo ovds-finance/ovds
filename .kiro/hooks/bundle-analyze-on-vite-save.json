@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "bundle-analyze-on-vite-save",
+      "trigger": "PostFileSave",
+      "description": "Runs bundle analysis after vite.config.ts is saved. Requires a prior production build (apps/public/assets/ must exist). Run 'npx nx build frontend' first.",
+      "matcher": "vite\\.config\\.ts$",
+      "action": {
+        "type": "command",
+        "command": "node scripts/bundle-analyze.mjs --output .reports/bundle"
+      }
+    }
+  ]
+}

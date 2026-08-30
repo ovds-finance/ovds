@@ -97,7 +97,7 @@
     - Run `npm run optimize:size-check` → `size-check.json` written (compared against baseline)
     - _Requirements: 4.1_
 
-- [ ] 5. CI smoke test — confirm GitHub Actions workflow triggers correctly
+- [x] 5. CI smoke test — confirm GitHub Actions workflow triggers correctly
 
   - [x] 5.1 Push a test branch that touches a watched path
     - Create branch: `git checkout -b test/dep-optimization-smoke`
@@ -105,7 +105,7 @@
     - Verify the `dep-optimization.yml` workflow is triggered in GitHub Actions
     - _Requirements: 5.1_
 
-  - [-] 5.2 Verify individual CI jobs run and produce artifacts
+  - [x] 5.2 Verify individual CI jobs run and produce artifacts
     - Monitor the `dep-check` job — confirm it completes and uploads `dep-check-report-*` artifact
     - Monitor the `bundle-analyze` job — confirm it completes (build step may be slow; ~10 min)
     - Monitor the `size-regression` job — confirm it downloads the bundle report and runs size-check.mjs
@@ -113,18 +113,18 @@
     - Monitor the `report` job — confirm `optimize-summary.md` is written and a PR comment is posted (if on a PR)
     - _Requirements: 5.1, 5.2_
 
-  - [~] 5.3 Verify strict-mode gate on main/develop
+  - [x] 5.3 Verify strict-mode gate on main/develop
     - Open a PR targeting `develop` and confirm `STRICT_MODE=true` is set in the workflow env
     - Intentionally introduce a loose version range in a test branch → confirm the `dep-check` job fails in strict mode
     - Revert the change and confirm the job passes
     - _Requirements: 5.2_
 
-  - [~] 5.4 Verify knip is skipped on regular pushes and included on nightly / PRs
+  - [x] 5.4 Verify knip is skipped on regular pushes and included on nightly / PRs
     - Push directly to a feature branch — confirm `SKIP_KNIP="--skip-knip"` path is taken in the `dep-check` job shell script
     - Open a PR → confirm knip runs (no `--skip-knip` flag for PRs)
     - _Requirements: 5.1_
 
-- [ ] 6. Documentation — add usage notes to scripts/README.md
+- [x] 6. Documentation — add usage notes to scripts/README.md
 
   - [x] 6.1 Append optimization pipeline section to scripts/README.md
     - Add a new section `## Dependency Optimization Pipeline` after the existing deployment content
@@ -139,28 +139,28 @@
     - Add a "Fixing common issues" table covering: loose ranges (`--fix-ranges`), dedupe (`pnpm dedupe`), knip false-positives (`ignoreDependencies` in knip.config.ts)
     - _Requirements: 6.1_
 
-  - [~] 6.2 Add optimization pipeline quick-reference to root README (or create one)
+  - [x] 6.2 Add optimization pipeline quick-reference to root README (or create one)
     - If no root `README.md` exists, create one with a minimal monorepo overview
     - Add a `### Optimization & Bundle Health` section with a 1-paragraph description and a link to `scripts/README.md#dependency-optimization-pipeline`
     - Include a badge or table row for the `dep-optimization.yml` workflow status
     - _Requirements: 6.1_
 
-- [ ] 7. (Optional) Set up Kiro PostFileSave hook for vite.config.ts changes
+- [x] 7. (Optional) Set up Kiro PostFileSave hook for vite.config.ts changes
 
-  - [~] 7.1 Create PostFileSave hook for bundle analysis on vite.config.ts save
+  - [x] 7.1 Create PostFileSave hook for bundle analysis on vite.config.ts save
     - Create `.kiro/hooks/bundle-analyze-on-vite-save.json` with trigger `PostFileSave`, matcher `vite\\.config\\.ts$`, and action `node scripts/bundle-analyze.mjs --output .reports/bundle`
     - Verify the hook file is valid JSON and the matcher fires only on `vite.config.ts` paths
     - Note: this requires a prior frontend build; add a guard comment in the hook description
     - _Requirements: 7.1_
 
-  - [~] 7.2 Test the hook fires after saving vite.config.ts
+  - [x] 7.2 Test the hook fires after saving vite.config.ts
     - Open `apps/frontend/vite.config.ts` in the editor and make a whitespace-only change
     - Save the file and confirm the hook executes `bundle-analyze.mjs`
     - Verify `.reports/bundle/bundle-stats.json` is updated with a fresh timestamp
     - Undo the whitespace change
     - _Requirements: 7.1_
 
-- [~] 8. Checkpoint — ensure all checks pass end-to-end
+- [-] 8. Checkpoint — ensure all checks pass end-to-end
   - Run the full local pipeline: `npm run optimize:local` (or `pwsh -File scripts/optimize.ps1`)
   - Confirm exit code 0 and no warnings in the summary at `.reports/optimize-summary.md`
   - Run `npm run optimize:ci` (the CI-equivalent strict run without a build step) and confirm exit 0
