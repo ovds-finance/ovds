@@ -1,0 +1,133 @@
+{
+  "name": "frontend",
+  "root": "apps/frontend",
+  "sourceRoot": "apps/frontend/src",
+  "projectType": "application",
+  "tags": [
+    "scope:frontend",
+    "type:app"
+  ],
+  "targets": {
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run dev",
+        "cwd": "apps/frontend"
+      },
+      "cache": false
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "apps/frontend"
+      },
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{workspaceRoot}/apps/public"
+      ],
+      "cache": true
+    },
+    "preview": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run preview",
+        "cwd": "apps/frontend"
+      },
+      "cache": false
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run typecheck",
+        "cwd": "apps/frontend"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run lint",
+        "cwd": "apps/frontend"
+      },
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run test",
+        "cwd": "apps/frontend"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    },
+    "test:watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run test:watch",
+        "cwd": "apps/frontend"
+      },
+      "cache": false
+    },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run test:coverage",
+        "cwd": "apps/frontend"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": false
+    },
+    "bundle-analyze": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node scripts/bundle-analyze.mjs --output .reports/bundle",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "dep-check": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node scripts/dep-check.mjs --output .reports/deps",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "size-check": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node scripts/size-check.mjs --output .reports/bundle",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "optimize": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node scripts/bundle-analyze.mjs --output .reports/bundle && node scripts/size-check.mjs --output .reports/bundle && node scripts/dep-check.mjs --output .reports/deps && node scripts/optimize-report.mjs --output .reports",
+        "cwd": "{workspaceRoot}"
+      }
+    }
+  }
+}

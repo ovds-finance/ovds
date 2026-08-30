@@ -1,0 +1,56 @@
+{
+  "name": "features-compliance",
+  "root": "packages/features/compliance",
+  "sourceRoot": "packages/features/compliance/src",
+  "projectType": "library",
+  "tags": [
+    "scope:frontend",
+    "type:lib",
+    "type:feature",
+    "feature:compliance"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "packages/features/compliance"
+      },
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run typecheck",
+        "cwd": "packages/features/compliance"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run test",
+        "cwd": "packages/features/compliance"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    }
+  }
+}

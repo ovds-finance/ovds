@@ -1,0 +1,46 @@
+{
+  "name": "hr",
+  "root": "packages/modules/hr",
+  "sourceRoot": "packages/modules/hr/src",
+  "projectType": "library",
+  "tags": [
+    "type:lib",
+    "type:module",
+    "domain:hr"
+  ],
+  "implicitDependencies": [
+    "core"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "packages/modules/hr"
+      },
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run typecheck",
+        "cwd": "packages/modules/hr"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    }
+  }
+}

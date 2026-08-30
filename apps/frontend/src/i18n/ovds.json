@@ -1,0 +1,537 @@
+{
+  "invoices": {
+    "title": "Invoices",
+    "subtitle": "Create and send customizable Invoices and Estimates that get you paid faster. Ovds has no limits to the number of Invoices you can send.",
+    "add_btn": "New Invoice",
+    "no_invoices": "No invoices found",
+    "search_placeholder": "Search invoices...",
+    "stats": {
+      "billed": "Total Invoiced",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "draft": "Draft"
+    },
+    "status": {
+      "draft": "Draft",
+      "pending": "Pending",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "cancelled": "Cancelled"
+    },
+    "table": {
+      "invoice_no": "Invoice #",
+      "customer": "Customer",
+      "date": "Date",
+      "due_date": "Due Date",
+      "amount": "Amount",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "modal": {
+      "add_title": "Create Invoice",
+      "edit_title": "Edit Invoice",
+      "customer_name": "Customer Name",
+      "invoice_date": "Invoice Date",
+      "due_date": "Due Date",
+      "items": "Line Items",
+      "add_item": "Add Item",
+      "subtotal": "Subtotal",
+      "vat": "VAT (15%)",
+      "drrf": "DRRF (5%)",
+      "total": "Total",
+      "notes": "Notes",
+      "save_draft": "Save as Draft",
+      "save_send": "Save & Send",
+      "cancel": "Cancel"
+    },
+    "actions": {
+      "send": "Send",
+      "download": "Download PDF",
+      "share": "Share Link",
+      "duplicate": "Duplicate",
+      "credit_note": "Create Credit Note",
+      "record_payment": "Record Payment",
+      "send_reminder": "Send Reminder",
+      "mark_paid": "Mark as Paid",
+      "cancel": "Cancel Invoice"
+    },
+    "qr_modal": {
+      "title": "Invoice QR Code",
+      "invoice": "Invoice",
+      "customer": "Customer",
+      "total": "Total",
+      "standard": "ERCA Standard",
+      "compliant": "Tax Compliant",
+      "scan_hint": "Scan to verify",
+      "print": "Print",
+      "nbr_iqr": "NBE-IQR Format"
+    },
+    "payment": {
+      "title": "Record Payment",
+      "amount": "Payment Amount",
+      "date": "Payment Date",
+      "method": "Payment Method",
+      "reference": "Reference",
+      "notes": "Notes",
+      "partial": "Partial Payment",
+      "full": "Full Payment",
+      "methods": {
+        "cash": "Cash",
+        "bank_transfer": "Bank Transfer",
+        "telecom": "Telebirr",
+        "cheque": "Cheque",
+        "mobile_banking": "Mobile Banking",
+        "credit_card": "Credit Card"
+      }
+    }
+  },
+  "bills": {
+    "title": "Bills",
+    "subtitle": "Vendor Bills & Expenses",
+    "add_btn": "Add Bill",
+    "no_bills": "No bills found",
+    "search_placeholder": "Search bills...",
+    "stats": {
+      "expenses": "Total Expenses",
+      "paid": "Paid",
+      "pending": "Pending",
+      "vendors": "Vendors"
+    },
+    "table": {
+      "bill_no": "Bill #",
+      "vendor": "Vendor",
+      "date": "Date",
+      "due_date": "Due Date",
+      "amount": "Amount",
+      "status": "Status",
+      "actions": "Actions"
+    }
+  },
+  "items": {
+    "title": "Items & Inventory",
+    "subtitle": "Products & Services",
+    "add_btn": "Add Item",
+    "no_items": "No items found",
+    "search_placeholder": "Search items...",
+    "stats": {
+      "total": "Total Items",
+      "value": "Total Value",
+      "low_stock": "Low Stock",
+      "categories": "Categories"
+    },
+    "table": {
+      "info": "Item",
+      "sku": "SKU",
+      "category": "Category",
+      "price": "Price",
+      "stock": "Stock",
+      "actions": "Actions"
+    },
+    "modal": {
+      "add_title": "Add Item",
+      "edit_title": "Edit Item",
+      "name": "Item Name",
+      "description": "Description",
+      "sku": "SKU",
+      "category": "Category",
+      "unit_price": "Unit Price",
+      "cost_price": "Cost Price",
+      "track_inventory": "Track Inventory",
+      "stock_quantity": "Stock Quantity",
+      "reorder_level": "Reorder Level",
+      "unit": "Unit of Measure",
+      "tax_rate": "Tax Rate"
+    }
+  },
+  "coa": {
+    "title": "Chart of Accounts",
+    "accounts_count_one": "1 account",
+    "accounts_count_other": "{{count}} accounts",
+    "search_placeholder": "Search accounts...",
+    "add_btn": "New Account",
+    "no_accounts": "No Accounts",
+    "no_accounts_hint": "Set up your chart of accounts to start posting journal entries and generating financial reports.",
+    "seed_btn": "Import Standard Chart",
+    "create_manually_btn": "Create Manually",
+    "modal": {
+      "add_title": "New Account",
+      "edit_title": "Edit Account",
+      "code": "Account Code *",
+      "name": "Account Name *",
+      "type": "Type *",
+      "category": "Category",
+      "parent": "Parent Account",
+      "description": "Description",
+      "save": "Save Account",
+      "cancel": "Cancel"
+    },
+    "types": {
+      "ASSET": "Asset",
+      "LIABILITY": "Liability",
+      "EQUITY": "Equity",
+      "INCOME": "Income",
+      "EXPENSE": "Expense"
+    },
+    "statuses": {
+      "inactive": "Inactive"
+    }
+  },
+  "am": {
+    "invoices": {
+      "title": "ደረሰኞች",
+      "subtitle": "የሽያጭ ደረሰኞች እና ግምቶች",
+      "add_btn": "አዲስ ደረሰኝ",
+      "no_invoices": "ምንም ደረሰኞች አልተገኙም",
+      "search_placeholder": "ደረሰኞችን ፈልግ...",
+      "stats": {
+        "billed": "ጠቅላላ የተከፈለ",
+        "paid": "የተከፈለ",
+        "overdue": "ጊዜው ያለፈ",
+        "draft": "ረቂቅ"
+      },
+      "status": {
+        "draft": "ረቂቅ",
+        "pending": "በመጠባበቅ ላይ",
+        "paid": "የተከፈለ",
+        "overdue": "ጊዜው ያለፈ",
+        "cancelled": "ተሰርዟል"
+      },
+      "table": {
+        "invoice_no": "የደረሰኝ ቁጥር",
+        "customer": "ደንበኛ",
+        "date": "ቀን",
+        "due_date": "መክፈያ ቀን",
+        "amount": "መጠን",
+        "status": "ሁኔታ",
+        "actions": "ድርጊቶች"
+      },
+      "modal": {
+        "add_title": "ደረሰኝ ፍጠር",
+        "edit_title": "ደረሰኝ አርትዕ",
+        "customer_name": "የደንበኛ ስም",
+        "invoice_date": "የደረሰኝ ቀን",
+        "due_date": "መክፈያ ቀን",
+        "items": "የንጥል ዝርዝሮች",
+        "add_item": "ንጥል ጨምር",
+        "subtotal": "ጠቅላላ ድምር",
+        "vat": "ቫት (15%)",
+        "drrf": "DRRF (5%)",
+        "total": "ጠቅላላ",
+        "notes": "ማስታወሻዎች",
+        "save_draft": "እንደ ረቂቅ አስቀምጥ",
+        "save_send": "አስቀምጥ እና ላክ",
+        "cancel": "ሰርዝ"
+      },
+      "actions": {
+        "send": "ላክ",
+        "download": "PDF አውርድ",
+        "share": "ሊንክ አጋራ",
+        "duplicate": "ቅጂ ፍጠር",
+        "credit_note": "የክሬዲት ማስታወሻ ፍጠር",
+        "record_payment": "ክፍያ መዝግብ",
+        "send_reminder": "ማሳሰቢያ ላክ",
+        "mark_paid": "እንደ ተከፈለ ምልክት አድርግ",
+        "cancel": "ደረሰኝ ሰርዝ"
+      },
+      "qr_modal": {
+        "title": "የደረሰኝ QR ኮድ",
+        "invoice": "ደረሰኝ",
+        "customer": "ደንበኛ",
+        "total": "ጠቅላላ",
+        "standard": "የኢ.ር.ካ ደረጃ",
+        "compliant": "ታክስ ተገዢ",
+        "scan_hint": "ለማረጋገጥ ስካን ያድርጉ",
+        "print": "አትም",
+        "nbr_iqr": "NBE-IQR ቅርጸት"
+      },
+      "payment": {
+        "title": "ክፍያ መዝግብ",
+        "amount": "የክፍያ መጠን",
+        "date": "የክፍያ ቀን",
+        "method": "የክፍያ ዘዴ",
+        "reference": "ማጣቀሻ",
+        "notes": "ማስታወሻዎች",
+        "partial": "ከፊል ክፍያ",
+        "full": "ሙሉ ክፍያ",
+        "methods": {
+          "cash": "ጥሬ ገንዘብ",
+          "bank_transfer": "የባንክ ዝውውር",
+          "telecom": "ቴሌብር",
+          "cheque": "ቼክ",
+          "mobile_banking": "የሞባይል ባንክ",
+          "credit_card": "ክሬዲት ካርድ"
+        }
+      }
+    },
+    "bills": {
+      "title": "ሂሳቦች",
+      "subtitle": "የአቅራቢ ሂሳቦች እና ወጪዎች",
+      "add_btn": "ሂሳብ ጨምር",
+      "no_bills": "ምንም ሂሳቦች አልተገኙም",
+      "search_placeholder": "ሂሳቦችን ፈልግ...",
+      "stats": {
+        "expenses": "ጠቅላላ ወጪዎች",
+        "paid": "የተከፈለ",
+        "pending": "በመጠባበቅ ላይ",
+        "vendors": "አቅራቢዎች"
+      },
+      "table": {
+        "bill_no": "የሂሳብ ቁጥር",
+        "vendor": "አቅራቢ",
+        "date": "ቀን",
+        "due_date": "መክፈያ ቀን",
+        "amount": "መጠን",
+        "status": "ሁኔታ",
+        "actions": "ድርጊቶች"
+      }
+    },
+    "items": {
+      "title": "እቃዎች እና ክምችት",
+      "subtitle": "ምርቶች እና አገልግሎቶች",
+      "add_btn": "እቃ ጨምር",
+      "no_items": "ምንም እቃዎች አልተገኙም",
+      "search_placeholder": "እቃዎችን ፈልግ...",
+      "stats": {
+        "total": "ጠቅላላ እቃዎች",
+        "value": "ጠቅላላ ዋጋ",
+        "low_stock": "አነስተኛ ክምችት",
+        "categories": "ምድቦች"
+      },
+      "table": {
+        "info": "እቃ",
+        "sku": "SKU",
+        "category": "ምድብ",
+        "price": "ዋጋ",
+        "stock": "ክምችት",
+        "actions": "ድርጊቶች"
+      },
+      "modal": {
+        "add_title": "እቃ ጨምር",
+        "edit_title": "እቃ አርትዕ",
+        "name": "የእቃ ስም",
+        "description": "መግለጫ",
+        "sku": "SKU",
+        "category": "ምድብ",
+        "unit_price": "የአሃድ ዋጋ",
+        "cost_price": "የወጪ ዋጋ",
+        "track_inventory": "ክምችት ተከታተል",
+        "stock_quantity": "የክምችት መጠን",
+        "reorder_level": "ዳግም ማዘዣ ደረጃ",
+        "unit": "የመለኪያ አሃድ",
+        "tax_rate": "የታክስ መጠን"
+      }
+    },
+    "coa": {
+      "title": "የሂሳብ መደቦች ዝርዝር",
+      "accounts_count_one": "1 መደብ",
+      "accounts_count_other": "{{count}} መደቦች",
+      "search_placeholder": "መደቦችን ፈልግ...",
+      "add_btn": "አዲስ መደብ",
+      "no_accounts": "ምንም መደቦች የሉም",
+      "no_accounts_hint": "ጆርናል ለመመዝገብ እና የፋይናንስ ሪፖርቶችን ለማውጣት የሂሳብ መደቦችን ዝርዝር ያዘጋጁ።",
+      "seed_btn": "መደበኛ ዝርዝር አስገባ",
+      "create_manually_btn": "በእጅ ፍጠር",
+      "modal": {
+        "add_title": "አዲስ መደብ",
+        "edit_title": "መደብ አርትዕ",
+        "code": "የመደብ ኮድ *",
+        "name": "የመደብ ስም *",
+        "type": "ዓይነት *",
+        "category": "ምድብ",
+        "parent": "ዋና መደብ",
+        "description": "መግለጫ",
+        "save": "መደቡን አስቀምጥ",
+        "cancel": "ሰርዝ"
+      },
+      "types": {
+        "ASSET": "ሀብት",
+        "LIABILITY": "ዕዳ",
+        "EQUITY": "ካፒታል",
+        "INCOME": "ገቢ",
+        "EXPENSE": "ወጪ"
+      },
+      "statuses": {
+        "inactive": "ንቁ ያልሆነ"
+      }
+    }
+  },
+  "ti": {
+    "invoices": {
+      "title": "ደረሰኝታት",
+      "subtitle": "ናይ ሽያጥ ደረሰኝታትን ግምታትን",
+      "add_btn": "ሓድሽ ደረሰኝ",
+      "no_invoices": "ደረሰኝታት ኣይተረኽቡን",
+      "search_placeholder": "ደረሰኝታት ድለ...",
+      "stats": {
+        "billed": "ጠቕላላ ዝተኸፈለ",
+        "paid": "ዝተኸፈለ",
+        "overdue": "ግዜኡ ዝሓለፈ",
+        "draft": "ረቂቕ"
+      },
+      "status": {
+        "draft": "ረቂቕ",
+        "pending": "ብምጽባይ ላይ",
+        "paid": "ዝተኸፈለ",
+        "overdue": "ግዜኡ ዝሓለፈ",
+        "cancelled": "ተሰሪዙ"
+      },
+      "table": {
+        "invoice_no": "ቁጽሪ ደረሰኝ",
+        "customer": "ዓሚል",
+        "date": "ዕለት",
+        "due_date": "መክፈሊ ዕለት",
+        "amount": "መጠን",
+        "status": "ኩነታት",
+        "actions": "ተግባራት"
+      },
+      "modal": {
+        "add_title": "ደረሰኝ ፍጠር",
+        "edit_title": "ደረሰኝ ኣርትዕ",
+        "customer_name": "ስም ዓሚል",
+        "invoice_date": "ዕለት ደረሰኝ",
+        "due_date": "መክፈሊ ዕለት",
+        "items": "ዝርዝር ንጥልታት",
+        "add_item": "ንጥል ወስኽ",
+        "subtotal": "ጠቕላላ ድምር",
+        "vat": "ቫት (15%)",
+        "drrf": "DRRF (5%)",
+        "total": "ጠቕላላ",
+        "notes": "መዘክርታት",
+        "save_draft": "ከም ረቂቕ ኣቐምጥ",
+        "save_send": "ኣቐምጥን ስደድን",
+        "cancel": "ሰርዝ"
+      },
+      "actions": {
+        "send": "ስደድ",
+        "download": "PDF ኣውርድ",
+        "share": "ሊንክ ኣካፍል",
+        "duplicate": "ቅዳሕ ፍጠር",
+        "credit_note": "ናይ ክሬዲት መዘክር ፍጠር",
+        "record_payment": "ክፍሊት መዝግብ",
+        "send_reminder": "መዘካከሪ ስደድ",
+        "mark_paid": "ከም ዝተኸፈለ ምልክት ግበር",
+        "cancel": "ደረሰኝ ሰርዝ"
+      },
+      "qr_modal": {
+        "title": "ናይ ደረሰኝ QR ኮድ",
+        "invoice": "ደረሰኝ",
+        "customer": "ዓሚል",
+        "total": "ጠቕላላ",
+        "standard": "ናይ ኢ.ር.ካ ደረጃ",
+        "compliant": "ቀረጥ ተገዛኢ",
+        "scan_hint": "ንምርግጋጽ ስካን ግበር",
+        "print": "ሕተም",
+        "nbr_iqr": "NBE-IQR ቅርጺ"
+      },
+      "payment": {
+        "title": "ክፍሊት መዝግብ",
+        "amount": "መጠን ክፍሊት",
+        "date": "ዕለት ክፍሊት",
+        "method": "ዓይነት ክፍሊት",
+        "reference": "መወከሲ",
+        "notes": "መዘክርታት",
+        "partial": "ከፊል ክፍሊት",
+        "full": "ምሉእ ክፍሊት",
+        "methods": {
+          "cash": "ጥረ ገንዘብ",
+          "bank_transfer": "ናይ ባንክ ምልውዋጥ",
+          "telecom": "ተለቢር",
+          "cheque": "ቼክ",
+          "mobile_banking": "ናይ ሞባይል ባንክ",
+          "credit_card": "ክሬዲት ካርድ"
+        }
+      }
+    },
+    "bills": {
+      "title": "ሕሳባት",
+      "subtitle": "ናይ ኣቕራቢ ሕሳባትን ወጻኢታትን",
+      "add_btn": "ሕሳብ ወስኽ",
+      "no_bills": "ሕሳባት ኣይተረኽቡን",
+      "search_placeholder": "ሕሳባት ድለ...",
+      "stats": {
+        "expenses": "ጠቕላላ ወጻኢታት",
+        "paid": "ዝተኸፈለ",
+        "pending": "ብምጽባይ ላይ",
+        "vendors": "ኣቕረብቲ"
+      },
+      "table": {
+        "bill_no": "ቁጽሪ ሕሳብ",
+        "vendor": "ኣቕራቢ",
+        "date": "ዕለት",
+        "due_date": "መክፈሊ ዕለት",
+        "amount": "መጠን",
+        "status": "ኩነታት",
+        "actions": "ተግባራት"
+      }
+    },
+    "items": {
+      "title": "ዕቃታትን ክምዕትን",
+      "subtitle": "ፍርያትን ኣገልግሎታትን",
+      "add_btn": "ዕቃ ወስኽ",
+      "no_items": "ዕቃታት ኣይተረኽቡን",
+      "search_placeholder": "ዕቃታት ድለ...",
+      "stats": {
+        "total": "ጠቕላላ ዕቃታት",
+        "value": "ጠቕላላ ዋጋ",
+        "low_stock": "ውሑድ ክምዕት",
+        "categories": "ምድባት"
+      },
+      "table": {
+        "info": "ዕቃ",
+        "sku": "SKU",
+        "category": "ምድብ",
+        "price": "ዋጋ",
+        "stock": "ክምዕት",
+        "actions": "ተግባራት"
+      },
+      "modal": {
+        "add_title": "ዕቃ ወስኽ",
+        "edit_title": "ዕቃ ኣርትዕ",
+        "name": "ስም ዕቃ",
+        "description": "መግለጺ",
+        "sku": "SKU",
+        "category": "ምድብ",
+        "unit_price": "ናይ ሓደ ዋጋ",
+        "cost_price": "ናይ ወጻኢ ዋጋ",
+        "track_inventory": "ክምዕት ተከታተል",
+        "stock_quantity": "መጠን ክምዕት",
+        "reorder_level": "ደረጃ ዳግም ትእዛዝ",
+        "unit": "መዐቀኒ ኣሃዱ",
+        "tax_rate": "ዓቐን ቀረጽ"
+      }
+    },
+    "coa": {
+      "title": "ዝርዝር መደባት ሕሳብ",
+      "accounts_count_one": "1 መደብ",
+      "accounts_count_other": "{{count}} መደባት",
+      "search_placeholder": "መደባት ድለ...",
+      "add_btn": "ሓድሽ መደብ",
+      "no_accounts": "መደባት ሕሳብ የለዉን",
+      "no_accounts_hint": "ጆርናል ንምምዝጋብን ናይ ፋይናንስ ጸብጻባት ንምውጻእን ዝርዝር መደባት ሕሳብ የዳልዉ።",
+      "seed_btn": "ስሩዕ ዝርዝር ኣእቱ",
+      "create_manually_btn": "ብኢድ ፍጠር",
+      "modal": {
+        "add_title": "ሓድሽ መደብ",
+        "edit_title": "መደብ ኣርትዕ",
+        "code": "ኮድ መደብ *",
+        "name": "ስም መደብ *",
+        "type": "ዓይነት *",
+        "category": "ምድብ",
+        "parent": "ቀንዲ መደብ",
+        "description": "መግለጺ",
+        "save": "መደብ ኣቐምጥ",
+        "cancel": "ሰርዝ"
+      },
+      "types": {
+        "ASSET": "ሃብቲ",
+        "LIABILITY": "ዕዳ",
+        "EQUITY": "ካፒታል",
+        "INCOME": "እቶት",
+        "EXPENSE": "ወጻኢ"
+      },
+      "statuses": {
+        "inactive": "ንጥፉ ዝኾነ"
+      }
+    }
+  }
+}

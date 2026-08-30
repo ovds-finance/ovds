@@ -1,0 +1,66 @@
+{
+  "success": {
+    "save": "Changes saved successfully",
+    "delete": "Item deleted",
+    "updated": "Updated successfully",
+    "created": "Item created",
+    "all_read": "All marked as read",
+    "exported": "Data exported"
+  },
+  "error": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "load": "Failed to load data",
+    "save": "Failed to save changes",
+    "delete": "Failed to delete item",
+    "validation": "Please fix the errors above"
+  },
+  "warning": {
+    "unsaved": "You have unsaved changes. Leave anyway?",
+    "confirm": "Are you sure?"
+  },
+  "am": {
+    "success": {
+      "save": "ለውጦች በተሳካ ሁኔታ ተቀምጠዋል",
+      "delete": "ንጥሉ ተሰርዟል",
+      "updated": "በተሳካ ሁኔታ ተዘምኗል",
+      "created": "ንጥሉ ተፈጥሯል",
+      "all_read": "ሁሉም እንደተነበበ ምልክት ተደርጓል",
+      "exported": "ዳታ ወደ ውጭ ተልኳል"
+    },
+    "error": {
+      "generic": "ችግር ተፈጥሯል። እንደገና ይሞክሩ።",
+      "network": "የኔትወርክ ስህተት። ግንኙነትዎን ያረጋግጡ።",
+      "load": "ዳታ መጫን አልተሳካም",
+      "save": "ለውጦችን ማስቀመጥ አልተሳካም",
+      "delete": "ንጥሉን መሰረዝ አልተሳካም",
+      "validation": "እባክዎ ከላይ ያሉትን ስህተቶች ያስተካክሉ"
+    },
+    "warning": {
+      "unsaved": "ያልተቀመጡ ለውጦች አሉዎት። ይውጡ?",
+      "confirm": "እርግጠኛ ነዎት?"
+    }
+  },
+  "ti": {
+    "success": {
+      "save": "ለውጢ ብዓወት ተቐሚጡ",
+      "delete": "ንጥሉ ተሰሪዙ",
+      "updated": "ብዓወት ተዘምኑ",
+      "created": "ንጥሉ ተፈጢሩ",
+      "all_read": "ኩሎም ከም ዝተነበቡ ምልክት ተገይሩ",
+      "exported": "ዳታ ናብ ወጻኢ ወጺኡ"
+    },
+    "error": {
+      "generic": "ጸገም ተፈጢሩ። ደጊምካ ፈትን።",
+      "network": "ናይ ኔትወርክ ጌጋ። ምትእስሳርካ ኣረጋግጽ።",
+      "load": "ዳታ ምጽዓን ኣይተሳኸዐን",
+      "save": "ለውጢ ምቕማጥ ኣይተሳኸዐን",
+      "delete": "ንጥሉ ምሰራዝ ኣይተሳኸዐን",
+      "validation": "በጃኻ ኣብ ላዕሊ ዘለዉ ጌጋታት ኣስተካኽሎ"
+    },
+    "warning": {
+      "unsaved": "ዘይተቐምጡ ለውጢ ኣለዉ። ወጻእ?",
+      "confirm": "ርግጸኛ ዲኻ?"
+    }
+  }
+}

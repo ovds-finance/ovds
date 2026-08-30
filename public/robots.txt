@@ -1,0 +1,26 @@
+# OVDS Robots.txt
+# https://www.ovds.et
+
+User-agent: *
+Allow: /api/health
+Allow: /api/health/live
+Allow: /api/health/ready
+Disallow: /api/
+Disallow: /auth/
+Disallow: /settings/
+Disallow: /admin/
+Disallow: /.env*
+Disallow: /node_modules/
+Disallow: /src/
+Disallow: /dist/
+Disallow: /test/
+Disallow: /coverage/
+Disallow: /*.ts
+Disallow: /*.js.map
+Disallow: /debug
+Disallow: /metrics
+Disallow: /swagger
+Disallow: /api/docs
+
+# Sitemap
+Sitemap: https://www.ovds.et/sitemap.xml

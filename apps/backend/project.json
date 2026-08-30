@@ -1,0 +1,128 @@
+{
+  "name": "backend",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "root": "apps/backend",
+  "sourceRoot": "apps/backend/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/apps/backend/dist"],
+      "options": {
+        "command": "node ../../scripts/bin-run.mjs @nestjs/cli/bin/nest build --builder swc",
+        "cwd": "apps/backend"
+      },
+      "configurations": {
+        "production": {
+          "command": "node ../../scripts/bin-run.mjs @nestjs/cli/bin/nest build --builder swc"
+        }
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node ../../scripts/bin-run.mjs --max-old-space-size=4096 typescript/bin/tsc --noEmit -p tsconfig.json",
+        "cwd": "apps/backend"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run lint",
+        "cwd": "apps/backend"
+      },
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run test",
+        "cwd": "apps/backend"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx nest start --watch --builder swc",
+        "cwd": "apps/backend",
+        "env": {
+          "NODE_OPTIONS": "--max-old-space-size=2048"
+        }
+      }
+    },
+    "db:push": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx prisma db push",
+        "cwd": "apps/backend"
+      }
+    },
+    "migrate:deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx prisma migrate deploy",
+        "cwd": "apps/backend"
+      }
+    },
+    "db:studio": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx prisma studio",
+        "cwd": "apps/backend"
+      }
+    },
+    "seed": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx prisma db seed",
+        "cwd": "apps/backend"
+      }
+    },
+    "bundle-analyze": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node scripts/bundle-analyze.mjs --output .reports/bundle",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "dep-check": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node scripts/dep-check.mjs --output .reports/deps",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "size-check": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node scripts/size-check.mjs --output .reports/bundle",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "optimize": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node scripts/bundle-analyze.mjs --output .reports/bundle && node scripts/size-check.mjs --output .reports/bundle && node scripts/dep-check.mjs --output .reports/deps && node scripts/optimize-report.mjs --output .reports",
+        "cwd": "{workspaceRoot}"
+      }
+    }
+  },
+  "tags": ["scope:backend", "type:app"]
+}

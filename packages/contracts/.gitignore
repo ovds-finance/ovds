@@ -1,0 +1,6 @@
+# Build artifacts that must never be committed in src/
+src/**/*.d.ts
+src/**/*.d.ts.map
+src/**/*.js
+src/**/*.js.map
+src/**/*.tsbuildinfo

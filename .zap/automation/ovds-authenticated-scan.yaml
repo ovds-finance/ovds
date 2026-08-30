@@ -1,0 +1,94 @@
+env:
+  contexts:
+    - name: OVDS
+      urls:
+        - http://localhost:3000/.*
+        - http://localhost:3001/.*
+      includePaths:
+        - http://localhost:3000/.*
+        - http://localhost:3001/.*
+      excludePaths:
+        - http://localhost:3000/logout.*
+        - http://localhost:3001/api/auth/logout.*
+        - http://localhost:3000/auth/logout.*
+        - http://localhost:3001/api/auth/forgot-password.*
+        - http://localhost:3000/forgot-password.*
+        - http://localhost:3001/api/auth/reset-password.*
+        - http://localhost:3000/reset-password.*
+        - http://localhost:3001/api/auth/register.*
+        - http://localhost:3000/register.*
+        - http://localhost:3001/api/notifications/send.*
+        - http://localhost:3001/api/payment/submit.*
+        - http://localhost:3001/api/admin/database-reset.*
+        - http://localhost:3001/api/admin/purge.*
+      authentication:
+        method: form
+        parameters:
+          loginUrl: http://localhost:3001/api/auth/login
+          loginPostData: email={%username%}&password={%password%}
+          loggedInRegex: '"success":\s*true'
+          loggedOutRegex: '"success":\s*false|Invalid credentials|401|Unauthorized'
+      users:
+        - name: normal_user
+          enabled: true
+          credentials:
+            username: scanner.user@ovds.local
+            password: ZapScan#2024!Strong
+        - name: admin_user
+          enabled: true
+          credentials:
+            username: scanner.admin@ovds.local
+            password: ZapRoot#2024!Secure
+
+  parameters:
+    failOnError: true
+    failOnWarning: false
+    progressToStdout: true
+
+  jobs:
+    - type: passiveScan-config
+      parameters:
+        config:
+          maxAlertsPerRule: 10
+
+    - type: spider
+      parameters:
+        context: OVDS
+        user: normal_user
+        maxDepth: 10
+        maxChildren: 5
+        threadCount: 4
+
+    - type: spiderAjax
+      parameters:
+        context: OVDS
+        user: normal_user
+        maxDepth: 10
+        maxChildren: 5
+        threadCount: 4
+
+    - type: passiveScan-wait
+      parameters:
+        maxDuration: 60
+
+    - type: activeScan
+      parameters:
+        context: OVDS
+        user: normal_user
+        policy: ovds-scan-policy
+        maxScanDuration: 60
+        maxRuleDuration: 30
+        maxThreadsPerHost: 4
+        delayBetweenRequests: 0
+
+    - type: report
+      parameters:
+        template: traditional-html
+        reportDir: /zap/wrk/
+        reportFile: zap-authenticated-report.html
+
+    - type: report
+      parameters:
+        template: traditional-json
+        reportDir: /zap/wrk/
+        reportFile: zap-authenticated-report.json

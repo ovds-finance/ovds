@@ -1,0 +1,29 @@
+{
+  "name": "@ovds/ovds",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "source": "./src/index.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "node ../../../scripts/bin-run.mjs typescript/bin/tsc --build",
+    "build:clean": "node ../../../scripts/bin-run.mjs typescript/bin/tsc --build --clean && node ../../../scripts/bin-run.mjs typescript/bin/tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ovds/core": "*",
+    "@ovds/shared": "*",
+    "@ovds/database": "*"
+  }
+}

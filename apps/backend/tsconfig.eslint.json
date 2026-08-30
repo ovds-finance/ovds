@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Override workspace package paths to use built dist artifacts.
+    // This prevents ESLint's TypeScript parser from loading all package
+    // source trees transitively, keeping lint fast.
+    "paths": {
+      "@common/*":             ["src/common/*"],
+      "@common/dto/*":         ["src/common/dto/*"],
+      "@common/interfaces/*":  ["src/common/interfaces/*"],
+      "@ovds/design-system":   ["../../packages/design-system/dist/index.js"],
+      "@ovds/design-system/*": ["../../packages/design-system/dist/*"],
+      "@ovds/shared":          ["../../packages/shared/dist/index.js"],
+      "@ovds/shared/*":        ["../../packages/shared/dist/*"],
+      "@ovds/database":        ["../../packages/database/dist/index.js"],
+      "@ovds/database/*":      ["../../packages/database/dist/*"],
+      "@ovds/dto":             ["../../packages/shared/dto/dist/index.js"],
+      "@ovds/dto/*":           ["../../packages/shared/dto/dist/*"]
+    }
+  },
+  "include": ["src", "test"]
+}

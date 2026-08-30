@@ -1,0 +1,56 @@
+{
+  "name": "features-currency",
+  "root": "packages/features/currency",
+  "sourceRoot": "packages/features/currency/src",
+  "projectType": "library",
+  "tags": [
+    "scope:frontend",
+    "type:lib",
+    "type:feature",
+    "feature:currency"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "packages/features/currency"
+      },
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run typecheck",
+        "cwd": "packages/features/currency"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run test",
+        "cwd": "packages/features/currency"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    }
+  }
+}

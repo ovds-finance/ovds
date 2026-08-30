@@ -1,0 +1,7 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "packages/shared/*"
+  - "packages/modules/*"
+  - "packages/domains/*"
+  - "packages/features/*"

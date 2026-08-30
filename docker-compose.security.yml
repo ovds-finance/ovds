@@ -1,0 +1,51 @@
+##############################################################################
+# docker-compose.security.yml
+#
+# Dedicated security testing stack for OVDS.
+# Spins up the application stack alongside OWASP ZAP for scanning.
+#
+# Usage:
+#   docker compose -f docker-compose.ovds.yml -f docker-compose.security.yml up -d
+#   docker compose -f docker-compose.ovds.yml -f docker-compose.security.yml ps
+#   docker compose -f docker-compose.ovds.yml -f docker-compose.security.yml down -v
+##############################################################################
+
+services:
+  zap:
+    build:
+      context: .
+      dockerfile: infra/zap/Dockerfile
+    container_name: ovds-zap
+    ports:
+      - "8080:8080"
+      - "8090:8090"
+    volumes:
+      - ./:/zap/wrk/:rw
+      - zap_data:/zap/wrk/.zap
+    environment:
+      - ZAP_API_KEY=${ZAP_API_KEY:-ovds-zap-secret}
+      - ZAP_PORT=8080
+      - INIT_SESSION=true
+      - TZ=Africa/Addis_Ababa
+    depends_on:
+      mysql:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    networks:
+      - ovds-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/JSON/core/view/version/?apikey=${ZAP_API_KEY:-ovds-zap-secret}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+volumes:
+  zap_data:
+    driver: local
+
+networks:
+  ovds-network:
+    driver: bridge

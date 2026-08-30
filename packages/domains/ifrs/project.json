@@ -1,0 +1,56 @@
+{
+  "name": "domains-ifrs",
+  "root": "packages/domains/ifrs",
+  "sourceRoot": "packages/domains/ifrs/src",
+  "projectType": "library",
+  "tags": [
+    "scope:backend",
+    "type:lib",
+    "type:domain",
+    "domain:ifrs"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "packages/domains/ifrs"
+      },
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run typecheck",
+        "cwd": "packages/domains/ifrs"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run test",
+        "cwd": "packages/domains/ifrs"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    }
+  }
+}

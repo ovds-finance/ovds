@@ -1,0 +1,56 @@
+{
+  "name": "domains-general-ledger-compliance",
+  "root": "packages/domains/general-ledger-compliance",
+  "sourceRoot": "packages/domains/general-ledger-compliance/src",
+  "projectType": "library",
+  "tags": [
+    "scope:backend",
+    "type:lib",
+    "type:domain",
+    "domain:general-ledger-compliance"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "packages/domains/general-ledger-compliance"
+      },
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run typecheck",
+        "cwd": "packages/domains/general-ledger-compliance"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run test",
+        "cwd": "packages/domains/general-ledger-compliance"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    }
+  }
+}

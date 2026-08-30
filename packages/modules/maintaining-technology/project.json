@@ -1,0 +1,45 @@
+{
+  "name": "maintaining-technology",
+  "root": "packages/modules/maintaining-technology",
+  "sourceRoot": "packages/modules/maintaining-technology/src",
+  "projectType": "library",
+  "tags": [
+    "type:lib",
+    "type:module",
+    "domain:maintaining-technology"
+  ],
+  "implicitDependencies": [
+    "core"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "packages/modules/maintaining-technology"
+      },
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run typecheck",
+        "cwd": "packages/modules/maintaining-technology"
+      },
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    }
+  }
+}

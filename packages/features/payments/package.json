@@ -1,0 +1,19 @@
+{
+  "name": "@ovds/features-payments",
+  "version": "0.0.1",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@ovds/ui": "*",
+    "@ovds/shared": "*",
+    "@ovds/design-system": "*"
+  },
+  "devDependencies": {}
+}
+

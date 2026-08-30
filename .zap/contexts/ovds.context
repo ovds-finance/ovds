@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE context>
+<context version="1.0" name="OVDS" description="OVDS Application Security Testing Context">
+  <include>http://localhost:3000/.*</include>
+  <include>http://localhost:3001/.*</include>
+  <exclude>http://localhost:3000/logout.*</exclude>
+  <exclude>http://localhost:3001/api/auth/logout.*</exclude>
+  <exclude>http://localhost:3000/auth/logout.*</exclude>
+  <exclude>http://localhost:3001/api/auth/forgot-password.*</exclude>
+  <exclude>http://localhost:3000/forgot-password.*</exclude>
+  <exclude>http://localhost:3001/api/auth/reset-password.*</exclude>
+  <exclude>http://localhost:3000/reset-password.*</exclude>
+  <exclude>http://localhost:3001/api/auth/register.*</exclude>
+  <exclude>http://localhost:3000/register.*</exclude>
+  <exclude>http://localhost:3001/api/notifications/send.*</exclude>
+  <exclude>http://localhost:3001/api/payment/submit.*</exclude>
+  <exclude>http://localhost:3001/api/admin/database-reset.*</exclude>
+  <exclude>http://localhost:3001/api/admin/purge.*</exclude>
+  <technology>JavaScript</technology>
+  <technology>Json</technology>
+  <technology>Nginx</technology>
+  <technology>NodeJS</technology>
+  <technology>Rest</technology>
+  <technology>WebSocket</technology>
+  <authentication method="form" url="http://localhost:3001/api/auth/login" 
+                 postData="email={%username%}&password={%password%}"
+                 loggedInIndicator="\"success\":\s*true" 
+                 loggedOutIndicator="Invalid credentials|401|Unauthorized|\"success\":\s*false">
+  </authentication>
+  <users>
+    <user name="normal_user" enabled="true">
+      <credentials username="scanner.user@ovds.local" password="ZapScan#2024!Strong">
+      </credentials>
+    </user>
+    <user name="admin_user" enabled="true">
+      <credentials username="scanner.admin@ovds.local" password="ZapRoot#2024!Secure">
+      </credentials>
+    </user>
+  </users>
+</context>

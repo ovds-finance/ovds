@@ -1,0 +1,56 @@
+{
+  "name": "domains-audit-outsourcing",
+  "root": "packages/domains/audit-outsourcing",
+  "sourceRoot": "packages/domains/audit-outsourcing/src",
+  "projectType": "library",
+  "tags": [
+    "scope:backend",
+    "type:lib",
+    "type:domain",
+    "domain:audit-outsourcing"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "packages/domains/audit-outsourcing"
+      },
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run typecheck",
+        "cwd": "packages/domains/audit-outsourcing"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run test",
+        "cwd": "packages/domains/audit-outsourcing"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    }
+  }
+}

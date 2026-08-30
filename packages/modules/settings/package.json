@@ -1,0 +1,43 @@
+{
+  "name": "@ovds/modules-settings",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "source": "./src/index.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./web": {
+      "source": "./src/web/index.ts",
+      "import": "./dist/web/index.js",
+      "types": "./dist/web/index.d.ts"
+    },
+    "./domain": {
+      "source": "./src/domain/index.ts",
+      "import": "./dist/domain/index.js",
+      "types": "./dist/domain/index.d.ts"
+    },
+    "./dto": {
+      "source": "./src/dto/index.ts",
+      "import": "./dist/dto/index.js",
+      "types": "./dist/dto/index.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@ovds/features-settings": "*",
+    "@ovds/core": "*",
+    "@ovds/shared": "*"
+  },
+  "devDependencies": {}
+}

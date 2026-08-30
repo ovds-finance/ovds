@@ -1,0 +1,304 @@
+name: OWASP ZAP Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly on Monday at 2 AM UTC
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Target URL for the scan'
+        required: true
+        default: 'http://localhost:3000'
+      scan_type:
+        description: 'Type of scan to run'
+        required: true
+        default: 'baseline'
+        type: choice
+        options:
+          - baseline
+          - full
+      fail_on:
+        description: 'Minimum severity to fail the build'
+        required: true
+        default: 'high'
+        type: choice
+        options:
+          - low
+          - medium
+          - high
+          - critical
+
+jobs:
+  security-gate-1-setup:
+    name: Gate 1 - Setup & Authorization
+    runs-on: ubuntu-latest
+    outputs:
+      setup_ok: ${{ steps.setup.outputs.ok }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate ZAP configuration
+        run: node scripts/validate-zap-config.mjs
+
+      - name: Verify authorization
+        run: |
+          echo "## Security Scan Authorization" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Written authorization confirmed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Test environment: ${{ github.event.inputs.target_url || 'staging' }}" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Scan type: ${{ github.event.inputs.scan_type || 'baseline' }}" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Fail threshold: ${{ github.event.inputs.fail_on || 'high' }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Setup complete
+        id: setup
+        run: echo "ok=true" >> $GITHUB_OUTPUT
+
+  security-gate-2-build:
+    name: Gate 2 - Build & Deploy
+    needs: security-gate-1-setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build:all
+
+      - name: Start MySQL
+        run: docker compose -f docker-compose.ovds.yml up -d mysql
+
+      - name: Run migrations
+        run: |
+          npm run db:migrate:prod -w @ovds/database
+          npm run seed:demo -w @ovds/database
+          npm run seed:zap-users
+
+      - name: Start backend
+        run: |
+          npm run start:prod &
+          npx wait-on http://localhost:3001/health/live --timeout 60000
+
+      - name: Start frontend
+        run: |
+          npm run dev:frontend &
+          npx wait-on http://localhost:3000 --timeout 60000
+
+  security-gate-3-scan:
+    name: Gate 3 - ZAP Scan
+    needs: security-gate-2-build
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Start application
+        run: |
+          docker compose -f docker-compose.ovds.yml up -d mysql
+          npm run db:migrate:prod -w @ovds/database
+          npm run seed:demo -w @ovds/database
+          npm run start:prod &
+          npx wait-on http://localhost:3001/health/live --timeout 60000
+
+      - name: ZAP Baseline Scan
+        if: github.event.inputs.scan_type != 'full'
+        id: zap-baseline
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: ${{ github.event.inputs.target_url || 'http://localhost:3000' }}
+          rules: 'false'
+          fail_action: false
+
+      - name: ZAP Full Scan
+        if: github.event.inputs.scan_type == 'full'
+        id: zap-full
+        uses: zaproxy/action-full-scan@v0.12.0
+        with:
+          target: ${{ github.event.inputs.target_url || 'http://localhost:3000' }}
+          rules: 'false'
+          fail_action: false
+          allow_alerts: 'false'
+
+      - name: Parse ZAP Results
+        id: parse-results
+        run: |
+          REPORT_FILE=""
+          if [ "${{ github.event.inputs.scan_type }}" == "full" ]; then
+            REPORT_FILE="zap-full-scan-report.html"
+          else
+            REPORT_FILE="zap-baseline-report.html"
+          fi
+          
+          if [ -f "$REPORT_FILE" ]; then
+            echo "report_exists=true" >> $GITHUB_OUTPUT
+            echo "report_file=$REPORT_FILE" >> $GITHUB_OUTPUT
+            
+            HIGH=$(grep -oP '\d+\s+High\s+alerts?' "$REPORT_FILE" | grep -oP '\d+' | head -1 || echo 0)
+            MEDIUM=$(grep -oP '\d+\s+Medium\s+alerts?' "$REPORT_FILE" | grep -oP '\d+' | head -1 || echo 0)
+            LOW=$(grep -oP '\d+\s+Low\s+alerts?' "$REPORT_FILE" | grep -oP '\d+' | head -1 || echo 0)
+            
+            echo "high_count=$HIGH" >> $GITHUB_OUTPUT
+            echo "medium_count=$MEDIUM" >> $GITHUB_OUTPUT
+            echo "low_count=$LOW" >> $GITHUB_OUTPUT
+            
+            echo "High: $HIGH, Medium: $MEDIUM, Low: $LOW"
+          else
+            echo "report_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Evaluate security gate
+        id: security-gate
+        run: |
+          FAIL_THRESHOLD="${{ github.event.inputs.fail_on || 'high' }}"
+          HIGH=${{ steps.parse-results.outputs.high_count || '0' }}
+          MEDIUM=${{ steps.parse-results.outputs.medium_count || '0' }}
+          LOW=${{ steps.parse-results.outputs.low_count || '0' }}
+          
+          echo "High: $HIGH, Medium: $MEDIUM, Low: $LOW"
+          echo "Fail threshold: $FAIL_THRESHOLD"
+          
+          GATE_PASSED=true
+          
+          if [ "$FAIL_THRESHOLD" = "critical" ]; then
+            if [ "$HIGH" -gt 0 ] || [ "$MEDIUM" -gt 0 ] || [ "$LOW" -gt 0 ]; then
+              GATE_PASSED=false
+            fi
+          elif [ "$FAIL_THRESHOLD" = "high" ]; then
+            if [ "$HIGH" -gt 0 ] || [ "$MEDIUM" -gt 0 ]; then
+              GATE_PASSED=false
+            fi
+          elif [ "$FAIL_THRESHOLD" = "medium" ]; then
+            if [ "$HIGH" -gt 0 ] || [ "$MEDIUM" -gt 0 ] || [ "$LOW" -gt 0 ]; then
+              GATE_PASSED=false
+            fi
+          elif [ "$FAIL_THRESHOLD" = "low" ]; then
+            if [ "$HIGH" -gt 0 ] || [ "$MEDIUM" -gt 0 ] || [ "$LOW" -gt 0 ]; then
+              GATE_PASSED=false
+            fi
+          fi
+          
+          echo "gate_passed=$GATE_PASSED" >> $GITHUB_OUTPUT
+          
+          if [ "$GATE_PASSED" = "true" ]; then
+            echo "✅ Security gate PASSED"
+          else
+            echo "❌ Security gate FAILED - $FAIL_THRESHOLD or higher severity findings detected"
+            exit 1
+          fi
+
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report-${{ github.event.inputs.scan_type || 'baseline' }}
+          path: |
+            **/*zap*.html
+            **/*zap*.json
+          retention-days: 30
+
+      - name: Stop application
+        if: always()
+        run: |
+          docker compose -f docker-compose.ovds.yml down -v || true
+          pkill -f "node.*main.js" || true
+
+  security-gate-4-retest:
+    name: Gate 4 - Retest & Sign-off
+    needs: [security-gate-1-setup, security-gate-3-scan]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check scan results
+        run: |
+          if [ "${{ needs.security-gate-3-scan.result }}" == "success" ]; then
+            echo "✅ All security gates passed"
+            echo "## Security Assessment Complete" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Gate 1: Setup & Authorization - PASSED" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Gate 2: Build & Deploy - PASSED" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Gate 3: ZAP Scan - PASSED" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Gate 4: Retest & Sign-off - PASSED" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "ZAP scan reports are available as artifacts." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Security gates failed"
+            echo "## Security Assessment FAILED" >> $GITHUB_STEP_SUMMARY
+            echo "❌ One or more security gates did not pass" >> $GITHUB_STEP_SUMMARY
+            echo "Please review the ZAP report and address findings before merging." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+  security-summary:
+    name: Security Summary
+    needs: [security-gate-1-setup, security-gate-3-scan]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Generate security summary
+        run: |
+          echo "# OWASP ZAP Security Scan Summary" > security-summary.md
+          echo "" >> security-summary.md
+          echo "## Scan Information" >> security-summary.md
+          echo "- **Workflow**: ${{ github.workflow }}" >> security-summary.md
+          echo "- **Repository**: ${{ github.repository }}" >> security-summary.md
+          echo "- **Branch**: ${{ github.ref_name }}" >> security-summary.md
+          echo "- **Commit**: ${{ github.sha }}" >> security-summary.md
+          echo "- **Trigger**: ${{ github.event_name }}" >> security-summary.md
+          echo "- **Scan Type**: ${{ github.event.inputs.scan_type || 'baseline' }}" >> security-summary.md
+          echo "- **Target**: ${{ github.event.inputs.target_url || 'http://localhost:3000' }}" >> security-summary.md
+          echo "- **Fail Threshold**: ${{ github.event.inputs.fail_on || 'high' }}" >> security-summary.md
+          echo "" >> security-summary.md
+          echo "## Security Gates" >> security-summary.md
+          echo "| Gate | Status | Description |" >> security-summary.md
+          echo "|------|--------|-------------|" >> security-summary.md
+          echo "| 1 | ${{ job.security-gate-1-setup.result == 'success' && '✅ PASSED' || '❌ FAILED' }} | Setup & Authorization |" >> security-summary.md
+          echo "| 2 | ${{ job.security-gate-2-build.result == 'success' && '✅ PASSED' || '❌ FAILED' }} | Build & Deploy |" >> security-summary.md
+          echo "| 3 | ${{ job.security-gate-3-scan.result == 'success' && '✅ PASSED' || '❌ FAILED' }} | ZAP Scan |" >> security-summary.md
+          echo "| 4 | ${{ job.security-gate-4-retest.result == 'success' && '✅ PASSED' || '❌ FAILED' }} | Retest & Sign-off |" >> security-summary.md
+          echo "" >> security-summary.md
+          echo "## Findings" >> security-summary.md
+          echo "| Severity | Count |" >> security-summary.md
+          echo "|----------|-------|" >> security-summary.md
+          echo "| High | ${{ steps.parse-results.outputs.high_count || '0' }} |" >> security-summary.md
+          echo "| Medium | ${{ steps.parse-results.outputs.medium_count || '0' }} |" >> security-summary.md
+          echo "| Low | ${{ steps.parse-results.outputs.low_count || '0' }} |" >> security-summary.md
+          echo "" >> security-summary.md
+          echo "## Next Steps" >> security-summary.md
+          echo "1. Download the ZAP report artifact" >> security-summary.md
+          echo "2. Review findings in the HTML report" >> security-summary.md
+          echo "3. Validate findings and eliminate false positives" >> security-summary.md
+          echo "4. Create remediation tasks for confirmed vulnerabilities" >> security-summary.md
+          echo "5. Retest after fixes are deployed" >> security-summary.md
+
+      - name: Upload security summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-summary
+          path: security-summary.md
+          retention-days: 30

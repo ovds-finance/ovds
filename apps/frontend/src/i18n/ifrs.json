@@ -1,0 +1,117 @@
+{
+  "updates": {
+    "title": "IASB Standard Updates — 2024–2027",
+    "overall_readiness": "Overall Readiness",
+    "standard": "Standard",
+    "effective": "Effective",
+    "status": "Status",
+    "impact": "Impact",
+    "readiness": "Readiness",
+    "action_required": "Action Required",
+    "key_changes": "Key Changes",
+    "summary": "Summary",
+    "replaces_amends": "Replaces/Amends",
+    "mandatory": "Mandatory",
+    "early_adoption": "Early Adoption",
+    "exposure_draft": "Exposure Draft",
+    "high_impact": "High Impact",
+    "medium_impact": "Medium Impact",
+    "low_impact": "Low Impact",
+    "dismiss": "Dismiss",
+    "dismiss_all": "Dismiss All",
+    "view_all": "View All",
+    "show_less": "Show Less",
+    "export_csv": "Export CSV",
+    "print": "Print",
+    "standard_list": {
+      "ifrs18": {
+        "title": "Presentation and Disclosure in Financial Statements",
+        "summary": "IFRS 18 replaces IAS 1. It introduces three mandatory income statement categories (Operating, Investing, Financing) and requires disclosure of Management-defined Performance Measures (MPMs).",
+        "action": "Review your income statement presentation. Identify any MPMs (e.g. EBITDA, adjusted profit) used in communications — these must now be reconciled to IFRS line items in the notes."
+      },
+      "ifrs19": {
+        "title": "Subsidiaries without Public Accountability: Disclosures",
+        "summary": "IFRS 19 allows eligible subsidiaries (those without public accountability) to apply reduced disclosure requirements while still using full IFRS recognition and measurement.",
+        "action": "Assess whether any of your entities qualify as subsidiaries without public accountability. If so, plan for reduced disclosure preparation from 2027."
+      }
+    }
+  },
+  "am": {
+    "updates": {
+      "title": "የIASB ደረጃዎች ዝማኔዎች — 2024–2027",
+      "overall_readiness": "ጠቅላላ ዝግጁነት",
+      "standard": "ደረጃ",
+      "effective": "የሚተገበርበት",
+      "status": "ሁኔታ",
+      "impact": "ተፅዕኖ",
+      "readiness": "ዝግጁነት",
+      "action_required": "የሚያስፈልግ እርምጃ",
+      "key_changes": "ቁልፍ ለውጦች",
+      "summary": "ማጠቃለያ",
+      "replaces_amends": "የሚተካው/የሚያሻሽለው",
+      "mandatory": "ግዴታ",
+      "early_adoption": "ቀድሞ መተግበር",
+      "exposure_draft": "ረቂቅ",
+      "high_impact": "ከፍተኛ ተፅዕኖ",
+      "medium_impact": "መካከለኛ ተፅዕኖ",
+      "low_impact": "ዝቅተኛ ተፅዕኖ",
+      "dismiss": "አሰናብት",
+      "dismiss_all": "ሁሉንም አሰናብት",
+      "view_all": "ሁሉንም እይ",
+      "show_less": "በትንሹ እይ",
+      "export_csv": "CSV ላክ",
+      "print": "አትም",
+      "standard_list": {
+        "ifrs18": {
+          "title": "በፋይናንስ መግለጫዎች ውስጥ አቀራረብ እና ይፋ ማድረግ",
+          "summary": "IFRS 18 IAS 1ን ይተካል። ሶስት የግዴታ የገቢ መግለጫ ምድቦችን (ኦፕሬቲንግ፣ ኢንቨስትንግ፣ ፋይናንሲንግ) ያስተዋውቃል እና በአስተዳደር የተገለጹ የአፈፃፀም እርምጃዎች (MPMs) ይፋ እንዲሆኑ ይጠይቃል።",
+          "action": "የገቢ መግለጫ አቀራረብዎን ይገምግሙ። በማንኛውም ግንኙነቶች ውስጥ ጥቅም ላይ የሚውሉ MPMዎችን (ለምሳሌ EBITDA፣ የተስተካከለ ትርፍ) ይለዩ — እነዚህ አሁን በማስታወሻዎች ውስጥ ከIFRS የንጥል ዝርዝሮች ጋር መታረቅ አለባቸው።"
+        },
+        "ifrs19": {
+          "title": "የህዝብ ተጠያቂነት የሌላቸው ቅርንጫፎች፡ ይፋ ማድረግ",
+          "summary": "IFRS 19 ብቁ የሆኑ ቅርንጫፎች (የህዝብ ተጠያቂነት የሌላቸው) ሙሉ የIFRS እውቅና እና ልኬትን እየተጠቀሙ የቀነሰ ይፋ የማድረግ መስፈርቶችን እንዲተገብሩ ይፈቅዳል።",
+          "action": "ማንኛቸውም አካላትዎ የህዝብ ተጠያቂነት እንደሌላቸው ቅርንጫፎች ብቁ መሆናቸውን ይገምግሙ። ከሆነ ከ2027 ጀምሮ ለቀነሰ ይፋ የማድረግ ዝግጅት ያቅዱ።"
+        }
+      }
+    }
+  },
+  "ti": {
+    "updates": {
+      "title": "ናይ IASB መለለዪታት መመሓየሺታት — 2024–2027",
+      "overall_readiness": "ጠቕላላ ድሉውነት",
+      "standard": "መለለዪ",
+      "effective": "ዝትግበረሉ",
+      "status": "ኩነታት",
+      "impact": "ጽልዋ",
+      "readiness": "ድሉውነት",
+      "action_required": "ዘድሊ ስጉምቲ",
+      "key_changes": "ቀንዲ ለውጥታት",
+      "summary": "ጽማቕ",
+      "replaces_amends": "ዝትክእ/ዘመሓይሽ",
+      "mandatory": "ግዴታ",
+      "early_adoption": "ቀዲምካ ምትግባር",
+      "exposure_draft": "ረቂቕ",
+      "high_impact": "ልዑል ጽልዋ",
+      "medium_impact": "ማእከላይ ጽልዋ",
+      "low_impact": "ትሑት ጽልዋ",
+      "dismiss": "ኣሰናብት",
+      "dismiss_all": "ኩሉ ኣሰናብት",
+      "view_all": "ኩሉ ርአ",
+      "show_less": "ውሑድ ርአ",
+      "export_csv": "CSV ስደድ",
+      "print": "ሕተም",
+      "standard_list": {
+        "ifrs18": {
+          "title": "ኣብ ናይ ፋይናንስ መግለጺታት ኣቀራርባን ምግላጽን",
+          "summary": "IFRS 18 ን IAS 1 ይትክእ። ሰለስተ ግዴታ ናይ እቶት መግለጺ ክፍልታት (Operating, Investing, Financing) የላልን ከምኡ እውን ብኣመራርሓ ዝተገልጹ ናይ ኣፈጻጽማ መዐቀኒታት (MPMs) ክግለጹ ይሓትት።",
+          "action": "ናይ እቶት መግለጺ ኣቀራርባኹም መርምሩ። ኣብ ዝኾነ ርክባት ዝጥቀሙ MPMs (ንኣብነት EBITDA, ዝተመዓራረየ ትርፊ) ለልዩ — እዚኦም ሕጂ ኣብ መዘክርታት ምስ IFRS ንጥልታት ክሰማምዑ ኣለዎም።"
+        },
+        "ifrs19": {
+          "title": "ናይ ህዝቢ ተሓታትነት ዘይብሎም ጨናፍር፡ ምግላጽ",
+          "summary": "IFRS 19 ብቑዓት ጨናፍር (ናይ ህዝቢ ተሓታትነት ዘይብሎም) ምሉእ ናይ IFRS ኣፍልጦን መዐቀንን እናተጠቐሙ ዝተቐነሰ ናይ ምግላጽ ጠለባት ክትግብሩ የፍቅድ።",
+          "action": "ዝኾነ ካብቶም ኣካላትኩም ከም ናይ ህዝቢ ተሓታትነት ዘይብሎም ጨናፍር ብቑዓት ምዃኖም መዝኑ። እንተኾይኖም ካብ 2027 ጀሚርኩም ንዝተቐነሰ ምግላጽ ምድላው ኣክይዱ።"
+        }
+      }
+    }
+  }
+}

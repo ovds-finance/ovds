@@ -1,0 +1,42 @@
+{
+  "migrations": [
+    {
+      "version": "23.0.0-beta.16",
+      "description": "Consolidates any remaining legacy releaseTag* flat properties into the nested releaseTag object. The flat properties were removed in Nx 23.",
+      "implementation": "./dist/src/migrations/update-23-0-0/consolidate-release-tag-config",
+      "package": "nx",
+      "name": "23-0-0-consolidate-release-tag-config"
+    },
+    {
+      "version": "23.0.0-beta.18",
+      "description": "Adds .nx/migrate-runs to .gitignore",
+      "implementation": "./dist/src/migrations/update-23-0-0/add-migrate-runs-to-git-ignore",
+      "package": "nx",
+      "name": "23-0-0-add-migrate-runs-to-git-ignore"
+    },
+    {
+      "cli": "nx",
+      "version": "23.0.0-beta.10",
+      "description": "Rewrites imports of NxReactWebpackPlugin from '@nx/react' to the sub-path '@nx/react/webpack-plugin'.",
+      "factory": "./dist/src/migrations/update-23-0-0/remove-nx-react-webpack-plugin-import",
+      "documentation": "./dist/src/migrations/update-23-0-0/remove-nx-react-webpack-plugin-import.md",
+      "package": "@nx/react",
+      "name": "update-23-0-0-remove-nx-react-webpack-plugin-import"
+    },
+    {
+      "version": "23.0.0-beta.24",
+      "description": "Rename imports of `createNodesV2` from `@nx/react/router-plugin` to the canonical `createNodes` export.",
+      "implementation": "./dist/src/migrations/update-23-0-0/migrate-create-nodes-v2-to-create-nodes",
+      "documentation": "./dist/src/migrations/update-23-0-0/migrate-create-nodes-v2-to-create-nodes.md",
+      "package": "@nx/react",
+      "name": "update-23-0-0-migrate-create-nodes-v2-import"
+    },
+    {
+      "version": "23.0.0-beta.25",
+      "description": "Rewrites `@nx/react/src/*` subpath imports now that the `./src/*` subpath is no longer exposed by `@nx/react`'s exports map. Named imports/exports of public symbols are routed to `@nx/react` and the rest to the new `@nx/react/internal` entry; `require`, dynamic `import` and `jest.mock` calls reference the whole module and are routed to `@nx/react/internal`.",
+      "implementation": "./dist/src/migrations/update-23-0-0/rewrite-internal-subpath-imports",
+      "package": "@nx/react",
+      "name": "rewrite-react-internal-subpath-imports"
+    }
+  ]
+}

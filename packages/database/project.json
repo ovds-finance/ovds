@@ -1,0 +1,145 @@
+{
+  "name": "database",
+  "root": "packages/database",
+  "sourceRoot": "packages/database/src",
+  "projectType": "library",
+  "tags": [
+    "type:lib",
+    "scope:backend"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "packages/database"
+      },
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "cache": true
+    },
+    "build:clean": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build:clean",
+        "cwd": "packages/database"
+      },
+      "cache": false
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run typecheck",
+        "cwd": "packages/database"
+      },
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run generate",
+        "cwd": "packages/database"
+      },
+      "inputs": [
+        "{projectRoot}/prisma/schema.prisma",
+        "{projectRoot}/prisma.config.js"
+      ],
+      "outputs": [
+        "{projectRoot}/src/generated",
+        "{projectRoot}/prisma/generated"
+      ],
+      "cache": true
+    },
+    "generate:plesk": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run generate:plesk",
+        "cwd": "packages/database"
+      },
+      "cache": false
+    },
+    "db:push": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run db:push",
+        "cwd": "packages/database"
+      },
+      "cache": false
+    },
+    "db:push:prod": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run db:push:prod",
+        "cwd": "packages/database"
+      },
+      "cache": false
+    },
+    "migrate:dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run migrate:dev",
+        "cwd": "packages/database"
+      },
+      "cache": false
+    },
+    "migrate:deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run migrate:deploy",
+        "cwd": "packages/database"
+      },
+      "cache": false
+    },
+    "migrate:prod": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run migrate:prod",
+        "cwd": "packages/database"
+      },
+      "cache": false
+    },
+    "db:studio": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run studio",
+        "cwd": "packages/database"
+      },
+      "cache": false
+    },
+    "seed": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run seed",
+        "cwd": "packages/database"
+      },
+      "cache": false
+    },
+    "seed:prod": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run seed:prod",
+        "cwd": "packages/database"
+      },
+      "cache": false
+    },
+    "seed:demo": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run seed:demo",
+        "cwd": "packages/database"
+      },
+      "cache": false
+    }
+  }
+}

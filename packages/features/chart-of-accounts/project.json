@@ -1,0 +1,42 @@
+{
+  "name": "features-chart-of-accounts",
+  "root": "packages/features/chart-of-accounts",
+  "sourceRoot": "packages/features/chart-of-accounts/src",
+  "projectType": "library",
+  "tags": [
+    "scope:frontend",
+    "type:feature",
+    "feature:chart-of-accounts"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "packages/features/chart-of-accounts"
+      },
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"],
+      "outputs": ["{projectRoot}/dist"],
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run typecheck",
+        "cwd": "packages/features/chart-of-accounts"
+      },
+      "inputs": ["default", "^production"],
+      "cache": true
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run test",
+        "cwd": "packages/features/chart-of-accounts"
+      },
+      "inputs": ["default", "^production"],
+      "cache": true
+    }
+  }
+}

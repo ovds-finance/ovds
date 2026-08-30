@@ -1,0 +1,29 @@
+# Nx should not hash these directories — they are build outputs or package
+# manager internals and would generate false cache misses.
+
+# Build outputs
+apps/backend/dist
+apps/frontend/dist
+apps/public
+dist
+
+# Per-package build outputs
+packages/**/dist
+packages/**/dist-cjs
+
+# TypeScript incremental build info
+**/.tsbuildinfo
+**/.tsbuildinfo-*
+
+# Test artefacts
+**/coverage
+**/.vitest-cache
+**/playwright-report
+**/test-results
+
+# Editor / OS noise
+.vscode
+**/*.log
+
+# Optimization pipeline reports — generated artefacts, not source
+.reports

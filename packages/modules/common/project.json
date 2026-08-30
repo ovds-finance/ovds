@@ -1,0 +1,47 @@
+{
+  "name": "modules-common",
+  "root": "packages/modules/common",
+  "sourceRoot": "packages/modules/common/src",
+  "projectType": "library",
+  "tags": [
+    "type:lib",
+    "type:module",
+    "domain:common"
+  ],
+  "implicitDependencies": [
+    "core",
+    "shared"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "packages/modules/common"
+      },
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run typecheck",
+        "cwd": "packages/modules/common"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    }
+  }
+}

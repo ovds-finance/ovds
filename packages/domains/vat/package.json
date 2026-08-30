@@ -1,0 +1,23 @@
+{
+  "name": "@ovds/domains/vat",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@nestjs/common": "*",
+    "@ovds/domains/infrastructure": "*",
+    "@ovds/shared": "*",
+    "@prisma/client": "*",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "zod": "*"
+  }
+}
+
+

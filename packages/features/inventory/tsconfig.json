@@ -1,0 +1,71 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "skipLibCheck": true,
+    "paths": {
+      "@ovds/ui": [
+        "packages/ui/src/index.ts"
+      ],
+      "@ovds/shared": [
+        "packages/shared/dist/index.d.ts"
+      ],
+      "@ovds/shared/*": [
+        "packages/shared/dist/*.d.ts"
+      ],
+      "@ovds/design-system": [
+        "packages/design-system/src/index.ts"
+      ],
+      "@ovds/contracts": [
+        "packages/contracts/src/index.ts"
+      ],
+      "@ovds/contracts/schemas": [
+        "packages/contracts/src/schemas/index.ts"
+      ],
+      "@ovds/contracts/schemas/inventory": [
+        "packages/contracts/src/schemas/inventory.ts"
+      ],
+      "@ovds/contracts/schemas/ovds": [
+        "packages/contracts/src/schemas/ovds.ts"
+      ],
+      "@ovds/contracts/schemas/hr": [
+        "packages/contracts/src/schemas/hr.ts"
+      ],
+      "@ovds/contracts/schemas/tax": [
+        "packages/contracts/src/schemas/tax.ts"
+      ],
+      "@ovds/contracts/schemas/settings": [
+        "packages/contracts/src/schemas/settings.ts"
+      ],
+      "@ovds/contracts/schemas/auth": [
+        "packages/contracts/src/schemas/auth.ts"
+      ],
+      "@ovds/contracts/schemas/common": [
+        "packages/contracts/src/schemas/common.ts"
+      ],
+      "@ovds/contracts/router": [
+        "packages/contracts/src/router/index.ts"
+      ],
+      "@ovds/contracts/prisma-zod": [
+        "packages/contracts/src/prisma-zod/index.ts"
+      ],
+      "@ovds/core": [
+        "packages/core/src/index.ts"
+      ],
+      "@ovds/dto": [
+        "packages/shared/dto/src/index.ts"
+      ]
+    },
+    "noEmit": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/.cache/.tsbuildinfo"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests"
+  ]
+}

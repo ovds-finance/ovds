@@ -1,0 +1,260 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Validate each script runs without errors locally": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073914112
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073942776
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788074261439
+      }
+    ],
+    "2. Write preservation property tests for non-error paths (BEFORE any fixes)": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073914284
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788074266896
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788074598498
+      }
+    ],
+    "3.1 Build frontend and establish bundle-size baseline on main branch": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073914446
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788074607391
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788074780802
+      }
+    ],
+    "3.2 Run dep-check with knip enabled and triage findings": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073914672
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788074787661
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788075039406
+      }
+    ],
+    "3.3 Verify Property 1 exploration test now passes (all scripts exit 0)": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073915042
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788075046062
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788075362731
+      }
+    ],
+    "3.4 Verify Property 2 preservation tests still pass": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073915298
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788075367934
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788075909520
+      }
+    ],
+    "4.1 Confirm nx.json targets are reachable": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073915579
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788075917088
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788077143818
+      }
+    ],
+    "4.2 Run workspace-wide optimize target": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073915832
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788077149831
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788078301667
+      }
+    ],
+    "4.3 Confirm individual alias scripts work": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073916340
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788078309143
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788078741891
+      }
+    ],
+    "5.1 Push a test branch that touches a watched path": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073916642
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788078779741
+      },
+      {
+        "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788080569679
+      }
+    ],
+    "5.2 Verify individual CI jobs run and produce artifacts": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073916898
+      },
+      {
+        "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788080584538
+      }
+    ],
+    "5.3 Verify strict-mode gate on main/develop": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073917159
+      }
+    ],
+    "5.4 Verify knip is skipped on regular pushes and included on nightly / PRs": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073917655
+      }
+    ],
+    "6.1 Append optimization pipeline section to scripts/README.md": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073917892
+      },
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788078780133
+      },
+      {
+        "executionId": "b07d950e-424a-45f3-b934-cbc4e03eebb5",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788080556683
+      }
+    ],
+    "6.2 Add optimization pipeline quick-reference to root README (or create one)": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073918122
+      }
+    ],
+    "7.1 Create PostFileSave hook for bundle analysis on vite.config.ts save": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073918490
+      }
+    ],
+    "7.2 Test the hook fires after saving vite.config.ts": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073918738
+      }
+    ],
+    "8. Checkpoint — ensure all checks pass end-to-end": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788073919141
+      }
+    ],
+    "3. Fix: establish baseline and resolve first-run issues": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788075909684
+      }
+    ],
+    "4. Verify `npx nx run-many --target=optimize` works across all projects": [
+      {
+        "executionId": "4b8e0484-8e3d-4062-a460-f17bf4e827f1",
+        "chatSessionId": "sess_4a4cbd2c-430a-4ca2-8c0c-657ec9cb6ef0",
+        "timestamp": 1788078742339
+      }
+    ]
+  }
+}

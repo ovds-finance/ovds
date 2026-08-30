@@ -1,0 +1,29 @@
+Source ERP Field,OVDS Target Field,Data Type,Validation Rule,Transform / Notes
+Company ID,companyCode,string,Required,Match against company_registry.company_code
+Company Legal Name,legalName,string,Required,From company_registry.legal_name
+TIN,tinNumber,string,Required,10-character Ethiopian TIN from company_registry
+VAT Registration Number,vatRegNumber,string,Required,15-character VAT reg from company_registry
+Base Currency,baseCurrency,string,Default ETB,ISO 4217 currency code
+Invoice Number,invoiceNumber,string,Required & Unique,Alphanumeric per ERCA IRN mandate
+Fiscal Device ID,fiscalDeviceId,string,Conditional,EFD-ET-XXXXXX format from fiscal device
+Transaction Type,transactionType,enum,Required,SUPPLY_LOCAL_SALE | SUPPLY_EXPORT | PURCHASE_LOCAL
+Execution Date,executionDate,date,Required,YYYY-MM-DD format
+Original Currency,originalCurrency,string,Required,ISO 4217 code
+Exchange Rate Applied,exchangeRate,decimal,Required > 0,Daily NBE mid-market rate
+Taxable Amount (ETB),taxableAmountEtb,decimal,Required >= 0,Converted to ETB via exchange rate
+VAT Rate Percent,vatRatePercent,decimal,Default 15.0,15% standard or 0% for exports
+Calculated VAT (ETB),calculatedVatEtb,decimal,Auto-computed,taxableAmountEtb * (vatRatePercent / 100)
+Withholding Tax Applied,whtType,enum,Conditional,WHT_3_PERCENT | WHT_2_PERCENT | NONE
+Withholding Tax Amount (ETB),whtAmountEtb,decimal,Default 0.00,invoiceAmount * 0.03 (Proc. 1395/2025)
+Is Intercompany,isIntercompany,boolean,Default false,True if from/to related entity
+Ledger Hash,ledgerHash,string,Required & Unique,SHA-256 of company+invoice+amount+date
+Created By User ID,createdByUser,string,Required,From auth context (JWT)
+Approved By User ID,approvedByUser,string,Conditional,Required for final sign-off
+GL Account Code String,glAccountCodeString,string,Required,From chart of accounts
+Row Version,rowVersion,integer,Default 1,Optimistic locking for concurrency
+Is Active,isActive,boolean,Default true,Soft delete flag for company_registry
+Period,period,string,Required for filing,YYYY-MM format derived from executionDate
+Sync Status,syncStatus,enum,Default PENDING,PENDING | SYNCED | ERROR
+Offline Created At,offlineCreatedAt,datetime,Auto-set,Server timestamp on ingestion
+Synced At,syncedAt,datetime,Conditional,Set when cloud sync succeeds
+Retry Count,retryCount,integer,Default 0,Incremented on sync failure

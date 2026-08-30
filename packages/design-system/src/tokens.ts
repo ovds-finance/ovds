@@ -1,0 +1,635 @@
+/**
+ * @ovds/design-system — Ovds-inspired tokens
+ *
+ * Ovds UI characteristics:
+ *  - Clean, minimal, flat design
+ *  - Single primary blue: #0056D2 (financial SaaS standard)
+ *  - Sans-serif Inter font
+ *  - Tight 4px grid, small rounded corners (6-10px)
+ *  - Subtle backgrounds, thin borders
+ *  - Emphasis on data legibility via tabular numbers
+ *  - Neutral chrome with blue-green-orange-red accent palette
+ */
+
+export const colors = {
+  // ── Core brand (Ovds blue) ────────────────────────────────────────
+  primary: '#0056D2',
+  primaryRGB: [0, 86, 210],
+  primaryDark: '#0044A8',
+  primaryDarkRGB: [0, 68, 168],
+  primaryLight: '#3B82F6',
+  primaryLightRGB: [59, 130, 246],
+  primary50: '#EEF4FF',
+  primary100: '#DBEAFE',
+
+  // ── Neutral chrome ──────────────────────────────────────────────────────
+  white: '#FFFFFF',
+  black: '#0A0A0A',
+  slate: {
+    50:  '#F8FAFC',
+    100: '#F1F5F9',
+    200: '#E2E8F0',
+    300: '#CBD5E1',
+    400: '#94A3B8',
+    500: '#64748B',
+    600: '#475569',
+    700: '#334155',
+    800: '#1E293B',
+    900: '#0F172A',
+    950: '#020617',
+  },
+
+  // ── 60-30-10 Ovds system ──────────────────────────────────────────
+  // 60% Backgrounds: clean, airy, near-white
+  background: '#F8FAFC',
+  backgroundAlt: '#F1F5F9',
+  backgroundDark: '#0F172A',
+  // 30% Surfaces & structure: white cards, subtle borders
+  surface: '#FFFFFF',
+  surfaceDark: '#1E293B',
+  surfaceAlt: '#F8FAFC',
+  surfaceAltDark: '#334155',
+  border: '#E2E8F0',
+  borderSubtle: '#F1F5F9',
+  borderDark: '#1E293B',
+  borderSubtleDark: '#334155',
+  // 10% Accent: single primary blue, sparingly applied
+  accent: '#0056D2',
+  accentHover: '#0044A8',
+  accentLight: '#DBEAFE',
+  // Secondary accent (rare use)
+  accentEmerald: '#10B981',
+  accentEmeraldHover: '#059669',
+  accentEmeraldLight: '#D1FAE5',
+  accentAmber: '#F59E0B',
+  accentAmberHover: '#D97706',
+  accentAmberLight: '#FEF3C7',
+  accentRose: '#F43F5E',
+  accentRoseHover: '#E11D48',
+  accentRoseLight: '#FFE4E6',
+  accentViolet: '#8B5CF6',
+  accentVioletHover: '#7C3AED',
+  accentVioletLight: '#EDE9FE',
+  accentOrange: '#F97316',
+  accentOrangeHover: '#EA580C',
+  accentOrangeLight: '#FFEDD5',
+  accentTeal: '#14B8A6',
+  accentTealHover: '#0D9488',
+  accentTealLight: '#CCFBF1',
+  accentSky: '#0EA5E9',
+  accentSkyHover: '#0284C7',
+  accentSkyLight: '#E0F2FE',
+  accentIndigo: '#6366F1',
+  accentIndigoHover: '#4F46E5',
+  accentIndigoLight: '#E0E7FF',
+
+  // ── AI, validation, and trust surfaces ─────────────────────────────────────
+  ai: {
+    bg: '#F5F3FF',
+    text: '#5B21B6',
+    border: '#DDD6FE',
+    dot: '#8B5CF6',
+    muted: '#EDE9FE',
+  },
+  validation: {
+    bg: '#FFFBEB',
+    text: '#B45309',
+    border: '#FDE68A',
+    dot: '#F59E0B',
+  },
+  security: {
+    bg: '#F0FDF4',
+    text: '#166534',
+    border: '#BBF7D0',
+    dot: '#10B981',
+  },
+  audit: {
+    bg: '#EFF6FF',
+    text: '#1E40AF',
+    border: '#BFDBFE',
+    dot: '#3B82F6',
+  },
+
+  // ── Semantic statuses (Ovds badge vocabulary) ─────────────────────
+  draft:     { bg: '#F8FAFC', text: '#64748B', border: '#E2E8F0', dot: '#94A3B8' },
+  pending:   { bg: '#FFFBEB', text: '#B45309', border: '#FDE68A', dot: '#F59E0B' },
+  sent:      { bg: '#EFF6FF', text: '#1E40AF', border: '#BFDBFE', dot: '#3B82F6' },
+  active:    { bg: '#F0FDF4', text: '#166534', border: '#BBF7D0', dot: '#10B981' },
+  inactive:  { bg: '#F8FAFC', text: '#475569', border: '#E2E8F0', dot: '#94A3B8' },
+  approved:  { bg: '#F0FDF4', text: '#166534', border: '#BBF7D0', dot: '#10B981' },
+  rejected:  { bg: '#FFF1F2', text: '#9F1239', border: '#FECDD3', dot: '#F43F5E' },
+  overdue:   { bg: '#FFF1F2', text: '#9F1239', border: '#FECDD3', dot: '#F43F5E' },
+  paid:      { bg: '#F0FDF4', text: '#166534', border: '#BBF7D0', dot: '#10B981' },
+  settled:   { bg: '#F0FDF4', text: '#166534', border: '#BBF7D0', dot: '#10B981' },
+  filed:     { bg: '#F0FDF4', text: '#166534', border: '#BBF7D0', dot: '#10B981' },
+  cancelled: { bg: '#F8FAFC', text: '#475569', border: '#E2E8F0', dot: '#94A3B8' },
+  open:      { bg: '#F5F3FF', text: '#5B21B6', border: '#DDD6FE', dot: '#8B5CF6' },
+  closed:    { bg: '#F8FAFC', text: '#475569', border: '#E2E8F0', dot: '#94A3B8' },
+  // Legacy statuses kept for backward compat
+  success:   { bg: '#F0FDF4', text: '#166534', border: '#BBF7D0', dot: '#10B981' },
+  warning:   { bg: '#FFFBEB', text: '#B45309', border: '#FDE68A', dot: '#F59E0B' },
+  danger:    { bg: '#FFF1F2', text: '#9F1239', border: '#FECDD3', dot: '#F43F5E' },
+  info:      { bg: '#EFF6FF', text: '#1E40AF', border: '#BFDBFE', dot: '#3B82F6' },
+
+  // ── Text (Ovds uses near-black for body, slate for breadcrumbs) ──
+  textPrimary:   '#111827',
+  textSecondary: '#374151',
+  textTertiary:  '#6B7280',
+  textQuaternary: '#9CA3AF',
+  textOnAccent:  '#FFFFFF',
+  textInverse:   '#FFFFFF',
+  // Dark-text variants
+  textPrimaryDark:   '#F9FAFB',
+  textSecondaryDark: '#D1D5DB',
+  textTertiaryDark:  '#9CA3AF',
+};
+
+// ── v5.0 Multi-Surface Design Tokens ─────────────────────────────────────────
+export const surfaceTokens = {
+  light: {
+    bgBase:             '#F8FAFC',
+    bgSurface:          '#FFFFFF',
+    bgSurfaceElevated:  '#F1F5F9',
+    bgOverlay:          '#FFFFFF',
+    borderBase:         '#E2E8F0',
+    borderSurface:      '#CBD5E1',
+    borderElevated:     '#94A3B8',
+    textPrimary:        '#0F172A',
+    textSecondary:      '#334155',
+    textMuted:          '#64748B',
+  },
+  dark: {
+    bgBase:             '#020617',
+    bgSurface:          '#0F172A',
+    bgSurfaceElevated:  '#162032',
+    bgOverlay:          '#1E293B',
+    borderBase:         '#1E293B',
+    borderSurface:      '#334155',
+    borderElevated:     '#475569',
+    textPrimary:        '#F8FAFC',
+    textSecondary:      '#CBD5E1',
+    textMuted:          '#94A3B8',
+  },
+} as const;
+
+export const brandTokens = {
+  primary: {
+    light: { bg: '#2563EB', text: '#FFFFFF', contrast: '7.2:1' },
+    dark:  { bg: '#3B82F6', text: '#0F172A', contrast: '7.5:1' },
+  },
+  success: {
+    light: { bg: '#ECFDF5', text: '#065F46', contrast: '8.1:1' },
+    dark:  { bg: '#022C22', text: '#34D399', contrast: '7.8:1' },
+  },
+  alert: {
+    light: { bg: '#FFFBEB', text: '#92400E', contrast: '7.9:1' },
+    dark:  { bg: '#451A03', text: '#FCD34D', contrast: '7.6:1' },
+  },
+  critical: {
+    light: { bg: '#FFF1F2', text: '#9F1239', contrast: '8.4:1' },
+    dark:  { bg: '#4C0519', text: '#FDA4AF', contrast: '7.9:1' },
+  },
+} as const;
+
+export const typographyScales = {
+  displayLg:  { fontSize: '32px', lineHeight: '38px', letterSpacing: '-0.025em', fontWeight: '700' as const },
+  headingMd:  { fontSize: '20px', lineHeight: '28px', letterSpacing: '-0.015em', fontWeight: '600' as const },
+  bodyDense:  { fontSize: '14px', lineHeight: '20px', letterSpacing: '0',    fontWeight: '400' as const },
+  microCaption: { fontSize: '12px', lineHeight: '16px', letterSpacing: '0.010em', fontWeight: '500' as const },
+} as const;
+
+export const layout = {
+  sidebarWidth:       '240px',
+  sidebarCollapsed:   '56px',
+  sidebarCollapsedWidth: '56px',
+  /** Full sidebar footprint: 56px icon rail + 240px nav panel */
+  sidebarTotalWidth:  '296px',
+  headerHeight:       '48px',
+  footerHeight:       '36px',
+  pagePadding:        '16px',
+  pageMaxWidth:       '1440px',
+  cardPadding:        '16px',
+  cardRadius:         '8px',
+  cardRadiusSm:       '4px',
+  cardRadiusLg:       '12px',
+  cardMinHeight:      '120px',
+  gridGap:            '24px',
+  gridGapSm:          '12px',
+  gridGapLg:          '32px',
+  gridColMinWidth:    '300px',
+};
+
+export const compact = {
+  xs: '4px',
+  sm: '8px',
+  md: '12px',
+  lg: '16px',
+  xl: '20px',
+  '2xl': '24px',
+  '3xl': '32px',
+};
+
+export const typography = {
+  fontFamily: {
+    sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+    mono: ['IBM Plex Mono', 'JetBrains Mono', 'SF Mono', 'Roboto Mono', 'Courier New', 'monospace'],
+  },
+  fontSize: {
+    '2xs':  ['10px',  { lineHeight: '12px', letterSpacing: '0.04em' }],
+    xs:     ['11px',  { lineHeight: '14px', letterSpacing: '0.02em' }],
+    sm:     ['12px',  { lineHeight: '16px' }],
+    base:   ['13px',  { lineHeight: '18px' }],
+    md:     ['14px',  { lineHeight: '20px' }],
+    lg:     ['15px',  { lineHeight: '22px', letterSpacing: '-0.01em' }],
+    xl:     ['16px',  { lineHeight: '24px', letterSpacing: '-0.01em' }],
+    '2xl':  ['20px',  { lineHeight: '28px', letterSpacing: '-0.02em' }],
+    '3xl':  ['24px',  { lineHeight: '32px', letterSpacing: '-0.02em' }],
+    display: ['30px', { lineHeight: '36px', letterSpacing: '-0.03em' }],
+  },
+  fontWeight: {
+    thin:       '100',
+    extralight: '200',
+    light:      '300',
+    normal:     '400',
+    medium:     '500',
+    semibold:   '600',
+    bold:       '700',
+    extrabold:  '800',
+    black:      '900',
+  },
+  tabularNums: {
+    numeric: ['IBM Plex Mono', 'JetBrains Mono', 'SF Mono', 'Roboto Mono', 'tabular-nums', 'monospace'],
+  },
+  tracking: {
+    tightest: '-0.05em',
+    tighter:  '-0.03em',
+    tight:    '-0.02em',
+    normal:   '0',
+    wide:     '0.02em',
+    wider:    '0.04em',
+    widest:   '0.08em',
+    uppercase: '0.06em',
+  },
+};
+
+export const zIndex = {
+  hide:    -1,
+  auto:    'auto',
+  base:    0,
+  content: 1,
+  docked:  10,
+  dropdown: 100,
+  sticky:  200,
+  banner:  300,
+  overlay: 400,
+  modal:   500,
+  popover: 510,
+  tooltip: 520,
+  toast:   530,
+};
+
+export const spacing = {
+  '0.5': '0.125rem',
+  '1':   '0.25rem',
+  '1.5': '0.375rem',
+  '2':   '0.5rem',
+  '2.5': '0.625rem',
+  '3':   '0.75rem',
+  '3.5': '0.875rem',
+  '4':   '1rem',
+  '5':   '1.25rem',
+  '6':   '1.5rem',
+  '7':   '1.75rem',
+  '8':   '2rem',
+  '9':   '2.25rem',
+  '10':  '2.5rem',
+  '12':  '3rem',
+  '14':  '3.5rem',
+  '16':  '4rem',
+  '18':  '4.5rem',
+  '20':  '5rem',
+  '24':  '6rem',
+  '28':  '7rem',
+  '32':  '8rem',
+  '36':  '9rem',
+  '40':  '10rem',
+  '44':  '11rem',
+  '48':  '12rem',
+  '52':  '13rem',
+  '56':  '14rem',
+  '60':  '15rem',
+  '64':  '16rem',
+  '72':  '18rem',
+  '76':  '19rem',
+  '80':  '20rem',
+  '88':  '22rem',
+  '92':  '23rem',
+  '96':  '24rem',
+  '100': '25rem',
+  '104': '26rem',
+  '112': '28rem',
+  '120': '30rem',
+  '128': '32rem',
+};
+
+export const borderRadius = {
+  'none': '0',
+  'xs':   '2px',
+  'sm':   '4px',
+  'DEFAULT': '6px',
+  'md':   '8px',
+  'lg':   '10px',
+  'xl':   '12px',
+  '2xl':  '16px',
+  '3xl':  '24px',
+  'full': '9999px',
+};
+
+export const shadows = {
+  none:     'none',
+  xs:      '0 1px 1px 0 rgb(0 0 0 / 0.02)',
+  sm:      '0 1px 2px 0 rgb(0 0 0 / 0.04)',
+  DEFAULT:  '0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04)',
+  md:      '0 4px 6px -1px rgb(0 0 0 / 0.04), 0 2px 4px -2px rgb(0 0 0 / 0.04)',
+  lg:      '0 10px 15px -3px rgb(0 0 0 / 0.04), 0 4px 6px -4px rgb(0 0 0 / 0.04)',
+  xl:      '0 20px 25px -5px rgb(0 0 0 / 0.04), 0 8px 10px -6px rgb(0 0 0 / 0.04)',
+  '2xl':   '0 25px 50px -12px rgb(0 0 0 / 0.06)',
+  inner:   'inset 0 2px 4px 0 rgb(0 0 0 / 0.04)',
+  // Ovds-specific: very subtle lift for cards
+  card:    '0 1px 3px 0 rgb(0 0 0 / 0.03), 0 1px 2px -1px rgb(0 0 0 / 0.03)',
+  raised:  '0 4px 12px 0 rgb(0 0 0 / 0.05)',
+  modal:   '0 20px 25px -5px rgb(0 0 0 / 0.08), 0 10px 10px -5px rgb(0 0 0 / 0.04)',
+  dropdown:'0 10px 15px -3px rgb(0 0 0 / 0.06), 0 4px 6px -4px rgb(0 0 0 / 0.04)',
+};
+
+export const animation = {
+  duration: {
+    instant: '80ms',
+    fast:    '150ms',
+    normal:  '200ms',
+    slow:    '300ms',
+    enter:   '250ms',
+    exit:    '150ms',
+  },
+  easing: {
+    standard: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    enter:    'cubic-bezier(0, 0, 0.2, 1)',
+    exit:     'cubic-bezier(0.4, 0, 1, 1)',
+    spring:   'cubic-bezier(0.34, 1.56, 0.64, 1)',
+    linear:   'linear',
+    bouncy:   'cubic-bezier(0.34, 1.3, 0.64, 1)',
+  },
+} as const;
+
+export const darkColors = {
+  background:      '#0A0A0A',
+  backgroundAlt:   '#171717',
+  surface:         '#141414',
+  surfaceAlt:      '#262626',
+  border:          '#262626',
+  borderSubtle:    '#1f1f1f',
+  primary:         '#0056D2',
+  primaryDark:     '#4F8FFF',
+  textPrimary:     '#F5F5F5',
+  textSecondary:   '#D1D5DB',
+  textTertiary:    '#737373',
+  textQuaternary:  '#525252',
+  accentEmerald:   '#10B981',
+  accentAmber:     '#F59E0B',
+  accentRose:      '#F43F5E',
+  accentViolet:    '#8B5CF6',
+  muted:           '#262626',
+  // v5.0 multi-surface dark theme
+  surfaceElevated: '#1a2234',
+  overlay:         '#1E293B',
+  bgBase:          '#020617',
+  bgSurface:       '#0F172A',
+  bgSurfaceElevated: '#162032',
+  bgOverlay:       '#1E293B',
+} as const;
+
+// ── Responsive Breakpoints ────────────────────────────────────────────────
+export const breakpoints = {
+  xs:  0,
+  sm:  640,
+  md:  768,
+  lg:  1024,
+  xl:  1280,
+  '2xl': 1536,
+} as const;
+
+export const mediaQueries = {
+  sm:       '(min-width: 640px)',
+  md:       '(min-width: 768px)',
+  lg:       '(min-width: 1024px)',
+  xl:       '(min-width: 1280px)',
+  '2xl':    '(min-width: 1536px)',
+  mobile:   '(max-width: 639px)',
+  tablet:   '(min-width: 640px) and (max-width: 1023px)',
+  desktop:  '(min-width: 1024px)',
+  dark:     '(prefers-color-scheme: dark)',
+  motion:   '(prefers-reduced-motion: reduce)',
+  print:    'print',
+} as const;
+
+// ── Icon Size Scale ──────────────────────────────────────────────────────
+export const iconSizes = {
+  'xs':  12,
+  sm:    14,
+  md:    16,
+  lg:    18,
+  xl:    20,
+  '2xl': 24,
+  '3xl': 28,
+  '4xl': 32,
+} as const;
+
+// ── Status Color Palette (hex) ────────────────────────────────────────────
+export const statusColors = {
+  draft:     { bg: '#F8FAFC', text: '#64748B', border: '#E2E8F0', dot: '#94A3B8' },
+  pending:   { bg: '#FFFBEB', text: '#B45309', border: '#FDE68A', dot: '#F59E0B' },
+  sent:      { bg: '#EFF6FF', text: '#1E40AF', border: '#BFDBFE', dot: '#3B82F6' },
+  paid:      { bg: '#F0FDF4', text: '#166534', border: '#BBF7D0', dot: '#10B981' },
+  settled:   { bg: '#F0FDF4', text: '#166534', border: '#BBF7D0', dot: '#10B981' },
+  overdue:   { bg: '#FFF1F2', text: '#9F1239', border: '#FECDD3', dot: '#F43F5E' },
+  approved:  { bg: '#F0FDF4', text: '#166534', border: '#BBF7D0', dot: '#10B981' },
+  rejected:  { bg: '#FFF1F2', text: '#9F1239', border: '#FECDD3', dot: '#F43F5E' },
+  cancelled: { bg: '#F8FAFC', text: '#475569', border: '#E2E8F0', dot: '#94A3B8' },
+  active:    { bg: '#F0FDF4', text: '#166534', border: '#BBF7D0', dot: '#10B981' },
+  inactive:  { bg: '#F8FAFC', text: '#475569', border: '#E2E8F0', dot: '#94A3B8' },
+  filed:     { bg: '#F0FDF4', text: '#166534', border: '#BBF7D0', dot: '#10B981' },
+  open:      { bg: '#F5F3FF', text: '#5B21B6', border: '#DDD6FE', dot: '#8B5CF6' },
+  closed:    { bg: '#F8FAFC', text: '#475569', border: '#E2E8F0', dot: '#94A3B8' },
+  success:   { bg: '#F0FDF4', text: '#166534', border: '#BBF7D0', dot: '#10B981' },
+  warning:   { bg: '#FFFBEB', text: '#B45309', border: '#FDE68A', dot: '#F59E0B' },
+  danger:    { bg: '#FFF1F2', text: '#9F1239', border: '#FECDD3', dot: '#F43F5E' },
+  info:      { bg: '#EFF6FF', text: '#1E40AF', border: '#BFDBFE', dot: '#3B82F6' },
+} as const;
+
+// ── Chart Palette ────────────────────────────────────────────────────────
+export const chartColors = [
+  '#0056D2',
+  '#10B981',
+  '#F59E0B',
+  '#F43F5E',
+  '#8B5CF6',
+  '#0EA5E9',
+  '#6366F1',
+  '#14B8A6',
+  '#F97316',
+  '#EC4899',
+] as const;
+
+export const chartGradients = {
+  revenue:  ['rgba(0, 86, 210, 0.15)', 'rgba(0, 86, 210, 0)'],
+  expenses: ['rgba(244, 63, 94, 0.12)', 'rgba(244, 63, 94, 0)'],
+  profit:   ['rgba(16, 185, 129, 0.12)', 'rgba(16, 185, 129, 0)'],
+  net:      ['rgba(139, 92, 246, 0.12)', 'rgba(139, 92, 246, 0)'],
+} as const;
+
+// ── Print tokens ─────────────────────────────────────────────────────────
+export const print = {
+  pageWidth:    '210mm',
+  pageHeight:   '297mm',
+  marginTop:    '15mm',
+  marginBottom: '15mm',
+  marginLeft:   '20mm',
+  marginRight:  '20mm',
+} as const;
+
+// ── Legacy aliases (single source of truth for backward-compat names) ──────
+// Used by tailwind.config.js and tokens.css so hardcoded hex values can be removed.
+export const legacyAliases = {
+  ovdsPrimary:          colors.primary,
+  ovdsPrimaryDark:      colors.primaryDark,
+  ovdsPrimaryLight:     colors.primaryLight,
+  ovdsSidebar:          '#0B1221',
+  ovdsBackground:       colors.background,
+  ovdsBackgroundDark:   colors.backgroundDark,
+  ovdsSurface:          colors.surface,
+  ovdsSurfaceDark:      colors.surfaceDark,
+  ovdsBorder:           colors.border,
+  ovdsBorderSubtle:     colors.borderSubtle,
+  ovdsMuted:            colors.backgroundAlt,
+  ovdsMutedDark:        darkColors.muted,
+  ovdsTextMain:         colors.textPrimary,
+  ovdsTextMuted:        colors.textSecondary,
+  ovdsTextSubtle:       colors.textTertiary,
+  ovdsTextPrimary:      colors.textPrimary,
+  ovdsTextSecondary:    colors.textSecondary,
+  ovdsSuccess:          '#10B981',
+  ovdsWarning:          '#F59E0B',
+  ovdsDanger:           '#F43F5E',
+  ovdsInfo:             '#3B82F6',
+  ovdsAccent:           colors.primary,
+  ovdsAccent400:        colors.primaryLight,
+  ovdsAccent600:        colors.primaryDark,
+  ovdsBgSecondary:      colors.backgroundAlt,
+  ovdsAiBg:             colors.ai.bg,
+  ovdsAiText:           colors.ai.text,
+  ovdsValidationBg:     colors.validation.bg,
+  ovdsSecurityBg:       colors.security.bg,
+  ovdsAuditBg:          colors.audit.bg,
+
+  akaBg:                colors.background,
+  akaBgAlt:             colors.backgroundAlt,
+  akaBgDark:            colors.backgroundDark,
+  akaSurface:           colors.surface,
+  akaSurfaceAlt:        colors.surfaceAlt,
+  akaSurfaceDark:       colors.surfaceDark,
+  akaSurfaceAltDark:    colors.surfaceAltDark,
+  akaBorder:            colors.border,
+  akaBorderSubtle:      colors.borderSubtle,
+  akaBorderDark:        colors.borderDark,
+  akaBorderSubtleDark:  colors.borderSubtleDark,
+  akaText:              colors.textPrimary,
+  akaTextSecondary:     colors.textSecondary,
+  akaTextTertiary:      colors.textTertiary,
+  akaTextDisabled:      '#C1C7CE',
+  akaTextDark:          colors.textPrimaryDark,
+  akaTextSecondaryDark: colors.textSecondaryDark,
+  akaTextTertiaryDark:  colors.textTertiaryDark,
+
+  financialAccent:      colors.primary,
+  financialBg:          colors.background,
+  financialSidebar:     '#0B1221',
+  financialTextMain:    colors.textPrimary,
+  financialTextMuted:   colors.textTertiary,
+  financialTextSubtle:  colors.textTertiary,
+  financialSuccess:     '#10B981',
+  financialWarning:     '#F59E0B',
+  financialDanger:      '#F43F5E',
+  financialInfo:        '#3B82F6',
+
+  akiAiBg:             colors.ai.bg,
+  akiAiText:           colors.ai.text,
+  akiAiBorder:         colors.ai.border,
+  akiAiDot:            colors.ai.dot,
+  akiAiMuted:          colors.ai.muted,
+  akiValidationBg:     colors.validation.bg,
+  akiValidationText:   colors.validation.text,
+  akiValidationBorder: colors.validation.border,
+  akiValidationDot:    colors.validation.dot,
+  akiSecurityBg:       colors.security.bg,
+  akiSecurityText:     colors.security.text,
+  akiSecurityBorder:   colors.security.border,
+  akiSecurityDot:      colors.security.dot,
+  akiAuditBg:          colors.audit.bg,
+  akiAuditText:        colors.audit.text,
+  akiAuditBorder:      colors.audit.border,
+  akiAuditDot:         colors.audit.dot,
+
+  akiIndigo:           'oklch(0.55 0.22 278)',
+  akiIndigoDim:        'oklch(0.94 0.04 278)',
+  akiIndigoDeep:       'oklch(0.38 0.20 278)',
+  akiIndigoLight:      'oklch(0.68 0.18 278)',
+  akiIndigoMid:        'oklch(0.88 0.09 278)',
+  akiGreen:            'oklch(0.59 0.19 155)',
+  akiGreenLight:       'oklch(0.74 0.14 155)',
+  akiGreenDim:         'oklch(0.94 0.04 155)',
+  akiGreenBorder:      'oklch(0.84 0.08 155)',
+  akiAmber:            'oklch(0.72 0.15 85)',
+  akiAmberLight:       'oklch(0.97 0.03 85)',
+  akiErr:              'oklch(0.55 0.20 25)',
+  akiErrLight:         'oklch(0.985 0.007 25)',
+  akiErrBorder:        'oklch(0.84 0.09 25)',
+  akiTextMuted:        'oklch(0.64 0.015 258)',
+  akiTextSubtle:       'oklch(0.74 0.012 258)',
+  akiSurface2:         'oklch(0.965 0.007 258)',
+  akiSurface3:         'oklch(0.952 0.008 258)',
+
+  lv:                  'var(--aki-indigo)',
+  lvDim:               'var(--aki-indigo-dim)',
+  lvDeep:              'var(--aki-indigo-deep)',
+  lvLight:             'var(--aki-indigo-light)',
+  lg:                  'var(--aki-green)',
+  ink:                 'var(--text)',
+  ink2:                'var(--text-2)',
+  ink3:                'var(--text-3)',
+  surface2:            'var(--surface-alt)',
+  green:               'var(--aki-green)',
+  greenLt:             'var(--aki-green-light)',
+  greenBd:             'var(--aki-green-border)',
+  amber:               'var(--aki-amber)',
+  amberLt:             'var(--aki-amber-light)',
+  err:                 'var(--aki-err)',
+  errLt:               'var(--aki-err-light)',
+  errBd:               'var(--aki-err-border)',
+  rg:                  'var(--aki-indigo)',
+  rgH:                 'var(--aki-indigo-deep)',
+  rgLt:                'var(--aki-indigo-dim)',
+  rgMd:                'var(--aki-indigo-light)',
+  rgDim:               'var(--aki-indigo-dim)',
+  ink4:                'var(--aki-text-muted)',
+  ink5:                'var(--aki-text-subtle)',
+  bd:                  'var(--border)',
+  bd2:                 'var(--border-alt)',
+  s0:                  'var(--surface)',
+  s1:                  'var(--surface-alt)',
+  s2:                  'var(--aki-surface-2)',
+  s3:                  'var(--aki-surface-3)',
+  violet:              'var(--aki-indigo)',
+  violetLight:         'var(--aki-indigo-light)',
+  violetDim:           'var(--aki-indigo-dim)',
+  violetDeep:          'var(--aki-indigo-deep)',
+} as const;

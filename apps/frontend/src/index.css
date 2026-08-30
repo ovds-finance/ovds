@@ -1,0 +1,17 @@
+/**
+ * apps/frontend — entry CSS
+ *
+ * All design tokens, CSS variables, animations, and utility classes are
+ * centralized in @ovds/ui. This file is intentionally minimal.
+ *
+ * DO NOT add CSS variables, animations, or utility classes here.
+ * Edit packages/ui/src/styles/globals.css instead.
+ */
+
+/* ── Canonical OVDS design system styles ── */
+@import '@ovds-styles/globals.css';
+
+/* ── Tailwind layers ── */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

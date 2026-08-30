@@ -1,0 +1,137 @@
+{
+  // Root tsconfig for tsc --build project references.
+  // Defines the full build graph so TypeScript can resolve symbol versions
+  // in the correct order and detect stale outputs across packages.
+  //
+  // Build order enforced by references:
+  //   design-system  (no deps)
+  //       ↓
+  //   shared         (depends on design-system)
+  //       ↓
+  //   dto            (depends on shared)
+  //       ↓
+  //   ui             (depends on shared + design-system)
+  //       ↓
+  //   database       (no shared deps, built alongside)
+  //       ↓
+  //   backend        (depends on shared + database + dto)
+  //   frontend       (depends on ui + shared + design-system + dto)
+  //
+  // Symbol versioning: each package exports SHARED_VERSION / DESIGN_SYSTEM_VERSION
+  // via version.ts. The backend calls assertSharedSingleton() at bootstrap to
+  // detect if two different builds of @ovds/shared are loaded simultaneously
+  // (e.g. dist/ artifact vs live src/ via tsconfig paths).
+  //
+  // Search-path priorities (highest → lowest):
+  //   1. tsconfig path aliases (src/ source for dev; dist d.ts for backend typecheck)
+  //   2. node_modules/@ovds/* (dist/ artifacts — used in production containers)
+  //   3. Fallback: bare specifier resolution via moduleResolution
+  //
+  // Usage:
+  //   tsc --build                  # incremental build of all packages
+  //   tsc --build --force          # full rebuild
+  //   tsc --build --clean          # remove all dist/ outputs
+  "files": [],
+  "references": [
+    { "path": "./packages/design-system" },
+    { "path": "./packages/core" },
+    { "path": "./packages/shared" },
+    { "path": "./packages/shared/dto" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/contracts" },
+    { "path": "./packages/database" },
+    { "path": "./packages/modules/hr" },
+    { "path": "./packages/modules/ovds" },
+
+    { "path": "./packages/domains/accounting" },
+    { "path": "./packages/domains/audit-outsourcing" },
+    { "path": "./packages/domains/banking" },
+    { "path": "./packages/domains/chart-of-accounts" },
+    { "path": "./packages/domains/compliance" },
+    { "path": "./packages/domains/crm" },
+    { "path": "./packages/domains/double-entry" },
+    { "path": "./packages/domains/expenses" },
+    { "path": "./packages/domains/general-ledger-compliance" },
+    { "path": "./packages/domains/helpdesk" },
+    { "path": "./packages/domains/hr" },
+    { "path": "./packages/domains/ifrs" },
+    { "path": "./packages/domains/infrastructure" },
+    { "path": "./packages/domains/inventory" },
+    { "path": "./packages/domains/invoice" },
+    { "path": "./packages/domains/items" },
+    { "path": "./packages/domains/journal" },
+    { "path": "./packages/domains/manufacturing" },
+    { "path": "./packages/domains/payments" },
+    { "path": "./packages/domains/payroll" },
+    { "path": "./packages/domains/platform" },
+    { "path": "./packages/domains/procurement" },
+    { "path": "./packages/domains/projects" },
+    { "path": "./packages/domains/purchases" },
+    { "path": "./packages/domains/receipts" },
+    { "path": "./packages/domains/reporting" },
+    { "path": "./packages/domains/sales" },
+    { "path": "./packages/domains/settings" },
+    { "path": "./packages/domains/sub-ledger" },
+    { "path": "./packages/domains/tax" },
+    { "path": "./packages/domains/trade" },
+    { "path": "./packages/domains/treasury" },
+    { "path": "./packages/domains/vat" },
+    { "path": "./packages/features/accounting" },
+    { "path": "./packages/features/appstore" },
+    { "path": "./packages/features/audit-outsourcing" },
+    { "path": "./packages/features/auth" },
+    { "path": "./packages/features/banking" },
+    { "path": "./packages/features/chart-of-accounts" },
+    { "path": "./packages/features/compliance" },
+    { "path": "./packages/features/contracts" },
+    { "path": "./packages/features/cost-centers" },
+    { "path": "./packages/features/crm" },
+    { "path": "./packages/features/currency" },
+    { "path": "./packages/features/custom-fields" },
+    { "path": "./packages/features/customers" },
+    { "path": "./packages/features/dashboard" },
+    { "path": "./packages/features/device-control" },
+    { "path": "./packages/features/disaster-fund" },
+    { "path": "./packages/features/double-entry" },
+    { "path": "./packages/features/eims" },
+    { "path": "./packages/features/expense-claims" },
+    { "path": "./packages/features/expenses" },
+    { "path": "./packages/features/fiscal" },
+    { "path": "./packages/features/general-ledger-compliance" },
+    { "path": "./packages/features/helpdesk" },
+    { "path": "./packages/features/hr" },
+    { "path": "./packages/features/ifrs" },
+    { "path": "./packages/features/inventory" },
+    { "path": "./packages/features/invoice" },
+    { "path": "./packages/features/iot" },
+    { "path": "./packages/features/items" },
+    { "path": "./packages/features/journal" },
+    { "path": "./packages/features/loyalty" },
+    { "path": "./packages/features/manufacturing" },
+    { "path": "./packages/features/monetization" },
+    { "path": "./packages/features/notifications" },
+    { "path": "./packages/features/offline-sync" },
+    { "path": "./packages/features/onboarding" },
+    { "path": "./packages/features/payments" },
+    { "path": "./packages/features/payroll" },
+    { "path": "./packages/features/platform" },
+    { "path": "./packages/features/procurement" },
+    { "path": "./packages/features/projects" },
+    { "path": "./packages/features/purchases" },
+    { "path": "./packages/features/receipts" },
+    { "path": "./packages/features/release" },
+    { "path": "./packages/features/reporting" },
+    { "path": "./packages/features/sales" },
+    { "path": "./packages/features/security" },
+    { "path": "./packages/features/security-assessment" },
+    { "path": "./packages/features/security-evaluator" },
+    { "path": "./packages/features/settings" },
+    { "path": "./packages/features/sub-ledger" },
+    { "path": "./packages/features/tax" },
+    { "path": "./packages/features/trade" },
+    { "path": "./packages/features/treasury" },
+    { "path": "./packages/features/vendors" },
+    { "path": "./packages/features/workflow" },
+    { "path": "./apps/backend" }
+  ]
+}

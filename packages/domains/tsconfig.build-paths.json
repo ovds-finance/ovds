@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@ovds/shared": ["packages/shared/dist/index.d.ts"],
+      "@ovds/shared/*": ["packages/shared/dist/*"],
+      "@ovds/core": ["packages/core/dist/index.d.ts"],
+      "@ovds/database": ["packages/database/dist/index.d.ts"],
+      "@ovds/dto": ["packages/shared/dto/dist/index.d.ts"],
+      "@ovds/dto/*": ["packages/shared/dto/dist/*/index.d.ts"],
+      "@ovds/contracts": ["packages/contracts/dist/index.d.ts"],
+      "@ovds/contracts/schemas": ["packages/contracts/dist/schemas/index.d.ts"],
+      "@ovds/contracts/router": ["packages/contracts/dist/router/index.d.ts"],
+      "@ovds/contracts/schemas/*": ["packages/contracts/dist/schemas/*.d.ts"],
+      "@ovds/contracts/prisma-zod": ["packages/contracts/dist/prisma-zod/index.d.ts"],
+      "@ovds/domains/infrastructure": ["packages/domains/infrastructure/dist/index.d.ts"],
+      "@ovds/domains/chart-of-accounts": ["packages/domains/chart-of-accounts/src/index.ts"],
+      "@ovds/domains/journal":      ["packages/domains/journal/src/index.ts"],
+      "@ovds/domains/payments":     ["packages/domains/payments/src/index.ts"],
+      "@ovds/domains/compliance":   ["packages/domains/compliance/src/index.ts"],
+      "@ovds/domains/platform":     ["packages/domains/platform/src/index.ts"],
+      "@ovds/domains/projects":     ["packages/domains/projects/src/index.ts"],
+      "@ovds/domains/inventory":    ["packages/domains/inventory/src/index.ts"],
+      "@ovds/domains/banking":      ["packages/domains/banking/src/index.ts"],
+      "@ovds/domains/tax":          ["packages/domains/tax/src/index.ts"]
+    }
+  }
+}

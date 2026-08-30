@@ -1,0 +1,34 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "Node16",
+    "moduleResolution": "node16",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "declarationMap": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "tsBuildInfoFile": "./.tsbuildinfo-dev",
+    "paths": {
+      "@common/*": ["src/common/*"],
+      "@common/dto/*": ["src/common/dto/*"],
+      "@common/interfaces/*": ["src/common/interfaces/*"],
+      "@packages/*": ["../../packages/*"]
+    },
+    "typeRoots": ["../../node_modules/@types"],
+    "skipLibCheck": true,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false,
+    "ignoreDeprecations": "5.0"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "test", "vitest.config.*", "**/*.spec.ts", "**/*.test.ts", "**/*.e2e-spec.ts", "**/*.integration-spec.ts"]
+}

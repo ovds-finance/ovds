@@ -1,0 +1,1 @@
+// loyalty type exports

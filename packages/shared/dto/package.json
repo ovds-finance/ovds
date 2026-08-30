@@ -1,0 +1,78 @@
+{
+  "name": "@ovds/dto",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OVDS shared DTO library — single import path for NestJS, React, TypeScript, and Prisma consumers",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "source": "./src/index.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./auth": {
+      "source": "./src/auth/index.ts",
+      "import": "./dist/auth/index.js",
+      "require": "./dist/auth/index.js",
+      "default": "./dist/auth/index.js",
+      "types": "./dist/auth/index.d.ts"
+    },
+    "./ovds": {
+      "source": "./src/ovds/index.ts",
+      "import": "./dist/ovds/index.js",
+      "require": "./dist/ovds/index.js",
+      "default": "./dist/ovds/index.js",
+      "types": "./dist/ovds/index.d.ts"
+    },
+    "./hr": {
+      "source": "./src/hr/index.ts",
+      "import": "./dist/hr/index.js",
+      "require": "./dist/hr/index.js",
+      "default": "./dist/hr/index.js",
+      "types": "./dist/hr/index.d.ts"
+    },
+    "./projects": {
+      "source": "./src/projects/index.ts",
+      "import": "./dist/projects/index.js",
+      "require": "./dist/projects/index.js",
+      "default": "./dist/projects/index.js",
+      "types": "./dist/projects/index.d.ts"
+    },
+    "./trade": {
+      "source": "./src/trade/index.ts",
+      "import": "./dist/trade/index.js",
+      "require": "./dist/trade/index.js",
+      "default": "./dist/trade/index.js",
+      "types": "./dist/trade/index.d.ts"
+    },
+    "./loyalty": {
+      "source": "./src/loyalty/index.ts",
+      "import": "./dist/loyalty/index.js",
+      "require": "./dist/loyalty/index.js",
+      "default": "./dist/loyalty/index.js",
+      "types": "./dist/loyalty/index.d.ts"
+    },
+    "./common": {
+      "source": "./src/common/index.ts",
+      "import": "./dist/common/index.js",
+      "require": "./dist/common/index.js",
+      "default": "./dist/common/index.js",
+      "types": "./dist/common/index.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "node ../../../scripts/bin-run.mjs typescript/bin/tsc",
+    "typecheck": "node ../../../scripts/bin-run.mjs typescript/bin/tsc --noEmit"
+  },
+  "dependencies": {
+    "@ovds/shared": "*",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1"
+  }
+}

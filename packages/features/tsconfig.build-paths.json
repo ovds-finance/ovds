@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@ovds/ui": ["packages/ui/dist/index.d.ts"],
+      "@ovds/shared": ["packages/shared/dist/index.d.ts"],
+      "@ovds/shared/*": ["packages/shared/dist/*"],
+      "@ovds/design-system": ["packages/design-system/dist/index.d.ts"],
+      "@ovds/contracts": ["packages/contracts/dist/index.d.ts"],
+      "@ovds/contracts/schemas": ["packages/contracts/dist/schemas/index.d.ts"],
+      "@ovds/contracts/schemas/inventory": ["packages/contracts/dist/schemas/inventory.d.ts"],
+      "@ovds/contracts/schemas/ovds": ["packages/contracts/dist/schemas/ovds.d.ts"],
+      "@ovds/contracts/schemas/hr": ["packages/contracts/dist/schemas/hr.d.ts"],
+      "@ovds/contracts/schemas/tax": ["packages/contracts/dist/schemas/tax.d.ts"],
+      "@ovds/contracts/schemas/settings": ["packages/contracts/dist/schemas/settings.d.ts"],
+      "@ovds/contracts/schemas/auth": ["packages/contracts/dist/schemas/auth.d.ts"],
+      "@ovds/contracts/schemas/common": ["packages/contracts/dist/schemas/common.d.ts"],
+      "@ovds/contracts/router": ["packages/contracts/dist/router/index.d.ts"],
+      "@ovds/contracts/prisma-zod": ["packages/contracts/dist/prisma-zod/index.d.ts"],
+      "@ovds/core": ["packages/core/dist/index.d.ts"],
+      "@ovds/dto": ["packages/shared/dto/dist/index.d.ts"],
+      "@ovds/dto/*": ["packages/shared/dto/dist/*/index.d.ts"],
+      "@ovds/features/eims": ["packages/features/eims/src/index.ts"],
+      "@ovds/features/security": ["packages/features/security/src/index.ts"],
+      "@ovds/features/security-assessment": ["packages/features/security-assessment/src/index.ts"],
+      "@ovds/features/chart-of-accounts": ["packages/features/chart-of-accounts/src/index.ts"],
+      "@ovds/features/journal":      ["packages/features/journal/src/index.ts"],
+      "@ovds/features/payments":     ["packages/features/payments/src/index.ts"],
+      "@ovds/features/compliance":   ["packages/features/compliance/src/index.ts"],
+      "@ovds/features/platform":     ["packages/features/platform/src/index.ts"],
+      "@ovds/features/projects":     ["packages/features/projects/src/index.ts"],
+      "@ovds/features/inventory":    ["packages/features/inventory/src/index.ts"],
+      "@ovds/features/banking":      ["packages/features/banking/src/index.ts"],
+      "@ovds/features/tax":          ["packages/features/tax/src/index.ts"]
+    }
+  }
+}

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#2980b9" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="google" content="notranslate" />
+    <meta name="description" content="OVDS - Online VAT Declaration System & ERP platform for Ethiopian businesses. Accounting, invoice, payroll, HR, tax compliance, and business intelligence." />
+    <meta name="keywords" content="OVDS, VAT declaration, Ethiopian tax, ERP, accounting software, invoice, payroll, HR management, tax compliance, eTax, Ethiopian business software" />
+    <link rel="apple-touch-icon" href="/pwa-192x192.png" />
+    <!-- Plus Jakarta Sans — loaded once here; components fall back to system-ui if offline -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800&display=swap" />
+    <title>Online Vat Declaretion System & Accounting Software</title>
+    <!-- Sync <html lang> with stored i18n language before React hydrates -->
+    <script src="/init-page.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- Force-clear stale SW caches that cause blank pages after deploys -->
+    <script src="/sw-bust.js"></script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

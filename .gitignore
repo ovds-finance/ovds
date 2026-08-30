@@ -1,0 +1,159 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Package build artifacts in source directories (should not be committed)
+packages/*/src/**/*.js
+packages/*/src/**/*.js.map
+packages/*/src/**/*.d.ts
+packages/*/src/**/*.d.ts.map
+!packages/*/src/**/*.ts
+
+# Vite build artifacts (public assets)
+apps/public/assets/
+apps/*/dist/
+apps/*/build/
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test.local
+.env.production
+.env.production.local
+apps/*/.env*
+apps/*/.env
+frontend/.env*
+backend/.env*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+
+# Vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Docker volumes
+docker-compose.override.yml
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.orig
+*.rej
+*~
+
+# ZAP session data (keep config, ignore session state)
+.zap/session/
+.zap/*.session
+.zap/*.bak
+
+# Security test reports (keep in reports dir, but ignore generated files)
+security-reports/
+
+# Scanner output files
+scanner-*.txt
+scanner-*.log
+scanner-*.json
+scanner-output.txt
+scanner-results.json
+scanner-summary.txt
+scanner-progress.txt
+scanner-enhanced*.txt
+scanner-final.log
+
+# Backup files
+*.bak
+*.backup
+
+# Test results
+test-results/
+playwright-report/
+
+# Nx
+.nx/cache/
+.nx/workspace-data/
+
+# Build output
+apps/public/
+apps/frontend/public/sw.js
+apps/frontend/public/registerSW.js
+apps/frontend/public/manifest.json
+
+.nx/migrate-runs
+
+# Optimization pipeline reports (generated, not committed)
+.reports/

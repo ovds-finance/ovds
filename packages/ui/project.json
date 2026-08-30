@@ -1,0 +1,51 @@
+{
+  "name": "ui",
+  "root": "packages/ui",
+  "sourceRoot": "packages/ui/src",
+  "projectType": "library",
+  "tags": [
+    "scope:shared",
+    "type:lib",
+    "type:ui"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "packages/ui"
+      },
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "cache": true
+    },
+    "build:clean": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build:clean",
+        "cwd": "packages/ui"
+      },
+      "cache": false
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run typecheck",
+        "cwd": "packages/ui"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    }
+  }
+}

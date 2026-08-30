@@ -1,0 +1,21 @@
+
+<--- Last few GCs --->
+
+[20592:0000026CF3130000]   478032 ms: Scavenge (during sweeping) 2030.3 (2049.0) -> 2022.9 (2049.0) MB, pooled: 0.0 MB, 2.54 / 0.00 ms (average mu = 0.348, current mu = 0.319) allocation failure; 
+[20592:0000026CF3130000]   480527 ms: Mark-Compact (reduce) 2038.2 (2056.3) -> 2024.4 (2035.5) MB, pooled: 0.0 MB, 372.02 / 0.00 ms (+ 1990.4 ms in 233 steps since start of marking, biggest step 55.2 ms, walltime since start of marking 2495 ms) (average m
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 00007FF6F9C4B106 node::OnFatalError+1318
+ 2: 00007FF6FA7E9C67 v8::Function::NewInstance+423
+ 3: 00007FF6FA5F8077 EVP_PKEY_asn1_set_get_priv_key+463063
+ 4: 00007FF6FA5FBF87 EVP_PKEY_asn1_set_get_priv_key+479207
+ 5: 00007FF6FA60DB88 v8::internal::StrongRootAllocatorBase::deallocate_impl+19176
+ 6: 00007FF6FA60D3BB v8::internal::StrongRootAllocatorBase::deallocate_impl+17179
+ 7: 00007FF6FBBCF9AD v8::base::DiyFp::Multiply+10628941
+ 8: 00007FF6FA5F59A8 EVP_PKEY_asn1_set_get_priv_key+453128
+ 9: 00007FF6FA6135E0 X509_STORE_set_cleanup+5664
+10: 00007FF6FA61230E X509_STORE_set_cleanup+846
+11: 00007FF6FA61FF5B EVP_PKEY_meth_set_digestsign+21131
+12: 00007FF6FA21FEEE v8::String::Utf8Value::~Utf8Value+152750
+13: 0000026C9FE7B4FA 

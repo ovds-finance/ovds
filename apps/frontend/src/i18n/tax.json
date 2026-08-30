@@ -1,0 +1,647 @@
+{
+  "vat": {
+    "title": "VAT Administration",
+    "subtitle": "Value Added Tax — Proclamation No. 1341/2024",
+    "rate": "15%",
+    "threshold": "ETB 2,000,000/year",
+    "filing_deadline": "30th of following month",
+    "late_penalty": "ETB 500/day",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "output": "Output VAT",
+      "input": "Input VAT",
+      "withholding": "Withholding",
+      "reverse_charge": "Reverse Charge",
+      "refunds": "Refunds",
+      "filings": "Filings",
+      "export_evidence": "Export Evidence"
+    },
+    "stats": {
+      "output_vat": "Output VAT",
+      "input_vat": "Input VAT",
+      "net_payable": "Net Payable",
+      "withheld": "Withheld",
+      "pending_refunds": "Pending Refunds",
+      "reverse_charge": "Reverse Charge"
+    },
+    "status": {
+      "draft": "Draft",
+      "computed": "Computed",
+      "reviewed": "Reviewed",
+      "submitted": "Submitted",
+      "acknowledged": "Acknowledged"
+    },
+    "categories": {
+      "standard": "Standard (15%)",
+      "zero_rated": "Zero-Rated (0%)",
+      "exempt": "Exempt",
+      "withholding": "Withholding (15%)",
+      "reverse_charge": "Reverse Charge (15%)"
+    },
+    "actions": {
+      "compute": "Compute VAT",
+      "review": "Mark Reviewed",
+      "submit": "Submit to ERCA",
+      "export_form1": "Export VAT Form 1",
+      "new_filing": "New Filing"
+    },
+    "filing": {
+      "period": "Filing Period",
+      "etax_ref": "eTax Reference",
+      "filed_at": "Filed At",
+      "due_date": "Due Date",
+      "output": "Output VAT",
+      "input": "Input VAT",
+      "net": "Net Payable"
+    },
+    "messages": {
+      "compute_success": "VAT computed for {{period}}",
+      "submit_success": "VAT return submitted — Ref: {{ref}}",
+      "submit_error": "Failed to submit VAT return",
+      "overdue_warning": "VAT filing overdue — ETB 500/day penalty applies"
+    }
+  },
+  "drrf": {
+    "title": "Disaster Risk Reduction Fund",
+    "subtitle": "DRRF Levies — Regulation No. 570/2025",
+    "tabs": {
+      "contributions": "Contributions",
+      "schedule": "Schedule",
+      "remittances": "Remittances",
+      "compliance": "Compliance Score",
+      "forecast": "Forecast"
+    },
+    "stats": {
+      "total": "Total Levies",
+      "remitted": "Remitted",
+      "pending": "Pending",
+      "overdue": "Overdue",
+      "compliance_score": "Compliance Score"
+    },
+    "status": {
+      "pending": "Pending",
+      "remitted": "Remitted",
+      "overdue": "Overdue",
+      "archived": "Archived"
+    },
+    "categories": {
+      "salary_contribution": "Salary Contribution (1%)",
+      "loan_value": "Loan Value (1%)",
+      "service_fee": "Service Fee (5%)",
+      "annual_sales_revenue": "Annual Sales Revenue (5%)",
+      "airtime_sales": "Airtime Sales (5%)",
+      "tobacco_alcohol": "Tobacco & Alcohol (5%)",
+      "telecom_digital": "Telecom/Digital (5%)",
+      "ticket_sales": "Ticket Sales (ETB 100 flat)",
+      "fuel_sales": "Fuel Sales (ETB 200 flat)",
+      "government_service": "Government Service (ETB 200 flat)",
+      "insurance_premium": "Insurance Premium (1%)",
+      "dividend": "Dividend (1%)",
+      "other": "Other (1%)"
+    },
+    "actions": {
+      "auto_generate": "Auto-Generate",
+      "record_remittance": "Record Remittance",
+      "generate_schedule": "Generate Schedule",
+      "export": "Export"
+    },
+    "remittance": {
+      "title": "Record Remittance",
+      "amount": "Amount",
+      "bank": "Bank Name",
+      "reference": "Reference No.",
+      "notes": "Notes",
+      "remitted_by": "Remitted By",
+      "bank_hint": "Commercial Bank of Ethiopia (CBE)"
+    },
+    "compliance": {
+      "grade_a": "Grade A — Excellent (≥90%)",
+      "grade_b": "Grade B — Good (≥75%)",
+      "grade_c": "Grade C — Fair (≥60%)",
+      "grade_d": "Grade D — Poor (≥40%)",
+      "grade_f": "Grade F — Critical (<40%)"
+    },
+    "messages": {
+      "generate_success": "{{count}} contributions generated for {{period}}",
+      "remittance_success": "Remittance recorded successfully",
+      "overdue_warning": "{{count}} contributions are overdue"
+    }
+  },
+  "bit": {
+    "title": "Business Income Tax",
+    "subtitle": "BIT Declaration — 30% of Net Profit",
+    "rate": "30%",
+    "filing_deadline": "Within 4 months of FY end (November 7)",
+    "stats": {
+      "net_profit": "Net Profit",
+      "tax_payable": "Tax Payable",
+      "paid": "Paid",
+      "balance_due": "Balance Due"
+    },
+    "actions": {
+      "calculate": "Calculate BIT",
+      "file": "File Declaration",
+      "export": "Export Declaration"
+    },
+    "messages": {
+      "calculate_success": "BIT calculated for FY {{year}}",
+      "file_success": "BIT declaration filed",
+      "mat_warning": "MAT applies — 2.5% of turnover (ETB {{mat}}) exceeds regular tax (ETB {{regular}})"
+    }
+  },
+  "compliance": {
+    "title": "Compliance Auditor",
+    "subtitle": "ERCA Compliance Status",
+    "checklist": {
+      "einvoice": "e-Invoice QR on every invoice",
+      "etax": "eTax portal account active",
+      "monthly": "Monthly VAT return filing",
+      "reverse": "Reverse-charge for digital services",
+      "annual": "Annual VAT reconciliation",
+      "pit": "PIT brackets in payroll",
+      "pension": "Pension 7%/11% configured",
+      "disaster": "DRRF levies tracked",
+      "bit": "BIT declaration ready",
+      "audit": "Audit trail immutable"
+    },
+    "status": {
+      "ok": "OK",
+      "warning": "Warning",
+      "critical": "Critical",
+      "pending": "Pending"
+    },
+    "calendar": {
+      "title": "Tax Calendar",
+      "vat_due": "VAT Due",
+      "drrf_due": "DRRF Due",
+      "bit_due": "BIT Due",
+      "pension_due": "Pension Due",
+      "payroll_pit": "Payroll PIT"
+    }
+  },
+  "universal_config": {
+    "title": "Universal Tax Configuration",
+    "subtitle": "Canonical Ethiopian tax rules, GL mappings, IAS 12 treatments, RBAC, and company filing profile — all industries",
+    "tabs": {
+      "rules": "Tax Rules",
+      "profile": "Company Profile",
+      "gl": "GL Account Map",
+      "calendar": "Filing Calendar",
+      "health": "Compliance Health",
+      "sectors": "Sector Overrides",
+      "rbac": "RBAC Matrix"
+    },
+    "labels": {
+      "tax_type": "Tax Type",
+      "rate": "Rate",
+      "threshold": "Threshold",
+      "ias12": "IAS 12",
+      "ifrs18": "IFRS 18",
+      "frequency": "Frequency",
+      "portal": "Portal",
+      "proclamation": "Proclamation",
+      "gl_debit": "GL Debit",
+      "gl_credit": "GL Credit",
+      "direction": "Direction",
+      "active_taxes": "Active Taxes",
+      "vat_tot_band": "VAT / TOT Band",
+      "bit_schedule": "BIT Schedule",
+      "sector": "Sector",
+      "framework": "AABE Framework",
+      "deferred_tax": "Deferred Tax (IAS 12)",
+      "pool_rates": "Pool Depreciation Rates",
+      "compliance_score": "Compliance Score",
+      "overdue": "Overdue",
+      "exempt": "EXEMPT",
+      "min_role": "Min. Role",
+      "min_level": "Min. Level",
+      "action": "Action",
+      "description": "Description"
+    },
+    "bands": {
+      "A_vat": "Band A — VAT registered (turnover ≥ ETB 2M)",
+      "B_tot": "Band B — TOT applies (turnover ETB 500K–2M)",
+      "C_tot": "Band C — TOT applies (turnover < ETB 500K)",
+      "A_bit": "Schedule A — Turnover > ETB 1M (30% flat)",
+      "B_bit": "Schedule B — Turnover ETB 500K–1M (30% / MAT)",
+      "C_bit": "Schedule C — Turnover < ETB 500K (progressive)"
+    },
+    "ias12": {
+      "CURRENT_TAX": "Current Tax",
+      "DEFERRED_TAX": "Deferred Tax",
+      "NOT_INCOME_TAX": "Not Income Tax"
+    },
+    "ifrs18": {
+      "OPERATING": "Operating",
+      "INCOME_TAX": "Income Tax",
+      "FINANCING": "Financing",
+      "INVESTING": "Investing"
+    },
+    "status": {
+      "COMPLIANT": "Compliant",
+      "PENDING": "Pending",
+      "NOT_FILED": "Not Filed",
+      "OVERDUE": "Overdue",
+      "CURRENT": "Current",
+      "NOT_APPLICABLE": "N/A",
+      "UNREMITTED": "Unremitted"
+    },
+    "messages": {
+      "save_success": "Tax profile saved successfully",
+      "save_error": "Failed to save tax profile",
+      "no_rules": "No tax rules loaded. Check backend connection.",
+      "no_deadlines": "No upcoming deadlines in the next 90 days.",
+      "no_health": "Compliance health data not available."
+    }
+  },
+  "am": {
+    "vat": {
+      "title": "የተጨማሪ እሴት ታክስ አስተዳደር",
+      "subtitle": "ተጨማሪ እሴት ታክስ — አዋጅ ቁጥር 1341/2024",
+      "rate": "15%",
+      "threshold": "ETB 2,000,000/ዓመት",
+      "filing_deadline": "የሚቀጥለው ወር 30ኛው ቀን",
+      "late_penalty": "ETB 500/ቀን",
+      "tabs": {
+        "dashboard": "ዳሽቦርድ",
+        "output": "ውጤት ቫት",
+        "input": "ግብዓት ቫት",
+        "withholding": "ዊዝሆልዲንግ",
+        "reverse_charge": "ሪቨርስ ቻርጅ",
+        "refunds": "ተመላሾች",
+        "filings": "ማቅረቢያዎች",
+        "export_evidence": "የኤክስፖርት ማስረጃ"
+      },
+      "stats": {
+        "output_vat": "ውጤት ቫት",
+        "input_vat": "ግብዓት ቫት",
+        "net_payable": "ተጣራ ሊከፈል የሚገባ",
+        "withheld": "የተያዘ",
+        "pending_refunds": "በመጠባበቅ ላይ ያሉ ተመላሾች",
+        "reverse_charge": "ሪቨርስ ቻርጅ"
+      },
+      "status": {
+        "draft": "ረቂቅ",
+        "computed": "ተሰልቷል",
+        "reviewed": "ተገምግሟል",
+        "submitted": "ቀርቧል",
+        "acknowledged": "ተቀብሏል"
+      },
+      "categories": {
+        "standard": "መደበኛ (15%)",
+        "zero_rated": "ዜሮ-ሬትድ (0%)",
+        "exempt": "ነፃ",
+        "withholding": "ዊዝሆልዲንግ (15%)",
+        "reverse_charge": "ሪቨርስ ቻርጅ (15%)"
+      },
+      "actions": {
+        "compute": "ቫት አስሊ",
+        "review": "እንደተገመገመ ምልክት አድርግ",
+        "submit": "ለኢ.ር.ካ ላክ",
+        "export_form1": "የቫት ፎርም 1 ላክ",
+        "new_filing": "አዲስ ማቅረቢያ"
+      },
+      "filing": {
+        "period": "የማቅረቢያ ጊዜ",
+        "etax_ref": "የeTax ማጣቀሻ",
+        "filed_at": "የቀረበበት ቀን",
+        "due_date": "መክፈያ ቀን",
+        "output": "ውጤት ቫት",
+        "input": "ግብዓት ቫት",
+        "net": "ተጣራ ክፍያ"
+      },
+      "messages": {
+        "compute_success": "ቫት ለ{{period}} ተሰልቷል",
+        "submit_success": "የቫት ተመላሽ ቀርቧል — ማጣቀሻ: {{ref}}",
+        "submit_error": "የቫት ተመላሽ ማቅረብ አልተሳካም",
+        "overdue_warning": "የቫት ማቅረቢያ ጊዜ አልፏል — ETB 500/ቀን ቅጣት ይተገበራል"
+      }
+    },
+    "drrf": {
+      "title": "የአደጋ ስጋት ቅነሳ ፈንድ",
+      "subtitle": "DRRF ቀረጥ — ደንብ ቁጥር 570/2025",
+      "tabs": {
+        "contributions": "አስተዋጽዖዎች",
+        "schedule": "መርሃ ግብር",
+        "remittances": "ክፍያዎች",
+        "compliance": "የተጣጣሚነት ነጥብ",
+        "forecast": "ትንበያ"
+      },
+      "stats": {
+        "total": "ጠቅላላ ቀረጥ",
+        "remitted": "የተላከ",
+        "pending": "በመጠባበቅ ላይ",
+        "overdue": "ጊዜው ያለፈ",
+        "compliance_score": "የተጣጣሚነት ነጥብ"
+      },
+      "status": {
+        "pending": "በመጠባበቅ ላይ",
+        "remitted": "ተልኳል",
+        "overdue": "ጊዜው ያለፈ",
+        "archived": "የተመዘገበ"
+      },
+      "categories": {
+        "salary_contribution": "የደሞዝ አስተዋጽዖ (1%)",
+        "loan_value": "የብድር ዋጋ (1%)",
+        "service_fee": "የአገልግሎት ክፍያ (5%)",
+        "annual_sales_revenue": "የዓመታዊ ሽያጭ ገቢ (5%)",
+        "airtime_sales": "የአየር ሰዓት ሽያጭ (5%)",
+        "tobacco_alcohol": "ትምባሆ እና አልኮል (5%)",
+        "telecom_digital": "ቴሌኮም/ዲጂታል (5%)",
+        "ticket_sales": "የቲኬት ሽያጭ (ETB 100)",
+        "fuel_sales": "የነዳጅ ሽያጭ (ETB 200)",
+        "government_service": "የመንግስት አገልግሎት (ETB 200)",
+        "insurance_premium": "የኢንሹራንስ ፕሪሚየም (1%)",
+        "dividend": "ትርፍ ድርሻ (1%)",
+        "other": "ሌላ (1%)"
+      },
+      "actions": {
+        "auto_generate": "በራስ-ሰር ፍጠር",
+        "record_remittance": "ክፍያ መዝግብ",
+        "generate_schedule": "መርሃ ግብር ፍጠር",
+        "export": "ወደ ውጭ ላክ"
+      },
+      "remittance": {
+        "title": "ክፍያ መዝግብ",
+        "amount": "መጠን",
+        "bank": "የባንክ ስም",
+        "reference": "የማጣቀሻ ቁጥር",
+        "notes": "ማስታወሻዎች",
+        "remitted_by": "የላከው አካል",
+        "bank_hint": "የኢትዮጵያ ንግድ ባንክ (CBE)"
+      },
+      "compliance": {
+        "grade_a": "ደረጃ A — በጣም ጥሩ (≥90%)",
+        "grade_b": "ደረጃ B — ጥሩ (≥75%)",
+        "grade_c": "ደረጃ C — ደህና (≥60%)",
+        "grade_d": "ደረጃ D — ዝቅተኛ (≥40%)",
+        "grade_f": "ደረጃ F — ወሳኝ (<40%)"
+      },
+      "messages": {
+        "generate_success": "{{count}} አስተዋጽዖዎች ለ{{period}} ተፈጥረዋል",
+        "remittance_success": "ክፍያ በተሳካ ሁኔታ ተመዝግቧል",
+        "overdue_warning": "{{count}} አስተዋጽዖዎች ጊዜያቸው አልፏል"
+      }
+    },
+    "bit": {
+      "title": "የንግድ ገቢ ታክስ",
+      "subtitle": "BIT ማስታወቂያ — 30% ከተጣራ ትርፍ",
+      "rate": "30%",
+      "filing_deadline": "የበጀት ዓመቱ ካለቀ በ4 ወራት ውስጥ (ህዳር 7)",
+      "stats": {
+        "net_profit": "ተጣራ ትርፍ",
+        "tax_payable": "ሊከፈል የሚገባ ታክስ",
+        "paid": "የተከፈለ",
+        "balance_due": "ቀሪ ክፍያ"
+      },
+      "actions": {
+        "calculate": "BIT አስሊ",
+        "file": "ማስታወቂያ አቅርብ",
+        "export": "ማስታወቂያ ላክ"
+      },
+      "messages": {
+        "calculate_success": "BIT ለበጀት ዓመት {{year}} ተሰልቷል",
+        "file_success": "የBIT ማስታወቂያ ቀርቧል",
+        "mat_warning": "MAT ይተገበራል — 2.5% ከሽያጭ (ETB {{mat}}) ከመደበኛው ታክስ (ETB {{regular}}) ይበልጣል"
+      }
+    },
+    "compliance": {
+      "title": "የተጣጣሚነት ኦዲተር",
+      "subtitle": "የኢ.ር.ካ ተጣጣሚነት ሁኔታ",
+      "checklist": {
+        "einvoice": "በእያንዳንዱ ደረሰኝ ላይ ኢ-ደረሰኝ QR",
+        "etax": "የeTax ፖርታል አካውንት ንቁ",
+        "monthly": "የወር ቫት ተመላሽ ማቅረቢያ",
+        "reverse": "ለዲጂታል አገልግሎቶች ሪቨርስ-ቻርጅ",
+        "annual": "የዓመታዊ ቫት እርቅ",
+        "pit": "የPIT ቅንፎች በደሞዝ ዝርዝር",
+        "pension": "ጡረታ 7%/11% ተዋቅሯል",
+        "disaster": "የDRRF ቀረጥ ተከታትሏል",
+        "bit": "የBIT ማስታወቂያ ዝግጁ",
+        "audit": "የኦዲት ምዝግብ የማይለወጥ"
+      },
+      "status": {
+        "ok": "ደህና",
+        "warning": "ማሳሰቢያ",
+        "critical": "ወሳኝ",
+        "pending": "በመጠባበቅ ላይ"
+      },
+      "calendar": {
+        "title": "የታክስ ቀን መቁጠሪያ",
+        "vat_due": "የቫት መክፈያ",
+        "drrf_due": "የDRRF መክፈያ",
+        "bit_due": "የBIT መክፈያ",
+        "pension_due": "የጡረታ መክፈያ",
+        "payroll_pit": "የደሞዝ PIT"
+      }
+    },
+    "universal_config": {
+      "title": "ሁለንተናዊ የታክስ ውቅር",
+      "subtitle": "ደምቦዎቹ ለሁሉም የኢትዮጵያ ዘርፎች ይተገበራሉ",
+      "tabs": {
+        "rules": "የታክስ ደምቦዎች",
+        "profile": "የኩባንያ መገለጫ",
+        "gl": "ጠቅላላ ደብተር ካርታ",
+        "calendar": "የማስገቢያ ቀን መቁጠሪያ",
+        "health": "የተጣጣሚነት ጤና",
+        "sectors": "የዘርፍ ልዩ ሁኔታዎች",
+        "rbac": "RBAC ማትሪክስ"
+      }
+    }
+  },
+  "ti": {
+    "vat": {
+      "title": "ናይ ተወሳኺ ዋጋ ቀረጥ ምምሕዳር",
+      "subtitle": "ተወሳኺ ዋጋ ቀረጥ — ኣዋጅ ቁጽሪ 1341/2024",
+      "rate": "15%",
+      "threshold": "ETB 2,000,000/ዓመት",
+      "filing_deadline": "ናይ ዝቕጽል ወርሒ 30",
+      "late_penalty": "ETB 500/መዓልቲ",
+      "tabs": {
+        "dashboard": "ዳሽቦርድ",
+        "output": "ውጽኢት ቫት",
+        "input": "ምእታው ቫት",
+        "withholding": "ዊዝሆልዲንግ",
+        "reverse_charge": "ሪቨርስ ቻርጅ",
+        "refunds": "ምምላስ",
+        "filings": "ምቕራብ",
+        "export_evidence": "መርትዖ ኤክስፖርት"
+      },
+      "stats": {
+        "output_vat": "ናይ ውጽኢት ቫት",
+        "input_vat": "ናይ ምእታው ቫት",
+        "net_payable": "ጽሩይ ዝኽፈል",
+        "withheld": "ዝተሓዘ",
+        "pending_refunds": "ዝጽበዩ ምምላስ",
+        "reverse_charge": "ሪቨርስ ቻርጅ"
+      },
+      "status": {
+        "draft": "ረቂቕ",
+        "computed": "ተሓሲቡ",
+        "reviewed": "ተገምጊሙ",
+        "submitted": "ቀሪቡ",
+        "acknowledged": "ተቐቢሉ"
+      },
+      "categories": {
+        "standard": "መደበኛ (15%)",
+        "zero_rated": "ዜሮ-ሬትድ (0%)",
+        "exempt": "ነፃ",
+        "withholding": "ዊዝሆልዲንግ (15%)",
+        "reverse_charge": "ሪቨርስ ቻርጅ (15%)"
+      },
+      "actions": {
+        "compute": "ቫት ሓሲብ",
+        "review": "ከም ዝተገምገመ ምልክት ግበር",
+        "submit": "ናብ ኢ.ር.ካ ስደድ",
+        "export_form1": "ናይ ቫት ፎርም 1 ስደድ",
+        "new_filing": "ሓዲሽ ምቕራብ"
+      },
+      "filing": {
+        "period": "ናይ ምቕራብ ግዜ",
+        "etax_ref": "ናይ eTax መወከሲ",
+        "filed_at": "ዝቐረበሉ ዕለት",
+        "due_date": "መክፈሊ ዕለት",
+        "output": "ውጽኢት ቫት",
+        "input": "ምእታው ቫት",
+        "net": "ጽሩይ ክፍሊት"
+      },
+      "messages": {
+        "compute_success": "ቫት ንዝኾነ {{period}} ተሓሲቡ",
+        "submit_success": "ናይ ቫት ምምላስ ቀሪቡ — ማጣቀሻ: {{ref}}",
+        "submit_error": "ናይ ቫት ምምላስ ምቕራብ ኣይተሳኸዐን",
+        "overdue_warning": "ናይ ቫት ምቕራብ ግዜ ሓሊፉ — ETB 500/መዓልቲ ቅጻዕ ይምልከት"
+      }
+    },
+    "drrf": {
+      "title": "ናይ ሓደጋ ስጋት ቅነሳ ፈንድ",
+      "subtitle": "DRRF ቀረጥ — ደንቢ ቁጽሪ 570/2025",
+      "tabs": {
+        "contributions": "ኣስተዋጽኦታት",
+        "schedule": "መደብ",
+        "remittances": "ክፍሊታት",
+        "compliance": "ናይ ምምጥጣን ነጥቢ",
+        "forecast": "ትንበያ"
+      },
+      "stats": {
+        "total": "ጠቕላላ ቀረጥ",
+        "remitted": "ዝተለኣኸ",
+        "pending": "ዝጽበ",
+        "overdue": "ግዜኡ ዝሓለፈ",
+        "compliance_score": "ናይ ምምጥጣን ነጥቢ"
+      },
+      "status": {
+        "pending": "ዝጽበ",
+        "remitted": "ተለኣኺሉ",
+        "overdue": "ግዜኡ ዝሓለፈ",
+        "archived": "ዝተመዝገበ"
+      },
+      "categories": {
+        "salary_contribution": "ናይ ደሞዝ ኣስተዋጽኦ (1%)",
+        "loan_value": "ናይ ብድሕሪ ዋጋ (1%)",
+        "service_fee": "ናይ ኣገልግሎት ክፍሊት (5%)",
+        "annual_sales_revenue": "ናይ ዓመታዊ ሽያጥ እቶት (5%)",
+        "airtime_sales": "ናይ ኣየር ሰዓት ሽያጥ (5%)",
+        "tobacco_alcohol": "ትምባሆን ኣልኮልን (5%)",
+        "telecom_digital": "ተሌኮም/ዲጂታል (5%)",
+        "ticket_sales": "ናይ ቲኬት ሽያጥ (ETB 100)",
+        "fuel_sales": "ናይ ነዳዲ ሽያጥ (ETB 200)",
+        "government_service": "ናይ መንግስቲ ኣገልግሎት (ETB 200)",
+        "insurance_premium": "ናይ ኢንሹራንስ ፕሪሚየም (1%)",
+        "dividend": "ናይ ትርፊ ግደ (1%)",
+        "other": "ካልእ (1%)"
+      },
+      "actions": {
+        "auto_generate": "ኣውቶማቲክ ፍጠር",
+        "record_remittance": "ክፍሊት መዝግብ",
+        "generate_schedule": "መደብ ፍጠር",
+        "export": "ናብ ወጻኢ ስደድ"
+      },
+      "remittance": {
+        "title": "ክፍሊት መዝግብ",
+        "amount": "መጠን",
+        "bank": "ስም ባንክ",
+        "reference": "ቁጽሪ መወከሲ",
+        "notes": "መዘክርታት",
+        "remitted_by": "ዝለኣኸ አካል",
+        "bank_hint": "ናይ ኢትዮጵያ ንግዲ ባንክ (CBE)"
+      },
+      "compliance": {
+        "grade_a": "ደረጃ A — ብጣዕሚ ጽቡቕ (≥90%)",
+        "grade_b": "ደረጃ B — ጽቡቕ (≥75%)",
+        "grade_c": "ደረጃ C — ደሓን (≥60%)",
+        "grade_d": "ደረጃ D — ድኹም (≥40%)",
+        "grade_f": "ደረጃ F — ወሳኒ (<40%)"
+      },
+      "messages": {
+        "generate_success": "{{count}} ኣስተዋጽኦታት ንዝኾነ {{period}} ተፈጢሮም",
+        "remittance_success": "ክፍሊት ብዓወት ተመዝጊቡ",
+        "overdue_warning": "{{count}} ኣስተዋጽኦታት ግዜኦም ሓሊፉ"
+      }
+    },
+    "bit": {
+      "title": "ናይ ንግዲ እቶት ቀረጥ",
+      "subtitle": "BIT ምልክታ — 30% ካብ ጽሩይ ትርፊ",
+      "rate": "30%",
+      "filing_deadline": "ናይ በጀት ዓመት ካብ ዝውዳእ ኣብ ውሽጢ 4 ወርሒ (ህዳር 7)",
+      "stats": {
+        "net_profit": "ጽሩይ ትርፊ",
+        "tax_payable": "ዝኽፈል ቀረጥ",
+        "paid": "ዝተኸፈለ",
+        "balance_due": "ዝተረፈ ክፍሊት"
+      },
+      "actions": {
+        "calculate": "BIT ሓስብ",
+        "file": "ምልክታ ኣቕርብ",
+        "export": "ምልክታ ስደድ"
+      },
+      "messages": {
+        "calculate_success": "BIT ንናይ በጀት ዓመት {{year}} ተሓሲቡ",
+        "file_success": "ናይ BIT ምልክታ ቀሪቡ",
+        "mat_warning": "MAT ይምልከት — 2.5% ካብ ሽያጥ (ETB {{mat}}) ካብቲ መደበኛ ቀረጥ (ETB {{regular}}) ይበልጽ"
+      }
+    },
+    "compliance": {
+      "title": "ናይ ምምጥጣን ኦዲተር",
+      "subtitle": "ናይ ኢ.ር.ካ ምምጥጣን ኩነታት",
+      "checklist": {
+        "einvoice": "ኣብ ነፍሲ ወከፍ ደረሰኝ ኢ-ደረሰኝ QR",
+        "etax": "ናይ eTax ፖርታል ኣካውንት ንጡፍ",
+        "monthly": "ናይ ወርሒ ቫት ምምላስ ምቕራብ",
+        "reverse": "ንዲጂታል ኣገልግሎታት ሪቨርስ-ቻርጅ",
+        "annual": "ናይ ዓመት ቫት ምስምማዕ",
+        "pit": "ናይ PIT ቅንፍታት ኣብ ደሞዝ ዝርዝር",
+        "pension": "ጡረታ 7%/11% ተዋቒሩ",
+        "disaster": "ናይ DRRF ቀረጥ ተኸታቲሉ",
+        "bit": "ናይ BIT ምልክታ ድሉው",
+        "audit": "ናይ ኦዲት ምዝገባ ዘይልወጥ"
+      },
+      "status": {
+        "ok": "ደሓን",
+        "warning": "መጠንቀቕታ",
+        "critical": "ወሳኒ",
+        "pending": "ይጽበ ኣሎ"
+      },
+      "calendar": {
+        "title": "ናይ ቀረጥ መቑጸሪ",
+        "vat_due": "ናይ ቫት መክፈሊ",
+        "drrf_due": "ናይ DRRF መክፈሊ",
+        "bit_due": "ናይ BIT መክፈሊ",
+        "pension_due": "ናይ ጡረታ መክፈሊ",
+        "payroll_pit": "ናይ ደሞዝ PIT"
+      }
+    },
+    "universal_config": {
+      "title": "ሁለንተናዊ ናይ ቀረጥ ውቅር",
+      "subtitle": "ደምቢታት ንኹሎም ናይ ኢትዮጵያ ዘርፊ ይምልከቱ",
+      "tabs": {
+        "rules": "ደምቢ ቀረጥ",
+        "profile": "ናይ ትካል ፕሮፋይል",
+        "gl": "ጠቕላላ ደብተር ካርታ",
+        "calendar": "ናይ ምቕራብ ቀን መቑጸሪ",
+        "health": "ናይ ምምጥጣን ጥዕና",
+        "sectors": "ናይ ዘርፊ ፍሉይ ኩነታት",
+        "rbac": "RBAC ማትሪክስ"
+      }
+    }
+  }
+}

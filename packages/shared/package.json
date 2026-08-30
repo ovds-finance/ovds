@@ -1,0 +1,59 @@
+{
+  "name": "@ovds/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OVDS shared RBAC, types, constants, icons — cross-environment singleton",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "source": "./src/index.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./types": {
+      "source": "./src/types.ts",
+      "import": "./dist/types.js",
+      "require": "./dist/types.js",
+      "default": "./dist/types.js",
+      "types": "./dist/types.d.ts"
+    },
+    "./ovds/*": {
+      "source": "./src/ovds/*.ts",
+      "import": "./dist/ovds/*.js",
+      "require": "./dist/ovds/*.js",
+      "default": "./dist/ovds/*.js",
+      "types": "./dist/ovds/*.d.ts"
+    },
+    "./ingestion": {
+      "source": "./src/ingestion/index.ts",
+      "import": "./dist/ingestion/index.js",
+      "require": "./dist/ingestion/index.js",
+      "default": "./dist/ingestion/index.js",
+      "types": "./dist/ingestion/index.d.ts"
+    },
+    "./*": {
+      "source": "./src/*.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.js",
+      "default": "./dist/*.js",
+      "types": "./dist/*.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "node ../../scripts/bin-run.mjs typescript/bin/tsc",
+    "build:clean": "node ../../scripts/bin-run.mjs typescript/bin/tsc --build --clean && node ../../scripts/bin-run.mjs typescript/bin/tsc",
+    "typecheck": "node ../../scripts/bin-run.mjs typescript/bin/tsc --noEmit",
+    "test": "node ../../scripts/bin-run.mjs vitest/vitest.mjs --run --config vitest.config.ts",
+    "test:watch": "node ../../scripts/bin-run.mjs vitest/vitest.mjs --config vitest.config.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

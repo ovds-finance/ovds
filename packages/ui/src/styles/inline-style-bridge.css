@@ -1,0 +1,26 @@
+/*
+ * inline-style-bridge.css
+ *
+ * Centralized helpers to eliminate inline style *properties* across OVDS.
+ *
+ * Usage pattern (recommended):
+ *   <div className="ovds-var-width" style={{'--ovds-w': '42%'}} />
+ *
+ * This file intentionally contains ONLY CSS for variables / selector-based styling.
+ */
+
+/* Width variable bridge */
+.ovds-var-width {
+  width: var(--ovds-w, 0%);
+}
+
+/* Height variable bridge */
+.ovds-var-height {
+  height: var(--ovds-h, auto);
+}
+
+/* SVG ring stroke offset bridge (expects --ovds-stroke-dashoffset as number px) */
+.ovds-svg-ring {
+  transition: stroke-dashoffset 0.8s ease-out;
+}
+

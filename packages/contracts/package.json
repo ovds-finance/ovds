@@ -1,0 +1,53 @@
+{
+  "name": "@ovds/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OVDS oRPC contracts — single source of truth for all API type contracts (frontend + backend)",
+  "main": "./dist-cjs/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "source": "./src/index.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "import": "./dist/index.js",
+      "require": "./dist-cjs/index.js",
+      "default": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./router": {
+      "source": "./src/router/index.ts",
+      "import": "./dist/router/index.js",
+      "require": "./dist-cjs/router/index.js",
+      "types": "./dist/router/index.d.ts"
+    },
+    "./schemas": {
+      "source": "./src/schemas/index.ts",
+      "import": "./dist/schemas/index.js",
+      "require": "./dist-cjs/schemas/index.js",
+      "types": "./dist/schemas/index.d.ts"
+    },
+    "./prisma-zod": {
+      "source": "./src/prisma-zod/index.ts",
+      "import": "./dist/prisma-zod/index.js",
+      "require": "./dist-cjs/prisma-zod/index.js",
+      "types": "./dist/prisma-zod/index.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "dist-cjs",
+    "src"
+  ],
+  "scripts": {
+    "build": "node ../../scripts/bin-run.mjs --max-old-space-size=8192 typescript/bin/tsc && node ../../scripts/bin-run.mjs --max-old-space-size=8192 tsx scripts/build-cjs.ts",
+    "build:cjs": "node ../../scripts/bin-run.mjs tsx scripts/build-cjs.ts",
+    "typecheck": "node ../../scripts/bin-run.mjs --max-old-space-size=4096 typescript/bin/tsc --noEmit"
+  },
+  "dependencies": {
+    "@orpc/contract": "^1.15.0",
+    "@orpc/zod": "^1.15.0",
+    "zod": "^4.4.3"
+  }
+}

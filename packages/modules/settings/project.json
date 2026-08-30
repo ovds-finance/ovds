@@ -1,0 +1,47 @@
+{
+  "name": "modules-settings",
+  "root": "packages/modules/settings",
+  "sourceRoot": "packages/modules/settings/src",
+  "projectType": "library",
+  "tags": [
+    "type:lib",
+    "type:module",
+    "domain:settings"
+  ],
+  "implicitDependencies": [
+    "core",
+    "shared"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "packages/modules/settings"
+      },
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run typecheck",
+        "cwd": "packages/modules/settings"
+      },
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    }
+  }
+}

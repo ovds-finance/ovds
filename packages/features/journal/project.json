@@ -1,0 +1,42 @@
+{
+  "name": "features-journal",
+  "root": "packages/features/journal",
+  "sourceRoot": "packages/features/journal/src",
+  "projectType": "library",
+  "tags": [
+    "scope:frontend",
+    "type:feature",
+    "feature:journal"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "packages/features/journal"
+      },
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"],
+      "outputs": ["{projectRoot}/dist"],
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run typecheck",
+        "cwd": "packages/features/journal"
+      },
+      "inputs": ["default", "^production"],
+      "cache": true
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run test",
+        "cwd": "packages/features/journal"
+      },
+      "inputs": ["default", "^production"],
+      "cache": true
+    }
+  }
+}

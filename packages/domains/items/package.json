@@ -1,0 +1,23 @@
+{
+  "name": "@ovds/domains/items",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@ovds/core": "*",
+    "@ovds/shared": "*",
+    "@ovds/database": "*",
+    "@ovds/domains/inventory": "*"
+  },
+  "devDependencies": {
+    "@nestjs/common": "*"
+  }
+}
+
+

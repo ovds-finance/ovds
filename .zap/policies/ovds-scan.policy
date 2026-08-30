@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE policy>
+<policy version="1.0" name="OVDS Scan Policy" description="Security scan policy for OVDS application">
+  <enabledRules>
+    <rule id="1" name="Cross Site Scripting (Reflected)" enabled="true" threshold="medium"/>
+    <rule id="2" name="SQL Injection" enabled="true" threshold="medium"/>
+    <rule id="3" name="Path Traversal" enabled="true" threshold="medium"/>
+    <rule id="4" name="Remote File Inclusion" enabled="true" threshold="medium"/>
+    <rule id="5" name="Server Side Include" enabled="true" threshold="medium"/>
+    <rule id="6" name="Cross Site Scripting (Persistent)" enabled="true" threshold="medium"/>
+    <rule id="7" name="Cross Site Scripting (DOM)" enabled="true" threshold="medium"/>
+    <rule id="9" name="Buffer Overflow" enabled="true" threshold="medium"/>
+    <rule id="10" name="Format String" enabled="true" threshold="medium"/>
+    <rule id="11" name="CRLF Injection" enabled="true" threshold="medium"/>
+    <rule id="12" name="Server Side Request Forgery" enabled="true" threshold="medium"/>
+    <rule id="13" name="XML External Entities" enabled="true" threshold="medium"/>
+    <rule id="14" name="Insecure Direct Object References" enabled="true" threshold="medium"/>
+    <rule id="15" name="Broken Authentication" enabled="true" threshold="medium"/>
+    <rule id="16" name="Sensitive Information in URL" enabled="true" threshold="medium"/>
+    <rule id="17" name="Insecure Cryptographic Storage" enabled="true" threshold="medium"/>
+    <rule id="18" name="Insecure Communications" enabled="true" threshold="medium"/>
+    <rule id="19" name="Improper Access Control" enabled="true" threshold="medium"/>
+    <rule id="20" name="Missing Cryptographic Keys" enabled="true" threshold="medium"/>
+    <rule id="21" name="Missing Encryption of Sensitive Data" enabled="true" threshold="medium"/>
+    <rule id="22" name="Missing Function Level Access Control" enabled="true" threshold="medium"/>
+    <rule id="23" name="Missing Rate Limiting" enabled="true" threshold="medium"/>
+    <rule id="24" name="Missing Session Timeout" enabled="true" threshold="medium"/>
+    <rule id="25" name="Missing Secure Cookie Flag" enabled="true" threshold="medium"/>
+    <rule id="26" name="Missing HttpOnly Cookie Flag" enabled="true" threshold="medium"/>
+    <rule id="27" name="Missing CSRF Token" enabled="true" threshold="medium"/>
+    <rule id="28" name="Missing Content Security Policy" enabled="true" threshold="medium"/>
+    <rule id="29" name="Missing X-Content-Type-Options" enabled="true" threshold="medium"/>
+    <rule id="30" name="Missing X-Frame-Options" enabled="true" threshold="medium"/>
+    <rule id="31" name="Server Leaks Information via X-Powered-By" enabled="true" threshold="medium"/>
+    <rule id="32" name="Server Leaks Information via Trace" enabled="true" threshold="medium"/>
+    <rule id="33" name="Application Error Disclosure" enabled="true" threshold="medium"/>
+    <rule id="34" name="Information Disclosure - Debug Errors" enabled="true" threshold="medium"/>
+    <rule id="35" name="Information Disclosure - Sensitive Information in HTTP Referrer" enabled="true" threshold="medium"/>
+    <rule id="36" name="Information Disclosure - Sensitive Information in Response" enabled="true" threshold="medium"/>
+    <rule id="37" name="User Controllable Key" enabled="true" threshold="medium"/>
+    <rule id="38" name="Weak Authentication Method" enabled="true" threshold="medium"/>
+    <rule id="39" name="Insufficient Session Expiration" enabled="true" threshold="medium"/>
+    <rule id="40" name="Session Fixation" enabled="true" threshold="medium"/>
+    <rule id="41" name="Cross Site Request Forgery" enabled="true" threshold="medium"/>
+    <rule id="42" name="Cookie Without SameSite Attribute" enabled="true" threshold="medium"/>
+    <rule id="43" name="Retire.js" enabled="true" threshold="medium"/>
+    <rule id="44" name="Modern Web App" enabled="true" threshold="medium"/>
+    <rule id="45" name="Insecure JWT" enabled="true" threshold="medium"/>
+    <rule id="46" name="GraphQL" enabled="true" threshold="medium"/>
+    <rule id="47" name="OpenAPI" enabled="true" threshold="medium"/>
+    <rule id="48" name="SOAP" enabled="true" threshold="medium"/>
+    <rule id="49" name="Cookie Slack Detector" enabled="true" threshold="medium"/>
+    <rule id="50" name="Private IP Disclosure" enabled="true" threshold="medium"/>
+  </enabledRules>
+  <disabledRules>
+    <rule id="50000" name="Script Active Scan Rules" enabled="false"/>
+    <rule id="50001" name="Passive Scan Rules" enabled="false"/>
+  </disabledRules>
+</policy>

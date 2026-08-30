@@ -1,0 +1,30 @@
+# OVDS Security Policy
+# See https://github.com/ovds/security for more information
+
+Contact: security@ovds.com.et
+Expires: 2027-12-31T23:59:59.000Z
+Acknowledgments: https://ovds.com.et/security/acknowledgments
+Preferred-Languages: en, am
+
+# Security Policy
+# https://ovds.com.et/security
+
+# Vulnerability Disclosure
+# Report security vulnerabilities to security@ovds.com.et
+# We will acknowledge receipt within 48 hours
+# We aim to provide a detailed response within 7 business days
+
+# Supported Versions
+# Latest stable release: Supported
+# Previous major release: Supported (security patches only)
+# Older releases: Not supported
+
+# Response Times
+# Critical: 72 hours
+# High: 14 days
+# Medium: 30 days
+# Low: Next scheduled release
+
+# Out of Scope
+# Social engineering, physical attacks, DoS, spam/phishing
+# Third-party service vulnerabilities (report to them directly)

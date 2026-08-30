@@ -1,0 +1,46 @@
+{
+  "name": "contracts",
+  "root": "packages/contracts",
+  "projectType": "library",
+  "sourceRoot": "packages/contracts/src",
+  "tags": [
+    "scope:shared",
+    "type:lib"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build -w @ovds/contracts",
+        "cwd": "."
+      },
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{projectRoot}/dist",
+        "{projectRoot}/dist-cjs"
+      ],
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run typecheck -w @ovds/contracts",
+        "cwd": "."
+      },
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    }
+  }
+}

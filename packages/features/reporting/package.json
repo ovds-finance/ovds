@@ -1,0 +1,19 @@
+{
+  "name": "@ovds/features-reporting",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@ovds/design-system": "*",
+    "@ovds/shared": "*",
+    "@ovds/ui": "*",
+    "lucide-react": "^0.473.0",
+    "react-hot-toast": "^2.6.0"
+  }
+}

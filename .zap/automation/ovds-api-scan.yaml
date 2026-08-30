@@ -1,0 +1,41 @@
+env:
+  parameters:
+    failOnError: true
+    failOnWarning: false
+    progressToStdout: true
+
+  jobs:
+    - type: passiveScan-config
+      parameters:
+        config:
+          maxAlertsPerRule: 10
+
+    - type: openapi
+      parameters:
+        apiUrl: http://localhost:3001/api/openapi.json
+        targetUrl: http://localhost:3001/api
+
+    - type: passiveScan-wait
+      parameters:
+        maxDuration: 60
+
+    - type: activeScan
+      parameters:
+        targetUrl: http://localhost:3001/api
+        policy: ovds-scan-policy
+        maxScanDuration: 60
+        maxRuleDuration: 30
+        maxThreadsPerHost: 4
+        delayBetweenRequests: 0
+
+    - type: report
+      parameters:
+        template: traditional-html
+        reportDir: /zap/wrk/
+        reportFile: zap-api-report.html
+
+    - type: report
+      parameters:
+        template: traditional-json
+        reportDir: /zap/wrk/
+        reportFile: zap-api-report.json

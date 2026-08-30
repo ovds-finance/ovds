@@ -1,0 +1,352 @@
+{
+  "en": {
+    "page": {
+      "title": "Business Registration — Ethiopian Commercial Code",
+      "subtitle": "Ethiopian Commercial Registration — 2021 Commercial Code",
+      "subtitle_detail": "Structure your company · Harmonize NID · TIN · License · VAT",
+      "breadcrumb_system": "System Administration",
+      "breadcrumb_business": "Business Registration",
+      "actions": {
+        "compliance_status": "Compliance Status",
+        "etrade_portal": "e-Trade Portal"
+      }
+    },
+    "structure": {
+      "title": "Business Structure",
+      "select_prompt": "Select the legal form that best fits your business — Proclamation No. 1243/2021",
+      "hide_btn": "Hide",
+      "choose_btn": "Choose",
+      "intro_title": "Ethiopian Commercial Code — 2021 Reforms",
+      "intro_desc": "Company registration in Ethiopia is a legal process that establishes the foundation of a business relationship between founders, investors, government authorities, and third parties. The 2021 Commercial Code introduced the <strong>One-Person Company</strong> and <strong>Limited Liability Partnership</strong> — new structures that expand options for entrepreneurs. Careful planning, proper documentation, and compliance with registration and licensing requirements remain essential for successful operation.",
+      "legal_essentials_title": "Legal essentials:",
+      "legal_essentials_body": "Understanding requirements at the formation stage helps companies avoid future disputes, regulatory problems, and unnecessary costs. All structures require a Trade License, TIN registration, and commercial registration at the Ministry of Trade & Regional Integration. VAT registration is mandatory for annual turnover ≥ ETB 2,000,000 (Proc. 1341/2024).",
+      "field_labels": {
+        "founders": "Founders:",
+        "capital": "Capital:",
+        "liability": "Liability:",
+        "tax": "Tax:"
+      }
+    },
+    "wizard": {
+      "registration_steps": "Registration Steps",
+      "registration_hierarchy": "Registration Hierarchy",
+      "step_of": "Step {{n}} of {{total}} — {{label}}",
+      "steps": {
+        "nid": "National ID (NID)",
+        "tin": "Taxpayer ID (TIN)",
+        "license": "Business License",
+        "vat": "VAT Registration",
+        "crossref": "Cross-Reference"
+      },
+      "step_descriptions": {
+        "nid": "Register with the National ID Program (NIDP) to get your 12-digit Fayda Identification Number — the root identity for all government systems.",
+        "tin": "Register at the Ministry of Revenues or your local Sub-City branch to receive your 10-digit TIN — the primary tax identifier required for all eTax portal access.",
+        "license": "Apply for and renew your commercial registration through the Ministry of Trade & Regional Integration. Your license must tie explicitly to your TIN and business address.",
+        "vat": "Businesses with annual gross income above ETB 2M must register for VAT at the Ministry of Revenues. You must present your TIN and Business License.",
+        "crossref": "Verify all identifiers are aligned on the e-Trade Platform and visit the Revenue Office to activate indirect taxes (VAT/TOT) in their administrative system."
+      }
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "back": "Back",
+      "next": "Next",
+      "submitting": "Submitting…",
+      "complete_harmonization": "Complete Harmonization",
+      "hide": "Hide",
+      "show": "Show",
+      "summary": "Summary",
+      "refresh": "Refresh",
+      "all_verified": "All Verified",
+      "verify_all": "Verify All",
+      "register_another": "Register Another"
+    },
+    "status": {
+      "incomplete": "Incomplete",
+      "in_progress": "In Progress",
+      "action_required": "Action Required",
+      "harmonized": "Harmonized",
+      "steps_completed": "Steps Completed",
+      "completion": "Completion",
+      "structure": "Structure",
+      "official_portal": "Official Portal"
+    },
+    "summary": {
+      "title": "Registration Summary",
+      "national_id": "National ID",
+      "taxpayer_id": "Taxpayer ID",
+      "business_license": "Business License",
+      "vat_registration": "VAT Registration",
+      "not_entered": "Not entered",
+      "not_registered": "Not registered"
+    },
+    "success": {
+      "title": "Registration Harmonized",
+      "description": "Your NID, TIN, Business License, and VAT identifiers have been linked. Your business is now registered across Ethiopian federal portals.",
+      "score": "Harmonization score: {{pct}}%",
+      "view_compliance": "View Compliance Status"
+    },
+    "kpi": {
+      "steps_completed": "Steps Completed",
+      "completion": "Completion",
+      "structure": "Structure",
+      "status": "Status"
+    },
+    "record": {
+      "saved_detected": "Saved record detected",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "save_failed": "Save failed"
+    },
+    "harmonization": {
+      "progress": "Harmonization Progress",
+      "verification_checklist": "Verification Checklist",
+      "nid_tin_linked": "NID ↔ TIN linked on e-Trade Platform",
+      "nid_tin_desc": "Your Fayda NID and TIN are cross-referenced and your trade name matches legally.",
+      "tin_license_verified": "TIN ↔ Business License verified",
+      "tin_license_desc": "Your TIN is explicitly tied to your business license number in MoR records.",
+      "license_vat_linked": "Business License ↔ VAT registration linked",
+      "license_vat_desc": "Your VAT certificate references your current business license number.",
+      "mor_activated": "MoR administrative system activated",
+      "mor_desc": "Visit the Revenue Office with original documents to activate indirect taxes (VAT/TOT).",
+      "conflict_notes": "Conflict Notes",
+      "conflict_notes_hint": "Optional — any discrepancies found during cross-referencing"
+    },
+    "nid_step": {
+      "info_title": "Fayda Identification Number",
+      "info_body": "The Fayda Identification Number (FIN) is a biometric 12-digit number issued by the National ID Program. It serves as the <strong>root identity</strong> for all commercial, banking, and government systems in Ethiopia. Register at your nearest NIDP enrollment center.",
+      "fayda_id_label": "Fayda Identification Number (FIN)",
+      "fayda_id_hint": "12 digits",
+      "fayda_id_placeholder": "XXXX-XXXX-XXXX",
+      "full_name_label": "Full Legal Name (as registered with NIDP)",
+      "full_name_placeholder": "e.g. Tigist Alemu Bekele",
+      "dob_label": "Date of Birth",
+      "dob_hint": "Optional",
+      "portal_name": "Fayda — NIDP Portal",
+      "portal_url": "https://fayda.et",
+      "legal_basis": "National ID Proclamation No. 1024/2017"
+    },
+    "tin_step": {
+      "info_body": "Register at the <strong>Ministry of Revenues</strong> (for companies) or your local Sub-City branch. You will need your NID, Commercial Registration, and a verified Memorandum of Association (if applicable) to complete biometric registration.",
+      "tin_label": "Taxpayer Identification Number (TIN)",
+      "tin_hint": "10 digits",
+      "tin_placeholder": "XXX-XXX-XXXX",
+      "business_name_label": "Registered Business Name (at MoR)",
+      "business_name_placeholder": "e.g. Addis Trading PLC",
+      "tax_office_label": "Tax Office / Sub-City Branch",
+      "tax_office_hint": "Optional",
+      "tax_office_placeholder": "e.g. Addis Ababa — Bole Sub-City",
+      "biometric_checkbox": "Biometric registration at the Ministry of Revenues is complete",
+      "portal_name": "ERCA eTax Portal",
+      "portal_url": "https://etax.erca.gov.et",
+      "legal_basis": "Tax Administration Proclamation No. 983/2016"
+    },
+    "license_step": {
+      "info_body": "Apply for and renew your commercial registration via the <strong>Ministry of Trade & Regional Integration</strong>. Your license must explicitly tie to your TIN and the physical address of your premises.",
+      "license_number_label": "License Number",
+      "license_number_placeholder": "e.g. 0023/17/AA",
+      "trade_name_label": "Trade Name",
+      "trade_name_placeholder": "Registered trade name",
+      "activity_label": "Business Activity / Sector",
+      "activity_placeholder": "e.g. Wholesale Trade — General Merchandise",
+      "address_label": "Registered Premises Address",
+      "address_placeholder": "e.g. Bole Road, Addis Ababa",
+      "turnover_label": "Annual Gross Turnover (ETB)",
+      "turnover_placeholder": "e.g. 2500000",
+      "turnover_category_a": "Category A (VAT Mandatory)",
+      "turnover_category_b": "Category B",
+      "turnover_category_c": "Category C (TOT Only)",
+      "vat_warning": "Annual turnover ≥ ETB 2,000,000 — <strong>VAT registration is mandatory</strong> per Regulation No. 570/2025. Proceed to Step 4 to register.",
+      "issue_date_label": "Issue Date",
+      "issue_date_hint": "Optional",
+      "expiry_date_label": "Expiry Date",
+      "expiry_date_hint": "Optional",
+      "portal_name": "e-Trade Platform",
+      "portal_url": "https://etrade.gov.et",
+      "legal_basis": "Commercial Registration Proclamation No. 980/2016"
+    },
+    "vat_step": {
+      "info_body": "Businesses with annual gross income in <strong>Category A</strong> (≥ ETB 2,000,000) must register for VAT. Present your TIN and Business License at the MoR office. Once registered, you must purchase an ERCA-approved <strong>Electronic Cash Register (ECR/POS)</strong>.",
+      "registration_status_label": "VAT Registration Status",
+      "vat_status_options": {
+        "not_registered": "Not Registered",
+        "not_registered_desc": "Turnover below ETB 2M threshold",
+        "pending_application": "Application Pending",
+        "pending_application_desc": "Submitted to ERCA, awaiting approval",
+        "registered": "Registered",
+        "registered_desc": "VAT certificate received",
+        "suspended": "Suspended",
+        "suspended_desc": "VAT suspended by ERCA",
+        "deregistered": "De-registered",
+        "deregistered_desc": "No longer VAT registered"
+      },
+      "vat_number_label": "VAT Certificate Number",
+      "vat_number_hint": "From ERCA certificate",
+      "vat_number_placeholder": "e.g. ETH-VAT-123456",
+      "ecr_label": "Electronic Cash Register (ECR / POS)",
+      "ecr_status_options": {
+        "not_required": "Not Required",
+        "required_pending": "Required — Pending Purchase",
+        "registered": "ECR/POS Registered with ERCA"
+      },
+      "ecr_serial_label": "ECR Device Serial Number",
+      "ecr_serial_hint": "Optional",
+      "ecr_serial_placeholder": "e.g. ERCA-POS-987654",
+      "penalty_warning": "VAT returns are due on the <strong>30th of the following month</strong>. Late filing incurs a penalty of <strong>ETB 500/day</strong> per Proclamation No. 1341/2024.",
+      "portal_name": "ERCA eTax — VAT Portal",
+      "portal_url": "https://etax.erca.gov.et/vat",
+      "legal_basis": "VAT Proclamation No. 1341/2024 · Regulation No. 570/2025"
+    },
+    "crossref_step": {
+      "info_body": "The final step verifies that all identifiers are aligned. Link your registered documents on the <strong>e-Trade Platform</strong> and visit the Revenue Office with originals to harmonize tax accounts and activate VAT/TOT in the administrative system.",
+      "portal_name": "e-Trade + MoR Admin System",
+      "portal_url": "https://etrade.gov.et",
+      "legal_basis": "Harmonization Directive (MoR / MoTRI 2024)",
+      "conflict_notes_placeholder": "e.g. Trade name mismatch between TIN and e-Trade records..."
+    },
+    "structures": {
+      "plc": {
+        "label": "Private Limited Company (PLC)",
+        "shortLabel": "PLC",
+        "minFounders": "2–50 members",
+        "minCapital": "No statutory minimum",
+        "liability": "Limited to contribution",
+        "taxRegime": "Corporate BIT 30%",
+        "proclamation": "Commercial Code Art. 510–563 (Proc. 1243/2021)",
+        "highlights": [
+          "Most common structure for SMEs",
+          "Memorandum of Association required",
+          "Transfer of shares requires member consent",
+          "Cannot issue shares to the public"
+        ]
+      },
+      "share_company": {
+        "label": "Share Company (SC)",
+        "shortLabel": "Share Co.",
+        "minFounders": "≥ 5 shareholders",
+        "minCapital": "ETB 50,000 minimum",
+        "liability": "Limited to share value",
+        "taxRegime": "Corporate BIT 30% + WHT on dividends",
+        "proclamation": "Commercial Code Art. 304–509 (Proc. 1243/2021)",
+        "highlights": [
+          "Can raise capital from the public",
+          "Requires Articles of Incorporation",
+          "Board of Directors mandatory",
+          "Subject to ECMA regulation for public companies"
+        ],
+        "badge": "Public Capital"
+      },
+      "one_person": {
+        "label": "One-Person Company (OPC)",
+        "shortLabel": "OPC",
+        "minFounders": "1 person",
+        "minCapital": "No statutory minimum",
+        "liability": "Limited (separate legal entity)",
+        "taxRegime": "Corporate BIT 30%",
+        "proclamation": "Commercial Code Art. 564–590 (Proc. 1243/2021)",
+        "highlights": [
+          "New under 2021 Commercial Code reforms",
+          "Single founder with full liability protection",
+          "Ideal for solo entrepreneurs scaling up",
+          "Memorandum of Association by sole founder"
+        ],
+        "badge": "New 2021"
+      },
+      "llp": {
+        "label": "Limited Liability Partnership (LLP)",
+        "shortLabel": "LLP",
+        "minFounders": "≥ 2 partners",
+        "minCapital": "No statutory minimum",
+        "liability": "Partners limited to contribution",
+        "taxRegime": "Partnership income taxed at partner level",
+        "proclamation": "Commercial Code Art. 591–620 (Proc. 1243/2021)",
+        "highlights": [
+          "New under 2021 Commercial Code reforms",
+          "All partners have limited liability",
+          "Flexible internal governance",
+          "Suitable for professional service firms"
+        ],
+        "badge": "New 2021"
+      },
+      "general_partnership": {
+        "label": "General Partnership",
+        "shortLabel": "GP",
+        "minFounders": "≥ 2 partners",
+        "minCapital": "No statutory minimum",
+        "liability": "Unlimited joint & several",
+        "taxRegime": "Partnership income taxed at partner level",
+        "proclamation": "Commercial Code Art. 210–280 (Proc. 1243/2021)",
+        "highlights": [
+          "Simple formation — partnership deed required",
+          "All partners manage and are liable",
+          "No separate legal personality in some cases",
+          "Common for family businesses and trades"
+        ]
+      },
+      "limited_partnership": {
+        "label": "Limited Partnership (Kommandit)",
+        "shortLabel": "LP",
+        "minFounders": "≥ 1 general + 1 limited partner",
+        "minCapital": "No statutory minimum",
+        "liability": "General: unlimited · Limited: capped",
+        "taxRegime": "Partnership income taxed at partner level",
+        "proclamation": "Commercial Code Art. 281–303 (Proc. 1243/2021)",
+        "highlights": [
+          "General partner manages and bears full liability",
+          "Limited partners are passive investors",
+          "Used for investment vehicles and joint ventures",
+          "Partnership deed must specify capital contributions"
+        ]
+      },
+      "sole_proprietor": {
+        "label": "Sole Proprietorship",
+        "shortLabel": "Sole Prop.",
+        "minFounders": "1 person",
+        "minCapital": "No statutory minimum",
+        "liability": "Unlimited personal liability",
+        "taxRegime": "Schedule C personal income tax (progressive)",
+        "proclamation": "Commercial Registration Proc. 980/2016",
+        "highlights": [
+          "Simplest form — trade license only",
+          "No separate legal entity from the owner",
+          "Registered at Sub-City/Woreda trade bureau",
+          "Subject to TOT if turnover below ETB 2M"
+        ]
+      }
+    },
+    "badge": {
+      "new_2021": "New 2021",
+      "public_capital": "Public Capital"
+    },
+    "context": {
+      "commercial_code": "Commercial Code Proc. 1243/2021",
+      "identifiers": "NID · TIN · License · VAT",
+      "complete_pct": "{{pct}}% Complete"
+    },
+    "portal": {
+      "official_portal": "Official Portal"
+    },
+    "validation": {
+      "fayda_required": "Fayda ID is required",
+      "fayda_invalid": "Must be a 12-digit Fayda Identification Number",
+      "full_name_required": "Full legal name is required",
+      "tin_required": "TIN is required",
+      "tin_invalid": "Must be a 10-digit Ethiopian TIN",
+      "business_name_required": "Registered business name is required",
+      "license_number_required": "License number is required",
+      "trade_name_required": "Trade name is required",
+      "activity_required": "Business activity is required",
+      "address_required": "Registered address is required",
+      "vat_number_required": "VAT number is required when registered",
+      "ecr_serial_required": "ECR serial number is required when registered"
+    },
+    "toasts": {
+      "saved": "Saved",
+      "save_step_failed": "Failed to save step",
+      "record_loaded": "Record loaded",
+      "record_load_failed": "Failed to load saved record",
+      "harmonized_success": "Business registration harmonized successfully",
+      "saved_success": "Registration details saved successfully",
+      "submission_failed": "Submission failed"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "ovds_test_users": [
+    {
+      "role": "normal_user",
+      "name": "Normal User",
+      "email": "scanner.user@ovds.local",
+      "password": "ZapScan#2024!Strong",
+      "description": "Standard employee with basic access to HR, accounting, and reporting modules"
+    },
+    {
+      "role": "admin_user",
+      "name": "System Administrator",
+      "email": "scanner.admin@ovds.local",
+      "password": "ZapRoot#2024!Secure",
+      "description": "Full administrative access to all system settings, user management, and configuration"
+    },
+    {
+      "role": "supervisor_user",
+      "name": "Supervisor",
+      "email": "scanner.supervisor@ovds.local",
+      "password": "ZapSuper#2024!View",
+      "description": "Managerial access with approval capabilities"
+    },
+    {
+      "role": "disabled_user",
+      "name": "Disabled User",
+      "email": "scanner.disabled@ovds.local",
+      "password": "ZapDisabled#2024!Lock",
+      "description": "Disabled account for testing access control"
+    }
+  ],
+  "notes": [
+    "These are dedicated test accounts for security scanning only",
+    "Do not use production credentials or personal accounts",
+    "Passwords should be rotated after testing",
+    "Create additional role-specific accounts as needed for authorization testing"
+  ]
+}

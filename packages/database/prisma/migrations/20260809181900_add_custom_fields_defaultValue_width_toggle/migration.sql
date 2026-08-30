@@ -1,0 +1,2 @@
+ALTER TABLE custom_field ADD COLUMN defaultValue LONGTEXT NULL;
+ALTER TABLE custom_field ADD COLUMN width VARCHAR(20) NULL DEFAULT 'full';
