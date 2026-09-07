@@ -17,9 +17,12 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 SCAN_TYPE="${1:-baseline}"
 TARGET_URL="${TARGET_URL:-http://localhost:3000}"
-API_DEFINITION="${API_DEFINITION:-http://localhost:3001/api/openapi.json}"
+BACKEND_URL="${BACKEND_URL:-http://localhost:3001}"
+API_DEFINITION="${API_DEFINITION:-${BACKEND_URL}/api/openapi.json}"
 REPORT_DIR="./security-reports"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 COMPOSE_FILES="-f docker-compose.ovds.yml -f docker-compose.security.yml"
@@ -60,12 +63,12 @@ docker compose ${COMPOSE_FILES} up -d backend
 # Wait for backend to be healthy
 echo "Waiting for backend to be healthy..."
 for i in $(seq 1 60); do
-  if curl -s -o /dev/null -w "%{http_code}" "${TARGET_URL}/health/live" | grep -q "200"; then
+  if curl -s -o /dev/null -w "%{http_code}" "${BACKEND_URL}/health/live" | grep -q "200"; then
     echo "✓ Backend is healthy"
     break
   fi
   if [ $i -eq 60 ]; then
-    echo "ERROR: Backend failed to become healthy"
+    echo "ERROR: Backend failed to become healthy at ${BACKEND_URL}/health/live"
     exit 1
   fi
   sleep 5
@@ -136,8 +139,8 @@ case "${SCAN_TYPE}" in
   all)
     echo ""
     echo "Running All Scans..."
-    
-    echo "  [1/3] Baseline Scan..."
+
+    echo "  [1/5] Baseline Scan..."
     docker compose ${COMPOSE_FILES} exec -T zap \
       zap-baseline.py \
       -t "${TARGET_URL}" \
@@ -150,7 +153,7 @@ case "${SCAN_TYPE}" in
       -j \
       --auto || true
 
-    echo "  [2/3] Full Scan..."
+    echo "  [2/5] Full Scan..."
     docker compose ${COMPOSE_FILES} exec -T zap \
       zap-full-scan.py \
       -t "${TARGET_URL}" \
@@ -161,7 +164,7 @@ case "${SCAN_TYPE}" in
       -j \
       --auto || true
 
-    echo "  [3/3] API Scan..."
+    echo "  [3/5] API Scan..."
     docker compose ${COMPOSE_FILES} exec -T zap \
       zap-api-scan.py \
       -t "${API_DEFINITION}" \
@@ -172,6 +175,13 @@ case "${SCAN_TYPE}" in
       --max_scan_time 60m \
       -j \
       --auto || true
+
+    echo "  [4/5] Authenticated Scan..."
+    docker compose ${COMPOSE_FILES} exec -T zap \
+      zap.sh -cmd -autorun /zap/ovds-authenticated-scan.yaml || true
+
+    echo "  [5/5] Phase 6 Manual Tests (auth/authz/session/rate-limit)..."
+    bash "${SCRIPT_DIR}/zap-test-manual-all.sh" "${BACKEND_URL}" || true
     ;;
 esac
 
@@ -179,6 +189,9 @@ esac
 echo ""
 echo "Copying reports to ${REPORT_DIR}..."
 docker compose ${COMPOSE_FILES} cp zap:/zap/wrk/reports/. "${REPORT_DIR}/" || true
+
+# Aggregate status snapshot for the dashboard
+node "${SCRIPT_DIR}/security-status-snapshot.mjs" --reports-dir "${REPORT_DIR}" || true
 
 # Display summary
 echo ""

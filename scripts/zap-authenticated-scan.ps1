@@ -92,7 +92,6 @@ $dockerArgs = @(
     "-v", "${tempConfig}:/zap/ovds-authenticated-scan.yaml:ro",
     "-t", $ZapImage,
     "zap.sh", "-cmd", "-autorun", "/zap/ovds-authenticated-scan.yaml",
-    "-config", "connection.timeoutInSecs=$($TimeoutMinutes * 60)",
     "-config", "connection.timeoutInSecs=$($TimeoutMinutes * 60)"
 )
 

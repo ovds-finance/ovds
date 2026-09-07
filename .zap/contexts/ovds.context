@@ -3,6 +3,8 @@
 <context version="1.0" name="OVDS" description="OVDS Application Security Testing Context">
   <include>http://localhost:3000/.*</include>
   <include>http://localhost:3001/.*</include>
+  <include>https://staging.ovds.example.internal/.*</include>
+  <include>https://api.ovds.example.internal/.*</include>
   <exclude>http://localhost:3000/logout.*</exclude>
   <exclude>http://localhost:3001/api/auth/logout.*</exclude>
   <exclude>http://localhost:3000/auth/logout.*</exclude>
@@ -13,19 +15,35 @@
   <exclude>http://localhost:3001/api/auth/register.*</exclude>
   <exclude>http://localhost:3000/register.*</exclude>
   <exclude>http://localhost:3001/api/notifications/send.*</exclude>
+  <exclude>http://localhost:3001/api/notifications/bulk.*</exclude>
   <exclude>http://localhost:3001/api/payment/submit.*</exclude>
+  <exclude>http://localhost:3001/api/payments/bulk.*</exclude>
   <exclude>http://localhost:3001/api/admin/database-reset.*</exclude>
   <exclude>http://localhost:3001/api/admin/purge.*</exclude>
+  <exclude>http://localhost:3001/api/admin/users/delete-all.*</exclude>
+  <exclude>http://localhost:3001/api/banking/transfers/bulk.*</exclude>
+  <exclude>http://localhost:3001/api/payroll/run.*</exclude>
+  <exclude>http://localhost:3001/api/eims/bulk-cancel.*</exclude>
+  <exclude>http://localhost:3001/api/eims/bulk-submit.*</exclude>
+  <exclude>http://localhost:3001/api/invoices/bulk-delete.*</exclude>
   <technology>JavaScript</technology>
   <technology>Json</technology>
   <technology>Nginx</technology>
   <technology>NodeJS</technology>
   <technology>Rest</technology>
   <technology>WebSocket</technology>
-  <authentication method="form" url="http://localhost:3001/api/auth/login" 
-                 postData="email={%username%}&password={%password%}"
-                 loggedInIndicator="\"success\":\s*true" 
-                 loggedOutIndicator="Invalid credentials|401|Unauthorized|\"success\":\s*false">
+  <technology>Postgres</technology>
+  <technology>MySQL</technology>
+  <!--
+    Authentication: OVDS uses JSON /api/auth/login, not HTML forms.
+    For ZAP Desktop users, configure "Script-based authentication"
+    in the context's Authentication dialog and point it at:
+      .zap/scripts/authentication/ovds-json-auth.js
+
+    The Automation Framework uses the script method via
+    .zap/automation/ovds-authenticated-scan.yaml — keep them in sync.
+  -->
+  <authentication method="script" scriptPath="/zap/wrk/.zap/scripts/authentication/ovds-json-auth.js">
   </authentication>
   <users>
     <user name="normal_user" enabled="true">

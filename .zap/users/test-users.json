@@ -1,10 +1,12 @@
 {
+  "_comment": "Dedicated ZAP test users. Credentials match those declared in .zap/contexts/ovds.context and seeded by scripts/seed-zap-test-users-db.mjs. Rotate after each security assessment.",
   "ovds_test_users": [
     {
       "role": "normal_user",
-      "name": "Normal User",
+      "name": "Normal Employee",
       "email": "scanner.user@ovds.local",
       "password": "ZapScan#2024!Strong",
+      "tenantRole": "EMPLOYEE",
       "description": "Standard employee with basic access to HR, accounting, and reporting modules"
     },
     {
@@ -12,6 +14,7 @@
       "name": "System Administrator",
       "email": "scanner.admin@ovds.local",
       "password": "ZapRoot#2024!Secure",
+      "tenantRole": "ADMIN",
       "description": "Full administrative access to all system settings, user management, and configuration"
     },
     {
@@ -19,20 +22,24 @@
       "name": "Supervisor",
       "email": "scanner.supervisor@ovds.local",
       "password": "ZapSuper#2024!View",
+      "tenantRole": "SUPERVISOR",
       "description": "Managerial access with approval capabilities"
     },
     {
       "role": "disabled_user",
-      "name": "Disabled User",
+      "name": "Disabled Account",
       "email": "scanner.disabled@ovds.local",
       "password": "ZapDisabled#2024!Lock",
-      "description": "Disabled account for testing access control"
+      "tenantRole": "EMPLOYEE",
+      "enabled": false,
+      "description": "Disabled account used to verify access control rejects disabled credentials"
     }
   ],
   "notes": [
-    "These are dedicated test accounts for security scanning only",
-    "Do not use production credentials or personal accounts",
-    "Passwords should be rotated after testing",
-    "Create additional role-specific accounts as needed for authorization testing"
+    "These are dedicated test accounts for security scanning only.",
+    "Do not use production credentials or personal accounts.",
+    "Passwords are rotated after each security assessment.",
+    "Create additional role-specific accounts as needed for authorization testing.",
+    "disabled_user intentionally has enabled=false — login attempts must be rejected."
   ]
 }

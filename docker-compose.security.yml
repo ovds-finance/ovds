@@ -33,7 +33,7 @@ services:
       backend:
         condition: service_healthy
     networks:
-      - ovds-network
+      - ovds-backend
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/JSON/core/view/version/?apikey=${ZAP_API_KEY:-ovds-zap-secret}"]
       interval: 30s
@@ -47,5 +47,6 @@ volumes:
     driver: local
 
 networks:
-  ovds-network:
-    driver: bridge
+  ovds-backend:
+    external: true
+    name: ${OVDS_NETWORK:-ovds_ovds-backend}

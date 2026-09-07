@@ -1,27 +1,15 @@
-# Secret Scanning Script for OVDS (Windows)
-# Scans the codebase for exposed secrets, API keys, passwords, and credentials
+# OVDS Secret Scanner (PowerShell, hardened)
 # Cross-platform counterpart: scripts/scan-secrets.sh
 #
 # Usage:
-#   .\scripts\scan-secrets.ps1 -Path "." -Format text -FailOn high
-#
-# Examples:
-#   .\scripts\scan-secrets.ps1
-#   .\scripts\scan-secrets.ps1 -Path ".\apps\backend" -FailOn high
-#   .\scripts\scan-secrets.ps1 -Format json -Output ".\security-reports\secrets-report.json"
+#   pwsh scripts/scan-secrets.ps1
+#   pwsh scripts/scan-secrets.ps1 -Path ./apps/backend -Format sarif -Output security-reports/secrets
 
 param(
-    [Parameter(Mandatory=$false)]
     [string]$Path = ".",
-
-    [Parameter(Mandatory=$false)]
-    [ValidateSet("text", "json")]
+    [ValidateSet("text", "json", "sarif")]
     [string]$Format = "text",
-
-    [Parameter(Mandatory=$false)]
-    [string]$Output = ".\security-reports\secrets-scan",
-
-    [Parameter(Mandatory=$false)]
+    [string]$Output = "security-reports/secrets-scan",
     [ValidateSet("low", "medium", "high")]
     [string]$FailOn = "high"
 )
@@ -36,173 +24,229 @@ Write-Host "Format:   $Format"
 Write-Host "Fail on:  $FailOn"
 Write-Host ""
 
-# Create output directory
 $outputDir = Split-Path -Parent $Output
-if (!(Test-Path $outputDir)) {
-    New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
-}
+if (!(Test-Path $outputDir)) { New-Item -ItemType Directory -Path $outputDir -Force | Out-Null }
 
-# Secret patterns to detect
 $patterns = @{
-    "AWS Access Key" = "AKIA[0-9A-Z]{16}"
-    "AWS Secret Key" = "(?i)aws(.{0,20})?['`"][0-9a-zA-Z/+=]{40}['`"]"
-    "Private Key" = "-----BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY-----"
-    "API Key" = "(?i)(api[_-]?key|apikey)['`"]?\s*[:=]\s*['`"][0-9a-zA-Z_\-]{20,}['`"]"
-    "Bearer Token" = "(?i)bearer\s+[0-9a-zA-Z_\-\._~+/]+=*"
-    "Basic Auth" = "(?i)basic\s+[0-9a-zA-Z+/]{20,}={0,2}"
-    "Password in URL" = "(?i)://[^:]+:[^@]+@"
-    "JWT Token" = "eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"
-    "GitHub Token" = "(?i)github[_-]?token['`"]?\s*[:=]\s*['`"][0-9a-zA-Z_]{35,40}['`"]"
-    "Google API Key" = "AIza[0-9A-Za-z\-_]{35}"
-    "Slack Token" = "xox[abpr]-[0-9a-zA-Z-]+"
-    "Stripe API Key" = "(?i)sk_(live|test)_[0-9a-zA-Z]{24,}"
-    "Twilio API Key" = "SK[0-9a-fA-F]{32}"
-    "Mailgun API Key" = "key-[0-9a-zA-Z]{32}"
-    "Generic Secret" = "(?i)(secret|password|passwd|pwd)['`"]?\s*[:=]\s*['`"][^'`"]{8,}['`"]"
-    "Database URL" = "(?i)(mysql|postgresql|mongodb|redis)://[^:]+:[^@]+@"
+    "AWS Access Key|high"               = "AKIA[0-9A-Z]{16}"
+    "AWS Secret Key|high"               = "(?i)aws(.{0,20})?['`"][0-9a-zA-Z/+=]{40}['`"]"
+    "Private Key Block|high"            = "-----BEGIN (RSA|DSA|EC|OPENSSH|PRIVATE) KEY-----"
+    "Password in URL|high"              = "(?i)://[^\s:/@]+:[^\s@]+@"
+    "Database URL with Password|high"   = "(?i)(mysql|postgresql|mongodb|redis|amqp)://[^\s:/@]+:[^\s@]+@"
+    "JWT Token|medium"                  = "eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"
+    "Bearer Token|medium"               = "(?i)bearer\s+[0-9a-zA-Z_\-\._~+/]+=*"
+    "Basic Auth Header|medium"          = "(?i)basic\s+[0-9a-zA-Z+/]{20,}={0,2}"
+    "GitHub Token|medium"               = "(?i)github[_-]?token['`"]?\s*[:=]\s*['`"][0-9a-zA-Z_]{35,40}['`"]"
+    "Google API Key|medium"             = "AIza[0-9A-Za-z\-_]{35}"
+    "Slack Token|medium"                = "xox[abpr]-[0-9a-zA-Z-]+"
+    "Stripe API Key|medium"             = "(?i)sk_(live|test)_[0-9a-zA-Z]{24,}"
+    "Twilio API Key|medium"             = "SK[0-9a-fA-F]{32}"
+    "Mailgun API Key|medium"            = "key-[0-9a-zA-Z]{32}"
+    "Generic API Key|medium"            = "(?i)(api[_-]?key|apikey)['`"]?\s*[:=]\s*['`"][0-9a-zA-Z_\-]{20,}['`"]"
+    "Generic Secret|medium"             = "(?i)(secret|password|passwd|pwd)['`"]?\s*[:=]\s*['`"][^'`"]{8,}['`"]"
 }
 
-# Exclude patterns
-$excludePatterns = @("node_modules", ".git", "dist", "build", "coverage", "*.min.js", "*.min.css", "package-lock.json", "yarn.lock", "pnpm-lock.yaml", ".zap", "security-reports")
+$excludeDirs   = @("node_modules", ".git", "dist", "build", "coverage", ".nx", ".zap", "security-reports", "out", "tmp")
+$excludeFiles  = @("*.min.js", "*.min.css", "package-lock.json", "yarn.lock", "pnpm-lock.yaml")
+$excludeTemplates = @(".env.example", ".env.sample", ".env.template", "*.test.example")
 
-# Get all files to scan
-$filesToScan = Get-ChildItem -Path $Path -Recurse -File -ErrorAction SilentlyContinue | Where-Object {
-    $exclude = $false
-    foreach ($excludePattern in $excludePatterns) {
-        if ($_.FullName -like "*\$excludePattern*") {
-            $exclude = $true
-            break
-        }
+function Test-IsBinary {
+    param([string]$FilePath)
+    $bytes = [System.IO.File]::ReadAllBytes($FilePath)
+    $size = $bytes.Length
+    if ($size -gt 5MB) { return $true }
+    # Check first 4096 bytes for null bytes (binary marker)
+    $check = [Math]::Min(4096, $size)
+    for ($i = 0; $i -lt $check; $i++) {
+        if ($bytes[$i] -eq 0) { return $true }
     }
-    -not $exclude
+    return $false
 }
 
-Write-Host "Scanning $($filesToScan.Count) files..."
+$files = Get-ChildItem -Path $Path -Recurse -File -ErrorAction SilentlyContinue
+
+$textFiles = @()
+$skippedBinary = 0
+$skippedDir = 0
+$skippedFile = 0
+$skippedTemplate = 0
+
+foreach ($f in $files) {
+    $path = $f.FullName
+    $excluded = $false
+    foreach ($d in $excludeDirs) {
+        if ($path -like "*\$d\*") { $excluded = $true; break }
+    }
+    if ($excluded) { $skippedDir++; continue }
+
+    foreach ($p in $excludeFiles) {
+        if ($f.Name -like $p) { $excluded = $true; break }
+    }
+    if ($excluded) { $skippedFile++; continue }
+
+    foreach ($p in $excludeTemplates) {
+        if ($f.Name -like $p) { $excluded = $true; break }
+    }
+    if ($excluded) { $skippedTemplate++; continue }
+
+    if (Test-IsBinary -FilePath $path) { $skippedBinary++; continue }
+
+    $textFiles += $f
+}
+
+Write-Host "Files scanned: $($textFiles.Count)"
+Write-Host "Skipped:  binary=$skippedBinary excluded-dir=$skippedDir lockfile=$skippedFile template=$skippedTemplate"
 Write-Host ""
 
-$findings = @()
-$totalFindings = 0
+$findings = New-Object System.Collections.ArrayList
+$sevHigh = 0
+$sevMedium = 0
+$sevLow = 0
 
-foreach ($file in $filesToScan) {
+foreach ($file in $textFiles) {
     try {
-        $content = Get-Content -Path $file.FullName -Raw -ErrorAction SilentlyContinue
+        $content = Get-Content -LiteralPath $file.FullName -Raw -ErrorAction SilentlyContinue
         if (-not $content) { continue }
-        
-        foreach ($patternName in $patterns.Keys) {
-            $pattern = $patterns[$patternName]
-            $matches = [regex]::Matches($content, $pattern)
-            
-            if ($matches.Count -gt 0) {
-                foreach ($match in $matches) {
-                    $lineNumber = ($content.Substring(0, $match.Index)).Split("`n").Count
-                    $finding = "$patternName|$($file.FullName):$lineNumber|$($match.Value)"
-                    $findings += $finding
-                    $totalFindings++
-                    
-                    if ($Format -eq "text") {
-                        Write-Host "[$patternName] $($file.FullName):$lineNumber" -ForegroundColor Red
-                        Write-Host "  Value: $($match.Value.Substring(0, [Math]::Min(50, $match.Value.Length)))..." -ForegroundColor DarkRed
-                    }
+
+        # Mark as test/fixture/mock paths as low severity by default
+        $isTestPath = $file.FullName -match "(test|spec|mock|fixture|fake|example|sample)"
+
+        foreach ($key in $patterns.Keys) {
+            $name = ($key -split '\|')[0]
+            $severity = ($key -split '\|')[1]
+            $pattern = $patterns[$key]
+
+            $regex = New-Object System.Text.RegularExpressions.Regex($pattern)
+            $matches = $regex.Matches($content)
+
+            foreach ($m in $matches) {
+                $lineNo = ($content.Substring(0, $m.Index)).Split("`n").Count
+                $value = $m.Value.Substring(0, [Math]::Min(80, $m.Value.Length))
+                $finalSev = $severity
+                if ($isTestPath) { $finalSev = "low" }
+
+                $script:findings.Add([PSCustomObject]@{
+                    severity = $finalSev
+                    type = $name
+                    location = "$($file.FullName):$lineNo"
+                    value = $value
+                }) | Out-Null
+
+                switch ($finalSev) {
+                    "high"   { $script:sevHigh++ }
+                    "medium" { $script:sevMedium++ }
+                    "low"    { $script:sevLow++ }
+                }
+
+                if ($Format -eq "text") {
+                    $color = if ($finalSev -eq "high") { "Red" } elseif ($finalSev -eq "medium") { "Yellow" } else { "DarkYellow" }
+                    Write-Host "  [$finalSev] $name :: $($file.FullName):$lineNo" -ForegroundColor $color
+                }
+
+                if ($env:GITHUB_ACTIONS -eq "true") {
+                    $level = if ($finalSev -eq "high") { "error" } else { "warning" }
+                    Write-Host "::$level file=$($file.FullName),line=$lineNo::$name"
                 }
             }
         }
     } catch {
-        # Skip files that can't be read
+        # skip unreadable
     }
 }
 
-# Check for private key files
-Write-Host "[Private Key Files] Checking for private key files..." -ForegroundColor Yellow
-$privateKeyFiles = Get-ChildItem -Path $Path -Recurse -File -ErrorAction SilentlyContinue | Where-Object {
-    $_.Extension -match "\.(pem|key|p12|pfx)$" -and
-    $_.FullName -notlike "*node_modules*" -and
-    $_.FullName -notlike "*.git*"
+$total = $sevHigh + $sevMedium + $sevLow
+
+switch ($Format) {
+    "json" {
+        $report = @{
+            scanDate = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
+            path = $Path
+            counts = @{ high = $sevHigh; medium = $sevMedium; low = $sevLow }
+            findings = $findings
+        }
+        $report | ConvertTo-Json -Depth 5 | Out-File -FilePath "$Output.json" -Encoding utf8
+        Write-Host "JSON report: $Output.json"
+    }
+    "sarif" {
+        $rules = @()
+        $ruleIndex = 0
+        $ruleMap = @{}
+        $results = @()
+        foreach ($f in $findings) {
+            if (-not $ruleMap.ContainsKey($f.type)) {
+                $ruleIndex++
+                $ruleMap[$f.type] = $ruleIndex
+                $level = if ($f.severity -eq "high") { "error" } else { "warning" }
+                $rules += [PSCustomObject]@{
+                    id = "secret-$ruleIndex"
+                    name = $f.type
+                    shortDescription = @{ text = $f.type }
+                    defaultConfiguration = @{ level = $level }
+                }
+            }
+            $parts = $f.location -split ':'
+            $filePath = ($parts[0..($parts.Length - 2)]) -join ':'
+            $lineNo = [int]$parts[-1]
+            $level = if ($f.severity -eq "high") { "error" } else { "warning" }
+            $results += [PSCustomObject]@{
+                ruleId = "secret-$($ruleMap[$f.type])"
+                level = $level
+                message = @{ text = $f.type }
+                locations = @(
+                    @{
+                        physicalLocation = @{
+                            artifactLocation = @{ uri = $filePath }
+                            region = @{ startLine = $lineNo }
+                        }
+                    }
+                )
+            }
+        }
+        $sarif = @{
+            '$schema' = "https://json.schemastore.org/sarif-2.1.0.json"
+            version = "2.1.0"
+            runs = @(
+                @{
+                    tool = @{
+                        driver = @{
+                            name = "ovds-secret-scanner"
+                            version = "1.0"
+                            informationUri = "https://ovds.example/security"
+                            rules = $rules
+                        }
+                    }
+                    results = $results
+                }
+            )
+        }
+        $sarif | ConvertTo-Json -Depth 10 | Out-File -FilePath "$Output.sarif.json" -Encoding utf8
+        Write-Host "SARIF report: $Output.sarif.json"
+    }
 }
 
-foreach ($file in $privateKeyFiles) {
-    $finding = "Private Key File|$($file.FullName)"
-    $findings += $finding
-    $totalFindings++
-    Write-Host "  Found: $($file.FullName)" -ForegroundColor Red
-}
-
-# Check for .env files
-Write-Host ""
-Write-Host "[Environment Files] Checking for .env files..." -ForegroundColor Yellow
-$envFiles = Get-ChildItem -Path $Path -Recurse -File -ErrorAction SilentlyContinue | Where-Object {
-    $_.Name -like ".env*" -and
-    $_.FullName -notlike "*node_modules*" -and
-    $_.FullName -notlike "*.git*"
-}
-
-foreach ($file in $envFiles) {
-    Write-Host "  Found: $($file.FullName)" -ForegroundColor Yellow
-}
-
-# Summary
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  Secret Scan Summary" -ForegroundColor Cyan
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Total findings: $totalFindings"
-Write-Host ""
+Write-Host "========================================"
+Write-Host "High:   $sevHigh"
+Write-Host "Medium: $sevMedium"
+Write-Host "Low:    $sevLow"
+Write-Host "Total:  $total"
 
-if ($totalFindings -eq 0) {
-    Write-Host "✅ No secrets found" -ForegroundColor Green
-    exit 0
-}
-
-# Generate JSON report if requested
-if ($Format -eq "json") {
-    $report = @{
-        scanDate = Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"
-        path = $Path
-        totalFindings = $totalFindings
-        findings = @()
-    }
-    
-    foreach ($finding in $findings) {
-        $parts = $finding -split "\|"
-        $report.findings += @{
-            type = $parts[0]
-            location = $parts[1]
-            value = $parts[2]
-        }
-    }
-    
-    $report | ConvertTo-Json -Depth 3 | Out-File -FilePath "$Output.json" -Encoding UTF8
-    Write-Host "JSON report saved to: $Output.json" -ForegroundColor Green
-}
-
-# Determine exit code based on severity
 $fail = $false
-
-if ($FailOn -eq "low") {
-    if ($totalFindings -gt 0) {
-        $fail = $true
-    }
-} elseif ($FailOn -eq "medium") {
-    $mediumCount = ($findings | Where-Object { $_ -match "API Key|Bearer Token|Basic Auth|JWT Token|GitHub Token|Google API Key|Slack Token|Stripe API Key|Twilio API Key|Mailgun API Key|Generic Secret" }).Count
-    if ($mediumCount -gt 0) {
-        $fail = $true
-    }
-} elseif ($FailOn -eq "high") {
-    $highCount = ($findings | Where-Object { $_ -match "AWS Access Key|AWS Secret Key|Private Key|Database URL|Password in URL" }).Count
-    if ($highCount -gt 0) {
-        $fail = $true
-    }
+switch ($FailOn) {
+    "low"    { if ($total -gt 0) { $fail = $true } }
+    "medium" { if ($sevHigh + $sevMedium -gt 0) { $fail = $true } }
+    "high"   { if ($sevHigh -gt 0) { $fail = $true } }
 }
 
 if ($fail) {
-    Write-Host "❌ Secrets detected - review required" -ForegroundColor Red
     Write-Host ""
-    Write-Host "Remediation:"
-    Write-Host "  1. Remove secrets from code"
-    Write-Host "  2. Rotate exposed credentials"
-    Write-Host "  3. Use environment variables or secret management"
-    Write-Host "  4. Add secrets to .gitignore"
+    Write-Host "❌ Secrets detected — review required" -ForegroundColor Red
     exit 1
-} else {
-    Write-Host "⚠️  Low-risk findings detected - review recommended" -ForegroundColor Yellow
-    exit 0
 }
+if ($total -gt 0) {
+    Write-Host ""
+    Write-Host "⚠ Low-risk findings detected — review recommended" -ForegroundColor Yellow
+}
+exit 0

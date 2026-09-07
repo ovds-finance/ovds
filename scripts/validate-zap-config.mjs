@@ -20,8 +20,11 @@ let warnings = 0;
 function check(description, test) {
   const result = test();
   checks.push({ description, ...result });
-  if (!result.pass) errors++;
-  else if (result.warning) warnings++;
+  if (!result.pass) {
+    errors++;
+  } else if (result.warning) {
+    warnings++;
+  }
   return result;
 }
 
@@ -138,12 +141,13 @@ if (fs.existsSync(usersFile)) {
     }));
     check('Passwords are not default/common', () => {
       const weakPasswords = ['password', '123456', 'admin', 'test'];
-      const usersWithWeakPasswords = users.ovds_test_users?.filter(u => 
+      const usersWithWeakPasswords = users.ovds_test_users?.filter(u =>
         weakPasswords.some(p => u.password.toLowerCase().includes(p))
       );
+      const weak = usersWithWeakPasswords && usersWithWeakPasswords.length > 0;
       return {
-        pass: !usersWithWeakPasswords || usersWithWeakPasswords.length === 0,
-        warning: 'Test user passwords appear weak - use strong passwords'
+        pass: !weak,
+        warning: weak ? 'Test user passwords appear weak - use strong passwords' : undefined
       };
     });
   } catch (e) {
@@ -202,9 +206,11 @@ const docs = [
 
 for (const doc of docs) {
   const docPath = path.join(rootDir, doc);
+  const exists = fs.existsSync(docPath);
   check(`Documentation exists: ${doc}`, () => ({
-    pass: fs.existsSync(docPath),
-    warning: `Missing ${doc}`
+    pass: exists,
+    warning: exists ? undefined : `Missing ${doc}`,
+    error: exists ? undefined : `Missing ${doc}`
   }));
 }
 
@@ -214,15 +220,17 @@ console.log('  ZAP Configuration Validation Results');
 console.log('========================================\n');
 
 checks.forEach(c => {
-  const status = c.pass ? (c.warning ? '⚠ ' : '✓ ') : '✗ ';
-  const color = c.pass ? (c.warning ? '\x1b[33m' : '\x1b[32m') : '\x1b[31m';
-  const message = c.pass ? c.description : (c.error || c.warning || c.description);
+  const isPass = c.pass === true;
+  const isWarn = c.pass === true && c.warning;
+  const status = isPass ? '✓ ' : (isWarn ? '⚠ ' : '✗ ');
+  const color = isPass ? '\x1b[32m' : (isWarn ? '\x1b[33m' : '\x1b[31m');
+  const message = isPass ? c.description : (c.error || c.warning || c.description);
   console.log(`${color}${status}${message}\x1b[0m`);
 });
 
 console.log('\n----------------------------------------');
 console.log(`Total: ${checks.length} checks`);
-console.log(`Passed: ${checks.filter(c => c.pass && !c.warning).length}`);
+console.log(`Passed: ${checks.filter(c => c.pass === true && !c.warning).length}`);
 console.log(`Warnings: ${warnings}`);
 console.log(`Errors: ${errors}`);
 console.log('----------------------------------------\n');
@@ -231,7 +239,7 @@ if (errors > 0) {
   console.log('Please fix the errors above before running security scans.');
   process.exit(1);
 } else if (warnings > 0) {
-  console.log('Configuration is valid but has warnings. Review warnings before scanning.');
+  console.log(`Configuration is valid (${warnings} advisory suggestions visible above as ⚠).`);
   process.exit(0);
 } else {
   console.log('Configuration is complete and valid. Ready for security testing.');

@@ -18,16 +18,28 @@ env:
         - http://localhost:3001/api/auth/register.*
         - http://localhost:3000/register.*
         - http://localhost:3001/api/notifications/send.*
+        - http://localhost:3001/api/notifications/bulk.*
         - http://localhost:3001/api/payment/submit.*
+        - http://localhost:3001/api/payments/bulk.*
         - http://localhost:3001/api/admin/database-reset.*
         - http://localhost:3001/api/admin/purge.*
+        - http://localhost:3001/api/admin/users/delete-all.*
+        - http://localhost:3001/api/banking/transfers/bulk.*
+        - http://localhost:3001/api/payroll/run.*
+        - http://localhost:3001/api/eims/bulk-cancel.*
+        - http://localhost:3001/api/eims/bulk-submit.*
+        - http://localhost:3001/api/invoices/bulk-delete.*
       authentication:
-        method: form
+        method: script
         parameters:
-          loginUrl: http://localhost:3001/api/auth/login
-          loginPostData: email={%username%}&password={%password%}
-          loggedInRegex: '"success":\s*true'
-          loggedOutRegex: '"success":\s*false|Invalid credentials|401|Unauthorized'
+          scriptPath: /zap/wrk/.zap/scripts/authentication/ovds-json-auth.js
+          url: http://localhost:3001
+        verification:
+          method: response
+          regex: '"success"\\s*:\\s*true|"access_token"\\s*:\\s*"[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+'
+          pollUrl: http://localhost:3001/api/users/me
+          pollFrequency: 60
+          enabled: true
       users:
         - name: normal_user
           enabled: true
@@ -75,7 +87,7 @@ env:
       parameters:
         context: OVDS
         user: normal_user
-        policy: ovds-scan-policy
+        policy: OVDS Scan Policy
         maxScanDuration: 60
         maxRuleDuration: 30
         maxThreadsPerHost: 4

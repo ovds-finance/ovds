@@ -68,10 +68,10 @@ docker-compose.security.yml    # Security testing stack overlay
 
 | Script | Purpose | Usage |
 |--------|---------|-------|
-| `zap-baseline.ps1` | Passive scan (no active payloads) | `.\scripts\zap-baseline.ps1 -TargetUrl "http://localhost:3000"` |
-| `zap-full-scan.ps1` | Active scan (with attack payloads) | `.\scripts\zap-full-scan.ps1 -TargetUrl "http://staging.example.com"` |
-| `zap-authenticated-scan.ps1` | Authenticated active scan | `.\scripts\zap-authenticated-scan.ps1 -TargetFrontend "http://localhost:3000" -TargetBackend "http://localhost:3001"` |
-| `zap-api-scan.ps1` | API security scan | `.\scripts\zap-api-scan.ps1 -ApiDefinition "http://localhost:3001/api/openapi.json"` |
+| `zap-baseline.ps1` / `.sh` | Passive scan (no active payloads) | `pwsh scripts/zap-baseline.ps1 -TargetUrl http://localhost:3000` |
+| `zap-full-scan.ps1` / `.sh` | Active scan (with attack payloads) | `pwsh scripts/zap-full-scan.ps1 -TargetUrl http://staging.example.com` |
+| `zap-authenticated-scan.ps1` / `.sh` | Authenticated active scan | `pwsh scripts/zap-authenticated-scan.ps1 -TargetFrontend http://localhost:3000 -TargetBackend http://localhost:3001` |
+| `zap-api-scan.ps1` / `.sh` | API security scan | `pwsh scripts/zap-api-scan.ps1 -ApiDefinition http://localhost:3001/api/openapi.json` |
 
 ### Utility Scripts
 
@@ -82,9 +82,23 @@ docker-compose.security.yml    # Security testing stack overlay
 | `seed-zap-test-users-db.mjs` | Create test users in DB | `npm run seed:zap-users` |
 | `seed-zap-test-data.mjs` | Create synthetic test data | `node scripts/seed-zap-test-data.mjs --api-url http://localhost:3001/api --token <jwt>` |
 | `zap-import-results.mjs` | Import ZAP results to security module | `node scripts/zap-import-results.mjs --report zap-report.json --assessment-id <id>` |
-| `zap-init-session.sh` | Initialize ZAP Desktop session | `bash scripts/zap-init-session.sh http://localhost:8080 ovds-zap-secret` |
-| `security-test-runner.sh` | Full security testing workflow | `bash scripts/security-test-runner.sh all` |
-| `security-test-runner.ps1` | Full security testing workflow (Windows) | `.\scripts\security-test-runner.ps1 -ScanType all` |
+| `zap-init-session.sh` / `.ps1` | Initialize ZAP Desktop session | `bash scripts/zap-init-session.sh http://localhost:8080 ovds-zap-secret` |
+| `security-test-runner.sh` / `.ps1` | Full security testing workflow | `bash scripts/security-test-runner.sh all` |
+| `zap-explore-helper.sh` / `.ps1` | Phase 1 manual exploration helper | `bash scripts/zap-explore-helper.sh` |
+| `zap-verify-openapi.sh` / `.ps1` | Phase 5 OpenAPI pre-flight | `bash scripts/zap-verify-openapi.sh --backend http://localhost:3001` |
+| `zap-test-authentication.sh` / `.ps1` | Phase 6 §13.1 | `pwsh scripts/zap-test-authentication.ps1` |
+| `zap-test-authorization.sh` / `.ps1` | Phase 6 §13.2 | `pwsh scripts/zap-test-authorization.ps1` |
+| `zap-test-session.sh` / `.ps1` | Phase 6 §13.3 | `pwsh scripts/zap-test-session.ps1` |
+| `zap-test-input-validation.sh` / `.ps1` | Phase 6 §13.4 | `pwsh scripts/zap-test-input-validation.ps1` |
+| `zap-test-misc.sh` / `.ps1` | Phase 6 §13.5/13.6/13.8 | `pwsh scripts/zap-test-misc.ps1` |
+| `zap-test-rate-limit.sh` / `.ps1` | Phase 6 §13.9 | `pwsh scripts/zap-test-rate-limit.ps1` |
+| `zap-test-manual-all.sh` / `.ps1` | Phase 6 master runner | `pwsh scripts/zap-test-manual-all.ps1` |
+| `zap-retest.sh` / `.ps1` | §18 retest helper | `pwsh scripts/zap-retest.ps1 -FindingsFile security-reports/retest-input.json` |
+| `zap-export-findings.mjs` | ZAP → redacted Markdown | `node scripts/zap-export-findings.mjs` |
+| `zap-report-diff.mjs` | Baseline diff | `node scripts/zap-report-diff.mjs --baseline security-reports/zap-baseline-report.json` |
+| `security-status-snapshot.mjs` | Aggregate status | `node scripts/security-status-snapshot.mjs` |
+| `scan-secrets.sh` / `.ps1` | Hardened secret scanner (SARIF) | `bash scripts/scan-secrets.sh --format sarif --output security-reports/secret-scan` |
+| `security-policy-check.sh` / `.ps1` | Governance checker | `pwsh scripts/security-policy-check.ps1` |
 
 ## Docker Compose
 
@@ -264,6 +278,71 @@ curl http://localhost:3000/health/live
 
 # Try manual exploration first
 # Use ZAP Desktop to manually browse the application
+```
+
+## Phase 6 — Mandatory Manual Tests
+
+OWASP ZAP automated scanning is not sufficient on its own. The following
+manual tests must be performed and recorded:
+
+| §    | Area                                | Script                                          |
+|------|-------------------------------------|-------------------------------------------------|
+| 13.1 | Authentication                      | `scripts/zap-test-authentication.ps1` / `.sh`   |
+| 13.2 | Authorization (IDOR, mass-assign)   | `scripts/zap-test-authorization.ps1` / `.sh`     |
+| 13.3 | Session Management                  | `scripts/zap-test-session.ps1` / `.sh`          |
+| 13.4 | Input Validation                    | `scripts/zap-test-input-validation.ps1` / `.sh`  |
+| 13.5 | File Upload                         | `scripts/zap-test-misc.ps1` / `.sh`              |
+| 13.6 | Error Handling                      | `scripts/zap-test-misc.ps1` / `.sh`              |
+| 13.8 | Business Logic                      | `scripts/zap-test-misc.ps1` / `.sh`              |
+| 13.9 | Rate Limiting & Abuse Controls      | `scripts/zap-test-rate-limit.ps1` / `.sh`        |
+
+Run the full Phase 6 suite via:
+
+```bash
+pwsh scripts/zap-test-manual-all.ps1
+# or on Linux/macOS:
+bash scripts/zap-test-manual-all.sh
+```
+
+The bash variants are drop-in replacements. The full manual checklist
+(including checks that cannot be automated, like MFA bypass and CSV
+injection) lives in `scripts/security-testing-checklist.md`.
+
+### Phase 1 — Manual Exploration Helper
+
+Before automated crawling, populate the Sites tree manually through ZAP
+Desktop:
+
+```bash
+pwsh scripts/zap-explore-helper.ps1
+```
+
+This prints the ZAP browser proxy configuration, lists every URL you need
+to visit (per role), and seed-checks that the application is reachable.
+
+### Exporting Findings to the Remediation Register
+
+After a scan, run:
+
+```bash
+node scripts/zap-export-findings.mjs \
+  --report security-reports/zap-authenticated-report.json \
+  --min High \
+  --output security-reports/findings.md
+```
+
+This produces Markdown rows that match `scripts/remediation-register.md`
+and can be pasted into the register. Tokens, passwords, and session
+cookies are redacted automatically.
+
+### Importing Findings into the Security Assessment Module
+
+```bash
+node scripts/zap-import-results.mjs \
+  --report zap-report.json \
+  --api-url http://localhost:3001/api \
+  --assessment-id <id> \
+  --token <jwt>
 ```
 
 ## References

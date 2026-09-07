@@ -22,7 +22,7 @@ env:
     - type: activeScan
       parameters:
         targetUrl: http://localhost:3001/api
-        policy: ovds-scan-policy
+        policy: OVDS Scan Policy
         maxScanDuration: 60
         maxRuleDuration: 30
         maxThreadsPerHost: 4

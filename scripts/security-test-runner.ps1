@@ -75,11 +75,12 @@ docker compose -f docker-compose.ovds.yml -f docker-compose.security.yml up -d b
 # Wait for backend
 Write-Host "Waiting for backend to be healthy..."
 $backendHealthy = $false
+$backendHealthUrl = $TargetUrl -replace ":3000", ":3001"
 for ($i = 1; $i -le 60; $i++) {
     try {
-        $response = Invoke-WebRequest -Uri "$TargetUrl/health/live" -UseBasicParsing -TimeoutSec 5
+        $response = Invoke-WebRequest -Uri "$backendHealthUrl/health/live" -UseBasicParsing -TimeoutSec 5
         if ($response.StatusCode -eq 200) {
-            Write-Host "✓ Backend is healthy" -ForegroundColor Green
+            Write-Host "✓ Backend is healthy at $backendHealthUrl" -ForegroundColor Green
             $backendHealthy = $true
             break
         }
@@ -88,7 +89,7 @@ for ($i = 1; $i -le 60; $i++) {
 }
 
 if (-not $backendHealthy) {
-    Write-Host "ERROR: Backend failed to become healthy" -ForegroundColor Red
+    Write-Host "ERROR: Backend failed to become healthy at $backendHealthUrl/health/live" -ForegroundColor Red
     exit 1
 }
 
@@ -164,8 +165,8 @@ switch ($ScanType) {
     "all" {
         Write-Host ""
         Write-Host "Running All Scans..." -ForegroundColor Yellow
-        
-        Write-Host "  [1/3] Baseline Scan..." -ForegroundColor Cyan
+
+        Write-Host "  [1/5] Baseline Scan..." -ForegroundColor Cyan
         $reportFile = "zap-baseline-${timestamp}.html"
         docker compose -f docker-compose.ovds.yml -f docker-compose.security.yml exec -T zap `
             zap-baseline.py `
@@ -178,7 +179,7 @@ switch ($ScanType) {
             -j `
             --auto 2>&1 | Write-Host
 
-        Write-Host "  [2/3] Full Scan..." -ForegroundColor Cyan
+        Write-Host "  [2/5] Full Scan..." -ForegroundColor Cyan
         $reportFile = "zap-full-${timestamp}.html"
         docker compose -f docker-compose.ovds.yml -f docker-compose.security.yml exec -T zap `
             zap-full-scan.py `
@@ -190,7 +191,7 @@ switch ($ScanType) {
             -j `
             --auto 2>&1 | Write-Host
 
-        Write-Host "  [3/3] API Scan..." -ForegroundColor Cyan
+        Write-Host "  [3/5] API Scan..." -ForegroundColor Cyan
         $reportFile = "zap-api-${timestamp}.html"
         docker compose -f docker-compose.ovds.yml -f docker-compose.security.yml exec -T zap `
             zap-api-scan.py `
@@ -202,6 +203,15 @@ switch ($ScanType) {
             --max_scan_time 60m `
             -j `
             --auto 2>&1 | Write-Host
+
+        Write-Host "  [4/5] Authenticated Scan..." -ForegroundColor Cyan
+        $authReport = "zap-authenticated-${timestamp}.html"
+        docker compose -f docker-compose.ovds.yml -f docker-compose.security.yml exec -T zap `
+            zap.sh -cmd -autorun /zap/ovds-authenticated-scan.yaml 2>&1 | Write-Host
+
+        Write-Host "  [5/5] Phase 6 Manual Tests..." -ForegroundColor Cyan
+        $backendUrl = "http://localhost:3001"
+        & pwsh -File (Join-Path $PSScriptRoot "zap-test-manual-all.ps1") -BackendUrl $backendUrl
     }
 }
 
@@ -209,6 +219,9 @@ switch ($ScanType) {
 Write-Host ""
 Write-Host "Copying reports to $ReportDir..." -ForegroundColor Yellow
 docker compose -f docker-compose.ovds.yml -f docker-compose.security.yml cp zap:/zap/wrk/reports/. $ReportDir 2>$null || Write-Host "No reports to copy"
+
+# Aggregate status snapshot
+& node "$PSScriptRoot\security-status-snapshot.mjs" --reports-dir $ReportDir 2>$null || Write-Host "Snapshot generation failed"
 
 # Summary
 Write-Host ""
