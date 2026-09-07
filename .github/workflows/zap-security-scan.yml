@@ -66,6 +66,37 @@ jobs:
         id: setup
         run: echo "ok=true" >> $GITHUB_OUTPUT
 
+  secret-scan:
+    name: Secret Scan (SARIF)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run secret scanner
+        shell: bash
+        run: |
+          chmod +x scripts/scan-secrets.sh
+          ./scripts/scan-secrets.sh --format sarif --output security-reports/secret-scan || true
+
+      - name: Upload SARIF to GitHub Code Scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: security-reports/secret-scan.sarif.json
+          category: ovds-secrets
+          wait-for-processing: true
+
+      - name: Upload secret scan artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secret-scan
+          path: |
+            security-reports/secret-scan.sarif.json
+            security-reports/secret-scan.json
+          retention-days: 30
+
   security-gate-2-build:
     name: Gate 2 - Build & Deploy
     needs: security-gate-1-setup
@@ -147,6 +178,16 @@ jobs:
           fail_action: false
           allow_alerts: 'false'
 
+      - name: Phase 6 — Manual security tests (auth/authz/upload/business-logic)
+        id: phase6
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          Write-Host "Running Phase 6 manual security suites"
+          pwsh -File scripts/zap-test-manual-all.ps1 -BackendUrl http://localhost:3001
+          $phase6_status = $LASTEXITCODE
+          "phase6_status=$phase6_status" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
       - name: Parse ZAP Results
         id: parse-results
         run: |
@@ -223,6 +264,30 @@ jobs:
             **/*zap*.json
           retention-days: 30
 
+      - name: Upload Phase 6 manual test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase6-manual-tests
+          path: |
+            security-reports/**/*zap-test*.json
+            **/*phase6*.log
+          retention-days: 30
+
+      - name: Aggregate status snapshot
+        if: always()
+        run: node scripts/security-status-snapshot.mjs --reports-dir security-reports || true
+
+      - name: Upload ZAP snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-status-snapshot
+          path: |
+            security-reports/status.json
+            security-reports/status.md
+          retention-days: 30
+
       - name: Stop application
         if: always()
         run: |
@@ -288,13 +353,24 @@ jobs:
           echo "| High | ${{ steps.parse-results.outputs.high_count || '0' }} |" >> security-summary.md
           echo "| Medium | ${{ steps.parse-results.outputs.medium_count || '0' }} |" >> security-summary.md
           echo "| Low | ${{ steps.parse-results.outputs.low_count || '0' }} |" >> security-summary.md
-          echo "" >> security-summary.md
-          echo "## Next Steps" >> security-summary.md
-          echo "1. Download the ZAP report artifact" >> security-summary.md
-          echo "2. Review findings in the HTML report" >> security-summary.md
-          echo "3. Validate findings and eliminate false positives" >> security-summary.md
-          echo "4. Create remediation tasks for confirmed vulnerabilities" >> security-summary.md
-          echo "5. Retest after fixes are deployed" >> security-summary.md
+echo "" >> security-summary.md
+      echo "## Next Steps" >> security-summary.md
+      echo "1. Download the ZAP report artifact" >> security-summary.md
+      echo "2. Review findings in the HTML report" >> security-summary.md
+      echo "3. Validate findings and eliminate false positives" >> security-summary.md
+      echo "4. Create remediation tasks for confirmed vulnerabilities" >> security-summary.md
+      echo "5. Retest after fixes are deployed" >> security-summary.md
+      echo "" >> security-summary.md
+      echo "## Phase 6 — Manual Security Tests" >> security-summary.md
+      echo "" >> security-summary.md
+      PHASE6_STATUS="${{ steps.phase6.outputs.phase6_status || 'skipped' }}"
+      if [ "$PHASE6_STATUS" = "0" ]; then
+        echo "Status: ✅ PASSED (all manual suites succeeded)" >> security-summary.md
+      elif [ "$PHASE6_STATUS" = "skipped" ]; then
+        echo "Status: ⏭️  Skipped" >> security-summary.md
+      else
+        echo "Status: ❌ FAILED (one or more manual suites reported failures)" >> security-summary.md
+      fi
 
       - name: Upload security summary
         uses: actions/upload-artifact@v4
