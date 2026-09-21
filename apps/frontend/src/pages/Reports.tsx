@@ -161,7 +161,7 @@ const DeferredTaxTab: React.FC<{ currency: string; companyId?: string }> = ({ cu
     a.download = `deferred-tax-${asOf}.csv`; a.click();
   };
 
-  const dtaBg  = 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-800';
+  const dtaBg  = 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] dark:bg-green-950/20 dark:border-green-800';
   const dtlBg  = 'bg-rose-50 border-rose-200 dark:bg-rose-950/20 dark:border-rose-800';
   const netBg  = data?.netPosition === 'NET_DTA' ? dtaBg : data?.netPosition === 'NET_DTL' ? dtlBg : 'bg-white border-slate-200';
 
@@ -191,10 +191,10 @@ const DeferredTaxTab: React.FC<{ currency: string; companyId?: string }> = ({ cu
       {/* KPI strip */}
       <div className="ovds-grid-layout cols-4">
         {[
-          { label: 'Deferred Tax Assets',     value: data?.totalDta ?? 0,          color: 'text-emerald-600', bg: dtaBg },
+          { label: 'Deferred Tax Assets',     value: data?.totalDta ?? 0,          color: 'text-[var(--pro-azure)]', bg: dtaBg },
           { label: 'Deferred Tax Liabilities', value: data?.totalDtl ?? 0,         color: 'text-rose-600',    bg: dtlBg },
-          { label: 'Net Position',             value: Math.abs(data?.netDeferredTax ?? 0), color: data?.netPosition === 'NET_DTA' ? 'text-emerald-700' : data?.netPosition === 'NET_DTL' ? 'text-rose-700' : 'text-slate-700', bg: netBg },
-          { label: 'DTA Recognition',          value: data?.recognitionAssessment?.profitabilityScore ?? 0, suffix: '%', color: (data?.recognitionAssessment?.profitabilityScore ?? 0) >= 60 ? 'text-emerald-600' : 'text-amber-600', bg: 'bg-amber-50 border-amber-200' },
+          { label: 'Net Position',             value: Math.abs(data?.netDeferredTax ?? 0), color: data?.netPosition === 'NET_DTA' ? 'text-[var(--pro-azure-dark)]' : data?.netPosition === 'NET_DTL' ? 'text-rose-700' : 'text-slate-700', bg: netBg },
+          { label: 'DTA Recognition',          value: data?.recognitionAssessment?.profitabilityScore ?? 0, suffix: '%', color: (data?.recognitionAssessment?.profitabilityScore ?? 0) >= 60 ? 'text-[var(--pro-azure)]' : 'text-amber-600', bg: 'bg-amber-50 border-amber-200' },
         ].map((c, i) => (
           <div key={i} className={`rounded-xl border p-4 ${c.bg}`}>
             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">{c.label}</p>
@@ -212,9 +212,9 @@ const DeferredTaxTab: React.FC<{ currency: string; companyId?: string }> = ({ cu
 
       {/* Recognition assessment */}
       {data?.recognitionAssessment && (
-        <div className={`p-4 rounded-xl border flex items-start gap-3 ${data.recognitionAssessment.dtaRecognisable ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
+        <div className={`p-4 rounded-xl border flex items-start gap-3 ${data.recognitionAssessment.dtaRecognisable ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' : 'bg-amber-50 border-amber-200'}`}>
           {data.recognitionAssessment.dtaRecognisable
-            ? <CheckCircle size={15} className="text-emerald-600 shrink-0 mt-0.5" />
+            ? <CheckCircle size={15} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
             : <AlertCircle size={15} className="text-amber-600 shrink-0 mt-0.5" />
           }
           <div>
@@ -253,26 +253,26 @@ const DeferredTaxTab: React.FC<{ currency: string; companyId?: string }> = ({ cu
                 </div>
               </AppTd>
               <AppTd>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${d.type === 'TAXABLE' ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${d.type === 'TAXABLE' ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] border-[var(--pro-azure-100)]'}`}>
                   {d.type}
                 </span>
               </AppTd>
               <AppTd align="right"><span className="tabular-nums text-[11px]">{fmt(d.carryingAmount)}</span></AppTd>
               <AppTd align="right"><span className="tabular-nums text-[11px]">{fmt(d.taxBase)}</span></AppTd>
-              <AppTd align="right"><span className={`tabular-nums text-[11px] font-bold ${d.difference > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>{fmt(d.difference)}</span></AppTd>
+              <AppTd align="right"><span className={`tabular-nums text-[11px] font-bold ${d.difference > 0 ? 'text-rose-600' : 'text-[var(--pro-azure)]'}`}>{fmt(d.difference)}</span></AppTd>
               <AppTd align="right">
-                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${d.deferredTaxType === 'DTL' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${d.deferredTaxType === 'DTL' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)]'}`}>
                   {d.deferredTaxType}
                 </span>
               </AppTd>
-              <AppTd align="right"><span className={`tabular-nums text-[11px] font-bold ${d.deferredTaxType === 'DTL' ? 'text-rose-600' : 'text-emerald-600'}`}>{fmt(d.deferredTax)}</span></AppTd>
+              <AppTd align="right"><span className={`tabular-nums text-[11px] font-bold ${d.deferredTaxType === 'DTL' ? 'text-rose-600' : 'text-[var(--pro-azure)]'}`}>{fmt(d.deferredTax)}</span></AppTd>
             </AppTr>
           ))}
           {data && data.differences.length > 0 && (
             <tr className="bg-white dark:bg-slate-800/80 border-t-2 border-slate-200 font-bold">
               <td className="px-4 py-3 font-black text-slate-800 dark:text-white" colSpan={5}>NET DEFERRED TAX POSITION</td>
-              <AppTd align="right"><span className={`text-[11px] font-black px-2 py-0.5 rounded ${data.netPosition === 'NET_DTA' ? 'bg-emerald-100 text-emerald-700' : data.netPosition === 'NET_DTL' ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'}`}>{data.netPosition}</span></AppTd>
-              <AppTd align="right"><span className={`tabular-nums font-black text-[13px] underline decoration-double ${data.netDeferredTax > 0 ? 'text-emerald-700' : data.netDeferredTax < 0 ? 'text-rose-700' : 'text-slate-500'}`}>{fmt(Math.abs(data.netDeferredTax))}</span></AppTd>
+              <AppTd align="right"><span className={`text-[11px] font-black px-2 py-0.5 rounded ${data.netPosition === 'NET_DTA' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : data.netPosition === 'NET_DTL' ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'}`}>{data.netPosition}</span></AppTd>
+              <AppTd align="right"><span className={`tabular-nums font-black text-[13px] underline decoration-double ${data.netDeferredTax > 0 ? 'text-[var(--pro-azure-dark)]' : data.netDeferredTax < 0 ? 'text-rose-700' : 'text-slate-500'}`}>{fmt(Math.abs(data.netDeferredTax))}</span></AppTd>
             </tr>
           )}
         </tbody>
@@ -289,7 +289,7 @@ const DeferredTaxTab: React.FC<{ currency: string; companyId?: string }> = ({ cu
             </div>
             <div className="flex justify-between pl-6">
               <span className="text-slate-600">Cr {data.journalEntry.creditAccount}</span>
-              <span className="font-bold text-emerald-600">{fmt(data.journalEntry.amount)}</span>
+              <span className="font-bold text-[var(--pro-azure)]">{fmt(data.journalEntry.amount)}</span>
             </div>
           </div>
           <p className="text-[10px] text-slate-400 mt-2">{data.journalEntry.description}</p>
@@ -334,9 +334,9 @@ const Ifrs15Tab: React.FC<{ currency: string; companyId?: string }> = ({ currenc
 
       {/* IFRS 15 compliance check banner */}
       {!compLoading && compliance && (
-        <div className={`p-4 rounded-xl border flex items-start gap-3 ${compliance.overallCompliant ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
+        <div className={`p-4 rounded-xl border flex items-start gap-3 ${compliance.overallCompliant ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' : 'bg-amber-50 border-amber-200'}`}>
           {compliance.overallCompliant
-            ? <CheckCircle size={15} className="text-emerald-600 shrink-0 mt-0.5" />
+            ? <CheckCircle size={15} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
             : <AlertTriangle size={15} className="text-amber-600 shrink-0 mt-0.5" />
           }
           <div className="flex-1">
@@ -345,11 +345,11 @@ const Ifrs15Tab: React.FC<{ currency: string; companyId?: string }> = ({ currenc
             </p>
             {!compliance.overallCompliant && compliance.issues.slice(0, 3).map(issue => (
               <p key={issue.invoiceId} className="text-[10px] text-amber-700 dark:text-amber-400">
-                · {issue.invoiceNumber}: {issue.issues[0]}
+                · {issue.invoiceNumber}: {issue.issues?.[0]}
               </p>
             ))}
           </div>
-          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${compliance.overallCompliant ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-amber-100 text-amber-700 border-amber-200'}`}>
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${compliance.overallCompliant ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' : 'bg-amber-100 text-amber-700 border-amber-200'}`}>
             {compliance.nonCompliant} issues
           </span>
         </div>
@@ -359,7 +359,7 @@ const Ifrs15Tab: React.FC<{ currency: string; companyId?: string }> = ({ currenc
       <div className="ovds-grid-layout cols-4">
         {[
           { label: 'Total Contract Revenue',  value: schedule?.totalContractRevenue ?? 0,  color: 'text-slate-800' },
-          { label: 'Recognised to Date',      value: schedule?.recognisedToDate ?? 0,       color: 'text-emerald-600' },
+          { label: 'Recognised to Date',      value: schedule?.recognisedToDate ?? 0,       color: 'text-[var(--pro-azure)]' },
           { label: 'Deferred Revenue',        value: schedule?.deferredRevenue ?? 0,        color: 'text-amber-600' },
           { label: 'Contract Liabilities',    value: schedule?.contractLiabilities ?? 0,   color: 'text-rose-600' },
         ].map((c, i) => (
@@ -387,14 +387,14 @@ const Ifrs15Tab: React.FC<{ currency: string; companyId?: string }> = ({ currenc
       {schedule && schedule.scheduleByMonth.length > 0 && (
         <div className="ovds-widget-card p-5">
           <p className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-            <TrendingUp size={14} className="text-emerald-500" />
+            <TrendingUp size={14} className="text-[var(--pro-azure)]" />
             Revenue Recognition Schedule — YTD
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {schedule.scheduleByMonth.map(m => (
               <div key={m.month} className="bg-white dark:bg-slate-800 rounded-xl p-3 text-center">
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">{m.month}</p>
-                <p className="text-sm font-black tabular-nums text-emerald-600">{fmt(m.amount)}</p>
+                <p className="text-sm font-black tabular-nums text-[var(--pro-azure)]">{fmt(m.amount)}</p>
                 <p className="text-[9px] text-slate-400 mt-0.5">{m.invoices} inv</p>
               </div>
             ))}
@@ -473,7 +473,7 @@ const ArAgingTab: React.FC<{ currency: string; companyId?: string }> = ({ curren
   };
 
   const STAGE_COLORS = [
-    'bg-emerald-50 text-emerald-700 border-emerald-200',
+    'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
     'bg-amber-50 text-amber-700 border-amber-200',
     'bg-rose-50 text-rose-700 border-rose-200',
   ];
@@ -507,7 +507,7 @@ const ArAgingTab: React.FC<{ currency: string; companyId?: string }> = ({ curren
           <div className="flex rounded-xl border border-slate-200 overflow-hidden">
             {(['AR', 'AP'] as const).map(v => (
               <button key={v} onClick={() => setView(v)}
-                className={`px-3 py-1.5 text-xs font-bold transition-colors ${view === v ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
+                className={`px-3 py-1.5 text-xs font-bold transition-colors ${view === v ? 'bg-[var(--pro-azure)] text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
                 {v} Aging
               </button>
             ))}
@@ -523,7 +523,7 @@ const ArAgingTab: React.FC<{ currency: string; companyId?: string }> = ({ curren
       {view === 'AR' && (
         <div className="flex items-center gap-2 flex-wrap p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
           <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-            <Shield size={13} className="text-emerald-500" /> Automation:
+            <Shield size={13} className="text-[var(--pro-azure)]" /> Automation:
           </span>
           <Btn variant="secondary" size="sm" onClick={() => handleDunning(true)} disabled={runningDunning}>
             {runningDunning ? 'Running…' : 'Preview Dunning'}
@@ -536,7 +536,7 @@ const ArAgingTab: React.FC<{ currency: string; companyId?: string }> = ({ curren
           </Btn>
           {arData?.collectionRate !== undefined && (
             <span className="ml-auto text-xs font-semibold text-slate-500">
-              Collection Rate: <span className={`font-black ${arData.collectionRate >= 80 ? 'text-emerald-600' : arData.collectionRate >= 60 ? 'text-amber-600' : 'text-rose-600'}`}>{arData.collectionRate?.toFixed(1)}%</span>
+              Collection Rate: <span className={`font-black ${arData.collectionRate >= 80 ? 'text-[var(--pro-azure)]' : arData.collectionRate >= 60 ? 'text-amber-600' : 'text-rose-600'}`}>{arData.collectionRate?.toFixed(1)}%</span>
             </span>
           )}
         </div>
@@ -544,8 +544,8 @@ const ArAgingTab: React.FC<{ currency: string; companyId?: string }> = ({ curren
 
       {/* Dunning result */}
       {dunningResult && (
-        <div className={`p-4 rounded-xl border flex items-start gap-3 ${dunningResult.dryRun ? 'bg-sky-50 border-sky-200' : 'bg-emerald-50 border-emerald-200'}`}>
-          <CheckCircle size={15} className={`shrink-0 mt-0.5 ${dunningResult.dryRun ? 'text-sky-500' : 'text-emerald-500'}`} />
+        <div className={`p-4 rounded-xl border flex items-start gap-3 ${dunningResult.dryRun ? 'bg-sky-50 border-sky-200' : 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]'}`}>
+          <CheckCircle size={15} className={`shrink-0 mt-0.5 ${dunningResult.dryRun ? 'text-sky-500' : 'text-[var(--pro-azure)]'}`} />
           <div>
             <p className="text-xs font-bold text-slate-800">{dunningResult.dryRun ? 'Dunning Preview' : 'Dunning Completed'}</p>
             <p className="text-[11px] text-slate-600">
@@ -563,11 +563,11 @@ const ArAgingTab: React.FC<{ currency: string; companyId?: string }> = ({ curren
         const kpiCells = view === 'AR' ? [
           { label: 'Gross Receivables',   value: data?.totalGross ?? 0,   color: 'text-slate-800', isNum: false, suffix: '' },
           { label: 'Total ECL Provision', value: data?.totalEcl ?? 0,    color: 'text-rose-600',  isNum: false, suffix: '' },
-          { label: 'Net Carrying Amount', value: data?.netCarrying ?? 0, color: 'text-emerald-700', isNum: false, suffix: '' },
-          { label: 'Collection Rate',     value: arData?.collectionRate ?? 0, suffix: '%', color: (arData?.collectionRate ?? 0) >= 80 ? 'text-emerald-600' : 'text-amber-600', isNum: false },
+          { label: 'Net Carrying Amount', value: data?.netCarrying ?? 0, color: 'text-[var(--pro-azure-dark)]', isNum: false, suffix: '' },
+          { label: 'Collection Rate',     value: arData?.collectionRate ?? 0, suffix: '%', color: (arData?.collectionRate ?? 0) >= 80 ? 'text-[var(--pro-azure)]' : 'text-amber-600', isNum: false },
         ] : [
           { label: 'Total Payables',    value: data?.totalGross ?? 0,   color: 'text-rose-600',   isNum: false, suffix: '' },
-          { label: 'Current (not due)', value: data?.buckets?.find(b => b.label.includes('not yet'))?.grossAmount ?? 0, color: 'text-emerald-600', isNum: false, suffix: '' },
+          { label: 'Current (not due)', value: data?.buckets?.find(b => b.label.includes('not yet'))?.grossAmount ?? 0, color: 'text-[var(--pro-azure)]', isNum: false, suffix: '' },
           { label: 'Overdue',           value: (data?.totalGross ?? 0) - (data?.buckets?.find(b => b.label.includes('not yet'))?.grossAmount ?? 0), color: 'text-amber-600', isNum: false, suffix: '' },
           { label: 'Vendors',           value: data?.buckets?.reduce((s, b) => s + b.count, 0) ?? 0, isNum: true, color: 'text-slate-700', suffix: '' },
         ];
@@ -611,7 +611,7 @@ const ArAgingTab: React.FC<{ currency: string; companyId?: string }> = ({ curren
             <AppTr key={b.label}>
               <AppTd><span className="text-[12px] font-semibold text-slate-800 dark:text-slate-100">{b.label}</span></AppTd>
               {view === 'AR' && (
-                <AppTd><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${STAGE_COLORS[(b.stage ?? 1) - 1]}`}>Stage {b.stage}</span></AppTd>
+                <AppTd><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${STAGE_COLORS[b.stage === 'OVERDUE' ? 2 : 0]}`}>Stage {b.stage}</span></AppTd>
               )}
               <AppTd align="right"><span className="tabular-nums text-[11px]">{b.count}</span></AppTd>
               <AppTd align="right"><span className={`tabular-nums text-[11px] font-bold ${b.grossAmount > 0 ? 'text-slate-800' : 'text-slate-400'}`}>{fmt(b.grossAmount)}</span></AppTd>
@@ -638,7 +638,7 @@ const ArAgingTab: React.FC<{ currency: string; companyId?: string }> = ({ curren
           <p className="text-[11px] font-bold text-violet-700 dark:text-violet-400 mb-2">Suggested IFRS 9 ECL Provision Journal Entry</p>
           <div className="space-y-1 font-mono text-[11px]">
             <div className="flex justify-between"><span className="text-slate-600">Dr Impairment Loss on Trade Receivables (P&L)</span><span className="font-bold text-rose-600">{fmt(data?.totalEcl ?? 0)}</span></div>
-            <div className="flex justify-between pl-6"><span className="text-slate-600">Cr Allowance for Doubtful Debts (BS contra)</span><span className="font-bold text-emerald-600">{fmt(data?.totalEcl ?? 0)}</span></div>
+            <div className="flex justify-between pl-6"><span className="text-slate-600">Cr Allowance for Doubtful Debts (BS contra)</span><span className="font-bold text-[var(--pro-azure)]">{fmt(data?.totalEcl ?? 0)}</span></div>
           </div>
         </div>
       )}
@@ -693,7 +693,7 @@ const ApprovalsTab: React.FC<{ currency: string; companyId?: string }> = ({ curr
 
   const STATUS_COLORS: Record<string, string> = {
     PENDING:   'bg-amber-50 text-amber-700 border-amber-200',
-    APPROVED:  'bg-emerald-50 text-emerald-700 border-emerald-200',
+    APPROVED:  'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
     REJECTED:  'bg-rose-50 text-rose-700 border-rose-200',
     ESCALATED: 'bg-violet-50 text-violet-700 border-violet-200',
     CANCELLED: 'bg-slate-100 text-slate-500 border-slate-200',
@@ -710,7 +710,7 @@ const ApprovalsTab: React.FC<{ currency: string; companyId?: string }> = ({ curr
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <GitBranch size={16} className="text-emerald-500" />
+            <GitBranch size={16} className="text-[var(--pro-azure)]" />
             Approval Workflow Engine
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -721,7 +721,7 @@ const ApprovalsTab: React.FC<{ currency: string; companyId?: string }> = ({ curr
           <div className="flex rounded-xl border border-slate-200 overflow-hidden">
             {(['pending', 'rules'] as const).map(v => (
               <button key={v} onClick={() => setView(v)}
-                className={`px-3 py-1.5 text-xs font-bold capitalize transition-colors ${view === v ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
+                className={`px-3 py-1.5 text-xs font-bold capitalize transition-colors ${view === v ? 'bg-[var(--pro-azure)] text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
                 {v === 'pending' ? `Pending (${requests.length})` : 'Rules'}
               </button>
             ))}
@@ -743,7 +743,7 @@ const ApprovalsTab: React.FC<{ currency: string; companyId?: string }> = ({ curr
             ))
           ) : requests.length === 0 ? (
             <div className="ovds-empty py-16">
-              <ShieldCheck size={28} className="text-emerald-500 mb-2" />
+              <ShieldCheck size={28} className="text-[var(--pro-azure)] mb-2" />
               <p className="font-semibold text-slate-700 dark:text-slate-300">No pending approvals</p>
               <p className="text-[11px] text-slate-400 mt-1">All documents for your role have been processed</p>
             </div>
@@ -754,8 +754,8 @@ const ApprovalsTab: React.FC<{ currency: string; companyId?: string }> = ({ curr
               <div key={req.id} className="ovds-widget-card p-5">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800 flex items-center justify-center shrink-0">
-                      <Icon name={RESOURCE_ICONS[req.resourceType] ?? 'ITEM' as any} size={15} className="text-emerald-600 dark:text-emerald-400" />
+                    <div className="w-9 h-9 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 flex items-center justify-center shrink-0">
+                      <Icon name={RESOURCE_ICONS[req.resourceType ?? 'ITEM'] ?? 'ITEM' as any} size={15} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
@@ -763,12 +763,12 @@ const ApprovalsTab: React.FC<{ currency: string; companyId?: string }> = ({ curr
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${STATUS_COLORS[req.status] ?? ''}`}>{req.status}</span>
                         <span className="text-[10px] text-slate-400">Level {req.currentLevel}/{req.levels.length}</span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-0.5 font-mono">Ref: {req.resourceId.slice(0, 12)}…</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5 font-mono">Ref: {req.resourceId?.slice(0, 12) ?? ''}…</p>
                       {req.notes && <p className="text-[11px] text-slate-400 mt-1 italic">{req.notes}</p>}
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-xl font-black tabular-nums text-slate-800 dark:text-slate-100">{fmt(req.amount)}</p>
+                    <p className="text-xl font-black tabular-nums text-slate-800 dark:text-slate-100">{fmt(req.amount ?? 0)}</p>
                     {currentLevel && (
                       <p className="text-[10px] text-slate-400 mt-0.5">Awaiting: <span className="font-bold text-amber-600">{currentLevel.label}</span></p>
                     )}
@@ -779,7 +779,7 @@ const ApprovalsTab: React.FC<{ currency: string; companyId?: string }> = ({ curr
                 <div className="flex items-center gap-1.5 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
                   {req.levels.map((l, i) => (
                     <React.Fragment key={l.level}>
-                      <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold border ${l.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : l.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200' : l.level === req.currentLevel ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-white text-slate-400 border-slate-200'}`}>
+                      <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold border ${l.status === 'APPROVED' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' : l.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200' : l.level === req.currentLevel ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-white text-slate-400 border-slate-200'}`}>
                         {l.status === 'APPROVED' ? <CheckCircle size={10} /> : l.status === 'REJECTED' ? <AlertCircle size={10} /> : <Clock size={10} />}
                         {l.label}
                       </div>
@@ -839,12 +839,12 @@ const ApprovalsTab: React.FC<{ currency: string; companyId?: string }> = ({ curr
               <div className="flex items-start justify-between gap-3 flex-wrap mb-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">{rule.resourceType}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)]">{rule.resourceType}</span>
                     <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{rule.name}</p>
                     {!rule.isActive && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 border border-slate-200">INACTIVE</span>}
                   </div>
                   <p className="text-[11px] text-slate-500 mt-0.5">
-                    Applies when amount ≥ {fmt(rule.minAmount)}{rule.maxAmount ? ` and < ${fmt(rule.maxAmount)}` : ''}
+                    Applies when amount ≥ {fmt(rule.minAmount ?? 0)}{rule.maxAmount ? ` and < ${fmt(rule.maxAmount)}` : ''}
                     · <span className={`font-bold ${rule.rejectionPolicy === 'STOP' ? 'text-rose-600' : 'text-amber-600'}`}>{rule.rejectionPolicy}</span>
                   </p>
                 </div>
@@ -854,10 +854,10 @@ const ApprovalsTab: React.FC<{ currency: string; companyId?: string }> = ({ curr
                 {rule.levels.map((l, i) => (
                   <React.Fragment key={l.level}>
                     <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[11px]">
-                      <span className="w-4 h-4 rounded-full bg-emerald-600 text-white text-[9px] font-black flex items-center justify-center">{l.level}</span>
+                      <span className="w-4 h-4 rounded-full bg-[var(--pro-azure)] text-white text-[9px] font-black flex items-center justify-center">{l.level}</span>
                       <span className="font-semibold text-slate-700 dark:text-slate-300">{l.label}</span>
                       <span className="text-slate-400">({l.requiredRole})</span>
-                      {l.timeoutHours > 0 && <span className="text-[9px] text-amber-500">{l.timeoutHours}h timeout</span>}
+                      {(l.timeoutHours ?? 0) > 0 && <span className="text-[9px] text-amber-500">{l.timeoutHours}h timeout</span>}
                       {l.minAmount && <span className="text-[9px] text-slate-400">≥{fmt(l.minAmount)}</span>}
                     </div>
                     {i < rule.levels.length - 1 && <ChevronRight size={12} className="text-slate-300 shrink-0" />}
@@ -900,17 +900,17 @@ const SaftExportTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
   return (
     <div className="space-y-6 max-w-2xl">
       {/* Header info */}
-      <div className="p-5 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+      <div className="p-5 bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-xl">
         <div className="flex items-start gap-3">
-          <Database size={18} className="text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+          <Database size={18} className="text-[var(--pro-azure)] mt-0.5 shrink-0" />
           <div>
-            <p className="text-sm font-bold text-blue-800 dark:text-blue-200">SAF-T (Standard Audit File for Tax)</p>
-            <p className="text-xs text-blue-700 dark:text-blue-300 mt-1 leading-relaxed">
+            <p className="text-sm font-bold text-[var(--pro-azure-dark)]">SAF-T (Standard Audit File for Tax)</p>
+            <p className="text-xs text-[var(--pro-azure-dark)] mt-1 leading-relaxed">
               The SAF-T file provides ERCA auditors and external reviewers a structured JSON export of
               your complete accounting records — chart of accounts, journal entries, sales invoices,
               purchase bills, customers, and suppliers — for a given fiscal year.
             </p>
-            <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 font-medium">
+            <p className="text-xs text-[var(--pro-azure)] mt-2 font-medium">
               Covers: General Ledger · Sales Invoices · Purchase Bills · Customers · Suppliers
             </p>
           </div>
@@ -967,7 +967,7 @@ const SaftExportTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
             icon: <Receipt size={14} />,
             title: 'Sales Invoices',
             desc: 'All invoices with customer, amount, VAT, date and status',
-            color: 'text-emerald-600 bg-emerald-50',
+            color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
           },
           {
             icon: <Briefcase size={14} />,
@@ -979,7 +979,7 @@ const SaftExportTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
             icon: <Shield size={14} />,
             title: 'Master Files',
             desc: 'Chart of accounts, customers (with TIN), and suppliers (with TIN)',
-            color: 'text-blue-600 bg-blue-50',
+            color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
           },
         ].map(item => (
           <div key={item.title} className="ovds-widget-card p-4 flex items-start gap-3">
@@ -1120,7 +1120,7 @@ const ConsolidationTab: React.FC<{ currency: string; companyId?: string }> = ({ 
           <AlertTriangle size={15} className="text-amber-500 shrink-0 mt-0.5" />
           <div>
             <p className="text-xs font-bold text-amber-700 dark:text-amber-400">Consolidation unavailable</p>
-            <p className="text-[11px] text-amber-600 dark:text-amber-500 mt-0.5">{error}</p>
+            <p className="text-[11px] text-amber-600 dark:text-amber-500 mt-0.5">{error?.message ?? String(error)}</p>
             <p className="text-[10px] text-slate-400 mt-2">
               To enable consolidation: go to Company Settings → IFRS → Group Structure and define subsidiary companies with ownership percentages.
             </p>
@@ -1156,8 +1156,8 @@ const ConsolidationTab: React.FC<{ currency: string; companyId?: string }> = ({ 
           {/* Group summary KPIs */}
           <div className="ovds-grid-layout cols-4">
             {[
-              { label: 'Group Revenue',         value: data.incomeStatement.totalRevenue,        color: 'text-emerald-600' },
-              { label: 'Group Net Profit',       value: data.incomeStatement.groupNetProfit,      color: data.incomeStatement.groupNetProfit >= 0 ? 'text-emerald-700' : 'text-rose-700' },
+              { label: 'Group Revenue',         value: data.incomeStatement.totalRevenue,        color: 'text-[var(--pro-azure)]' },
+              { label: 'Group Net Profit',       value: data.incomeStatement.groupNetProfit,      color: data.incomeStatement.groupNetProfit >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-700' },
               { label: 'Parent Share',           value: data.incomeStatement.parentShareOfProfit, color: 'text-slate-800 dark:text-slate-100' },
               { label: 'NCI Share',              value: data.incomeStatement.nciShareOfProfit,    color: 'text-violet-600' },
             ].map((c, i) => (
@@ -1190,12 +1190,12 @@ const ConsolidationTab: React.FC<{ currency: string; companyId?: string }> = ({ 
                     <div>
                       <p className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">{s.companyName}</p>
                       <p className="text-[9px] text-slate-400">
-                        {s.currency} · FX rate {s.fxRate.toFixed(4)}
-                        {s.nciPct > 0 && ` · NCI ${s.nciPct}%`}
+                        {s.currency} · FX rate {s.fxRate ? s.fxRate.toFixed(4) : '—'}
+                        {s.nciPct && s.nciPct > 0 && ` · NCI ${s.nciPct}%`}
                       </p>
                     </div>
                     <div className="text-right">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${s.ownershipPct >= 100 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${s.ownershipPct >= 100 ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : 'bg-amber-100 text-amber-700'}`}>
                         {s.ownershipPct}%
                       </span>
                     </div>
@@ -1217,7 +1217,7 @@ const ConsolidationTab: React.FC<{ currency: string; companyId?: string }> = ({ 
                     <div key={i} className="px-3 py-2 bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900 rounded-xl">
                       <div className="flex items-start justify-between gap-2">
                         <p className="text-[10px] font-semibold text-rose-700 dark:text-rose-400 leading-tight">{e.description}</p>
-                        <span className="text-[10px] font-black text-rose-600 shrink-0">{fmt(e.amount)}</span>
+                        <span className="text-[10px] font-black text-rose-600 shrink-0">{fmt(e.amount ?? 0)}</span>
                       </div>
                       <div className="text-[9px] text-slate-400 mt-1 font-mono">
                         Dr {e.debitAccount} / Cr {e.creditAccount}
@@ -1251,7 +1251,7 @@ const ConsolidationTab: React.FC<{ currency: string; companyId?: string }> = ({ 
                 Consolidated Statement of Financial Position
               </p>
               <div className="flex items-center gap-3">
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${data.balanceSheet.isBalanced ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'}`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${data.balanceSheet.isBalanced ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' : 'bg-rose-50 text-rose-700 border-rose-200'}`}>
                   {data.balanceSheet.isBalanced ? 'Balanced ✓' : 'Imbalanced ✗'}
                 </span>
                 <span className="text-[10px] text-slate-400">As of {data.asOf}</span>
@@ -1268,8 +1268,8 @@ const ConsolidationTab: React.FC<{ currency: string; companyId?: string }> = ({ 
               </tr></thead>
               <tbody>
                 {/* Assets */}
-                <tr className="bg-emerald-50/50 dark:bg-emerald-950/10">
-                  <td colSpan={6} className="px-4 py-2 text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">ASSETS</td>
+                <tr className="bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10">
+                  <td colSpan={6} className="px-4 py-2 text-[10px] font-black text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] uppercase tracking-wider">ASSETS</td>
                 </tr>
                 {data.balanceSheet.assets.filter(l => l.totalBeforeElim !== 0 || l.consolidatedAmount !== 0).map((l, i) => (
                   <AppTr key={i}>
@@ -1281,9 +1281,9 @@ const ConsolidationTab: React.FC<{ currency: string; companyId?: string }> = ({ 
                     <AppTd align="right"><span className="tabular-nums text-[11px] font-bold text-slate-800 dark:text-slate-100">{fmt(l.consolidatedAmount)}</span></AppTd>
                   </AppTr>
                 ))}
-                <tr className="bg-emerald-50 dark:bg-emerald-950/20 border-t-2 border-emerald-200 dark:border-emerald-800">
-                  <td colSpan={5} className="px-4 py-2 text-[11px] font-black text-emerald-700 dark:text-emerald-400">TOTAL ASSETS</td>
-                  <td className="px-4 py-2 text-right text-[13px] font-black tabular-nums text-emerald-700 dark:text-emerald-400 underline decoration-double">{fmt(data.balanceSheet.totalAssets)}</td>
+                <tr className="bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-t-2 border-[var(--pro-azure-100)] dark:border-green-800">
+                  <td colSpan={5} className="px-4 py-2 text-[11px] font-black text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">TOTAL ASSETS</td>
+                  <td className="px-4 py-2 text-right text-[13px] font-black tabular-nums text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] underline decoration-double">{fmt(data.balanceSheet.totalAssets)}</td>
                 </tr>
 
                 {/* Liabilities */}
@@ -1351,8 +1351,8 @@ const ConsolidationTab: React.FC<{ currency: string; companyId?: string }> = ({ 
                 <AppTh align="right">Consolidated</AppTh>
               </tr></thead>
               <tbody>
-                <tr className="bg-emerald-50/50 dark:bg-emerald-950/10">
-                  <td colSpan={5} className="px-4 py-2 text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">REVENUE</td>
+                <tr className="bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10">
+                  <td colSpan={5} className="px-4 py-2 text-[10px] font-black text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] uppercase tracking-wider">REVENUE</td>
                 </tr>
                 {data.incomeStatement.revenue.filter(l => l.consolidatedAmount !== 0).map((l, i) => (
                   <AppTr key={i}>
@@ -1360,12 +1360,12 @@ const ConsolidationTab: React.FC<{ currency: string; companyId?: string }> = ({ 
                     <AppTd align="right"><span className="tabular-nums text-[11px]">{fmt(l.parentAmount)}</span></AppTd>
                     <AppTd align="right"><span className="tabular-nums text-[11px] text-violet-600">{fmt(l.totalBeforeElim - l.parentAmount)}</span></AppTd>
                     <AppTd align="right"><span className="tabular-nums text-[11px] text-rose-500">{l.eliminations !== 0 ? `(${fmt(l.eliminations)})` : '—'}</span></AppTd>
-                    <AppTd align="right"><span className="tabular-nums text-[11px] font-bold text-emerald-700 dark:text-emerald-400">{fmt(l.consolidatedAmount)}</span></AppTd>
+                    <AppTd align="right"><span className="tabular-nums text-[11px] font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">{fmt(l.consolidatedAmount)}</span></AppTd>
                   </AppTr>
                 ))}
-                <tr className="bg-emerald-50 dark:bg-emerald-950/20 border-t border-emerald-200">
-                  <td colSpan={4} className="px-4 py-2 text-[11px] font-black text-emerald-700">TOTAL REVENUE</td>
-                  <td className="px-4 py-2 text-right text-[12px] font-black tabular-nums text-emerald-700">{fmt(data.incomeStatement.totalRevenue)}</td>
+                <tr className="bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-t border-[var(--pro-azure-100)]">
+                  <td colSpan={4} className="px-4 py-2 text-[11px] font-black text-[var(--pro-azure-dark)]">TOTAL REVENUE</td>
+                  <td className="px-4 py-2 text-right text-[12px] font-black tabular-nums text-[var(--pro-azure-dark)]">{fmt(data.incomeStatement.totalRevenue)}</td>
                 </tr>
 
                 <tr className="bg-rose-50/50 dark:bg-rose-950/10">
@@ -1417,10 +1417,10 @@ const ConsolidationTab: React.FC<{ currency: string; companyId?: string }> = ({ 
               IFRS 10 Disclosure Notes
             </p>
             <div className="space-y-2">
-              {data.disclosures.map((note, i) => (
+              {data?.disclosures?.map((note, i) => (
                 <div key={i} className="flex items-start gap-2.5 text-[11px] text-slate-600 dark:text-slate-400">
                   <span className="w-4 h-4 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-[9px] font-black flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
-                  <p className="leading-relaxed">{note}</p>
+                  <p className="leading-relaxed">{typeof note === 'object' && note !== null ? JSON.stringify(note) : String(note)}</p>
                 </div>
               ))}
             </div>
@@ -1487,7 +1487,7 @@ const EquityChangesTab: React.FC<{ currency: string; companyId?: string }> = ({ 
       <div className="ovds-grid-layout cols-4">
         {[
           { label: 'Opening Equity',    value: totals.openingBalance ?? 0,      color: 'text-slate-700' },
-          { label: 'Net Profit',        value: totals.netProfitForPeriod ?? 0,  color: (totals.netProfitForPeriod ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600' },
+          { label: 'Net Profit',        value: totals.netProfitForPeriod ?? 0,  color: (totals.netProfitForPeriod ?? 0) >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600' },
           { label: 'Dividends Paid',    value: -(totals.dividendsPaid ?? 0),    color: 'text-amber-600' },
           { label: 'Closing Equity',    value: totals.closingBalance ?? 0,      color: 'text-violet-700 font-black' },
         ].map((c, i) => (
@@ -1519,7 +1519,7 @@ const EquityChangesTab: React.FC<{ currency: string; companyId?: string }> = ({ 
                 <AppTr key={a.accountId}>
                   <AppTd><div><p className="text-[12px] font-semibold text-slate-800">{a.accountName}</p><p className="ovds-caption">{a.accountCode}</p></div></AppTd>
                   <AppTd align="right"><span className="tabular-nums text-[11px]">{fmt(a.openingBalance)}</span></AppTd>
-                  <AppTd align="right"><span className={`tabular-nums text-[11px] font-bold ${a.netProfitForPeriod >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{fmt(a.netProfitForPeriod)}</span></AppTd>
+                  <AppTd align="right"><span className={`tabular-nums text-[11px] font-bold ${a.netProfitForPeriod >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>{fmt(a.netProfitForPeriod)}</span></AppTd>
                   <AppTd align="right"><span className="tabular-nums text-[11px]">{fmt(a.otherMovements)}</span></AppTd>
                   <AppTd align="right"><span className="tabular-nums text-[11px] text-amber-600">{a.dividendsPaid > 0 ? `(${fmt(a.dividendsPaid)})` : '—'}</span></AppTd>
                   <AppTd align="right"><span className="tabular-nums text-[11px] text-slate-400">{fmt(a.otherComprehensiveIncome)}</span></AppTd>
@@ -1529,7 +1529,7 @@ const EquityChangesTab: React.FC<{ currency: string; companyId?: string }> = ({ 
               <tr className="bg-white dark:bg-slate-800/80 border-t-2 border-slate-200 font-bold">
                 <AppTd className="text-slate-800 font-black">TOTAL</AppTd>
                 <AppTd align="right"><span className="tabular-nums font-black">{fmt(totals.openingBalance ?? 0)}</span></AppTd>
-                <AppTd align="right"><span className={`tabular-nums font-black ${(totals.netProfitForPeriod ?? 0) >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>{fmt(totals.netProfitForPeriod ?? 0)}</span></AppTd>
+                <AppTd align="right"><span className={`tabular-nums font-black ${(totals.netProfitForPeriod ?? 0) >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-700'}`}>{fmt(totals.netProfitForPeriod ?? 0)}</span></AppTd>
                 <AppTd align="right"><span className="tabular-nums font-black">{fmt(totals.otherMovements ?? 0)}</span></AppTd>
                 <AppTd align="right"><span className="tabular-nums font-black text-amber-700">{(totals.dividendsPaid ?? 0) > 0 ? `(${fmt(totals.dividendsPaid)})` : '—'}</span></AppTd>
                 <AppTd align="right"><span className="tabular-nums font-black text-slate-400">{fmt(totals.otherComprehensiveIncome ?? 0)}</span></AppTd>
@@ -1567,8 +1567,8 @@ const Ifrs9EclTab: React.FC<{ currency: string; companyId?: string }> = ({ curre
   const stageSummary: any[] = data?.stageSummary ?? [];
   const totals = data?.totals ?? {};
 
-  const STAGE_COLORS = ['text-emerald-600', 'text-amber-600', 'text-rose-600'];
-  const STAGE_BG = ['bg-emerald-50 border-emerald-200', 'bg-amber-50 border-amber-200', 'bg-rose-50 border-rose-200'];
+  const STAGE_COLORS = ['text-[var(--pro-azure)]', 'text-amber-600', 'text-rose-600'];
+  const STAGE_BG = ['bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]', 'bg-amber-50 border-amber-200', 'bg-rose-50 border-rose-200'];
 
   const exportCSV = () => {
     const rows = [
@@ -1612,7 +1612,7 @@ const Ifrs9EclTab: React.FC<{ currency: string; companyId?: string }> = ({ curre
         {[
           { label: 'Gross Receivables',   value: totals.grossReceivables ?? 0,   color: 'text-slate-800' },
           { label: 'Total ECL Provision', value: totals.totalEclProvision ?? 0,  color: 'text-rose-600' },
-          { label: 'Net Carrying Amount', value: totals.netCarryingAmount ?? 0,  color: 'text-emerald-700' },
+          { label: 'Net Carrying Amount', value: totals.netCarryingAmount ?? 0,  color: 'text-[var(--pro-azure-dark)]' },
           { label: 'Effective Loss Rate', value: totals.effectiveLossRate ?? '0%', isText: true, color: 'text-amber-600' },
         ].map((c: any, i) => (
           <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
@@ -1654,7 +1654,7 @@ const Ifrs9EclTab: React.FC<{ currency: string; companyId?: string }> = ({ curre
           <p className="font-bold text-violet-700 dark:text-violet-400 mb-2">Suggested Journal Entry (IFRS 9.5.5)</p>
           <div className="space-y-1 font-mono">
             <div className="flex justify-between"><span className="text-slate-600">Dr {data.journalEntry.debit.account}</span><span className="font-bold text-rose-600">{fmt(data.journalEntry.debit.amount)}</span></div>
-            <div className="flex justify-between pl-6"><span className="text-slate-600">Cr {data.journalEntry.credit.account}</span><span className="font-bold text-emerald-600">{fmt(data.journalEntry.credit.amount)}</span></div>
+            <div className="flex justify-between pl-6"><span className="text-slate-600">Cr {data.journalEntry.credit.account}</span><span className="font-bold text-[var(--pro-azure)]">{fmt(data.journalEntry.credit.amount)}</span></div>
           </div>
         </div>
       )}
@@ -1714,8 +1714,8 @@ const TaxLiabilityTab: React.FC<{ currency: string; companyId?: string }> = ({ c
       refund: vatPayable < 0 ? Math.abs(vatPayable) : 0,
       deadline: vatDeadline.toLocaleDateString('en-ET'),
       daysLeft: daysToVat,
-      color: 'text-emerald-700',
-      bg: 'bg-emerald-50 border-emerald-200',
+      color: 'text-[var(--pro-azure-dark)]',
+      bg: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]',
       link: '/tax/vat',
       linkLabel: 'File VAT Return' },
     {
@@ -1758,7 +1758,7 @@ const TaxLiabilityTab: React.FC<{ currency: string; companyId?: string }> = ({ c
           <p className="text-xs text-slate-500 mt-0.5">Consolidated view of all outstanding tax obligations — {currentMonth}</p>
         </div>
         <a href="https://etax.mor.gov.et" target="_blank" rel="noopener noreferrer"
-          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-all shadow-sm">
+          className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all shadow-sm">
           <Icon name="ARROW_UP_RIGHT" size={13} /> eTax Portal
         </a>
       </div>
@@ -1804,7 +1804,7 @@ const TaxLiabilityTab: React.FC<{ currency: string; companyId?: string }> = ({ c
                 <Amount value={o.amount} currency={currency} />
               </p>
               {o.refund > 0 && (
-                <p className="text-[10px] text-emerald-600 font-bold mt-1 flex items-center gap-1">
+                <p className="text-[10px] text-[var(--pro-azure)] font-bold mt-1 flex items-center gap-1">
                   <Icon name="TREND_DOWN" size={10} /> Refund due: <Amount value={o.refund} currency={currency} />
                 </p>
               )}
@@ -1826,7 +1826,7 @@ const TaxLiabilityTab: React.FC<{ currency: string; companyId?: string }> = ({ c
       <Card className="overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <Icon name="CALENDAR" size={14} className="text-emerald-500" />
+            <Icon name="CALENDAR" size={14} className="text-[var(--pro-azure)]" />
             Tax Calendar — Upcoming Deadlines
           </h3>
           <EthTaxBadge type="VAT" />
@@ -1844,7 +1844,7 @@ const TaxLiabilityTab: React.FC<{ currency: string; companyId?: string }> = ({ c
             const isPast = days < 0;
             return (
               <div key={i} className={`flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-800/30 ${item.urgent ? 'bg-rose-50/30 dark:bg-rose-900/5' : ''}`}>
-                <div className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center shrink-0 border ${isPast ? 'bg-white border-slate-200 text-slate-400' : item.urgent ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-emerald-50 border-emerald-200 text-emerald-600'}`}>
+                <div className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center shrink-0 border ${isPast ? 'bg-white border-slate-200 text-slate-400' : item.urgent ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure)]'}`}>
                   <span className="text-[10px] font-bold uppercase">{isPast ? 'Past' : 'In'}</span>
                   <span className="text-sm font-black leading-none">{isPast ? '—' : days}</span>
                   {!isPast && <span className="text-[8px] font-bold uppercase">Days</span>}
@@ -1917,7 +1917,7 @@ return (
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <Icon name="RECEIPT" className="text-emerald-500" />
+            <Icon name="RECEIPT" className="text-[var(--pro-azure)]" />
             Sales Tax Summary
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">VAT collected, input VAT, withholding tax — monthly breakdown</p>
@@ -1949,9 +1949,9 @@ return (
       <div className="ovds-grid-layout cols-4">
         {[
           { label: 'Taxable Revenue',  value: totals.taxableRevenue,  color: 'text-slate-800 dark:text-white', icon: 'TREND_UP' as const },
-          { label: 'VAT Collected (15%)', value: totals.vatCollected, color: 'text-emerald-600', icon: 'RECEIPT' as const },
+          { label: 'VAT Collected (15%)', value: totals.vatCollected, color: 'text-[var(--pro-azure)]', icon: 'RECEIPT' as const },
           { label: 'Input VAT Paid',   value: totals.vatPaid,         color: 'text-rose-600', icon: 'BANKNOTE' as const },
-          { label: 'Net VAT Payable',  value: totals.netVat,          color: totals.netVat >= 0 ? 'text-amber-600' : 'text-emerald-600', icon: 'WALLET' as const },
+          { label: 'Net VAT Payable',  value: totals.netVat,          color: totals.netVat >= 0 ? 'text-amber-600' : 'text-[var(--pro-azure)]', icon: 'WALLET' as const },
         ].map((c, i) => (
           <Card key={i} className="p-4 border-l-4 border-l-slate-200 dark:border-l-slate-700">
             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1.5">
@@ -1992,13 +1992,13 @@ return (
                 <AppTr key={i}>
                   <AppTd className="font-bold">{r.month}</AppTd>
                   <AppTd align="right"><Amount value={r.taxableRevenue ?? 0} currency={currency} /></AppTd>
-                  <AppTd align="right" className="text-emerald-700 dark:text-emerald-500 font-bold">
+                  <AppTd align="right" className="text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure)] font-bold">
                     <Amount value={r.vatCollected ?? 0} currency={currency} />
                   </AppTd>
                   <AppTd align="right" className="text-rose-600 dark:text-rose-400">
                     <Amount value={r.vatPaid ?? 0} currency={currency} />
                   </AppTd>
-                  <AppTd align="right" className={`font-semibold ${(r.netVat ?? 0) >= 0 ? 'text-amber-700 dark:text-amber-500' : 'text-emerald-700 dark:text-emerald-500'}`}>
+                  <AppTd align="right" className={`font-semibold ${(r.netVat ?? 0) >= 0 ? 'text-amber-700 dark:text-amber-500' : 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure)]'}`}>
                     <Amount value={r.netVat ?? 0} currency={currency} />
                   </AppTd>
                   <AppTd align="right"><Amount value={r.withholdingTax ?? 0} currency={currency} /></AppTd>
@@ -2007,9 +2007,9 @@ return (
               <tr className="bg-white dark:bg-slate-800/80 border-t-2 border-slate-200 dark:border-slate-600 font-bold">
                 <AppTd className="text-slate-800 dark:text-white">TOTAL</AppTd>
                 <AppTd align="right" className="text-slate-800 dark:text-white"><Amount value={totals.taxableRevenue} currency={currency} /></AppTd>
-                <AppTd align="right" className="text-emerald-700 dark:text-emerald-500 font-black"><Amount value={totals.vatCollected} currency={currency} /></AppTd>
+                <AppTd align="right" className="text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure)] font-black"><Amount value={totals.vatCollected} currency={currency} /></AppTd>
                 <AppTd align="right" className="text-rose-700 dark:text-rose-500 font-black"><Amount value={totals.vatPaid} currency={currency} /></AppTd>
-                <AppTd align="right" className={`font-black underline decoration-double ${totals.netVat >= 0 ? 'text-amber-700 dark:text-amber-500' : 'text-emerald-700 dark:text-emerald-500'}`}>
+                <AppTd align="right" className={`font-black underline decoration-double ${totals.netVat >= 0 ? 'text-amber-700 dark:text-amber-500' : 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure)]'}`}>
                   <Amount value={totals.netVat} currency={currency} />
                 </AppTd>
                 <AppTd align="right" className="text-slate-800 dark:text-white"><Amount value={totals.withholdingTax} currency={currency} /></AppTd>
@@ -2040,7 +2040,7 @@ const SOURCE_ICON: Record<string, string> = {
   employees: 'EMPLOYEE', journal: 'JOURNAL',
 };
 const SOURCE_COLOR: Record<string, string> = {
-  invoices:  'emerald', bills: 'amber', payroll: 'violet',
+  invoices:  'indigo', bills: 'amber', payroll: 'violet',
   employees: 'sky',     journal: 'rose',
 };
 
@@ -2340,7 +2340,7 @@ const CustomReportBuilder: React.FC<{ currency: string }> = ({ currency }) => {
                     className="w-3.5 h-3.5 rounded border-slate-300 accent-violet-600" />
                   <span className={`text-xs font-semibold transition-colors flex-1 ${selectedFields.includes(f.key) ? 'text-slate-800 dark:text-slate-100' : 'text-slate-400 dark:text-slate-600'}`}>{f.label}</span>
                   <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full border ${
-                    f.type === 'currency' ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800'
+                    f.type === 'currency' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800'
                     : f.type === 'date'   ? 'bg-sky-50 text-sky-700 border-sky-100 dark:bg-sky-950/30 dark:text-sky-400 dark:border-sky-800'
                     : f.type === 'number' ? 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800'
                     : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
@@ -2458,7 +2458,7 @@ const CustomReportBuilder: React.FC<{ currency: string }> = ({ currency }) => {
                 <div className={`grid gap-3 ${Object.keys(aggregates).length >= 3 ? 'grid-cols-3' : Object.keys(aggregates).length === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}>
                   {Object.entries(aggregates).map(([fk, total], idx) => {
                     const fd = fields.find(f => f.key === fk);
-                    const colors = ['emerald','violet','sky','amber','rose'];
+                    const colors = ['indigo','violet','sky','amber','rose'];
                     const c = colors[idx % colors.length];
                     return (
                       <div key={fk} className={`rounded-2xl border p-4 bg-${c}-50/50 dark:bg-${c}-950/10 border-${c}-200 dark:border-${c}-800`}>
@@ -2555,7 +2555,7 @@ const CustomReportBuilder: React.FC<{ currency: string }> = ({ currency }) => {
                             <div key={name} className="flex items-center gap-2">
                               <span className="text-[11px] text-slate-600 dark:text-slate-300 font-medium truncate flex-1 max-w-[160px]">{name}</span>
                               <div className="flex-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${Math.round((count / topArr[0][1]) * 100)}%` }} />
+                                <div className="h-full bg-[var(--pro-azure-50)]0 rounded-full" style={{ width: `${Math.round((count / topArr[0][1]) * 100)}%` }} />
                               </div>
                               <span className="text-[10px] font-bold text-slate-500 w-6 text-right">{count}</span>
                             </div>
@@ -2600,7 +2600,7 @@ const CustomReportBuilder: React.FC<{ currency: string }> = ({ currency }) => {
                           return (
                             <AppTd key={fk} align={fd?.type === 'currency' ? 'right' : 'left'}>
                               {fd?.type === 'currency' ? (
-                                <span className="font-bold text-emerald-700 dark:text-emerald-400 tabular-nums"><Amount value={v ?? 0} currency={currency} /></span>
+                                <span className="font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] tabular-nums"><Amount value={v ?? 0} currency={currency} /></span>
                               ) : fd?.type === 'date' ? (
                                 <span className="text-slate-500 dark:text-slate-400 font-medium text-[11px]">{fmt(v, 'date')}</span>
                               ) : fk === 'status' ? (
@@ -2748,9 +2748,9 @@ const CustomerStatementTab: React.FC<{ currency: string; companyId?: string }> =
           {/* Summary cards */}
           <div className="ovds-grid-layout cols-4">
             <AppKpi cells={[{ label: 'Opening Balance', value: fmt(statement.openingBalance ?? 0), color: 'slate' }]} />
-            <AppKpi cells={[{ label: 'Total Invoiced', value: fmt(statement.totalDebit ?? 0), color: 'emerald' }]} />
-            <AppKpi cells={[{ label: 'Total Paid', value: fmt(statement.totalCredit ?? 0), color: 'emerald' }]} />
-            <AppKpi cells={[{ label: 'Closing Balance', value: fmt(statement.closingBalance ?? 0), color: (statement.closingBalance ?? 0) > 0 ? 'amber' : 'emerald' }]} />
+            <AppKpi cells={[{ label: 'Total Invoiced', value: fmt(statement.totalDebit ?? 0), color: 'green' }]} />
+            <AppKpi cells={[{ label: 'Total Paid', value: fmt(statement.totalCredit ?? 0), color: 'green' }]} />
+            <AppKpi cells={[{ label: 'Closing Balance', value: fmt(statement.closingBalance ?? 0), color: (statement.closingBalance ?? 0) > 0 ? 'amber' : 'indigo' }]} />
           </div>
 
           {/* Transaction table */}
@@ -2798,7 +2798,7 @@ const CustomerStatementTab: React.FC<{ currency: string; companyId?: string }> =
                     <td colSpan={4} className="px-4 py-4 font-black text-slate-800 dark:text-slate-100 text-[10px] uppercase tracking-widest text-right">Closing Balance</td>
                     <td className="px-4 py-4 font-black text-slate-800 dark:text-slate-100 tabular-nums text-xs text-right border-l border-slate-200/50 dark:border-slate-700/50">{fmt(statement.totalDebit ?? 0)}</td>
                     <td className="px-4 py-4 font-black text-slate-800 dark:text-slate-100 tabular-nums text-xs text-right border-l border-slate-200/50 dark:border-slate-700/50">{fmt(statement.totalCredit ?? 0)}</td>
-                    <td className="px-4 py-4 font-black tabular-nums text-xs text-emerald-600 dark:text-emerald-400 text-right border-l border-slate-200/50 dark:border-slate-700/50">{fmt(statement.closingBalance ?? 0)}</td>
+                    <td className="px-4 py-4 font-black tabular-nums text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] text-right border-l border-slate-200/50 dark:border-slate-700/50">{fmt(statement.closingBalance ?? 0)}</td>
                   </tr>
                 </tbody>
               </table>
@@ -2847,7 +2847,7 @@ const CustomerGrowthTab: React.FC<{ currency: string; companyId?: string }> = ({
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <Icon name="TREND_UP" className="text-emerald-500" />
+            <Icon name="TREND_UP" className="text-[var(--pro-azure)]" />
             Customer Growth & Trends
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">New customers acquired, revenue growth, and retention trends over time</p>
@@ -2862,8 +2862,8 @@ const CustomerGrowthTab: React.FC<{ currency: string; companyId?: string }> = ({
 
       {/* KPI summary */}
       <div className="ovds-grid-layout cols-4">
-        <AppKpi cells={[{ label: `New Customers — FY ${year}`, value: loading ? '—' : totals.newCustomers, color: 'emerald' }]} />
-        <AppKpi cells={[{ label: 'Total Revenue (From New Customers)', value: loading ? '—' : fmt(totals.totalRevenue), color: 'emerald' }]} />
+        <AppKpi cells={[{ label: `New Customers — FY ${year}`, value: loading ? '—' : totals.newCustomers, color: 'green' }]} />
+        <AppKpi cells={[{ label: 'Total Revenue (From New Customers)', value: loading ? '—' : fmt(totals.totalRevenue), color: 'green' }]} />
         <AppKpi cells={[{ label: 'Avg per Month (Acquisition Rate)', value: loading ? '—' : Math.round(totals.newCustomers / 12), color: 'slate' }]} />
         <AppKpi cells={[{ label: 'Total Customers (Cumulative)', value: loading ? '—' : (data?.totalCustomers ?? '—'), color: 'amber' }]} />
       </div>
@@ -2872,7 +2872,7 @@ const CustomerGrowthTab: React.FC<{ currency: string; companyId?: string }> = ({
       <Card className="p-6">
         <div className="flex items-center justify-between mb-8">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+            <span className="w-2 h-2 bg-[var(--pro-azure-50)]0 rounded-full animate-pulse" />
             Monthly Acquisition — {year}
           </p>
         </div>
@@ -2883,7 +2883,7 @@ const CustomerGrowthTab: React.FC<{ currency: string; companyId?: string }> = ({
               <div key={i} className="flex-1 flex flex-col items-center gap-3 group">
                 <div className="relative w-full flex items-end justify-center h-40">
                   <div
-                    className="w-full bg-slate-100 dark:bg-slate-800/50 rounded-t-md transition-all duration-500 group-hover:bg-emerald-500 group-hover:shadow-lg group-hover:shadow-emerald-500/20 cursor-pointer origin-bottom scale-y-100 hover:scale-y-105"
+                    className="w-full bg-slate-100 dark:bg-slate-800/50 rounded-t-md transition-all duration-500 group-hover:bg-[var(--pro-azure-dark)] group-hover:shadow-lg group-hover:shadow-green-500/20 cursor-pointer origin-bottom scale-y-100 hover:scale-y-105"
                     style={{ height: `${Math.max(4, pct)}%`, backgroundColor: pct > 0 ? undefined : '' }}
                     title={`${r.month}: ${r.newCustomers ?? 0} new customers`}
                   />
@@ -2932,11 +2932,11 @@ const CustomerGrowthTab: React.FC<{ currency: string; companyId?: string }> = ({
                   <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                     <td className="px-5 py-4 text-xs font-bold text-slate-700 dark:text-slate-300">{r.month}</td>
                     <td className="px-5 py-4 text-xs font-bold text-slate-900 dark:text-slate-100 tabular-nums">{r.newCustomers ?? 0}</td>
-                    <td className="px-5 py-4 text-xs font-bold text-emerald-600 dark:text-emerald-400 tabular-nums text-right">{fmt(r.totalRevenue ?? 0)}</td>
+                    <td className="px-5 py-4 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] tabular-nums text-right">{fmt(r.totalRevenue ?? 0)}</td>
                     <td className="px-5 py-4 text-xs font-bold text-slate-600 dark:text-slate-400 tabular-nums text-right">{r.avgOrderValue ? fmt(r.avgOrderValue) : '—'}</td>
                     <td className="px-5 py-4 text-right">
                       {growth !== null ? (
-                        <div className={`flex items-center justify-end gap-1 text-[10px] font-black ${growth >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        <div className={`flex items-center justify-end gap-1 text-[10px] font-black ${growth >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>
                           <Icon name={growth >= 0 ? 'TREND_UP' : 'TREND_DOWN'} size={10} />
                           {Math.abs(growth)}%
                         </div>
@@ -2947,8 +2947,8 @@ const CustomerGrowthTab: React.FC<{ currency: string; companyId?: string }> = ({
               })}
               <tr className="bg-slate-50/80 dark:bg-slate-800/50 border-t-2 border-slate-200 dark:border-slate-700">
                 <td className="px-5 py-4 text-[10px] font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest">Total</td>
-                <td className="px-5 py-4 text-sm font-black text-emerald-600 dark:text-emerald-400 tabular-nums">{totals.newCustomers}</td>
-                <td className="px-5 py-4 text-sm font-black text-emerald-600 dark:text-emerald-400 tabular-nums text-right">{fmt(totals.totalRevenue)}</td>
+                <td className="px-5 py-4 text-sm font-black text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] tabular-nums">{totals.newCustomers}</td>
+                <td className="px-5 py-4 text-sm font-black text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] tabular-nums text-right">{fmt(totals.totalRevenue)}</td>
                 <td colSpan={2} className="px-5 py-4" />
               </tr>
             </tbody>
@@ -2965,13 +2965,13 @@ const CustomerGrowthTab: React.FC<{ currency: string; companyId?: string }> = ({
           <div className="divide-y divide-slate-50 dark:divide-slate-800/50">
             {data.topCustomers.slice(0, 10).map((c: any, i: number) => (
               <div key={i} className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
-                <span className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-black text-slate-500 shrink-0 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors">{i + 1}</span>
+                <span className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-black text-slate-500 shrink-0 group-hover:bg-[var(--pro-azure-50)] group-hover:text-[var(--pro-azure)] transition-colors">{i + 1}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">{c.customerName}</p>
                   <p className="text-[10px] font-bold text-slate-400 uppercase">{c.invoiceCount} invoices generated</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-black text-emerald-600 dark:text-emerald-400 tabular-nums">{fmt(c.totalRevenue)}</p>
+                  <p className="text-sm font-black text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] tabular-nums">{fmt(c.totalRevenue)}</p>
                 </div>
               </div>
             ))}
@@ -3064,7 +3064,7 @@ const NotesToFinancialsTab: React.FC<{ currency: string; companyId?: string }> =
           For the period ended {periodEnd}
         </p>
         <div className="flex items-center justify-center gap-4 mt-3">
-          <span className="px-3 py-1 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-full text-[10px] font-bold text-emerald-700 dark:text-emerald-400">IAS 1.112 Compliant</span>
+          <span className="px-3 py-1 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-full text-[10px] font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">IAS 1.112 Compliant</span>
           <span className="px-3 py-1 bg-violet-50 dark:bg-violet-950/20 border border-violet-200 dark:border-violet-800 rounded-full text-[10px] font-bold text-violet-700 dark:text-violet-400">AABE — Ethiopian IFRS</span>
         </div>
       </div>
@@ -3145,7 +3145,7 @@ const NotesToFinancialsTab: React.FC<{ currency: string; companyId?: string }> =
               },
             ].map(policy => (
               <div key={policy.title} className="flex gap-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-[5px] shrink-0" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--pro-azure-50)]0 mt-[5px] shrink-0" />
                 <div>
                   <p className="text-[12px] font-black text-slate-800 dark:text-slate-200">{policy.title}</p>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">{policy.body}</p>
@@ -3209,7 +3209,7 @@ const NotesToFinancialsTab: React.FC<{ currency: string; companyId?: string }> =
                 <div key={r.label} className="p-3 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">{r.note}</p>
                   <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300">{r.label}</p>
-                  <p className="text-xl font-black text-emerald-700 dark:text-emerald-400 tabular-nums mt-1">{r.value}</p>
+                  <p className="text-xl font-black text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] tabular-nums mt-1">{r.value}</p>
                 </div>
               ))}
             </div>
@@ -3228,8 +3228,8 @@ const NotesToFinancialsTab: React.FC<{ currency: string; companyId?: string }> =
               { label: 'IFRS Tier', value: 'Determined by AABE thresholds', ref: 'Proclamation 847/2014', status: 'compliant' },
             ].map(item => (
               <div key={item.label} className="flex items-start gap-3 p-3 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                <div className="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle size={11} className="text-emerald-500" />
+                <div className="w-5 h-5 rounded-full bg-[var(--pro-azure-50)] dark:bg-green-950/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle size={11} className="text-[var(--pro-azure)]" />
                 </div>
                 <div className="min-w-0">
                   <p className="text-[11px] font-black text-slate-700 dark:text-slate-300">{item.label}</p>
@@ -3483,7 +3483,7 @@ return (
                 onClick={() => setActiveTab(t.key as ReportTab)}
                 className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all whitespace-nowrap flex items-center gap-2 ${
                   activeTab === t.key 
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-105 z-10' 
+                  ? 'bg-[var(--pro-azure)] text-white shadow-lg shadow-green-500/30 scale-105 z-10' 
                   : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
@@ -3524,7 +3524,7 @@ return (
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">IFRS Financial Statements</p>
-              <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded-full uppercase tracking-wider">Full IFRS · IAS 1</span>
+              <span className="text-[10px] font-medium text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 px-2 py-0.5 rounded-full uppercase tracking-wider">Full IFRS · IAS 1</span>
             </div>
             {/* PDF export dropdown */}
             <div className="flex items-center gap-2">
@@ -3551,8 +3551,8 @@ return (
           </div>
           <div className="ovds-grid-layout cols-auto" style={{ '--grid-col-min': '200px' } as React.CSSProperties}>
             {[
-              { label: 'Statement of Financial Position', sub: 'IAS 1.54 · Balance Sheet', icon: <Scale size={18} />, color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900', tab: 'financial' as ReportTab, pdfType: 'balance-sheet' },
-              { label: 'Statement of Comprehensive Income', sub: 'IAS 1.81A · P&L', icon: <TrendingUp size={18} />, color: 'text-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900', tab: 'financial' as ReportTab, pdfType: 'profit-loss' },
+              { label: 'Statement of Financial Position', sub: 'IAS 1.54 · Balance Sheet', icon: <Scale size={18} />, color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)] dark:border-green-900', tab: 'financial' as ReportTab, pdfType: 'balance-sheet' },
+              { label: 'Statement of Comprehensive Income', sub: 'IAS 1.81A · P&L', icon: <TrendingUp size={18} />, color: 'text-[var(--pro-azure-dark)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)] dark:border-green-900', tab: 'financial' as ReportTab, pdfType: 'profit-loss' },
               { label: 'Statement of Cash Flows', sub: 'IAS 7 · Indirect Method', icon: <Wallet size={18} />, color: 'text-teal-700 bg-teal-50 dark:bg-teal-950/30 border-teal-200 dark:border-teal-900', tab: 'financial' as ReportTab, pdfType: 'cash-flow' },
               { label: 'Statement of Changes in Equity', sub: 'IAS 1.106 · Equity Movements', icon: <Layers size={18} />, color: 'text-violet-700 bg-violet-50 dark:bg-violet-950/30 border-violet-200 dark:border-violet-900', tab: 'equity-changes' as ReportTab, pdfType: null },
               { label: 'Notes to Financial Statements', sub: 'IAS 1.112 · Disclosures', icon: <BookOpen size={18} />, color: 'text-slate-700 bg-white dark:bg-slate-800/60 border-slate-200 dark:border-slate-700', tab: 'notes' as ReportTab, pdfType: null },
@@ -3613,13 +3613,13 @@ return (
             <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">Operational & CRM Reports</p>
             <div className="ovds-grid-layout cols-4 gap-sm">
               {([
-                { label: 'Income vs Expense', sub: 'Monthly revenue vs costs', icon: <TrendingUp size={15} />, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30', tab: 'financial' as ReportTab },
-                { label: 'General Ledger', sub: 'All journal lines by account', icon: <BookOpen size={15} />, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30', tab: 'financial' as ReportTab },
+                { label: 'Income vs Expense', sub: 'Monthly revenue vs costs', icon: <TrendingUp size={15} />, color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30', tab: 'financial' as ReportTab },
+                { label: 'General Ledger', sub: 'All journal lines by account', icon: <BookOpen size={15} />, color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30', tab: 'financial' as ReportTab },
                 { label: 'Sale Summary', sub: 'Revenue by customer & period', icon: <Receipt size={15} />, color: 'text-teal-600 dark:text-teal-400', bg: 'bg-teal-50 dark:bg-teal-950/30', tab: 'financial' as ReportTab },
                 { label: 'Customer Growth', sub: 'New customers over time', icon: <Building2 size={15} />, color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-950/30', tab: 'customer-growth' as ReportTab },
                 { label: 'Customer Statement', sub: 'Invoices, payments, balance', icon: <FileText size={15} />, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/30', tab: 'customer-statement' as ReportTab },
                 { label: 'Employee Summary', sub: 'Headcount & payroll by dept', icon: <Briefcase size={15} />, color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-950/30', tab: 'payroll' as ReportTab },
-                { label: 'Payroll Summary', sub: 'Gross, deductions, net by dept', icon: <Banknote size={15} />, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30', tab: 'payroll' as ReportTab },
+                { label: 'Payroll Summary', sub: 'Gross, deductions, net by dept', icon: <Banknote size={15} />, color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30', tab: 'payroll' as ReportTab },
                 { label: 'Attendance Summary', sub: 'Present, absent, late by dept', icon: <Activity size={15} />, color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-50 dark:bg-sky-950/30', tab: 'attendance' as ReportTab },
               ] as const).map(r => (
                 <button
@@ -3643,15 +3643,15 @@ return (
       {activeTab === 'payroll' && (
         <div className="space-y-8">
           {/* Payroll Reports Header */}
-          <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 flex items-center gap-4">
-            <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/40 rounded-xl flex items-center justify-center shrink-0">
-              <TrendingUp size={18} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="bg-[var(--pro-azure-50)] dark:bg-green-950/30 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl p-4 flex items-center gap-4">
+            <div className="w-10 h-10 bg-[var(--pro-azure-100)] dark:bg-green-900/40 rounded-xl flex items-center justify-center shrink-0">
+              <TrendingUp size={18} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Payroll Reports — {getMonthName(filterMonth - 1)} {filterYear}</p>
-              <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70">Generate pay slips, department summaries, PF reports, and tax deduction statements</p>
+              <p className="text-sm font-semibold text-[var(--pro-azure-dark)] dark:text-green-200">Payroll Reports — {getMonthName(filterMonth - 1)} {filterYear}</p>
+              <p className="text-xs text-[var(--pro-azure)]/70 dark:text-[var(--pro-azure-light)]/70">Generate pay slips, department summaries, PF reports, and tax deduction statements</p>
             </div>
-            <Link to="/hr/payroll-administration" className="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-xs font-bold hover:bg-emerald-600 shrink-0">
+            <Link to="/hr/payroll-administration" className="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-lg text-xs font-bold hover:bg-[var(--pro-azure-dark)] shrink-0">
               Payroll Admin <ExternalLink size={11} />
             </Link>
           </div>.
@@ -3695,7 +3695,7 @@ return (
             <button
               onClick={fetchPayroll}
               disabled={payrollLoading}
-              className="flex items-center gap-2 px-5 py-2 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 disabled:opacity-50 transition-all"
+              className="flex items-center gap-2 px-5 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 transition-all"
             >
               {payrollLoading ? (
                 <RefreshCw size={14} className="animate-spin" />
@@ -3737,8 +3737,8 @@ return (
               {
                 label: 'Net Pay',
                 value: `${currency} ${totalNet.toLocaleString()}`,
-                color: 'text-emerald-700 dark:text-emerald-400',
-                bg: 'bg-emerald-50 dark:bg-emerald-950/40' },
+                color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
+                bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/40' },
             ].map((s, i) => (
               <div
                 key={s.label}
@@ -3759,7 +3759,7 @@ return (
             {/* Pay Slip Report */}
             <div className="ovds-widget-card overflow-hidden transition-colors">
               <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex items-center gap-3">
-                <FileText size={16} className="text-emerald-600 dark:text-emerald-400" />
+                <FileText size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                 <div>
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
                     Pay Slip Report
@@ -3799,13 +3799,13 @@ return (
                         ],
                       )
                     }
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 dark:bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 dark:hover:bg-slate-700 transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-50)]0 dark:bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] dark:hover:bg-slate-700 transition-all"
                   >
                     <Printer size={12} /> Print PDF
                   </button>
                   <button
                     onClick={() => downloadPayrollCSV('payslip_report')}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
                   >
                     <Download size={12} /> CSV
                   </button>
@@ -3816,7 +3816,7 @@ return (
             {/* Department Summary */}
             <div className="ovds-widget-card overflow-hidden transition-colors">
               <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex items-center gap-3">
-                <Building2 size={16} className="text-emerald-600" />
+                <Building2 size={16} className="text-[var(--pro-azure)]" />
                 <div>
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
                     Department Summary
@@ -3839,7 +3839,7 @@ return (
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs font-semibold text-emerald-700">
+                      <p className="text-xs font-semibold text-[var(--pro-azure-dark)]">
                         {currency} {d.net.toLocaleString()}
                       </p>
                       <p className="ovds-caption">net pay</p>
@@ -3875,7 +3875,7 @@ return (
                       ],
                     )
                   }
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
                 >
                   <Printer size={12} /> Print Report
                 </button>
@@ -3909,7 +3909,7 @@ return (
                     <span className="text-slate-500">
                       Employer Pension (11%)
                     </span>
-                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                    <span className="font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                       {currency} {totalEmployerPension.toLocaleString()}
                     </span>
                   </div>
@@ -3947,7 +3947,7 @@ return (
                       ],
                     )
                   }
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
                 >
                   <Printer size={12} /> Print PF Report
                 </button>
@@ -3985,7 +3985,7 @@ return (
                     <span className="text-slate-500">
                       Tax-Exempt (≤ETB 600)
                     </span>
-                    <span className="font-semibold text-emerald-700">
+                    <span className="font-semibold text-[var(--pro-azure-dark)]">
                       {payroll.filter((p) => (p.incomeTax ?? 0) === 0).length}
                     </span>
                   </div>
@@ -4046,7 +4046,7 @@ return [
             {/* Monthly Bank Advice */}
             <div className="ovds-widget-card overflow-hidden transition-colors">
               <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex items-center gap-3">
-                <Banknote size={16} className="text-emerald-600" />
+                <Banknote size={16} className="text-[var(--pro-azure)]" />
                 <div>
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
                     Monthly Bank Advice
@@ -4060,7 +4060,7 @@ return [
                 <div className="space-y-2 text-xs">
                   <div className="flex justify-between py-1.5 border-b border-slate-50">
                     <span className="text-slate-500">Total Disbursement</span>
-                    <span className="font-semibold text-emerald-700">
+                    <span className="font-semibold text-[var(--pro-azure-dark)]">
                       {currency} {totalNet.toLocaleString()}
                     </span>
                   </div>
@@ -4086,7 +4086,7 @@ return [
                         ['#', 'Employee ID', 'Name', 'Department', 'Net Pay'],
                       )
                     }
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
                   >
                     <Printer size={12} /> Print
                   </button>
@@ -4116,7 +4116,7 @@ const rows = payroll
             {/* Salary Summary Report */}
             <div className="ovds-widget-card overflow-hidden transition-colors">
               <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex items-center gap-3">
-                <BarChart3 size={16} className="text-emerald-600 dark:text-emerald-400" />
+                <BarChart3 size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                 <div>
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
                     Salary Summary Report
@@ -4147,7 +4147,7 @@ const rows = payroll
                   {
                     label: 'Total Net Pay',
                     value: `${currency} ${totalNet.toLocaleString()}`,
-                    color: 'text-emerald-700 font-semibold' },
+                    color: 'text-[var(--pro-azure-dark)] font-semibold' },
                 ].map((s, i) => (
                   <div
                     key={s.label}
@@ -4192,7 +4192,7 @@ const rows = payroll
                       ['Description', 'Amount'],
                     )
                   }
-                  className="mt-2 flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all"
+                  className="mt-2 flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
                 >
                   <Printer size={12} /> Print Summary
                 </button>
@@ -4202,9 +4202,9 @@ const rows = payroll
             {/* Subsidiary & Group Distribution - Strategic */}
             {settings?.org_structure_type &&
               settings.org_structure_type !== 'single' && (
-                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 overflow-hidden shadow-sm shadow-emerald-50">
-                  <div className="px-5 py-4 border-b border-slate-100 bg-emerald-50/30 flex items-center gap-3">
-                    <Layers size={16} className="text-emerald-600 dark:text-emerald-400" />
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 overflow-hidden shadow-sm shadow-green-50">
+                  <div className="px-5 py-4 border-b border-slate-100 bg-[var(--pro-azure-50)]/30 flex items-center gap-3">
+                    <Layers size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                     <div>
                       <p className="text-sm font-semibold text-slate-800">
                         Subsidiary & Group Distribution
@@ -4219,13 +4219,13 @@ const rows = payroll
                       ([sub, s]: [string, any]) => (
                         <div
                           key={sub}
-                          className="group p-3 rounded-xl border border-slate-50 hover:border-emerald-200 dark:border-emerald-800 hover:bg-slate-50 transition-all"
+                          className="group p-3 rounded-xl border border-slate-50 hover:border-[var(--pro-azure-100)] dark:border-green-800 hover:bg-slate-50 transition-all"
                         >
                           <div className="flex items-center justify-between mb-1">
                             <p className="text-xs font-semibold text-slate-800">
                               {sub}
                             </p>
-                            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/10 px-2 py-0.5 rounded-full">
+                            <span className="text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 px-2 py-0.5 rounded-full">
                               {s.count} Staff
                             </span>
                           </div>
@@ -4233,7 +4233,7 @@ const rows = payroll
                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
                               Net Liability
                             </p>
-                            <p className="text-xs font-semibold text-emerald-700">
+                            <p className="text-xs font-semibold text-[var(--pro-azure-dark)]">
                               {currency} {s.net.toLocaleString()}
                             </p>
                           </div>
@@ -4258,7 +4258,7 @@ const rows = payroll
                                   ['ID', 'Name', 'Dept', 'Gross', 'Net Pay'],
                                 )
                               }
-                              className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-wider"
+                              className="text-[10px] font-medium text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-wider"
                             >
                               Generate Audit PDF
                             </button>
@@ -4297,7 +4297,7 @@ const rows = payroll
                           ],
                         )
                       }
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all w-full justify-center"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all w-full justify-center"
                     >
                       <Printer size={12} /> Print Consolidated Report
                     </button>
@@ -4311,7 +4311,7 @@ const rows = payroll
             {/* PFMS Report */}
             <div className="ovds-widget-card overflow-hidden transition-colors">
               <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex items-center gap-3">
-                <Download size={16} className="text-emerald-600 dark:text-emerald-400" />
+                <Download size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                 <div>
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
                     PFMS Report
@@ -4320,7 +4320,7 @@ const rows = payroll
                     Public Financial Management System — Excel format
                   </p>
                 </div>
-                <span className="ml-auto text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 uppercase">
+                <span className="ml-auto text-[10px] font-medium text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] px-2 py-0.5 rounded-full border border-[var(--pro-azure-100)] uppercase">
                   After Approval
                 </span>
               </div>
@@ -4341,7 +4341,7 @@ const rows = payroll
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-400">Total Net Pay</span>
-                    <span className="font-bold text-emerald-700">
+                    <span className="font-bold text-[var(--pro-azure-dark)]">
                       {currency} {totalNet.toLocaleString()}
                     </span>
                   </div>
@@ -4361,7 +4361,7 @@ const rows = payroll
                       `PFMS_Report_${filterYear}_${String(filterMonth).padStart(2, '0')}.csv`,
                     );
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all"
+                  className="w-full flex items-center justify-center gap-2 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
                 >
                   <Download size={13} /> Download PFMS Report
                 </button>
@@ -4438,7 +4438,7 @@ const blob = new Blob([JSON.stringify(payload, null, 2)], {
                       `Treasury_Report_${filterYear}_${String(filterMonth).padStart(2, '0')}.json`,
                     );
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2 bg-emerald-500 dark:bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 dark:hover:bg-slate-700 transition-all"
+                  className="w-full flex items-center justify-center gap-2 py-2 bg-[var(--pro-azure-50)]0 dark:bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] dark:hover:bg-slate-700 transition-all"
                 >
                   <Download size={13} /> Download Treasury JSON
                 </button>
@@ -4450,7 +4450,7 @@ const blob = new Blob([JSON.stringify(payload, null, 2)], {
           <div className="ovds-widget-card overflow-hidden transition-colors">
             <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <BarChart3 size={16} className="text-emerald-600 dark:text-emerald-400" />
+                <BarChart3 size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                 <div>
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
                     Earning-Deduction Report — {getMonthName(filterMonth - 1)}{' '}
@@ -4492,13 +4492,13 @@ const blob = new Blob([JSON.stringify(payload, null, 2)], {
                       ],
                     )
                   }
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 dark:bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 dark:hover:bg-slate-700 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-50)]0 dark:bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] dark:hover:bg-slate-700 transition-all"
                 >
                   <Printer size={12} /> Print
                 </button>
                 <button
                   onClick={() => downloadPayrollCSV('earning_deduction_report')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
                 >
                   <Download size={12} /> CSV
                 </button>
@@ -4554,10 +4554,10 @@ const blob = new Blob([JSON.stringify(payload, null, 2)], {
                         <td className="px-4 py-3 text-slate-500">
                           {p.departmentName}
                         </td>
-                        <td className="px-4 py-3 text-emerald-600 font-semibold">
+                        <td className="px-4 py-3 text-[var(--pro-azure)] font-semibold">
                           {currency} {(p.grossPay ?? 0).toLocaleString()}
                         </td>
-                        <td className="px-4 py-3 text-emerald-600 dark:text-emerald-400">
+                        <td className="px-4 py-3 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                           {(p.otPay ?? 0) > 0
                             ? `${currency} ${(p.otPay ?? 0).toLocaleString()}`
                             : '—'}
@@ -4576,7 +4576,7 @@ const blob = new Blob([JSON.stringify(payload, null, 2)], {
                             ? `${currency} ${(p.loanDeduction ?? 0).toLocaleString()}`
                             : '—'}
                         </td>
-                        <td className="px-4 py-3 font-semibold text-emerald-700">
+                        <td className="px-4 py-3 font-semibold text-[var(--pro-azure-dark)]">
                           {currency} {p.calculatedSalary.toLocaleString()}
                         </td>
                       </tr>
@@ -4592,13 +4592,13 @@ const blob = new Blob([JSON.stringify(payload, null, 2)], {
                       >
                         TOTALS ({payroll.length})
                       </td>
-                      <td className="px-4 py-3 font-semibold text-emerald-700 text-xs">
+                      <td className="px-4 py-3 font-semibold text-[var(--pro-azure-dark)] text-xs">
                         {currency}{' '}
                         {payroll
                           .reduce((s, p) => s + (p.grossPay ?? 0), 0)
                           .toLocaleString()}
                       </td>
-                      <td className="px-4 py-3 font-semibold text-emerald-600 dark:text-emerald-400 text-xs">
+                      <td className="px-4 py-3 font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] text-xs">
                         {currency}{' '}
                         {payroll
                           .reduce((s, p) => s + (p.otPay ?? 0), 0)
@@ -4616,7 +4616,7 @@ const blob = new Blob([JSON.stringify(payload, null, 2)], {
                       <td className="px-4 py-3 font-semibold text-amber-700 text-xs">
                         {currency} {totalLoans.toLocaleString()}
                       </td>
-                      <td className="px-4 py-3 font-semibold text-emerald-800 text-xs">
+                      <td className="px-4 py-3 font-semibold text-[var(--pro-azure-dark)] text-xs">
                         {currency} {totalNet.toLocaleString()}
                       </td>
                     </tr>
@@ -4632,7 +4632,7 @@ const blob = new Blob([JSON.stringify(payload, null, 2)], {
               {/* Overtime Report */}
               <div className="ovds-widget-card overflow-hidden transition-colors">
                 <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex items-center gap-3">
-                  <Activity size={16} className="text-emerald-600 dark:text-emerald-400" />
+                  <Activity size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                   <div>
                     <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
                       Overtime Report
@@ -4658,11 +4658,11 @@ const totalOtPay = payroll.reduce(
 return (
                       <>
                         <div className="grid grid-cols-3 gap-2 text-xs">
-                          <div className="bg-emerald-50 rounded-xl p-3 text-center">
-                            <p className="font-semibold text-emerald-600 dark:text-emerald-400">
+                          <div className="bg-[var(--pro-azure-50)] rounded-xl p-3 text-center">
+                            <p className="font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                               {otEmployees.length}
                             </p>
-                            <p className="text-emerald-600 dark:text-emerald-400 mt-0.5">With OT</p>
+                            <p className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] mt-0.5">With OT</p>
                           </div>
                           <div className="bg-white rounded-xl p-3 text-center">
                             <p className="font-semibold text-slate-700">
@@ -4670,11 +4670,11 @@ return (
                             </p>
                             <p className="text-slate-400 mt-0.5">Total Hours</p>
                           </div>
-                          <div className="bg-emerald-50 rounded-xl p-3 text-center">
-                            <p className="font-semibold text-emerald-700">
+                          <div className="bg-[var(--pro-azure-50)] rounded-xl p-3 text-center">
+                            <p className="font-semibold text-[var(--pro-azure-dark)]">
                               {currency} {totalOtPay.toLocaleString()}
                             </p>
-                            <p className="text-emerald-500 mt-0.5">Total Pay</p>
+                            <p className="text-[var(--pro-azure)] mt-0.5">Total Pay</p>
                           </div>
                         </div>
                         <div className="max-h-40 overflow-y-auto space-y-1">
@@ -4692,10 +4692,10 @@ return (
                                 </p>
                               </div>
                               <div className="text-right">
-                                <p className="font-bold text-emerald-600 dark:text-emerald-400">
+                                <p className="font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                                   {(p.otHours ?? 0).toFixed(1)}h
                                 </p>
-                                <p className="text-emerald-600">
+                                <p className="text-[var(--pro-azure)]">
                                   {currency} {(p.otPay ?? 0).toLocaleString()}
                                 </p>
                               </div>
@@ -4728,7 +4728,7 @@ return (
                                 ],
                               )
                             }
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)]"
                           >
                             <Printer size={12} /> Print
                           </button>
@@ -4761,7 +4761,7 @@ const rows = otEmployees
               {/* Increment History Report */}
               <div className="ovds-widget-card overflow-hidden transition-colors">
                 <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex items-center gap-3">
-                  <TrendingUp size={16} className="text-emerald-600" />
+                  <TrendingUp size={16} className="text-[var(--pro-azure)]" />
                   <div>
                     <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
                       Increment History Report
@@ -4782,11 +4782,11 @@ const rows = otEmployees
 return (
                       <>
                         <div className="grid grid-cols-2 gap-2 text-xs mb-2">
-                          <div className="bg-emerald-50 rounded-xl p-3 text-center">
-                            <p className="font-semibold text-emerald-700">
+                          <div className="bg-[var(--pro-azure-50)] rounded-xl p-3 text-center">
+                            <p className="font-semibold text-[var(--pro-azure-dark)]">
                               {dueIncrements.length}
                             </p>
-                            <p className="text-emerald-500 mt-0.5">
+                            <p className="text-[var(--pro-azure)] mt-0.5">
                               Due Increments
                             </p>
                           </div>
@@ -4816,7 +4816,7 @@ return (
                                   {currency}{' '}
                                   {(p.grossPay ?? 0).toLocaleString()}
                                 </p>
-                                <p className="text-[10px] text-emerald-600">
+                                <p className="text-[10px] text-[var(--pro-azure)]">
                                   {p.dateOfNextIncrement
                                     ? new Date(
                                         p.dateOfNextIncrement,
@@ -4859,7 +4859,7 @@ return (
                                 ],
                               )
                             }
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)]"
                           >
                             <Printer size={12} /> Print
                           </button>
@@ -4896,7 +4896,7 @@ const rows = dueIncrements
             <div className="ovds-widget-card overflow-hidden transition-colors">
               <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <TrendingUp size={16} className="text-emerald-500" />
+                  <TrendingUp size={16} className="text-[var(--pro-azure)]" />
                   <div>
                     <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
                       Monthly Salary Comparison
@@ -4932,7 +4932,7 @@ const rows = dueIncrements
                       ],
                     )
                   }
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
                 >
                   <Printer size={12} /> Print Comparison
                 </button>
@@ -4981,7 +4981,7 @@ return (
                           <td className="px-4 py-2.5 text-right text-rose-700 font-medium">
                             {(p.totalDeductions ?? 0).toLocaleString()}
                           </td>
-                          <td className="px-4 py-2.5 text-right font-semibold text-emerald-700">
+                          <td className="px-4 py-2.5 text-right font-semibold text-[var(--pro-azure-dark)]">
                             {(p.calculatedSalary ?? 0).toLocaleString()}
                           </td>
                           <td className="px-4 py-2.5 text-center">
@@ -5036,7 +5036,7 @@ return (
                   {(data.reimbursement.byStatus ?? []).map((s: any) => {
                     const colors: Record<string, string> = {
                       PENDING: 'bg-amber-400',
-                      APPROVED: 'bg-emerald-500',
+                      APPROVED: 'bg-[var(--pro-azure-50)]0',
                       REJECTED: 'bg-rose-400' };
                     const total =
                       (data.reimbursement.byStatus ?? []).reduce(
@@ -5072,7 +5072,7 @@ return (
                     const tierColors: Record<number, string> = {
                       1: 'bg-rose-400',
                       2: 'bg-amber-400',
-                      3: 'bg-emerald-500' };
+                      3: 'bg-[var(--pro-azure-50)]0' };
                     const tierLabels: Record<number, string> = {
                       1: 'Tier 1 — Urban',
                       2: 'Tier 2 — Wereda',
@@ -5218,14 +5218,14 @@ return (
                   {
                     label: `${getMonthName(filterMonth - 1)} Net Pay`,
                     value: `${currency} ${curTotalNet.toLocaleString()}`,
-                    color: 'text-emerald-700',
-                    bg: 'bg-emerald-50' },
+                    color: 'text-[var(--pro-azure-dark)]',
+                    bg: 'bg-[var(--pro-azure-50)]' },
                   {
                     label: 'Month-on-Month Change',
                     value: `${totalDiff >= 0 ? '+' : ''}${currency} ${totalDiff.toLocaleString()}`,
                     color:
-                      totalDiff >= 0 ? 'text-emerald-700' : 'text-rose-700',
-                    bg: totalDiff >= 0 ? 'bg-emerald-50' : 'bg-rose-50' },
+                      totalDiff >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-700',
+                    bg: totalDiff >= 0 ? 'bg-[var(--pro-azure-50)]' : 'bg-rose-50' },
                 ].map((s, i) => (
                   <div
                     key={s.label}
@@ -5261,7 +5261,7 @@ const csvRows = rows
                         `salary_comparison_${filterYear}_${filterMonth}.csv`,
                       );
                     }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 dark:bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 dark:hover:bg-slate-700 transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-50)]0 dark:bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] dark:hover:bg-slate-700 transition-all"
                   >
                     <Download size={12} /> Export CSV
                   </button>
@@ -5340,7 +5340,7 @@ const csvRows = rows
                             </td>
                             <td className="px-4 py-3">
                               <span
-                                className={`text-xs font-bold ${r.netDiff > 0 ? 'text-emerald-600' : r.netDiff < 0 ? 'text-rose-600' : 'text-slate-400'}`}
+                                className={`text-xs font-bold ${r.netDiff > 0 ? 'text-[var(--pro-azure)]' : r.netDiff < 0 ? 'text-rose-600' : 'text-slate-400'}`}
                               >
                                 {r.netDiff > 0 ? '+' : ''}
                                 {r.netDiff.toFixed(0)}
@@ -5349,7 +5349,7 @@ const csvRows = rows
                             <td className="px-4 py-3">
                               <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                                 <div
-                                  className={`h-full rounded-full transition-all ${r.netDiff > 0 ? 'bg-emerald-400' : r.netDiff < 0 ? 'bg-rose-400' : 'bg-slate-300'}`}
+                                  className={`h-full rounded-full transition-all ${r.netDiff > 0 ? 'bg-[var(--pro-azure-light)]' : r.netDiff < 0 ? 'bg-rose-400' : 'bg-slate-300'}`}
                                   style={{
                                     width: `${Math.min(100, (Math.abs(r.netDiff) / Math.max(1, Math.abs(r.netPay ?? r.calculatedSalary ?? 1))) * 100 * 5)}%` }}
                                 />
@@ -5374,7 +5374,7 @@ const csvRows = rows
             <div className="p-10 border-b border-slate-100 bg-slate-50/30 flex justify-between items-center">
               <div>
                 <h3 className="text-2xl font-semibold text-slate-900 tracking-tight flex items-center gap-3">
-                  <TrendingUp className="text-emerald-600 dark:text-emerald-400" size={28} />
+                  <TrendingUp className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" size={28} />
                   {t('reports.weekly_trends')}
                 </h3>
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">
@@ -5404,7 +5404,7 @@ return (
                       <div className="w-full flex flex-col justify-end gap-1 h-48 relative">
                         <div
                           style={{ height: `${presentHeight}%` }}
-                          className="bg-emerald-500 rounded-t-lg transition-all group-hover:brightness-110 shadow-lg shadow-emerald-100"
+                          className="bg-[var(--pro-azure-50)]0 rounded-t-lg transition-all group-hover:brightness-110 shadow-lg shadow-green-100"
                           title={`Present: ${stat.present}`}
                         ></div>
                         <div
@@ -5427,7 +5427,7 @@ return (
               </div>
               <div className="mt-12 flex justify-center gap-5 border-t border-slate-100 pt-8">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-emerald-500 rounded-full"></div>
+                  <div className="w-4 h-4 bg-[var(--pro-azure-50)]0 rounded-full"></div>
                   <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
                     {t('reports.on_time')}
                   </span>
@@ -5453,7 +5453,7 @@ return (
             <div className="ovds-widget-card overflow-hidden">
               <div className="p-5 border-b border-slate-100 bg-slate-50/30">
                 <h3 className="text-xl font-semibold text-slate-900 tracking-tight flex items-center gap-3">
-                  <PieChart className="text-emerald-500" size={24} />
+                  <PieChart className="text-[var(--pro-azure)]" size={24} />
                   {t('reports.leave_dist')}
                 </h3>
               </div>
@@ -5478,7 +5478,7 @@ return (
                         <div
                           style={{
                             width: `${(stat.count / (data?.leaveStats?.reduce((a: any, b: any) => a + b.count, 0) || 1)) * 100}%` }}
-                          className={`h-full bg-emerald-500 rounded-full shadow-sm`}
+                          className={`h-full bg-[var(--pro-azure-50)]0 rounded-full shadow-sm`}
                         ></div>
                       </div>
                     </div>
@@ -5491,7 +5491,7 @@ return (
             <div className="ovds-widget-card overflow-hidden">
               <div className="p-5 border-b border-slate-100 bg-slate-50/30">
                 <h3 className="text-xl font-semibold text-slate-900 tracking-tight flex items-center gap-3">
-                  <Briefcase className="text-emerald-600 dark:text-emerald-400" size={24} />
+                  <Briefcase className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" size={24} />
                   {t('reports.dept_dist')}
                 </h3>
               </div>
@@ -5499,10 +5499,10 @@ return (
                 {data?.departmentStats?.map((stat: any, i: number) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-100 hover:border-emerald-200 dark:border-emerald-800 transition-all group"
+                    className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-100 hover:border-[var(--pro-azure-100)] dark:border-green-800 transition-all group"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-600 dark:text-emerald-400 font-semibold border border-slate-200 shadow-sm group-hover:scale-110 transition-transform">
+                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[var(--pro-azure)] dark:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold border border-slate-200 shadow-sm group-hover:scale-110 transition-transform">
                         {stat.name[0]}
                       </div>
                       <div>
@@ -5531,11 +5531,11 @@ return (
           {/* Audit & Health Summary */}
           <div className="ovds-grid-layout cols-3">
             <div className="lg:col-span-1 bg-white dark:bg-gradient-to-br dark:from-slate-900 dark:to-slate-800 rounded-2xl p-10 text-white shadow-2xl shadow-slate-900/20 relative overflow-hidden">
-              <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-emerald-50 dark:bg-white/5 rounded-full blur-3xl"></div>
+              <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-[var(--pro-azure-50)] dark:bg-white/5 rounded-full blur-3xl"></div>
               <div className="relative z-10 space-y-8">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-emerald-100 dark:bg-white/10 rounded-2xl backdrop-blur-md border border-emerald-200 dark:border-white/10">
-                    <Shield size={24} className="text-emerald-400" />
+                  <div className="p-3 bg-[var(--pro-azure-100)] dark:bg-white/10 rounded-2xl backdrop-blur-md border border-[var(--pro-azure-100)] dark:border-white/10">
+                    <Shield size={24} className="text-[var(--pro-azure-light)]" />
                   </div>
                   <div>
                     <h4 className="text-lg font-semibold tracking-tight">
@@ -5552,7 +5552,7 @@ return (
                     <span className="text-xs font-bold text-slate-500 dark:text-white/60 uppercase tracking-wider">
                       {t('reports.db_health')}
                     </span>
-                    <span className="text-sm font-semibold text-emerald-400">
+                    <span className="text-sm font-semibold text-[var(--pro-azure-light)]">
                       {systemHealth?.uptime ?? '—'}
                     </span>
                   </div>
@@ -5578,7 +5578,7 @@ return (
                 </div>
 
                 <Link to="/settings/audit-logs" className="block w-full">
-                  <button className="w-full py-4 bg-emerald-50 dark:bg-white/5 hover:bg-emerald-100 dark:bg-white/10 border border-emerald-200 dark:border-white/10 rounded-xl text-[10px] font-semibold uppercase tracking-[0.2em] transition-all">
+                  <button className="w-full py-4 bg-[var(--pro-azure-50)] dark:bg-white/5 hover:bg-[var(--pro-azure-100)] dark:bg-white/10 border border-[var(--pro-azure-100)] dark:border-white/10 rounded-xl text-[10px] font-semibold uppercase tracking-[0.2em] transition-all">
                     {t('reports.view_audit_logs')}
                   </button>
                 </Link>
@@ -5601,7 +5601,7 @@ return (
                     {
                       label: t('reports.standard_arrival'),
                       val: rates.present,
-                      color: 'bg-emerald-500' },
+                      color: 'bg-[var(--pro-azure-50)]0' },
                     {
                       label: t('reports.late_arrival_rate'),
                       val: rates.late,

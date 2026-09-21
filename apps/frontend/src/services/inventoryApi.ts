@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { apiGet, apiPost, apiPatch, apiDelete } from './api';
-import toast from 'react-hot-toast';
+import { useCallback } from 'react';
+
+
+import { useFetchQuery } from '../hooks/useFetchQuery';
 import type {
   Item,
   ItemGroup,
@@ -15,236 +16,191 @@ import type {
   ProductSalesPerformance,
 } from '../types/inventory';
 
+import { apiPost, apiPatch, apiDelete } from './api';
+
+// -- Helpers ------------------------------------------------------------------
+
+function qs(params: Record<string, string | number | undefined>): string {
+  const p = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== undefined) p.set(k, String(v));
+  }
+  const s = p.toString();
+  return s ? `?${s}` : '';
+}
+
+const toArray = <T>(d: unknown): T[] => (Array.isArray(d) ? (d as T[]) : []);
+
 // ── Items ─────────────────────────────────────────────────────────────────────
+//
+// Has create/update/remove/adjustStock mutations so keeps local array state.
+// The fetch itself is done via useFetchQuery; mutations update that cache via mutate().
 
 export function useItems(params?: { search?: string; page?: number; limit?: number }) {
-  const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState(true);
+  const url = `/ovds/inventory/items${qs({
+    search: params?.search,
+    page:   params?.page,
+    take:   params?.limit,
+  })}`;
 
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const q = new URLSearchParams();
-      if (params?.search) q.set('search', params.search);
-      if (params?.page) q.set('page', params.page.toString());
-      if (params?.limit) q.set('take', params.limit.toString());
-
-      const res = await apiGet<any>(`/ovds/inventory/items?${q}`);
-      const arr: Item[] = Array.isArray(res) ? res : (res?.items ?? []);
-      setItems(arr);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? 'Failed to load items');
-    } finally {
-      setLoading(false);
-    }
-  }, [params?.search, params?.page, params?.limit]);
+  const query = useFetchQuery<Item[]>(url, {
+    deps: [params?.search, params?.page, params?.limit],
+    select: (res) => (Array.isArray(res) ? res : (res?.items ?? [])),
+  });
 
   const create = useCallback(async (dto: Partial<Item>) => {
     const created = await apiPost<Item>('/ovds/inventory/items', dto);
-    setItems(prev => [created, ...prev]);
+    query.mutate((prev) => [created, ...(prev ?? [])]);
     return created;
-  }, []);
+  }, [query]);
 
   const update = useCallback(async (id: string, dto: Partial<Item>) => {
     const updated = await apiPatch<Item>(`/ovds/inventory/items/${id}`, dto);
-    setItems(prev => prev.map(i => i.id === id ? updated : i));
+    query.mutate((prev) => (prev ?? []).map((i) => (i.id === id ? updated : i)));
     return updated;
-  }, []);
+  }, [query]);
 
   const remove = useCallback(async (id: string) => {
     await apiDelete(`/ovds/inventory/items/${id}`);
-    setItems(prev => prev.filter(i => i.id !== id));
-  }, []);
+    query.mutate((prev) => (prev ?? []).filter((i) => i.id !== id));
+  }, [query]);
 
-  const adjustStock = useCallback(async (itemId: string, data: { quantity: number; type: 'ADD' | 'SUBTRACT'; reason?: string; warehouseId?: string; notes?: string; companyId?: string }) => {
+  const adjustStock = useCallback(async (itemId: string, data: {
+    quantity: number; type: 'ADD' | 'SUBTRACT'; reason?: string;
+    warehouseId?: string; notes?: string; companyId?: string;
+  }) => {
     const res = await apiPost<any>('/ovds/inventory/adjust', { itemId, ...data });
-    fetch();
+    query.refetch();
     return res;
-  }, [fetch]);
+  }, [query]);
 
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { items, loading, refetch: fetch, create, update, remove, adjustStock };
+  return { items: query.data ?? [], loading: query.loading, refetch: query.refetch, create, update, remove, adjustStock };
 }
 
 // ── Item Groups ───────────────────────────────────────────────────────────────
 
 export function useItemGroups() {
-  const [groups, setGroups] = useState<ItemGroup[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await apiGet<ItemGroup[]>('/ovds/inventory/item-groups');
-      setGroups(res ?? []);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? 'Failed to load item groups');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const query = useFetchQuery<ItemGroup[]>('/ovds/inventory/item-groups', {
+    select: (res) => res ?? [],
+  });
 
   const create = useCallback(async (dto: Partial<ItemGroup>) => {
     const created = await apiPost<ItemGroup>('/ovds/inventory/item-groups', dto);
-    setGroups(prev => [...prev, created]);
+    query.mutate((prev) => [...(prev ?? []), created]);
     return created;
-  }, []);
+  }, [query]);
 
   const update = useCallback(async (id: string, dto: Partial<ItemGroup>) => {
     const updated = await apiPatch<ItemGroup>(`/ovds/inventory/item-groups/${id}`, dto);
-    setGroups(prev => prev.map(g => g.id === id ? updated : g));
+    query.mutate((prev) => (prev ?? []).map((g) => (g.id === id ? updated : g)));
     return updated;
-  }, []);
+  }, [query]);
 
   const remove = useCallback(async (id: string) => {
     await apiDelete(`/ovds/inventory/item-groups/${id}`);
-    setGroups(prev => prev.filter(g => g.id !== id));
-  }, []);
+    query.mutate((prev) => (prev ?? []).filter((g) => g.id !== id));
+  }, [query]);
 
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { groups, loading, refetch: fetch, create, update, remove };
+  return { groups: query.data ?? [], loading: query.loading, refetch: query.refetch, create, update, remove };
 }
 
 // ── Item Variants ─────────────────────────────────────────────────────────────
 
 export function useItemVariants(itemId: string) {
-  const [variants, setVariants] = useState<ItemVariant[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    if (!itemId) return;
-    setLoading(true);
-    try {
-      const res = await apiGet<ItemVariant[]>(`/ovds/inventory/items/${itemId}/variants`);
-      setVariants(res ?? []);
-    } catch {
-      toast.error('Failed to load variants');
-    } finally {
-      setLoading(false);
-    }
-  }, [itemId]);
+  const query = useFetchQuery<ItemVariant[]>(
+    `/ovds/inventory/items/${itemId}/variants`,
+    { enabled: !!itemId, deps: [itemId], select: (res) => res ?? [] },
+  );
 
   const create = useCallback(async (dto: Partial<ItemVariant>) => {
     const created = await apiPost<ItemVariant>(`/ovds/inventory/items/${itemId}/variants`, dto);
-    setVariants(prev => [...prev, created]);
+    query.mutate((prev) => [...(prev ?? []), created]);
     return created;
-  }, [itemId]);
+  }, [itemId, query]);
 
   const update = useCallback(async (id: string, dto: Partial<ItemVariant>) => {
     const updated = await apiPatch<ItemVariant>(`/ovds/inventory/variants/${id}`, dto);
-    setVariants(prev => prev.map(v => v.id === id ? updated : v));
+    query.mutate((prev) => (prev ?? []).map((v) => (v.id === id ? updated : v)));
     return updated;
-  }, []);
+  }, [query]);
 
   const remove = useCallback(async (id: string) => {
     await apiDelete(`/ovds/inventory/variants/${id}`);
-    setVariants(prev => prev.filter(v => v.id !== id));
-  }, []);
+    query.mutate((prev) => (prev ?? []).filter((v) => v.id !== id));
+  }, [query]);
 
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { variants, loading, refetch: fetch, create, update, remove };
+  return { variants: query.data ?? [], loading: query.loading, refetch: query.refetch, create, update, remove };
 }
 
 // ── Warehouses ────────────────────────────────────────────────────────────────
+//
+// Has a 404-silent error path; useFetchQuery's suppressToast handles that since
+// it suppresses all error toasts — the 404 will set error.statusCode = 404
+// which callers can inspect if needed, but the empty array fallback is identical.
 
 export function useWarehouses() {
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await apiGet<any>('/ovds/inventory/warehouses');
-      const arr: Warehouse[] = Array.isArray(res) ? res : (res?.data ?? res?.items ?? res?.warehouses ?? []);
-      setWarehouses(Array.isArray(arr) ? arr : []);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? 'Failed to load warehouses');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const query = useFetchQuery<Warehouse[]>('/ovds/inventory/warehouses', {
+    select: (res) => {
+      const arr = Array.isArray(res) ? res : (res?.data ?? res?.items ?? res?.warehouses ?? []);
+      return Array.isArray(arr) ? arr : [];
+    },
+  });
 
   const create = useCallback(async (dto: Partial<Warehouse>) => {
     const created = await apiPost<Warehouse>('/ovds/inventory/warehouses', dto);
-    setWarehouses(prev => [...prev, created]);
+    query.mutate((prev) => [...(prev ?? []), created]);
     return created;
-  }, []);
+  }, [query]);
 
   const update = useCallback(async (id: string, dto: Partial<Warehouse>) => {
     const updated = await apiPatch<Warehouse>(`/ovds/inventory/warehouses/${id}`, dto);
-    setWarehouses(prev => prev.map(w => w.id === id ? updated : w));
+    query.mutate((prev) => (prev ?? []).map((w) => (w.id === id ? updated : w)));
     return updated;
-  }, []);
+  }, [query]);
 
   const remove = useCallback(async (id: string) => {
     await apiDelete(`/ovds/inventory/warehouses/${id}`);
-    setWarehouses(prev => prev.filter(w => w.id !== id));
-  }, []);
+    query.mutate((prev) => (prev ?? []).filter((w) => w.id !== id));
+  }, [query]);
 
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { warehouses, loading, refetch: fetch, create, update, remove };
+  return { warehouses: query.data ?? [], loading: query.loading, refetch: query.refetch, create, update, remove };
 }
 
 // ── Inventory Valuation ───────────────────────────────────────────────────────
 
 export function useInventoryValuation(method: 'FIFO' | 'LIFO' | 'WA' = 'WA') {
-  const [data, setData] = useState<InventoryResult | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await apiGet<InventoryResult>(`/ovds/inventory?method=${method}`);
-      setData(res);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? 'Failed to load inventory valuation');
-    } finally {
-      setLoading(false);
-    }
-  }, [method]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { data, loading, refetch: fetch };
+  return useFetchQuery<InventoryResult>(`/ovds/inventory?method=${method}`, {
+    deps: [method],
+  });
 }
 
 // ── Inventory History (Adjustments) ───────────────────────────────────────────
 
 export function useInventoryHistory(params?: { itemId?: string; companyId?: string; page?: number; limit?: number }) {
-  const [history, setHistory] = useState<InventoryAdjustment[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const url = `/ovds/inventory/adjustments${qs({
+    itemId:    params?.itemId,
+    companyId: params?.companyId,
+    page:      params?.page,
+    limit:     params?.limit,
+  })}`;
 
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const q = new URLSearchParams();
-      if (params?.itemId) q.set('itemId', params.itemId);
-      if (params?.companyId) q.set('companyId', params.companyId);
-      if (params?.page) q.set('page', params.page.toString());
-      if (params?.limit) q.set('limit', params.limit.toString());
+  const query = useFetchQuery<{ data: InventoryAdjustment[]; total: number }>(url, {
+    deps: [params?.itemId, params?.companyId, params?.page, params?.limit],
+    select: (res) => ({
+      data:  Array.isArray(res) ? res : (res?.data ?? []),
+      total: res?.total ?? (Array.isArray(res) ? res.length : 0),
+    }),
+  });
 
-      const res = await apiGet<any>(`/ovds/inventory/adjustments?${q}`);
-      const arr: InventoryAdjustment[] = Array.isArray(res) ? res : (res?.data ?? []);
-      setHistory(Array.isArray(arr) ? arr : []);
-      setTotal(res?.total ?? arr.length);
-    } catch {
-      toast.error('Failed to load inventory adjustments');
-    } finally {
-      setLoading(false);
-    }
-  }, [params?.itemId, params?.companyId, params?.page, params?.limit]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { history, total, loading, refetch: fetch };
+  return {
+    history: query.data?.data ?? [],
+    total:   query.data?.total ?? 0,
+    loading: query.loading,
+    refetch: query.refetch,
+  };
 }
 
-// ── Inventory Adjust ──────────────────────────────────────────────────────────
+// ── Inventory Adjust — pure mutation hook (no auto-fetch) ─────────────────────
 
 export function useInventoryAdjust() {
   const adjust = useCallback(async (itemId: string, data: {
@@ -263,183 +219,89 @@ export function useInventoryAdjust() {
 // ── Transfer Orders ───────────────────────────────────────────────────────────
 
 export function useTransferOrders() {
-  const [transfers, setTransfers] = useState<TransferOrder[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await apiGet<any>('/ovds/inventory/transfer-orders');
-      const arr: TransferOrder[] = Array.isArray(res) ? res : (res?.data ?? res?.items ?? []);
-      setTransfers(Array.isArray(arr) ? arr : []);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? 'Failed to load transfer orders');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const query = useFetchQuery<TransferOrder[]>('/ovds/inventory/transfer-orders', {
+    select: (res) => {
+      const arr = Array.isArray(res) ? res : (res?.data ?? res?.items ?? []);
+      return Array.isArray(arr) ? arr : [];
+    },
+  });
 
   const create = useCallback(async (dto: any) => {
     const created = await apiPost<TransferOrder>('/ovds/inventory/transfer-orders', dto);
-    setTransfers(prev => [created, ...prev]);
+    query.mutate((prev) => [created, ...(prev ?? [])]);
     return created;
-  }, []);
+  }, [query]);
 
   const updateStatus = useCallback(async (id: string, status: string) => {
     const updated = await apiPatch<TransferOrder>(`/ovds/inventory/transfer-orders/${id}/status`, { status });
-    setTransfers(prev => prev.map(t => t.id === id ? updated : t));
+    query.mutate((prev) => (prev ?? []).map((t) => (t.id === id ? updated : t)));
     return updated;
-  }, []);
+  }, [query]);
 
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { transfers, loading, refetch: fetch, create, updateStatus };
+  return { transfers: query.data ?? [], loading: query.loading, refetch: query.refetch, create, updateStatus };
 }
 
 // ── Warehouse Stock ───────────────────────────────────────────────────────────
 
 export function useWarehouseStock(itemId: string) {
-  const [stock, setStock] = useState<WarehouseStockEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    if (!itemId) return;
-    setLoading(true);
-    try {
-      const res = await apiGet<WarehouseStockEntry[]>(`/ovds/inventory/warehouse-stock/${itemId}`);
-      setStock(res ?? []);
-    } catch {
-      toast.error('Failed to load warehouse stock');
-    } finally {
-      setLoading(false);
-    }
-  }, [itemId]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { stock, loading, refetch: fetch };
+  return useFetchQuery<WarehouseStockEntry[]>(
+    `/ovds/inventory/warehouse-stock/${itemId}`,
+    { enabled: !!itemId, deps: [itemId], select: (r) => r ?? [] },
+  );
 }
 
 export function useAllWarehouseStock() {
-  const [stock, setStock] = useState<WarehouseStockEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await apiGet<WarehouseStockEntry[]>('/ovds/inventory/warehouse-stock');
-      setStock(res ?? []);
-    } catch {
-      toast.error('Failed to load warehouse stock');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { stock, loading, refetch: fetch };
+  return useFetchQuery<WarehouseStockEntry[]>('/ovds/inventory/warehouse-stock', {
+    select: (r) => r ?? [],
+  });
 }
 
-// ── Low-Stock Alerts ──────────────────────────────────────────────────────────
+// ── Stock Alerts ──────────────────────────────────────────────────────────────
 
 export function useLowStockAlerts() {
-  const [alerts, setAlerts] = useState<LowStockAlert[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await apiGet<LowStockAlert[]>('/ovds/inventory/alerts/low-stock');
-      setAlerts(res ?? []);
-    } catch {
-      toast.error('Failed to load low-stock alerts');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { alerts, loading, refetch: fetch };
+  const result = useFetchQuery<LowStockAlert[]>('/ovds/inventory/alerts/low-stock', {
+    select: (r) => r ?? [],
+  });
+  return { ...result, alerts: result.data ?? [] };
 }
 
 export function useOutOfStockAlerts() {
-  const [alerts, setAlerts] = useState<LowStockAlert[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await apiGet<LowStockAlert[]>('/ovds/inventory/alerts/out-of-stock');
-      setAlerts(res ?? []);
-    } catch {
-      toast.error('Failed to load out-of-stock alerts');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { alerts, loading, refetch: fetch };
+  const result = useFetchQuery<LowStockAlert[]>('/ovds/inventory/alerts/out-of-stock', {
+    select: (r) => r ?? [],
+  });
+  return { ...result, alerts: result.data ?? [] };
 }
 
-// ── Reports ───────────────────────────────────────────────────────────────────
+// ── Inventory Summary Report ──────────────────────────────────────────────────
 
 export function useInventorySummary(params?: { companyId?: string; dateFrom?: string; dateTo?: string }) {
-  const [data, setData] = useState<InventorySummaryReport | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    if (!params?.companyId) return;
-    setLoading(true);
-    try {
-      const q = new URLSearchParams();
-      q.set('companyId', params.companyId);
-      if (params.dateFrom) q.set('dateFrom', params.dateFrom);
-      if (params.dateTo) q.set('dateTo', params.dateTo);
-      const res = await apiGet<InventorySummaryReport>(`/ovds/inventory/reports/summary?${q}`);
-      setData(res);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? 'Failed to load inventory summary');
-    } finally {
-      setLoading(false);
-    }
-  }, [params?.companyId, params?.dateFrom, params?.dateTo]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { data, loading, refetch: fetch };
+  return useFetchQuery<InventorySummaryReport>(
+    params?.companyId
+      ? `/ovds/inventory/reports/summary${qs({ companyId: params.companyId, dateFrom: params.dateFrom, dateTo: params.dateTo })}`
+      : '',
+    {
+      enabled: !!params?.companyId,
+      deps: [params?.companyId, params?.dateFrom, params?.dateTo],
+    },
+  );
 }
+
+// ── Product Sales Performance ─────────────────────────────────────────────────
 
 export function useProductSalesPerformance(params?: { companyId?: string; dateFrom?: string; dateTo?: string }) {
-  const [data, setData] = useState<ProductSalesPerformance[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    if (!params?.companyId) return;
-    setLoading(true);
-    try {
-      const q = new URLSearchParams();
-      q.set('companyId', params.companyId);
-      if (params.dateFrom) q.set('dateFrom', params.dateFrom);
-      if (params.dateTo) q.set('dateTo', params.dateTo);
-      const res = await apiGet<ProductSalesPerformance[]>(`/ovds/inventory/reports/sales-performance?${q}`);
-      setData(res ?? []);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? 'Failed to load sales performance');
-    } finally {
-      setLoading(false);
-    }
-  }, [params?.companyId, params?.dateFrom, params?.dateTo]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { data, loading, refetch: fetch };
+  return useFetchQuery<ProductSalesPerformance[]>(
+    params?.companyId
+      ? `/ovds/inventory/reports/sales-performance${qs({ companyId: params.companyId, dateFrom: params.dateFrom, dateTo: params.dateTo })}`
+      : '',
+    {
+      enabled: !!params?.companyId,
+      deps: [params?.companyId, params?.dateFrom, params?.dateTo],
+      select: toArray,
+    },
+  );
 }
 
-// ── Pipeline ──────────────────────────────────────────────────────────────────
+// ── Pipeline — pure mutation hook (no auto-fetch) ─────────────────────────────
 
 export function useInventoryPipeline() {
   const triggerInvoice = useCallback(async (data: {
@@ -464,7 +326,7 @@ export function useInventoryPipeline() {
   return { triggerInvoice, triggerBill };
 }
 
-// ── Batch Adjustment ──────────────────────────────────────────────────────────
+// ── Batch Adjustment — pure mutation hook (no auto-fetch) ─────────────────────
 
 export function useBatchAdjust() {
   const adjust = useCallback(async (data: {
@@ -478,110 +340,66 @@ export function useBatchAdjust() {
 
 // ── Stock Movements ───────────────────────────────────────────────────────────
 
-export function useStockMovements(params?: { companyId?: string; itemId?: string; warehouseId?: string; type?: string; dateFrom?: string; dateTo?: string; page?: number; limit?: number }) {
-  const [data, setData] = useState<any>({ data: [], total: 0, page: 1, pages: 1 });
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const q = new URLSearchParams();
-      if (params?.companyId) q.set('companyId', params.companyId);
-      if (params?.itemId) q.set('itemId', params.itemId);
-      if (params?.warehouseId) q.set('warehouseId', params.warehouseId);
-      if (params?.type) q.set('type', params.type);
-      if (params?.dateFrom) q.set('dateFrom', params.dateFrom);
-      if (params?.dateTo) q.set('dateTo', params.dateTo);
-      if (params?.page) q.set('page', params.page.toString());
-      if (params?.limit) q.set('limit', params.limit.toString());
-
-      const res = await apiGet<any>(`/ovds/inventory/stock-movements?${q}`);
-      setData(res ?? { data: [], total: 0, page: 1, pages: 1 });
-    } catch {
-      toast.error('Failed to load stock movements');
-    } finally {
-      setLoading(false);
-    }
-  }, [params?.companyId, params?.itemId, params?.warehouseId, params?.type, params?.dateFrom, params?.dateTo, params?.page, params?.limit]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { ...data, loading, refetch: fetch };
+export function useStockMovements(params?: {
+  companyId?: string; itemId?: string; warehouseId?: string; type?: string;
+  dateFrom?: string; dateTo?: string; page?: number; limit?: number;
+}) {
+  const query = useFetchQuery<any>(
+    `/ovds/inventory/stock-movements${qs({
+      companyId:   params?.companyId,
+      itemId:      params?.itemId,
+      warehouseId: params?.warehouseId,
+      type:        params?.type,
+      dateFrom:    params?.dateFrom,
+      dateTo:      params?.dateTo,
+      page:        params?.page,
+      limit:       params?.limit,
+    })}`,
+    {
+      deps: [params?.companyId, params?.itemId, params?.warehouseId, params?.type,
+             params?.dateFrom, params?.dateTo, params?.page, params?.limit],
+      select: (r) => r ?? { data: [], total: 0, page: 1, pages: 1 },
+    },
+  );
+  // Spread the result shape so callers can destructure .data, .total, .page, .pages directly
+  const result = query.data ?? { data: [], total: 0, page: 1, pages: 1 };
+  return { ...result, loading: query.loading, refetch: query.refetch };
 }
 
 // ── Inventory Aging ───────────────────────────────────────────────────────────
 
 export function useInventoryAging(companyId?: string) {
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    if (!companyId) return;
-    setLoading(true);
-    try {
-      const res = await apiGet<any[]>(`/ovds/inventory/reports/aging?companyId=${companyId}`);
-      setData(res ?? []);
-    } catch {
-      toast.error('Failed to load inventory aging');
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { data, loading, refetch: fetch };
+  return useFetchQuery<any[]>(
+    companyId ? `/ovds/inventory/reports/aging?companyId=${companyId}` : '',
+    { enabled: !!companyId, deps: [companyId], select: toArray },
+  );
 }
 
 // ── Reorder Suggestions ───────────────────────────────────────────────────────
 
 export function useReorderSuggestions(companyId?: string) {
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    if (!companyId) return;
-    setLoading(true);
-    try {
-      const res = await apiGet<any[]>(`/ovds/inventory/reorder-suggestions?companyId=${companyId}`);
-      setData(res ?? []);
-    } catch {
-      toast.error('Failed to load reorder suggestions');
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { data, loading, refetch: fetch };
+  return useFetchQuery<any[]>(
+    companyId ? `/ovds/inventory/reorder-suggestions?companyId=${companyId}` : '',
+    { enabled: !!companyId, deps: [companyId], select: toArray },
+  );
 }
 
 // ── All Alerts ────────────────────────────────────────────────────────────────
 
 export function useAllAlerts(companyId?: string) {
-  const [data, setData] = useState<any>({ lowStock: [], outOfStock: [], total: 0, critical: 0, warning: 0 });
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    if (!companyId) return;
-    setLoading(true);
-    try {
-      const res = await apiGet<any>(`/ovds/inventory/alerts/all?companyId=${companyId}`);
-      setData(res ?? { lowStock: [], outOfStock: [], total: 0, critical: 0, warning: 0 });
-    } catch {
-      toast.error('Failed to load alerts');
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { ...data, loading, refetch: fetch };
+  const query = useFetchQuery<any>(
+    companyId ? `/ovds/inventory/alerts/all?companyId=${companyId}` : '',
+    {
+      enabled: !!companyId,
+      deps: [companyId],
+      select: (r) => r ?? { lowStock: [], outOfStock: [], total: 0, critical: 0, warning: 0 },
+    },
+  );
+  const result = query.data ?? { lowStock: [], outOfStock: [], total: 0, critical: 0, warning: 0 };
+  return { ...result, loading: query.loading, refetch: query.refetch };
 }
 
-// ── Send Alert Notifications ──────────────────────────────────────────────────
+// ── Send Alert Notifications — pure mutation hook (no auto-fetch) ─────────────
 
 export function useAlertNotifications() {
   const notify = useCallback(async (data: { companyId?: string; severity?: 'ALL' | 'LOW' | 'OUT' }) => {
@@ -593,51 +411,21 @@ export function useAlertNotifications() {
 // ── Demand Forecasting ───────────────────────────────────────────────────────
 
 export function useDemandForecast(companyId?: string, daysBack = 90, daysForward = 30) {
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    if (!companyId) return;
-    setLoading(true);
-    try {
-      const res = await apiGet<any[]>(`/ovds/inventory/reports/forecast?companyId=${companyId}&daysBack=${daysBack}&daysForward=${daysForward}`);
-      setData(res ?? []);
-    } catch {
-      toast.error('Failed to load demand forecast');
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId, daysBack, daysForward]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { data, loading, refetch: fetch };
+  return useFetchQuery<any[]>(
+    companyId
+      ? `/ovds/inventory/reports/forecast?companyId=${companyId}&daysBack=${daysBack}&daysForward=${daysForward}`
+      : '',
+    { enabled: !!companyId, deps: [companyId, daysBack, daysForward], select: toArray },
+  );
 }
 
 // ── Supplier Performance ──────────────────────────────────────────────────────
 
 export function useSupplierPerformance(companyId?: string, dateFrom?: string, dateTo?: string) {
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    if (!companyId) return;
-    setLoading(true);
-    try {
-      const q = new URLSearchParams();
-      q.set('companyId', companyId);
-      if (dateFrom) q.set('dateFrom', dateFrom);
-      if (dateTo) q.set('dateTo', dateTo);
-      const res = await apiGet<any[]>(`/ovds/inventory/reports/supplier-performance?${q}`);
-      setData(res ?? []);
-    } catch {
-      toast.error('Failed to load supplier performance');
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId, dateFrom, dateTo]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-
-  return { data, loading, refetch: fetch };
+  return useFetchQuery<any[]>(
+    companyId
+      ? `/ovds/inventory/reports/supplier-performance${qs({ companyId, dateFrom, dateTo })}`
+      : '',
+    { enabled: !!companyId, deps: [companyId, dateFrom, dateTo], select: toArray },
+  );
 }

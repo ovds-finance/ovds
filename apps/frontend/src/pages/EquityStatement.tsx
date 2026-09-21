@@ -11,18 +11,20 @@
  * Shows per equity account:
  *   Opening Balance | Net Profit | Other Movements | Dividends | OCI | Closing Balance
  */
-import React, { useState } from 'react';
+import { AppPage, Btn } from '@ovds/ui';
 import {
   RefreshCw, Download, Info, TrendingUp,
   TrendingDown, Minus, BookOpen,
 } from 'lucide-react';
-import { AppPage, Btn } from '@ovds/ui';
+import React, { useState } from 'react';
+
 import { useEquityMovements, type EquityMovementRow } from '../services/reportsApi';
-import type { EquityMovementStatement } from '@ovds/features/reporting';
+import type {  } from '@ovds/features/reporting';
 import { useBusiness } from '../context/businessContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { fmtCurrency } from '../utils/fmt';
 import api from '../services/api';
+
 import toast from 'react-hot-toast';
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
@@ -40,7 +42,7 @@ const COLS: Array<{
   cls: string;
 }> = [
   { key: 'openingBalance',         label: 'Opening Balance',       hint: 'Balance at start of period',             cls: 'text-slate-700' },
-  { key: 'netProfitForPeriod',     label: 'Net Profit / (Loss)',   hint: 'P&L result credited to retained earnings', cls: 'text-emerald-700' },
+  { key: 'netProfitForPeriod',     label: 'Net Profit / (Loss)',   hint: 'P&L result credited to retained earnings', cls: 'text-[var(--pro-azure-dark)]' },
   { key: 'otherMovements',         label: 'Other Movements',       hint: 'Capital injections, revaluations, etc.',  cls: 'text-sky-700' },
   { key: 'dividendsPaid',          label: 'Dividends Paid',        hint: 'Distributions to shareholders (debit)',   cls: 'text-rose-600' },
   { key: 'otherComprehensiveIncome', label: 'OCI',                 hint: 'Other comprehensive income (IAS 1.82A)',  cls: 'text-violet-700' },
@@ -75,7 +77,7 @@ const EquityRow: React.FC<{ row: EquityMovementRow; isTotal?: boolean }> = ({ ro
       })}
       <td className="px-4 py-3 text-sm text-right">
         <span className={`inline-flex items-center gap-1 text-xs font-medium ${
-          change > 0 ? 'text-emerald-600' : change < 0 ? 'text-rose-600' : 'text-slate-400'
+          change > 0 ? 'text-[var(--pro-azure)]' : change < 0 ? 'text-rose-600' : 'text-slate-400'
         }`}>
           {change > 0 ? <TrendingUp size={11} /> : change < 0 ? <TrendingDown size={11} /> : <Minus size={11} />}
           {fmtDiff(change)}
@@ -155,7 +157,7 @@ const EquityStatement: React.FC = () => {
           <div className="ovds-stat-row">
             {[
               { label: 'Opening Equity',    value: fmt(totals.openingBalance),    accent: 'bg-slate-400' },
-              { label: 'Net Profit',        value: fmt(totals.netProfitForPeriod),accent: totals.netProfitForPeriod >= 0 ? 'bg-emerald-500' : 'bg-rose-500' },
+              { label: 'Net Profit',        value: fmt(totals.netProfitForPeriod),accent: totals.netProfitForPeriod >= 0 ? 'bg-[var(--pro-azure-50)]0' : 'bg-rose-500' },
               { label: 'Other Movements',   value: fmt(totals.otherMovements),    accent: 'bg-sky-500' },
               { label: 'Dividends',         value: fmt(totals.dividendsPaid),     accent: totals.dividendsPaid > 0 ? 'bg-rose-400' : 'bg-slate-200' },
               { label: 'Closing Equity',    value: fmt(totals.closingBalance),    accent: totals.closingBalance >= 0 ? 'bg-violet-500' : 'bg-rose-500' },

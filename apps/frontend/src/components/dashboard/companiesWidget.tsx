@@ -1,6 +1,7 @@
+import { Building2, ArrowUpRight, CheckCircle2, Clock } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, ArrowUpRight, CheckCircle2, Clock } from 'lucide-react';
+
 import { useApiQuery } from '../../hooks/useApiQuery';
 import { useAuth } from '../../rbac/AuthContext';
 
@@ -26,7 +27,7 @@ const CompaniesWidget: React.FC = () => {
             <p className="ovds-caption">{companies.length} registered</p>
           </div>
         </div>
-        <Link to="/accounting-hub?tab=COMPANIES" className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 hover:underline">
+        <Link to="/accounting-hub?tab=COMPANIES" className="flex items-center gap-1 text-[11px] font-semibold text-[var(--pro-azure)] hover:underline">
           Manage <ArrowUpRight size={11} />
         </Link>
       </div>
@@ -53,7 +54,7 @@ const CompaniesWidget: React.FC = () => {
         <div className="space-y-2.5">
           {companies.slice(0, 5).map((co: any, i) => (
             <div key={co.id ?? i} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/80 to-emerald-600 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[var(--pro-azure)] to-[var(--pro-azure-dark)] flex items-center justify-center shrink-0">
                 <span className="text-[11px] font-bold text-white">
                   {(co.name ?? 'C').slice(0, 2).toUpperCase()}
                 </span>
@@ -63,7 +64,7 @@ const CompaniesWidget: React.FC = () => {
                 <p className="ovds-caption">{co.tinNumber ?? co.type ?? 'Active'}</p>
               </div>
               {co.isActive !== false ? (
-                <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
+                <CheckCircle2 size={14} className="text-[var(--pro-azure)] shrink-0" />
               ) : (
                 <Clock size={14} className="text-amber-400 shrink-0" />
               )}

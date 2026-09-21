@@ -32,7 +32,7 @@ export const VVChecklist: React.FC<VVChecklistProps> = ({ checks, className }) =
       className={cn(
         'rounded-oki border p-4',
         allPass
-          ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20'
+          ? 'border-[var(--pro-azure-100)] dark:border-green-800 bg-[var(--pro-azure-50)]/50 dark:bg-green-950/20'
           : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900',
         className,
       )}
@@ -45,7 +45,7 @@ export const VVChecklist: React.FC<VVChecklistProps> = ({ checks, className }) =
           className={cn(
             'text-[10px] font-bold px-1.5 py-0.5 rounded-full',
             allPass
-              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+              ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300'
               : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
           )}
         >
@@ -62,7 +62,7 @@ export const VVChecklist: React.FC<VVChecklistProps> = ({ checks, className }) =
         {checks.map((c) => (
           <li key={c.key} className="flex items-start gap-2 text-[12px]">
             {c.pass ? (
-              <CheckCircle2 size={14} className="text-emerald-500 mt-0.5 shrink-0" />
+              <CheckCircle2 size={14} className="text-[var(--pro-azure)] mt-0.5 shrink-0" />
             ) : (
               <XCircle size={14} className="text-rose-500 mt-0.5 shrink-0" />
             )}

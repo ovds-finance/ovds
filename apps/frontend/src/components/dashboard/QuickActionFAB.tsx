@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { Icon } from '../ui';
 
 interface QuickAction {
@@ -14,9 +15,9 @@ const QUICK_ACTIONS: QuickAction[] = [
   { label: 'New Invoice', icon: 'INVOICE', to: '/sales/invoices', color: 'bg-sky-500 hover:bg-sky-600', description: 'Create a new invoice' },
   { label: 'New Bill', icon: 'VENDOR', to: '/purchases/bills', color: 'bg-violet-500 hover:bg-violet-600', description: 'Record a new bill' },
   { label: 'New Expense', icon: 'MONEY', to: '/purchases/expenses', color: 'bg-amber-500 hover:bg-amber-600', description: 'Log an expense' },
-  { label: 'New Customer', icon: 'CUSTOMER', to: '/customers', color: 'bg-emerald-500 hover:bg-emerald-600', description: 'Add a customer' },
+  { label: 'New Customer', icon: 'CUSTOMER', to: '/customers', color: 'bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)]', description: 'Add a customer' },
   { label: 'New Vendor', icon: 'COMPANY', to: '/purchases/vendors', color: 'bg-rose-500 hover:bg-rose-600', description: 'Add a vendor' },
-  { label: 'Journal Entry', icon: 'FILE_TEXT', to: '/double-entry/journals', color: 'bg-indigo-500 hover:bg-indigo-600', description: 'Record a journal entry' },
+  { label: 'Journal Entry', icon: 'FILE_TEXT', to: '/double-entry/journals', color: 'bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)]', description: 'Record a journal entry' },
 ];
 
 const QuickActionFAB: React.FC = () => {
@@ -71,7 +72,7 @@ const QuickActionFAB: React.FC = () => {
       {/* Main FAB Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-14 h-14 rounded-2xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 flex items-center justify-center shadow-2xl transition-all duration-300 hover:shadow-emerald-500/25 hover:scale-105 active:scale-95 ${
+        className={`w-14 h-14 rounded-2xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 flex items-center justify-center shadow-2xl transition-all duration-300 hover:shadow-green-500/25 hover:scale-105 active:scale-95 ${
           isOpen ? 'rotate-45 bg-slate-800 dark:bg-slate-200' : ''
         }`}
       >

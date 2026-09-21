@@ -153,7 +153,7 @@ export interface StatCellProps {
   label: string;
   value: React.ReactNode;
   sub?: string;
-  /** Tailwind bg class for the bottom accent line e.g. 'bg-emerald-500' */
+  /** Tailwind bg class for the bottom accent line e.g. 'bg-[var(--pro-azure)]' */
   accentCls?: string;
   active?: boolean;
   className?: string;
@@ -202,14 +202,14 @@ export interface ContextPillProps {
 
 const PILL_CLS: Record<string, string> = {
   default: 'bg-white border-slate-100 text-slate-600 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300',
-  success: 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/30 dark:border-emerald-800 dark:text-emerald-300',
+  success: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:border-green-800 dark:text-green-300',
   alert:   'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/30 dark:border-rose-800 dark:text-rose-300',
   info:    'bg-sky-50 border-sky-200 text-sky-700 dark:bg-sky-950/30 dark:border-sky-800 dark:text-sky-300',
 };
 
 const DOT_CLS: Record<string, string> = {
   default: 'bg-slate-400',
-  success: 'bg-emerald-500',
+  success: 'bg-[var(--pro-azure)]',
   alert:   'bg-rose-500',
   info:    'bg-sky-500',
 };

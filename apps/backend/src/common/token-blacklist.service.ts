@@ -1,7 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from './prisma.service';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+
+import { PrismaService } from './prisma.service';
 
 @Injectable()
 export class TokenBlacklistService {

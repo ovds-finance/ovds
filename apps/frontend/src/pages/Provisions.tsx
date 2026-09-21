@@ -9,18 +9,19 @@
  * Types: Legal, Warranty, Restructuring, Onerous Contract, Environmental, Other
  * Not recognised (disclosed only): Contingent liabilities (possible/remote)
  */
-import React, { useState, useCallback, useEffect } from 'react';
+import { AppPage, Btn } from '@ovds/ui';
 import {
   Plus, RefreshCw, X, AlertTriangle, CheckCircle2,
   Clock, TrendingDown, Info, Send, Minus,
 } from 'lucide-react';
-import { AppPage, Btn } from '@ovds/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { fmtCurrency } from '../utils/fmt';
-import { Icon } from '../components/ui';
-import api from '../services/api';
+import React, { useState, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
+
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { fmtCurrency } from '../utils/fmt';
+
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
@@ -29,7 +30,7 @@ const TYPES: Array<{ value: string; label: string; color: string }> = [
   { value: 'WARRANTY',         label: 'Product Warranty',      color: 'bg-amber-50 text-amber-700 border-amber-200' },
   { value: 'RESTRUCTURING',    label: 'Restructuring',         color: 'bg-orange-50 text-orange-700 border-orange-200' },
   { value: 'ONEROUS_CONTRACT', label: 'Onerous Contract',      color: 'bg-violet-50 text-violet-700 border-violet-200' },
-  { value: 'ENVIRONMENTAL',    label: 'Environmental',         color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  { value: 'ENVIRONMENTAL',    label: 'Environmental',         color: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' },
   { value: 'GRATUITY',         label: 'Employee Gratuity',     color: 'bg-teal-50 text-teal-700 border-teal-200' },
   { value: 'OTHER',            label: 'Other',                 color: 'bg-slate-100 text-slate-600 border-slate-200' },
 ];
@@ -44,7 +45,7 @@ const STATUS_CFG: Record<string, { label: string; cls: string }> = {
   OPEN:      { label: 'Open',      cls: 'bg-amber-50 text-amber-700 border-amber-200' },
   UTILISED:  { label: 'Utilised',  cls: 'bg-sky-50 text-sky-700 border-sky-200' },
   REVERSED:  { label: 'Reversed',  cls: 'bg-slate-100 text-slate-500 border-slate-200' },
-  SETTLED:   { label: 'Settled',   cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  SETTLED:   { label: 'Settled',   cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' },
 };
 
 const typeLabel = (v: string) => TYPES.find(t => t.value === v)?.label ?? v;
@@ -459,7 +460,7 @@ const Provisions: React.FC = () => {
                           <p className="text-xs font-bold text-amber-600 tabular-nums">Remaining: {fmt(remaining)}</p>
                         )}
                         {p.journalEntryId && (
-                          <p className="text-[10px] text-emerald-500 flex items-center gap-1 justify-end">
+                          <p className="text-[10px] text-[var(--pro-azure)] flex items-center gap-1 justify-end">
                             <CheckCircle2 size={9} /> Posted to GL
                           </p>
                         )}

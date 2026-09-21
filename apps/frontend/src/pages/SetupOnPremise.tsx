@@ -1,11 +1,12 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { usePageTitle } from '../hooks/usePageTitle';
 import {
   Server, ArrowLeft, ArrowRight, Cloud,
   CheckCircle2, Database, Globe, Shield, Download, Crown,
 } from 'lucide-react';
+import React from 'react';
+import { Link } from 'react-router-dom';
+
 import SetupGuide from '../components/setupGuide';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const SetupOnPremise: React.FC = () => {
   usePageTitle('OVDS On-Premise Self-Hosting');
@@ -15,7 +16,7 @@ const SetupOnPremise: React.FC = () => {
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-slate-400">
-        <Link to="/start" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+        <Link to="/start" className="hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors flex items-center gap-1.5">
           <ArrowLeft size={12} /> Get Started
         </Link>
         <span className="text-slate-300">/</span>
@@ -23,19 +24,19 @@ const SetupOnPremise: React.FC = () => {
       </nav>
 
       {/* Hero section with ovds flavor */}
-      <div className="relative overflow-hidden rounded-2xl bg-slate-900 px-7 py-10 text-white shadow-2xl shadow-emerald-900/20">
+      <div className="relative overflow-hidden rounded-2xl bg-slate-900 px-7 py-10 text-white shadow-2xl shadow-green-900/20">
         <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-100 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-50 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-[var(--pro-azure-100)] rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-[var(--pro-azure-50)] rounded-full blur-[80px] pointer-events-none" />
         
         <div className="relative flex flex-col lg:flex-row items-center gap-10">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-500 to-slate-800 flex items-center justify-center shrink-0 shadow-xl shadow-emerald-500/20">
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[var(--pro-azure)] to-slate-800 flex items-center justify-center shrink-0 shadow-xl shadow-green-500/20">
             <Server size={40} className="text-white" />
           </div>
           <div className="flex-1 text-center lg:text-left space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-              <Shield size={12} className="text-emerald-400" />
-              <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Enterprise Sovereignty · On-Premise · Hybrid Deployment</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[var(--pro-azure-50)]0/10 border border-[var(--pro-azure)]/20 rounded-full">
+              <Shield size={12} className="text-[var(--pro-azure-light)]" />
+              <span className="text-[10px] font-bold text-[var(--pro-azure-light)] uppercase tracking-widest">Enterprise Sovereignty · On-Premise · Hybrid Deployment</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">OVDS On-Premise Self-Hosting</h1>
             <p className="text-slate-400 text-sm max-w-2xl mx-auto lg:mx-0 leading-relaxed">
@@ -65,10 +66,10 @@ const SetupOnPremise: React.FC = () => {
             to="/getting-started/cloud"
             className="flex items-center justify-center gap-3 p-6 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group"
           >
-            <Cloud size={24} className="text-slate-400 shrink-0 group-hover:text-emerald-600 transition-colors" />
+            <Cloud size={24} className="text-slate-400 shrink-0 group-hover:text-[var(--pro-azure)] transition-colors" />
             <div className="text-left">
               <p className="text-sm font-black uppercase tracking-widest text-slate-400 group-hover:text-slate-800 dark:group-hover:text-white transition-colors">OVDS Cloud</p>
-              <p className="text-[10px] text-slate-300 font-bold group-hover:text-emerald-500 transition-colors">Managed Hosting</p>
+              <p className="text-[10px] text-slate-300 font-bold group-hover:text-[var(--pro-azure)] transition-colors">Managed Hosting</p>
             </div>
           </Link>
           <div className="flex items-center justify-center gap-3 p-6 bg-slate-800 text-white rounded-xl shadow-xl shadow-slate-900/40 transition-all">
@@ -114,7 +115,7 @@ const SetupOnPremise: React.FC = () => {
           <ArrowLeft size={16} /> Back to Start
         </Link>
         <div className="flex items-center gap-4">
-          <Link to="/getting-started/cloud" className="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">
+          <Link to="/getting-started/cloud" className="text-sm font-bold text-slate-500 hover:text-[var(--pro-azure)] transition-colors">
             Cloud Setup Guide
           </Link>
           <Link to="/plans" className="flex items-center gap-2 px-8 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl text-sm font-bold hover:bg-slate-800 dark:hover:bg-slate-700 transition-all shadow-xl">

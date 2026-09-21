@@ -1,5 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { isSuperUser } from '@ovds/shared';
+
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
 /**
@@ -32,6 +34,12 @@ export class RolesGuard implements CanActivate {
     const userRoles: string[] = (
       Array.isArray(user.roles) ? user.roles : [user.role].filter(Boolean)
     ).map((r: string) => r.toUpperCase());
+
+    // Super-users (SPURADMIN, SUPERADMIN, DEVELOPER) bypass all role checks,
+    // matching the same bypass logic in PermissionsGuard.
+    if (userRoles.some((r) => isSuperUser(r))) {
+      return true;
+    }
 
     const hasRole = requiredRoles.some((role) =>
       userRoles.includes(role.toUpperCase()),

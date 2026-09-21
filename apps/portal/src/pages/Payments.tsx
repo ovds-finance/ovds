@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
 interface Payment {
@@ -71,7 +71,7 @@ const Payments: React.FC = () => {
         <select
           value={selectedInvoiceId ?? ''}
           onChange={(e) => setSelectedInvoiceId(e.target.value || null)}
-          className="w-full max-w-md px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+          className="w-full max-w-md px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-[var(--pro-azure)]"
         >
           <option value="">All invoices</option>
           {invoices.map((inv) => (
@@ -129,3 +129,4 @@ const Payments: React.FC = () => {
 };
 
 export default Payments;
+

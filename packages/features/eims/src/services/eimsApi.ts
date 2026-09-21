@@ -82,6 +82,12 @@ export const eimsApi = {
       organizationName: string;
       email: string;
       organizationalUnitName?: string;
+      /** Override the server default — must be 'ET' for ERCA/INSA submissions */
+      countryName?: string;
+      /** Ethiopian state or region — defaults to 'Addis Ababa' if omitted */
+      stateOrProvinceName?: string;
+      /** City / locality — defaults to 'Addis Ababa' if omitted */
+      localityName?: string;
       sourceSystemId?: string;
     }) => post<any>('/eims/certificates/generate-csr', data),
     install: (id: string, certificatePem: string) =>

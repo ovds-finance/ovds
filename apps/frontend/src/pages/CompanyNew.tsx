@@ -3,12 +3,6 @@
  * First page shown after account creation.
  * Ovds-style: white card, green accents, clean forms.
  */
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import api from '../services/api';
-import toast from 'react-hot-toast';
 import {
   Building2, ArrowLeft, Check, CheckCircle2,
   Globe, Phone, Mail, MapPin, Zap,
@@ -16,6 +10,13 @@ import {
   Sparkles, ShieldCheck, LayoutGrid, FileText,
   RefreshCw, Hash,
 } from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
 
 type BusinessType =
   | 'MANUFACTURING'
@@ -46,7 +47,7 @@ const inpCls = (err?: string, focused?: boolean) =>
   (err
     ? 'border-red-300 ring-2 ring-red-100 bg-red-50/40'
     : focused
-      ? 'border-emerald-400 ring-2 ring-emerald-100 shadow-sm'
+      ? 'border-[var(--pro-azure)] ring-2 ring-[var(--pro-azure-100)] shadow-sm'
       : 'border-gray-200 hover:border-gray-300');
 
 const labelCls = 'block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1.5';
@@ -211,7 +212,7 @@ const CompanyNew: React.FC = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FieldWrap label="Company Name" required error={errors.name} focused={focused==='name'}>
                       <div className="relative">
-                        <Building2 size={14} className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${focused==='name'?'text-emerald-500':'text-gray-400'}`}/>
+                        <Building2 size={14} className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${focused==='name'?'text-[var(--pro-azure)]':'text-gray-400'}`}/>
                         <input value={form.name} onChange={set('name')}
                           onFocus={() => setFocused('name')} onBlur={() => setFocused(null)}
                           placeholder="e.g. Selam Trading PLC" autoFocus
@@ -220,7 +221,7 @@ const CompanyNew: React.FC = () => {
                     </FieldWrap>
                     <FieldWrap label="TIN Number" hint="15 digits" error={errors.tin} focused={focused==='tin'}>
                       <div className="relative">
-                        <Hash size={14} className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${focused==='tin'?'text-emerald-500':'text-gray-400'}`}/>
+                        <Hash size={14} className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${focused==='tin'?'text-[var(--pro-azure)]':'text-gray-400'}`}/>
                         <input value={form.tin} onChange={set('tin')}
                           onFocus={() => setFocused('tin')} onBlur={() => setFocused(null)}
                           placeholder="000000000000000" maxLength={15}
@@ -241,19 +242,19 @@ const CompanyNew: React.FC = () => {
                             onClick={() => setForm(f => ({ ...f, type: bt.value }))}
                             className={`relative flex flex-col items-start gap-2.5 p-4 rounded-xl border-2 text-left transition-all duration-150 ${
                               selected
-                                ? 'border-emerald-500 bg-emerald-50'
-                                : 'border-gray-200 bg-white hover:border-emerald-300 hover:shadow-sm'
+                                ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]'
+                                : 'border-gray-200 bg-white hover:border-[var(--pro-azure-light)] hover:shadow-sm'
                             }`}>
                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all ${selected ? 'text-white shadow-sm' : 'bg-gray-100 text-gray-500'}`}
                               style={selected ? { background:'#55bc7e' } : {}}>
                               <BtIcon size={15}/>
                             </div>
                             <div>
-                              <p className={`text-[12px] font-extrabold leading-none ${selected ? 'text-emerald-700' : 'text-gray-800'}`}>{bt.label}</p>
+                              <p className={`text-[12px] font-extrabold leading-none ${selected ? 'text-[var(--pro-azure-dark)]' : 'text-gray-800'}`}>{bt.label}</p>
                               <p className="text-[10px] text-gray-400 mt-0.5">{bt.desc}</p>
-                              <p className={`text-[9px] font-bold mt-1 ${selected ? 'text-emerald-500' : 'text-gray-300'}`}>{bt.ifrs}</p>
+                              <p className={`text-[9px] font-bold mt-1 ${selected ? 'text-[var(--pro-azure)]' : 'text-gray-300'}`}>{bt.ifrs}</p>
                             </div>
-                            <div className={`absolute top-2.5 right-2.5 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${selected ? 'border-emerald-500' : 'border-gray-200'}`}
+                            <div className={`absolute top-2.5 right-2.5 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${selected ? 'border-[var(--pro-azure)]' : 'border-gray-200'}`}
                               style={selected ? { background:'#55bc7e' } : {}}>
                               {selected && <Check size={8} className="text-white"/>}
                             </div>
@@ -278,7 +279,7 @@ const CompanyNew: React.FC = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FieldWrap label="Official Email" error={errors.email} focused={focused==='email'}>
                       <div className="relative">
-                        <Mail size={14} className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${focused==='email'?'text-emerald-500':'text-gray-400'}`}/>
+                        <Mail size={14} className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${focused==='email'?'text-[var(--pro-azure)]':'text-gray-400'}`}/>
                         <input type="email" value={form.email} onChange={set('email')}
                           onFocus={() => setFocused('email')} onBlur={() => setFocused(null)}
                           placeholder="office@company.com"
@@ -287,7 +288,7 @@ const CompanyNew: React.FC = () => {
                     </FieldWrap>
                     <FieldWrap label="Phone Number" focused={focused==='phone'}>
                       <div className="relative">
-                        <Phone size={14} className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${focused==='phone'?'text-emerald-500':'text-gray-400'}`}/>
+                        <Phone size={14} className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${focused==='phone'?'text-[var(--pro-azure)]':'text-gray-400'}`}/>
                         <input value={form.phone} onChange={set('phone')}
                           onFocus={() => setFocused('phone')} onBlur={() => setFocused(null)}
                           placeholder="+251 9XX XXX XXX"
@@ -296,7 +297,7 @@ const CompanyNew: React.FC = () => {
                     </FieldWrap>
                     <FieldWrap label="Business Address" focused={focused==='address'}>
                       <div className="relative">
-                        <MapPin size={14} className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${focused==='address'?'text-emerald-500':'text-gray-400'}`}/>
+                        <MapPin size={14} className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${focused==='address'?'text-[var(--pro-azure)]':'text-gray-400'}`}/>
                         <input value={form.address} onChange={set('address')}
                           onFocus={() => setFocused('address')} onBlur={() => setFocused(null)}
                           placeholder="Addis Ababa, Ethiopia"
@@ -305,7 +306,7 @@ const CompanyNew: React.FC = () => {
                     </FieldWrap>
                     <FieldWrap label="Corporate Website" focused={focused==='website'}>
                       <div className="relative">
-                        <Globe size={14} className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${focused==='website'?'text-emerald-500':'text-gray-400'}`}/>
+                        <Globe size={14} className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${focused==='website'?'text-[var(--pro-azure)]':'text-gray-400'}`}/>
                         <input value={form.website} onChange={set('website')}
                           onFocus={() => setFocused('website')} onBlur={() => setFocused(null)}
                           placeholder="www.yourcompany.com"
@@ -347,7 +348,7 @@ const CompanyNew: React.FC = () => {
                   </div>
 
                   {/* VAT toggle */}
-                  <div className={`rounded-xl border-2 transition-all duration-200 overflow-hidden ${form.vatRegistered ? 'border-emerald-300 bg-emerald-50' : 'border-gray-200 bg-white'}`}>
+                  <div className={`rounded-xl border-2 transition-all duration-200 overflow-hidden ${form.vatRegistered ? 'border-[var(--pro-azure-light)] bg-[var(--pro-azure-50)]' : 'border-gray-200 bg-white'}`}>
                     <div className="flex items-center justify-between px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${form.vatRegistered ? 'text-white shadow-sm' : 'bg-gray-100 text-gray-500'}`}
@@ -355,20 +356,20 @@ const CompanyNew: React.FC = () => {
                           <ShieldCheck size={16}/>
                         </div>
                         <div>
-                          <p className={`text-[13px] font-extrabold ${form.vatRegistered ? 'text-emerald-700' : 'text-gray-800'}`}>VAT Registered</p>
+                          <p className={`text-[13px] font-extrabold ${form.vatRegistered ? 'text-[var(--pro-azure-dark)]' : 'text-gray-800'}`}>VAT Registered</p>
                           <p className="text-[11px] text-gray-400">Mandatory for turnover ≥ ETB 2M</p>
                         </div>
                       </div>
                       {/* Toggle switch */}
                       <button type="button" onClick={() => setForm(f => ({ ...f, vatRegistered: !f.vatRegistered }))}
-                        className={`relative w-11 h-6 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 ${form.vatRegistered ? '' : 'bg-gray-200'}`}
+                        className={`relative w-11 h-6 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/50 ${form.vatRegistered ? '' : 'bg-gray-200'}`}
                         style={form.vatRegistered ? { background:'#55bc7e' } : {}}
                         role="switch" aria-checked={form.vatRegistered}>
                         <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${form.vatRegistered ? 'left-[calc(100%-21px)]' : 'left-0.5'}`}/>
                       </button>
                     </div>
                     {form.vatRegistered && (
-                      <div className="px-5 pb-4 border-t border-emerald-200">
+                      <div className="px-5 pb-4 border-t border-[var(--pro-azure-100)]">
                         <FieldWrap label="VAT Number" required error={errors.vatNumber} focused={focused==='vatNumber'}>
                           <input value={form.vatNumber} onChange={set('vatNumber')}
                             onFocus={() => setFocused('vatNumber')} onBlur={() => setFocused(null)}
@@ -399,7 +400,7 @@ const CompanyNew: React.FC = () => {
                         { icon: FileText,   title: 'Config Invoices',        desc: 'Set your branding & terms' },
                       ].map(({ icon: Icon, title, desc }) => (
                         <div key={title} className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center shrink-0 text-emerald-600">
+                          <div className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center shrink-0 text-[var(--pro-azure)]">
                             <Icon size={14}/>
                           </div>
                           <div>
@@ -417,12 +418,12 @@ const CompanyNew: React.FC = () => {
                   <div className="absolute inset-0 opacity-5 pointer-events-none"
                     style={{ backgroundImage:'radial-gradient(circle at 2px 2px,#55bc7e 1px,transparent 0)', backgroundSize:'20px 20px' }}/>
                   <div className="relative bg-white p-5">
-                    <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-2">Need Help?</p>
+                    <p className="text-[10px] font-bold text-[var(--pro-azure)] uppercase tracking-widest mb-2">Need Help?</p>
                     <p className="text-[12px] text-gray-500 leading-relaxed mb-4">
                       Our migration specialists can help move your legacy data into OVDS Cloud.
                     </p>
                     <button type="button"
-                      className="w-full py-2 border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 rounded-xl text-[12px] font-semibold text-gray-600 hover:text-emerald-700 transition-all">
+                      className="w-full py-2 border border-gray-200 hover:border-[var(--pro-azure-light)] hover:bg-[var(--pro-azure-50)] rounded-xl text-[12px] font-semibold text-gray-600 hover:text-[var(--pro-azure-dark)] transition-all">
                       View Setup Guide
                     </button>
                   </div>
@@ -441,7 +442,7 @@ const CompanyNew: React.FC = () => {
                 <div className="mt-4 flex items-center justify-center gap-4 text-[10px] text-gray-400">
                   {['ERCA compliant','IFRS ready','Multi-currency'].map(t => (
                     <span key={t} className="flex items-center gap-1">
-                      <Check size={9} className="text-emerald-400"/>{t}
+                      <Check size={9} className="text-[var(--pro-azure-light)]"/>{t}
                     </span>
                   ))}
                 </div>

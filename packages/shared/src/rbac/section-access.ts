@@ -44,7 +44,7 @@ export const ROLE_SECTION_ACCESS: Record<string, string[]> = {
     "__sec_dashboard", "__sec_accounting", "__sec_sales", "__sec_purchases", "__sec_inventory",
     "__sec_banking", "__sec_tax", "__sec_hr", "__sec_reports", "__sec_system",
     "__sec_iot", "__sec_admin", "__sec_governance", "__sec_ovds",
-    "__sec_disaster", "__sec_trade", "__sec_device",
+    "__sec_crm", "__sec_disaster", "__sec_trade", "__sec_device",
     "__sec_ifrs", "__sec_aabe", "__sec_cc", "__sec_reg",
   ],
   PROJECT_MANAGER: [
@@ -60,7 +60,7 @@ export const ROLE_SECTION_ACCESS: Record<string, string[]> = {
   FINANCE: [
     "__sec_dashboard", "__sec_accounting", "__sec_sales", "__sec_purchases", "__sec_inventory",
     "__sec_banking", "__sec_tax", "__sec_reports", "__sec_system",
-    "__sec_ovds", "__sec_disaster",
+    "__sec_crm", "__sec_ovds", "__sec_disaster",
     "__sec_ifrs", "__sec_aabe", "__sec_cc", "__sec_reg",
   ],
   SALES: [

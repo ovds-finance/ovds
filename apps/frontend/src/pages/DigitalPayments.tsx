@@ -6,14 +6,16 @@
  *   - Chapa payment gateway webhooks
  * Unmatched receipts are surfaced for manual review.
  */
-import React, { useState, useCallback } from 'react';
-import { CreditCard, RefreshCw, CheckCircle2, AlertTriangle, Link, Info } from 'lucide-react';
 import { AppPage, Btn } from '@ovds/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { fmtCurrency } from '../utils/fmt';
-import api from '../services/api';
+import { CreditCard, RefreshCw, CheckCircle2, AlertTriangle, Link, Info } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
+
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { fmtCurrency } from '../utils/fmt';
+
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
@@ -29,12 +31,12 @@ interface DigitalTx {
 }
 
 const PROVIDER_CFG = {
-  TELEBIRR: { label: 'Telebirr',  cls: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
+  TELEBIRR: { label: 'Telebirr',  cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)]' },
   CHAPA:    { label: 'Chapa',     cls: 'bg-violet-50 text-violet-700 border border-violet-200' },
 };
 
 const STATUS_CFG = {
-  MATCHED:   { label: 'Matched',   cls: 'bg-emerald-50 text-emerald-700 border border-emerald-200', icon: CheckCircle2 },
+  MATCHED:   { label: 'Matched',   cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)]', icon: CheckCircle2 },
   UNMATCHED: { label: 'Unmatched', cls: 'bg-rose-50 text-rose-700 border border-rose-200',           icon: AlertTriangle },
   PARTIAL:   { label: 'Partial',   cls: 'bg-amber-50 text-amber-700 border border-amber-200',        icon: AlertTriangle },
 };
@@ -102,7 +104,7 @@ const DigitalPaymentsPage: React.FC = () => {
         <div className="ovds-stat-row">
           {[
             { label: 'Total Volume',       value: fmt(totalVol),          accent: 'bg-violet-500' },
-            { label: 'Matched',            value: String(matched),        accent: 'bg-emerald-500' },
+            { label: 'Matched',            value: String(matched),        accent: 'bg-[var(--pro-azure-50)]0' },
             { label: 'Unmatched (action)', value: String(unmatched),      accent: unmatched > 0 ? 'bg-rose-500' : 'bg-slate-300' },
             { label: 'Total Transactions', value: String(transactions.length), accent: 'bg-sky-500' },
           ].map(kpi => (

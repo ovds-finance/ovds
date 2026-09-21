@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
 import { Button } from '@ovds/ui';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
 import { X, Save } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+
+import api from '../../services/api';
+
 
 interface TaxRateFormData {
   id?: string;
@@ -273,7 +275,7 @@ const TaxRateModal: React.FC<TaxRateModalProps> = ({ isOpen, onClose, rate, onSu
                         : formData.appliesTo.filter(t => t !== option);
                       setFormData({...formData, appliesTo: newAppliesTo});
                     }}
-                    className="rounded border-slate-300 text-emerald-600 dark:text-emerald-400 focus:ring-teal-400"
+                    className="rounded border-slate-300 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] focus:ring-teal-400"
                   />
                   <span className="text-sm text-slate-700 dark:text-slate-300">{option}</span>
                 </label>
@@ -315,7 +317,7 @@ const TaxRateModal: React.FC<TaxRateModalProps> = ({ isOpen, onClose, rate, onSu
                 type="checkbox"
                 checked={formData.isActive}
                 onChange={(e) => setFormData({...formData, isActive: e.target.checked})}
-                className="rounded border-slate-300 text-emerald-600 dark:text-emerald-400 focus:ring-teal-400"
+                className="rounded border-slate-300 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] focus:ring-teal-400"
               />
               <span className="text-sm text-slate-700 dark:text-slate-300">Active</span>
             </label>

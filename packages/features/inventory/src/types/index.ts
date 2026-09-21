@@ -1,11 +1,14 @@
 /**
- * @ovds/features/items — local frontend types.
+ * @ovds/features/inventory — local frontend types.
  *
  * Frontend-only view models and UI state shapes.
  * Canonical API shapes (Item, ItemGroup, Warehouse, …) are re-exported from
  * the shared Zod contracts in @ovds/contracts/schemas/inventory so that the
  * item catalogue stays in lock-step with the NestJS handler and the Prisma
  * schema.
+ *
+ * PaginatedResult is intentionally NOT re-defined here.
+ * Import it from @ovds/contracts/schemas/common instead.
  */
 import type {
   Item as ApiItem,
@@ -23,6 +26,9 @@ import type {
   StockSummary as ApiStockSummary,
 } from '@ovds/contracts/schemas/inventory';
 
+// Re-export canonical pagination type — single source of truth
+export type { PaginatedResult } from '@ovds/contracts/schemas/common';
+
 // ── Canonical re-exports (single source of truth) ───────────────────────────────
 
 export type Item               = ApiItem;
@@ -38,24 +44,6 @@ export type CreateWarehouse    = ApiCreateWarehouse;
 export type StockTransaction   = ApiStockTransaction;
 export type InventoryAdjustment = ApiInventoryAdjustment;
 export type StockSummary       = ApiStockSummary;
-
-export interface ItemLookupResult {
-  id: string;
-  name: string;
-  code: string;
-  description: string | null;
-  salePrice: number;
-  costPrice: number;
-  vatRate: number;
-  itemType: ItemType;
-  unit: string | null;
-  barcode: string | null;
-  imageUrl: string | null;
-  isActive: boolean;
-  status: ItemStatus;
-  group: { id: string; name: string } | null;
-  category: { id: string; name: string; type: string } | null;
-}
 
 export const ITEM_TYPES: ReadonlyArray<{ value: ItemType; label: string; description: string }> = [
   { value: 'PRODUCT',  label: 'Product',  description: 'Physical goods tracked in stock' },
@@ -112,22 +100,13 @@ export interface ItemRow {
 export interface ItemLookupResult {
   id: string;
   name: string;
-  code: string;
-  description: string | null;
-  salePrice: number;
-  costPrice: number;
-  vatRate: number;
-  itemType: ItemType;
-  unit: string | null;
-  barcode: string | null;
-  imageUrl: string | null;
-  isActive: boolean;
-  status: ItemStatus;
-  group: { id: string; name: string } | null;
-  category: { id: string; name: string; type: string } | null;
+  code?: string | null;
+  sku?: string | null;
+  unit?: string | null;
+  salePrice?: number | null;
+  stock?: number | null;
 }
 
-/** A category bucket — maps to an ItemGroup for reporting / GL mapping. */
 export interface ItemCategoryOption {
   id: string;
   name: string;
@@ -146,19 +125,6 @@ export interface ItemStats {
 
 /** Stock-status badge kind derived from current stock vs reorder level. */
 export type StockStatus = 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'NOT_TRACKED';
-
-/** Generic paginated envelope. */
-export interface PaginatedResult<T> {
-  data: T[];
-  total: number;
-  page: number;
-  totalPages: number;
-  limit: number;
-}
-
-/** Query params for listing items (mirrors the backend PaginationQueryDto). */
-
-/** Body for a single stock adjustment (POST /ovds/inventory/adjust). */
 
 /** Form values for the "New Item" / "Edit Item" drawer — mirrors CreateItem. */
 export interface CreateItemFormValues {

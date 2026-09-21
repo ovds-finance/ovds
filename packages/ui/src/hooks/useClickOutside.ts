@@ -12,7 +12,7 @@ import { useEffect, useRef, RefObject } from 'react';
  *   useClickOutside(ref, () => setOpen(false));
  */
 export function useClickOutside<T extends HTMLElement>(
-  ref: RefObject<T>,
+  ref: RefObject<T | null>,
   handler: () => void,
   enabled = true,
 ): void {

@@ -104,7 +104,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
       {/* Leading icon */}
       <span className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
         {loading
-          ? <Loader2 size={iconSize} className="animate-spin text-emerald-500" />
+          ? <Loader2 size={iconSize} className="animate-spin text-[var(--pro-azure)]" />
           : <Search size={iconSize} />
         }
       </span>
@@ -126,7 +126,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           'bg-white dark:bg-slate-900',
           'text-slate-800 dark:text-slate-100',
           'placeholder:text-slate-400',
-          'focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400',
+          'focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/30 focus:border-[var(--pro-azure)]',
           'transition-all duration-150',
           disabled ? 'opacity-50 cursor-not-allowed' : '',
           // Hide the native browser clear button (we have our own)

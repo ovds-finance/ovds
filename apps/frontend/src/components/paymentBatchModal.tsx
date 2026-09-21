@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { X, Plus, Trash2, CreditCard } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { treasuryApi } from '../services/treasuryApi';
 
 interface PaymentBatchModalProps {
@@ -45,8 +46,8 @@ export const PaymentBatchModal: React.FC<PaymentBatchModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center">
-              <CreditCard size={15} className="text-emerald-600" />
+            <div className="w-8 h-8 rounded-xl bg-[var(--pro-azure-50)] flex items-center justify-center">
+              <CreditCard size={15} className="text-[var(--pro-azure)]" />
             </div>
             <h2 className="text-[15px] font-bold text-slate-800">Create Payment Batch</h2>
           </div>
@@ -94,7 +95,7 @@ export const PaymentBatchModal: React.FC<PaymentBatchModalProps> = ({
               <h3 className="ovds-card-title text-slate-700">Payment Items</h3>
               <button
                 onClick={addItem}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-semibold rounded-xl transition-all"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-[11px] font-semibold rounded-xl transition-all"
               >
                 <Plus size={12} /> Add Item
               </button>
@@ -143,7 +144,7 @@ export const PaymentBatchModal: React.FC<PaymentBatchModalProps> = ({
             <button
               onClick={handleSubmit}
               disabled={mutation.isPending}
-              className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 text-white text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
+              className="flex-1 py-2.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] disabled:opacity-60 text-white text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
             >
               {mutation.isPending ? (
                 <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Creating…</>

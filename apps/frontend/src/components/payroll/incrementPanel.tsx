@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { TrendingUp, RefreshCw, Zap, Trash2 } from 'lucide-react';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
-import { confirm } from '../../utils/confirm';
 import { Skeleton } from '@ovds/ui';
+import { TrendingUp, RefreshCw, Zap, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
+import api from '../../services/api';
+import { confirm } from '../../utils/confirm';
 import { fmtDecimal } from '../../utils/fmt';
 
 const fmt = fmtDecimal;
@@ -26,7 +27,7 @@ const STATUS_COLOR: Record<IncrStatus, string> = {
   GENERATED: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
   VERIFIED: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
   FINALIZED: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
-  APPROVED: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+  APPROVED: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/30 dark:text-[var(--pro-azure-light)]',
 };
 
 const IncrementPanel: React.FC<{ year: number; month: number }> = ({ year, month }) => {
@@ -90,7 +91,7 @@ const IncrementPanel: React.FC<{ year: number; month: number }> = ({ year, month
       <div className="flex items-center justify-between">
         <div>
           <h3 className="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <TrendingUp size={18} className="text-emerald-600 dark:text-emerald-400" /> Increment Management
+            <TrendingUp size={18} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" /> Increment Management
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">Generate → Verify → Finalize → Approve</p>
         </div>
@@ -99,7 +100,7 @@ const IncrementPanel: React.FC<{ year: number; month: number }> = ({ year, month
             <RefreshCw size={14} />
           </button>
           <button onClick={handleGenerate} disabled={generating}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 disabled:opacity-50">
+            className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] disabled:opacity-50">
             {generating ? <RefreshCw size={14} className="animate-spin" /> : <Zap size={14} />}
             Generate Increments
           </button>
@@ -118,14 +119,14 @@ const IncrementPanel: React.FC<{ year: number; month: number }> = ({ year, month
 
       {/* Workflow actions */}
       {subTab === 'process' && selected.size > 0 && (
-        <div className="flex items-center gap-2 p-3 bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-200 dark:border-emerald-800 rounded-xl">
-          <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{selected.size} selected</span>
+        <div className="flex items-center gap-2 p-3 bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl">
+          <span className="text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{selected.size} selected</span>
           <div className="flex gap-2 ml-auto">
             {[
               { label: 'Verify', status: 'VERIFIED', color: 'bg-amber-500' },
               { label: 'Un-Verify', status: 'GENERATED', color: 'bg-slate-500' },
               { label: 'Finalize', status: 'FINALIZED', color: 'bg-teal-600' },
-              { label: 'Approve', status: 'APPROVED', color: 'bg-emerald-500' },
+              { label: 'Approve', status: 'APPROVED', color: 'bg-[var(--pro-azure-50)]0' },
             ].map(({ label, status, color }) => (
               <button key={status} onClick={() => advance(status)}
                 className={`px-3 py-1.5 ${color} text-white rounded-lg text-xs font-bold hover:opacity-90`}>
@@ -170,8 +171,8 @@ const IncrementPanel: React.FC<{ year: number; month: number }> = ({ year, month
                 </td>
                 <td className="px-4 py-3 text-xs text-slate-500">{r.employee?.department?.name ?? '—'}</td>
                 <td className="px-4 py-3 text-xs font-bold text-slate-700 dark:text-slate-200">ETB {fmt(r.currentBasic)}</td>
-                <td className="px-4 py-3 text-xs font-bold text-emerald-600">ETB {fmt(r.newBasic)}</td>
-                <td className="px-4 py-3 text-xs font-bold text-emerald-600 dark:text-emerald-400">+{r.incrementPct}%</td>
+                <td className="px-4 py-3 text-xs font-bold text-[var(--pro-azure)]">ETB {fmt(r.newBasic)}</td>
+                <td className="px-4 py-3 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">+{r.incrementPct}%</td>
                 <td className="px-4 py-3">
                   <span className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold ${STATUS_COLOR[r.status]}`}>{r.status}</span>
                 </td>

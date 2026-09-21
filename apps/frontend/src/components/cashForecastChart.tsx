@@ -10,6 +10,8 @@
  *  - recharts (already in package.json, not @nivo/line)
  *  - fmtCompact for axis labels
  */
+import { Skeleton } from '@ovds/ui';
+import { TrendingUp, AlertCircle } from 'lucide-react';
 import React from 'react';
 import {
   ResponsiveContainer,
@@ -21,10 +23,10 @@ import {
   Tooltip,
   ReferenceLine,
 } from 'recharts';
+
 import { useApiQuery } from '../hooks/useApiQuery';
-import { Skeleton } from '@ovds/ui';
 import { fmtCompact } from '../utils/fmt';
-import { TrendingUp, AlertCircle } from 'lucide-react';
+
 
 interface ForecastPoint {
   period: string;
@@ -74,7 +76,7 @@ const CashForecastChart: React.FC = () => {
     return (
       <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
         <div className="flex items-center gap-2 mb-4">
-          <TrendingUp size={16} className="text-emerald-600 dark:text-emerald-400" />
+          <TrendingUp size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-sm">Cash Forecast Trend</h3>
         </div>
         <Skeleton.Card className="h-64" />
@@ -86,7 +88,7 @@ const CashForecastChart: React.FC = () => {
     return (
       <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
         <div className="flex items-center gap-2 mb-4">
-          <TrendingUp size={16} className="text-emerald-600 dark:text-emerald-400" />
+          <TrendingUp size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-sm">Cash Forecast Trend</h3>
         </div>
         <div className="flex flex-col items-center justify-center h-48 gap-3 text-slate-400">
@@ -107,8 +109,8 @@ const CashForecastChart: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl flex items-center justify-center">
-            <TrendingUp size={15} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="w-8 h-8 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl flex items-center justify-center">
+            <TrendingUp size={15} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Cash Forecast Trend</h3>
@@ -119,11 +121,11 @@ const CashForecastChart: React.FC = () => {
         </div>
         <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500">
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-[var(--pro-azure-50)]0 inline-block" />
             Projected
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-[var(--pro-azure-100)] dark:bg-green-900/30 inline-block" />
             Range
           </span>
         </div>

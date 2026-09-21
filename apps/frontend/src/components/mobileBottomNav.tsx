@@ -6,11 +6,13 @@
  * Roles aligned with the four-phase OVDS ovds sidebar structure.
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../rbac/AuthContext';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+
 import { useInterval } from '../hooks';
+import { useAuth } from '../rbac/AuthContext';
 import api from '../services/api';
+
 import { Icon } from './ui';
 
 // ---------------------------------------------------------------------------
@@ -279,7 +281,8 @@ const MobileBottomNav: React.FC = () => {
       {/* FAB backdrop */}
       {fabOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-[75] bg-slate-900/50 backdrop-blur-sm"
+          className="lg:hidden fixed inset-0 z-[75]"
+          style={{ background: 'rgba(5,10,20,0.6)', backdropFilter: 'blur(3px)' }}
           onClick={() => setFabOpen(false)}
         />
       )}
@@ -294,7 +297,7 @@ const MobileBottomNav: React.FC = () => {
               className="ovds-action-chip text-sm font-semibold active:scale-95 transition-all"
               style={{ animation: `fabItemIn 200ms ${i * 40}ms ease-out both` }}
             >
-              <span className="text-[#93C5FD]">
+              <span style={{ color: 'var(--pro-azure-light)' }}>
                 <Icon name={item.icon as any} size={16} />
               </span>
               {t(item.labelKey)}
@@ -304,8 +307,15 @@ const MobileBottomNav: React.FC = () => {
       )}
 
       <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-[80] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-[80]"
+        style={{
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          background: 'var(--header-bg)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderTop: '1px solid var(--border)',
+          boxShadow: '0 -2px 12px rgba(0,0,0,0.06)',
+        }}
         aria-label={t('a11y.main_nav')}
       >
         <div className="flex items-stretch h-14 relative">
@@ -314,18 +324,27 @@ const MobileBottomNav: React.FC = () => {
             <NavItem key={item.to + item.labelKey} item={item} pathname={pathname} unread={unread} />
           ))}
 
-          {/* Centre FAB slot */}
+          {/* Centre FAB */}
           <div className="flex-1 flex items-center justify-center">
             <button
               onClick={() => setFabOpen(v => !v)}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-md transition-all active:scale-90 ${
-                fabOpen
-                  ? 'bg-rose-500 text-white rotate-45 shadow-rose-500/30'
-                  : 'bg-[#0056D2] text-white shadow-[#0056D2]/30'
-              }`}
               aria-label={t('a11y.quick_create')}
               aria-expanded={fabOpen}
-              style={{ marginBottom: 6 }}
+              style={{
+                width: 40, height: 40, borderRadius: 12,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                marginBottom: 6,
+                background: fabOpen
+                  ? 'var(--pro-rose)'
+                  : 'var(--pro-azure)',
+                color: '#fff',
+                border: 'none', cursor: 'pointer',
+                boxShadow: fabOpen
+                  ? '0 4px 14px rgba(231,76,60,0.35)'
+                  : '0 4px 14px rgba(79,186,111,0.35)',
+                transform: fabOpen ? 'rotate(45deg)' : 'rotate(0deg)',
+                transition: 'transform 200ms cubic-bezier(0.16,1,0.3,1), background 160ms, box-shadow 160ms',
+              }}
             >
               <Icon name={fabOpen ? 'CLOSE' : 'PLUS'} size={fabOpen ? 18 : 20} />
             </button>
@@ -357,29 +376,54 @@ const NavItem: React.FC<{
 
   const cls = ({ isActive }: { isActive: boolean }) =>
     `relative flex-1 flex flex-col items-center justify-center gap-0.5 transition-all active:scale-90 select-none ${
-      isActive ? 'text-[#3B82F6]' : 'text-slate-400'
+      isActive ? 'text-pro-azure' : 'text-[var(--text-4)]'
     }`;
 
   const inner = ({ isActive }: { isActive: boolean }) => (
     <>
+      {/* Top active bar */}
       {isActive && (
-        <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-[#3B82F6] rounded-b-full" />
+        <span
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-8 rounded-b-full"
+          style={{ height: 2.5, background: 'var(--pro-azure)' }}
+        />
       )}
-      <span className={`relative transition-transform duration-150 ${isActive ? 'scale-110' : ''}`}>
+
+      {/* Icon */}
+      <span
+        className="relative transition-transform duration-150"
+        style={{ transform: isActive ? 'scale(1.12)' : 'scale(1)' }}
+      >
         <Icon name={item.icon as any} size={19} />
         {showBadge && (
-          <span className="absolute -top-1 -right-1 min-w-[13px] h-3 px-0.5 bg-rose-500 text-white text-[7px] font-semibold rounded-full flex items-center justify-center leading-none border border-white dark:border-slate-900">
+          <span
+            className="absolute -top-1 -right-1 flex items-center justify-center leading-none"
+            style={{
+              minWidth: 13, height: 13, padding: '0 2px',
+              background: 'var(--pro-rose)', color: '#fff',
+              fontSize: 7, fontWeight: 700,
+              borderRadius: 99,
+              border: '1.5px solid var(--surface)',
+            }}
+          >
             {unread > 9 ? '9+' : unread}
           </span>
         )}
       </span>
-      <span className={`text-[8px] leading-none transition-all ${isActive ? 'font-bold' : 'font-medium'}`}>
+
+      {/* Label */}
+      <span
+        style={{
+          fontSize: 8, lineHeight: 1, letterSpacing: '0.01em',
+          fontWeight: isActive ? 700 : 500,
+          color: isActive ? 'var(--pro-azure)' : 'var(--text-4)',
+        }}
+      >
         {t(item.labelKey)}
       </span>
     </>
   );
 
-  // Dashboard items: either /dashboard counts as active
   if (isDashboardItem) {
     const isActive = pathname === '/dashboard';
     return (

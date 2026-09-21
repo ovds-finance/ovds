@@ -7,20 +7,21 @@
  * adjustments with full audit trail. Cost variance auto-journals via the
  * double-entry engine on the backend.
  */
-import React, { useState } from 'react';
+import { AppPage, EmptyState, Skeleton, StatusBadge } from '@ovds/ui';
 import {
   PackagePlus, PackageMinus, RefreshCw,
   Plus, ClipboardList, Search, Filter, ChevronDown,
   TrendingUp, TrendingDown, CheckCircle2,
 } from 'lucide-react';
-import { AppPage, EmptyState, Skeleton, StatusBadge } from '@ovds/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+
+import Can from '../components/can';
 import { useBusiness } from '../context/businessContext';
 import { useApiQuery } from '../hooks/useApiQuery';
-import { fmtCurrency, fmtDate, fmtNum } from '../utils/fmt';
-import toast from 'react-hot-toast';
+import { usePageTitle } from '../hooks/usePageTitle';
 import api from '../services/api';
-import Can from '../components/can';
+import { fmtCurrency, fmtDate, fmtNum } from '../utils/fmt';
 
 type AdjustmentType = 'POSITIVE' | 'NEGATIVE';
 type AdjustmentReason =
@@ -181,13 +182,13 @@ const Adjustments: React.FC = () => {
 
       {/* Summary strip */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 rounded-2xl p-4 flex items-center gap-3">
-          <span className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600">
+        <div className="bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900/40 rounded-2xl p-4 flex items-center gap-3">
+          <span className="w-9 h-9 rounded-xl bg-[var(--pro-azure-100)] dark:bg-green-900/30 flex items-center justify-center text-[var(--pro-azure)]">
             <TrendingUp size={16} />
           </span>
           <div>
-            <p className="text-[11px] font-black uppercase tracking-widest text-emerald-600">Positive</p>
-            <p className="text-lg font-black text-emerald-700 dark:text-emerald-300">{fmtCurrency(totals.positive, 'ETB')}</p>
+            <p className="text-[11px] font-black uppercase tracking-widest text-[var(--pro-azure)]">Positive</p>
+            <p className="text-lg font-black text-[var(--pro-azure-dark)] dark:text-green-300">{fmtCurrency(totals.positive, 'ETB')}</p>
           </div>
         </div>
         <div className="bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/40 rounded-2xl p-4 flex items-center gap-3">
@@ -271,7 +272,7 @@ const Adjustments: React.FC = () => {
                     </td>
                     <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{adj.warehouseName}</td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1 text-[11px] font-black rounded-lg px-2 py-0.5 ${adj.type === 'POSITIVE' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300'}`}>
+                      <span className={`inline-flex items-center gap-1 text-[11px] font-black rounded-lg px-2 py-0.5 ${adj.type === 'POSITIVE' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/30 dark:text-green-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300'}`}>
                         {adj.type === 'POSITIVE' ? <PackagePlus size={11} /> : <PackageMinus size={11} />}
                         {adj.type === 'POSITIVE' ? '+' : '−'}
                       </span>

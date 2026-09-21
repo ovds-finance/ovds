@@ -1,13 +1,15 @@
-import React, { useState, useMemo } from 'react';
 import { Package } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
+
 import {
   AppPage, AppTable, AppTh, AppTd, AppTr,
   Btn, Icon, Modal, FormField, Input, Select, EmptyState,
 } from '../components/ui';
-import { useItems, useItemVariants } from '../services/inventoryApi';
 import { useAuth } from '../rbac/AuthContext';
+import { useItems, useItemVariants } from '../services/inventoryApi';
 import type { ItemVariant } from '../types/inventory';
-import toast from 'react-hot-toast';
+
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('en-ET', {
@@ -167,7 +169,7 @@ const ItemVariants: React.FC = () => {
                     <span className="tabular-nums text-[12px] text-slate-500">{fmt(Number(v.costPrice))}</span>
                   </AppTd>
                   <AppTd align="right">
-                    <span className={`tabular-nums text-[12px] font-semibold ${Number(v.stock) > 0 ? 'text-emerald-700' : 'text-rose-600'}`}>
+                    <span className={`tabular-nums text-[12px] font-semibold ${Number(v.stock) > 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-600'}`}>
                       {v.stock}
                     </span>
                   </AppTd>

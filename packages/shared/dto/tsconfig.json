@@ -17,13 +17,15 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "ignoreDeprecations": "5.0",
     "incremental": true,
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "strict": true,
     "strictPropertyInitialization": false,
     "paths": {
       "@ovds/shared": ["../dist/index"],
-      "@ovds/shared/*": ["../dist/*"]
+      "@ovds/shared/*": ["../dist/*"],
+      "@ovds/contracts/schemas": ["../../contracts/src/schemas/index.ts"]
     }
   },
   "references": [{ "path": ".." }],

@@ -27,15 +27,15 @@ export interface EntitySwitcherProps {
 
 const ENTITY_TYPE_COLORS: Record<EntityType, string> = {
   SAAS: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-400 dark:border-violet-800',
-  PROFESSIONAL_SERVICES: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800',
-  RETAIL: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800',
+  PROFESSIONAL_SERVICES: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-[var(--pro-azure-50)]/10 dark:text-[var(--pro-azure-light)] dark:border-[var(--pro-azure)]/20',
+  RETAIL: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800',
   MANUFACTURING: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-800',
   WHOLESALE: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/30 dark:text-sky-400 dark:border-sky-800',
   GOVERNMENT: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
   NGO: 'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-400 dark:border-teal-800',
   HOLDING: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800',
   SUBSIDIARY: 'bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-950/30 dark:text-pink-400 dark:border-pink-800',
-  BRANCH: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-800',
+  BRANCH: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-400 dark:border-green-800',
 };
 
 export function EntitySwitcher({
@@ -70,12 +70,12 @@ export function EntitySwitcher({
         className={cn(
           'flex items-center gap-2 px-3 py-2 rounded-xl border text-[12px] font-semibold transition-all',
           currentEntity
-            ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-aki-blue dark:hover:border-aki-blue'
+            ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-[var(--pro-azure)] dark:hover:border-[var(--pro-azure)]'
             : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400',
           disabled && 'opacity-50 cursor-not-allowed',
         )}
       >
-        <Building2 size={14} className={currentEntity ? 'text-aki-blue dark:text-blue-400' : 'text-slate-400'} />
+        <Building2 size={14} className={currentEntity ? 'text-[var(--pro-azure)] dark:text-blue-400' : 'text-slate-400'} />
         <span className="truncate max-w-[160px]">{currentEntity?.name ?? 'Select Entity'}</span>
         {currentEntity?.isDefault && (
           <Star size={10} className="text-amber-400 fill-amber-400 shrink-0" />
@@ -169,14 +169,14 @@ function EntityOption({
       className={cn(
         'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all',
         isSelected
-          ? 'bg-aki-blue-50 dark:bg-aki-blue-950/30 text-aki-blue dark:text-blue-400'
+          ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]-950/30 text-[var(--pro-azure)] dark:text-blue-400'
           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800',
       )}
     >
       <div className={cn(
         'w-8 h-8 rounded-xl flex items-center justify-center shrink-0',
         isSelected
-          ? 'bg-aki-blue-100 dark:bg-aki-blue-900/50 text-aki-blue dark:text-blue-400'
+          ? 'bg-[var(--pro-azure-100)] dark:bg-[var(--pro-azure)]-900/50 text-[var(--pro-azure)] dark:text-blue-400'
           : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400',
       )}>
         <Building2 size={14} />
@@ -197,7 +197,7 @@ function EntityOption({
         <Star size={12} className="text-amber-400 fill-amber-400 shrink-0" />
       )}
       {isSelected && (
-        <div className="w-2 h-2 rounded-full bg-aki-blue dark:bg-blue-400 shrink-0" />
+        <div className="w-2 h-2 rounded-full bg-[var(--pro-azure)] dark:bg-blue-400 shrink-0" />
       )}
     </button>
   );

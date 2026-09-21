@@ -30,9 +30,10 @@
  */
 import { createORPCClient } from '@orpc/client';
 import { RPCLink } from '@orpc/client/fetch';
-import { createORPCReactQueryUtils } from '@orpc/react-query';
 import type { ContractRouterClient } from '@orpc/contract';
+import { createORPCReactQueryUtils } from '@orpc/react-query';
 import type { AppContract } from '@ovds/contracts/router';
+
 import { BEARER_PREFIX } from '../utils/constants';
 
 // ── Auth token provider ───────────────────────────────────────────────────────

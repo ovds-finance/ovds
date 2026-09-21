@@ -4,32 +4,34 @@
  * AppPage · AppKpi · AppTable · useApiCrud
  * Ethiopian WHT · ERCA compliance
  */
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { evalMath } from '@ovds/ui';
 import {
   CreditCard, Plus, Edit2, Trash2, Download, RefreshCw,
   CheckCircle2, XCircle, User, DollarSign, WifiOff,
   AlertTriangle, BarChart3, ShieldCheck,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { useOfflineQueue } from '../hooks/useOfflineQueue';
-import { confirm } from '../utils/confirm';
-import { fmtETB } from '../utils/ethiopianTax';
-import { evalMath } from '@ovds/ui';
-import api from '../services/api';
+import {
+  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip as RechartTooltip, Legend, PieChart as RechartsPie, Pie, Cell,
+} from 'recharts';
+
+import { OvdsEmptyState } from '../components/ovds';
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select, Textarea,
   SearchBar, Amount, Pagination, Card, Banner,
 } from '../components/ui';
-import { OvdsEmptyState } from '../components/ovds';
-import {
-  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip as RechartTooltip, Legend, PieChart as RechartsPie, Pie, Cell,
-} from 'recharts';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { useOfflineQueue } from '../hooks/useOfflineQueue';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { confirm } from '../utils/confirm';
+import { fmtETB } from '../utils/ethiopianTax';
+
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -104,7 +106,7 @@ type ViewTab = 'CLAIMS' | 'ANALYTICS' | 'POLICIES';
 
 const CHART_COLORS = [
   '#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6',
-  '#ec4899', '#06b6d4', '#f97316', '#6366f1', '#14b8a6',
+  '#ec4899', '#06b6d4', '#f97316', '#4FBA6F', '#14b8a6',
 ];
 
 // ── Form Component ─────────────────────────────────────────────────────────
@@ -270,7 +272,7 @@ const Expenses: React.FC = () => {
   const kpiCells = useMemo(() => {
     if (viewTab === 'ANALYTICS' && analytics) {
       return [
-        { label: 'Total Claims', value: analytics.totalClaims, color: 'emerald' as const },
+        { label: 'Total Claims', value: analytics.totalClaims, color: 'green' as const },
         { label: 'Total Amount', value: fmtETB(analytics.totalAmount), color: 'violet' as const },
         { label: 'Approved', value: fmtETB(analytics.approvedAmount), color: 'sky' as const },
         { label: 'Rejected', value: fmtETB(analytics.rejectedAmount), color: 'rose' as const },
@@ -278,7 +280,7 @@ const Expenses: React.FC = () => {
       ];
     }
     return [
-      { label: 'Total',    value: rows.length,                                                    color: 'emerald' as const },
+      { label: 'Total',    value: rows.length,                                                    color: 'green' as const },
       { label: 'Pending',  value: rows.filter(e => e.status === 'PENDING').length,               color: 'amber' as const },
       { label: 'Approved', value: rows.filter(e => e.status === 'APPROVED').length,              color: 'sky' as const },
       { label: 'Paid',     value: rows.filter(e => e.status === 'PAID').length,                  color: 'teal' as const },
@@ -501,14 +503,14 @@ const Expenses: React.FC = () => {
                     <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       {e.status === 'PENDING' && can('ovds:write') && (
                         <>
-                          <button onClick={() => handleApprove(e.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Approve"><CheckCircle2 size={11} /></button>
+                          <button onClick={() => handleApprove(e.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Approve"><CheckCircle2 size={11} /></button>
                           <button onClick={() => handleReject(e.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Reject"><XCircle size={11} /></button>
                         </>
                       )}
                       {e.status === 'APPROVED' && can('ovds:write') && (
                         <button onClick={() => handlePay(e.id, e.title)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-teal-50 hover:text-teal-600 transition-all" title="Mark as Paid"><DollarSign size={11} /></button>
                       )}
-                      <button onClick={() => setModal({ open: true, data: { ...e } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Edit"><Edit2 size={11} /></button>
+                      <button onClick={() => setModal({ open: true, data: { ...e } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Edit"><Edit2 size={11} /></button>
                       <button onClick={async () => { if (await confirm({ title: `Delete "${e.title}"?`, variant: 'danger' })) remove(e.id); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Delete"><Trash2 size={11} /></button>
                     </div>
                   </AppTd>
@@ -618,12 +620,12 @@ const Expenses: React.FC = () => {
                     <Card key={p.id || p.category} hover padding="p-4">
                       <div className="flex items-start justify-between mb-2">
                         <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{p.category}</span>
-                        {p.isActive !== false && <ShieldCheck size={14} className="text-emerald-500" />}
+                        {p.isActive !== false && <ShieldCheck size={14} className="text-[var(--pro-azure)]" />}
                       </div>
                       <p className="text-lg font-bold text-slate-800 dark:text-slate-100">ETB {Number(p.maxAmount).toLocaleString()}</p>
                       <p className="text-[11px] text-slate-500 mt-1">{p.description || 'No description'}</p>
                       <div className="flex items-center gap-3 mt-3 text-[10px] text-slate-400">
-                        <span className={p.requiresReceipt ? 'text-emerald-600' : 'text-slate-400'}>
+                        <span className={p.requiresReceipt ? 'text-[var(--pro-azure)]' : 'text-slate-400'}>
                           {p.requiresReceipt ? 'Receipt required' : 'No receipt needed'}
                         </span>
                         <span>{p.approvalLevels} level{p.approvalLevels !== 1 ? 's' : ''} approval</span>

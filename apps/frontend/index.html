@@ -7,22 +7,98 @@
     <meta name="theme-color" content="#2980b9" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!--
+      robots/googlebot: prevent indexing of the app shell.
+      The app is behind authentication; search engines should not crawl it.
+    -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+    <meta name="googlebot" content="noindex, nofollow" />
+
+    <!--
+      notranslate: prevent browser translation extensions from rewriting the DOM.
+      Translation rewrites trigger MutationObserver alerts and can break React hydration.
+    -->
     <meta name="google" content="notranslate" />
-    <meta name="description" content="OVDS - Online VAT Declaration System & ERP platform for Ethiopian businesses. Accounting, invoice, payroll, HR, tax compliance, and business intelligence." />
-    <meta name="keywords" content="OVDS, VAT declaration, Ethiopian tax, ERP, accounting software, invoice, payroll, HR management, tax compliance, eTax, Ethiopian business software" />
+
+    <!--
+      referrer: never send Referer header to third-party origins from authenticated pages.
+    -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!--
+      Content-Security-Policy meta tag — defence-in-depth backup.
+      The authoritative CSP is set as an HTTP header by SecurityHeadersMiddleware
+      (with a per-request nonce). This meta tag covers the static file scenario
+      where the HTML is served directly without the NestJS middleware (e.g. CDN
+      edge cache, direct Nginx static serving).  It intentionally omits the nonce
+      (unavailable at build time) and allows 'unsafe-inline' only for styles.
+    -->
+    <meta http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+               script-src 'self';
+               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+               img-src 'self' data: https:;
+               font-src 'self' data: https://fonts.gstatic.com;
+               connect-src 'self' ws: wss:;
+               frame-src 'none';
+               frame-ancestors 'none';
+               object-src 'none';
+               base-uri 'self';
+               form-action 'self';
+               upgrade-insecure-requests;" />
+
+    <!--
+      X-Content-Type-Options and X-Frame-Options equivalents via meta
+      (belt-and-suspenders; real protection comes from HTTP headers)
+    -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+
+    <!-- No-cache pragma for the HTML shell itself -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <meta name="description" content="Ovds, Accounting, Invoice, E-Invoice, Payroll, HR, Tax Compliance, and business intelligence." />
+
+    <!--
+      keywords: kept minimal — long keyword lists are a reconnaissance aid.
+      Do NOT add technology stack hints (React, NestJS, Vite, etc.) here.
+    -->
+    <meta name="keywords" content="Ovds, VAT declaration, Ethiopian tax, ERP, accounting software" />
+
     <link rel="apple-touch-icon" href="/pwa-192x192.png" />
-    <!-- Plus Jakarta Sans — loaded once here; components fall back to system-ui if offline -->
+
+    <!--
+      Fonts: preconnect for performance; crossorigin required for CORS font fetch.
+      No integrity hash here — Google Fonts CDN rotates files; SRI would break.
+      Font loading is non-blocking by design (display=swap).
+    -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800&display=swap" />
-    <title>Online Vat Declaretion System & Accounting Software</title>
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800&display=swap"
+      referrerpolicy="no-referrer" />
+
+    <title>Ovds &amp; Accounting</title>
+
     <!-- Sync <html lang> with stored i18n language before React hydrates -->
     <script src="/init-page.js"></script>
   </head>
   <body>
     <div id="root"></div>
+
     <!-- Force-clear stale SW caches that cause blank pages after deploys -->
     <script src="/sw-bust.js"></script>
+
+    <!--
+      security-shield.js — production anti-inspection and DOM-tampering defence.
+      Loaded synchronously before the React bundle so it runs at parse time.
+      The script self-terminates on non-production hostnames (localhost / dev port).
+    -->
+    <script src="/security-shield.js"></script>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

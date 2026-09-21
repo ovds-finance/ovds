@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import {
-  Shield, QrCode, RefreshCw, CheckCircle2, AlertTriangle, ExternalLink,
-  Receipt, Banknote, Percent,
-} from 'lucide-react';
-import toast from 'react-hot-toast';
 import {
   useRegisterInvoiceEims,
   useEimsReceipts,
   eimsApi,
 } from '@ovds/features/eims';
+import {
+  Shield, QrCode, RefreshCw, CheckCircle2, AlertTriangle, ExternalLink,
+  Receipt, Banknote, Percent,
+} from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 
 const STATUS_STYLE: Record<string, string> = {
   REGISTERED: 'aki-badge sm solid-success',
@@ -149,7 +149,7 @@ const EimsInvoicePanel: React.FC<EimsInvoicePanelProps> = ({ invoice, onRefresh 
         <p className="ovds-label flex items-center gap-1.5">
           <Shield size={12} /> EIMS / MoR
           {isCreditNote && <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">CRN</span>}
-          {isDebitNote && <span className="text-[9px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">DBN</span>}
+          {isDebitNote && <span className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]">DBN</span>}
         </p>
         <Link to="/settings/eims" className="text-[10px] text-teal-600 hover:underline flex items-center gap-0.5">
           Setup <ExternalLink size={10} />
@@ -187,7 +187,7 @@ const EimsInvoicePanel: React.FC<EimsInvoicePanelProps> = ({ invoice, onRefresh 
         )}
 
         {verifyResult && (
-          <div className={`flex items-start gap-1.5 text-[11px] ${verifyResult.valid ? 'text-emerald-700' : 'text-amber-700'}`}>
+          <div className={`flex items-start gap-1.5 text-[11px] ${verifyResult.valid ? 'text-[var(--pro-azure-dark)]' : 'text-amber-700'}`}>
             {verifyResult.valid ? <CheckCircle2 size={13} className="shrink-0 mt-0.5" /> : <AlertTriangle size={13} className="shrink-0 mt-0.5" />}
             <span>{verifyResult.message ?? (verifyResult.valid ? 'Valid on MoR registry' : 'Verification returned issues')}</span>
           </div>

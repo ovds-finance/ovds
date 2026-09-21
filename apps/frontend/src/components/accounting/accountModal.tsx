@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
 import { X } from 'lucide-react';
-import { useAuth } from '../../rbac/AuthContext';
+import React, { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
 import { useEscapeKey } from '../../hooks';
+import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
 import CustomFieldRenderer, { type CustomFieldValuesMap } from '../CustomFieldRenderer';
 
 const ACCOUNT_TYPES = ['ASSET', 'LIABILITY', 'EQUITY', 'INCOME', 'EXPENSE'];
@@ -196,9 +197,9 @@ const AccountModal: React.FC<AccountModalProps> = ({
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Full IFRS reference banner */}
-          <div className="flex items-start gap-2 px-3 py-2.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 rounded-xl">
-            <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-wider shrink-0 mt-0.5">Full IFRS</span>
-            <p className="text-[10px] text-emerald-600 dark:text-emerald-400">
+          <div className="flex items-start gap-2 px-3 py-2.5 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900/40 rounded-xl">
+            <span className="text-[10px] font-medium text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] uppercase tracking-wider shrink-0 mt-0.5">Full IFRS</span>
+            <p className="text-[10px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
               Categories follow <strong>IAS 1</strong> (Statement of Financial Position) &amp; <strong>IFRS 15/9</strong> (Income/Financial Instruments). Current/Non-current per IAS 1.54–1.60. Covers all business types.
             </p>
           </div>
@@ -224,7 +225,7 @@ const AccountModal: React.FC<AccountModalProps> = ({
             </div>
             <div className="space-y-1.5">
               <label className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                Category * <span className="text-[8px] text-emerald-500 font-bold">(IAS 1)</span>
+                Category * <span className="text-[8px] text-[var(--pro-azure)] font-bold">(IAS 1)</span>
               </label>
               <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
                 className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-teal-400/10 dark:text-slate-200">
@@ -245,7 +246,7 @@ const AccountModal: React.FC<AccountModalProps> = ({
               <div className="col-span-2">
                 <label className="flex items-center gap-3 cursor-pointer select-none">
                   <div
-                    className={`w-10 h-5 rounded-full transition-colors relative ${form.isActive ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                    className={`w-10 h-5 rounded-full transition-colors relative ${form.isActive ? 'bg-[var(--pro-azure)]' : 'bg-slate-300'}`}
                     onClick={() =>
                       setForm({ ...form, isActive: !form.isActive })
                     }

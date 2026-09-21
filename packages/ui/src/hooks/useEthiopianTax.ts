@@ -5,7 +5,6 @@
 import { useMemo } from 'react';
 import {
   calculatePIT,
-  calcVAT,
   calcWHT,
   calculateBIT,
   fmtETB,
@@ -14,9 +13,9 @@ import {
   getVatPeriod,
   isVatRegistered,
   type PitResult,
-  type VatResult,
   type WhtType,
 } from '@ovds/shared';
+import { calcVAT, type VatResult } from '@ovds/shared/ovds/tax-calc';
 
 export interface TaxLineItem {
   amount: number;

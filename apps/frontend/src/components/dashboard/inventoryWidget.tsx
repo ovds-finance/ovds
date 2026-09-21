@@ -1,10 +1,12 @@
+import { fmtNum } from '@ovds/ui';
+import { Package, ArrowUpRight, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Package, ArrowUpRight, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
-import { useApiQuery } from '../../hooks/useApiQuery';
+
 import { useBusiness } from '../../context/businessContext';
+import { useApiQuery } from '../../hooks/useApiQuery';
 import { useAuth } from '../../rbac/AuthContext';
-import { fmtNum } from '@ovds/ui';
+
 
 interface Props {
   currency?: string;
@@ -48,7 +50,7 @@ const InventoryWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
             <p className="ovds-caption">Real-time stock levels</p>
           </div>
         </div>
-        <Link to="/inventory" className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 hover:underline">
+        <Link to="/inventory" className="flex items-center gap-1 text-[11px] font-semibold text-[var(--pro-azure)] hover:underline">
           Manage <ArrowUpRight size={11} />
         </Link>
       </div>
@@ -65,9 +67,9 @@ const InventoryWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
         ) : (
           <>
             <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-100">
-                <p className="text-[10px] text-emerald-600 uppercase tracking-wider mb-1">Total Items</p>
-                <p className="text-[22px] font-extrabold text-emerald-700 tabular-nums">{fmtNum(totalItems)}</p>
+              <div className="p-3.5 rounded-xl bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)]">
+                <p className="text-[10px] text-[var(--pro-azure)] uppercase tracking-wider mb-1">Total Items</p>
+                <p className="text-[22px] font-extrabold text-[var(--pro-azure-dark)] tabular-nums">{fmtNum(totalItems)}</p>
               </div>
               <div className="p-3.5 rounded-xl bg-white border border-slate-100">
                 <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Categories</p>
@@ -101,20 +103,20 @@ const InventoryWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
             )}
 
             {criticalCount === 0 && totalItems > 0 && (
-              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
-                <TrendingUp size={13} className="text-emerald-500 shrink-0" />
+              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)]">
+                <TrendingUp size={13} className="text-[var(--pro-azure)] shrink-0" />
                 <div className="flex-1">
-                  <p className="text-[11px] font-semibold text-emerald-700">All Stock Levels Healthy</p>
-                  <p className="text-[10px] text-emerald-600">No items below reorder thresholds</p>
+                  <p className="text-[11px] font-semibold text-[var(--pro-azure-dark)]">All Stock Levels Healthy</p>
+                  <p className="text-[10px] text-[var(--pro-azure)]">No items below reorder thresholds</p>
                 </div>
               </div>
             )}
 
-            {lowStock?.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-slate-100">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Top Alerts</p>
-                <div className="space-y-1.5">
-                  {lowStock.slice(0, 3).map((a: any) => (
+          {(lowStock?.length ?? 0) > 0 && (
+            <div className="mt-3 pt-3 border-t border-slate-100">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Top Alerts</p>
+              <div className="space-y-1.5">
+                {(lowStock ?? []).slice(0, 3).map((a: any) => (
                     <div key={a.itemId} className="flex items-center justify-between text-[11px]">
                       <span className="text-slate-600 truncate flex-1">{a.itemName}</span>
                       <span className="text-slate-400 tabular-nums">{a.currentStock}/{a.reorderLevel}</span>

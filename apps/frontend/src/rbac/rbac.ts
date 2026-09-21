@@ -1,4 +1,4 @@
-/**
+﻿/**
  * RBAC Policy Layer — Frontend Wrapper
  *
  * This file delegates core RBAC logic to @ovds/shared to ensure 
@@ -10,7 +10,6 @@ import {
   ROLE_HIERARCHY,
   RESOURCE_DOMAINS,
   ROUTE_PERMISSIONS,
-  DEFAULT_ROUTE,
   CONTEXTUAL_RULES,
   hasPermission,
   canAny as sharedCanAny,
@@ -81,7 +80,7 @@ export const ROLE_METADATA: Record<AppRole, RoleMetadata> = {
   HR: {
     label: 'HR Manager',
     description: 'Personnel, payroll, and recruitment management.',
-    color: { badge: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20', dot: 'bg-emerald-500' }
+    color: { badge: 'bg-green-500/10 text-green-600 border-green-500/20', dot: 'bg-green-500' }
   },
   EMPLOYEE: {
     label: 'Employee',
@@ -91,7 +90,7 @@ export const ROLE_METADATA: Record<AppRole, RoleMetadata> = {
   OVDS: {
     label: 'OVDS Controller',
     description: 'Financial oversight and treasury management.',
-    color: { badge: 'bg-emerald-600/10 text-emerald-600 border-emerald-600/20', dot: 'bg-emerald-600' }
+    color: { badge: 'bg-green-600/10 text-green-600 border-green-600/20', dot: 'bg-green-600' }
   },
   ACCOUNTING: {
     label: 'Accountant',
@@ -111,7 +110,7 @@ export const ROLE_METADATA: Record<AppRole, RoleMetadata> = {
   BANK_LIAISON: {
     label: 'Bank Liaison',
     description: 'Banking operations and loan management.',
-    color: { badge: 'bg-indigo-600/10 text-indigo-600 border-indigo-600/20', dot: 'bg-indigo-600' }
+    color: { badge: 'bg-green-600/10 text-green-600 border-green-600/20', dot: 'bg-green-600' }
   },
   EXTERNAL_AUDITOR: {
     label: 'External Auditor',
@@ -246,7 +245,7 @@ export const ROLE_GROUPS: Record<string, { label: string; roles: AppRole[]; colo
   OVDS: {
     label: 'OVDS & Treasury',
     roles: ['OVDS', 'ACCOUNTING', 'IFRS_OFFICER', 'BANK_LIAISON'] as AppRole[],
-    color: 'text-emerald-500',
+    color: 'text-[var(--pro-azure)]',
     redirect: '/dashboard'
   },
   external: {
@@ -307,7 +306,7 @@ function domainAccessMap(role: AppRole, businessType?: string): Record<string, '
   );
 }
 
-function defaultRoute(role: AppRole): string {
+function DEFAULT_ROUTE(role: AppRole): string {
   return sharedDefaultRoute(role);
 }
 
@@ -382,7 +381,8 @@ export const rbac = {
   permissionsFor: (role: AppRole, businessType?: string) => getPermissions(role, businessType),
   rolesWithPermission,
   summary,
-  defaultRoute,
+  DEFAULT_ROUTE,
+  defaultRoute: DEFAULT_ROUTE,
   // Group helpers
   groupOf,
   rolesInGroup,

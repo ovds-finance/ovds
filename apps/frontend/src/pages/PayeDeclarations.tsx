@@ -5,12 +5,13 @@
  * - Pension (7% employee + 11% employer) → PFSA, due 30th of following month
  * Proclamation No. 1395/2025 + PFSA Regulations
  */
-import React, { useState, useEffect, useCallback } from 'react';
-import { Users, RefreshCw, CheckCircle, AlertTriangle, Clock, Send, CreditCard, ChevronDown } from 'lucide-react';
 import { AppPage, AppKpi } from '@ovds/ui';
+import { Users, RefreshCw, CheckCircle, AlertTriangle, Send, CreditCard } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
 import { useBusiness } from '../context/businessContext';
 import api from '../services/api';
-import toast from 'react-hot-toast';
 
 // -- Types ---------------------------------------------------------------------
 interface PayeDecl {
@@ -49,8 +50,8 @@ type Tab = 'paye' | 'pension';
 
 const STATUS_COLOR: Record<string, string> = {
   DRAFT:     'bg-slate-100 text-slate-600',
-  SUBMITTED: 'bg-blue-100 text-blue-700',
-  PAID:      'bg-emerald-100 text-emerald-700',
+  SUBMITTED: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
+  PAID:      'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   OVERDUE:   'bg-rose-100 text-rose-600',
 };
 
@@ -82,7 +83,7 @@ const SubmitModal: React.FC<{
         </div>
         <div className="flex gap-3">
           <button onClick={onClose} className="flex-1 px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
-          <button onClick={submit} disabled={saving} className="flex-1 px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 disabled:opacity-50 transition-colors">
+          <button onClick={submit} disabled={saving} className="flex-1 px-4 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 transition-colors">
             {saving ? 'Submitting…' : 'Confirm'}
           </button>
         </div>
@@ -125,7 +126,7 @@ const PayModal: React.FC<{
         </div>
         <div className="flex gap-3">
           <button onClick={onClose} className="flex-1 px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
-          <button onClick={submit} disabled={saving} className="flex-1 px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 disabled:opacity-50 transition-colors">
+          <button onClick={submit} disabled={saving} className="flex-1 px-4 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 transition-colors">
             {saving ? 'Saving…' : 'Confirm Payment'}
           </button>
         </div>
@@ -180,9 +181,9 @@ const PayeDeclarations: React.FC = () => {
   };
 
   const kpiCells = compliance ? [
-    { label: 'PAYE Overdue', value: compliance.paye?.overdue?.toString() ?? '0', accentCls: compliance.paye?.overdue > 0 ? 'bg-rose-500' : 'bg-emerald-500' },
+    { label: 'PAYE Overdue', value: compliance.paye?.overdue?.toString() ?? '0', accentCls: compliance.paye?.overdue > 0 ? 'bg-rose-500' : 'bg-[var(--pro-azure-50)]0' },
     { label: 'PAYE Overdue Amt', value: `ETB ${((compliance.paye?.overdueAmount ?? 0) / 1000).toFixed(0)}K`, accentCls: 'bg-amber-500' },
-    { label: 'Pension Overdue', value: compliance.pension?.overdue?.toString() ?? '0', accentCls: compliance.pension?.overdue > 0 ? 'bg-rose-500' : 'bg-emerald-500' },
+    { label: 'Pension Overdue', value: compliance.pension?.overdue?.toString() ?? '0', accentCls: compliance.pension?.overdue > 0 ? 'bg-rose-500' : 'bg-[var(--pro-azure-50)]0' },
     { label: 'Pension Overdue Amt', value: `ETB ${((compliance.pension?.overdueAmount ?? 0) / 1000).toFixed(0)}K`, accentCls: 'bg-amber-500' },
   ] : [];
 
@@ -203,7 +204,7 @@ const PayeDeclarations: React.FC = () => {
           <select value={year} onChange={e => setYear(parseInt(e.target.value))} className="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800">
             {[2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
           </select>
-          <button onClick={load} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"><RefreshCw size={16} className={loading ? 'animate-spin text-emerald-500' : 'text-slate-500'} /></button>
+          <button onClick={load} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"><RefreshCw size={16} className={loading ? 'animate-spin text-[var(--pro-azure)]' : 'text-slate-500'} /></button>
         </div>
       }
       tabs={
@@ -274,13 +275,13 @@ const PayeDeclarations: React.FC = () => {
                         <div className="flex items-center gap-1">
                           {(d.status === 'DRAFT' || d.status === 'OVERDUE') && (
                             <button onClick={() => setModal({ type: 'submit', id: d.id, itemType: 'paye' })}
-                              title="submit to MoR" className="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg text-blue-600 transition-colors">
+                              title="submit to MoR" className="p-1 hover:bg-[var(--pro-azure-50)] rounded-lg text-[var(--pro-azure)] transition-colors">
                               <Send size={13} />
                             </button>
                           )}
                           {d.status === 'SUBMITTED' && (
                             <button onClick={() => setModal({ type: 'pay', id: d.id, itemType: 'paye' })}
-                              title="Mark Paid" className="p-1 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-lg text-emerald-600 transition-colors">
+                              title="Mark Paid" className="p-1 hover:bg-[var(--pro-azure-100)] dark:hover:bg-green-900/30 rounded-lg text-[var(--pro-azure)] transition-colors">
                               <CreditCard size={13} />
                             </button>
                           )}
@@ -321,7 +322,7 @@ const PayeDeclarations: React.FC = () => {
                       <td className="py-2.5 px-3 ovds-number text-right">{fmt(Number(d.totalInsurableEarnings))}</td>
                       <td className="py-2.5 px-3 ovds-number text-right text-sky-700 dark:text-sky-400">{fmt(Number(d.employeeContrib))}</td>
                       <td className="py-2.5 px-3 ovds-number text-right text-violet-700 dark:text-violet-400">{fmt(Number(d.employerContrib))}</td>
-                      <td className="py-2.5 px-3 ovds-number text-right font-bold text-emerald-700 dark:text-emerald-400">{fmt(Number(d.totalContrib))}</td>
+                      <td className="py-2.5 px-3 ovds-number text-right font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">{fmt(Number(d.totalContrib))}</td>
                       <td className="py-2.5 px-3 ovds-caption">{d.dueDate ? new Date(d.dueDate).toLocaleDateString('en-ET') : '—'}</td>
                       <td className="py-2.5 px-3">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${STATUS_COLOR[d.status] ?? 'bg-slate-100 text-slate-600'}`}>{d.status}</span>
@@ -330,13 +331,13 @@ const PayeDeclarations: React.FC = () => {
                         <div className="flex items-center gap-1">
                           {(d.status === 'DRAFT' || d.status === 'OVERDUE') && (
                             <button onClick={() => setModal({ type: 'submit', id: d.id, itemType: 'pension' })}
-                              title="Submit to PFSA" className="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg text-blue-600 transition-colors">
+                              title="Submit to PFSA" className="p-1 hover:bg-[var(--pro-azure-50)] rounded-lg text-[var(--pro-azure)] transition-colors">
                               <Send size={13} />
                             </button>
                           )}
                           {d.status === 'SUBMITTED' && (
                             <button onClick={() => setModal({ type: 'pay', id: d.id, itemType: 'pension' })}
-                              title="Mark Paid" className="p-1 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-lg text-emerald-600 transition-colors">
+                              title="Mark Paid" className="p-1 hover:bg-[var(--pro-azure-100)] dark:hover:bg-green-900/30 rounded-lg text-[var(--pro-azure)] transition-colors">
                               <CreditCard size={13} />
                             </button>
                           )}

@@ -1,4 +1,4 @@
-import { useBladeState, type BladeState, type ApiError as BladeApiError } from '../hooks/useBladeState';
+﻿import { useBladeState, type BladeState, type ApiError as BladeApiError } from '../hooks/useBladeState';
 
 // ── Compound component types ─────────────────────────────────────────────────
 
@@ -24,7 +24,7 @@ export interface BladeProps<T> {
 // ── Blade component ──────────────────────────────────────────────────────────
 
 /**
- * Blade — Akaunting-style compound component for predictable async UI states.
+ * Blade — Ovds SaaS style compound component for predictable async UI states.
  *
  * Usage:
  *   <Blade run={fetchInvoices} deps={[companyId]}>
@@ -61,7 +61,7 @@ export function BladeLoading({ children }: BladeLoadingProps) {
   return <>{children}</>;
 }
 
-interface BladeErrorProps<T> {
+interface BladeErrorProps<_T> {
   error: BladeApiError | null;
   onRetry?: () => void;
   render?: (error: BladeApiError) => React.ReactNode;

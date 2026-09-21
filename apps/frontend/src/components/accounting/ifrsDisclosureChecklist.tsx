@@ -4,15 +4,16 @@
  * Covers all mandatory notes and supplementary disclosures
  * Enhanced with IASB 2024–2027 update banner and role-based access gating.
  */
-import React, { useState } from 'react';
 import {
   CheckSquare, Square, ChevronDown, ChevronUp,
   BookOpen, Scale, TrendingUp, Banknote, Package,
   Users, Printer, Info, Lock, Sparkles, Globe,
 } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { useBusiness } from '../../context/businessContext';
-import IASBUpdateBanner from '../iasbUpdateBanner';
 import { useIFRSAccess } from '../../hooks/useIfrsAccess';
+import IASBUpdateBanner from '../iasbUpdateBanner';
 
 interface DisclosureItem {
   id: string;
@@ -43,9 +44,9 @@ const buildGroups = (businessType: string): DisclosureGroup[] => {
       id: 'basis',
       title: 'Basis of Preparation',
       icon: <BookOpen size={14} />,
-      color: 'text-emerald-700 dark:text-emerald-600 dark:text-emerald-300',
-      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-      border: 'border-emerald-200 dark:border-emerald-800',
+      color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure)] dark:text-green-300',
+      bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
+      border: 'border-[var(--pro-azure-100)] dark:border-green-800',
       items: [
         { id: 'b1', standard: 'IAS 1.16',   title: 'Statement of IFRS compliance',           required: true,  applicableTo: ['all'], description: 'Explicit statement that FS comply with IFRS as issued by IASB', checked: false },
         { id: 'b2', standard: 'IAS 1.25',   title: 'Going concern assessment',               required: true,  applicableTo: ['all'], description: 'Management assessment of ability to continue for 12+ months', checked: false },
@@ -59,9 +60,9 @@ const buildGroups = (businessType: string): DisclosureGroup[] => {
       id: 'revenue',
       title: 'Revenue & Tax (IFRS 15 / IAS 12)',
       icon: <TrendingUp size={14} />,
-      color: 'text-emerald-700 dark:text-emerald-600 dark:text-emerald-300',
-      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-      border: 'border-emerald-200 dark:border-emerald-800',
+      color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure)] dark:text-green-300',
+      bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
+      border: 'border-[var(--pro-azure-100)] dark:border-green-800',
       items: [
         { id: 'r1', standard: 'IFRS 15.114', title: 'Disaggregation of revenue by type',     required: true,  applicableTo: ['all'], description: 'Revenue split by goods, services, exports, zero-rated, exempt', checked: false },
         { id: 'r2', standard: 'IFRS 15.116', title: 'Contract assets and liabilities',       required: true,  applicableTo: ['all'], description: 'Opening/closing balances of contract assets and deferred revenue', checked: false },
@@ -228,8 +229,8 @@ const IFRSDisclosureChecklist: React.FC = () => {
   const pct        = required.length ? Math.round((reqChecked.length / required.length) * 100) : 0;
   const grade      = pct >= 90 ? 'A' : pct >= 75 ? 'B' : pct >= 60 ? 'C' : pct >= 40 ? 'D' : 'F';
 
-  const gradeColor = { A: 'text-emerald-600', B: 'text-emerald-600', C: 'text-amber-600', D: 'text-orange-600', F: 'text-rose-600' }[grade];
-  const gradeBg    = { A: 'bg-emerald-50 dark:bg-emerald-950/30', B: 'bg-emerald-50 dark:bg-emerald-950/30', C: 'bg-amber-50 dark:bg-amber-950/30', D: 'bg-orange-50 dark:bg-orange-950/30', F: 'bg-rose-50 dark:bg-rose-950/30' }[grade];
+  const gradeColor = { A: 'text-[var(--pro-azure)]', B: 'text-[var(--pro-azure)]', C: 'text-amber-600', D: 'text-orange-600', F: 'text-rose-600' }[grade];
+  const gradeBg    = { A: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30', B: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30', C: 'bg-amber-50 dark:bg-amber-950/30', D: 'bg-orange-50 dark:bg-orange-950/30', F: 'bg-rose-50 dark:bg-rose-950/30' }[grade];
 
   const printChecklist = () => {
     const rows = groups.flatMap(g => g.items.map(i =>
@@ -295,11 +296,11 @@ const IFRSDisclosureChecklist: React.FC = () => {
           )}
 
       {/* Header */}
-      <div className="bg-emerald-50 dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-800 rounded-xl p-5 text-white">
+      <div className="bg-[var(--pro-azure-50)] dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-800 rounded-xl p-5 text-white">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-500/20 border border-slate-200 rounded-xl flex items-center justify-center shrink-0">
-              <BookOpen size={18} className="text-emerald-400" />
+            <div className="w-10 h-10 bg-[var(--pro-azure-50)]0/20 border border-slate-200 rounded-xl flex items-center justify-center shrink-0">
+              <BookOpen size={18} className="text-[var(--pro-azure-light)]" />
             </div>
             <div>
               <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-slate-500 dark:text-white/40 mb-0.5">IAS 1.112–138</p>
@@ -320,9 +321,9 @@ const IFRSDisclosureChecklist: React.FC = () => {
         </div>
 
         {/* Progress bar */}
-        <div className="mt-4 h-2 bg-emerald-100 dark:bg-white/10 rounded-full overflow-hidden">
+        <div className="mt-4 h-2 bg-[var(--pro-azure-100)] dark:bg-white/10 rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-700 ${grade === 'A' ? 'bg-emerald-400' : grade === 'B' ? 'bg-teal-400' : grade === 'C' ? 'bg-amber-400' : 'bg-rose-400'}`}
+            className={`h-full rounded-full transition-all duration-700 ${grade === 'A' ? 'bg-[var(--pro-azure-light)]' : grade === 'B' ? 'bg-teal-400' : grade === 'C' ? 'bg-amber-400' : 'bg-rose-400'}`}
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -335,15 +336,15 @@ const IFRSDisclosureChecklist: React.FC = () => {
             Show required only
           </label>
           <button onClick={printChecklist}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 dark:bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold text-slate-500 dark:text-white/70 hover:text-white transition-colors">
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-100)] dark:bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold text-slate-500 dark:text-white/70 hover:text-white transition-colors">
             <Printer size={12} /> Print
           </button>
           <button onClick={exportCSV}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 dark:bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold text-slate-500 dark:text-white/70 hover:text-white transition-colors">
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-100)] dark:bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold text-slate-500 dark:text-white/70 hover:text-white transition-colors">
             ↓ CSV
           </button>
           <button onClick={() => setGroups(buildGroups(businessType))}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 dark:bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold text-slate-500 dark:text-white/70 hover:text-white transition-colors">
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-100)] dark:bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold text-slate-500 dark:text-white/70 hover:text-white transition-colors">
             Reset
           </button>
         </div>
@@ -362,7 +363,7 @@ const IFRSDisclosureChecklist: React.FC = () => {
               onClick={() => toggleGroup(group.id)}
               className={`w-full flex items-center gap-3 px-5 py-3.5 text-left ${group.bg} hover:opacity-90 transition-opacity`}
             >
-              <div className={`w-7 h-7 rounded-lg bg-white/60 dark:bg-emerald-100 dark:bg-white/10 flex items-center justify-center shrink-0 ${group.color}`}>
+              <div className={`w-7 h-7 rounded-lg bg-white/60 dark:bg-[var(--pro-azure-100)] dark:bg-white/10 flex items-center justify-center shrink-0 ${group.color}`}>
                 {group.icon}
               </div>
               <div className="flex-1">
@@ -371,7 +372,7 @@ const IFRSDisclosureChecklist: React.FC = () => {
               </div>
               <button
                 onClick={e => { e.stopPropagation(); checkAll(group.id); }}
-                className={`text-[10px] font-bold px-2.5 py-1 rounded-lg bg-white/60 dark:bg-emerald-100 dark:bg-white/10 ${group.color} hover:bg-white/80 dark:hover:bg-white/20 transition-colors`}
+                className={`text-[10px] font-bold px-2.5 py-1 rounded-lg bg-white/60 dark:bg-[var(--pro-azure-100)] dark:bg-white/10 ${group.color} hover:bg-white/80 dark:hover:bg-white/20 transition-colors`}
               >
                 Check all
               </button>
@@ -388,13 +389,13 @@ const IFRSDisclosureChecklist: React.FC = () => {
                   >
                     <div className="mt-0.5 shrink-0">
                       {item.checked
-                        ? <CheckSquare size={16} className="text-emerald-500" />
+                        ? <CheckSquare size={16} className="text-[var(--pro-azure)]" />
                         : <Square size={16} className="text-slate-300 dark:text-slate-600" />
                       }
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded-md">{item.standard}</span>
+                        <span className="text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 px-2 py-0.5 rounded-md">{item.standard}</span>
                         <span className={`text-xs font-bold ${item.checked ? 'text-slate-400 line-through' : 'text-slate-700 dark:text-slate-200'}`}>{item.title}</span>
                         {item.required && (
                           <span className="text-[10px] font-medium text-rose-500 bg-rose-50 dark:bg-rose-950/30 px-1.5 py-0.5 rounded-full">Required</span>
@@ -411,8 +412,8 @@ const IFRSDisclosureChecklist: React.FC = () => {
       })}
 
       {/* Footer */}
-      <div className="flex items-start gap-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900 rounded-xl p-3">
-        <Info size={14} className="text-emerald-500 mt-0.5 shrink-0" />
+      <div className="flex items-start gap-2 bg-[var(--pro-azure-50)] dark:bg-green-950/30 border border-[var(--pro-azure-100)] dark:border-green-900 rounded-xl p-3">
+        <Info size={14} className="text-[var(--pro-azure)] mt-0.5 shrink-0" />
         <p className="text-xs text-slate-600 dark:text-slate-300">
           <strong>AABE Requirement:</strong> All public interest entities in Ethiopia must prepare financial statements in accordance with full IFRS. Smaller entities may use IFRS for SMEs. Disclosures must be filed with the Accounting and Auditing Board of Ethiopia (AABE) within the prescribed deadlines.
         </p>

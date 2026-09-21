@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { buildTenantScopedExtension } from '@ovds/database';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
+import { PrismaClient } from '@prisma/client';
+
 import { getTenantContext } from './tenant-context.middleware';
+
+
+type DeploymentMode = 'CLOUD_SAAS' | 'ON_PREMISE_SINGLE' | 'ON_PREMISE_MULTI';
 
 @Injectable()
 export class PrismaService extends PrismaClient {
@@ -16,42 +21,11 @@ export class PrismaService extends PrismaClient {
       log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error', 'warn'],
     });
 
-    const extended = (this as unknown as { $extends: (ext: any) => PrismaClient }).$extends({
-      query: {
-        $allModels: {
-          async $allOperations({ model, operation, args, query }: any) {
-            const context = getTenantContext();
-            const companyId = context?.companyId || null;
-            const isSuperUser = context?.role === 'ADMIN' || context?.role === 'SUPER_ADMIN';
+    const deploymentMode = (process.env.DEPLOYMENT_MODE || 'CLOUD_SAAS') as DeploymentMode;
 
-            if (!companyId || isSuperUser) {
-              return query(args);
-            }
-
-            if (operation === 'findMany' || operation === 'findFirst' || operation === 'findUnique') {
-              const hasCompanyId =
-                model === 'company' || model === 'employee' || model === 'user' ||
-                model === 'invoice' || model === 'bill' || model === 'customer' || model === 'vendor' ||
-                model === 'bankAccount' || model === 'transaction' || model === 'payroll' ||
-                model === 'leave' || model === 'attendance' || model === 'item' || model === 'project' ||
-                model === 'deal' || model === 'activity' || model === 'auditLog' || model === 'taxReport' ||
-                model === 'vatDeclaration' || model === 'purchaseOrder' || model === 'expense' ||
-                model === 'transfer' || model === 'reconciliation' || model === 'budget';
-
-              if (hasCompanyId) {
-                const where = args?.where ?? {};
-                if (operation === 'findUnique' && where.companyId && where.companyId !== companyId) {
-                  return null;
-                }
-                args = { ...args, where: { ...where, companyId } };
-              }
-            }
-
-            return query(args);
-          },
-        },
-      },
-    });
+    const extended = (this as unknown as { $extends: (ext: any) => PrismaClient }).$extends(
+      buildTenantScopedExtension(getTenantContext, deploymentMode),
+    );
 
     (extended as unknown as { onModuleInit: () => Promise<void> }).onModuleInit = async () => {
       await extended.$connect();

@@ -132,14 +132,14 @@ export const InvoiceAnalytics: React.FC<Props> = React.memo(({
         {/* Total Billed */}
         <div className="group dash-stat-cell relative overflow-hidden">
           <div className="absolute top-0 right-0 p-3 opacity-[0.05] group-hover:opacity-[0.08] transition-opacity pointer-events-none">
-            <DollarSign size={48} className="text-emerald-600 dark:text-emerald-400" />
+            <DollarSign size={48} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Total Receivables</p>
           <div className="flex items-baseline gap-2">
             <h3 className="ovds-value text-slate-800 dark:text-white">{fmt(totalBilled)}</h3>
             {momTrend !== null && (
               <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${
-                momTrend >= 0 ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400'
+                momTrend >= 0 ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:bg-green-900/30 dark:text-[var(--pro-azure-light)]' : 'bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400'
               }`}>
                 {momTrend > 0 ? '+' : ''}{momTrend}%
               </span>
@@ -162,21 +162,21 @@ export const InvoiceAnalytics: React.FC<Props> = React.memo(({
         {/* Collection Performance */}
         <div className="group dash-stat-cell relative overflow-hidden">
           <div className="absolute top-0 right-0 p-3 opacity-[0.05] group-hover:opacity-[0.08] transition-opacity pointer-events-none">
-            <TrendingUp size={48} className="text-emerald-600 dark:text-emerald-400" />
+            <TrendingUp size={48} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Collection Rate</p>
           <div className="flex items-baseline gap-2">
-            <h3 className="ovds-value text-emerald-600 dark:text-emerald-400">{collectionRate}%</h3>
+            <h3 className="ovds-value text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{collectionRate}%</h3>
             <span className="ovds-caption font-bold">{fmt(totalCollected)}</span>
           </div>
           <div className="mt-4">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Efficiency</span>
-              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">{collectionRate}%</span>
+              <span className="text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{collectionRate}%</span>
             </div>
             <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
               <div
-                className="h-full bg-emerald-500 transition-all duration-1000 ease-out rounded-full shadow-[0_0_8px_rgba(16,185,129,0.4)]"
+                className="h-full bg-[var(--pro-azure-50)]0 transition-all duration-1000 ease-out rounded-full shadow-[0_0_8px_rgba(16,185,129,0.4)]"
                 style={{ width: `${collectionRate}%` }}
               />
             </div>
@@ -216,7 +216,7 @@ export const InvoiceAnalytics: React.FC<Props> = React.memo(({
         {/* DSO / Velocity */}
         <div className="group dash-stat-cell relative overflow-hidden">
           <div className="absolute top-0 right-0 p-3 opacity-[0.05] group-hover:opacity-[0.08] transition-opacity pointer-events-none">
-            <Clock3 size={48} className="text-indigo-600 dark:text-indigo-400" />
+            <Clock3 size={48} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Payment Velocity</p>
           <div className="flex items-baseline gap-2">
@@ -227,14 +227,14 @@ export const InvoiceAnalytics: React.FC<Props> = React.memo(({
           <div className="mt-4">
             <div className="flex items-center justify-between mb-1">
               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Financial Health</span>
-              <span className={`text-[10px] font-bold ${arHealthScore >= 80 ? 'text-emerald-500' : 'text-amber-500'}`}>
+              <span className={`text-[10px] font-bold ${arHealthScore >= 80 ? 'text-[var(--pro-azure)]' : 'text-amber-500'}`}>
                 {arHealthScore >= 80 ? 'Excellent' : 'Stable'}
               </span>
             </div>
             <div className="flex gap-1">
               {[...Array(5)].map((_, i) => (
                 <div key={i} className={`h-1 flex-1 rounded-full ${
-                  i < (arHealthScore / 20) ? 'bg-emerald-500' : 'bg-slate-100 dark:bg-slate-800'
+                  i < (arHealthScore / 20) ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-100 dark:bg-slate-800'
                 }`} />
               ))}
             </div>
@@ -249,8 +249,8 @@ export const InvoiceAnalytics: React.FC<Props> = React.memo(({
           className="w-full flex items-center justify-between px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
-              <BarChart2 size={16} className="text-emerald-600 dark:text-emerald-400" />
+            <div className="w-8 h-8 rounded-lg bg-[var(--pro-azure-50)] dark:bg-green-900/30 flex items-center justify-center">
+              <BarChart2 size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
             </div>
             <div className="text-left">
               <span className="block ovds-card-title">Deep Insights</span>
@@ -293,8 +293,8 @@ export const InvoiceAnalytics: React.FC<Props> = React.memo(({
                     <div>
                       <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-0.5">Credit Quality</p>
                       <p className={`text-sm font-bold ${
-                        arHealthScore >= 85 ? 'text-emerald-600' :
-                        arHealthScore >= 70 ? 'text-emerald-600' :
+                        arHealthScore >= 85 ? 'text-[var(--pro-azure)]' :
+                        arHealthScore >= 70 ? 'text-[var(--pro-azure)]' :
                         arHealthScore >= 55 ? 'text-amber-600' : 'text-rose-600'
                       }`}>
                         Class {arHealthScore >= 85 ? 'Premium (A+)' : arHealthScore >= 70 ? 'Standard (B)' : arHealthScore >= 55 ? 'Watch (C)' : 'Sub-prime (F)'}
@@ -332,11 +332,11 @@ export const InvoiceAnalytics: React.FC<Props> = React.memo(({
                               </span>
                             </div>
                             <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                              <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                              <div className="h-full bg-[var(--pro-azure-50)]0 rounded-full transition-all" style={{ width: `${pct}%` }} />
                             </div>
                           </div>
                           <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0 ${
-                            c.payRate >= 80 ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                            c.payRate >= 80 ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure)] dark:bg-green-900/30 dark:text-[var(--pro-azure-light)]' :
                             c.payRate >= 50 ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400' :
                             'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400'
                           }`}>{c.payRate}%</span>
@@ -352,8 +352,8 @@ export const InvoiceAnalytics: React.FC<Props> = React.memo(({
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">6-Month Trend</p>
                   <div className="flex items-center gap-3 text-[9px] font-bold text-slate-400">
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-emerald-100 dark:bg-emerald-900/40 inline-block" />Billed</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-emerald-500 inline-block" />Collected</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[var(--pro-azure-100)] dark:bg-green-900/40 inline-block" />Billed</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[var(--pro-azure-50)]0 inline-block" />Collected</span>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -364,15 +364,15 @@ export const InvoiceAnalytics: React.FC<Props> = React.memo(({
                         <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 w-8 shrink-0">{m.label}</span>
                         <div className="flex-1 h-5 bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden relative"
                           title={`Billed: ${fmtF(m.invoiced)} · Collected: ${fmtF(m.collected)}`}>
-                          <div className="absolute inset-0 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg" style={{ width: `${maxMonthly > 0 ? (m.invoiced / maxMonthly) * 100 : 0}%` }} />
-                          <div className="absolute inset-0 bg-emerald-500 rounded-lg" style={{ width: `${maxMonthly > 0 ? (m.collected / maxMonthly) * 100 : 0}%` }} />
+                          <div className="absolute inset-0 bg-[var(--pro-azure-100)] dark:bg-green-900/30 rounded-lg" style={{ width: `${maxMonthly > 0 ? (m.invoiced / maxMonthly) * 100 : 0}%` }} />
+                          <div className="absolute inset-0 bg-[var(--pro-azure-50)]0 rounded-lg" style={{ width: `${maxMonthly > 0 ? (m.collected / maxMonthly) * 100 : 0}%` }} />
                           {m.count > 0 && (
                             <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[8px] font-semibold text-white/80">{m.count}</span>
                           )}
                         </div>
                         <div className="text-right w-20 shrink-0">
                           <p className="text-[10px] font-semibold text-slate-700 dark:text-slate-300 tabular-nums">{fmt(m.invoiced)}</p>
-                          {collPct > 0 && <p className="text-[9px] text-emerald-600 font-bold">{collPct}%</p>}
+                          {collPct > 0 && <p className="text-[9px] text-[var(--pro-azure)] font-bold">{collPct}%</p>}
                         </div>
                       </div>
                     );
@@ -380,7 +380,7 @@ export const InvoiceAnalytics: React.FC<Props> = React.memo(({
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between text-xs font-semibold">
                   <span className="text-slate-400">6-month total</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 tabular-nums">{fmt(monthlyData.reduce((s: number, m: any) => s + m.invoiced, 0))}</span>
+                  <span className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] tabular-nums">{fmt(monthlyData.reduce((s: number, m: any) => s + m.invoiced, 0))}</span>
                 </div>
               </div>
 
@@ -422,7 +422,7 @@ export const InvoiceAnalytics: React.FC<Props> = React.memo(({
                     {
                       label: 'VAT Collected',
                       value: invoices.filter((i: any) => i.status === 'PAID').reduce((s: number, i: any) => s + Number(i.vatAmount || 0), 0),
-                      color: 'text-emerald-600', sub: 'Remit to ERCA',
+                      color: 'text-[var(--pro-azure)]', sub: 'Remit to ERCA',
                     },
                     {
                       label: 'VAT Pending',
@@ -452,11 +452,11 @@ export const InvoiceAnalytics: React.FC<Props> = React.memo(({
 
               {/* IFRS 9/15 Exposure */}
               {ifrsAnalytics && (ifrsAnalytics.withIfrs > 0 || ifrsAnalytics.eclExposure > 0) && (
-                <div className="bg-white dark:bg-slate-900 rounded-xl border border-indigo-100 dark:border-indigo-900/40 p-5">
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-[var(--pro-azure-100)] dark:border-green-900/40 p-5">
                   <div className="flex items-center gap-2 mb-4">
-                    <TrendingUp size={14} className="text-indigo-600 dark:text-indigo-400" />
+                    <TrendingUp size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                     <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">IFRS 9 / 15 Exposure</p>
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-full ml-auto">
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 bg-[var(--pro-azure-100)] dark:bg-green-900/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] rounded-full ml-auto">
                       Live
                     </span>
                   </div>
@@ -501,7 +501,7 @@ export const InvoiceAnalytics: React.FC<Props> = React.memo(({
                       </div>
                     )}
                     {ifrsAnalytics.contractRefs > 0 && (
-                      <div className="flex items-center gap-1.5 mt-1 text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">
+                      <div className="flex items-center gap-1.5 mt-1 text-[10px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold">
                         <AlertCircle size={10} />
                         {ifrsAnalytics.contractRefs} IFRS 15 contract{ifrsAnalytics.contractRefs !== 1 ? 's' : ''} with performance obligations
                       </div>

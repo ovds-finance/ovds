@@ -3,22 +3,23 @@
  * AppPage · AppKpi · AppTable · useApiCrud
  * Cross-company reporting · Consolidated financials
  */
-import React, { useState, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   Columns, RefreshCw, Building2, Users2, BarChart3,
   Settings, ArrowRight, CheckCircle2, Globe,
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import api from '../services/api';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { fmtETB } from '../utils/ethiopianTax';
+import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import {
   AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, SearchBar, EmptyState, IFRSBadge,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { fmtETB } from '../utils/ethiopianTax';
 
 interface CompanySnapshot {
   id: string;
@@ -52,6 +53,7 @@ const MultiCompanyAdmin: React.FC = () => {
     staleTime: 60_000,
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const companies: CompanySnapshot[] = Array.isArray(raw) ? raw : [];
 
   const filtered = useMemo(() => {
@@ -65,7 +67,7 @@ const MultiCompanyAdmin: React.FC = () => {
     const totalExpenses = companies.reduce((s, c) => s + (c.totalExpenses ?? 0), 0);
     const totalCash     = companies.reduce((s, c) => s + (c.cashBalance ?? 0), 0);
     return [
-      { label: 'Companies',    value: companies.length,                                                    color: 'emerald' as const },
+      { label: 'Companies',    value: companies.length,                                                    color: 'green' as const },
       { label: 'Consolidated Revenue', value: fmtETB(totalRevenue),                                       color: 'sky' as const },
       { label: 'Consolidated Expenses',value: fmtETB(totalExpenses),                                      color: 'rose' as const },
       { label: 'Total Cash',   value: fmtETB(totalCash),                                                   color: 'violet' as const },
@@ -97,7 +99,7 @@ const MultiCompanyAdmin: React.FC = () => {
         <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Consolidated Financial Position</p>
         <div className="ovds-grid-layout cols-4">
           {[
-            { label: 'Total Revenue',  value: fmtETB(companies.reduce((s, c) => s + (c.totalRevenue ?? 0), 0)),  color: 'text-emerald-600', bg: 'bg-emerald-50' },
+            { label: 'Total Revenue',  value: fmtETB(companies.reduce((s, c) => s + (c.totalRevenue ?? 0), 0)),  color: 'text-[var(--pro-azure)]', bg: 'bg-[var(--pro-azure-50)]' },
             { label: 'Total Expenses', value: fmtETB(companies.reduce((s, c) => s + (c.totalExpenses ?? 0), 0)), color: 'text-rose-600',    bg: 'bg-rose-50' },
             { label: 'Net Position',   value: fmtETB(companies.reduce((s, c) => s + ((c.totalRevenue ?? 0) - (c.totalExpenses ?? 0)), 0)), color: 'text-sky-600', bg: 'bg-sky-50' },
             { label: 'VAT Payable',    value: fmtETB(companies.reduce((s, c) => s + (c.vatPayable ?? 0), 0)),    color: 'text-violet-600', bg: 'bg-violet-50' },
@@ -136,24 +138,24 @@ const MultiCompanyAdmin: React.FC = () => {
             <AppTr key={c.id}>
               <AppTd>
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center text-[11px] font-bold text-emerald-700 shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--pro-azure-100)] to-teal-100 flex items-center justify-center text-[11px] font-bold text-[var(--pro-azure-dark)] shrink-0">
                     {c.name.slice(0, 2).toUpperCase()}
                   </div>
                   <div>
                     <button
                       onClick={() => setSelectedCompanyId(c.id)}
-                      className={`text-[12px] font-semibold hover:text-emerald-600 transition-colors text-left ${c.id === selectedCompanyId ? 'text-emerald-700' : 'text-slate-800'}`}
+                      className={`text-[12px] font-semibold hover:text-[var(--pro-azure)] transition-colors text-left ${c.id === selectedCompanyId ? 'text-[var(--pro-azure-dark)]' : 'text-slate-800'}`}
                     >
                       {c.name}
                     </button>
-                    {c.id === selectedCompanyId && <span className="text-[9px] text-emerald-500 font-bold block">● Active</span>}
+                    {c.id === selectedCompanyId && <span className="text-[9px] text-[var(--pro-azure)] font-bold block">● Active</span>}
                   </div>
                 </div>
               </AppTd>
               <AppTd><span className="text-[10px] font-semibold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-100">{c.type.replace(/_/g, ' ')}</span></AppTd>
               <AppTd><span className="font-mono text-[10px] text-slate-500">{c.tin ?? '—'}</span></AppTd>
               <AppTd align="right">
-                {c.totalRevenue ? <span className="text-[11px] font-bold text-emerald-600 tabular-nums">{fmtETB(c.totalRevenue)}</span> : <span className="text-[10px] text-slate-300">—</span>}
+                {c.totalRevenue ? <span className="text-[11px] font-bold text-[var(--pro-azure)] tabular-nums">{fmtETB(c.totalRevenue)}</span> : <span className="text-[10px] text-slate-300">—</span>}
               </AppTd>
               <AppTd align="right">
                 {c.cashBalance ? <span className="text-[11px] font-bold text-sky-600 tabular-nums">{fmtETB(c.cashBalance)}</span> : <span className="text-[10px] text-slate-300">—</span>}
@@ -169,7 +171,7 @@ const MultiCompanyAdmin: React.FC = () => {
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => { setSelectedCompanyId(c.id); navigate('/dashboard'); }}
-                    className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                    className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all"
                     title="Switch to company"
                   >
                     <ArrowRight size={11} />

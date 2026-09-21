@@ -14,7 +14,7 @@
       },
       "configurations": {
         "production": {
-          "command": "node ../../scripts/bin-run.mjs @nestjs/cli/bin/nest build --builder swc"
+          "command": "cp .swcrc.production .swcrc.build && node ../../scripts/bin-run.mjs @nestjs/cli/bin/nest build --builder swc --config .swcrc.build && node -e \"const fs=require('fs'),path=require('path'),walk=d=>{fs.readdirSync(d,{withFileTypes:true}).forEach(e=>{const p=path.join(d,e.name);e.isDirectory()?walk(p):e.name.endsWith('.map')&&fs.unlinkSync(p)})};walk('dist')\" && rm -f .swcrc.build"
         }
       }
     },
@@ -33,7 +33,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run lint",
+        "command": "node ../../scripts/bin-run.mjs eslint/bin/eslint . --fix --report-unused-disable-directives",
         "cwd": "apps/backend"
       },
       "inputs": [
@@ -44,7 +44,7 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run test",
+        "command": "node ../../scripts/bin-run.mjs vitest/vitest.mjs --run --config vitest.config.ts",
         "cwd": "apps/backend"
       },
       "inputs": [
@@ -56,7 +56,7 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx nest start --watch --builder swc",
+        "command": "node ../../scripts/bin-run.mjs @nestjs/cli/bin/nest start --watch --builder swc",
         "cwd": "apps/backend",
         "env": {
           "NODE_OPTIONS": "--max-old-space-size=2048"
@@ -66,28 +66,28 @@
     "db:push": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx prisma db push",
+        "command": "node ../../scripts/bin-run.mjs prisma/build/index.js db push",
         "cwd": "apps/backend"
       }
     },
     "migrate:deploy": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx prisma migrate deploy",
+        "command": "node ../../scripts/bin-run.mjs prisma/build/index.js migrate deploy",
         "cwd": "apps/backend"
       }
     },
     "db:studio": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx prisma studio",
+        "command": "node ../../scripts/bin-run.mjs prisma/build/index.js studio",
         "cwd": "apps/backend"
       }
     },
     "seed": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx prisma db seed",
+        "command": "node ../../scripts/bin-run.mjs prisma/build/index.js db seed",
         "cwd": "apps/backend"
       }
     },
@@ -126,3 +126,4 @@
   },
   "tags": ["scope:backend", "type:app"]
 }
+

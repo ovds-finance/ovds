@@ -1,21 +1,22 @@
 /**
  * Debit Notes — issue debit notes to vendors for returning goods
  */
-import React, { useState, useMemo } from 'react';
-import { FilePlus, Plus, Edit2, Trash2, RefreshCw, CheckCircle2 } from 'lucide-react';
-import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
 import { evalMath } from '@ovds/ui';
+import { FilePlus, Plus, Edit2, Trash2, RefreshCw, CheckCircle2 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
+
 import {
   AppPage, AppTabs, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Textarea,
   EmptyState, Pagination, Amount,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
 import api from '../services/api';
+import { confirm } from '../utils/confirm';
 
 interface DebitNote {
   id: string;
@@ -113,7 +114,7 @@ const DebitNotes: React.FC = () => {
     { label: 'Total',   value: rows.length, cls: 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300' },
     { label: 'Draft',   value: rows.filter(r => r.status === 'DRAFT').length, cls: 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400' },
     { label: 'Issued',  value: rows.filter(r => r.status === 'ISSUED').length, cls: 'bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-400' },
-    { label: 'Applied', value: rows.filter(r => r.status === 'APPLIED').length, cls: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' },
+    { label: 'Applied', value: rows.filter(r => r.status === 'APPLIED').length, cls: 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' },
   ], [rows]);
 
   const blank = (): Partial<DebitNote> => ({

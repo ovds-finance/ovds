@@ -1,4 +1,3 @@
-import React from 'react';
 import { 
   Cpu, 
   Database, 
@@ -11,12 +10,13 @@ import {
   QrCode,
   FileSpreadsheet
 } from 'lucide-react';
+import React from 'react';
 
 export const IngestionWorkflowOverview: React.FC = () => {
   const steps = [
     {
       title: "Multi-Source Ingestion",
-      icon: <Layers className="text-emerald-500" size={24} />,
+      icon: <Layers className="text-[var(--pro-azure)]" size={24} />,
       description: "Capture from any source including Screenshots, QR codes, Vouchers, PDFs, Excel/CSV, POS systems, and Camera capture.",
       details: ["Mobile Camera", "Voucher Codes", "QR Scanners", "API Integrations"]
     },
@@ -28,7 +28,7 @@ export const IngestionWorkflowOverview: React.FC = () => {
     },
     {
       title: "Validation & Correction",
-      icon: <ShieldCheck className="text-emerald-500" size={24} />,
+      icon: <ShieldCheck className="text-[var(--pro-azure)]" size={24} />,
       description: "Automated business rule validation against Ethiopian tax law (ERCA). Human-in-the-loop interface for low-confidence extractions.",
       details: ["TIN Validation", "VAT Calculation Check", "Duplicate Detection", "Audit Trail"]
     },
@@ -40,7 +40,7 @@ export const IngestionWorkflowOverview: React.FC = () => {
     },
     {
       title: "Downstream Integration",
-      icon: <Zap className="text-emerald-600 dark:text-emerald-400" size={24} />,
+      icon: <Zap className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" size={24} />,
       description: "Automatic posting to General Ledger, VAT Ledgers, and Disaster Fund (DRRF) schedules. Real-time updates via WebSockets.",
       details: ["GL Auto-Posting", "VAT Filing Pre-fill", "Analytics Sync", "Instant Notifications"]
     }
@@ -49,8 +49,8 @@ export const IngestionWorkflowOverview: React.FC = () => {
   return (
     <div className="p-6 ovds-widget-card shadow-ovds-lg">
       <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl">
-          <Zap className="text-emerald-600 dark:text-emerald-400" size={28} />
+        <div className="p-3 bg-[var(--pro-azure-50)] dark:bg-green-900/30 rounded-2xl">
+          <Zap className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" size={28} />
         </div>
         <div>
           <h2 className="text-xl font-semibold text-slate-800 dark:text-white">AI Ingestion Pipeline</h2>
@@ -66,9 +66,9 @@ export const IngestionWorkflowOverview: React.FC = () => {
         {steps.map((step, idx) => (
           <div key={idx} className="relative z-10 flex flex-col items-center text-center">
             <div className={`p-4 rounded-2xl border-2 mb-4 transition-all duration-300 hover:scale-110 shadow-sm
-              ${idx === 0 ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800' : 
+              ${idx === 0 ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] dark:bg-green-900/20 dark:border-green-800' : 
                 idx === 1 ? 'bg-purple-50 border-purple-200 dark:bg-purple-900/20 dark:border-purple-800' :
-                idx === 2 ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800' :
+                idx === 2 ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] dark:bg-green-900/20 dark:border-green-800' :
                 idx === 3 ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800' :
                 'bg-white border-slate-200 dark:bg-slate-800 dark:border-slate-700'
               }`}
@@ -84,7 +84,7 @@ export const IngestionWorkflowOverview: React.FC = () => {
       {/* Detailed Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {steps.map((step, idx) => (
-          <div key={idx} className="p-5 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/40 dark:hover:border-emerald-900 transition-colors group">
+          <div key={idx} className="p-5 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-[var(--pro-azure)]/40 dark:hover:border-green-900 transition-colors group">
             <div className="flex items-start gap-4 mb-3">
               <div className="p-2 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 group-hover:rotate-12 transition-transform">
                 {step.icon}

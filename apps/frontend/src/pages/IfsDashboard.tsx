@@ -1,12 +1,3 @@
-import React, { useState, useMemo } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiQuery } from '../hooks/useApiQuery';
-import { useAuth } from '../rbac/AuthContext';
-import { Can } from '../components/can';
-import api from '../services/api';
-import { AppPage } from '../components/ui';
 import {
   BookOpen, ShieldCheck, Globe, FileText, TrendingUp, TrendingDown,
   AlertTriangle, CheckCircle, Clock,
@@ -14,8 +5,20 @@ import {
   Activity, Building2, Receipt, Landmark, Users2,
   ChevronDown, ChevronUp, Info, Zap, Star,
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
+
+import { Can } from '../components/can';
+import { AppPage } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiQuery } from '../hooks/useApiQuery';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { IfrsLiveDashboard } from '../services/ifrsApi';
+
 import { IFRSComplianceReport } from './IFRSComplianceReport';
-import { getLiveDashboard, IfrsLiveDashboard } from '../services/ifrsApi';
+
 
 // -- Types ---------------------------------------------------------------------
 type IfrsTier = '1' | '2' | '3';
@@ -24,7 +27,7 @@ type IfrsTier = '1' | '2' | '3';
 const PRIORITY_CONFIG: Record<string, { label: string; cls: string }> = {
   critical: { label: 'Critical', cls: 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-800' },
   high:     { label: 'High',     cls: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800' },
-  medium:   { label: 'Medium',   cls: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800' },
+  medium:   { label: 'Medium',   cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800' },
   low:      { label: 'Low',      cls: 'bg-white text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700' },
 };
 
@@ -50,7 +53,7 @@ const TIERS: Array<{ tier: IfrsTier; label: string; standard: string; since: str
     criteria: ['Turnover > ETB 20M', 'Employees > 20', 'Assets > ETB 20M', 'Liabilities > ETB 20M'],
     businessTypes: ['Small Business', 'Medium Enterprise', 'Cooperative Society', 'Partnership'],
     keyStandards: ['Section 23 (Revenue)', 'Section 20 (Leases)', 'Sections 11–12 (Financial Instruments)', 'Section 17 (PP&E)', 'Section 28 (Employee Benefits)'],
-    color: 'text-emerald-700 dark:text-emerald-300', bg: 'bg-emerald-50/50 dark:bg-emerald-950/10', border: 'border-emerald-200 dark:border-emerald-800',
+    color: 'text-[var(--pro-azure-dark)] dark:text-green-300', bg: 'bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10', border: 'border-[var(--pro-azure-100)] dark:border-green-800',
   },
   {
     tier: '3', label: 'Micro-entity', standard: 'Outside IFRS scope', since: 'N/A',
@@ -63,13 +66,13 @@ const TIERS: Array<{ tier: IfrsTier; label: string; standard: string; since: str
 
 const AABE_THRESHOLDS = [
   { tier: 'Tier 1 — Full IFRS',    since: '7 July 2023', criteria: 'Meet 2 of 4: Turnover > ETB 300M · Employees > 200 · Assets > ETB 200M · Liabilities > ETB 200M', always: 'Banks, insurance companies, and government-owned enterprises are always Tier 1 regardless of size.', color: 'border-violet-400 bg-violet-50/50 dark:bg-violet-950/10' },
-  { tier: 'Tier 2 — IFRS for SMEs', since: '7 July 2024', criteria: 'Meet 2 of 4: Turnover > ETB 20M · Employees > 20 · Assets > ETB 20M · Liabilities > ETB 20M', always: null, color: 'border-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/10' },
+  { tier: 'Tier 2 — IFRS for SMEs', since: '7 July 2024', criteria: 'Meet 2 of 4: Turnover > ETB 20M · Employees > 20 · Assets > ETB 20M · Liabilities > ETB 20M', always: null, color: 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10' },
   { tier: 'Tier 3 — Micro-entity',  since: 'N/A',         criteria: 'Below Tier 2 thresholds on all 4 criteria. No IFRS obligation.', always: 'VAT (15%), PIT, pension (7%/11%), and DRRF obligations still apply regardless of IFRS tier.', color: 'border-amber-400 bg-amber-50/50 dark:bg-amber-950/10' },
 ];
 
 const FINANCIAL_STATEMENTS = [
-  { label: 'Balance Sheet',       sub: 'Assets, liabilities, equity as of date',    standard: 'IAS 1 / Section 4', route: '/reports?type=bs',           icon: <BarChart3 size={16} />, color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30' },
-  { label: 'Profit & Loss',       sub: 'Income, expenses, net profit for period',   standard: 'IAS 1 / Section 5', route: '/reports?type=pl',           icon: <TrendingUp size={16} />, color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30' },
+  { label: 'Balance Sheet',       sub: 'Assets, liabilities, equity as of date',    standard: 'IAS 1 / Section 4', route: '/reports?type=bs',           icon: <BarChart3 size={16} />, color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30' },
+  { label: 'Profit & Loss',       sub: 'Income, expenses, net profit for period',   standard: 'IAS 1 / Section 5', route: '/reports?type=pl',           icon: <TrendingUp size={16} />, color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30' },
   { label: 'Changes in Equity',   sub: 'Opening equity + movements = closing',      standard: 'IAS 1 / Section 6', route: '/reports?type=equity',       icon: <Users2 size={16} />, color: 'text-violet-600 bg-violet-50 dark:bg-violet-950/30' },
   { label: 'Cash Flow',           sub: 'Operating, investing, financing activities', standard: 'IAS 7 / Section 7', route: '/reports?type=cf',           icon: <Landmark size={16} />, color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/30' },
   { label: 'Notes to Financials', sub: 'IFRS-compliant disclosure notes',           standard: 'IAS 1 / Section 8', route: '/reports?type=notes',        icon: <FileText size={16} />, color: 'text-slate-600 bg-white dark:bg-slate-800' },
@@ -108,9 +111,9 @@ function buildTimeline() {
 
 // -- Sub-components -------------------------------------------------------------
 const StandardCard: React.FC<{ s: typeof STANDARDS[0] }> = ({ s }) => (
-  <div className="ovds-widget-card p-5 hover:border-emerald-200 dark:hover:border-emerald-800 transition-all">
+  <div className="ovds-widget-card p-5 hover:border-[var(--pro-azure-100)] dark:hover:border-green-800 transition-all">
     <div className="flex items-start justify-between gap-2 mb-2">
-      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800">{s.code}</span>
+      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] border border-[var(--pro-azure-100)] dark:border-green-800">{s.code}</span>
       <div className="flex gap-1">
         {s.tier.map(t => (
           <span key={t} className="text-[8px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">T{t}</span>
@@ -127,7 +130,7 @@ const StandardCard: React.FC<{ s: typeof STANDARDS[0] }> = ({ s }) => (
 );
 
 const SectionHeader: React.FC<{ title: string; sub: string; icon: React.ReactNode }> = ({ title, sub, icon }) => (  <div className="flex items-start gap-3 mb-4">
-    <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">{icon}</div>
+    <div className="w-8 h-8 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/20 flex items-center justify-center text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0">{icon}</div>
     <div>
       <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-sm">{title}</h3>
       <p className="ovds-caption mt-0.5">{sub}</p>
@@ -136,13 +139,13 @@ const SectionHeader: React.FC<{ title: string; sub: string; icon: React.ReactNod
 );
 
 const ComplianceRow: React.FC<{ item: ReturnType<typeof buildTimeline>[0] }> = ({ item }) => {
-  const statusColor = item.status === 'overdue' ? 'text-rose-600 bg-rose-50 dark:bg-rose-950/30' : item.status === 'urgent' ? 'text-amber-600 bg-amber-50 dark:bg-amber-950/30' : 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30';
+  const statusColor = item.status === 'overdue' ? 'text-rose-600 bg-rose-50 dark:bg-rose-950/30' : item.status === 'urgent' ? 'text-amber-600 bg-amber-50 dark:bg-amber-950/30' : 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30';
   return (
     <Link to={item.route} className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
       <div className="flex items-center gap-2 min-w-0">
         <Clock size={12} className="text-slate-400 shrink-0" />
         <div className="min-w-0">
-          <p className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate group-hover:text-emerald-600 dark:text-emerald-400 transition-colors">{item.label}</p>
+          <p className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">{item.label}</p>
           <p className="text-[9px] text-slate-400 truncate">{item.detail}</p>
         </div>
       </div>
@@ -159,7 +162,7 @@ const TierCard: React.FC<{ info: typeof TIERS[0]; active: boolean; onClick: () =
     <p className="font-semibold text-sm text-slate-800 dark:text-slate-100">{info.label}</p>
     <p className="text-[10px] text-slate-500 mt-0.5">{info.standard}</p>
     <p className="text-[9px] text-slate-400 mt-1">Since {info.since}</p>
-    <div className="flex items-center gap-1 mt-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">View details <ArrowRight size={9} /></div>
+    <div className="flex items-center gap-1 mt-2 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">View details <ArrowRight size={9} /></div>
   </button>
 );
 
@@ -202,7 +205,7 @@ return (
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
               IFRS 18
             </span>
-            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 uppercase tracking-wide">
+            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-[var(--pro-azure)]/20 uppercase tracking-wide">
               Effective 1 Jan 2027
             </span>
             {saving && <RefreshCw size={11} className="text-slate-400 animate-spin" />}
@@ -219,7 +222,7 @@ return (
       {/* Progress bar */}
       <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full mb-4 overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r from-emerald-600 to-violet-500 rounded-full transition-all duration-500"
+          className="h-full bg-gradient-to-r from-[var(--pro-azure)] to-violet-500 rounded-full transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -230,11 +233,11 @@ return (
 const isOpen = expanded === task.id;
 const pc = PRIORITY_CONFIG[task.priority];
 return (
-            <div key={task.id} className={`rounded-xl border transition-all ${isDone ? 'border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-950/10' : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900'}`}>
+            <div key={task.id} className={`rounded-xl border transition-all ${isDone ? 'border-[var(--pro-azure-100)] dark:border-green-900/30 bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10' : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900'}`}>
               <div className="flex items-center gap-3 px-4 py-2.5">
                 <button
                   onClick={() => toggleTask(task.id)}
-                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${isDone ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300 dark:border-slate-600 hover:border-emerald-600'}`}
+                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${isDone ? 'bg-[var(--pro-azure-50)]0 border-[var(--pro-azure)]' : 'border-slate-300 dark:border-slate-600 hover:border-[var(--pro-azure)]'}`}
                 >
                   {isDone && <CheckCircle size={12} className="text-white" />}
                 </button>
@@ -320,11 +323,11 @@ return (
       title="IFRS Dashboard"
       subtitle="International Financial Reporting Standards — Ethiopian context, AABE compliance &amp; key standards"
       icon={<BookOpen size={18} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       crumbs={[{ label: 'ovds' }, { label: 'IFRS' }]}
       actions={
         <Can permission="ovds:write">
-          <Link to="/settings?tab=ifrs-standards" className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 transition-all shadow-sm">
+          <Link to="/settings?tab=ifrs-standards" className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[var(--pro-azure)] text-white text-xs font-semibold hover:bg-[var(--pro-azure-dark)] transition-all shadow-sm">
             <Zap size={13} /> Configure IFRS
           </Link>
         </Can>
@@ -336,9 +339,9 @@ return (
       <div className="ovds-grid-layout cols-4">
         {[
           { label: 'AABE Mandatory Since', value: '7 Jul 2023', sub: 'Tier 1 — Full IFRS', icon: <Award size={18} className="text-violet-500" />, bg: 'bg-violet-50 dark:bg-violet-950/20' },
-          { label: 'Compliance Score', value: complianceScore > 0 ? `${complianceScore}%` : '—', sub: complianceScore >= 80 ? 'Audit-ready' : complianceScore >= 60 ? 'Minor gaps' : 'Needs review', icon: <ShieldCheck size={18} className="text-emerald-500" />, bg: 'bg-emerald-50 dark:bg-emerald-950/20' },
+          { label: 'Compliance Score', value: complianceScore > 0 ? `${complianceScore}%` : '—', sub: complianceScore >= 80 ? 'Audit-ready' : complianceScore >= 60 ? 'Minor gaps' : 'Needs review', icon: <ShieldCheck size={18} className="text-[var(--pro-azure)]" />, bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20' },
           { label: 'Upcoming Deadlines', value: urgentCount.toString(), sub: `${timeline.filter(t => t.status === 'overdue').length} overdue`, icon: <Clock size={18} className="text-amber-500" />, bg: 'bg-amber-50 dark:bg-amber-950/20' },
-          { label: 'Key Standards', value: STANDARDS.length.toString(), sub: 'Tier 1 + Tier 2 coverage', icon: <BookOpen size={18} className="text-emerald-600 dark:text-emerald-400" />, bg: 'bg-emerald-50 dark:bg-emerald-950/20' },
+          { label: 'Key Standards', value: STANDARDS.length.toString(), sub: 'Tier 1 + Tier 2 coverage', icon: <BookOpen size={18} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />, bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20' },
         ].map(kpi => (
           <div key={kpi.label} className={`${kpi.bg} rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex items-center gap-3`}>
             <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center shadow-sm shrink-0">
@@ -361,7 +364,7 @@ return (
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-t-lg text-xs font-bold whitespace-nowrap transition-all border-b-2 -mb-px ${
               activeTab === tab.id
-                ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20'
+                ? 'border-[var(--pro-azure)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/20'
                 : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50'
             }`}
           >
@@ -371,7 +374,7 @@ return (
               <span className="px-1.5 py-0.5 bg-amber-500 text-white text-[8px] font-semibold rounded-full leading-none">{tab.badge}</span>
             )}
             {tab.isNew && (
-              <span className="text-[7px] font-semibold px-1 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 uppercase tracking-wide leading-none">New</span>
+              <span className="text-[7px] font-semibold px-1 py-0.5 rounded bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-[var(--pro-azure)]/20 uppercase tracking-wide leading-none">New</span>
             )}
           </button>
         ))}
@@ -396,7 +399,7 @@ return (
                     <p className="font-semibold text-sm text-slate-800 dark:text-slate-100">{t.label}</p>
                     <p className="text-[10px] text-slate-500 mt-0.5">{t.standard}</p>
                     <p className="text-[9px] text-slate-400 mt-1">Since {t.since}</p>
-                    <div className="flex items-center gap-1 mt-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                    <div className="flex items-center gap-1 mt-2 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                       View details <ArrowRight size={9} />
                     </div>
                   </button>
@@ -419,8 +422,8 @@ return (
                       label: 'IFRS 16 — ROU Asset',
                       value: liveDashboard ? `ETB ${liveDashboard.ifrs16.totalRouAsset.toLocaleString()}` : '—',
                       sub: liveDashboard ? `${liveDashboard.ifrs16.activeLeases} active leases · Liability ETB ${liveDashboard.ifrs16.totalLeaseLiability.toLocaleString()}` : 'No leases',
-                      icon: <Building2 size={16} className="text-emerald-500" />,
-                      color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30',
+                      icon: <Building2 size={16} className="text-[var(--pro-azure)]" />,
+                      color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30',
                     },
                     {
                       label: 'IAS 38 — Capitalized Software',
@@ -457,13 +460,13 @@ return (
                   <Link
                     key={fs.label}
                     to={fs.route}
-                    className="group flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:border-emerald-800 hover:shadow-sm transition-all bg-slate-50/50 dark:bg-slate-800/30"
+                    className="group flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-[var(--pro-azure-100)] dark:border-green-800 hover:shadow-sm transition-all bg-slate-50/50 dark:bg-slate-800/30"
                   >
                     <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-[10px] font-semibold shrink-0 ${fs.color}`}>
                       {fs.icon}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:text-emerald-400 transition-colors truncate">{fs.label}</p>
+                      <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors truncate">{fs.label}</p>
                       <p className="text-[9px] text-slate-400 truncate">{fs.standard}</p>
                     </div>
                   </Link>
@@ -486,11 +489,11 @@ return (
                   </thead>
                   <tbody>
                     {[
-                      { std: 'IFRS 15', eth: 'VAT Proclamation 1341/2024', rate: '15% output VAT', treatment: 'Output VAT is a liability, not revenue', stdColor: 'bg-emerald-50 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-950/30' },
-                      { std: 'IAS 12',  eth: 'Income Tax Proc. 979/2016',  rate: '30% BIT flat rate', treatment: 'Current tax liability + deferred tax', stdColor: 'bg-emerald-50 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-950/30' },
-                      { std: 'IAS 19',  eth: 'Pension Proc. 714/2011',     rate: '7% + 11% pension (cap ETB 15,000)', treatment: 'Defined contribution — expense when due', stdColor: 'bg-emerald-50 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-950/30' },
-                      { std: 'IAS 37',  eth: 'DRRF Reg. 570/2025',         rate: '1%–5% + flat fees', treatment: 'Provision recognised when obligation arises', stdColor: 'bg-emerald-50 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-950/30' },
-                      { std: 'IFRS 9',  eth: 'NBE FIS/01/2012',            rate: 'ECL provisioning', treatment: 'Lifetime ECL for trade receivables', stdColor: 'bg-emerald-50 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-950/30' },
+                      { std: 'IFRS 15', eth: 'VAT Proclamation 1341/2024', rate: '15% output VAT', treatment: 'Output VAT is a liability, not revenue', stdColor: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] dark:bg-green-950/30' },
+                      { std: 'IAS 12',  eth: 'Income Tax Proc. 979/2016',  rate: '30% BIT flat rate', treatment: 'Current tax liability + deferred tax', stdColor: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] dark:bg-green-950/30' },
+                      { std: 'IAS 19',  eth: 'Pension Proc. 714/2011',     rate: '7% + 11% pension (cap ETB 15,000)', treatment: 'Defined contribution — expense when due', stdColor: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] dark:bg-green-950/30' },
+                      { std: 'IAS 37',  eth: 'DRRF Reg. 570/2025',         rate: '1%–5% + flat fees', treatment: 'Provision recognised when obligation arises', stdColor: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] dark:bg-green-950/30' },
+                      { std: 'IFRS 9',  eth: 'NBE FIS/01/2012',            rate: 'ECL provisioning', treatment: 'Lifetime ECL for trade receivables', stdColor: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] dark:bg-green-950/30' },
                       { std: 'IFRS 18', eth: 'AABE IFRS Adoption (2027)',  rate: 'Effective 1 Jan 2027', treatment: 'Replaces IAS 1 — new P&L categories', stdColor: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' },
                     ].map((row, i) => (
                       <tr key={row.std} className={`border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors ${i % 2 === 0 ? '' : 'bg-slate-50/30 dark:bg-slate-800/20'}`}>
@@ -515,7 +518,7 @@ return (
               <div className="space-y-1">
                 {timeline.map(item => <ComplianceRow key={item.id} item={item} />)}
               </div>
-              <Link to="/compliance/auditor" className="mt-4 flex items-center justify-center gap-1.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+              <Link to="/compliance/auditor" className="mt-4 flex items-center justify-center gap-1.5 text-[11px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
                 Full compliance dashboard <ArrowRight size={11} />
               </Link>
             </div>
@@ -534,8 +537,8 @@ return (
                   { label: 'Audit Outsourcing', to: '/compliance/audit-outsourcing', icon: <ShieldCheck size={14} /> },
                   { label: 'IFRS Settings', to: '/settings?tab=ifrs-standards', icon: <Zap size={14} /> },
                 ].map(a => (
-                  <Link key={a.label} to={a.to} className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-emerald-50/50 dark:bg-emerald-950/10 hover:text-emerald-600 dark:text-emerald-400 transition-all group">
-                    <span className="text-slate-400 group-hover:text-emerald-600 dark:text-emerald-400 transition-colors">{a.icon}</span>
+                  <Link key={a.label} to={a.to} className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-all group">
+                    <span className="text-slate-400 group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">{a.icon}</span>
                     {a.label}
                     <ArrowRight size={10} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
                   </Link>
@@ -577,7 +580,7 @@ return (
                 <div className="space-y-1.5">
                   {currentTierInfo.criteria.map(c => (
                     <div key={c} className="flex items-center gap-2">
-                      <CheckCircle size={12} className="text-emerald-500 shrink-0" />
+                      <CheckCircle size={12} className="text-[var(--pro-azure)] shrink-0" />
                       <span className="text-xs text-slate-700 dark:text-slate-300">{c}</span>
                     </div>
                   ))}
@@ -619,8 +622,8 @@ return (
               </div>
             )}
             {currentTierInfo.tier === '2' && (
-              <div className="mt-4 p-3 bg-emerald-100/50 dark:bg-emerald-950/20 rounded-xl border border-emerald-200 dark:border-emerald-800">
-                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5">
+              <div className="mt-4 p-3 bg-[var(--pro-azure-100)]/50 dark:bg-green-950/20 rounded-xl border border-[var(--pro-azure-100)] dark:border-green-800">
+                <p className="text-xs font-bold text-[var(--pro-azure-dark)] dark:text-green-300 flex items-center gap-1.5">
                   <Info size={12} /> Key difference from Full IFRS: cost model only for PP&E, borrowing costs expensed, goodwill amortized over max 10 years.
                 </p>
               </div>
@@ -677,8 +680,8 @@ return (
                     { type: 'Large Enterprise', code: 'LARGE', tier: 'Tier 1', color: 'bg-violet-50 text-violet-700 dark:bg-violet-950/30 dark:text-violet-300', rationale: 'Publicly accountable; always exceeds Threshold 1' },
                     { type: 'Government', code: 'GOV', tier: 'Tier 1', color: 'bg-violet-50 text-violet-700 dark:bg-violet-950/30 dark:text-violet-300', rationale: 'Government-owned enterprises — mandatory Full IFRS' },
                     { type: 'Manufacturing', code: 'MFG', tier: 'Tier 1 or 2', color: 'bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-300', rationale: 'Depends on turnover/asset size; large manufacturers → Tier 1' },
-                    { type: 'Medium Enterprise', code: 'MED', tier: 'Tier 1 or 2', color: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300', rationale: 'Straddles both thresholds; AABE criteria determine tier' },
-                    { type: 'Small Business', code: 'SMB', tier: 'Tier 2', color: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300', rationale: 'Typically meets Threshold 2 but not Threshold 1' },
+                    { type: 'Medium Enterprise', code: 'MED', tier: 'Tier 1 or 2', color: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:text-green-300', rationale: 'Straddles both thresholds; AABE criteria determine tier' },
+                    { type: 'Small Business', code: 'SMB', tier: 'Tier 2', color: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:text-green-300', rationale: 'Typically meets Threshold 2 but not Threshold 1' },
                     { type: 'Freelancer', code: 'FRLNC', tier: 'Tier 3', color: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400', rationale: 'Below Threshold 2; outside IFRS scope' },
                   ].map((row, i) => (
                     <tr key={row.code} className={`border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors ${i % 2 === 0 ? '' : 'bg-slate-50/30 dark:bg-slate-800/20'}`}>
@@ -705,15 +708,15 @@ return (
                 <Link
                   key={fs.label}
                   to={fs.route}
-                  className="group p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-emerald-200 dark:border-emerald-800 hover:shadow-md transition-all bg-slate-50/30 dark:bg-slate-800/20"
+                  className="group p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-[var(--pro-azure-100)] dark:border-green-800 hover:shadow-md transition-all bg-slate-50/30 dark:bg-slate-800/20"
                 >
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-sm font-semibold mb-3 ${fs.color}`}>
                     {fs.icon}
                   </div>
-                  <p className="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-emerald-600 dark:text-emerald-400 transition-colors mb-0.5">{fs.label}</p>
+                  <p className="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors mb-0.5">{fs.label}</p>
                   <p className="text-[11px] text-slate-500 mb-1">{fs.sub}</p>
                   <p className="text-[10px] font-bold text-slate-400">{fs.standard}</p>
-                  <div className="flex items-center gap-1 mt-3 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1 mt-3 text-[11px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] opacity-0 group-hover:opacity-100 transition-opacity">
                     Open report <ArrowRight size={10} />
                   </div>
                 </Link>
@@ -754,8 +757,8 @@ return (
                   onClick={() => setStdFilter(f)}
                   className={`px-3 py-2 rounded-lg text-xs font-medium transition-all border ${
                     stdFilter === f
-                      ? 'bg-emerald-500 text-white border-emerald-600 shadow-sm'
-                      : 'bg-white dark:bg-slate-900 text-slate-500 border-slate-200 dark:border-slate-700 hover:border-emerald-600 hover:text-emerald-600 dark:text-emerald-400'
+                      ? 'bg-[var(--pro-azure)] text-white border-[var(--pro-azure)] shadow-sm'
+                      : 'bg-white dark:bg-slate-900 text-slate-500 border-slate-200 dark:border-slate-700 hover:border-[var(--pro-azure)] hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
                   }`}
                 >
                   {f === 'all' ? 'All' : `Tier ${f}`}
@@ -785,26 +788,26 @@ return (
             <div className="flex items-start justify-between gap-3 mb-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">IFRS S1</span>
-                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 uppercase tracking-wide">New</span>
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300 border border-[var(--pro-azure-100)] dark:border-green-800">IFRS S1</span>
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-[var(--pro-azure)]/20 uppercase tracking-wide">New</span>
                 </div>
                 <h3 className="text-base font-semibold text-slate-800 dark:text-slate-100">Sustainability-related Financial Disclosures</h3>
                 <p className="text-[11px] text-slate-400 mt-0.5">General requirements for sustainability-related financial information</p>
               </div>
-              <Link to="/compliance/auditor?view=sustainability" className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 text-xs font-bold hover:bg-emerald-100 dark:hover:bg-emerald-950/50 transition-all border border-emerald-200 dark:border-emerald-800">
+              <Link to="/compliance/auditor?view=sustainability" className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-green-300 text-xs font-bold hover:bg-[var(--pro-azure-100)] dark:hover:bg-green-950/50 transition-all border border-[var(--pro-azure-100)] dark:border-green-800">
                 Open <ArrowRight size={11} />
               </Link>
             </div>
             <div className="ovds-grid-layout cols-4 gap-sm">
               {[
                 { pillar: 'Governance', icon: <ShieldCheck size={18} />, desc: 'Board oversight of sustainability risks and opportunities', route: '/compliance/auditor?view=sustainability&pillar=governance', color: 'text-violet-600 bg-violet-50 dark:bg-violet-950/30' },
-                { pillar: 'Strategy', icon: <TrendingUp size={18} />, desc: 'How sustainability affects business model and strategy', route: '/compliance/auditor?view=sustainability&pillar=strategy', color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30' },
+                { pillar: 'Strategy', icon: <TrendingUp size={18} />, desc: 'How sustainability affects business model and strategy', route: '/compliance/auditor?view=sustainability&pillar=strategy', color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30' },
                 { pillar: 'Risk Management', icon: <AlertTriangle size={18} />, desc: 'Processes for identifying and managing sustainability risks', route: '/compliance/auditor?view=sustainability&pillar=risk', color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/30' },
-                { pillar: 'Metrics & Targets', icon: <BarChart3 size={18} />, desc: 'Quantitative measures and targets for sustainability performance', route: '/compliance/auditor?view=sustainability&pillar=metrics', color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30' },
+                { pillar: 'Metrics & Targets', icon: <BarChart3 size={18} />, desc: 'Quantitative measures and targets for sustainability performance', route: '/compliance/auditor?view=sustainability&pillar=metrics', color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30' },
               ].map(p => (
-                <Link key={p.pillar} to={p.route} className="group p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:border-emerald-800 hover:shadow-sm transition-all">
+                <Link key={p.pillar} to={p.route} className="group p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-[var(--pro-azure-100)] dark:border-green-800 hover:shadow-sm transition-all">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2 ${p.color}`}>{p.icon}</div>
-                  <p className="font-semibold text-sm text-slate-800 dark:text-slate-100 group-hover:text-emerald-600 dark:text-emerald-400 transition-colors">{p.pillar}</p>
+                  <p className="font-semibold text-sm text-slate-800 dark:text-slate-100 group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">{p.pillar}</p>
                   <p className="ovds-caption mt-0.5 leading-relaxed">{p.desc}</p>
                 </Link>
               ))}
@@ -817,7 +820,7 @@ return (
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300 border border-sky-200 dark:border-sky-800">IFRS S2</span>
-                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 uppercase tracking-wide">New</span>
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-[var(--pro-azure)]/20 uppercase tracking-wide">New</span>
                 </div>
                 <h3 className="text-base font-semibold text-slate-800 dark:text-slate-100">Climate-related Disclosures</h3>
                 <p className="text-[11px] text-slate-400 mt-0.5">Climate-related risks, opportunities, and GHG emissions reporting</p>
@@ -830,12 +833,12 @@ return (
               {[
                 { label: 'Climate Risks', desc: 'Physical and transition risks from climate change', route: '/compliance/auditor?view=climate&tab=risks', icon: <AlertTriangle size={16} />, color: 'text-rose-500 bg-rose-50 dark:bg-rose-950/30' },
                 { label: 'GHG Emissions', desc: 'Scope 1, 2, and 3 greenhouse gas emissions', route: '/compliance/auditor?view=climate&tab=emissions', icon: <Activity size={16} />, color: 'text-sky-500 bg-sky-50 dark:bg-sky-950/30' },
-                { label: 'Transition Plan', desc: 'Strategy for transitioning to a lower-carbon economy', route: '/compliance/auditor?view=climate&tab=transition', icon: <ArrowRight size={16} />, color: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-950/30' },
+                { label: 'Transition Plan', desc: 'Strategy for transitioning to a lower-carbon economy', route: '/compliance/auditor?view=climate&tab=transition', icon: <ArrowRight size={16} />, color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30' },
               ].map(item => (
-                <Link key={item.label} to={item.route} className="group flex items-center gap-3 p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:border-emerald-800 hover:shadow-sm transition-all">
+                <Link key={item.label} to={item.route} className="group flex items-center gap-3 p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-[var(--pro-azure-100)] dark:border-green-800 hover:shadow-sm transition-all">
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>{item.icon}</div>
                   <div>
-                    <p className="font-semibold text-sm text-slate-800 dark:text-slate-100 group-hover:text-emerald-600 dark:text-emerald-400 transition-colors">{item.label}</p>
+                    <p className="font-semibold text-sm text-slate-800 dark:text-slate-100 group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">{item.label}</p>
                     <p className="ovds-caption">{item.desc}</p>
                   </div>
                 </Link>
@@ -848,15 +851,15 @@ return (
             <SectionHeader title="ESG Reporting" sub="Environmental, Social, and Governance — integrated with IFRS S1 & S2" icon={<Globe size={16} />} />
             <div className="ovds-grid-layout cols-3">
               {[
-                { label: 'Environmental', code: 'E', desc: 'Climate, emissions, energy, water, waste', route: '/reports/insights?view=esg&tab=e', color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800' },
-                { label: 'Social', code: 'S', desc: 'Labour practices, community, human rights', route: '/reports/insights?view=esg&tab=s', color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800' },
+                { label: 'Environmental', code: 'E', desc: 'Climate, emissions, energy, water, waste', route: '/reports/insights?view=esg&tab=e', color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)] dark:border-green-800' },
+                { label: 'Social', code: 'S', desc: 'Labour practices, community, human rights', route: '/reports/insights?view=esg&tab=s', color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)] dark:border-green-800' },
                 { label: 'Governance', code: 'G', desc: 'Board structure, ethics, transparency, RBAC', route: '/reports/insights?view=esg&tab=g', color: 'text-violet-600 bg-violet-50 dark:bg-violet-950/30 border-violet-200 dark:border-violet-800' },
               ].map(esg => (
                 <Link key={esg.code} to={esg.route} className={`group p-5 rounded-2xl border-2 ${esg.color} hover:shadow-md transition-all`}>
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl font-semibold mb-3 bg-white dark:bg-slate-900 shadow-sm`}>{esg.code}</div>
-                  <p className="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-emerald-600 dark:text-emerald-400 transition-colors">{esg.label}</p>
+                  <p className="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">{esg.label}</p>
                   <p className="text-[11px] text-slate-500 mt-0.5">{esg.desc}</p>
-                  <div className="flex items-center gap-1 mt-3 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1 mt-3 text-[11px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] opacity-0 group-hover:opacity-100 transition-opacity">
                     View ESG data <ArrowRight size={10} />
                   </div>
                 </Link>
@@ -880,18 +883,18 @@ return (
           {/* Compliance tools */}
           <div className="space-y-4">
             {[
-              { label: 'IFRS Compliance Auditor', sub: 'ERCA checklist + compliance score', route: '/compliance/auditor', icon: <ShieldCheck size={18} />, color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30' },
+              { label: 'IFRS Compliance Auditor', sub: 'ERCA checklist + compliance score', route: '/compliance/auditor', icon: <ShieldCheck size={18} />, color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30' },
               { label: 'Audit Outsourcing', sub: 'Statutory audit, tax audit, compliance certificate', route: '/compliance/audit-outsourcing', icon: <Award size={18} />, color: 'text-violet-600 bg-violet-50 dark:bg-violet-950/30' },
-              { label: 'Period Close (IAS 10)', sub: 'Lock fiscal period — prevents backdated entries', route: '/accounting/period-close', icon: <CheckCircle size={18} />, color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30' },
+              { label: 'Period Close (IAS 10)', sub: 'Lock fiscal period — prevents backdated entries', route: '/accounting/period-close', icon: <CheckCircle size={18} />, color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30' },
               { label: 'Audit Logs', sub: 'Immutable activity trail — 7-year retention', route: '/settings/audit-logs', icon: <Activity size={18} />, color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/30' },
             ].map(tool => (
-              <Link key={tool.label} to={tool.route} className="group flex items-center gap-4 p-4 ovds-widget-card hover:border-emerald-200 dark:border-emerald-800 hover:shadow-md transition-all">
+              <Link key={tool.label} to={tool.route} className="group flex items-center gap-4 p-4 ovds-widget-card hover:border-[var(--pro-azure-100)] dark:border-green-800 hover:shadow-md transition-all">
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${tool.color}`}>{tool.icon}</div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-emerald-600 dark:text-emerald-400 transition-colors">{tool.label}</p>
+                  <p className="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">{tool.label}</p>
                   <p className="text-[11px] text-slate-400">{tool.sub}</p>
                 </div>
-                <ArrowRight size={14} className="text-slate-300 group-hover:text-emerald-600 dark:text-emerald-400 transition-colors shrink-0" />
+                <ArrowRight size={14} className="text-slate-300 group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors shrink-0" />
               </Link>
             ))}
 
@@ -905,12 +908,12 @@ return (
                   { label: 'IASB — IFRS Standards', url: 'https://www.ifrs.org', sub: 'Official IFRS standard-setter' },
                 ].map(link => (
                   <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white dark:hover:bg-slate-900 transition-colors group">
-                    <Globe size={13} className="text-slate-400 group-hover:text-emerald-600 dark:text-emerald-400 transition-colors shrink-0" />
+                    <Globe size={13} className="text-slate-400 group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-emerald-600 dark:text-emerald-400 transition-colors truncate">{link.label}</p>
+                      <p className="text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors truncate">{link.label}</p>
                       <p className="text-[9px] text-slate-400 truncate">{link.sub}</p>
                     </div>
-                    <ExternalLink size={10} className="text-slate-300 group-hover:text-emerald-600 dark:text-emerald-400 transition-colors shrink-0" />
+                    <ExternalLink size={10} className="text-slate-300 group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors shrink-0" />
                   </a>
                 ))}
               </div>
@@ -929,7 +932,7 @@ return (
             <div className="bg-purple-50 dark:bg-purple-950/20 rounded-2xl border border-purple-200 dark:border-purple-800 p-5">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800">IFRS 18</span>
-                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 uppercase tracking-wide">Effective 1 Jan 2027</span>
+                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-[var(--pro-azure)]/20 uppercase tracking-wide">Effective 1 Jan 2027</span>
               </div>
               <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-2">What Changes?</h3>
               <div className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
@@ -953,7 +956,7 @@ return (
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 AABE has indicated adoption of IFRS 18 effective <strong>1 January 2027</strong> for Tier 1 entities. Ethiopian businesses should begin readiness assessments now to avoid last-minute restatements.
               </p>
-              <a href="https://aabe.gov.et" target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+              <a href="https://aabe.gov.et" target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center gap-1.5 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
                 AABE guidance <ExternalLink size={10} />
               </a>
             </div>

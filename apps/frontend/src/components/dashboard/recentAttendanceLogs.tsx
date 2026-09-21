@@ -1,6 +1,4 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { getLocale } from '../../lib/locale';
+import { Skeleton } from '@ovds/ui';
 import {
   Users,
   Search,
@@ -9,7 +7,10 @@ import {
   CheckCircle2,
   MoreHorizontal,
 } from 'lucide-react';
-import { Skeleton } from '@ovds/ui';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { getLocale } from '../../lib/locale';
 
 interface RecentAttendanceLogsProps {
   filteredLogs: any[];
@@ -66,7 +67,7 @@ const RecentAttendanceLogs: React.FC<RecentAttendanceLogsProps> = ({
           </button>
           <button
             onClick={() => exportData('pdf')}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all text-xs font-bold shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30"
+            className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl hover:bg-[var(--pro-azure-dark)] transition-all text-xs font-bold shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30"
           >
             <FileDown size={14} />
             <span className="hidden sm:inline">{t('admin.export_pdf')}</span>
@@ -146,25 +147,25 @@ const RecentAttendanceLogs: React.FC<RecentAttendanceLogsProps> = ({
                       className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
                         log.status === 'LATE'
                           ? 'bg-amber-50 text-amber-600 border border-amber-100'
-                          : 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                          : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] border border-[var(--pro-azure-100)]'
                       }`}
                     >
                       <span
-                        className={`w-1.5 h-1.5 rounded-full ${log.status === 'LATE' ? 'bg-amber-400' : 'bg-emerald-400'}`}
+                        className={`w-1.5 h-1.5 rounded-full ${log.status === 'LATE' ? 'bg-amber-400' : 'bg-[var(--pro-azure-light)]'}`}
                       ></span>
                       {log.status}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     {log.verified ? (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[var(--pro-azure-50)] text-[var(--pro-azure)] border border-[var(--pro-azure-100)] rounded-full text-[10px] font-extrabold uppercase tracking-wider">
                         <CheckCircle2 size={12} />
                         {t('admin.table.verified')}
                       </span>
                     ) : (
                       <button
                         onClick={() => handleVerify(log.id)}
-                        className="px-4 py-1.5 bg-emerald-500 dark:bg-slate-900 text-white rounded-lg text-[10px] font-bold hover:bg-emerald-600 dark:hover:bg-slate-800 transition-all hover:scale-105 active:scale-95 shadow-md shadow-emerald-200 dark:shadow-slate-200"
+                        className="px-4 py-1.5 bg-[var(--pro-azure-50)]0 dark:bg-slate-900 text-white rounded-lg text-[10px] font-bold hover:bg-[var(--pro-azure-dark)] dark:hover:bg-slate-800 transition-all hover:scale-105 active:scale-95 shadow-md shadow-green-200 dark:shadow-slate-200"
                       >
                         {t('admin.table.verify_now')}
                       </button>

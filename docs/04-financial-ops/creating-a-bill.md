@@ -8,7 +8,7 @@
 >
 > **Lifecycle phase:** [Phase 1 — Data Capture](./../FILING-LIFECYCLE.md#2-phase-1--data-capture) &middot; [Phase 2 — Tax Calculation](./../FILING-LIFECYCLE.md#3-phase-2--tax-calculation--accrual) | WHT rates: [`CORE-CONFIG.md`](./../CORE-CONFIG.md#7-tax-rate--deadline-summary)
 
-Tracking bills keeps your business on top of expenses, cash flow, and vendor relationships. OVDS makes it straightforward to record, manage, and pay vendor bills — with Withholding Tax (WHT) calculated automatically where applicable.
+Tracking bills keeps your business on top of expenses, cash flow, and vendor relationships. Ovds makes it straightforward to record, manage, and pay vendor bills — with Withholding Tax (WHT) calculated automatically where applicable.
 
 ---
 
@@ -22,32 +22,16 @@ Tracking bills keeps your business on top of expenses, cash flow, and vendor rel
 
 ## Creating a Bill
 
-### Step 1 — Navigate to Bills
+Once you log in to your dashboard, go to **Purchases** on the navigation menu bar.
 
-1. Log in to your OVDS Dashboard.
-2. On the main navigation menu bar, click **Purchases**.
-3. Click **Purchases** to reveal the drop-down menu.
-4. Select **Bills**.
-5. From the Bills dashboard, click **New Bill**.
-
----
-
-### Step 2 — Fill in Bill Details
-
-Enter the required information on the bill creation page:
-
-| Field | Required | Notes |
-|-------|----------|-------|
-| Vendor | ✅ | Select existing or create new |
-| Bill Date | ✅ | Date on the vendor's invoice |
-| Bill Number | ✅ | Vendor's invoice reference number |
-| Due Date | Optional | Calculated from payment terms if left blank |
-| Currency | ✅ | Defaults to ETB |
-| Line Items | ✅ | At least one item required |
+1. Click **Purchases** to reveal a drop-down menu.
+2. Select **Bills**.
+3. From the Bills dashboard, click **New Bill**.
+4. Enter the required details on the Bill creation page.
 
 ---
 
-### Step 3 — Add a Vendor
+### Add a Vendor
 
 1. In the **Vendor** field, click **Add a Vendor**.
 2. Select an existing vendor from the dropdown, or click **New Vendor** to create one.
@@ -69,7 +53,7 @@ Enter the required information on the bill creation page:
 
 ---
 
-### Step 4 — Add Items or Services
+### Add Items or Services
 
 1. Click **Add an Item**.
 2. Enter the following for each item:
@@ -80,11 +64,9 @@ Enter the required information on the bill creation page:
 3. The bill total is automatically calculated as you add items.
 4. Repeat for each additional product or service.
 
-> You can apply a **discount** or assign a **tax** directly on each item row. See the sections below.
-
 ---
 
-### Step 5 — Notes, Footer, and Attachments
+### Notes, Footer, and Attachments
 
 1. Use the **Notes** box to add instructions, remarks, or references relevant to the bill.
 2. Scroll down and click **Advanced** to expand:
@@ -95,11 +77,11 @@ Enter the required information on the bill creation page:
 
 ---
 
-### Step 6 — Save
+### Save
 
 Click **Save** — the bill is created with **Draft** status.
 
-> **WHT Auto-Calculation:** If the vendor has a TIN on file and the bill total is ≥ ETB 10,000 (goods) or ≥ ETB 500 (services), OVDS automatically calculates and displays the 2% Withholding Tax deduction. This amount is tracked separately for ERCA remittance.
+> **WHT Auto-Calculation:** If the vendor has a TIN on file and the bill total is ≥ ETB 10,000 (goods) or ≥ ETB 500 (services), Ovds automatically calculates and displays the 2% Withholding Tax deduction. This amount is tracked separately for ERCA remittance.
 
 ---
 
@@ -120,10 +102,10 @@ Line discounts are disabled by default:
 
 Once enabled:
 
-1. Click **Add an Item** and enter the item details — name, description, quantity, and amount.
-2. Below the **Quantity** field on the item row, click **Add Discount**.
+1. Click **New Item** and enter the item details — name, description, quantity, and amount.
+2. Below the **Quantity** input box, click **Add Discount**.
 3. Enter the discount as a **percentage** or a **fixed currency amount**.
-4. The discounted total is automatically reflected in the bill.
+4. The total discount is automatically reflected in the bill.
 
 > Global discounts (applied to the whole bill) are available without any settings change — enter the discount value in the discount field at the bottom of the line items section.
 
@@ -131,10 +113,8 @@ Once enabled:
 
 ## Adding Taxes to Bills
 
-> **Prerequisite:** Tax rates must be configured in **Settings → Taxes** before they can be assigned to bill items.
-
-1. Click **Add an Item** and enter the item details.
-2. Below the **Price** field on the item row, click **Add Tax**.
+1. Click **New Item** and enter the item details — name, description, quantity, and price.
+2. Below the **Price** input box, click **Add Tax**.
 3. Click **New Tax** from the dropdown.
 4. Enter:
    - **Name** — e.g. *VAT 15%*
@@ -147,14 +127,14 @@ Once enabled:
 
 ## Changing the Color of a Bill
 
-Customize the accent color of the bill PDF to match your brand or the vendor's branding.
+While creating a bill, you can customize the color to match your brand or the vendor's branding.
+
+1. On the **New Bill** page, scroll down to **Advanced**.
+2. Click **Advanced** to expand.
+3. Click the **Color** icon to see an extended color palette, or enter the color code manually.
+4. Click **Save**.
 
 > This applies to the **PDF and print layout** only — it does not affect the bill record's appearance in your dashboard.
-
-1. On the **New Bill** page (or when editing), scroll down to **Advanced**.
-2. Click **Advanced** to expand.
-3. Click the **Color** icon to open the color palette, or type a hex code directly (e.g. `#16A34A`).
-4. Click **Save**.
 
 ---
 
@@ -172,7 +152,7 @@ Customize the accent color of the bill PDF to match your brand or the vendor's b
 
 ## Recording Bill Payment
 
-1. Open the bill → click **Pay Bill**.
+1. Open the bill and click **Pay Bill**.
 2. Select the **payment account** (bank account or cash).
 3. Enter the **payment date** and an optional **reference number**.
 4. If WHT applies, the deductible amount is shown separately — it is automatically tracked for ERCA remittance.
@@ -218,7 +198,7 @@ Bills are sortable by: Date, Status, Vendor, Bill Number, and Amount.
 
 ### Duplicating a Bill
 
-1. Open the bill → click **More Actions (⋯) → Duplicate**.
+1. Open the bill and click **More Actions (⋯) → Duplicate**.
 2. A new Draft bill is created with the same vendor, items, and amounts — update the bill date and number to match the new invoice.
 
 ### Set a Default Bill Tab
@@ -235,7 +215,7 @@ After recording bill payments with WHT deductions, generate monthly certificates
 
 1. Navigate to **Purchases → WHT Certificates** (`/tax/wht-certificates`) — requires `vat:write`.
 2. Click **Generate** for the relevant month.
-3. OVDS creates one certificate per vendor showing the total payments made and WHT withheld.
+3. Ovds creates one certificate per vendor showing the total payments made and WHT withheld.
 4. Email the certificate to the vendor — they use it to claim WHT credit on their own tax return.
 5. Keep a copy in the Audit Trail for ERCA verification.
 
@@ -245,12 +225,12 @@ After recording bill payments with WHT deductions, generate monthly certificates
 
 ## Scanned Receipts (OCR Import)
 
-Upload physical receipts and paper invoices — OVDS extracts the data automatically using OCR.
+Upload physical receipts and paper invoices — Ovds extracts the data automatically using OCR.
 
 Navigate to **Purchases → Scanned Receipts** (`/scanned-bills`) — requires `bills:read`.
 
 1. Click **Upload Receipt** — drag and drop a photo or PDF of the paper bill.
-2. OVDS reads: vendor name, date, amount, and VAT.
+2. Ovds reads: vendor name, date, amount, and VAT.
 3. Review and confirm the extracted values.
 4. The receipt is converted to a bill and posted to the GL.
 5. The original image is stored and linked to the bill for audit purposes.

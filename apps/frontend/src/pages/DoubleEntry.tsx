@@ -3,25 +3,27 @@
  *               Income Statement (P&L), Manual Journals
  * OVDS style: AppPage · AppKpi · AppTable · tabs · modals
  */
-import React, { useState, useCallback, useEffect } from 'react';
+import type { KpiCell } from '@ovds/features/reporting';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   BookOpen, Plus, Edit2, Trash2, RefreshCw, FileText,
   Scale, List, BarChart2, PlusCircle, MinusCircle, TrendingUp,
 } from 'lucide-react';
+import React, { useState, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { confirm } from '../utils/confirm';
-import { fmtCurrency, fmtDate } from '../utils/fmt';
-import api from '../services/api';
+
 import {
   AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, Modal, FormField, Input, Select, EmptyState, Pagination, Amount,
 } from '../components/ui';
-import type { KpiCell } from '@ovds/features/reporting';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { confirm } from '../utils/confirm';
+import { fmtCurrency, fmtDate } from '../utils/fmt';
+
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -295,12 +297,12 @@ const JournalForm: React.FC<{
               <tr>
                 <td colSpan={2} className="px-3 py-2">
                   <button type="button" onClick={addLine}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-500">
+                    className="flex items-center gap-1.5 text-xs font-semibold text-[var(--pro-azure)] hover:text-[var(--pro-azure)]">
                     <PlusCircle size={13} /> Add Line
                   </button>
                 </td>
-                <td className={`px-3 py-2 text-right text-sm font-bold ${balanced ? 'text-emerald-600' : 'text-rose-500'}`}>{fmt(totalDebit)}</td>
-                <td className={`px-3 py-2 text-right text-sm font-bold ${balanced ? 'text-emerald-600' : 'text-rose-500'}`}>{fmt(totalCredit)}</td>
+                <td className={`px-3 py-2 text-right text-sm font-bold ${balanced ? 'text-[var(--pro-azure)]' : 'text-rose-500'}`}>{fmt(totalDebit)}</td>
+                <td className={`px-3 py-2 text-right text-sm font-bold ${balanced ? 'text-[var(--pro-azure)]' : 'text-rose-500'}`}>{fmt(totalCredit)}</td>
                 <td />
               </tr>
             </tfoot>
@@ -514,7 +516,7 @@ const DoubleEntry: React.FC = () => {
   const tbKpis: KpiCell[] = [
     { label: 'Total Debits',  value: fmt(tbDebit),           icon: <PlusCircle size={16} className="text-sky-500" /> },
     { label: 'Total Credits', value: fmt(tbCredit),          icon: <MinusCircle size={16} className="text-violet-500" /> },
-    { label: 'Net Balance',   value: fmt(tbDebit - tbCredit), icon: <Scale size={16} className={Math.abs(tbDebit - tbCredit) < 0.01 ? 'text-emerald-500' : 'text-rose-500'} /> },
+    { label: 'Net Balance',   value: fmt(tbDebit - tbCredit), icon: <Scale size={16} className={Math.abs(tbDebit - tbCredit) < 0.01 ? 'text-[var(--pro-azure)]' : 'text-rose-500'} /> },
   ];
 
   return (
@@ -595,7 +597,7 @@ const DoubleEntry: React.FC = () => {
               <tbody>
                 {filteredAccounts.map(a => (
                   <AppTr key={a.id}>
-                    <AppTd><span className="font-mono text-sm font-bold text-blue-600 dark:text-blue-400">{a.code}</span></AppTd>
+                    <AppTd><span className="font-mono text-sm font-bold text-[var(--pro-azure)]">{a.code}</span></AppTd>
                     <AppTd>
                       <div className="font-semibold text-sm">{a.name}</div>
                       {a.description && <div className="text-xs text-slate-400 truncate max-w-[220px]">{a.description}</div>}
@@ -607,7 +609,7 @@ const DoubleEntry: React.FC = () => {
                     </AppTd>
                     <AppTd muted>{a.category.replace(/_/g, ' ')}</AppTd>
                     <AppTd>
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${a.isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : 'bg-slate-100 text-slate-400 border-slate-200 dark:bg-slate-800 dark:border-slate-700'}`}>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${a.isActive ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-900/20 dark:text-[var(--pro-azure-light)] dark:border-green-800' : 'bg-slate-100 text-slate-400 border-slate-200 dark:bg-slate-800 dark:border-slate-700'}`}>
                         {a.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </AppTd>
@@ -669,7 +671,7 @@ const DoubleEntry: React.FC = () => {
                       <AppTd align="right"><Amount value={cr} currency="ETB" /></AppTd>
                       <AppTd>
                         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${
-                          je.status === 'POSTED'   ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' :
+                          je.status === 'POSTED'   ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-900/20 dark:text-[var(--pro-azure-light)] dark:border-green-800' :
                           je.status === 'REVERSED' ? 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:border-slate-700' :
                                                      'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400'
                         }`}>{je.status}</span>
@@ -725,13 +727,13 @@ const DoubleEntry: React.FC = () => {
               <tbody>
                 {trialBalance.map(r => (
                   <AppTr key={r.accountId}>
-                    <AppTd><span className="font-mono text-sm font-bold text-blue-600 dark:text-blue-400">{r.accountCode}</span></AppTd>
+                    <AppTd><span className="font-mono text-sm font-bold text-[var(--pro-azure)]">{r.accountCode}</span></AppTd>
                     <AppTd><span className="font-semibold text-sm">{r.accountName}</span></AppTd>
                     <AppTd muted>{r.accountCategory}</AppTd>
                     <AppTd align="right"><Amount value={r.totalDebit}  currency="ETB" /></AppTd>
                     <AppTd align="right"><Amount value={r.totalCredit} currency="ETB" /></AppTd>
                     <AppTd align="right">
-                      <span className={`font-bold text-sm ${r.balance >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
+                      <span className={`font-bold text-sm ${r.balance >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-500'}`}>
                         {fmt(r.balance)}
                       </span>
                     </AppTd>
@@ -744,7 +746,7 @@ const DoubleEntry: React.FC = () => {
                     <td colSpan={3} className="px-4 py-3 text-sm font-black text-slate-700 dark:text-slate-200">TOTALS</td>
                     <td className="px-4 py-3 text-right text-sm font-bold text-slate-700 dark:text-slate-200">{fmt(tbDebit)}</td>
                     <td className="px-4 py-3 text-right text-sm font-bold text-slate-700 dark:text-slate-200">{fmt(tbCredit)}</td>
-                    <td className={`px-4 py-3 text-right text-sm font-black ${Math.abs(tbDebit - tbCredit) < 0.01 ? 'text-emerald-600' : 'text-rose-500'}`}>
+                    <td className={`px-4 py-3 text-right text-sm font-black ${Math.abs(tbDebit - tbCredit) < 0.01 ? 'text-[var(--pro-azure)]' : 'text-rose-500'}`}>
                       {fmt(tbDebit - tbCredit)}
                     </td>
                   </tr>
@@ -788,9 +790,9 @@ const DoubleEntry: React.FC = () => {
                       <div className="text-xs text-slate-500 space-y-0.5">
                         {je.journalLine?.slice(0, 3).map((l, i) => (
                           <div key={i} className="flex items-center gap-2">
-                            <span className="font-mono text-blue-600 dark:text-blue-400 w-14 shrink-0 truncate">{l.account?.code}</span>
+                            <span className="font-mono text-[var(--pro-azure)] w-14 shrink-0 truncate">{l.account?.code}</span>
                             <span className="truncate max-w-[120px]">{l.account?.name}</span>
-                            {Number(l.debit)  > 0 && <span className="ml-auto text-emerald-600 shrink-0">Dr {fmt(Number(l.debit))}</span>}
+                            {Number(l.debit)  > 0 && <span className="ml-auto text-[var(--pro-azure)] shrink-0">Dr {fmt(Number(l.debit))}</span>}
                             {Number(l.credit) > 0 && <span className="ml-auto text-sky-600 shrink-0">Cr {fmt(Number(l.credit))}</span>}
                           </div>
                         ))}
@@ -800,7 +802,7 @@ const DoubleEntry: React.FC = () => {
                       </div>
                     </AppTd>
                     <AppTd>
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800">
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)] dark:bg-green-900/20 dark:text-[var(--pro-azure-light)] dark:border-green-800">
                         {je.status}
                       </span>
                     </AppTd>
@@ -837,7 +839,7 @@ const DoubleEntry: React.FC = () => {
               title="ASSETS"
               rows={bs.assets.rows}
               total={bs.assets.total}
-              colorClass="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-300"
+              colorClass="bg-[var(--pro-azure-50)] dark:bg-green-900/20 text-[var(--pro-azure-dark)] dark:text-green-300"
             />
             <BsSection
               title="LIABILITIES"
@@ -885,15 +887,15 @@ const DoubleEntry: React.FC = () => {
 
             {/* KPI strip */}
             <AppKpi cells={[
-              { label: 'Total Revenue',  value: fmt(pl.revenue.total),  icon: <TrendingUp  size={15} className="text-emerald-500" /> },
+              { label: 'Total Revenue',  value: fmt(pl.revenue.total),  icon: <TrendingUp  size={15} className="text-[var(--pro-azure)]" /> },
               { label: 'Gross Profit',   value: fmt(pl.grossProfit),    icon: <BarChart2   size={15} className={pl.grossProfit  >= 0 ? 'text-sky-500'     : 'text-rose-500'} /> },
-              { label: 'Net Income',     value: fmt(pl.netIncome),      icon: <Scale       size={15} className={pl.netIncome    >= 0 ? 'text-emerald-500' : 'text-rose-500'} /> },
+              { label: 'Net Income',     value: fmt(pl.netIncome),      icon: <Scale       size={15} className={pl.netIncome    >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-500'} /> },
             ]} cols={3} className="mb-5" />
 
             {/* Revenue */}
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden mb-4">
-              <div className="px-4 py-2.5 flex justify-between items-center bg-emerald-50 dark:bg-emerald-900/20">
-                <span className="font-bold text-sm text-emerald-800 dark:text-emerald-300">REVENUE</span>
+              <div className="px-4 py-2.5 flex justify-between items-center bg-[var(--pro-azure-50)] dark:bg-green-900/20">
+                <span className="font-bold text-sm text-[var(--pro-azure-dark)] dark:text-green-300">REVENUE</span>
                 <Amount value={pl.revenue.total} currency="ETB" />
               </div>
               {pl.revenue.rows.map(r => (
@@ -923,7 +925,7 @@ const DoubleEntry: React.FC = () => {
             {/* Gross profit subtotal */}
             <div className="flex justify-between items-center px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 mb-4 bg-white dark:bg-slate-800/50">
               <span className="font-bold text-sm text-slate-700 dark:text-slate-200">GROSS PROFIT</span>
-              <span className={`font-black text-sm ${pl.grossProfit >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>{fmt(pl.grossProfit)}</span>
+              <span className={`font-black text-sm ${pl.grossProfit >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-500'}`}>{fmt(pl.grossProfit)}</span>
             </div>
 
             {/* Operating expenses */}
@@ -942,9 +944,9 @@ const DoubleEntry: React.FC = () => {
             </div>
 
             {/* Net income */}
-            <div className={`flex justify-between items-center px-4 py-3 rounded-xl border-2 mt-2 ${pl.netIncome >= 0 ? 'border-emerald-300 dark:border-emerald-700' : 'border-rose-300 dark:border-rose-700'}`}>
+            <div className={`flex justify-between items-center px-4 py-3 rounded-xl border-2 mt-2 ${pl.netIncome >= 0 ? 'border-[var(--pro-azure-light)] dark:border-green-700' : 'border-rose-300 dark:border-rose-700'}`}>
               <span className="font-black text-sm text-slate-700 dark:text-slate-200">NET INCOME</span>
-              <span className={`font-black text-base ${pl.netIncome >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>{fmt(pl.netIncome)}</span>
+              <span className={`font-black text-base ${pl.netIncome >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-500'}`}>{fmt(pl.netIncome)}</span>
             </div>
           </div>
         )

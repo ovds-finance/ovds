@@ -23,7 +23,9 @@
  * the prefetch is a no-op.
  */
 import { useCallback } from 'react';
+
 import api from '../services/api';
+
 import { setCacheData, getCacheData } from './useApiQuery';
 
 const PREFETCH_STALE_MS = 30_000;

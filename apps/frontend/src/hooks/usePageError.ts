@@ -25,6 +25,7 @@
  *   const emailError = fieldError('email');  // → "must be an email" | undefined
  */
 import { useState, useCallback } from 'react';
+
 import { buildApiQueryError, type ApiQueryError } from './useApiQuery';
 
 export type PageError = ApiQueryError;

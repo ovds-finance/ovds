@@ -1,29 +1,30 @@
 /**
  * Items — ovds-style product & service catalog
  * Inherits: AppPage · AppKpi · AppTable · useApiCrud
- * White background · Emerald text · White-blue icons
+ * White background · indigo text · White-blue icons
  * Ethiopian VAT 15% · IFRS inventory costing
  */
-import React, { useState, useMemo, useCallback } from 'react';
+import { useDebounce } from '@ovds/ui';
+import { evalMath } from '@ovds/ui';
 import {
   Package, Download, RefreshCw, ChevronDown, Upload,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import { fmtETB, ETH_TAX } from '../utils/ethiopianTax';
+
+import CustomFieldRenderer, { type CustomFieldValuesMap } from '../components/CustomFieldRenderer';
+import { OvdsEmptyState } from '../components/ovds';
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select, Textarea,
   Amount, Pagination, SearchBar, Icon,
 } from '../components/ui';
-import { OvdsEmptyState } from '../components/ovds';
-import { useDebounce } from '@ovds/ui';
-import { evalMath } from '@ovds/ui';
-import CustomFieldRenderer, { type CustomFieldValuesMap } from '../components/CustomFieldRenderer';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
+import { fmtETB, ETH_TAX } from '../utils/ethiopianTax';
 
 interface Item {
   id: string;
@@ -88,21 +89,21 @@ const ItemForm: React.FC<{ data: Partial<Item>; onChange: (d: Partial<Item>) => 
           <Input type="text" value={data.purchasePrice ?? ''} onChange={e => set('purchasePrice', e.target.value)} onBlur={e => applyMath('purchasePrice', e.target.value)} placeholder="0.00" />
         </FormField>
       </div>
-      <div className={`flex items-center justify-between p-3 rounded-xl border transition-all ${data.vatApplicable !== false ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-slate-100'}`}>
+      <div className={`flex items-center justify-between p-3 rounded-xl border transition-all ${data.vatApplicable !== false ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' : 'bg-white border-slate-100'}`}>
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
             id="vatApplicable"
             checked={data.vatApplicable !== false}
             onChange={e => set('vatApplicable', e.target.checked)}
-            className="accent-emerald-600"
+            className="accent-indigo-600"
           />
-          <label htmlFor="vatApplicable" className="text-[12px] font-semibold text-emerald-800 cursor-pointer">
+          <label htmlFor="vatApplicable" className="text-[12px] font-semibold text-[var(--pro-azure-dark)] cursor-pointer">
             VAT Applicable — 15% (ERCA)
           </label>
         </div>
         {vatPreview && (
-          <span className="text-[10px] font-bold text-emerald-700">
+          <span className="text-[10px] font-bold text-[var(--pro-azure-dark)]">
             +{fmtETB(vatPreview * 0.15)} → {fmtETB(vatPreview * 1.15)}
           </span>
         )}
@@ -121,7 +122,7 @@ const ItemForm: React.FC<{ data: Partial<Item>; onChange: (d: Partial<Item>) => 
         <Textarea value={data.description ?? ''} onChange={e => set('description', e.target.value)} rows={2} placeholder="Optional description" />
       </FormField>
       <div className="flex items-center gap-2">
-        <input type="checkbox" id="isActive" checked={data.isActive !== false} onChange={e => set('isActive', e.target.checked)} className="accent-emerald-600" />
+        <input type="checkbox" id="isActive" checked={data.isActive !== false} onChange={e => set('isActive', e.target.checked)} className="accent-indigo-600" />
         <label htmlFor="isActive" className="text-[12px] font-semibold text-slate-700 cursor-pointer">Active item</label>
       </div>
     </div>
@@ -242,7 +243,7 @@ const Items: React.FC = () => {
     e.target.value = '';
   };
 
-  const isLowStock = (item: Item) => item.type !== 'SERVICE' && (item.stockQuantity ?? 0) <= (item.reorderLevel ?? 5);
+  const _isLowStock = (item: Item) => item.type !== 'SERVICE' && (item.stockQuantity ?? 0) <= (item.reorderLevel ?? 5);
 
   return (
     <AppPage
@@ -267,7 +268,7 @@ const Items: React.FC = () => {
           <Btn variant="ghost" size="sm" icon={<Icon name="REFRESH" size={11} />} onClick={refetch}>Refresh</Btn>
           <Btn variant="secondary" size="sm" icon={<Icon name="DOWNLOAD" size={11} />} onClick={handleExport}>Export</Btn>
           <label className="cursor-pointer">
-            <Btn variant="secondary" size="sm" icon={<Upload size={11} />} asChild>
+            <Btn variant="secondary" size="sm" icon={<Upload size={11} />}>
               <span>Import</span>
             </Btn>
             <input type="file" accept=".csv" onChange={handleImportCsv} className="hidden" />
@@ -280,7 +281,7 @@ const Items: React.FC = () => {
     >
       <AppKpi
         cells={[
-          { label: 'Total Items', value: stats.total, color: 'emerald' as const },
+          { label: 'Total Items', value: stats.total, color: 'green' as const },
           { label: 'Products', value: stats.products, color: 'sky' as const },
           { label: 'Services', value: stats.services, color: 'violet' as const },
           { label: 'VAT Items', value: stats.vat, color: 'amber' as const },
@@ -307,7 +308,7 @@ const Items: React.FC = () => {
           </select>
           <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
         </div>
-        <button onClick={refetch} className="p-1.5 rounded text-slate-400 hover:text-emerald-600 transition-colors" title="Refresh">
+        <button onClick={refetch} className="p-1.5 rounded text-slate-400 hover:text-[var(--pro-azure)] transition-colors" title="Refresh">
           <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
         </button>
         <div className="flex-1" />
@@ -355,10 +356,10 @@ const Items: React.FC = () => {
               <AppTr key={item.id}>
                 <AppTd>
                   <div className="flex items-center gap-2.5">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${item.type === 'SERVICE' ? 'bg-violet-50 text-violet-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${item.type === 'SERVICE' ? 'bg-violet-50 text-violet-600' : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]'}`}>
                       {item.type === 'SERVICE'
                         ? <Icon name="TAG" size={14} />
-                        : <Icon name="PACKAGE" size={14} />}
+                        : <Icon name="ITEM" size={14} />}
                     </div>
                     <div className="min-w-0">
                       <p className={`text-[12px] font-semibold truncate max-w-[200px] ${item.isActive === false ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100'}`}>{item.name}</p>
@@ -375,7 +376,7 @@ const Items: React.FC = () => {
                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold border ${
                     item.type === 'SERVICE'
                       ? 'bg-violet-50 text-violet-700 border-violet-100'
-                      : 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                      : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]'
                   }`}>
                     {item.type ?? 'PRODUCT'}
                   </span>
@@ -409,7 +410,7 @@ const Items: React.FC = () => {
                   <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     {can('ovds:write') && (
                       <>
-                        <button onClick={() => openEdit(item)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Edit">
+                        <button onClick={() => openEdit(item)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Edit">
                           <Icon name="EDIT" size={11} />
                         </button>
                         <button onClick={() => handleDelete(item)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Delete">

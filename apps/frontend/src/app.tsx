@@ -1,54 +1,51 @@
-﻿import React, { Suspense, lazy, Component, type ReactNode, useEffect } from 'react';
-
-declare namespace JSX {
-  interface IntrinsicElements {
-    'ovdsSummaryBar': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & Record<string, any>;
-    'ovdsKpiCard': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & Record<string, any>;
-    'ovdsHealthScore': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & Record<string, any>;
-    'ovdsQuickActions': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & Record<string, any>;
-    'ovdsRecentActivity': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & Record<string, any>;
-    'ovdsPipelineConsole': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & Record<string, any>;
-    'ovdsAabeVatSummary': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & Record<string, any>;
-  }
-}
+﻿import { ThemeProvider, useTheme } from '@ovds/ui/context';
+import { Refine } from '@refinedev/core';
+import routerProvider, {
+  DocumentTitleHandler,
+  UnsavedChangesNotifier,
+} from '@refinedev/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React, { Suspense, lazy, Component, type ReactNode, useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
 import {
-  BrowserRouter as Router,
+  createBrowserRouter,
+  RouterProvider,
   Routes,
   Route,
   Navigate,
   Outlet,
   useNavigate,
 } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import { Icon } from './components/ui';
+
 import Layout from './components/layout';
+import { ModuleGuard } from './components/ModuleGuard';
+import { NavigateInjector } from './components/NavigateInjector';
+import { PushNotificationInit } from './components/PushNotificationInit';
 import { SecurityWrapper } from './components/securityWrapper';
-import { AuthProvider, useAuth } from './rbac/AuthContext';
-import { Auth0ProviderWrapper } from './rbac/Auth0ProviderWrapper';
-import { rbac } from './rbac/rbac';
-import { BusinessProvider, useBusiness } from './context/businessContext';
-import { ThemeProvider, useTheme } from '@ovds/ui/context';
-import { EntitlementProvider } from './context/entitlementContext';
-import { HealthProvider } from './services/health.service';
 import { StepUpProvider } from './components/stepUpAuthModal';
+import { Icon } from './components/ui';
+import { VatNavBridgeMount } from './components/VatNavBridgeMount';
+import { AppModuleRegistry } from './context/AppModuleRegistry';
+import { BusinessProvider, useBusiness } from './context/businessContext';
+import { EntitlementProvider } from './context/entitlementContext';
+import { ModuleRegistryProvider } from './context/ExtensionSlotRegistry';
+import { ModuleProvider } from './context/ModuleContext';
+import { VatModuleProvider } from './context/VatModuleContext';
+import { ModuleRouter } from './lib/module-router';
+import { refineAuthProvider } from './lib/refineAuthProvider';
+import { refineDataProvider } from './lib/refineDataProvider';
+import { Auth0ProviderWrapper } from './rbac/Auth0ProviderWrapper';
+import { AuthProvider, useAuth } from './rbac/AuthContext';
+import { rbac } from './rbac/rbac';
+import { RouteLayoutDispatcher } from './router';
+import type { RouteRecord } from './router';
+import { HealthProvider } from './services/health.service';
 import {
   QUERY_GC_TIME_MS,
   CHUNK_RETRY_KEY,
   CHUNK_RELOAD_TIMEOUT_MS,
   generateErrorId,
 } from './utils/constants';
-import { NavigateInjector } from './components/NavigateInjector';
-import { PushNotificationInit } from './components/PushNotificationInit';
-import { Refine } from '@refinedev/core';
-import routerProvider, {
-  DocumentTitleHandler,
-  UnsavedChangesNotifier,
-} from '@refinedev/react-router';
-import { refineDataProvider } from './lib/refineDataProvider';
-import { refineAuthProvider } from './lib/refineAuthProvider';
-import { ModuleRouter } from './lib/module-router';
-import { ModuleProvider } from './context/ModuleContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -99,7 +96,8 @@ class ErrorBoundary extends Component<EBProps, EBState> {
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     // Log to console with context — in production wire to Sentry/Datadog
-    console.error('[OVDS ErrorBoundary]', error, info.componentStack);
+     
+    console.error('[OVDS ErrorBoundary]', error, import.meta.env.DEV ? info.componentStack : '(stack hidden in production)');
   }
 
   componentDidUpdate(prev: EBProps) {
@@ -172,7 +170,7 @@ class ErrorBoundary extends Component<EBProps, EBState> {
               sessionStorage.removeItem(CHUNK_RETRY_KEY);
               window.location.reload();
             }}
-            className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-all shadow-lg shadow-green-500/20 dark:shadow-green-500/10"
           >
             <Icon name="REFRESH_CW" size={14} /> Reload Page
           </button>
@@ -219,6 +217,9 @@ const Inventory = lazyWithRetry(() => import('./pages/Inventory'));
 const InventoryDashboard = lazyWithRetry(() => import('./pages/InventoryDashboard'));
 const CRM = lazyWithRetry(() => import('./pages/CRM'));
 const VatAdministration = lazyWithRetry(() => import('./pages/VatAdministration'));
+// Modular VAT sub-router — mounts the full /tax/vat/* country-module tree
+const VatModuleRouterPage = lazyWithRetry(() => import('./lib/vat-module-router').then(m => ({ default: m.VatModuleRouter })));
+const VatModuleStorePage   = lazyWithRetry(() => import('./pages/vat/VatModuleStore'));
 const DisasterFund = lazyWithRetry(() => import('./pages/DisasterFund'));
 const AccountingCollections = lazyWithRetry(() => import('./pages/AccountingCollections'));
 const IfsDashboard = lazyWithRetry(() => import('./pages/IfsDashboard'));
@@ -276,7 +277,6 @@ const Leases = lazyWithRetry(() => import('./pages/Leases'));
 const FundTransfers = lazyWithRetry(() => import('./pages/FundTransfers'));
 const Transactions = lazyWithRetry(() => import('./pages/Transactions'));
 const RolePermissions = lazyWithRetry(() => import('./pages/RolePermissions'));
-const AdvancedAccessControls = lazyWithRetry(() => import('./pages/AdvancedAccessControls'));
 const BankStatementImport = lazyWithRetry(() => import('./pages/BankStatementImport'));
 const BankReconciliation = lazyWithRetry(() => import('./pages/BankReconciliation'));
 const Budgets = lazyWithRetry(() => import('./pages/Budgets'));
@@ -413,6 +413,7 @@ const Auth0Callback = lazyWithRetry(() => import('./pages/Auth0Callback'));
 const GoogleCallback = lazyWithRetry(() => import('./pages/GoogleCallback'));
 const NotFound = lazyWithRetry(() => import('./pages/NotFound'));
 const Forbidden = lazyWithRetry(() => import('./pages/Forbidden'));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ModularSettings = lazyWithRetry(() => import('./pages/ModularSettings'));
 const CompanyProfile = lazyWithRetry(() => import('./pages/CompanyProfile'));
 const SettingsCatalog = lazyWithRetry(() => import('./pages/admin/SettingsCatalog'));
@@ -428,13 +429,16 @@ const SecuritySettings = lazyWithRetry(() => import('./pages/settings/SecuritySe
 const CurrencySettings = lazyWithRetry(() => import('./pages/settings/CurrencySettings'));
 const EmailSettings = lazyWithRetry(() => import('./pages/settings/EmailSettings'));
 const MaintainingTechnology = lazyWithRetry(() => import('./pages/MaintainingTechnology'));
+const CompanyProfilePage = lazyWithRetry(() => import('./pages/settings/CompanyProfilePage'));
+const UsersAccessPage = lazyWithRetry(() => import('./pages/settings/UsersAccessPage'));
+const ModulesPage = lazyWithRetry(() => import('./pages/settings/ModulesPage'));
 
 
 
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-[60vh]" aria-label="Loading page" aria-live="polite">
     <div className="flex flex-col items-center gap-4">
-      <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin shadow-lg shadow-emerald-500/20" />
+      <div className="w-10 h-10 border-2 border-[var(--pro-azure)] border-t-transparent rounded-full animate-spin shadow-lg shadow-green-500/20" />
       <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
         Loading...
       </span>
@@ -465,6 +469,7 @@ function lazyWithRetry<T extends React.ComponentType<any>>(
       if (isChunkLoadError(err) && !sessionStorage.getItem(CHUNK_RETRY_KEY)) {
         sessionStorage.setItem(CHUNK_RETRY_KEY, '1');
         return new Promise((resolve, reject) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const timeout = setTimeout(() => {
             sessionStorage.removeItem(CHUNK_RETRY_KEY);
             reject(new Error('Chunk reload timed out'));
@@ -505,13 +510,19 @@ const GuestRoute = ({ children }: { children: React.ReactNode }) => {
 // -- Persistent layout shell — ONE instance for the entire authenticated session
 // All protected pages render via <Outlet /> inside this single Layout mount.
 // This keeps the sidebar, header, and all layout state alive across navigations.
+// RouteLayoutDispatcher sits between Layout and Outlet so it can read route
+// handles via useMatches() and wrap the page in the appropriate shell
+// (FullPageShell, WizardShell, or SliderShell) on every navigation.
 const AuthenticatedShell: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
   if (!isAuthenticated || !user) return <Navigate to="/login" replace />;
   return (
     <Layout>
+      <VatNavBridgeMount />
       <PushNotificationInit />
-      <Outlet />
+      <RouteLayoutDispatcher>
+        <Outlet />
+      </RouteLayoutDispatcher>
     </Layout>
   );
 };
@@ -544,7 +555,15 @@ const ProtectedRoute = ({
 };
 
 // -- Route table ---------------------------------------------------------------
-const ROUTES: [string, React.ComponentType<any>][] = [
+// Each entry is a RouteRecord tuple: [path, Component, handle?]
+// The optional third element is a RouteHandle — structural metadata that tells
+// the RouteLayoutDispatcher which shell to render around the page:
+//   • omitted / layout:'inline'  → FullPageShell  (standard full-page view, default)
+//   • layout:'wizard'            → WizardShell    (sequential multi-step flow)
+//   • layout:'slider'            → SliderShell    (slide-out panel over current page)
+//   • layout:'modal'             → ModalShell     (centered modal overlay, ephemeral)
+// 'table' is a backward-compatible alias for 'inline'.
+const ROUTES: RouteRecord[] = [
   ['/dashboard', Dashboard],
   ['/hr/employees', Employees],
   ['/hr/departments', Departments],
@@ -558,7 +577,24 @@ const ROUTES: [string, React.ComponentType<any>][] = [
   ['/customers/summary', CustomerSummary],
   ['/reports', Reports],
   ['/notifications', Notifications],
-  ['/settings/enroll', Enrollment],
+  ['/settings/enroll', Enrollment, {
+    layout: 'wizard',
+    wizard: {
+      title: 'Company Enrollment',
+      description: 'Set up your company profile, fiscal config, and team access',
+      stepParam: 'step',
+      variant: 'vertical',
+      exitOnFirstBack: true,
+      completionRoute: '/dashboard',
+      steps: [
+        { id: 'company',    label: 'Company Details',   description: 'TIN, legal name, and address' },
+        { id: 'fiscal',     label: 'Fiscal Settings',   description: 'Tax year, base currency, VAT type' },
+        { id: 'users',      label: 'Invite Team',       description: 'Add team members and assign roles' },
+        { id: 'erca',       label: 'ERCA / EIMS',       description: 'Connect to the Ethiopian Revenue Authority' },
+        { id: 'confirm',    label: 'Review & Confirm',  description: 'Review all settings before going live' },
+      ],
+    },
+  }],
   ['/settings/users', Users],
   ['/settings/audit-logs', AuditLogs],
   ['/settings', Settings],
@@ -566,7 +602,11 @@ const ROUTES: [string, React.ComponentType<any>][] = [
   ['/settings/api-docs', ApiDocs],
   ['/reports/insights', BusinessInsights],
   ['/items', Items],
-  ['/sales/invoices', Invoices],
+  ['/sales/invoices', Invoices, {
+    layout: 'inline',
+    inline: { title: 'Invoices' },
+    meta: { module: 'sales', entity: 'invoice' },
+  }],
   ['/companies', Companies],
   ['/inventory', Inventory],
   ['/inventory/dashboard', InventoryDashboard],
@@ -577,14 +617,35 @@ const ROUTES: [string, React.ComponentType<any>][] = [
   ['/crm/activities', CrmActivities],
   ['/crm/settings', CRM],
   ['/crm', CRM],
-  ['/purchases/bills', Bills],
+  ['/purchases/bills', Bills, {
+    layout: 'inline',
+    inline: { title: 'Bills' },
+    meta: { module: 'purchases', entity: 'bill' },
+  }],
   ['/purchases/bills/:id', BillDetail],
   ['/purchases/payments', Payments],
   ['/purchases/aged-payables', AgedPayables],
   ['/purchases', PurchasesDashboard],
-  ['/tax/vat', VatAdministration],
-  // NOTE: /vat-administration is a redirect alias — see redirect section below
-  ['/disaster-fund', DisasterFund],
+  ['/tax/vat', VatAdministration, {
+    layout: 'inline',
+    inline: { title: 'VAT Administration' },
+    meta: { module: 'tax', entity: 'vat' },
+  }],
+  // ── Modular VAT Declaration sub-routes ──────────────────────────────────
+  // /tax/vat/store — App-Store-style installer for country VAT modules
+  ['/tax/vat/store', VatModuleStorePage, {
+    layout: 'inline',
+    inline: { title: 'VAT Module Store' },
+    meta: { module: 'tax', entity: 'vat-store' },
+  }],
+  // /tax/vat/:countryCode/* — delegated to VatModuleRouter which lazy-loads
+  //   per-country page sets and enforces activation via VatModuleGuard.
+  //   The wildcard is handled by VatModuleRouter's internal <Routes>.
+  ['/tax/vat/:countryCode/*', VatModuleRouterPage, {
+    layout: 'inline',
+    inline: { title: 'VAT Module' },
+    meta: { module: 'tax', entity: 'vat-module' },
+  }],  ['/disaster-fund', DisasterFund],
   ['/disaster-fund/contributions', DisasterFund],
   ['/disaster-fund/remittance', DisasterFund],
   ['/disaster-fund/erca', DisasterFund],
@@ -603,7 +664,16 @@ const ROUTES: [string, React.ComponentType<any>][] = [
   ['/ovds/pipeline', OvdsPipelineConsole],
   ['/accounting/workflow', AccountingWorkflow],
   ['/accounting/categories', TransactionCategories],
-  ['/customers/portal', ClientPortal],
+  ['/customers/portal', ClientPortal, {
+    layout: 'modal',
+    modal: {
+      title: 'Client Portal',
+      description: 'Send portal invite and manage client access',
+      maxWidth: 'max-w-lg',
+      closeRoute: '/customers',
+      icon: 'CUSTOMER',
+    },
+  }],
 
   ['/customers/payment-tracker', PaymentTracker],
   ['/settings/multi-company', MultiCompanyAdmin],
@@ -627,11 +697,34 @@ const ROUTES: [string, React.ComponentType<any>][] = [
   ['/treasury/payment-run', SupplierPaymentRun],
   ['/accounting/fixed-assets', FixedAssets],
   ['/accounting/leases', Leases],
-  ['/banking/transfers', FundTransfers],
+  ['/banking/transfers', FundTransfers, {
+    layout: 'modal',
+    modal: {
+      title: 'New Fund Transfer',
+      description: 'Move funds between bank accounts',
+      maxWidth: 'max-w-lg',
+      closeRoute: '/banking/accounts',
+      icon: 'TRANSFER',
+    },
+  }],
   ['/banking/transactions', Transactions],
    ['/settings/roles', RolePermissions],
-   ['/settings/advanced-access-controls', AdvancedAccessControls],
-  ['/banking/statement-import', BankStatementImport],
+  ['/banking/statement-import', BankStatementImport, {
+    layout: 'wizard',
+    wizard: {
+      title: 'Import Bank Statement',
+      description: 'Upload, map columns, and reconcile your bank transactions',
+      stepParam: 'step',
+      variant: 'horizontal',
+      completionRoute: '/banking/reconciliation',
+      steps: [
+        { id: 'upload',   label: 'Upload File',    description: 'Select your CSV, OFX, or MT940 file' },
+        { id: 'map',      label: 'Map Columns',    description: 'Match file columns to OVDS fields' },
+        { id: 'preview',  label: 'Preview',        description: 'Review parsed transactions before import' },
+        { id: 'import',   label: 'Import',         description: 'Confirm and write transactions to the ledger' },
+      ],
+    },
+  }],
   ['/banking/reconciliation', BankReconciliation],
   ['/accounting/budgets', Budgets],
   ['/banking/fx-rates', FxRates],
@@ -667,7 +760,16 @@ const ROUTES: [string, React.ComponentType<any>][] = [
   ['/helpdesk', Helpdesk],
   ['/getting-started', GettingStarted],
   ['/settings/setup-wizard', SystemAdministrationSetup],
-  ['/companies/new', CompanyNew],
+  ['/companies/new', CompanyNew, {
+    layout: 'modal',
+    modal: {
+      title: 'Add New Company',
+      description: 'Register a new subsidiary or branch entity',
+      maxWidth: 'max-w-xl',
+      closeRoute: '/companies',
+      icon: 'COMPANY',
+    },
+  }],
   ['/ifrs', IfsDashboard],
   ['/reconciliation', Reconciliation],
   // Tax sub-routes — direct access (not just via redirect)
@@ -677,7 +779,17 @@ const ROUTES: [string, React.ComponentType<any>][] = [
   // New structural pages
   ['/sales/refunds', Refunds],
   ['/sales/receipts', Receipts],
-  ['/crm/pipeline', CRMPipeline],
+  ['/crm/pipeline', CRMPipeline, {
+    layout: 'slider',
+    slider: {
+      title: 'CRM Pipeline',
+      description: 'Drag deals across stages to update their status',
+      side: 'right',
+      width: 'w-[680px]',
+      closeRoute: '/crm',
+      icon: 'PIPELINE',
+    },
+  }],
   ['/settings/import', ImportCenter],
   ['/trade', Trade],
   ['/trade/shipments', Trade],
@@ -721,13 +833,13 @@ const ROUTES: [string, React.ComponentType<any>][] = [
   ['/accounting/consolidation', Consolidation],
   ['/nodes', ConnectedNodes],
   ['/manufacturing', Manufacturing],
-  ['/ovds/accounts',                     DoubleEntry],
-  ['/ovds/reports/trial-balance',        DoubleEntry],
-  ['/ovds/reports/general-ledger',       DoubleEntry],
-  ['/ovds/reports/balance-sheet',        DoubleEntry],
-  ['/ovds/reports/profit-loss',          DoubleEntry],
+  ['/ovds/accounts',                     DoubleEntry, undefined, 'double-entry'],
+  ['/ovds/reports/trial-balance',        DoubleEntry, undefined, 'double-entry'],
+  ['/ovds/reports/general-ledger',       DoubleEntry, undefined, 'double-entry'],
+  ['/ovds/reports/balance-sheet',        DoubleEntry, undefined, 'double-entry'],
+  ['/ovds/reports/profit-loss',          DoubleEntry, undefined, 'double-entry'],
   ['/ovds/workflow',                     AccountingWorkflow],
-  ['/double-entry/journals',                JournalEntries],
+  ['/double-entry/journals',                JournalEntries, undefined, 'double-entry'],
   ['/reports/notes', NotesToFinancials],
   ['/accounting/cost-centers', CostCenters],
   ['/accounting/estimates', AccountingEstimatesPage],
@@ -784,18 +896,49 @@ const ROUTES: [string, React.ComponentType<any>][] = [
   // -- Inventory Adjustments ----------------------------------------------------
   ['/inventory/adjustments',       Adjustments],
   // -- Settings sub-routes ------------------------------------------------------
-  ['/settings/company-profile',   CompanyProfile],
+  ['/settings/company-profile',   CompanyProfilePage],
   ['/settings/catalog',           SettingsCatalog],
   ['/settings/digital-wallets',   Settings],
   ['/settings/payment-gateways/chapa', Settings],
   ['/settings/license',           LicenseManager],
-  ['/settings/eims',              EimsSettings],
-  ['/settings/security',          SecuritySettings],
+  ['/settings/users-access',      UsersAccessPage],
+  ['/settings/modules',           ModulesPage],
+  ['/settings/eims',              EimsSettings, {
+    layout: 'slider',
+    slider: {
+      title: 'EIMS Integration',
+      description: 'Configure the Ethiopian Invoice Management System connection',
+      side: 'right',
+      width: 'w-[560px]',
+      closeRoute: '/settings',
+      icon: 'COMPLIANCE',
+    },
+  }],
+  ['/settings/security',          SecuritySettings, {
+    layout: 'slider',
+    slider: {
+      title: 'Security Settings',
+      description: 'MFA, session policy, and password requirements',
+      side: 'right',
+      width: 'w-[560px]',
+      closeRoute: '/settings',
+      icon: 'SHIELD',
+    },
+  }],
   ['/settings/currencies',        CurrencySettings],
   ['/settings/email',             EmailSettings],
   ['/settings/maintaining-technology', MaintainingTechnology],
   // -- Expense Claims -----------------------------------------------------------
-  ['/expense-claims',                      ExpenseClaims],
+  ['/expense-claims', ExpenseClaims, {
+    layout: 'modal',
+    modal: {
+      title: 'Expense Claims',
+      description: 'Submit and review out-of-pocket expense reimbursements',
+      maxWidth: 'max-w-2xl',
+      closeRoute: '/purchases/expenses',
+      icon: 'RECEIPT',
+    },
+  }],
   // -- ovds Reports ----------------------------------------------------------
   // ── Banking Hub (full flow: Accounts · Transactions · Transfers · Feeds · Reconciliation) ──
   ['/banking',                             Banking],
@@ -987,13 +1130,16 @@ const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       />
-      {ROUTES.map(([path, Page]) => (
+      {ROUTES.map(([path, Page, handle, moduleKey]) => (
         <Route
           key={path}
           path={path}
+          handle={handle}
           element={
             <ProtectedRoute path={path}>
-              <Page />
+              <ModuleGuard moduleKey={moduleKey as string | undefined}>
+                <Page />
+              </ModuleGuard>
             </ProtectedRoute>
           }
         />
@@ -1229,6 +1375,44 @@ const ThemedToaster: React.FC = () => {
     />
   );
 };
+/**
+ * RootShell — rendered as the element of the single splat route inside
+ * createBrowserRouter.  Because it lives inside a data-router context,
+ * useMatches() (and every other data-router hook) works correctly here
+ * and in every descendant component (e.g. RouteLayoutDispatcher).
+ */
+const RootShell: React.FC = () => (
+  <>
+    <NavigateInjector />
+    <ThemedToaster />
+    <Refine
+      dataProvider={refineDataProvider}
+      authProvider={refineAuthProvider}
+      routerProvider={routerProvider}
+      resources={[]}
+      options={{
+        syncWithLocation: false,
+        disableTelemetry: true,
+        warnWhenUnsavedChanges: true,
+        reactQuery: { clientConfig: queryClient },
+      }}
+    >
+      <AppRoutes />
+      <UnsavedChangesNotifier />
+      <DocumentTitleHandler />
+    </Refine>
+    <ModuleProvider>
+      <ModuleRouter />
+    </ModuleProvider>
+  </>
+);
+
+// createBrowserRouter gives every descendant access to the data-router
+// context that useMatches() (used by RouteLayoutDispatcher) requires.
+const browserRouter = createBrowserRouter([
+  { path: '*', element: <RootShell /> },
+]);
+
 const App: React.FC = () => (
   <QueryClientProvider client={queryClient}>
   <ThemeProvider>
@@ -1239,30 +1423,11 @@ const App: React.FC = () => (
             <StepUpProvider>
               <EntitlementWrapper>
               <SecurityWrapper>
-                {/* Router — future flags suppressed: types don't match this RR version */}
-                <Router>
-                  <NavigateInjector />
-                  <ThemedToaster />
-                  <Refine
-                    dataProvider={refineDataProvider}
-                    authProvider={refineAuthProvider}
-                    routerProvider={routerProvider}
-                    resources={[]}
-                    options={{
-                      syncWithLocation: false,
-                      disableTelemetry: true,
-                      warnWhenUnsavedChanges: true,
-                      reactQuery: { clientConfig: queryClient },
-                    }}
-                  >
-                    <AppRoutes />
-                    <UnsavedChangesNotifier />
-                    <DocumentTitleHandler />
-                  </Refine>
-                  <ModuleProvider>
-                    <ModuleRouter />
-                  </ModuleProvider>
-                </Router>
+                <AppModuleRegistry>
+                  <VatModuleProvider>
+                    <RouterProvider router={browserRouter} />
+                  </VatModuleProvider>
+                </AppModuleRegistry>
               </SecurityWrapper>
               </EntitlementWrapper>
             </StepUpProvider>

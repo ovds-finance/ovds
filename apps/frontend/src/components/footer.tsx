@@ -1,33 +1,38 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
 import { Icon } from './ui';
 
 const APP_VERSION = '1.0.0';
 
-
-
-// -- Footer --------------------------------------------------------------------
+/**
+ * Footer — Ovds SaaS minimal status bar.
+ *
+ * Design: single horizontal strip with a very subtle top border.
+ * Left: brand mark + copyright + version + locale switcher.
+ * Right: TLS badge, API health dot, latency, network status.
+ * No decorative gradients — clean, unobtrusive, data-only.
+ */
 const Footer: React.FC = () => {
   const year = new Date().getFullYear();
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
   const currentLocale = i18n.language?.split('-')[0] || 'en';
 
-  const [online, setOnline] = useState(navigator.onLine);
-  const [serverOk, setServerOk] = useState<boolean | null>(null);
+  const [online,      setOnline]      = useState(navigator.onLine);
+  const [serverOk,    setServerOk]    = useState<boolean | null>(null);
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
-  const [checking, setChecking] = useState(false);
-  const [latencyMs, setLatencyMs] = useState<number | null>(null);
-
+  const [checking,    setChecking]    = useState(false);
+  const [latencyMs,   setLatencyMs]   = useState<number | null>(null);
 
   useEffect(() => {
-    const on = () => setOnline(true);
+    const on  = () => setOnline(true);
     const off = () => setOnline(false);
-    window.addEventListener('online', on);
+    window.addEventListener('online',  on);
     window.addEventListener('offline', off);
     return () => {
-      window.removeEventListener('online', on);
+      window.removeEventListener('online',  on);
       window.removeEventListener('offline', off);
     };
   }, []);
@@ -38,10 +43,9 @@ const Footer: React.FC = () => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     fetch('/api/health/ready', { method: 'GET', signal: controller.signal })
-      .then((r) => {
+      .then(r => {
         clearTimeout(timeoutId);
-        const ms = Date.now() - start;
-        setLatencyMs(ms);
+        setLatencyMs(Date.now() - start);
         setServerOk(r.ok || r.status < 500);
         setLastChecked(new Date());
       })
@@ -56,7 +60,7 @@ const Footer: React.FC = () => {
 
   useEffect(() => {
     checkServer();
-    const id = setInterval(checkServer, 60000);
+    const id = setInterval(checkServer, 60_000);
     return () => clearInterval(id);
   }, [checkServer]);
 
@@ -64,76 +68,180 @@ const Footer: React.FC = () => {
     d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   const LOCALE_LABELS: Record<string, string> = {
-    en: 'English',
-    am: 'አማርኛ',
-    ti: 'ትግርኛ',
+    en: 'English', am: 'አማርኛ', ti: 'ትግርኛ',
   };
+
+  const latencyColor =
+    latencyMs === null ? 'var(--text-4)'
+    : latencyMs < 200  ? 'var(--pro-indigo)'
+    : latencyMs < 600  ? 'var(--pro-amber)'
+    :                    'var(--pro-rose)';
+
+  /* ── shared separator ─────────────────────────────────────────────── */
+  const Sep = () => (
+    <span aria-hidden style={{ color: 'var(--border)', userSelect: 'none', margin: '0 2px' }}>·</span>
+  );
 
   return (
     <footer
-      className="mt-auto flex flex-col justify-center min-h-[40px]"
+      style={{
+        height: 'var(--footer-h)',
+        display: 'flex',
+        alignItems: 'center',
+        borderTop: '1px solid var(--border)',
+        background: 'var(--surface)',
+        padding: '0 24px',
+        gap: 0,
+      }}
     >
-      <div className="border-t border-slate-100 pt-2">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          {/* Left: logo + copyright + version + locale */}
-          <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium">
-            <div className="w-4 h-4 bg-emerald-500 rounded-md flex items-center justify-center text-white shrink-0 font-bold text-[8px]">O</div>
-             <span className="font-semibold text-slate-600">© {year} {t('brand.full', 'OVDS ovds')}</span>
-            <span className="text-slate-300">·</span>
-            <span className="font-mono text-[9px] text-slate-400 select-none">v{APP_VERSION}</span>
-            <span className="text-slate-300">·</span>
-            <button
-              onClick={() => navigate('/settings?tab=localization')}
-              className="flex items-center gap-0.5 text-slate-400 hover:text-emerald-600 transition-colors"
-              title={t('footer.change_language', 'Change language')}
-            >
-              <Icon name="GLOBE" size={9} />
-              {LOCALE_LABELS[currentLocale] ?? currentLocale.toUpperCase()}
-            </button>
-          </div>
+      {/* ── Left ──────────────────────────────────────────────────────── */}
+      <div
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          fontSize: 10, fontWeight: 500, color: 'var(--text-4)',
+          flex: 1, minWidth: 0,
+        }}
+      >
+        {/* Ovds SaaS style brand mark — small green square */}
+        <div
+          style={{
+            width: 14, height: 14, borderRadius: 4, flexShrink: 0,
+            background: 'var(--pro-gradient-primary)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', fontSize: 7, fontWeight: 900,
+          }}
+        >
+          O
+        </div>
 
-          {/* Right: status indicators */}
-          <div className="flex items-center gap-1.5 text-[10px]">
-            <div className="flex items-center gap-1 text-emerald-600 font-semibold">
-              <Icon name="SUCCESS" size={9} />
-              <span className="uppercase tracking-wider">TLS</span>
-            </div>
-            <span className="text-slate-200">·</span>
-            {serverOk !== null && (
+        <span style={{ fontWeight: 600, color: 'var(--text-3)', whiteSpace: 'nowrap' }}>
+          © {year} {t('brand.full', 'OVDS')}
+        </span>
+
+        <Sep />
+
+        <span
+          style={{
+            fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+            fontSize: 9, color: 'var(--text-5)', userSelect: 'none',
+          }}
+        >
+          v{APP_VERSION}
+        </span>
+
+        <Sep />
+
+        {/* Locale switcher */}
+        <button
+          onClick={() => navigate('/settings?tab=localization')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 3,
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'var(--text-4)', fontSize: 10, fontWeight: 500,
+            fontFamily: 'inherit',
+            padding: '1px 4px', borderRadius: 4,
+            transition: 'color 120ms, background 120ms',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.color = 'var(--pro-azure)';
+            (e.currentTarget as HTMLButtonElement).style.background = 'var(--pro-azure-50)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-4)';
+            (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+          }}
+          title={t('footer.change_language', 'Change language')}
+        >
+          <Icon name="GLOBE" size={9} />
+          {LOCALE_LABELS[currentLocale] ?? currentLocale.toUpperCase()}
+        </button>
+      </div>
+
+      {/* ── Right: status strip ───────────────────────────────────────── */}
+      <div
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          fontSize: 10, fontWeight: 600, flexShrink: 0,
+        }}
+      >
+        {/* TLS — always green */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 3, color: 'var(--pro-indigo)' }}>
+          <Icon name="SUCCESS" size={9} />
+          <span style={{ letterSpacing: '0.06em', textTransform: 'uppercase' }}>TLS</span>
+        </div>
+
+        <Sep />
+
+        {/* API health */}
+        {serverOk !== null && (
+          <>
+            <button
+              onClick={checkServer}
+              title={lastChecked ? `Last checked: ${fmtTime(lastChecked)}` : 'Check server'}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 3,
+                background: 'none', border: 'none', cursor: 'pointer',
+                color: serverOk ? 'var(--pro-indigo)' : 'var(--pro-rose)',
+                fontWeight: 600, fontSize: 10, fontFamily: 'inherit',
+                transition: 'opacity 120ms', padding: 0,
+              }}
+              onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.opacity = '0.7')}
+              onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.opacity = '1')}
+            >
+              {checking
+                ? <Icon name="REFRESH" size={9} className="animate-aki-spin" />
+                : <Icon name="ACTIVITY" size={9} />
+              }
+              <span style={{ letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                {serverOk ? 'API' : 'API Down'}
+              </span>
+            </button>
+
+            {/* Latency badge */}
+            {latencyMs !== null && serverOk && (
               <>
-                <button
-                  onClick={checkServer}
-                  title={lastChecked ? `Last checked: ${fmtTime(lastChecked)}` : 'Check server'}
-                  className={`flex items-center gap-1 font-semibold transition-colors ${
-                    serverOk ? 'text-emerald-600' : 'text-rose-500'
-                  }`}
+                <Sep />
+                <span
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 3,
+                    fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                    fontWeight: 700, color: latencyColor,
+                  }}
                 >
-                  {checking ? <Icon name="REFRESH" size={9} className="animate-spin" /> : <Icon name="ACTIVITY" size={9} />}
-                  <span>{serverOk ? 'API ONLINE' : 'API DOWN'}</span>
-                </button>
-                {latencyMs !== null && serverOk && (
-                  <>
-                    <span className="text-slate-200">·</span>
-                    <span className={`flex items-center gap-0.5 font-mono font-semibold ${
-                      latencyMs < 200 ? 'text-emerald-600'
-                        : latencyMs < 600 ? 'text-amber-500' : 'text-rose-500'
-                    }`}>
-                      <Icon name="ZAP" size={9} />{latencyMs}ms
-                    </span>
-                  </>
-                )}
-                <span className="text-slate-200">·</span>
+                  <Icon name="ZAP" size={9} />
+                  {latencyMs}ms
+                </span>
               </>
             )}
-            <div
-              role="status"
-              aria-label={online ? 'Online' : 'Offline'}
-              className={`flex items-center gap-1 font-semibold ${online ? 'text-emerald-600' : 'text-rose-500'}`}
-            >
-              {online ? <Icon name="WIFI" size={9} /> : <Icon name="WIFI_OFF" size={9} />}
-              <span>{online ? t('footer.online', 'ONLINE') : t('footer.offline', 'OFFLINE')}</span>
-            </div>
-          </div>
+
+            <Sep />
+          </>
+        )}
+
+        {/* Network status */}
+        <div
+          role="status"
+          aria-label={online ? 'Online' : 'Offline'}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 4,
+            color: online ? 'var(--pro-indigo)' : 'var(--pro-rose)',
+          }}
+        >
+          {/* Pulsing live dot */}
+          <span
+            style={{
+              width: 5, height: 5, borderRadius: '50%',
+              background: 'currentColor',
+              flexShrink: 0,
+              animation: online ? 'aki-pulse 2.5s ease-in-out infinite' : 'none',
+            }}
+          />
+          <span style={{ letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            {online
+              ? t('footer.online',  'Online')
+              : t('footer.offline', 'Offline')
+            }
+          </span>
         </div>
       </div>
     </footer>
@@ -141,4 +249,3 @@ const Footer: React.FC = () => {
 };
 
 export default Footer;
-

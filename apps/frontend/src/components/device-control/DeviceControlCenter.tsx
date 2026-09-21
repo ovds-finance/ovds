@@ -1,4 +1,10 @@
-import React from 'react';
+import {
+  DEVICE_CONTROL_CATEGORY_META,
+  DEVICE_CONTROL_CATEGORIES,
+  type DeviceControlCategory,
+  type DeviceControlPolicyDTO as DeviceControlPolicy,
+  type DeviceControlSettings,
+} from '@ovds/shared';
 import { Card, Btn, StatusBadge } from '@ovds/ui';
 import {
   Lock,
@@ -7,13 +13,8 @@ import {
   SlidersHorizontal,
   Pencil,
 } from 'lucide-react';
-import {
-  DEVICE_CONTROL_CATEGORY_META,
-  DEVICE_CONTROL_CATEGORIES,
-  type DeviceControlCategory,
-  type DeviceControlPolicyDTO as DeviceControlPolicy,
-  type DeviceControlSettings,
-} from '@ovds/shared';
+import React from 'react';
+
 import { useAuth } from '../../rbac/AuthContext';
 
 const ICONS: Record<DeviceControlCategory, React.ReactNode> = {

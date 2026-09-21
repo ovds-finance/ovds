@@ -1,5 +1,5 @@
 /**
- * @ovds/domains/general-ledger-compliance
+ * @ovds/domains-general-ledger-compliance
  * AABE/IFRS compliance control tower — aggregates accounting, tax, and reporting
  * into a unified dashboard, statutory reports, audit-readiness score, and dual-ledger status.
  */

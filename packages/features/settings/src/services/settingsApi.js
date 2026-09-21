@@ -196,3 +196,43 @@ export const advancedAccessApi = {
         await post('/settings/advanced-access', { overrides, companyId });
     },
 };
+// ── RBAC — Roles ──────────────────────────────────────────────────────────────
+export const rolesApi = {
+    /** List all roles (system + tenant-custom). Pass companyId to include custom roles for a tenant. */
+    list: (companyId) => get(`/settings/rbac/roles${qs({ companyId })}`),
+    /** Get a single role by id. */
+    get: (id) => get(`/settings/rbac/roles/${encodeURIComponent(id)}`),
+    /** Create a new custom role for a tenant. */
+    create: (dto) => post('/settings/rbac/roles', dto),
+    /** Update role metadata / permissions. */
+    update: (id, dto) => patch(`/settings/rbac/roles/${encodeURIComponent(id)}`, dto),
+    /** Delete a custom role (system roles are protected server-side). */
+    remove: (id) => del(`/settings/rbac/roles/${encodeURIComponent(id)}`),
+    /** Seed/sync system roles from the shared RBAC constants. */
+    seed: () => post('/settings/rbac/roles/seed', {}),
+};
+// ── RBAC — Permissions ────────────────────────────────────────────────────────
+export const permissionsApi = {
+    /** List all permissions, optionally filtered by category or module. */
+    list: (params = {}) => get(`/settings/rbac/permissions${qs(params)}`),
+    /** Get a single permission by key. */
+    get: (key) => get(`/settings/rbac/permissions/${encodeURIComponent(key)}`),
+    /** Seed/sync permissions from the shared permission catalog. */
+    seed: () => post('/settings/rbac/permissions/seed', {}),
+};
+// ── RBAC — SoD Rules ──────────────────────────────────────────────────────────
+export const sodRulesApi = {
+    /** List all Segregation-of-Duties rules (global + tenant-specific). */
+    list: (companyId) => get(`/settings/rbac/sod-rules${qs({ companyId })}`),
+    /** Create a tenant-specific SoD rule. */
+    create: (dto) => post('/settings/rbac/sod-rules', dto),
+    /** Update an existing SoD rule. */
+    update: (id, dto) => patch(`/settings/rbac/sod-rules/${encodeURIComponent(id)}`, dto),
+    /** Delete a tenant-specific SoD rule. */
+    remove: (id) => del(`/settings/rbac/sod-rules/${encodeURIComponent(id)}`),
+};
+// ── RBAC — Audit Event Catalog ────────────────────────────────────────────────
+export const auditEventCatalogApi = {
+    /** List audit event catalog entries. */
+    list: (companyId) => get(`/settings/rbac/audit-events${qs({ companyId })}`),
+};

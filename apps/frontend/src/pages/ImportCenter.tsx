@@ -2,17 +2,19 @@
  * ImportCenter — Bulk data import
  * OVDS Grid UI · CSV/Excel for all entities · Ethiopian data formats
  */
-import React, { useState, useRef, useCallback } from 'react';
+import { GridHero, ContextStrip, ContextPill } from '@ovds/ui';
 import {
   Upload, Download, CheckCircle2, AlertTriangle, RefreshCw,
   FileText, Users2, Building2, Package, Banknote, X,
   Info, ChevronRight, Zap, Clock, XCircle,
 } from 'lucide-react';
+import React, { useState, useRef, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
+
 import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
 import api from '../services/api';
-import { GridHero, ContextStrip, ContextPill } from '@ovds/ui';
+
 
 /* ── Types ─────────────────────────────────────────────────────────────────── */
 interface ImportJob {
@@ -64,7 +66,7 @@ const TEMPLATES: ImportTemplate[] = [
     entity: 'items',
     label: 'Items & Products',
     icon: <Package size={15} />,
-    accent: 'emerald',
+    accent: 'green',
     description: 'Import product catalogue with pricing, SKU and VAT flags',
     fields: ['name', 'sku', 'type', 'unit', 'salePrice', 'purchasePrice', 'vatApplicable', 'stockQuantity'],
     requiredFields: ['name', 'salePrice'],
@@ -96,7 +98,7 @@ const TEMPLATES: ImportTemplate[] = [
 const ACC: Record<string, { icon: string; badge: string; ring: string; dot: string }> = {
   sky:     { icon: 'bg-sky-100 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400',         badge: 'bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-400 border-sky-200 dark:border-sky-800',         ring: 'ring-sky-400/50',     dot: 'bg-sky-400' },
   amber:   { icon: 'bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400', badge: 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800', ring: 'ring-amber-400/50',   dot: 'bg-amber-400' },
-  emerald: { icon: 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400', badge: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', ring: 'ring-emerald-400/50', dot: 'bg-emerald-400' },
+  indigo: { icon: 'bg-[var(--pro-azure-100)] dark:bg-green-950/40 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', badge: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] border-[var(--pro-azure-100)] dark:border-green-800', ring: 'ring-[var(--pro-azure)]/50', dot: 'bg-[var(--pro-azure-light)]' },
   violet:  { icon: 'bg-violet-100 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400', badge: 'bg-violet-50 dark:bg-violet-950/30 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800', ring: 'ring-violet-400/50',  dot: 'bg-violet-400' },
   rose:    { icon: 'bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400',     badge: 'bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800',     ring: 'ring-rose-400/50',    dot: 'bg-rose-400' },
 };
@@ -264,7 +266,7 @@ const ImportCenter: React.FC = () => {
                 <div className="flex items-center gap-1 shrink-0">
                   <button
                     onClick={e => downloadTemplate(t, e)}
-                    className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-white dark:hover:bg-slate-700 hover:text-emerald-600 transition-all"
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-white dark:hover:bg-slate-700 hover:text-[var(--pro-azure)] transition-all"
                     title="Download CSV template"
                   >
                     <Download size={12} />
@@ -289,10 +291,10 @@ const ImportCenter: React.FC = () => {
               onClick={() => fileRef.current?.click()}
               className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all ${
                 dragOver
-                  ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20'
+                  ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/20'
                   : file
-                  ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/40 dark:bg-emerald-950/10'
-                  : 'border-slate-200 dark:border-slate-700 hover:border-emerald-400 hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                  ? 'border-[var(--pro-azure-light)] dark:border-green-700 bg-[var(--pro-azure-50)]/40 dark:bg-green-950/10'
+                  : 'border-slate-200 dark:border-slate-700 hover:border-[var(--pro-azure)] hover:bg-slate-50 dark:hover:bg-slate-800/40'
               }`}
             >
               <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" className="hidden"
@@ -300,8 +302,8 @@ const ImportCenter: React.FC = () => {
 
               {file ? (
                 <div className="flex items-center justify-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
-                    <FileText size={20} className="text-emerald-600 dark:text-emerald-400" />
+                  <div className="w-11 h-11 rounded-xl bg-[var(--pro-azure-100)] dark:bg-green-950/40 flex items-center justify-center shrink-0">
+                    <FileText size={20} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                   </div>
                   <div className="text-left min-w-0">
                     <p className="ovds-body font-semibold text-slate-800 dark:text-slate-100 truncate">{file.name}</p>
@@ -350,7 +352,7 @@ const ImportCenter: React.FC = () => {
                     <span key={f}
                       className={`px-2 py-0.5 rounded-md text-[10px] font-mono border ${
                         required
-                          ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 font-bold'
+                          ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)] dark:border-green-800 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] font-bold'
                           : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
                       }`}>
                       {f}{required && ' *'}
@@ -359,7 +361,7 @@ const ImportCenter: React.FC = () => {
                 })}
               </div>
               <p className="ovds-caption">
-                <span className="font-bold text-emerald-600 dark:text-emerald-400">Green *</span> = required fields
+                <span className="font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">Green *</span> = required fields
               </p>
             </div>
           )}
@@ -379,21 +381,21 @@ const ImportCenter: React.FC = () => {
               <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Import History</p>
                 <div className="flex items-center gap-3">
-                  {completedJobs > 0 && <span className="ovds-caption text-emerald-600 dark:text-emerald-400 font-semibold">{completedJobs} completed</span>}
+                  {completedJobs > 0 && <span className="ovds-caption text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold">{completedJobs} completed</span>}
                   {failedJobs > 0 && <span className="ovds-caption text-rose-500 font-semibold">{failedJobs} failed</span>}
                 </div>
               </div>
               <div className="divide-y divide-slate-50 dark:divide-slate-800">
                 {jobs.map(job => {
-                  const ac = ACC[TEMPLATES.find(t => t.entity === job.entity)?.accent ?? 'emerald'];
+                  const _ac = ACC[TEMPLATES.find(t => t.entity === job.entity)?.accent ?? 'indigo'];
                   return (
                     <div key={job.id} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                        job.status === 'COMPLETED' ? 'bg-emerald-50 dark:bg-emerald-950/30' :
+                        job.status === 'COMPLETED' ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30' :
                         job.status === 'FAILED'    ? 'bg-rose-50 dark:bg-rose-950/30' :
                         'bg-amber-50 dark:bg-amber-950/30'
                       }`}>
-                        {job.status === 'COMPLETED' ? <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400" /> :
+                        {job.status === 'COMPLETED' ? <CheckCircle2 size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" /> :
                          job.status === 'FAILED'    ? <XCircle size={14} className="text-rose-500" /> :
                          <RefreshCw size={14} className="text-amber-500 animate-spin" />}
                       </div>
@@ -402,7 +404,7 @@ const ImportCenter: React.FC = () => {
                         <p className="ovds-caption">
                           {job.label}
                           {job.status === 'COMPLETED' && (
-                            <> · <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{job.imported} imported</span>
+                            <> · <span className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold">{job.imported} imported</span>
                             {(job.errors ?? 0) > 0 && <>, <span className="text-rose-500 font-semibold">{job.errors} errors</span></>}
                             </>
                           )}
@@ -412,7 +414,7 @@ const ImportCenter: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                          job.status === 'COMPLETED' ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' :
+                          job.status === 'COMPLETED' ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] border-[var(--pro-azure-100)] dark:border-green-800' :
                           job.status === 'FAILED'    ? 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800' :
                           'bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800'
                         }`}>{job.status}</span>

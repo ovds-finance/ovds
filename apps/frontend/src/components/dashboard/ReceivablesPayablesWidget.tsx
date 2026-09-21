@@ -1,14 +1,16 @@
-﻿/**
+/**
  * ReceivablesPayablesWidget
  * Ovds-style dual card: Receivables (AR) left / Payables (AP) right
  * Shows Open + Overdue split with "View Report" link for each side.
  */
+import { fmtCompact } from '@ovds/ui';
+import { ArrowDownLeft, ArrowUpRight, AlertCircle, ExternalLink } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowDownLeft, ArrowUpRight, AlertCircle, ExternalLink } from 'lucide-react';
-import { useApiQuery } from '../../hooks/useApiQuery';
+
 import { useBusiness } from '../../context/businessContext';
-import { fmtCompact } from '@ovds/ui';
+import { useApiQuery } from '../../hooks/useApiQuery';
+
 
 interface Props {
   currency?: string;
@@ -26,7 +28,7 @@ const AmountRow: React.FC<AmountRowProps> = ({ label, value, currency, variant }
     <div className="flex items-center gap-1.5">
       <span
         className={`w-2 h-2 rounded-full shrink-0 ${
-          variant === 'overdue' ? 'bg-rose-400' : 'bg-emerald-400'
+          variant === 'overdue' ? 'bg-rose-400' : 'bg-[var(--pro-azure-light)]'
         }`}
       />
       <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{label}</span>
@@ -80,12 +82,12 @@ const ReceivablesPayablesWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
       {/* ── Receivables ── */}
       <div className="ovds-widget-card overflow-hidden">
         {/* top accent */}
-        <div className="h-[3px] bg-emerald-500 rounded-t-[inherit]" />
+        <div className="h-[3px] bg-[var(--pro-azure-50)]0 rounded-t-[inherit]" />
         <div className="p-4 pb-3">
           <div className="flex items-start justify-between mb-0.5">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center shrink-0">
-                <ArrowDownLeft size={14} className="text-emerald-600 dark:text-emerald-400" />
+              <div className="w-7 h-7 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/30 flex items-center justify-center shrink-0">
+                <ArrowDownLeft size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
               </div>
               <div>
                 <h3 className="text-[13px] font-semibold text-slate-800 dark:text-slate-100 leading-tight">Receivables</h3>
@@ -94,7 +96,7 @@ const ReceivablesPayablesWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
             </div>
             <Link
               to="/reports?type=ar-aging"
-              className="flex items-center gap-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline shrink-0"
+              className="flex items-center gap-0.5 text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline shrink-0"
             >
               View Report <ExternalLink size={9} />
             </Link>
@@ -147,7 +149,7 @@ const ReceivablesPayablesWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
             </div>
             <Link
               to="/reports?type=ap-aging"
-              className="flex items-center gap-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline shrink-0"
+              className="flex items-center gap-0.5 text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline shrink-0"
             >
               View Report <ExternalLink size={9} />
             </Link>

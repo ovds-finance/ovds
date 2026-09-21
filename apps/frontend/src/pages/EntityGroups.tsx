@@ -3,17 +3,18 @@
  *
  * Backend: EntityGroupController @Controller('ovds/accounting/entity-groups')
  */
-import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, RefreshCw, Building2 } from 'lucide-react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { confirm } from '../utils/confirm';
-import { entityGroupsApi } from '../services/ovdsApi';
+
 import {
   AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, Modal, FormField, Input, EmptyState, SearchBar,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { entityGroupsApi } from '../services/ovdsApi';
+import { confirm } from '../utils/confirm';
 
 interface EntityGroup {
   id: string;
@@ -97,7 +98,7 @@ const EntityGroups: React.FC = () => {
       }
     >
       <AppKpi cells={[
-        { label: 'Total Groups', value: groups.length, color: 'emerald' as const },
+        { label: 'Total Groups', value: groups.length, color: 'green' as const },
         { label: 'Report Currency', value: 'ETB', color: 'sky' as const },
       ]} />
 

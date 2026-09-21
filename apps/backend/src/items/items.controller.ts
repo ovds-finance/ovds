@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+﻿﻿﻿import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, HttpCode, HttpStatus, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
-import { ItemsService } from './items.service';
+
+import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
+
+import { ItemsService } from './items.service';
 
 @ApiTags('items')
 @Controller('items')
@@ -15,8 +17,9 @@ export class ItemsController {
   @Roles('ADMIN', 'EMPLOYEE')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'List items' })
-  list(@Query() query: Record<string, unknown>) {
-    return this.itemsService.findItems(query);
+  list(@Query() query: Record<string, unknown>, @Request() req: any) {
+    const companies = [((query.companyId as string) ?? req.user?.companyId) as string].filter(Boolean);
+    return this.itemsService.findItems({ ...query, companies } as any);
   }
 
   @Get(':id')

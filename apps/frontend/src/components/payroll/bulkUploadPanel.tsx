@@ -1,8 +1,9 @@
-import React, { useState, useRef } from 'react';
 import { Upload, Download, CheckCircle, AlertTriangle, RefreshCw } from 'lucide-react';
-import api from '../../services/api';
+import React, { useState, useRef } from 'react';
 import toast from 'react-hot-toast';
+
 import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
 
 // -- Bulk Upload Panel ---------------------------------------------------------
 // Covers all bulk upload types from the Payroll Management System spec
@@ -145,7 +146,7 @@ const UploadCard: React.FC<{ type: UploadType; canUpload: boolean }> = ({ type, 
           </button>
           {canUpload && (
             <button onClick={() => fileRef.current?.click()} disabled={uploading}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-500 text-white rounded-lg text-xs font-bold hover:bg-emerald-600 transition-colors disabled:opacity-50">
+              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[var(--pro-azure)] text-white rounded-lg text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-colors disabled:opacity-50">
               {uploading ? <RefreshCw size={11} className="animate-spin" /> : <Upload size={11} />}
               {uploading ? 'Uploading…' : 'Upload CSV'}
             </button>
@@ -162,10 +163,10 @@ const UploadCard: React.FC<{ type: UploadType; canUpload: boolean }> = ({ type, 
 
       {/* Result */}
       {result && (
-        <div className={`rounded-xl p-3 border text-xs ${result.errors.length === 0 ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'}`}>
+        <div className={`rounded-xl p-3 border text-xs ${result.errors.length === 0 ? 'bg-[var(--pro-azure-50)] dark:bg-green-900/20 border-[var(--pro-azure-100)] dark:border-green-800' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'}`}>
           <div className="flex items-center gap-2 font-bold">
             {result.errors.length === 0
-              ? <><CheckCircle size={12} className="text-emerald-600" /> {result.success} of {result.total} records uploaded successfully</>
+              ? <><CheckCircle size={12} className="text-[var(--pro-azure)]" /> {result.success} of {result.total} records uploaded successfully</>
               : <><AlertTriangle size={12} className="text-amber-600" /> {result.success} succeeded, {result.errors.length} errors</>
             }
           </div>

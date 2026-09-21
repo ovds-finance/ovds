@@ -22,7 +22,7 @@
     "incremental": true,
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "paths": {
-      "@ovds/domains/projects": [
+      "@ovds/domains-projects": [
         "packages/domains/projects/dist/index.d.ts"
       ]
     }

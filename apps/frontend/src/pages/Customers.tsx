@@ -1,29 +1,30 @@
 /**
  * Customers — ovds-style customer management
  * Inherits: AppPage · AppKpi · AppTable · useApiCrud
- * White background · Emerald text · White-blue icons
+ * White background · indigo text · White-blue icons
  * Ethiopian KYC + TIN validation · IFRS credit risk
  */
-import React, { useState, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { evalMath } from '@ovds/ui';
 import {
   Users2, Plus, Edit2, Trash2, Eye, Download, RefreshCw,
   Mail, Phone,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import { fmtETB } from '../utils/ethiopianTax';
+import { useNavigate } from 'react-router-dom';
+
+import { OvdsEmptyState } from '../components/ovds';
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select, Textarea,
   SearchBar, Amount, Pagination,
 } from '../components/ui';
-import { evalMath } from '@ovds/ui';
-import { OvdsEmptyState } from '../components/ovds';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
+import { fmtETB } from '../utils/ethiopianTax';
 
 // -- Types ---------------------------------------------------------------------
 interface Customer {
@@ -153,7 +154,7 @@ const Customers: React.FC = () => {
 
   // -- KPI cells -------------------------------------------------------------
   const kpiCells = useMemo(() => [
-    { label: 'Total',       value: rows.length,                                                  color: 'emerald' as const, tooltip: 'All registered customers' },
+    { label: 'Total',       value: rows.length,                                                  color: 'green' as const, tooltip: 'All registered customers' },
     { label: 'With TIN',    value: rows.filter(c => c.tin).length,                               color: 'sky' as const,     tooltip: 'Customers with ERCA Tax Identification Number' },
     { label: 'High Risk',   value: rows.filter(c => c.riskLevel === 'HIGH').length,              color: 'rose' as const,    tooltip: 'Customers flagged as high credit risk' },
     { label: 'KYC Pending', value: rows.filter(c => !c.kycStatus || c.kycStatus === 'PENDING').length, color: 'amber' as const, tooltip: 'Customers awaiting identity verification' },
@@ -191,7 +192,7 @@ const Customers: React.FC = () => {
 
   const riskBadge = (level?: string) => {
     const map: Record<string, string> = {
-      LOW:    'bg-emerald-50 text-emerald-700 border-emerald-100',
+      LOW:    'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
       MEDIUM: 'bg-amber-50 text-amber-700 border-amber-100',
       HIGH:   'bg-rose-50 text-rose-700 border-rose-100',
     };
@@ -275,13 +276,13 @@ const Customers: React.FC = () => {
             <AppTr key={c.id}>
               <AppTd>
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-100 to-sky-100 flex items-center justify-center text-[11px] font-bold text-emerald-700 shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--pro-azure-100)] to-[var(--pro-azure-100)] flex items-center justify-center text-[11px] font-bold text-[var(--pro-azure-dark)] shrink-0">
                     {c.name.slice(0, 2).toUpperCase()}
                   </div>
                   <div className="min-w-0">
                     <button
                       onClick={() => navigate(`/customer-summary/${c.id}`)}
-                      className="text-[12px] font-semibold text-slate-800 hover:text-emerald-600 transition-colors truncate block max-w-[160px] text-left"
+                      className="text-[12px] font-semibold text-slate-800 hover:text-[var(--pro-azure)] transition-colors truncate block max-w-[160px] text-left"
                     >
                       {c.name}
                     </button>
@@ -313,7 +314,7 @@ const Customers: React.FC = () => {
                     </span>
                   )}
                   {c.vatNumber && (
-                    <span className="font-mono text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 block w-fit">
+                    <span className="font-mono text-[10px] text-[var(--pro-azure)] bg-[var(--pro-azure-50)] px-1.5 py-0.5 rounded border border-[var(--pro-azure-100)] block w-fit">
                       VAT: {c.vatNumber}
                     </span>
                   )}
@@ -351,7 +352,7 @@ const Customers: React.FC = () => {
                     <>
                       <button
                         onClick={() => openEdit(c)}
-                        className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                        className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all"
                         title="Edit"
                       >
                         <Edit2 size={11} />

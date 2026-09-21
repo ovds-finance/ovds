@@ -1,5 +1,3 @@
-import React, { useState } from 'react';
-import { usePageTitle } from '../hooks/usePageTitle';
 import {
   Book,
   ExternalLink,
@@ -13,11 +11,15 @@ import {
   Copy,
   CheckCheck,
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+
+import { usePageTitle } from '../hooks/usePageTitle';
+
 const METHOD_COLORS: Record<string, string> = {
-  GET: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-  POST: 'bg-emerald-50 text-emerald-600 dark:text-emerald-400 border border-emerald-200',
+  GET: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)]',
+  POST: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-[var(--pro-azure-100)]',
   PATCH: 'bg-amber-50 text-amber-700 border border-amber-200',
   DELETE: 'bg-rose-50 text-rose-700 border border-rose-200',
 };
@@ -47,7 +49,7 @@ const endpointGroups = [
   {
     group: 'Employees',
     icon: <Shield size={16} />,
-    color: 'text-emerald-600 dark:text-emerald-400',
+    color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
     items: [
       {
         method: 'GET',
@@ -76,7 +78,7 @@ const endpointGroups = [
   {
     group: 'Attendance',
     icon: <Zap size={16} />,
-    color: 'text-emerald-600',
+    color: 'text-[var(--pro-azure)]',
     items: [
       {
         method: 'POST',
@@ -267,7 +269,7 @@ const endpointGroups = [
   {
     group: 'Departments',
     icon: <Code size={16} />,
-    color: 'text-emerald-600',
+    color: 'text-[var(--pro-azure)]',
     items: [
       { method: 'GET', path: '/api/departments', desc: 'List all departments' },
       { method: 'POST', path: '/api/departments', desc: 'Create department' },
@@ -401,7 +403,7 @@ const endpointGroups = [
   {
     group: 'ovds — Invoices & Bills',
     icon: <Code size={16} />,
-    color: 'text-emerald-600',
+    color: 'text-[var(--pro-azure)]',
     items: [
       {
         method: 'GET',
@@ -487,7 +489,7 @@ const endpointGroups = [
   {
     group: 'ovds — Customers & Vendors',
     icon: <Shield size={16} />,
-    color: 'text-emerald-600 dark:text-emerald-400',
+    color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
     items: [
       {
         method: 'GET',
@@ -800,13 +802,13 @@ return (
             icon: <Zap size={24} />,
             title: t('api_docs_page.real_time'),
             desc: t('api_docs_page.real_time_desc'),
-            color: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+            color: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] border-[var(--pro-azure-100)]',
           },
           {
             icon: <Database size={24} />,
             title: t('api_docs_page.prisma_orm'),
             desc: t('api_docs_page.prisma_orm_desc'),
-            color: 'bg-emerald-50 text-emerald-600 dark:text-emerald-400 border-emerald-100',
+            color: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border-[var(--pro-azure-100)]',
           },
         ].map((card, i) => (
           <div
@@ -845,7 +847,7 @@ return (
           href="/api/docs"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 bg-emerald-500 text-white px-5 py-2.5 rounded-xl hover:bg-emerald-600 transition-all text-sm font-bold shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30 shrink-0"
+          className="flex items-center gap-2 bg-[var(--pro-azure)] text-white px-5 py-2.5 rounded-xl hover:bg-[var(--pro-azure-dark)] transition-all text-sm font-bold shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30 shrink-0"
         >
           <ExternalLink size={16} />
           {t('api_docs_page.open_swagger')}
@@ -855,7 +857,7 @@ return (
       {/* Endpoint groups */}
       <div className="ovds-widget-card shadow-sm overflow-hidden">
         <div className="p-5 border-b border-slate-100 bg-slate-50/30 flex items-center gap-3">
-          <Code size={18} className="text-emerald-600 dark:text-emerald-400" />
+          <Code size={18} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           <h2 className="text-lg font-bold text-slate-900">
             {t('api_docs_page.core_endpoints')}
           </h2>
@@ -911,7 +913,7 @@ return (
                       >
                         {item.method}
                       </span>
-                      <code className="text-emerald-600 dark:text-emerald-400 font-mono text-xs flex-1 truncate">
+                      <code className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-mono text-xs flex-1 truncate">
                         {item.path}
                       </code>
                       <span className="text-slate-500 text-xs">
@@ -923,7 +925,7 @@ return (
                         title="Copy path"
                       >
                         {copiedPath === item.path ? (
-                          <CheckCheck size={13} className="text-emerald-500" />
+                          <CheckCheck size={13} className="text-[var(--pro-azure)]" />
                         ) : (
                           <Copy size={13} />
                         )}

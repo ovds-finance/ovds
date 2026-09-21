@@ -17,7 +17,6 @@
  *   POST /ovds/reconciliation/:id/dismiss
  *   POST /ovds/bank-transactions/bulk-reconcile  { ids }
  */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   CheckCircle,
   XCircle,
@@ -36,10 +35,9 @@ import {
   Clock,
   BarChart3,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
+
 import {
   AppPage,
   AppTabs,
@@ -55,6 +53,9 @@ import {
   SearchBar,
   Amount,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
 import api from '../services/api';
 
 // -- Types ---------------------------------------------------------------------
@@ -117,7 +118,7 @@ type ViewTab = 'pending' | 'reconciled' | 'all';
 const ScoreBadge: React.FC<{ score: number }> = ({ score }) => {
   const cls =
     score >= 85
-      ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800'
+      ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800'
       : score >= 50
         ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800'
         : 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-800';
@@ -133,7 +134,7 @@ const ScoreBadge: React.FC<{ score: number }> = ({ score }) => {
 
 // -- Method badge ---------------------------------------------------------------
 const METHOD_LABELS: Record<string, { label: string; cls: string }> = {
-  EXACT_REF: { label: 'Exact Ref', cls: 'text-emerald-700 bg-emerald-50' },
+  EXACT_REF: { label: 'Exact Ref', cls: 'text-[var(--pro-azure-dark)] bg-[var(--pro-azure-50)]' },
   QR: { label: 'QR Code', cls: 'text-violet-700 bg-violet-50' },
   FUZZY_REF: { label: 'Fuzzy Ref', cls: 'text-amber-700 bg-amber-50' },
   AMOUNT_DATE: { label: 'Amt + Date', cls: 'text-sky-700 bg-sky-50' },
@@ -171,7 +172,7 @@ const ProposalRow: React.FC<{
     <>
       <AppTr
         className={
-          selected ? 'bg-emerald-50/40 dark:bg-emerald-950/10' : undefined
+          selected ? 'bg-[var(--pro-azure-50)]/40 dark:bg-green-950/10' : undefined
         }
       >
         {/* Checkbox */}
@@ -180,7 +181,7 @@ const ProposalRow: React.FC<{
             type="checkbox"
             checked={selected}
             onChange={onSelect}
-            className="rounded border-slate-300 text-emerald-600 focus:ring-teal-400/20"
+            className="rounded border-slate-300 text-[var(--pro-azure)] focus:ring-teal-400/20"
           />
         </AppTd>
 
@@ -215,13 +216,13 @@ const ProposalRow: React.FC<{
         {/* Amount */}
         <AppTd align="right">
           <span
-            className={`tabular-nums font-bold text-[12px] ${isCredit ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}
+            className={`tabular-nums font-bold text-[12px] ${isCredit ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-600 dark:text-rose-400'}`}
           >
             {isCredit ? '+' : '-'}
             <Amount value={Math.abs(Number(tx.amount))} size="sm" />
           </span>
           <span
-            className={`block text-[9px] font-bold mt-0.5 ${isCredit ? 'text-emerald-500' : 'text-rose-400'}`}
+            className={`block text-[9px] font-bold mt-0.5 ${isCredit ? 'text-[var(--pro-azure)]' : 'text-rose-400'}`}
           >
             {tx.type}
           </span>
@@ -582,20 +583,20 @@ const BankReconciliation: React.FC = () => {
       {
         label: 'Reconciled',
         value: stats?.reconciled ?? '—',
-        color: 'emerald' as const,
+        color: "indigo" as const,
       },
       {
         label: 'Pending',
         value: stats?.pending ?? '—',
         color:
-          (stats?.pending ?? 0 > 0) ? ('amber' as const) : ('emerald' as const),
+          (stats?.pending ?? 0 > 0) ? ('amber' as const) : ('indigo' as const),
       },
       {
         label: 'Reconciliation Rate',
         value: stats ? `${stats.reconciliationRate}%` : '—',
         color:
           (stats?.reconciliationRate ?? 0) >= 80
-            ? ('emerald' as const)
+            ? ('indigo' as const)
             : ('amber' as const),
       },
     ],
@@ -678,7 +679,7 @@ const BankReconciliation: React.FC = () => {
               )}
               <div className="flex items-center justify-between">
                 <span
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${acc.pendingCount > 0 ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'}`}
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${acc.pendingCount > 0 ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400' : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)]'}`}
                 >
                   {acc.pendingCount > 0
                     ? `${acc.pendingCount} pending`
@@ -767,7 +768,7 @@ const BankReconciliation: React.FC = () => {
                 type="checkbox"
                 checked={allSelected}
                 onChange={toggleAll}
-                className="rounded border-slate-300 text-emerald-600 focus:ring-teal-400/20"
+                className="rounded border-slate-300 text-[var(--pro-azure)] focus:ring-teal-400/20"
               />
             </AppTh>
             <AppTh>Date</AppTh>
@@ -798,7 +799,7 @@ const BankReconciliation: React.FC = () => {
             <tr>
               <td colSpan={7}>
                 <EmptyState
-                  icon={<ShieldCheck size={20} className="text-emerald-400" />}
+                  icon={<ShieldCheck size={20} className="text-[var(--pro-azure-light)]" />}
                   title={
                     activeTab === 'pending'
                       ? 'All clear — no pending transactions'
@@ -872,7 +873,7 @@ const BankReconciliation: React.FC = () => {
                             return ns;
                           })
                         }
-                        className="rounded border-slate-300 text-emerald-600 focus:ring-teal-400/20"
+                        className="rounded border-slate-300 text-[var(--pro-azure)] focus:ring-teal-400/20"
                       />
                     )}
                   </AppTd>
@@ -904,7 +905,7 @@ const BankReconciliation: React.FC = () => {
                   </AppTd>
                   <AppTd align="right">
                     <span
-                      className={`tabular-nums font-bold text-[12px] ${isCredit ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}
+                      className={`tabular-nums font-bold text-[12px] ${isCredit ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-600 dark:text-rose-400'}`}
                     >
                       {isCredit ? '+' : '-'}
                       <Amount value={Math.abs(Number(tx.amount))} size="sm" />
@@ -912,7 +913,7 @@ const BankReconciliation: React.FC = () => {
                   </AppTd>
                   <AppTd>
                     {isReconciled ? (
-                      <span className="flex items-center gap-1 text-[10px] text-emerald-600 font-bold">
+                      <span className="flex items-center gap-1 text-[10px] text-[var(--pro-azure)] font-bold">
                         <CheckCircle size={11} /> Reconciled
                       </span>
                     ) : tx.matchedInvoiceId || tx.matchedBillId ? (
@@ -1039,7 +1040,7 @@ const BankReconciliation: React.FC = () => {
               <p className="text-[10px] font-bold text-sky-700 dark:text-sky-400">
                 {m.label}
               </p>
-              <p className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400">
+              <p className="text-[9px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                 {m.score}
               </p>
               <p className="text-[9px] text-slate-500 mt-0.5 leading-relaxed">

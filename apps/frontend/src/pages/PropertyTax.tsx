@@ -2,22 +2,6 @@
  * Property Tax — Ethiopia
  * Proclamation No. 1161/2019 · Regional Revenue Bureaus + ERCA oversight
  */
-import React, { useState, useCallback, useEffect } from 'react';
-import {
-  AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
-  Btn, Modal, FormField, Input, Select, Icon, StatusBadge, Amount,
-} from '../components/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
-import { useInterval } from '../hooks';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import {
-  usePropertyTaxDashboard,
-  usePropertyRecords,
-  usePropertyAssessments,
-} from '../services/newTaxApi';
 import {
   calculatePropertyTax,
   URBAN_LAND_RATE_ETB_PER_SQM,
@@ -28,9 +12,26 @@ import {
   type ValuationMethod,
   type PropertyTaxStatus,
 } from '@ovds/ui';
+import React, { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
+import {
+  AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
+  Btn, Modal, FormField, Input, Select, Icon, StatusBadge, Amount,
+} from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useInterval } from '../hooks';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import {
+  usePropertyTaxDashboard,
+  usePropertyRecords,
+  usePropertyAssessments,
+} from '../services/newTaxApi';
 
 // -- Types ---------------------------------------------------------------------
-interface PropertyRecord {
+interface _PropertyRecord {
   id: string;
   propertyCode: string;
   description: string;
@@ -50,7 +51,7 @@ interface PropertyRecord {
   createdAt: string;
 }
 
-interface Assessment {
+interface _Assessment {
   id: string;
   propertyId: string;
   period: string;
@@ -65,7 +66,7 @@ interface Assessment {
   createdAt: string;
 }
 
-const today = new Date().toISOString().slice(0, 10);
+const _today = new Date().toISOString().slice(0, 10);
 const currentYear = new Date().getFullYear().toString();
 
 const PROPERTY_TYPES: { value: PropertyTaxType; label: string }[] = [
@@ -92,7 +93,7 @@ const STATUS_COLORS: Record<string, string> = {
   DRAFT:    'bg-slate-100 text-slate-600',
   ASSESSED: 'bg-sky-50 text-sky-700',
   NOTIFIED: 'bg-amber-50 text-amber-700',
-  PAID:     'bg-emerald-50 text-emerald-700',
+  PAID:     'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
   OVERDUE:  'bg-rose-50 text-rose-700',
   DISPUTED: 'bg-violet-50 text-violet-700',
   EXEMPT:   'bg-white text-slate-400',
@@ -135,8 +136,8 @@ const PropertyTaxCalculator: React.FC = () => {
             onClick={() => setPType(pt.value)}
             className={`p-3 rounded-xl border text-xs font-semibold transition-colors text-left ${
               pType === pt.value
-                ? 'bg-emerald-600 text-white border-emerald-600'
-                : 'bg-white border-slate-200 text-slate-600 hover:border-emerald-300'
+                ? 'bg-[var(--pro-azure)] text-white border-[var(--pro-azure)]'
+                : 'bg-white border-slate-200 text-slate-600 hover:border-[var(--pro-azure-light)]'
             }`}
           >
             {pt.label}
@@ -183,7 +184,7 @@ const PropertyTaxCalculator: React.FC = () => {
         <div className="space-y-3">
           <div className="ovds-grid-layout cols-3">
             {[
-              { label: 'Annual Tax Due',   value: result.annualTaxDue,   color: 'text-emerald-700' },
+              { label: 'Annual Tax Due',   value: result.annualTaxDue,   color: 'text-[var(--pro-azure-dark)]' },
               { label: 'Penalty',          value: result.penaltyAmount,  color: 'text-rose-600' },
               { label: 'Total Payable',    value: result.totalPayable,   color: 'text-slate-800' },
             ].map(c => (
@@ -196,7 +197,7 @@ const PropertyTaxCalculator: React.FC = () => {
           <div className="space-y-1">
             {result.notes.map((n, i) => (
               <p key={i} className="text-[11px] text-slate-500 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--pro-azure-light)] shrink-0" />
                 {n}
               </p>
             ))}
@@ -310,7 +311,7 @@ function AddPropertyModal({ onClose, onSaved }: { onClose: () => void; onSaved: 
           </FormField>
         </div>
         <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
-          <input type="checkbox" checked={form.isExempt} onChange={e => set('isExempt', e.target.checked)} className="rounded accent-emerald-500" />
+          <input type="checkbox" checked={form.isExempt} onChange={e => set('isExempt', e.target.checked)} className="rounded accent-indigo-500" />
           Property is exempt from tax
         </label>
         <FormField label="Notes">
@@ -383,9 +384,9 @@ const PropertyTax: React.FC = () => {
     >
       {/* KPI strip */}
       <AppKpi cells={[
-        { label: 'Total Properties',  value: String(properties.length),      icon: <Icon name="COMPANY" size={14} />, color: 'emerald' },
+        { label: 'Total Properties',  value: String(properties.length),      icon: <Icon name="COMPANY" size={14} />, color: 'green' },
         { label: 'Annual Tax Due',    value: `ETB ${fmtK(totalDue)}`,        icon: <Icon name="MONEY" size={14} />,   color: 'violet' },
-        { label: 'Paid',              value: `ETB ${fmtK(totalPaid)}`,        icon: <Icon name="SUCCESS" size={14} />, color: 'emerald' },
+        { label: 'Paid',              value: `ETB ${fmtK(totalPaid)}`,        icon: <Icon name="SUCCESS" size={14} />, color: 'green' },
         { label: 'Outstanding',       value: `ETB ${fmtK(totalOutstanding)}`, icon: <Icon name="WARNING" size={14} />, color: totalOverdue > 0 ? 'rose' : 'amber' },
       ]} />
 
@@ -583,7 +584,7 @@ const PropertyTax: React.FC = () => {
               title: 'Urban Land Use Fee',
               ref: 'Proclamation No. 1161/2019, Art. 3',
               content: 'All urban land holders pay an annual use fee based on land grade, size (m²), and municipality. Addis Ababa uses 4 grades (ETB 1.20–3.50/m²). Failure to pay within 30 days of notice attracts 5% penalty p.a. Disputes are submitted to the Regional Tax Appeal Commission within 30 days.',
-              color: 'border-emerald-200 bg-emerald-50',
+              color: 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]',
             },
             {
               title: 'Building / House Tax',

@@ -1,7 +1,7 @@
 /**
- * CentralControlPanelContent — unified settings hub for OVDS
+ * CentralControlPanelContent — unified settings hub for Ovds SaaS
  *
- * Akaunting-inspired sidebar-driven layout. All configuration sections
+ * Ovds SaaS sidebar-driven layout. All configuration sections
  * are accessible from one place: Company, Localization, Financial, Invoice,
  * Defaults, Currencies, Email/SMTP, Taxes, Users & Access, Modules, Developers.
  *
@@ -16,6 +16,10 @@ import {
   Mail, Save, RefreshCw, CheckCircle2, AlertCircle, ArrowRight,
   Wallet, UserCog, Shield, Code, Settings as SettingsIcon,
   ChevronDown, Eye, EyeOff, ExternalLink, Plug,
+  Users, Lock, KeyRound, ShieldCheck, LogIn, ClipboardList,
+  Network, UserPlus, ChevronRight, Palette, LayoutTemplate,
+  Sparkles, Wand2, Type, AlignLeft, Columns, StickyNote, Hash,
+  CreditCard,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -288,6 +292,18 @@ function FinancialSection({ data, onChange, sources }: { data: Record<string, st
   );
 }
 
+// ── Invoice color swatches ────────────────────────────────────────────────────
+const INVOICE_COLORS = [
+  { name: 'Emerald',  value: '#10B981' },
+  { name: 'Azure',    value: '#2563EB' },
+  { name: 'Indigo',   value: '#4F46E5' },
+  { name: 'Violet',   value: '#7C3AED' },
+  { name: 'Rose',     value: '#E11D48' },
+  { name: 'Amber',    value: '#D97706' },
+  { name: 'Teal',     value: '#0D9488' },
+  { name: 'Slate',    value: '#475569' },
+];
+
 function InvoiceSection({ data, onChange, sources }: { data: Record<string, string>; onChange: (k: string, v: string) => void; sources?: Record<string, { value: string; source: string; conflicts: string[] }> }) {
   const f = (k: string) => ({ value: data[k] ?? '', onChange: (v: string) => onChange(k, v) });
   const src = (camel: string) => {
@@ -295,38 +311,225 @@ function InvoiceSection({ data, onChange, sources }: { data: Record<string, stri
     const snake = camel.replace(/[A-Z]/g, m => '_' + m.toLowerCase());
     return sources[snake]?.source;
   };
+
+  const selectedColor = data['invoiceThemeColor'] || '#10B981';
+
   return (
-    <div>
-      <p className="text-xs text-slate-500 mb-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5">
-        Set custom document naming prefixes (e.g. changing INV- to a custom layout), footer terms, and PDF generation templates.
+    <div className="space-y-0">
+      {/* ── Description ─────────────────────────────────────────────────── */}
+      <p className="text-xs text-slate-500 mb-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 leading-relaxed">
+        Configure invoice numbering, default payment terms, color theme, content visibility, and footer text.
+        For advanced drag-and-drop template design, use the{' '}
+        <Link to="/apps/invoice-templates" className="font-semibold text-[var(--pro-azure)] hover:underline inline-flex items-center gap-0.5">
+          Print-ready Invoice Template App <ExternalLink size={10} />
+        </Link>.
       </p>
-      <FieldRow label="Invoice Prefix" hint="Custom prefix for invoice document numbers" required source={src('invoicePrefix')}>
-        <TI {...f('invoicePrefix')} placeholder="INV-" />
-      </FieldRow>
-      <FieldRow label="Next Invoice Number" hint="Next sequential number to assign" source={src('invoiceNextNumber')}>
-        <TI {...f('invoiceNextNumber')} placeholder="1001" />
-      </FieldRow>
-      <FieldRow label="PDF Template" source={src('invoiceTemplate')}>
-        <SI {...f('invoiceTemplate')} options={[
-          { label: 'Simple',   value: 'simple' },
-          { label: 'Modern',   value: 'modern' },
-          { label: 'Detailed', value: 'detailed' },
-        ]} />
-      </FieldRow>
-      <FieldRow label="Footer Terms" hint="Custom terms printed at the bottom of every invoice PDF" source={src('invoiceFooter')}>
-        <textarea className="ovds-input w-full max-w-lg" rows={3}
-          value={data['invoiceFooter'] ?? ''} onChange={e => onChange('invoiceFooter', e.target.value)}
-          placeholder="Payment is due within 30 days. Thank you for your business." />
-      </FieldRow>
-      <FieldRow label="Show MoR Tax QR Code" source={src('invoiceShowQr')}><Toggle {...f('invoiceShowQr')} label="Print QR code on invoice" /></FieldRow>
-      <FieldRow label="Show Company Logo" source={src('invoiceShowLogo')}><Toggle {...f('invoiceShowLogo')} label="Display logo on invoice PDF" /></FieldRow>
-      <FieldRow label="Show Bank Details" source={src('invoiceShowBankDetails')}><Toggle {...f('invoiceShowBankDetails')} label="Print bank account details on invoice" /></FieldRow>
-      <FieldRow label="Due Days" hint="Default payment terms in days" source={src('invoiceDueDays')}>
-        <TI {...f('invoiceDueDays')} placeholder="30" />
-      </FieldRow>
-      <FieldRow label="Reminder Days" hint="Days after due date to send reminder" source={src('invoiceReminderDays')}>
-        <TI {...f('invoiceReminderDays')} placeholder="7" />
-      </FieldRow>
+
+      {/* ── Sub-section: Numbering ───────────────────────────────────────── */}
+      <div className="mb-1">
+        <div className="flex items-center gap-2 py-2 mb-1">
+          <Hash size={13} className="text-slate-400 shrink-0" />
+          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Numbering</p>
+        </div>
+        <FieldRow label="Invoice Prefix" hint="Custom prefix for invoice document numbers (e.g. INV-, RCPT-, PFI-)" required source={src('invoicePrefix')}>
+          <TI {...f('invoicePrefix')} placeholder="INV-" />
+        </FieldRow>
+        <FieldRow label="Next Invoice Number" hint="Next sequential number to assign — auto-increments on every new invoice" source={src('invoiceNextNumber')}>
+          <TI {...f('invoiceNextNumber')} placeholder="1001" />
+        </FieldRow>
+        <FieldRow label="Estimate Prefix" hint="Prefix for estimate / proforma documents" source={src('estimatePrefix')}>
+          <TI {...f('estimatePrefix')} placeholder="EST-" />
+        </FieldRow>
+      </div>
+
+      {/* ── Sub-section: Appearance ──────────────────────────────────────── */}
+      <div className="mb-1 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2 py-2 mb-1">
+          <Palette size={13} className="text-slate-400 shrink-0" />
+          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Appearance</p>
+        </div>
+        <FieldRow label="Default Document Title" hint="Printed at the top of every invoice PDF" source={src('invoiceDefaultTitle')}>
+          <SI {...f('invoiceDefaultTitle')} options={[
+            { label: 'TAX INVOICE',      value: 'TAX INVOICE' },
+            { label: 'INVOICE',          value: 'INVOICE' },
+            { label: 'PROFORMA INVOICE', value: 'PROFORMA INVOICE' },
+            { label: 'RECEIPT',          value: 'RECEIPT' },
+            { label: 'CREDIT NOTE',      value: 'CREDIT NOTE' },
+            { label: 'DEBIT NOTE',       value: 'DEBIT NOTE' },
+          ]} />
+        </FieldRow>
+        <FieldRow label="PDF Layout Template" hint="Base layout used when generating invoice PDFs" source={src('invoiceTemplate')}>
+          <SI {...f('invoiceTemplate')} options={[
+            { label: 'Simple — clean single-column',      value: 'simple' },
+            { label: 'Modern — two-column with sidebar',  value: 'modern' },
+            { label: 'Detailed — full IFRS/ERCA fields',  value: 'detailed' },
+            { label: 'Compact — condensed for reprints',  value: 'compact' },
+          ]} />
+        </FieldRow>
+        <FieldRow label="Template Color Theme" hint="Accent color used for headers, borders, and totals row in the PDF" source={src('invoiceThemeColor')}>
+          <div className="flex flex-wrap gap-2 items-center">
+            {INVOICE_COLORS.map(c => (
+              <button
+                key={c.value}
+                type="button"
+                title={c.name}
+                onClick={() => onChange('invoiceThemeColor', c.value)}
+                className="w-7 h-7 rounded-lg border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-slate-400"
+                style={{
+                  background: c.value,
+                  borderColor: selectedColor === c.value ? '#111827' : 'transparent',
+                  transform: selectedColor === c.value ? 'scale(1.2)' : 'scale(1)',
+                  boxShadow: selectedColor === c.value ? `0 0 0 1px white, 0 0 0 3px ${c.value}` : 'none',
+                }}
+                aria-pressed={selectedColor === c.value}
+                aria-label={`Color: ${c.name}`}
+              />
+            ))}
+            {/* Custom hex input */}
+            <div className="flex items-center gap-1.5 ml-2">
+              <div className="w-5 h-5 rounded border border-slate-200 dark:border-slate-600" style={{ background: selectedColor }} />
+              <input
+                type="text"
+                maxLength={7}
+                value={selectedColor}
+                onChange={e => /^#[0-9A-Fa-f]{0,6}$/.test(e.target.value) && onChange('invoiceThemeColor', e.target.value)}
+                className="ovds-input w-20 text-xs font-mono"
+                placeholder="#10B981"
+                aria-label="Custom color hex"
+              />
+            </div>
+          </div>
+        </FieldRow>
+      </div>
+
+      {/* ── Sub-section: Default Payment Terms ──────────────────────────── */}
+      <div className="mb-1 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2 py-2 mb-1">
+          <CreditCard size={13} className="text-slate-400 shrink-0" />
+          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Payment Terms</p>
+        </div>
+        <FieldRow label="Default Payment Terms" hint="Pre-selected on every new invoice — can be changed per-invoice" source={src('invoiceDefaultPaymentTerms')}>
+          <SI {...f('invoiceDefaultPaymentTerms')} options={[
+            { label: 'Due Immediately',  value: 'IMMEDIATE' },
+            { label: 'Net 7 days',       value: 'NET7' },
+            { label: 'Net 15 days',      value: 'NET15' },
+            { label: 'Net 30 days',      value: 'NET30' },
+            { label: 'Net 60 days',      value: 'NET60' },
+            { label: 'Net 90 days',      value: 'NET90' },
+          ]} />
+        </FieldRow>
+        <FieldRow label="Due Days (override)" hint="Exact number of days — overrides the terms selection above if set" source={src('invoiceDueDays')}>
+          <TI {...f('invoiceDueDays')} placeholder="30" />
+        </FieldRow>
+        <FieldRow label="Reminder Days" hint="Days after due date to automatically send a payment reminder" source={src('invoiceReminderDays')}>
+          <TI {...f('invoiceReminderDays')} placeholder="7" />
+        </FieldRow>
+      </div>
+
+      {/* ── Sub-section: Content Toggles ─────────────────────────────────── */}
+      <div className="mb-1 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2 py-2 mb-1">
+          <Eye size={13} className="text-slate-400 shrink-0" />
+          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Content Visibility</p>
+        </div>
+        <p className="text-xs text-slate-400 mb-3 ml-0.5 leading-relaxed">
+          Control which fields and sections appear on every generated invoice PDF. These are global defaults — individual invoices can still override them.
+        </p>
+        <FieldRow label="Item Descriptions" hint="Show the free-text description line beneath each line item name" source={src('invoiceShowItemDesc')}>
+          <Toggle {...f('invoiceShowItemDesc')} label="Show item descriptions on PDF" />
+        </FieldRow>
+        <FieldRow label="Unit Prices & Amounts" hint="Show the unit price, quantity, and per-line net amount columns" source={src('invoiceShowAmounts')}>
+          <Toggle {...f('invoiceShowAmounts')} label="Show amounts and unit prices" />
+        </FieldRow>
+        <FieldRow label="Discount Column" hint="Show the discount column in the line items table when discounts are applied" source={src('invoiceShowDiscountCol')}>
+          <Toggle {...f('invoiceShowDiscountCol')} label="Show discount column" />
+        </FieldRow>
+        <FieldRow label="Tax / VAT Column" hint="Show the per-line VAT rate and amount column" source={src('invoiceShowTaxCol')}>
+          <Toggle {...f('invoiceShowTaxCol')} label="Show tax / VAT column" />
+        </FieldRow>
+        <FieldRow label="Custom Columns" hint="Show any additional custom columns added via the Invoice Template App" source={src('invoiceShowCustomColumns')}>
+          <Toggle {...f('invoiceShowCustomColumns')} label="Show custom columns" />
+        </FieldRow>
+        <FieldRow label="Customer Notes" hint="Show the 'Notes to Customer' block on the PDF" source={src('invoiceShowNotes')}>
+          <Toggle {...f('invoiceShowNotes')} label="Show customer notes section" />
+        </FieldRow>
+        <FieldRow label="Footer / Terms" hint="Show the footer text and payment terms block at the bottom of the PDF" source={src('invoiceShowFooter')}>
+          <Toggle {...f('invoiceShowFooter')} label="Show footer and terms section" />
+        </FieldRow>
+        <FieldRow label="Show MoR Tax QR Code" hint="Print the NBE-IQR QR code for ERCA e-Tax verification" source={src('invoiceShowQr')}>
+          <Toggle {...f('invoiceShowQr')} label="Print QR code on invoice" />
+        </FieldRow>
+        <FieldRow label="Show Company Logo" hint="Display your company logo from the Company profile section" source={src('invoiceShowLogo')}>
+          <Toggle {...f('invoiceShowLogo')} label="Display company logo on PDF" />
+        </FieldRow>
+        <FieldRow label="Show Bank Details" hint="Print bank account and payment instructions in the footer" source={src('invoiceShowBankDetails')}>
+          <Toggle {...f('invoiceShowBankDetails')} label="Print bank details on invoice" />
+        </FieldRow>
+      </div>
+
+      {/* ── Sub-section: Footer ──────────────────────────────────────────── */}
+      <div className="mb-1 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2 py-2 mb-1">
+          <AlignLeft size={13} className="text-slate-400 shrink-0" />
+          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Footer</p>
+        </div>
+        <FieldRow label="Default Footer Terms" hint="Printed at the bottom of every invoice PDF; supports plain text" source={src('invoiceFooter')}>
+          <textarea className="ovds-input w-full max-w-lg" rows={3}
+            value={data['invoiceFooter'] ?? ''} onChange={e => onChange('invoiceFooter', e.target.value)}
+            placeholder="Payment is due within 30 days. Late payments attract 15% p.a. interest. Thank you for your business." />
+        </FieldRow>
+      </div>
+
+      {/* ── Print-ready Invoice Template App upsell ──────────────────────── */}
+      <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800">
+        <div className="rounded-xl border border-violet-200 dark:border-violet-800 bg-gradient-to-br from-violet-50 to-indigo-50 dark:from-violet-950/30 dark:to-indigo-950/20 p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center shrink-0">
+                <Wand2 size={18} className="text-white" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-sm font-bold text-violet-900 dark:text-violet-200">Print-ready Invoice Template App</p>
+                  <span className="px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest rounded-full bg-violet-600 text-white">App</span>
+                </div>
+                <p className="text-xs text-violet-700 dark:text-violet-300 leading-relaxed max-w-sm">
+                  Visually design invoice layouts with a drag-and-drop builder — no coding required. Add custom backgrounds, unlimited custom fields, and multiple distinct template designs for PDF printing and sharing.
+                </p>
+                <ul className="mt-3 space-y-1.5">
+                  {[
+                    { icon: <LayoutTemplate size={11} />, text: 'Drag-and-drop layout editor with live preview' },
+                    { icon: <Columns size={11} />,        text: 'Unlimited custom fields and column definitions' },
+                    { icon: <Sparkles size={11} />,       text: 'Multiple distinct templates — switch per invoice' },
+                    { icon: <Type size={11} />,           text: 'Add your logo, business details, and payment terms' },
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center gap-2 text-[11px] text-violet-700 dark:text-violet-300">
+                      <span className="text-violet-500 shrink-0">{item.icon}</span>
+                      {item.text}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 flex items-center gap-3">
+            <Link
+              to="/apps/invoice-templates"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm shadow-violet-500/30"
+            >
+              <Wand2 size={13} /> Open Template Builder
+            </Link>
+            <a
+              href="https://ovds.com/apps/invoice-template"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-violet-600 dark:text-violet-400 hover:text-violet-800 dark:hover:text-violet-200 transition-colors"
+            >
+              Learn more <ExternalLink size={11} />
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -487,6 +690,7 @@ function TaxSection({ data, onChange, sources }: { data: Record<string, string>;
       <FieldRow label="VAT Rate (%)" hint="Standard statutory rate is 15%" source={src('vatRate')}><TI {...f('vatRate')} placeholder="15" /></FieldRow>
       <FieldRow label="TOT (Turnover Tax)" source={src('totEnabled')}><Toggle {...f('totEnabled')} label="2% for below-VAT-threshold businesses" /></FieldRow>
       <FieldRow label="WHT (Withholding Tax)" source={src('whtEnabled')}><Toggle {...f('whtEnabled')} label="3% on qualifying service payments" /></FieldRow>
+      <FieldRow label="WHT Rate (%)" hint="Standard: 2% on goods, 3% on services (Proc. 1395/2025 Art. 52). Check MoR ruling for your transaction type." source={src('whtRate')}><TI {...f('whtRate')} placeholder="2" /></FieldRow>
       <FieldRow label="BIT (Business Income Tax)" source={src('bitEnabled')}><Toggle {...f('bitEnabled')} label="30% flat on business income" /></FieldRow>
       <FieldRow label="PIT (Personal Income Tax / PAYE)" source={src('pitEnabled')}><Toggle {...f('pitEnabled')} label="0–35% via 6 PIT brackets (Proc. 1395/2025)" /></FieldRow>
       <FieldRow label="DRRF (Disaster Risk Fund)" source={src('drrfEnabled')}><Toggle {...f('drrfEnabled')} label="1% quarterly contribution" /></FieldRow>
@@ -501,56 +705,280 @@ function TaxSection({ data, onChange, sources }: { data: Record<string, string>;
   );
 }
 
-function UsersSection({ data, onChange, sources }: { data: Record<string, string>; onChange: (k: string, v: string) => void; sources?: Record<string, { value: string; source: string; conflicts: string[] }> }) {
+// ── UsersSection sub-components ───────────────────────────────────────────────
+
+function SubSectionHeader({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+  return (
+    <div className="flex items-center gap-2.5 mb-3 mt-5 first:mt-0">
+      <div className="w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 shrink-0">
+        {icon}
+      </div>
+      <div>
+        <p className="text-[11px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">{title}</p>
+        <p className="text-[10px] text-slate-400">{description}</p>
+      </div>
+    </div>
+  );
+}
+
+function UserQuickStats({ companyId }: { companyId?: string | null }) {
+  const statsQuery = useQuery({
+    queryKey: ['users-quick-stats', companyId],
+    queryFn: async () => {
+      const token = localStorage.getItem('ovds_token') || localStorage.getItem('auth0_token') || '';
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(
+        `/api/auth/users?limit=200${companyId ? `&companyId=${encodeURIComponent(companyId)}` : ''}`,
+        { headers }
+      );
+      if (!res.ok) return null;
+      const json = await res.json();
+      const rows: any[] = Array.isArray(json) ? json : (json.data ?? json.rows ?? []);
+      const total   = rows.length;
+      const active  = rows.filter((u: any) => !u.isLocked && (u.failedLoginAttempts ?? 0) < 5).length;
+      const admins  = rows.filter((u: any) => ['ADMIN', 'SPURADMIN', 'SUPERADMIN'].includes(u.role)).length;
+      const locked  = rows.filter((u: any) => u.isLocked || (u.failedLoginAttempts ?? 0) >= 5).length;
+      return { total, active, admins, locked };
+    },
+    staleTime: 60_000,
+    enabled: true,
+  });
+
+  if (statsQuery.isLoading) {
+    return (
+      <div className="grid grid-cols-4 gap-2 mb-5">
+        {[1,2,3,4].map(i => (
+          <div key={i} className="h-14 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />
+        ))}
+      </div>
+    );
+  }
+  if (!statsQuery.data) return null;
+
+  const { total, active, admins, locked } = statsQuery.data;
+  const stats = [
+    { label: 'Total Users',  value: total,  color: 'text-slate-700 dark:text-slate-200',  bg: 'bg-slate-50 dark:bg-slate-800/60',   border: 'border-slate-200 dark:border-slate-700', icon: <Users size={12} className="text-slate-400" /> },
+    { label: 'Active',       value: active,  color: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-800', icon: <CheckCircle2 size={12} className="text-emerald-500" /> },
+    { label: 'Admins',       value: admins,  color: 'text-violet-700 dark:text-violet-400',  bg: 'bg-violet-50 dark:bg-violet-950/30',  border: 'border-violet-200 dark:border-violet-800',  icon: <ShieldCheck size={12} className="text-violet-500" /> },
+    { label: 'Locked',       value: locked,  color: locked > 0 ? 'text-rose-700 dark:text-rose-400' : 'text-slate-500', bg: locked > 0 ? 'bg-rose-50 dark:bg-rose-950/30' : 'bg-slate-50 dark:bg-slate-800/60', border: locked > 0 ? 'border-rose-200 dark:border-rose-800' : 'border-slate-200 dark:border-slate-700', icon: <Lock size={12} className={locked > 0 ? 'text-rose-500' : 'text-slate-400'} /> },
+  ];
+
+  return (
+    <div className="grid grid-cols-4 gap-2 mb-5">
+      {stats.map(s => (
+        <Link
+          key={s.label}
+          to="/users"
+          className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl border ${s.bg} ${s.border} transition-all hover:shadow-sm group`}
+        >
+          <div className="flex items-center gap-1.5">
+            {s.icon}
+            <span className={`text-lg font-bold leading-none ${s.color}`}>{s.value}</span>
+          </div>
+          <span className="text-[9px] text-slate-400 font-medium uppercase tracking-wide group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">{s.label}</span>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+// ── Main UsersSection ─────────────────────────────────────────────────────────
+
+function UsersSection({ data, onChange, sources, companyId }: {
+  data: Record<string, string>;
+  onChange: (k: string, v: string) => void;
+  sources?: Record<string, { value: string; source: string; conflicts: string[] }>;
+  companyId?: string | null;
+}) {
   const f = (k: string) => ({ value: data[k] ?? '', onChange: (v: string) => onChange(k, v) });
   const src = (camel: string) => {
     if (!sources) return undefined;
     const snake = camel.replace(/[A-Z]/g, m => '_' + m.toLowerCase());
     return sources[snake]?.source;
   };
+
   return (
     <div>
-      <p className="text-xs text-slate-500 mb-4 bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800 rounded-lg px-4 py-2.5">
-        Enforce compliance and data protection by defining specific user types and system boundaries. Admin: full access. Manager: invoices & bills only. Customer/Vendor: restricted portal access.
-      </p>
-      <FieldRow label="Default User Role" hint="Role assigned to newly created users" source={src('defaultUserRole')}>
-        <SI {...f('defaultUserRole')} options={[
-          { label: 'Admin — Full system access',      value: 'ADMIN' },
-          { label: 'Manager — Invoices & bills',      value: 'MANAGER' },
-          { label: 'Customer — Portal view/print',    value: 'CUSTOMER' },
-          { label: 'Vendor — Portal view/print',      value: 'VENDOR' },
-        ]} />
-      </FieldRow>
-      <FieldRow label="Customer Portal" source={src('allowCustomerPortal')}><Toggle {...f('allowCustomerPortal')} label="Enable customer self-service portal" /></FieldRow>
-      <FieldRow label="Vendor Portal" source={src('allowVendorPortal')}><Toggle {...f('allowVendorPortal')} label="Enable vendor self-service portal" /></FieldRow>
-      <FieldRow label="Session Timeout (min)" hint="Auto-logout after inactivity period" source={src('sessionTimeoutMinutes')}>
-        <TI {...f('sessionTimeoutMinutes')} placeholder="60" />
-      </FieldRow>
-      <FieldRow label="Minimum Password Length" hint="Enforced on all user accounts" source={src('passwordMinLength')}>
-        <TI {...f('passwordMinLength')} placeholder="8" />
-      </FieldRow>
-      <FieldRow label="Require Two-Factor Auth" source={src('requireTwoFactor')}><Toggle {...f('requireTwoFactor')} label="Enforce 2FA for all admin users" /></FieldRow>
-      <FieldRow label="Max Login Attempts" hint="Lock account after N failed attempts" source={src('maxLoginAttempts')}>
-        <TI {...f('maxLoginAttempts')} placeholder="5" />
-      </FieldRow>
-      <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap gap-3">
-        <Link to="/settings/users"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">
-          <UserCog size={14} /> Manage Users
-        </Link>
-        <Link to="/settings/roles"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-          <Shield size={14} /> Roles & Permissions
-        </Link>
-        <Link to="/settings/advanced-access-controls"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-          <Shield size={14} /> Advanced Access Controls <ExternalLink size={12} />
-        </Link>
+      {/* ── Description banner ── */}
+      <div className="flex items-start gap-3 mb-5 bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800 rounded-xl px-4 py-3">
+        <div className="w-7 h-7 rounded-lg bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center shrink-0 mt-0.5">
+          <ShieldCheck size={14} className="text-sky-600 dark:text-sky-400" />
+        </div>
+        <div>
+          <p className="text-xs font-semibold text-sky-800 dark:text-sky-300 mb-0.5">Access & security policies</p>
+          <p className="text-[11px] text-sky-700/80 dark:text-sky-400/80 leading-relaxed">
+            Configure role defaults, portal access, session timeouts, and authentication rules.
+            These settings apply company-wide and are enforced at login time.
+          </p>
+        </div>
+      </div>
+
+      {/* ── Quick stats strip ── */}
+      <UserQuickStats companyId={companyId} />
+
+      {/* ══ Access Policies ══════════════════════════════════════════════════ */}
+      <SubSectionHeader
+        icon={<UserCog size={13} />}
+        title="Access Policies"
+        description="Default roles, portal access, and session rules"
+      />
+      <div className="rounded-xl border border-slate-100 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800 overflow-hidden mb-1">
+        <FieldRow label="Default User Role" hint="Role assigned to newly created users" source={src('defaultUserRole')}>
+          <SI {...f('defaultUserRole')} options={[
+            { label: 'Admin — Full system access',           value: 'ADMIN' },
+            { label: 'Accounting — Finance & billing',       value: 'ACCOUNTING' },
+            { label: 'HR — Payroll & employee management',   value: 'HR' },
+            { label: 'Data Clerk — Data entry only',         value: 'DATA_CLERK' },
+            { label: 'Auditor — Read-only audit view',       value: 'AUDITOR' },
+            { label: 'Employee — Self-service portal',       value: 'EMPLOYEE' },
+            { label: 'Customer — Portal view/print',         value: 'CUSTOMER' },
+            { label: 'Vendor — Portal view/print',           value: 'VENDOR' },
+          ]} />
+        </FieldRow>
+        <FieldRow label="Customer Portal" hint="Allow customers to view invoices and statements" source={src('allowCustomerPortal')}>
+          <Toggle {...f('allowCustomerPortal')} label="Enable customer self-service portal" />
+        </FieldRow>
+        <FieldRow label="Vendor Portal" hint="Allow vendors to submit invoices and track payments" source={src('allowVendorPortal')}>
+          <Toggle {...f('allowVendorPortal')} label="Enable vendor self-service portal" />
+        </FieldRow>
+        <FieldRow label="Employee Portal" hint="Allow employees to access payslips, leave, and claims" source={src('allowEmployeePortal')}>
+          <Toggle {...f('allowEmployeePortal')} label="Enable employee self-service portal" />
+        </FieldRow>
+        <FieldRow label="User Invitation" hint="How new users are added to the system" source={src('invitationPolicy')}>
+          <SI {...f('invitationPolicy')} options={[
+            { label: 'Admin-only — Admins create accounts',      value: 'admin_only' },
+            { label: 'Invite link — Admin sends invite email',   value: 'invite_link' },
+            { label: 'Open registration — Anyone can sign up',   value: 'open' },
+          ]} />
+        </FieldRow>
+        <FieldRow label="Session Timeout" hint="Auto-logout after inactivity period" source={src('sessionTimeoutMinutes')}>
+          <div className="flex items-center gap-2">
+            <TI {...f('sessionTimeoutMinutes')} placeholder="60" />
+            <span className="text-xs text-slate-400 shrink-0">minutes</span>
+          </div>
+        </FieldRow>
+        <FieldRow label="Concurrent Sessions" hint="Maximum simultaneous logins per user" source={src('maxConcurrentSessions')}>
+          <SI {...f('maxConcurrentSessions')} options={[
+            { label: '1 — Single session only',   value: '1' },
+            { label: '2 — Two sessions',          value: '2' },
+            { label: '5 — Up to five sessions',   value: '5' },
+            { label: 'Unlimited',                 value: '0' },
+          ]} />
+        </FieldRow>
+      </div>
+
+      {/* ══ Security Policies ════════════════════════════════════════════════ */}
+      <SubSectionHeader
+        icon={<Lock size={13} />}
+        title="Security Policies"
+        description="Password rules, 2FA, and lockout controls"
+      />
+      <div className="rounded-xl border border-slate-100 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800 overflow-hidden mb-1">
+        <FieldRow label="Require Two-Factor Auth" hint="Enforce 2FA via TOTP or email OTP" source={src('requireTwoFactor')}>
+          <Toggle {...f('requireTwoFactor')} label="Enforce 2FA for all admin users" />
+        </FieldRow>
+        <FieldRow label="Minimum Password Length" hint="Enforced on all user accounts" source={src('passwordMinLength')}>
+          <div className="flex items-center gap-2">
+            <TI {...f('passwordMinLength')} placeholder="8" />
+            <span className="text-xs text-slate-400 shrink-0">characters</span>
+          </div>
+        </FieldRow>
+        <FieldRow label="Password Complexity" hint="Require uppercase, numbers and symbols" source={src('requirePasswordComplexity')}>
+          <Toggle {...f('requirePasswordComplexity')} label="Require complex passwords" />
+        </FieldRow>
+        <FieldRow label="Password Expiry (days)" hint="Force password rotation — 0 to disable" source={src('passwordExpiryDays')}>
+          <div className="flex items-center gap-2">
+            <TI {...f('passwordExpiryDays')} placeholder="0" />
+            <span className="text-xs text-slate-400 shrink-0">days (0 = off)</span>
+          </div>
+        </FieldRow>
+        <FieldRow label="Max Login Attempts" hint="Lock account after N failed attempts" source={src('maxLoginAttempts')}>
+          <TI {...f('maxLoginAttempts')} placeholder="5" />
+        </FieldRow>
+        <FieldRow label="Lockout Duration" hint="How long a locked account stays locked" source={src('lockoutDurationMinutes')}>
+          <SI {...f('lockoutDurationMinutes')} options={[
+            { label: '5 minutes',    value: '5' },
+            { label: '15 minutes',   value: '15' },
+            { label: '30 minutes',   value: '30' },
+            { label: '1 hour',       value: '60' },
+            { label: 'Until unlocked by admin', value: '0' },
+          ]} />
+        </FieldRow>
+      </div>
+
+      {/* ══ Audit & Compliance ═══════════════════════════════════════════════ */}
+      <SubSectionHeader
+        icon={<ClipboardList size={13} />}
+        title="Audit & Compliance"
+        description="Log retention and IP access controls"
+      />
+      <div className="rounded-xl border border-slate-100 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800 overflow-hidden mb-5">
+        <FieldRow label="Audit Log Retention" hint="How long login and action logs are kept" source={src('auditLogRetentionDays')}>
+          <SI {...f('auditLogRetentionDays')} options={[
+            { label: '30 days',   value: '30' },
+            { label: '90 days',   value: '90' },
+            { label: '180 days',  value: '180' },
+            { label: '1 year',    value: '365' },
+            { label: '2 years',   value: '730' },
+          ]} />
+        </FieldRow>
+        <FieldRow label="IP Allowlist" hint="Restrict logins to specific IP ranges" source={src('ipAllowlistEnabled')}>
+          <Toggle {...f('ipAllowlistEnabled')} label="Enable IP allowlist (configure in Security settings)" />
+        </FieldRow>
+        <FieldRow label="Login Notifications" hint="Email users on new device or location logins" source={src('loginNotificationsEnabled')}>
+          <Toggle {...f('loginNotificationsEnabled')} label="Send login alert emails" />
+        </FieldRow>
+      </div>
+
+      {/* ── Action footer ── */}
+      <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-3">Quick access</p>
+        <div className="grid grid-cols-3 gap-2">
+          <Link
+            to="/users"
+            className="flex items-center gap-2.5 px-3 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold transition-colors group"
+          >
+            <div className="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+              <Users size={12} />
+            </div>
+            <div className="min-w-0">
+              <p className="leading-tight">Manage Users</p>
+              <p className="text-[9px] font-normal opacity-75 truncate">Create, edit &amp; assign roles</p>
+            </div>
+            <ChevronRight size={12} className="ml-auto opacity-60 group-hover:opacity-100 shrink-0" />
+          </Link>
+          <Link
+            to="/settings/roles"
+            className="flex items-center gap-2.5 px-3 py-2.5 bg-violet-50 dark:bg-violet-950/30 hover:bg-violet-100 dark:hover:bg-violet-950/60 border border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-300 rounded-xl text-xs font-semibold transition-colors group"
+          >
+            <div className="w-6 h-6 rounded-lg bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center shrink-0">
+              <Shield size={12} className="text-violet-600 dark:text-violet-400" />
+            </div>
+            <div className="min-w-0">
+              <p className="leading-tight">Roles &amp; Permissions</p>
+              <p className="text-[9px] font-normal opacity-75 truncate">RBAC permission matrix</p>
+            </div>
+            <ChevronRight size={12} className="ml-auto opacity-60 group-hover:opacity-100 shrink-0" />
+          </Link>
+          <Link
+            to="/settings/security"
+            className="flex items-center gap-2.5 px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold transition-colors group"
+          >
+            <div className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
+              <KeyRound size={12} className="text-slate-500 dark:text-slate-400" />
+            </div>
+            <div className="min-w-0">
+              <p className="leading-tight">Security Settings</p>
+              <p className="text-[9px] font-normal opacity-75 truncate">MFA, sessions &amp; IP rules</p>
+            </div>
+            <ChevronRight size={12} className="ml-auto opacity-60 group-hover:opacity-100 shrink-0" />
+          </Link>
+        </div>
       </div>
     </div>
   );
 }
-
 
 // ── Module labels ─────────────────────────────────────────────────────────────
 
@@ -772,15 +1200,22 @@ export interface CentralControlPanelContentProps {
   orpc: any;
   canWrite: boolean;
   companyId: string | null | undefined;
+  /**
+   * Pin the panel to a specific section on mount.
+   * When set the URL ?tab= param is still honoured if present, but this value
+   * is used as the fallback instead of 'profile'.  Dedicated sub-pages pass
+   * their own section key so the sidebar starts on the right item.
+   */
+  defaultSection?: SettingsSection;
 }
 
-export function CentralControlPanelContent({ orpc, canWrite, companyId }: CentralControlPanelContentProps) {
+export function CentralControlPanelContent({ orpc, canWrite, companyId, defaultSection }: CentralControlPanelContentProps) {
   const qc = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const rawTab = searchParams.get('tab') as SettingsSection | null;
   const validSections = SETTINGS_SECTIONS.map(s => s.id);
   const [activeSection, setActiveSection] = useState<SettingsSection>(
-    rawTab && validSections.includes(rawTab) ? rawTab : 'profile',
+    rawTab && validSections.includes(rawTab) ? rawTab : (defaultSection ?? 'profile'),
   );
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [isDirty, setIsDirty] = useState(false);
@@ -842,7 +1277,7 @@ export function CentralControlPanelContent({ orpc, canWrite, companyId }: Centra
     setActiveSection(section);
     setDraft({});
     setIsDirty(false);
-    setSearchParams(prev => { prev.set('tab', section); return prev; }, { replace: true });
+    setSearchParams((prev: URLSearchParams) => { prev.set('tab', section); return prev; }, { replace: true });
   }, [isDirty, setSearchParams]);
 
   const checklist = (checklistQuery.data as any)?.checks;
@@ -951,7 +1386,7 @@ export function CentralControlPanelContent({ orpc, canWrite, companyId }: Centra
               {activeSection === 'currency'     && <CurrencySection     data={effectiveData} onChange={handleChange} sources={mergeSourcesQuery.data} />}
               {activeSection === 'email'        && <EmailSection        data={effectiveData} onChange={handleChange} sources={mergeSourcesQuery.data} />}
               {activeSection === 'taxes'        && <TaxSection          data={effectiveData} onChange={handleChange} sources={mergeSourcesQuery.data} />}
-              {activeSection === 'users'        && <UsersSection        data={effectiveData} onChange={handleChange} sources={mergeSourcesQuery.data} />}
+              {activeSection === 'users'        && <UsersSection        data={effectiveData} onChange={handleChange} sources={mergeSourcesQuery.data} companyId={companyId} />}
               {activeSection === 'modules'      && <ModulesSection      data={effectiveData} onChange={handleChange} />}
               {activeSection === 'developers'   && <DevelopersSection />}
               {activeSection === 'integrations' && <IntegrationsSection data={effectiveData} onChange={handleChange} />}

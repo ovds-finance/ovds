@@ -3,21 +3,22 @@
  * Proclamation No. 110/1998 (as amended)
  * Regional/City Revenue Bureaus
  */
-import React, { useState, useCallback, useEffect } from 'react';
-import {
-  AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
-  Btn, Modal, FormField, Input, Select, Icon, Amount, StatusBadge,
-} from '../components/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
-import api from '../services/api';
-import toast from 'react-hot-toast';
 import {
   calculateStampDuty,
   STAMP_DUTY_RATES,
   type StampDutyDocumentType,
 } from '@ovds/ui';
+import React, { useState, useCallback, useEffect } from 'react';
+import toast from 'react-hot-toast';
+
+import {
+  AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
+  Btn, Modal, FormField, Input, Select, Icon, Amount, StatusBadge,
+} from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
 
 const today = new Date().toISOString().slice(0, 10);
 const fmt   = (n: number) => new Intl.NumberFormat('en-ET', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
@@ -43,7 +44,7 @@ const DOC_TYPES: { value: StampDutyDocumentType; label: string }[] = [
 
 const STATUS_COLORS: Record<string, string> = {
   DRAFT:   'bg-slate-100 text-slate-600',
-  PAID:    'bg-emerald-50 text-emerald-700',
+  PAID:    'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
   PENDING: 'bg-amber-50 text-amber-700',
   EXEMPT:  'bg-white text-slate-400',
 };
@@ -159,9 +160,9 @@ const StampDuty: React.FC = () => {
       tabs={<AppTabs tabs={TABS.map(t => ({ key: t.key, label: t.label }))} active={activeTab} onChange={k => setActiveTab(k as any)} />}
     >
       <AppKpi cells={[
-        { label: 'Total Records',   value: String(records.length),           icon: <Icon name="RECEIPT" size={14} />, color: 'emerald' },
+        { label: 'Total Records',   value: String(records.length),           icon: <Icon name="RECEIPT" size={14} />, color: 'green' },
         { label: 'Total Duty Due',  value: `ETB ${fmtK(totalDue)}`,          icon: <Icon name="MONEY" size={14} />,   color: 'violet' },
-        { label: 'Paid',            value: `ETB ${fmtK(totalPaid)}`,          icon: <Icon name="SUCCESS" size={14} />, color: 'emerald' },
+        { label: 'Paid',            value: `ETB ${fmtK(totalPaid)}`,          icon: <Icon name="SUCCESS" size={14} />, color: 'green' },
         { label: 'Outstanding',     value: `ETB ${fmtK(totalDue - totalPaid)}`, icon: <Icon name="WARNING" size={14} />, color: 'amber' },
       ]} />
 
@@ -206,7 +207,7 @@ const StampDuty: React.FC = () => {
                   <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{dt.label}</p>
                   <p className="text-[11px] text-slate-400 mt-0.5">{config.notes}</p>
                 </div>
-                <span className="text-sm font-bold text-emerald-700 shrink-0 ml-4">
+                <span className="text-sm font-bold text-[var(--pro-azure-dark)] shrink-0 ml-4">
                   {config.type === 'FIXED' ? `ETB ${fmt(config.fixedAmount ?? 0)} flat` : `${((config.rate ?? 0) * 100).toFixed(1)}% of value`}
                 </span>
               </div>

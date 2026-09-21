@@ -57,10 +57,10 @@ core (kernel)
 ```
 
 - `apps/frontend` may import `@ovds/ui`, `@ovds/features/*`, `@ovds/shared`, `@ovds/core`.
-- `apps/backend` may import `@ovds/domains/*`, `@ovds/core`, `@ovds/shared`, `@ovds/database`, `@ovds/dto`, `@ovds/contracts`.
+- `apps/backend` may import `@ovds/domains-*`, `@ovds/core`, `@ovds/shared`, `@ovds/database`, `@ovds/dto`, `@ovds/contracts`.
 - `apps/backend` **never** imports `@ovds/features/*` or `@ovds/ui`.
-- `apps/frontend` **never** imports `@ovds/domains/*` or `@ovds/database`.
-- `packages/domains/*` may import `@ovds/core`, `@ovds/shared`, `@ovds/database`, `@ovds/dto`, `@ovds/contracts`, and `@ovds/domains/<itself>`.
+- `apps/frontend` **never** imports `@ovds/domains-*` or `@ovds/database`.
+- `packages/domains/*` may import `@ovds/core`, `@ovds/shared`, `@ovds/database`, `@ovds/dto`, `@ovds/contracts`, and `@ovds/domains-<itself>`.
 - `packages/features/*` may import `@ovds/ui`, `@ovds/shared`, `@ovds/core`, `@ovds/contracts`.
 
 These are enforced by `nx.json` `@nx/enforce-module-boundaries` **and** by
@@ -72,7 +72,7 @@ These are enforced by `nx.json` `@nx/enforce-module-boundaries` **and** by
 
 | Library | `project.json` name | `package.json` name | Path alias |
 |---------|--------------------|--------------------|------------|
-| Backend domain | `domains-accounting` | `@ovds/domains/accounting` | `@ovds/domains/accounting` |
+| Backend domain | `domains-accounting` | `@ovds/domains-accounting` | `@ovds/domains-accounting` |
 | Frontend feature | `features-accounting` | `@ovds/features/accounting` | `@ovds/features/accounting` |
 
 **Canonical tags** (in `project.json`):
@@ -91,7 +91,7 @@ Add a `domain:<name>` / `feature:<name>` tag for filtered Nx commands, e.g.
 ```
 packages/domains/<domain>/
 ├── project.json           ← name: domains-<domain>, tags
-├── package.json           ← name: @ovds/domains/<domain>
+├── package.json           ← name: @ovds/domains-<domain>
 ├── tsconfig.json          ← extends ../../../tsconfig.base.json
 ├── src/
 │   ├── index.ts           ← public API barrel (NO @Module decorator re-export)
@@ -145,7 +145,7 @@ To move a backend concern out of `apps/backend` into a domain library:
 
 1. Create (or reuse) `packages/domains/<domain>/`.
 2. Move the service/controller/guard/dto into the right subfolder.
-3. Rewrite import paths to use `@ovds/domains/<domain>` (and `@ovds/dto`,
+3. Rewrite import paths to use `@ovds/domains-<domain>` (and `@ovds/dto`,
    `@ovds/database`, `@ovds/shared`).
 4. Re-export the moved symbols from `src/index.ts`.
 5. Update the thin NestJS module in `apps/backend` to import from the library.
@@ -169,15 +169,15 @@ document:
 
 - Rule 11 — apps must not contain business logic (service methods calling prisma).
 - Rule 7 — backend must not import `@ovds/features/*`.
-- Rule 8 — frontend must not import `@ovds/domains/*`.
+- Rule 8 — frontend must not import `@ovds/domains-*`.
 - Rule 12 — domains must not cross-import other domains.
 
 ## 10. Code Style
 
-- **NestJS services** extend `BaseService` from `@ovds/domains/infrastructure`
+- **NestJS services** extend `BaseService` from `@ovds/domains-infrastructure`
   when they need prisma + audit access.
 - **Repositories / prisma access** go through `@ovds/database` (`PrismaService`)
-  or `@ovds/domains/infrastructure` (`IPrismaClient`), never raw `@prisma/client`
+  or `@ovds/domains-infrastructure` (`IPrismaClient`), never raw `@prisma/client`
   in apps.
 - **Errors** use NestJS exceptions (`NotFoundException`, `BadRequestException`)
   from `@nestjs/common`.

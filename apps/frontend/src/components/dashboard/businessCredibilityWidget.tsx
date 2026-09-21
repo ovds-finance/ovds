@@ -1,9 +1,10 @@
+import { HeartHandshake, Star, Landmark, TrendingUp, AlertCircle } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { HeartHandshake, Star, Landmark, TrendingUp, AlertCircle } from 'lucide-react';
+
+import { useBusiness } from '../../context/businessContext';
 import api from '../../services/api';
 import { fmtNum } from '../../utils/fmt';
-import { useBusiness } from '../../context/businessContext';
 
 const ScoreRing: React.FC<{ score: number }> = ({ score }) => {
   const r = 20;
@@ -65,8 +66,8 @@ const BusinessCredibilityWidget: React.FC<{ loading?: boolean }> = ({ loading: e
       value: s.activePartnerships ?? 0,
       sub: `${s.totalPartnerships ?? 0} total`,
       icon: <HeartHandshake size={14} />,
-      bg: 'bg-emerald-50 dark:bg-emerald-950/40',
-      tc: 'text-emerald-600 dark:text-emerald-400 dark:text-emerald-400',
+      bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/40',
+      tc: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
     },
     {
       label: 'Business Loans',
@@ -81,8 +82,8 @@ const BusinessCredibilityWidget: React.FC<{ loading?: boolean }> = ({ loading: e
       value: s.totalInvestments ?? 0,
       sub: `ETB ${fmtNum(s.totalInvestmentAmount ?? 0)}`,
       icon: <TrendingUp size={14} />,
-      bg: 'bg-emerald-50 dark:bg-emerald-950/40',
-      tc: 'text-emerald-600 dark:text-emerald-400',
+      bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/40',
+      tc: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
     },
   ];
 
@@ -90,9 +91,9 @@ const BusinessCredibilityWidget: React.FC<{ loading?: boolean }> = ({ loading: e
     <div className="ovds-widget-card shadow-sm p-6 transition-colors">
       <div className="flex items-center justify-between mb-5">
         <h3 className="text-sm font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-2">
-          <HeartHandshake size={14} className="text-emerald-600 dark:text-emerald-400" /> Business Credibility
+          <HeartHandshake size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" /> Business Credibility
         </h3>
-        <Link to="/reports/insights" className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1">
+        <Link to="/reports/insights" className="text-xs font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline flex items-center gap-1">
           Full Dashboard →
         </Link>
       </div>
@@ -102,7 +103,7 @@ const BusinessCredibilityWidget: React.FC<{ loading?: boolean }> = ({ loading: e
         <ScoreRing score={avgScore} />
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Avg Credibility Score</p>
-          <p className={`text-xl font-semibold mt-0.5 ${avgScore >= 70 ? 'text-emerald-600 dark:text-emerald-400' : avgScore >= 40 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400'}`}>
+          <p className={`text-xl font-semibold mt-0.5 ${avgScore >= 70 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : avgScore >= 40 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400'}`}>
             {avgScore}/100
           </p>
           <div className="flex items-center gap-1 mt-1">
@@ -119,8 +120,8 @@ const BusinessCredibilityWidget: React.FC<{ loading?: boolean }> = ({ loading: e
       {/* Score pillars */}
       <div className="mb-4 space-y-2">
         {[
-          { label: 'Org Structure', score: Math.min(40, Math.round(avgScore * 0.4)), max: 40, color: 'bg-emerald-500' },
-          { label: 'Customer Relations', score: Math.min(35, Math.round(avgScore * 0.35)), max: 35, color: 'bg-emerald-500' },
+          { label: 'Org Structure', score: Math.min(40, Math.round(avgScore * 0.4)), max: 40, color: 'bg-[var(--pro-azure-50)]0' },
+          { label: 'Customer Relations', score: Math.min(35, Math.round(avgScore * 0.35)), max: 35, color: 'bg-[var(--pro-azure-50)]0' },
           { label: 'Financial Transparency', score: Math.min(25, Math.round(avgScore * 0.25)), max: 25, color: 'bg-violet-500' },
         ].map(pillar => (
           <div key={pillar.label}>
@@ -165,9 +166,9 @@ const BusinessCredibilityWidget: React.FC<{ loading?: boolean }> = ({ loading: e
 
       <div className="flex gap-2">
         {[
-          { label: 'Partnerships', to: '/ovds/partnerships', color: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 dark:text-emerald-400' },
+          { label: 'Partnerships', to: '/ovds/partnerships', color: 'bg-[var(--pro-azure-50)] dark:bg-green-950/40 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] dark:text-[var(--pro-azure-light)]' },
           { label: 'Loans', to: '/ovds/loans', color: 'bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400' },
-          { label: 'Investments', to: '/ovds/investments', color: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400' },
+          { label: 'Investments', to: '/ovds/investments', color: 'bg-[var(--pro-azure-50)] dark:bg-green-950/40 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
           { label: 'CRM', to: '/crm', color: 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400' },
         ].map((item) => (
           <Link key={item.label} to={item.to}

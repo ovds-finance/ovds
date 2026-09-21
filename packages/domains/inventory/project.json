@@ -13,7 +13,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run build",
+        "command": "pnpm run build",
         "cwd": "packages/domains/inventory"
       },
       "dependsOn": [
@@ -31,7 +31,7 @@
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run typecheck",
+        "command": "pnpm run typecheck",
         "cwd": "packages/domains/inventory"
       },
       "inputs": [
@@ -43,7 +43,7 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run test",
+        "command": "pnpm run test",
         "cwd": "packages/domains/inventory"
       },
       "inputs": [
@@ -54,3 +54,4 @@
     }
   }
 }
+

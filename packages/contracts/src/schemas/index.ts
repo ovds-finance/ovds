@@ -26,3 +26,4 @@ export * from './eims';
 export * from './cyber-audit';
 export * from './ifrs';
 export * from './sub-ledger';
+export * from './master-compliance';

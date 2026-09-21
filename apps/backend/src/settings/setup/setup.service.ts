@@ -1,11 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../common/prisma.service';
 import type {
   CompanySetupProgress,
+  SetupStatus,
   SetupStepDefinition,
   SetupStepStatus,
   SetupWizardCompleteResponse,
 } from '@ovds/shared';
+
+import { PrismaService } from '../../common/prisma.service';
 
 const PROGRESS_KEY_PREFIX = 'setup:progress:';
 
@@ -45,6 +47,24 @@ const STEP_CATALOGUE: SetupStepDefinition[] = [
     category: 'financial',
     sortOrder: 4,
     isRequired: false,
+    scope: 'company',
+  },
+  {
+    key: 'security_baseline',
+    label: 'Security baseline',
+    description: 'Seed roles, permissions and segregation-of-duties guardrails',
+    category: 'security',
+    sortOrder: 5,
+    isRequired: true,
+    scope: 'company',
+  },
+  {
+    key: 'roles_permissions',
+    label: 'Roles & permissions',
+    description: 'Review high-risk roles and resolve SoD conflicts',
+    category: 'security',
+    sortOrder: 6,
+    isRequired: true,
     scope: 'company',
   },
 ];
@@ -105,6 +125,24 @@ export class SetupService {
     };
   }
 
+  private mergeMissingSteps(progress: CompanySetupProgress): CompanySetupProgress {
+    const existingKeys = new Set(progress.steps.map((s) => s.stepKey));
+    const missing: SetupStepStatus[] = STEP_CATALOGUE
+      .filter((s) => !existingKeys.has(s.key))
+      .map((s) => ({
+        stepKey: s.key,
+        status: 'pending' as SetupStatus,
+        scope: s.scope,
+      }));
+    if (missing.length === 0) return progress;
+    return {
+      ...progress,
+      steps: [...progress.steps, ...missing],
+      overallProgress: this.calcOverall([...progress.steps, ...missing]),
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
   private calcOverall(steps: SetupStepStatus[]): number {
     if (!steps.length) return 0;
     const done = steps.filter((s) => s.status === 'completed' || s.status === 'skipped').length;
@@ -128,12 +166,17 @@ export class SetupService {
   async getProgress(companyId: string): Promise<CompanySetupProgress> {
     await this.assertCompanyExists(companyId);
     const existing = await this.loadProgress(companyId);
-    if (existing) return existing;
+    if (!existing) {
+      const fresh = this.buildInitialProgress(companyId);
+      await this.saveProgress(fresh);
+      return fresh;
+    }
 
-    // Auto-initialise on first access
-    const fresh = this.buildInitialProgress(companyId);
-    await this.saveProgress(fresh);
-    return fresh;
+    const merged = this.mergeMissingSteps(existing);
+    if (merged !== existing) {
+      await this.saveProgress(merged);
+    }
+    return merged;
   }
 
   async startWizard(
@@ -141,7 +184,8 @@ export class SetupService {
   ): Promise<{ companyId: string; steps: SetupStepDefinition[]; progress: CompanySetupProgress }> {
     await this.assertCompanyExists(companyId);
     const existing = await this.loadProgress(companyId);
-    const progress = existing ?? this.buildInitialProgress(companyId);
+    const base = existing ?? this.buildInitialProgress(companyId);
+    const progress = this.mergeMissingSteps(base);
     await this.saveProgress(progress);
     return { companyId, steps: STEP_CATALOGUE, progress };
   }

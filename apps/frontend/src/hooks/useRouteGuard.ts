@@ -14,11 +14,12 @@
  *   const { canAccess } = useRouteGuard();
  *   if (canAccess('/vat-administration')) { ... }
  */
-import { useMemo } from 'react';
-import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
-import { rbac } from '../rbac/rbac';
 import { Role } from '@ovds/ui';
+import { useMemo } from 'react';
+
+import { useBusiness } from '../context/businessContext';
+import { useAuth } from '../rbac/AuthContext';
+import { rbac } from '../rbac/rbac';
 
 export interface RouteGuardResult {
   /** True when the current user can access the given path */

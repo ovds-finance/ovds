@@ -13,12 +13,12 @@
  * IFRS 10.B86 — all intercompany balances and transactions are eliminated
  * before the consolidated statements are submitted to AABE.
  */
-import { useState, useCallback } from 'react';
 import { EmptyState } from '@ovds/ui';
+import { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
 import { Can } from '../components/can';
 import { useBusiness } from '../context/businessContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import toast from 'react-hot-toast';
 import {
   useConsolidatedSummary,
   useUnmatchedBalances,
@@ -27,6 +27,7 @@ import {
   useAutoApportionment,
   type LedgerIntegrityResult,
 } from '../hooks/useConsolidation';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -75,7 +76,7 @@ function IntegrityBadge({ result }: { result: LedgerIntegrityResult | null }) {
   if (!result) return null;
   if (result.intact) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold px-3 py-1">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--pro-azure-100)] dark:bg-green-900/40 text-[var(--pro-azure-dark)] dark:text-green-300 text-xs font-semibold px-3 py-1">
         ✓ Chain intact — {result.verified} entries verified
       </span>
     );
@@ -162,13 +163,13 @@ export default function ConsolidationPage() {
             type="month"
             value={period}
             onChange={e => setPeriod(e.target.value)}
-            className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm px-3 py-1.5 text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none"
+            className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm px-3 py-1.5 text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[var(--pro-azure)] outline-none"
           />
           <input
             placeholder="Entity Group ID"
             value={entityGroupId}
             onChange={e => setEntityGroupId(e.target.value)}
-            className="w-52 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm px-3 py-1.5 text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none"
+            className="w-52 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm px-3 py-1.5 text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[var(--pro-azure)] outline-none"
           />
         </div>
       </div>
@@ -239,7 +240,7 @@ export default function ConsolidationPage() {
               {[...Array(3)].map((_, i) => <div key={i} className="h-8 bg-slate-100 dark:bg-slate-700 rounded animate-pulse" />)}
             </div>
           ) : unmatchedCount === 0 ? (
-            <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+            <p className="text-sm text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-medium">
               ✓ All intercompany balances are matched for {period}
             </p>
           ) : (
@@ -291,13 +292,13 @@ export default function ConsolidationPage() {
               <button
                 onClick={handleRunEliminations}
                 disabled={running}
-                className="rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-medium px-4 py-1.5 transition-colors"
+                className="rounded-lg bg-[var(--pro-azure)] hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 text-white text-sm font-medium px-4 py-1.5 transition-colors"
               >
                 {running ? 'Running…' : `Run eliminations for ${period}`}
               </button>
               {runResult && (
                 <div className="mt-3 text-xs space-y-0.5">
-                  <p className="text-emerald-600 dark:text-emerald-400">✓ {runResult.posted} posted</p>
+                  <p className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">✓ {runResult.posted} posted</p>
                   {runResult.failed > 0 && <p className="text-red-500">✗ {runResult.failed} failed</p>}
                 </div>
               )}
@@ -366,7 +367,7 @@ export default function ConsolidationPage() {
                 </div>
                 <div>
                   <p className="text-slate-400">Claimable ratio</p>
-                  <p className="font-semibold text-emerald-600 dark:text-emerald-400">{pct(apportionmentResult.apportionmentPct)}</p>
+                  <p className="font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{pct(apportionmentResult.apportionmentPct)}</p>
                 </div>
                 <div>
                   <p className="text-slate-400">Non-recoverable VAT</p>

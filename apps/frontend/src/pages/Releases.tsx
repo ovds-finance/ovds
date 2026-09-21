@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { Skeleton, EmptyState, AppPage, MetricCard } from '@ovds/ui';
 import {
   Download,
   History,
@@ -45,7 +45,9 @@ import {
   BarChart2,
   BookOpen,
 } from 'lucide-react';
-import { useAuth } from '../rbac';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import toast from 'react-hot-toast';
+
 import {
   usePageTitle,
   useDebounce,
@@ -54,9 +56,8 @@ import {
   useLastRefreshed,
   useInterval,
 } from '../hooks';
+import { useAuth } from '../rbac';
 import { releaseApi, CompanyRelease, UpdateSettings, FeatureFlag } from '../services/releaseApi';
-import toast from 'react-hot-toast';
-import { Skeleton, EmptyState, AppPage, Btn, MetricCard } from '@ovds/ui';
 import { confirm } from '../utils/confirm';
 
 // -- Design tokens -------------------------------------------------------------
@@ -102,7 +103,7 @@ const Toggle: React.FC<{ checked: boolean; onChange: (v: boolean) => void; disab
     aria-checked={checked}
     disabled={disabled}
     onClick={() => onChange(!checked)}
-    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed ${checked ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}
+    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pro-azure)] disabled:opacity-50 disabled:cursor-not-allowed ${checked ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-200 dark:bg-slate-700'}`}
   >
     <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
   </button>
@@ -110,7 +111,7 @@ const Toggle: React.FC<{ checked: boolean; onChange: (v: boolean) => void; disab
 
 // -- History status config -----------------------------------------------------
 const HISTORY_STATUS: Record<string, { cls: string; icon: React.ReactNode; label: string }> = {
-  APPLIED:   { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800', icon: <CheckCircle2 size={9} />, label: 'Applied' },
+  APPLIED:   { cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800', icon: <CheckCircle2 size={9} />, label: 'Applied' },
   FAILED:    { cls: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-800',                   icon: <AlertTriangle size={9} />, label: 'Failed' },
   SKIPPED:   { cls: 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',               icon: <Clock size={9} />, label: 'Skipped' },
   AVAILABLE: { cls: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800',             icon: <Download size={9} />, label: 'Available' },
@@ -135,7 +136,7 @@ const TypePill: React.FC<{ type: 'STAGING' | 'PRODUCTION' }> = ({ type }) =>
 
 // -- Release status pill (DRAFT / RELEASED / REVOKED) -------------------------
 const RELEASE_STATUS_CFG: Record<string, { cls: string; icon: React.ReactNode; label: string }> = {
-  RELEASED: { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800', icon: <CheckCircle2 size={9} />, label: 'Released' },
+  RELEASED: { cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800', icon: <CheckCircle2 size={9} />, label: 'Released' },
   DRAFT:    { cls: 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',               icon: <FileText size={9} />,    label: 'Draft'    },
   REVOKED:  { cls: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-800',                   icon: <Ban size={9} />,         label: 'Revoked'  },
 };
@@ -150,6 +151,7 @@ const ReleaseStatusPill: React.FC<{ status: string }> = ({ status }) => {
 };
 
 // -- Changelog expander --------------------------------------------------------
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ChangelogText: React.FC<{ text: string }> = ({ text }) => {
   const [expanded, setExpanded] = useState(false);
   const isLong = text.length > 120;
@@ -161,7 +163,7 @@ const ChangelogText: React.FC<{ text: string }> = ({ text }) => {
       {isLong && (
         <button
           onClick={e => { e.stopPropagation(); setExpanded(v => !v); }}
-          className="flex items-center gap-1 mt-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+          className="flex items-center gap-1 mt-1 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:text-[var(--pro-azure-dark)] dark:hover:text-green-300 transition-colors"
         >
           {expanded ? <><ChevronUp size={11} /> Show less</> : <><ChevronDown size={11} /> Show more</>}
         </button>
@@ -215,7 +217,7 @@ const CopyCommandBtn: React.FC<{ text: string }> = ({ text }) => {
     <button
       onClick={handleCopy}
       title="Copy command to clipboard"
-      className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center bg-slate-100 hover:bg-emerald-100 dark:bg-slate-700 dark:hover:bg-emerald-900/40 text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 transition-all"
+      className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center bg-slate-100 hover:bg-[var(--pro-azure-100)] dark:bg-slate-700 dark:hover:bg-green-900/40 text-slate-500 hover:text-[var(--pro-azure)] dark:text-slate-400 dark:hover:text-[var(--pro-azure-light)] transition-all"
     >
       {copied ? <Check size={11} /> : <Copy size={11} />}
     </button>
@@ -265,7 +267,7 @@ const InstallProgressModal: React.FC<{
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4">
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
         {/* Header */}
-        <div className={`px-6 py-5 flex items-center gap-3 ${done ? 'bg-gradient-to-r from-emerald-500 to-emerald-600' : 'bg-gradient-to-r from-violet-600 to-violet-700'} transition-all duration-700`}>
+        <div className={`px-6 py-5 flex items-center gap-3 ${done ? 'bg-gradient-to-r from-green-500 to-green-600' : 'bg-gradient-to-r from-violet-600 to-violet-700'} transition-all duration-700`}>
           <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
             {done
               ? <CheckCircle2 size={20} className="text-white" />
@@ -281,7 +283,7 @@ const InstallProgressModal: React.FC<{
         {/* Progress bar */}
         <div className="h-1.5 bg-slate-100 dark:bg-slate-800">
           <div
-            className={`h-full transition-all duration-150 ${done ? 'bg-emerald-500' : 'bg-violet-500'}`}
+            className={`h-full transition-all duration-150 ${done ? 'bg-[var(--pro-azure-50)]0' : 'bg-violet-500'}`}
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -294,7 +296,7 @@ const InstallProgressModal: React.FC<{
             return (
               <div key={s.label} className="flex items-center gap-3">
                 <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
-                  isDone   ? 'bg-emerald-500' :
+                  isDone   ? 'bg-[var(--pro-azure-50)]0' :
                   isActive ? 'bg-violet-500 animate-pulse' :
                              'bg-slate-100 dark:bg-slate-800'
                 }`}>
@@ -303,7 +305,7 @@ const InstallProgressModal: React.FC<{
                    <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600" />}
                 </div>
                 <span className={`text-[11px] font-medium transition-colors ${
-                  isDone   ? 'text-emerald-600 dark:text-emerald-400 line-through decoration-emerald-300' :
+                  isDone   ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] line-through decoration-indigo-300' :
                   isActive ? 'text-violet-700 dark:text-violet-300 font-bold' :
                              'text-slate-400 dark:text-slate-600'
                 }`}>
@@ -320,7 +322,7 @@ const InstallProgressModal: React.FC<{
             {done && (
               <button
                 onClick={onDone}
-                className="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all"
+                className="px-4 py-1.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-lg text-xs font-bold transition-all"
               >
                 Done
               </button>
@@ -369,7 +371,7 @@ const ParsedChangelog: React.FC<{ text: string; maxItems?: number }> = ({ text, 
       {categorized.length > maxItems && !showAll && (
         <button
           onClick={e => { e.stopPropagation(); setShowAll(true); }}
-          className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 transition-colors mt-1"
+          className="flex items-center gap-1 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:text-[var(--pro-azure-dark)] transition-colors mt-1"
         >
           <ChevronDown size={11} /> {categorized.length - maxItems} more items
         </button>
@@ -381,12 +383,12 @@ const ParsedChangelog: React.FC<{ text: string; maxItems?: number }> = ({ text, 
 // -- Version Diff Badge -------------------------------------------------------
 const VersionDiff: React.FC<{ from: string | null; to: string }> = ({ from, to }) => {
   if (!from) return (
-    <span className="px-2 py-0.5 rounded-lg bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-black tracking-tight">
+    <span className="px-2 py-0.5 rounded-lg bg-[var(--pro-azure-100)] dark:bg-green-950/40 text-[var(--pro-azure-dark)] dark:text-green-300 text-xs font-black tracking-tight">
       v{to}
     </span>
   );
-  const [fMaj = '0', fMin = '0', fPat = '0'] = from.split('.');
-  const [tMaj = '0', tMin = '0', tPat = '0'] = to.split('.');
+  const [fMaj = '0', fMin = '0', _fPat = '0'] = from.split('.');
+  const [tMaj = '0', tMin = '0', _tPat = '0'] = to.split('.');
   const isMajor = tMaj > fMaj;
   const isMinor = !isMajor && tMin > fMin;
   const bump = isMajor ? 'Major' : isMinor ? 'Minor' : 'Patch';
@@ -402,7 +404,7 @@ const VersionDiff: React.FC<{ from: string | null; to: string }> = ({ from, to }
         v{from}
       </span>
       <ArrowRight size={10} className="text-slate-400" />
-      <span className="px-2 py-0.5 rounded-lg bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-black tracking-tight">
+      <span className="px-2 py-0.5 rounded-lg bg-[var(--pro-azure-100)] dark:bg-green-950/40 text-[var(--pro-azure-dark)] dark:text-green-300 text-xs font-black tracking-tight">
         v{to}
       </span>
       <span className={`px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${bumpColor}`}>
@@ -434,7 +436,7 @@ const SystemHealthCheck: React.FC = () => {
         {status === 'checking' ? (
           <RefreshCw size={11} className="text-slate-400 animate-spin" />
         ) : status === 'ok' ? (
-          <CheckCircle2 size={11} className="text-emerald-500" />
+          <CheckCircle2 size={11} className="text-[var(--pro-azure)]" />
         ) : (
           <AlertTriangle size={11} className="text-amber-500" />
         )}
@@ -448,7 +450,7 @@ const SystemHealthCheck: React.FC = () => {
             status === 'checking'
               ? 'bg-white dark:bg-slate-800 text-slate-400 animate-pulse'
               : c.ok
-              ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
+              ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
               : 'bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400'
           }`}>
             {c.icon}
@@ -474,6 +476,7 @@ const SPECIFIC_APPS = [
   { label: 'Database Package',   pkg: '@ovds/database',      cmd: 'npm run build -w @ovds/database',             icon: <Database size={12} /> },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const OvdsUpdateGuide: React.FC<{
   currentVersion: string | null;
   availableCount: number;
@@ -512,7 +515,7 @@ const OvdsUpdateGuide: React.FC<{
           {availableCount} pending
         </button>
       ) : (
-        <span className="flex items-center gap-1 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 rounded-lg text-[10px] font-bold border border-emerald-200 dark:border-emerald-800 shrink-0">
+        <span className="flex items-center gap-1 px-2.5 py-1 bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] rounded-lg text-[10px] font-bold border border-[var(--pro-azure-100)] dark:border-green-800 shrink-0">
           <CheckCircle2 size={10} /> Up to date
         </span>
       ),
@@ -521,13 +524,13 @@ const OvdsUpdateGuide: React.FC<{
       step: '2',
       icon: <Download size={13} />,
       title: 'One-Click Update',
-      color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40',
-      borderColor: 'border-emerald-100 dark:border-emerald-900/40',
+      color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/40',
+      borderColor: 'border-[var(--pro-azure-100)] dark:border-green-900/40',
       desc: 'Click "Install" next to any available release above. A real-time progress overlay guides you through every step — no SSH or command line needed.',
       action: availableCount > 0 ? (
         <button
           onClick={onScrollToUpdates}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-[10px] font-bold transition-all shrink-0 shadow-sm shadow-emerald-500/20"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-lg text-[10px] font-bold transition-all shrink-0 shadow-sm shadow-green-500/20"
         >
           <Download size={10} /> Install Now
         </button>
@@ -546,7 +549,7 @@ const OvdsUpdateGuide: React.FC<{
         <div className="mt-3 space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800">
           <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Full deployment script</p>
           <div className="flex items-start gap-2">
-            <code className="flex-1 px-3 py-2.5 rounded-xl bg-slate-900 dark:bg-black border border-slate-700 text-[11px] font-mono text-emerald-400 whitespace-pre leading-relaxed overflow-x-auto">
+            <code className="flex-1 px-3 py-2.5 rounded-xl bg-slate-900 dark:bg-black border border-slate-700 text-[11px] font-mono text-[var(--pro-azure-light)] whitespace-pre leading-relaxed overflow-x-auto">
 {`# 1. Navigate to OVDS root
 cd /var/www/ovds
 
@@ -579,7 +582,7 @@ pm2 restart ovds-backend ovds-frontend --update-env`}
           <div>
             <button
               onClick={() => setShowHealthCheck(v => !v)}
-              className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+              className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors"
             >
               {showHealthCheck ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
               {showHealthCheck ? 'Hide' : 'Run'} pre-install health check
@@ -612,7 +615,7 @@ pm2 restart ovds-backend ovds-frontend --update-env`}
                   <code className="text-[9px] text-slate-400 dark:text-slate-500 truncate block">{app.pkg}</code>
                 </div>
                 <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <code className="text-[9px] font-mono text-emerald-700 dark:text-emerald-400 px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded hidden sm:block truncate max-w-[160px]">{app.cmd}</code>
+                  <code className="text-[9px] font-mono text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded hidden sm:block truncate max-w-[160px]">{app.cmd}</code>
                   <CopyCommandBtn text={app.cmd} />
                 </div>
               </div>
@@ -714,7 +717,7 @@ Please confirm once complete. Thank you.`}
                       {item.setExpanded && (
                         <button
                           onClick={() => item.setExpanded!(!item.expanded)}
-                          className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                          className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
                           aria-expanded={item.expanded}
                           aria-label={item.expanded ? 'Collapse' : 'Expand'}
                         >
@@ -745,15 +748,15 @@ Please confirm once complete. Thank you.`}
           <ExternalLink size={11} className="text-slate-400 shrink-0" />
           <p className="text-[10px] text-slate-400">
             Need help?{' '}
-            <a href="mailto:support@ovds.com.et" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
+            <a href="mailto:support@ovds.com.et" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold hover:underline">
               support@ovds.com.et
             </a>
             {' '}·{' '}
-            <a href="/helpdesk" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
+            <a href="/helpdesk" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold hover:underline">
               Help Center
             </a>
             {' '}·{' '}
-            <a href="/settings/releases" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
+            <a href="/settings/releases" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold hover:underline">
               Release Notes
             </a>
           </p>
@@ -762,7 +765,7 @@ Please confirm once complete. Thank you.`}
           href="https://docs.ovds.com.et/updates"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1 text-[10px] font-semibold text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors shrink-0"
+          className="flex items-center gap-1 text-[10px] font-semibold text-slate-400 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors shrink-0"
         >
           <BookOpen size={10} /> Docs
         </a>
@@ -1058,7 +1061,7 @@ const ReleasesPage: React.FC = () => {
           amount={`v${stats.current}`}
           percentage={0}
           isPositive={true}
-          color="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400"
+          color="bg-[var(--pro-azure-50)] dark:bg-green-950/40 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]"
           sub={settings?.environment ?? 'Production'}
         />
         <MetricCard
@@ -1068,7 +1071,7 @@ const ReleasesPage: React.FC = () => {
           isPositive={true}
           color={stats.available > 0
             ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400'
-            : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400'}
+            : 'bg-[var(--pro-azure-50)] dark:bg-green-950/40 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'}
           sub={stats.available === 0 ? 'Up to date' : `${stats.available} pending`}
         />
         <MetricCard
@@ -1076,7 +1079,7 @@ const ReleasesPage: React.FC = () => {
           amount={stats.installed}
           percentage={0}
           isPositive={true}
-          color="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400"
+          color="bg-[var(--pro-azure-50)] dark:bg-green-950/40 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]"
           sub="All time"
         />
         <MetricCard
@@ -1098,14 +1101,14 @@ const ReleasesPage: React.FC = () => {
           {/* Current Environment */}
           <Card>
             <CardHeader
-              icon={<ShieldCheck size={15} className="text-emerald-600 dark:text-emerald-400" />}
-              iconBg="bg-emerald-50 dark:bg-emerald-950/40"
+              icon={<ShieldCheck size={15} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />}
+              iconBg="bg-[var(--pro-azure-50)] dark:bg-green-950/40"
               title="Current Environment"
               subtitle="Version and update policy"
               right={
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">Healthy</span>
+                  <span className="w-2 h-2 rounded-full bg-[var(--pro-azure-50)]0 animate-pulse" />
+                  <span className="text-[11px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">Healthy</span>
                 </div>
               }
             />
@@ -1114,11 +1117,11 @@ const ReleasesPage: React.FC = () => {
               <div className="ovds-kpi-cell">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Version</p>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-sm font-black tracking-tight">
+                  <span className="px-2.5 py-1 rounded-lg bg-[var(--pro-azure-100)] dark:bg-green-900/50 text-[var(--pro-azure-dark)] dark:text-green-300 text-sm font-black tracking-tight">
                     v{settings?.currentVersion ?? '—'}
                   </span>
                   {availableReleases.length === 0 && (
-                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                    <span className="text-[10px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold flex items-center gap-1">
                       <CheckCircle2 size={11} /> Latest
                     </span>
                   )}
@@ -1133,7 +1136,7 @@ const ReleasesPage: React.FC = () => {
                   ) : settings?.environment === 'DEVELOPMENT' ? (
                     <><Layers size={14} className="text-violet-500" /><span className="text-[13px] font-bold text-slate-700 dark:text-slate-200">Development</span></>
                   ) : (
-                    <><Globe size={14} className="text-emerald-500" /><span className="text-[13px] font-bold text-slate-700 dark:text-slate-200">Production</span></>
+                    <><Globe size={14} className="text-[var(--pro-azure)]" /><span className="text-[13px] font-bold text-slate-700 dark:text-slate-200">Production</span></>
                   )}
                 </div>
               </div>
@@ -1175,7 +1178,7 @@ const ReleasesPage: React.FC = () => {
                 <button
                   onClick={() => fetchData(true)}
                   disabled={refreshing}
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all disabled:opacity-50"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] hover:bg-slate-100 dark:hover:bg-slate-800 transition-all disabled:opacity-50"
                   title="Refresh"
                 >
                   <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
@@ -1196,7 +1199,7 @@ const ReleasesPage: React.FC = () => {
                     {/* Top row */}
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex gap-3 min-w-0">
-                        <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5">
+                        <div className="w-9 h-9 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/40 flex items-center justify-center text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5">
                           <ArrowUpCircle size={16} />
                         </div>
                         <div className="min-w-0">
@@ -1221,7 +1224,7 @@ const ReleasesPage: React.FC = () => {
                       <button
                         onClick={() => handleApply(cr.releaseId, cr.release.version, cr.release.isMandatory)}
                         disabled={!!applying}
-                        className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-all text-xs font-bold shrink-0 shadow-sm shadow-emerald-500/20 disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-lg transition-all text-xs font-bold shrink-0 shadow-sm shadow-green-500/20 disabled:opacity-60 disabled:cursor-not-allowed"
                       >
                         {applying === cr.releaseId
                           ? <><RefreshCw size={12} className="animate-spin" /> Installing…</>
@@ -1264,7 +1267,7 @@ const ReleasesPage: React.FC = () => {
                   icon: <Download size={13} />,
                   title: 'One-Click Update',
                   desc: 'Click the "Install" button next to any available update above. The system will apply the update automatically — no SSH access required.',
-                  color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40',
+                  color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/40',
                 },
                 {
                   step: '3',
@@ -1302,7 +1305,7 @@ const ReleasesPage: React.FC = () => {
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{item.desc}</p>
                     {item.cmd && (
                       <div className="mt-1.5 flex items-center gap-2">
-                        <code className="flex-1 px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-mono text-emerald-700 dark:text-emerald-400 whitespace-pre-wrap break-all">
+                        <code className="flex-1 px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-mono text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] whitespace-pre-wrap break-all">
                           {item.cmd}
                         </code>
                         <CopyCommandBtn text={item.cmd} />
@@ -1381,7 +1384,7 @@ const ReleasesPage: React.FC = () => {
             </div>
             <div className="grid grid-cols-3 divide-x divide-slate-100 dark:divide-slate-800">
               {[
-                { label: 'Applied',  value: history.filter(h => h.status === 'APPLIED').length,  color: 'text-emerald-600 dark:text-emerald-400' },
+                { label: 'Applied',  value: history.filter(h => h.status === 'APPLIED').length,  color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
                 { label: 'Failed',   value: history.filter(h => h.status === 'FAILED').length,   color: 'text-rose-600 dark:text-rose-400'    },
                 { label: 'Skipped',  value: history.filter(h => h.status === 'SKIPPED').length,  color: 'text-slate-500 dark:text-slate-400'   },
               ].map(s => (
@@ -1396,13 +1399,13 @@ const ReleasesPage: React.FC = () => {
               <div className="px-5 pb-3">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[10px] text-slate-400">Success rate</span>
-                  <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                  <span className="text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                     {Math.round((history.filter(h => h.status === 'APPLIED').length / history.length) * 100)}%
                   </span>
                 </div>
                 <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-emerald-500 rounded-full transition-all duration-700"
+                    className="h-full bg-[var(--pro-azure-50)]0 rounded-full transition-all duration-700"
                     style={{ width: `${Math.round((history.filter(h => h.status === 'APPLIED').length / history.length) * 100)}%` }}
                   />
                 </div>
@@ -1427,12 +1430,12 @@ const ReleasesPage: React.FC = () => {
                   onClick={() => setHistoryTab(tab)}
                   className={`flex items-center gap-1.5 px-3 py-2.5 text-[11px] font-bold uppercase tracking-wider whitespace-nowrap border-b-2 transition-colors ${
                     historyTab === tab
-                      ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
+                      ? 'border-[var(--pro-azure)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
                       : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
                   }`}
                 >
                   {tab}
-                  <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${historyTab === tab ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                  <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${historyTab === tab ? 'bg-[var(--pro-azure-100)] dark:bg-green-950/50 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
                     {historyTabCounts[tab]}
                   </span>
                 </button>
@@ -1516,7 +1519,7 @@ const ReleasesPage: React.FC = () => {
               <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
                 <button
                   onClick={() => setHistoryLimit(v => v + HISTORY_PAGE_SIZE)}
-                  className="w-full flex items-center justify-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-1"
+                  className="w-full flex items-center justify-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors py-1"
                 >
                   <ChevronDown size={13} />
                   Show {Math.min(HISTORY_PAGE_SIZE, filteredHistory.length - historyLimit)} more
@@ -1529,7 +1532,7 @@ const ReleasesPage: React.FC = () => {
           {/* Update Assistant Card */}
           <div className="ovds-widget-card overflow-hidden">
             {/* Notification Bell Header */}
-            <div className={`px-5 py-4 flex items-center gap-3 ${availableReleases.length > 0 ? 'bg-gradient-to-r from-amber-500 to-amber-600' : 'bg-gradient-to-r from-emerald-500 to-emerald-600'}`}>
+            <div className={`px-5 py-4 flex items-center gap-3 ${availableReleases.length > 0 ? 'bg-gradient-to-r from-amber-500 to-amber-600' : 'bg-gradient-to-r from-green-500 to-green-600'}`}>
               <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
                 {availableReleases.length > 0
                   ? <Bell size={18} className="text-white" />
@@ -1565,14 +1568,14 @@ const ReleasesPage: React.FC = () => {
                   label: 'Notifications',
                   value: availableReleases.length > 0 ? `${availableReleases.length} pending` : 'None',
                   ok: availableReleases.length === 0,
-                  color: availableReleases.length > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400',
+                  color: availableReleases.length > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
                 },
                 {
                   icon: <Package size={12} />,
                   label: 'Current Version',
                   value: `v${settings?.currentVersion ?? '—'}`,
                   ok: true,
-                  color: 'text-emerald-600 dark:text-emerald-400',
+                  color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
                 },
                 {
                   icon: <Globe size={12} />,
@@ -1586,14 +1589,14 @@ const ReleasesPage: React.FC = () => {
                   label: 'Auto-Update',
                   value: settings?.autoUpdate ? 'Enabled' : 'Disabled',
                   ok: !!settings?.autoUpdate,
-                  color: settings?.autoUpdate ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400',
+                  color: settings?.autoUpdate ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-slate-400',
                 },
                 {
                   icon: <ShieldCheck size={12} />,
                   label: 'Security Patches',
                   value: 'Active',
                   ok: true,
-                  color: 'text-emerald-600 dark:text-emerald-400',
+                  color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
                 },
                 {
                   icon: <History size={12} />,
@@ -1604,7 +1607,7 @@ const ReleasesPage: React.FC = () => {
                 },
               ].map((row) => (
                 <div key={row.label} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                  <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${row.ok ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400' : 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400'}`}>
+                  <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${row.ok ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/40 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400'}`}>
                     {row.icon}
                   </div>
                   <span className="flex-1 text-[11px] text-slate-500 dark:text-slate-400">{row.label}</span>
@@ -1623,7 +1626,7 @@ const ReleasesPage: React.FC = () => {
                   <Download size={13} /> Install Updates
                 </button>
               ) : (
-                <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 justify-center">
+                <div className="flex items-center gap-2 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] justify-center">
                   <CheckCircle2 size={14} />
                   <span className="text-xs font-semibold">System fully up to date</span>
                 </div>
@@ -1632,21 +1635,21 @@ const ReleasesPage: React.FC = () => {
           </div>
 
           {/* Security Shield Card */}
-          <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-2xl p-5 text-white relative overflow-hidden shadow-lg shadow-emerald-500/20">
+          <div className="bg-gradient-to-br from-[var(--pro-azure)] to-[var(--pro-azure-dark)] rounded-2xl p-5 text-white relative overflow-hidden shadow-lg shadow-green-500/20">
             <div className="absolute -top-6 -right-6 w-28 h-28 bg-white/10 rounded-full blur-2xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-20 h-20 bg-emerald-800/30 rounded-full blur-xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-20 h-20 bg-[var(--pro-azure)]/10 rounded-full blur-xl pointer-events-none" />
             <div className="relative z-10">
               <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center mb-4">
-                <ShieldCheck size={20} className="text-emerald-100" />
+                <ShieldCheck size={20} className="text-green-100" />
               </div>
               <h4 className="font-bold text-base mb-1.5">Automated Security</h4>
-              <p className="text-xs text-emerald-100 leading-relaxed">
+              <p className="text-xs text-green-100 leading-relaxed">
                 Your environment is protected by automatic security patches. Critical vulnerabilities are addressed within 24 hours of discovery.
               </p>
               <div className="mt-4 pt-4 border-t border-white/20 flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-200">OVDS Shield</span>
-                <span className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-green-200">OVDS Shield</span>
+                <span className="flex items-center gap-1.5 text-[10px] font-bold text-green-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--pro-azure-light)] animate-pulse" />
                   Active
                 </span>
               </div>
@@ -1681,7 +1684,7 @@ const ReleasesPage: React.FC = () => {
                 <label className={lbl}>Release Type</label>
                 <div className="grid grid-cols-2 gap-3">
                   <button type="button" onClick={() => setNewRelease({ ...newRelease, type: 'PRODUCTION' })}
-                    className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all ${newRelease.type === 'PRODUCTION' ? 'bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-500/20' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-emerald-500/40'}`}>
+                    className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all ${newRelease.type === 'PRODUCTION' ? 'bg-[var(--pro-azure-50)]0 border-[var(--pro-azure)] text-white shadow-md shadow-green-500/20' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-[var(--pro-azure)]/40'}`}>
                     <Globe size={14} /> Production
                   </button>
                   <button type="button" onClick={() => setNewRelease({ ...newRelease, type: 'STAGING' })}
@@ -1704,7 +1707,7 @@ const ReleasesPage: React.FC = () => {
                 Cancel
               </button>
               <button type="submit" disabled={creating}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-md shadow-emerald-500/20 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-xl text-sm font-bold shadow-md shadow-green-500/20 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
                 {creating ? <><RefreshCw size={14} className="animate-spin" /> Publishing…</> : <><Package size={14} /> Publish Release</>}
               </button>
             </div>
@@ -1758,7 +1761,7 @@ const ReleasesPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={creatingFlag}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-md shadow-emerald-500/20 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-xl text-sm font-bold shadow-md shadow-green-500/20 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {creatingFlag
                   ? <><RefreshCw size={14} className="animate-spin" /> Creating…</>

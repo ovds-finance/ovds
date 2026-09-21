@@ -48,7 +48,7 @@ export interface GridStatCellProps {
   value: React.ReactNode;
   sub?: string;
   trend?: number;
-  /** Tailwind bg class for bottom accent line e.g. 'bg-emerald-500' */
+  /** Tailwind bg class for bottom accent line e.g. 'bg-[var(--pro-azure)]' */
   accentCls?: string;
   /** Make entire cell clickable */
   onClick?: () => void;
@@ -299,7 +299,7 @@ export const GridStatCell: React.FC<GridStatCellProps> = ({
           <span
             className={[
               'text-[9px] font-bold flex items-center gap-0.5 shrink-0 ml-auto',
-              trend > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400',
+              trend > 0 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-rose-500 dark:text-rose-400',
             ].join(' ')}
           >
             {trend > 0 ? '↑' : '↓'} {Math.abs(trend).toFixed(1)}%
@@ -378,7 +378,7 @@ export const GridSummaryRow: React.FC<GridSummaryRowProps> = ({
       <div className="h-1 bg-slate-100 dark:bg-slate-800">
         <div
           ref={barRef}
-          className="h-full bg-gradient-to-r from-emerald-500 to-teal-500"
+          className="h-full bg-gradient-to-r from-green-500 to-green-600"
           style={{ width: 0 }}
         />
       </div>
@@ -388,7 +388,7 @@ export const GridSummaryRow: React.FC<GridSummaryRowProps> = ({
           {/* Money In */}
           <div>
             <p className="ovds-label mb-1.5">Money In</p>
-            <p className="ovds-value text-emerald-600 dark:text-emerald-400 tabular-nums">
+            <p className="ovds-value text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] tabular-nums">
               {income}
             </p>
             {period && (
@@ -416,7 +416,7 @@ export const GridSummaryRow: React.FC<GridSummaryRowProps> = ({
               className={[
                 'ovds-value tabular-nums',
                 netPositive
-                  ? 'text-emerald-600 dark:text-emerald-400'
+                  ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
                   : 'text-rose-500 dark:text-rose-400',
               ].join(' ')}
             >
@@ -443,14 +443,14 @@ export const GridSummaryRow: React.FC<GridSummaryRowProps> = ({
  *  - Category pill + star rating in header
  *  - Title + line-clamped description
  *  - Subscription price / license term info
- *  - Active state with emerald ring + "Installed" badge
+ *  - Active state with indigo ring + "Installed" badge
  *  - "Get Module" / "Configure" CTA buttons
  */
 export const GridModuleCard: React.FC<GridModuleCardProps> = ({
   title,
   description,
   icon,
-  iconBg = 'bg-emerald-50',
+  iconBg = 'bg-[var(--pro-azure-50)]',
   category,
   active = false,
   onAction,
@@ -465,7 +465,7 @@ export const GridModuleCard: React.FC<GridModuleCardProps> = ({
   <div
     className={[
       'group relative flex flex-col justify-between rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200',
-      active ? 'ring-1 ring-emerald-500/30 dark:ring-emerald-400/20' : '',
+      active ? 'ring-1 ring-[var(--pro-azure)]/30' : '',
       className,
     ].filter(Boolean).join(' ')}
     aria-labelledby={`mod-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
@@ -535,13 +535,13 @@ export const GridModuleCard: React.FC<GridModuleCardProps> = ({
             'inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-all cursor-pointer',
             active
               ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-              : 'bg-blue-600 dark:bg-blue-500 text-white dark:text-slate-950 hover:bg-blue-700 dark:hover:bg-blue-400',
-            'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900',
+              : 'bg-[var(--pro-azure)] text-white hover:bg-[var(--pro-azure-dark)]',
+            'focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)] focus:ring-offset-2',
           ].join(' ')}
           aria-haspopup="dialog"
         >
           {active && (
-            <span className="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400 ring-1 ring-inset ring-emerald-600/20 mr-2">
+            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset mr-2" style={{ background: 'var(--pro-azure-50)', color: 'var(--pro-azure-dark)', borderColor: 'var(--pro-azure-100)' }}>
               Installed
             </span>
           )}

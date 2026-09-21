@@ -22,30 +22,31 @@
  *   • Filing deadline: 30th of following month
  *   • Registration threshold: ETB 2,000,000 — Regulation No. 570/2025
  */
-import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useAuth } from '../rbac/AuthContext';
-import { useInterval } from '../hooks';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useAuditLog } from '../hooks/useAuditLog';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import {
-  AppPage, AppTabs, AppTable, AppTh, AppTd, AppTr,
-  Btn, Modal, FormField, Input, Toolbar,
-  Icon, Amount, StatusBadge,
-} from '../components/ui';
 import {
   AkiMetricCard, AkiStatStrip, AkiAuditTrail, AkiValidationPanel,
   AkiMultiStateProgress, AkiSectionHeader,
   type AkiAuditEntry, type AkiValidationError,
 } from '@ovds/ui';
+import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+
+import {
+  AppPage, AppTabs, AppTable, AppTh, AppTd, AppTr,
+  Btn, Modal, FormField, Input, Toolbar,
+  Icon, Amount, StatusBadge,
+} from '../components/ui';
+import { useInterval } from '../hooks';
+import { useAuditLog } from '../hooks/useAuditLog';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { useDeclarationReadiness } from '../services/newTaxApi';
 import {
   useVatFilings, useVatDashboard, useInputLedger, useOutputLedger,
   useWithholding, useReverseCharges, useRefundClaims,
   useEtaxSubmissions, lockVatPeriod, setVatApportionment,
 } from '../services/vatApi';
-import { useDeclarationReadiness } from '../services/newTaxApi';
 
 const LevyCollectionPanel = lazy(() => import('../components/disaster-fund/LevyCollectionPanel'));
 const VatReportsPanel     = lazy(() => import('../components/disaster-fund/VatReportsPanel'));
@@ -320,18 +321,18 @@ function LeftSidebar({
         label={isRefund ? 'Refund Due' : 'Net VAT Payable'}
         value={`ETB ${fmtK(Math.abs(net))}`}
         sub={isRefund ? 'Credit to carry forward' : 'Due by 30th of next month'}
-        accent={isRefund ? 'sky' : net > 0 ? 'emerald' : 'blue'}
+        accent={isRefund ? "sky" : net > 0 ? "green" : "blue"}
         loading={loading}
         icon={<Icon name={isRefund ? 'SUCCESS' : 'RECEIPT'} size={16} />}
-        iconBg={isRefund ? 'bg-sky-50' : 'bg-emerald-50'}
-        iconColor={isRefund ? 'text-sky-600' : 'text-emerald-600'}
+        iconBg={isRefund ? 'bg-sky-50' : 'bg-[var(--pro-azure-50)]'}
+        iconColor={isRefund ? 'text-sky-600' : 'text-[var(--pro-azure)]'}
         sparkData={[output * 0.6, output * 0.75, output * 0.8, output * 0.9, output]}
       />
 
       {/* Output / Input / WHT mini-strip */}
       <div className="aki-card p-0 overflow-hidden">
         {[
-          { label: 'Output VAT',     value: fmtK(output), color: 'text-emerald-600', dot: 'bg-emerald-500' },
+          { label: 'Output VAT',     value: fmtK(output), color: 'text-[var(--pro-azure)]', dot: 'bg-[var(--pro-azure)]' },
           { label: 'Input VAT',      value: fmtK(input),  color: 'text-sky-600',     dot: 'bg-sky-500'     },
           { label: 'Reverse Charge', value: fmtK(rc),     color: 'text-rose-600',    dot: 'bg-rose-500'    },
           { label: 'WHT Collected',  value: fmtK(wht),    color: 'text-amber-600',   dot: 'bg-amber-500'   },
@@ -362,7 +363,7 @@ function LeftSidebar({
               onClick={onAddOutput}
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] font-semibold text-[var(--text-2)] hover:bg-[var(--surface-alt)] transition-colors text-left"
             >
-              <Icon name="PLUS" size={13} className="text-emerald-500 shrink-0" />
+              <Icon name="PLUS" size={13} className="text-[var(--pro-azure)] shrink-0" />
               Add Output Entry
               <span className="ml-auto text-[9px] font-mono text-[var(--text-4)]">N</span>
             </button>
@@ -474,7 +475,7 @@ function RightRail({ period, filings, submissions, readiness, readinessLoading }
             <div className="space-y-2.5">
               <div className={`flex items-center gap-2 p-2.5 rounded-lg border text-[11px] font-semibold ${
                 readiness.ready
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/20 dark:border-emerald-800 dark:text-emerald-300'
+                  ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/20 dark:border-green-800 dark:text-green-300'
                   : 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/20 dark:border-rose-800 dark:text-rose-300'
               }`}>
                 <Icon name={readiness.ready ? 'CHECK_CIRCLE' : 'X_CIRCLE'} size={14} className="shrink-0" />
@@ -508,7 +509,7 @@ function RightRail({ period, filings, submissions, readiness, readinessLoading }
             {recentSubs.map((s: any) => (
               <div key={s.id} className="px-4 py-3 flex items-center gap-3">
                 <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                  s.status === 'ACCEPTED' ? 'bg-emerald-500'
+                  s.status === 'ACCEPTED' ? 'bg-[var(--pro-azure)]'
                   : s.status === 'REJECTED' ? 'bg-rose-500'
                   : 'bg-amber-500'
                 }`} />
@@ -517,7 +518,7 @@ function RightRail({ period, filings, submissions, readiness, readinessLoading }
                   <p className="text-[10px] text-[var(--text-4)]">{s.status}</p>
                 </div>
                 {s.ercaReferenceNo && (
-                  <span className="text-[9px] font-mono text-emerald-600 dark:text-emerald-400 shrink-0">{s.ercaReferenceNo.slice(-6)}</span>
+                  <span className="text-[9px] font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0">{s.ercaReferenceNo.slice(-6)}</span>
                 )}
               </div>
             ))}
@@ -632,8 +633,8 @@ function LedgerTable({
         </tbody>
         {filtered.length > 0 && (
           <tfoot>
-            <tr className="bg-emerald-50/50 dark:bg-emerald-950/10">
-              <td colSpan={canWrite ? 4 : 3} className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Total VAT</td>
+            <tr className="bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10">
+              <td colSpan={canWrite ? 4 : 3} className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">Total VAT</td>
               <td className="px-3 py-2 text-right"><Amount value={totalVat} size="sm" /></td>
               {canWrite && <td />}
             </tr>
@@ -811,7 +812,7 @@ function VatStatStrip({ dashboard, loading }: { dashboard: any; loading: boolean
     <AkiStatStrip
       loading={loading}
       cells={[
-        { label: 'Output VAT',      value: `ETB ${fmtK(output)}`,       sub: 'Collected from customers', accentLine: 'bg-emerald-500' },
+        { label: 'Output VAT',      value: `ETB ${fmtK(output)}`,       sub: 'Collected from customers', accentLine: 'bg-[var(--pro-azure)]' },
         { label: 'Input VAT',       value: `ETB ${fmtK(input)}`,        sub: 'Paid to suppliers',        accentLine: 'bg-sky-500'     },
         { label: isRefund ? 'Refund Due' : 'Net Payable', value: `ETB ${fmtK(Math.abs(net))}`, sub: isRefund ? 'Credit balance' : 'Due 30th next month', trend: isRefund ? 5.2 : -3.1, accentLine: isRefund ? 'bg-sky-500' : 'bg-[#0056D2]' },
         { label: 'Pending Refunds', value: `ETB ${fmtK(refunds)}`,      sub: 'Awaiting MoR approval',    accentLine: 'bg-violet-500'  },
@@ -1134,7 +1135,7 @@ export default function VatAdministration() {
       {showVatReturn && dashboard && (
         <Modal open={showVatReturn} title={`Submit VAT Return — ${period}`} onClose={() => setShowVatReturn(false)} width="max-w-2xl">
           <div className="space-y-4">
-            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg border border-emerald-100 dark:border-emerald-800 text-[12px] text-emerald-700 dark:text-emerald-400 flex items-start gap-2">
+            <div className="p-3 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-lg border border-[var(--pro-azure-100)] dark:border-green-800 text-[12px] text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] flex items-start gap-2">
               <Icon name="INFO" size={13} className="flex-shrink-0 mt-0.5" />
               <span>Review the VAT return summary before submitting to the MoR e-Tax Portal (etax.mor.gov.et).</span>
             </div>
@@ -1145,8 +1146,8 @@ export default function VatAdministration() {
               </thead>
               <tbody>
                 {[
-                  { label: 'Box 1 — Output VAT (Sales)',        value: Number(dashboard.totalOutputVat ?? 0),     color: 'text-emerald-700' },
-                  { label: 'Box 2 — Input VAT (Claimable)',     value: -Number(dashboard.claimableInputVat ?? 0), color: 'text-emerald-700' },
+                  { label: 'Box 1 — Output VAT (Sales)',        value: Number(dashboard.totalOutputVat ?? 0),     color: 'text-[var(--pro-azure-dark)]' },
+                  { label: 'Box 2 — Input VAT (Claimable)',     value: -Number(dashboard.claimableInputVat ?? 0), color: 'text-[var(--pro-azure-dark)]' },
                   { label: 'Box 3 — Reverse Charge VAT',        value: Number(dashboard.totalReverseCharge ?? 0), color: 'text-rose-700'    },
                   { label: 'Box 4 — Withholding Tax Collected', value: Number(dashboard.totalWithheld ?? 0),      color: 'text-amber-700'   },
                 ].map(r => (

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * EntitlementContext
  *
  * Provides app-wide access to the company's monetization entitlements.
@@ -8,6 +8,7 @@
  *   const { isEntitled, status, loading } = useEntitlement();
  *   if (isEntitled('feature:gl')) { ... }
  */
+import type { EntitlementStatusResponse, TrialRestriction } from '@ovds/ui';
 import React, {
   createContext,
   useContext,
@@ -16,9 +17,9 @@ import React, {
   useCallback,
   useRef,
 } from 'react';
-import type { EntitlementStatusResponse, TrialRestriction } from '@ovds/ui';
-import { getEntitlementStatus } from '../services/monetizationApi';
+
 import { useAuth } from '../rbac/AuthContext';
+import { getEntitlementStatus } from '../services/monetizationApi';
 
 // -- Types ---------------------------------------------------------------------
 
@@ -153,6 +154,7 @@ export const EntitlementProvider: React.FC<EntitlementProviderProps> = ({
 
 // -- Hook ----------------------------------------------------------------------
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useEntitlement = (): EntitlementContextValue =>
   useContext(EntitlementContext);
 

@@ -6,10 +6,11 @@
  *
  * Renders nothing. Mounted once inside Auth0Provider via Auth0ProviderWrapper.
  */
-import React, { useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { registerAuth0LogoutListener } from './auth0Logout';
+import React, { useEffect } from 'react';
+
 import { registerAuth0RefreshListener } from './auth0Client';
+import { registerAuth0LogoutListener } from './auth0Logout';
 
 export const Auth0LogoutHandler: React.FC = () => {
   const { logout, getAccessTokenSilently } = useAuth0();

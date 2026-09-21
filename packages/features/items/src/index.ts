@@ -53,10 +53,10 @@ export {
   ItemTable,
   ItemFilterBar,
   ItemStatsBar,
-} from './components';
+} from './components/index';
 
 // ── Page shells (reference templates) ──────────────────────────────────────────
-export { ItemsPageContent } from './pages';
+export { ItemsPageContent } from './pages/index';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 export type {
@@ -78,11 +78,11 @@ export type {
   ItemStats,
   ItemLookupResult,
   PaginatedResult,
-  ItemListParams,
-  StockAdjustment,
   CreateItemFormValues,
   UpdateItemFormValues,
 } from './types';
+
+export type { ItemListParams, StockAdjustment } from '@ovds/features/inventory';
 
 // ── Utils ──────────────────────────────────────────────────────────────────────
 export {

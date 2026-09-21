@@ -127,6 +127,7 @@ export interface TelecomReceiptResponse {
 
 export interface CompanyUpdateData {
   name?: string;
+  subdomain?: string;
   type?: BusinessType;
   environment?: AppEnvironment;
   autoUpdate?: boolean;

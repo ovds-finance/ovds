@@ -1,350 +1,370 @@
 /**
  * @ovds/ui — Design Token CSS Custom Properties
  * ─────────────────────────────────────────────────────────────────────────────
- * Single source of truth for all CSS custom properties.
+ * Premium Professional GUI — OVDS Design System v3
  *
- * Source of truth: @ovds/design-system/src/tokens.ts
- * This file is auto-generated from the TypeScript tokens and MUST stay in sync.
+ * Architecture:
+ *  - --pro-*      : Premium brand palette (corporate green #4FBA6F / #2ED47A)
+ *  - --sys-*      : Multi-surface semantic tokens (light / dark)
+ *  - --status-*   : Status badge tokens
+ *  - --ovds-*     : Legacy backward-compat aliases
+ *  - --aka-* / --aki-* : Additional aliases
  *
- * Usage:
- *   color: var(--aki-blue);
- *   background: var(--sys-bg-base);
- *   border-color: var(--sys-border-base);
+ * Brand color system (60-30-10):
+ *  60% Neutrals & Base    — #F8FAFC → #1E293B grayscale / cool slate
+ *  30% Supporting Accents — functional pastels (status, charts)
+ *  10% Primary Brand      — corporate green #4FBA6F / vibrant #2ED47A
  *
- * Dark mode: toggle the .dark class on <html> or any ancestor.
- * Multi-surface: use --sys-* tokens which have light/dark variants.
+ * Semantic color mapping:
+ *  🟢 Success / Paid / Revenue  → Primary brand green block
+ *  🔴 Danger / Error / Overdue  → Red tint  #F5365C / tailwind red
+ *  🟡 Warning / Pending / Draft → Amber/orange blocks
+ *  🔵 Info / Audit / Logs       → Professional blue layer
  */
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   1. BRAND / PRIMARY
+   1. BRAND / PRIMARY — Ovds SaaS Corporate Green
    ══════════════════════════════════════════════════════════════════════════════ */
 :root {
-  --aki-blue:           #0056D2;
-  --aki-blue-dark:      #0044A8;
-  --aki-blue-light:     #3B82F6;
-  --aki-blue-50:        #EEF4FF;
-  --aki-blue-100:       #DBEAFE;
+  /* ── Vibrant actionable green (CTAs, primary buttons, nav markers, links) */
+  --pro-green:          #2ED47A;
+  --pro-green-dark:     #22A85F;
+  --pro-green-light:    #6EE8A4;
+  --pro-green-50:       #F0FDF4;
+  --pro-green-100:      #DCFCE7;
+  --pro-green-200:      #BBF7D0;
+  --pro-green-600:      #16A34A;
+  --pro-green-700:      #15803D;
 
-  /* Marketing / auth page palette (oklch) */
-  --aki-indigo:         oklch(0.55 0.22 278);
-  --aki-indigo-dark:    oklch(0.46 0.22 278);
-  --aki-indigo-dim:     oklch(0.94 0.04 278);
-  --aki-indigo-deep:    oklch(0.38 0.20 278);
-  --aki-indigo-light:   oklch(0.68 0.18 278);
-  --aki-indigo-mid:     oklch(0.88 0.09 278);
-  --aki-green:          oklch(0.59 0.19 155);
-  --aki-green-light:    oklch(0.74 0.14 155);
-  --aki-green-dim:      oklch(0.94 0.04 155);
-  --aki-green-border:   oklch(0.84 0.08 155);
-  --aki-amber:          oklch(0.72 0.15 85);
-  --aki-amber-light:    oklch(0.97 0.03 85);
-  --aki-err:            oklch(0.55 0.20 25);
-  --aki-err-light:      oklch(0.985 0.007 25);
-  --aki-err-border:     oklch(0.84 0.09 25);
+  /* ── Corporate green (slightly desaturated — structures, borders, sidebar rail) */
+  --pro-azure:          #4FBA6F;
+  --pro-azure-dark:     #3B9957;
+  --pro-azure-light:    #7DD49A;
+  --pro-azure-50:       #F0FDF4;
+  --pro-azure-100:      #DCFCE7;
 
-  /* Auth-page text/surface aliases */
-  --aki-text-muted:     oklch(0.64 0.015 258);
-  --aki-text-subtle:    oklch(0.74 0.012 258);
-  --aki-surface-2:      oklch(0.965 0.007 258);
-  --aki-surface-3:      oklch(0.952 0.008 258);
+  /* ── Legacy aki-blue aliases — remapped to brand green */
+  --aki-blue:           #4FBA6F;
+  --aki-blue-dark:      #3B9957;
+  --aki-blue-light:     #7DD49A;
+  --aki-blue-50:        #F0FDF4;
+  --aki-blue-100:       #DCFCE7;
+
+  /* ── Supporting palette (non-brand accents) */
+  --pro-navy:           #1E293B;
+  --pro-navy-2:         #334155;
+  --pro-navy-3:         #475569;
+  --pro-navy-4:         #64748B;
+
+  --pro-violet:         #7C3AED;
+  --pro-violet-light:   #EDE9FE;
+
+  --pro-emerald:        #10B981;
+  --pro-emerald-light:  #D1FAE5;
+  --pro-indigo:         #10B981; /* was indigo, now mapped to emerald for success trend */
+
+  --pro-amber:          #F59E0B;
+  --pro-amber-light:    #FEF3C7;
+
+  --pro-rose:           #F43F5E;
+  --pro-rose-light:     #FFE4E6;
+  --pro-rose-dim:       rgba(244, 63, 94, 0.18);
+
+  --pro-cyan:           #0EA5E9;
+  --pro-cyan-light:     #E0F2FE;
+
+  /* ── Gradients */
+  --pro-gradient-primary: linear-gradient(135deg, #2ED47A 0%, #4FBA6F 100%);
+  --pro-gradient-success: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  --pro-gradient-warm:    linear-gradient(135deg, #F59E0B 0%, #F97316 100%);
+  --pro-gradient-sidebar: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  --pro-gradient-hero:    linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 50%, #BBF7D0 100%);
+
+  /* ── Canvas & surfaces (light mode) */
+  --canvas:         #FFFFFF;
+  --bg-main:        #F8FAFC;
+  --surface:        #FFFFFF;
+  --surface-alt:    #F8FAFC;
+  --surface-light:  #F1F5F9;
+  --surface-active: #F0FDF4;
+  --surface-elevated: #FFFFFF;
+  --surface-overlay:  #FFFFFF;
+  --surface-subtle:   #F8FAFC;
+
+  /* ── Text (light mode) */
+  --text:           #0F172A;
+  --text-2:         #334155;
+  --text-3:         #64748B;
+  --text-4:         #94A3B8;
+  --text-5:         #CBD5E1;
+  --text-primary:   #0F172A;
+  --text-secondary: #334155;
+  --text-muted:     #64748B;
+  --text-subtle:    #94A3B8;
+  --text-inverse:   #FFFFFF;
+
+  /* ── Borders (light mode) */
+  --border:         #E2E8F0;
+  --border-alt:     #F1F5F9;
+  --border-default: #E2E8F0;
+  --border-subtle:  #F1F5F9;
+  --border-strong:  #CBD5E1;
+
+  /* ── Sidebar tokens */
+  --sidebar-bg:        #FFFFFF;
+  --sidebar-rail-bg:   #F8FAFC;
+  --sidebar-border:    #E2E8F0;
+  --sidebar-fg:        #475569;
+  --sidebar-fg-muted:  #94A3B8;
+  --sidebar-fg-hover:  #0F172A;
+  --sidebar-active-bg: #F0FDF4;
+  --sidebar-active-fg: #15803D;
+  --sidebar-hover-bg:  #F8FAFC;
+
+  /* ── Header tokens */
+  --header-bg:       #FFFFFF;
+  --header-border:   #E2E8F0;
+  --header-shadow:   0 1px 3px rgba(0,0,0,0.04);
+
+  /* ── Card / shadow tokens */
+  --card-shadow:        0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  --card-shadow-hover:  0 4px 12px 0 rgb(0 0 0 / 0.08);
+  --card-shadow-raised: 0 8px 24px 0 rgb(0 0 0 / 0.10);
+
+  /* ── Motion */
+  --ease:           cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring:    cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast:       120ms;
+  --dur-base:       180ms;
+  --dur-slow:       280ms;
+
+  /* ── Misc */
+  --input-h:        36px;
+  --footer-h:       40px;
+  --grid-gap:       24px;
+  --grid-gap-sm:    12px;
+  --grid-gap-lg:    32px;
+  --font:           'Inter', 'ui-sans-serif', 'system-ui', '-apple-system', sans-serif;
+
+  /* ── Status badges */
+  --status-draft-bg:          #F8FAFC;
+  --status-draft-text:        #64748B;
+  --status-draft-border:      #E2E8F0;
+  --status-draft-dot:         #94A3B8;
+
+  --status-pending-bg:        #FFFBEB;
+  --status-pending-text:      #B45309;
+  --status-pending-border:    #FDE68A;
+  --status-pending-dot:       #F59E0B;
+
+  --status-sent-bg:           #EFF6FF;
+  --status-sent-text:         #1E3A8A;
+  --status-sent-border:       #CCE0FF;
+  --status-sent-dot:          #0066FF;
+
+  --status-paid-bg:           #F0FDF4;
+  --status-paid-text:         #03543F;
+  --status-paid-border:       #A7F3D0;
+  --status-paid-dot:          #059669;
+
+  --status-overdue-bg:        #FFF1F2;
+  --status-overdue-text:      #9F1239;
+  --status-overdue-border:    #FECDD3;
+  --status-overdue-dot:       #E11D48;
+
+  --status-approved-bg:       #F0FDF4;
+  --status-approved-text:     #03543F;
+  --status-approved-border:   #A7F3D0;
+  --status-approved-dot:      #059669;
+
+  --status-rejected-bg:       #FFF1F2;
+  --status-rejected-text:     #9F1239;
+  --status-rejected-border:   #FECDD3;
+  --status-rejected-dot:      #E11D48;
+
+  --status-cancelled-bg:      #F8FAFC;
+  --status-cancelled-text:    #475569;
+  --status-cancelled-border:  #E2E8F0;
+  --status-cancelled-dot:     #94A3B8;
+
+  --status-active-bg:         #F0FDF4;
+  --status-active-text:       #03543F;
+  --status-active-border:     #A7F3D0;
+  --status-active-dot:        #059669;
+
+  --status-open-bg:           #EFF6FF;
+  --status-open-text:         #1E3A8A;
+  --status-open-border:       #CCE0FF;
+  --status-open-dot:          #0066FF;
+
+  --status-closed-bg:         #F8FAFC;
+  --status-closed-text:       #475569;
+  --status-closed-border:     #E2E8F0;
+  --status-closed-dot:        #94A3B8;
+
+  --status-success-bg:        #F0FDF4;
+  --status-success-text:      #03543F;
+  --status-success-border:    #A7F3D0;
+  --status-success-dot:       #059669;
+
+  --status-warning-bg:        #FFFBEB;
+  --status-warning-text:      #B45309;
+  --status-warning-border:    #FDE68A;
+  --status-warning-dot:       #F59E0B;
+
+  --status-danger-bg:         #FFF1F2;
+  --status-danger-text:       #9F1239;
+  --status-danger-border:     #FECDD3;
+  --status-danger-dot:        #E11D48;
+
+  --status-info-bg:           #EFF6FF;
+  --status-info-text:         #1E3A8A;
+  --status-info-border:       #CCE0FF;
+  --status-info-dot:          #0066FF;
+
+  /* ── Typography */
+  --font-sans: 'Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif';
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'ui-monospace', 'monospace';
+
+  /* ── Layout */
+  --sidebar-w:            276px;
+  --sidebar-collapsed:    56px;
+  --header-h:             60px;
+  --page-pad:             24px;
+  --page-max:             1440px;
+  --card-pad:             20px;
+  --card-radius:          8px;
+  --card-radius-sm:       4px;
+  --card-radius-lg:       12px;
+
+  /* ── Legacy page-scoped aliases (Login / Register / Landing inline CSS) */
+  --lv:          var(--pro-azure);
+  --lv-deep:     var(--pro-azure-dark);
+  --lv-dim:      var(--pro-azure-50);
+  --lg:          var(--pro-green);
+  --ink:         var(--text);
+  --ink-2:       var(--text-2);
+  --ink-3:       var(--text-3);
+  --ink-4:       var(--text-4);
+  --ink-5:       var(--text-5);
+  --rg:          var(--pro-azure);
+  --rg-h:        var(--pro-azure-dark);
+  --rg-lt:       var(--pro-azure-50);
+  --green:       var(--pro-green);
+  --s0:          var(--surface);
+  --s1:          var(--surface-alt);
+  --s2:          var(--surface-light);
+  --bd:          var(--border);
+  --err:         var(--pro-rose);
+  --err-lt:      var(--pro-rose-light);
+  --violet:      var(--pro-violet);
+  --violet-dim:  var(--pro-violet-light);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   2. MULTI-SURFACE TOKENS (light / dark)
+   2. DARK MODE OVERRIDES
+   ══════════════════════════════════════════════════════════════════════════════ */
+.dark {
+  /* Canvas & surfaces */
+  --canvas:         #0F172A;
+  --bg-main:        #020617;
+  --surface:        #0F172A;
+  --surface-alt:    #162032;
+  --surface-light:  #1E293B;
+  --surface-active: #052E16;
+  --surface-elevated: #1E293B;
+  --surface-overlay:  #1E293B;
+  --surface-subtle:   #0B1221;
+
+  /* Text */
+  --text:           #F1F5F9;
+  --text-2:         #CBD5E1;
+  --text-3:         #94A3B8;
+  --text-4:         #64748B;
+  --text-5:         #475569;
+  --text-primary:   #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted:     #64748B;
+  --text-subtle:    #475569;
+  --text-inverse:   #0F172A;
+
+  /* Borders */
+  --border:         #1E293B;
+  --border-alt:     #162032;
+  --border-default: #334155;
+  --border-subtle:  #1E293B;
+  --border-strong:  #475569;
+
+  /* Sidebar */
+  --sidebar-bg:        #0F172A;
+  --sidebar-rail-bg:   #0B1221;
+  --sidebar-border:    #1E293B;
+  --sidebar-fg:        #94A3B8;
+  --sidebar-fg-muted:  #64748B;
+  --sidebar-fg-hover:  #F1F5F9;
+  --sidebar-active-bg: #052E16;
+  --sidebar-active-fg: #4ADE80;
+  --sidebar-hover-bg:  #162032;
+
+  /* Header */
+  --header-bg:       #0F172A;
+  --header-border:   #1E293B;
+  --header-shadow:   0 1px 3px rgba(0,0,0,0.20);
+
+  /* Brand stays green in dark mode */
+  --pro-azure:          #2ED47A;
+  --pro-azure-dark:     #22A85F;
+  --pro-azure-light:    #6EE8A4;
+  --pro-azure-50:       #052E16;
+  --pro-azure-100:      #064E24;
+
+  --sys-bg-accent:            #052E16;
+  --sys-border-accent:        rgba(46, 212, 122, 0.25);
+  --sys-brand-primary:        #2ED47A;
+  --sys-brand-primary-hover:  #4FBA6F;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   3. MULTI-SURFACE TOKENS — Ovds SaaS light surfaces
    ══════════════════════════════════════════════════════════════════════════════ */
 :root {
-  --sys-bg-base:            #F8FAFC;
-  --sys-bg-surface:         #FFFFFF;
-  --sys-bg-surface-elevated: #F1F5F9;
-  --sys-bg-overlay:         #FFFFFF;
-  --sys-border-base:        #E2E8F0;
-  --sys-border-surface:     #CBD5E1;
-  --sys-border-elevated:    #94A3B8;
-  --sys-text-primary:       #0F172A;
-  --sys-text-secondary:     #334155;
-  --sys-text-muted:         #64748B;
+  /* Backgrounds — white surfaces on soft light-grey page canvas */
+  --sys-bg-base:              #F8FAFC;
+  --sys-bg-surface:           #FFFFFF;
+  --sys-bg-surface-elevated:  #FFFFFF;
+  --sys-bg-overlay:           #FFFFFF;
+  --sys-bg-subtle:            #F8FAFC;
+  --sys-bg-accent:            #F0FDF4;
 
-  --sys-brand-primary:        #2563EB;
+  /* Borders — cool-toned light greys */
+  --sys-border-base:          #E2E8F0;
+  --sys-border-surface:       #CBD5E1;
+  --sys-border-elevated:      #94A3B8;
+  --sys-border-accent:        rgba(79, 186, 111, 0.25);
+
+  /* Text */
+  --sys-text-primary:         #0F172A;
+  --sys-text-secondary:       #334155;
+  --sys-text-muted:           #64748B;
+  --sys-text-subtle:          #94A3B8;
+  --sys-text-inverse:         #FFFFFF;
+
+  /* Brand — corporate green accent */
+  --sys-brand-primary:        #4FBA6F;
+  --sys-brand-primary-hover:  #3B9957;
   --sys-brand-primary-text:   #FFFFFF;
-  --sys-state-success:        #ECFDF5;
-  --sys-state-success-text:   #065F46;
+
+  /* State surfaces */
+  --sys-state-success:        #F0FDF4;
+  --sys-state-success-text:   #059669;
+  --sys-state-success-border: #BBF7D0;
   --sys-state-alert:          #FFFBEB;
-  --sys-state-alert-text:     #92400E;
-  --sys-state-critical:       #FFF1F2;
-  --sys-state-critical-text:  #9F1239;
-}
-.dark {
-  --sys-bg-base:            #020617;
-  --sys-bg-surface:         #0F172A;
-  --sys-bg-surface-elevated: #162032;
-  --sys-bg-overlay:         #1E293B;
-  --sys-border-base:        #1E293B;
-  --sys-border-surface:     #334155;
-  --sys-border-elevated:    #475569;
-  --sys-text-primary:       #F8FAFC;
-  --sys-text-secondary:     #CBD5E1;
-  --sys-text-muted:         #94A3B8;
-
-  --sys-brand-primary:        #3B82F6;
-  --sys-brand-primary-text:   #0F172A;
-  --sys-state-success:        #022C22;
-  --sys-state-success-text:   #34D399;
-  --sys-state-alert:          #451A03;
-  --sys-state-alert-text:     #FCD34D;
-  --sys-state-critical:       #4C0519;
-  --sys-state-critical-text:  #FDA4AF;
-}
-
-/* ══════════════════════════════════════════════════════════════════════════════
-   3. STATUS BADGE TOKENS
-   ══════════════════════════════════════════════════════════════════════════════ */
-:root {
-  --status-draft-bg:     #F8FAFC;  --status-draft-text:     #64748B;  --status-draft-border:     #E2E8F0;  --status-draft-dot:     #94A3B8;
-  --status-pending-bg:   #FFFBEB;  --status-pending-text:   #B45309;  --status-pending-border:   #FDE68A;  --status-pending-dot:   #F59E0B;
-  --status-sent-bg:      #EFF6FF;  --status-sent-text:      #1E40AF;  --status-sent-border:      #BFDBFE;  --status-sent-dot:      #3B82F6;
-  --status-paid-bg:      #F0FDF4;  --status-paid-text:      #166534;  --status-paid-border:      #BBF7D0;  --status-paid-dot:      #10B981;
-  --status-overdue-bg:   #FFF1F2;  --status-overdue-text:   #9F1239;  --status-overdue-border:   #FECDD3;  --status-overdue-dot:   #F43F5E;
-  --status-approved-bg:  #F0FDF4;  --status-approved-text:  #166534;  --status-approved-border:  #BBF7D0;  --status-approved-dot:  #10B981;
-  --status-rejected-bg:  #FFF1F2;  --status-rejected-text:  #9F1239;  --status-rejected-border:  #FECDD3;  --status-rejected-dot:  #F43F5E;
-  --status-cancelled-bg: #F8FAFC;  --status-cancelled-text: #475569;  --status-cancelled-border: #E2E8F0;  --status-cancelled-dot: #94A3B8;
-  --status-active-bg:    #F0FDF4;  --status-active-text:    #166534;  --status-active-border:    #BBF7D0;  --status-active-dot:    #10B981;
-  --status-open-bg:      #F5F3FF;  --status-open-text:      #5B21B6;  --status-open-border:      #DDD6FE;  --status-open-dot:      #8B5CF6;
-  --status-closed-bg:    #F8FAFC;  --status-closed-text:    #475569;  --status-closed-border:    #E2E8F0;  --status-closed-dot:    #94A3B8;
-  --status-success-bg:   #F0FDF4;  --status-success-text:   #166534;  --status-success-border:   #BBF7D0;  --status-success-dot:   #10B981;
-  --status-warning-bg:   #FFFBEB;  --status-warning-text:   #B45309;  --status-warning-border:   #FDE68A;  --status-warning-dot:   #F59E0B;
-  --status-danger-bg:    #FFF1F2;  --status-danger-text:    #9F1239;  --status-danger-border:    #FECDD3;  --status-danger-dot:    #F43F5E;
-  --status-info-bg:      #EFF6FF;  --status-info-text:      #1E40AF;  --status-info-border:      #BFDBFE;  --status-info-dot:      #3B82F6;
-}
-
-/* ══════════════════════════════════════════════════════════════════════════════
-   4. LEGACY / BACKWARD-COMPAT ALIASES
-   ══════════════════════════════════════════════════════════════════════════════ */
-:root {
-  /* ovds-* → maps to brand/surface system */
-  --ovds-primary:          var(--aki-blue);
-  --ovds-primary-dark:     var(--aki-blue-dark);
-  --ovds-primary-light:    var(--aki-blue-light);
-  --ovds-sidebar:          #0B1221;
-  --ovds-background:       var(--sys-bg-base);
-  --ovds-background-dark:  var(--sys-bg-base);
-  --ovds-surface:          var(--sys-bg-surface);
-  --ovds-surface-dark:     var(--sys-bg-surface-elevated);
-  --ovds-border:           var(--sys-border-base);
-  --ovds-border-subtle:    var(--sys-border-surface);
-  --ovds-muted:            var(--sys-bg-surface-elevated);
-  --ovds-muted-dark:       var(--sys-bg-surface-elevated);
-  --ovds-text-main:        var(--sys-text-primary);
-  --ovds-text-muted:       var(--sys-text-secondary);
-  --ovds-text-subtle:      var(--sys-text-muted);
-  --ovds-text-primary:     var(--sys-text-primary);
-  --ovds-text-secondary:   var(--sys-text-secondary);
-  --ovds-success:          #10B981;
-  --ovds-warning:          #F59E0B;
-  --ovds-danger:           #F43F5E;
-  --ovds-info:             #3B82F6;
-  --ovds-accent:           var(--aki-blue);
-  --ovds-accent-400:       var(--aki-blue-light);
-  --ovds-accent-600:       var(--aki-blue-dark);
-  --ovds-bg-secondary:     var(--sys-bg-surface-elevated);
-  --ovds-ai-bg:            var(--aki-ai-bg);
-  --ovds-ai-text:          var(--aki-ai-text);
-  --ovds-validation-bg:    var(--aki-validation-bg);
-  --ovds-security-bg:      var(--aki-security-bg);
-  --ovds-audit-bg:         var(--aki-audit-bg);
-
-  /* financial-* → legacy bridge for BaseComponents / PageHeader / DashboardLayout */
-  --financial-accent:      var(--aki-blue);
-  --financial-bg:          var(--sys-bg-base);
-  --financial-sidebar:     #0B1221;
-  --financial-textMain:    var(--sys-text-primary);
-  --financial-textMuted:   var(--sys-text-muted);
-  --financial-textSubtle:  var(--sys-text-muted);
-  --financial-success:     #10B981;
-  --financial-warning:     #F59E0B;
-  --financial-danger:      #F43F5E;
-  --financial-info:        #3B82F6;
-
-  /* aka-* → alias bridge */
-  --aka-bg:                var(--sys-bg-base);
-  --aka-bg-alt:            var(--sys-bg-surface-elevated);
-  --aka-bg-dark:           var(--sys-bg-base);
-  --aka-surface:           var(--sys-bg-surface);
-  --aka-surface-alt:       var(--sys-bg-surface);
-  --aka-surface-dark:      var(--sys-bg-overlay);
-  --aka-surface-alt-dark:  var(--sys-bg-surface-elevated);
-  --aka-border:            var(--sys-border-base);
-  --aka-border-subtle:     var(--sys-border-surface);
-  --aka-border-dark:       var(--sys-border-base);
-  --aka-border-subtle-dark:var(--sys-border-surface);
-  --aka-text:              var(--sys-text-primary);
-  --aka-text-secondary:    var(--sys-text-secondary);
-  --aka-text-tertiary:     var(--sys-text-muted);
-  --aka-text-disabled:     #C1C7CE;
-  --aka-text-dark:         var(--sys-text-primary);
-  --aka-text-secondary-dark: var(--sys-text-secondary);
-  --aka-text-tertiary-dark:  var(--sys-text-muted);
-
-  /* aki-ai / validation / security / audit surfaces */
-  --aki-ai-bg:             #F5F3FF;
-  --aki-ai-text:           #5B21B6;
-  --aki-ai-border:         #DDD6FE;
-  --aki-ai-dot:            #8B5CF6;
-  --aki-ai-muted:          #EDE9FE;
-  --aki-validation-bg:     #FFFBEB;
-  --aki-validation-text:   #B45309;
-  --aki-validation-border: #FDE68A;
-  --aki-validation-dot:    #F59E0B;
-  --aki-security-bg:       #F0FDF4;
-  --aki-security-text:     #166534;
-  --aki-security-border:   #BBF7D0;
-  --aki-security-dot:      #10B981;
-  --aki-audit-bg:          #EFF6FF;
-  --aki-audit-text:        #1E40AF;
-  --aki-audit-border:      #BFDBFE;
-  --aki-audit-dot:         #3B82F6;
-
-  /* Auth-page legacy aliases (lv = login violet, lg = login green, etc.) */
-  --lv:                    var(--aki-indigo);
-  --lv-dim:                var(--aki-indigo-dim);
-  --lv-deep:               var(--aki-indigo-deep);
-  --lv-light:              var(--aki-indigo-light);
-  --lg:                    var(--aki-green);
-  --ink:                   var(--text);
-  --ink-2:                 var(--text-2);
-  --ink-3:                 var(--text-3);
-  --surface-2:             var(--surface-alt);
-  --green:                 var(--aki-green);
-  --green-lt:              var(--aki-green-light);
-  --green-bd:              var(--aki-green-border);
-  --amber:                 var(--aki-amber);
-  --amber-lt:              var(--aki-amber-light);
-  --err:                   var(--aki-err);
-  --err-lt:                 var(--aki-err-light);
-  --err-bd:                 var(--aki-err-border);
-  --rg:                    var(--aki-indigo);
-  --rg-h:                  var(--aki-indigo-deep);
-  --rg-lt:                 var(--aki-indigo-dim);
-  --rg-md:                 var(--aki-indigo-light);
-  --rg-dim:                var(--aki-indigo-dim);
-  --ink2:                  var(--text-2);
-  --ink4:                  var(--aki-text-muted);
-  --ink5:                  var(--aki-text-subtle);
-  --bd:                    var(--border);
-  --bd2:                   var(--border-alt);
-  --s0:                    var(--surface);
-  --s1:                    var(--surface-alt);
-  --s2:                    var(--aki-surface-2);
-  --s3:                    var(--aki-surface-3);
-  --violet:                var(--aki-indigo);
-  --violet-light:          var(--aki-indigo-light);
-  --violet-dim:            var(--aki-indigo-dim);
-  --violet-deep:           var(--aki-indigo-deep);
-}
-
-/* ══════════════════════════════════════════════════════════════════════════════
-   5. SURFACE / TEXT / SPACING / LAYOUT (backward-compat aliases)
-   ══════════════════════════════════════════════════════════════════════════════ */
-:root {
-  /* Spacing (maps to design-system compact tokens) */
-  --space-1:  4px;  --space-2:  8px;  --space-3:  12px;  --space-4:  16px;
-  --space-5:  20px; --space-6:  24px; --space-7:  28px;  --space-8:  32px;
-  --space-10: 40px; --space-12: 48px; --space-16: 64px;
-
-  /* Layout — aligned with design-system layout tokens */
-  --sidebar-w:          296px;
-  --sidebar-collapsed:  56px;
-  --header-h:           48px;
-  --footer-h:           36px;
-  --page-pad:           16px;
-  --page-max:           1440px;
-  --card-pad:           16px;
-  --card-radius:        8px;
-  --card-radius-sm:     4px;
-  --card-radius-lg:     12px;
-  --card-shadow:        none;
-  --input-h:            40px;
-  --grid-gap:           24px;
-  --grid-gap-sm:        12px;
-  --grid-gap-lg:        32px;
-
-  /* Typography */
-  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'IBM Plex Mono', 'JetBrains Mono', 'SF Mono', 'Roboto Mono', monospace;
-
-  /* Motion */
-  --ease: cubic-bezier(0.4, 0, 0.2, 1);
-  --dur-fast: 150ms;
-  --dur-base: 200ms;
-  --dur-slow: 300ms;
-
-  /* Chart colors */
-  --chart-1: #0056D2; --chart-2: #10B981; --chart-3: #F59E0B; --chart-4: #F43F5E;
-  --chart-5: #8B5CF6; --chart-6: #0EA5E9; --chart-7: #6366F1; --chart-8: #14B8A6;
-  --chart-9: #F97316; --chart-10: #EC4899;
-
-  /* Semantic surface (backward-compat: surface, border, bg-main, text-*) */
-  --surface:      #FFFFFF;
-  --surface-alt:  #FAFAFA;
-  --border:       #E2E8F0;
-  --border-alt:   #F1F5F9;
-  --bg-main:      #FFFFFF;
-  --text:         #111827;
-  --text-2:       #374151;
-  --text-3:       #6B7280;
-  --text-4:       #9CA3AF;
-  --text-5:       #C1C7CE;
-  --text-inv:     #FFFFFF;
-}
-
-.dark {
-  --surface:      #141414;
-  --surface-alt:  #1c1c1c;
-  --border:       #262626;
-  --border-alt:   #1f1f1f;
-  --bg-main:      #0A0A0A;
-  --text:         #F5F5F5;
-  --text-2:       #A3A3A3;
-  --text-3:       #737373;
-  --text-4:       #525252;
-  --text-5:       #525252;
-  --aki-blue-50:  #0a1e3d;
-  --aki-blue-100: #0d2a54;
-  --aki-ai-bg:    #1a1040;
-  --aki-ai-border:#3a2a70;
-  --aki-err-bg:   #200d0f;
-  --aki-err-border:#4a1520;
-  --aki-warning-bg:#1f1200;
-  --aki-warning-border:#4a3000;
-  --aki-success-bg:#0d2016;
-  --aki-success-border:#1a4d30;
-}
-
-/* ══════════════════════════════════════════════════════════════════════════════
-   6. SIDEBAR WIDTH CSS VARIABLE (consumed by fixed overlay panels)
-   ══════════════════════════════════════════════════════════════════════════════ */
-@media (max-width: 1023px) {
-  :root { --sidebar-w: 0px; }
-}
-:root[data-sidebar="collapsed"] {
-  --sidebar-w: 56px;
-}
-
-/* ══════════════════════════════════════════════════════════════════════════════
-   7. SIDEBAR SURFACE TOKENS (canonical dark nav background)
-   ══════════════════════════════════════════════════════════════════════════════ */
-:root {
-  --sidebar-bg:           #0B1221;
-  --sidebar-fg:           #CBD5E1;
-  --sidebar-fg-muted:     #64748B;
-  --sidebar-fg-hover:     #E2E8F0;
-  --sidebar-border:       rgba(30, 41, 59, 0.6);
-  --sidebar-active-bg:    rgba(0, 86, 210, 0.15);
-  --sidebar-active-fg:    #BFDBFE;
-  --sidebar-accent:       #3B82F6;
-  --sidebar-rail-bg:      #0B1221;
-  --sidebar-section-dot:  #3B82F6;
-  --sidebar-new-badge-bg: rgba(0, 86, 210, 0.18);
-  --sidebar-new-badge-fg: #93C5FD;
-  --sidebar-pin-idle:     #334155;
-  --sidebar-pin-hover:    #F59E0B;
+  --sys-state-alert-text:     #B45309;
+  --sys-state-alert-border:   #FDE68A;
+  --sys-state-critical:       #FEF2F2;
+  --sys-state-critical-text:  #991B1B;
+  --sys-state-critical-border:#FECACA;
+  --sys-state-info:           #EFF6FF;
+  --sys-state-info-text:      #1E40AF;
+  --sys-state-info-border:    #BFDBFE;
 }

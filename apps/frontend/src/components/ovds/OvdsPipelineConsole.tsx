@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+
+import api from '../../services/api';
 import {
   PipelineJourney,
   PipelineBadge,
 } from '../pipelineComponents';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
+
 
 export type PipelineStage = 'INGESTION' | 'COMPLIANCE' | 'RECONCILIATION' | 'AGGREGATION' | 'SIGNED';
 export type TransactionStatus = 'PENDING' | 'VALIDATED' | 'BLOCKED' | 'RECONCILED' | 'SIGNED' | 'REJECTED';
@@ -260,7 +262,7 @@ export function OvdsPipelineConsole() {
             <button
               type="submit"
               disabled={pipelineMutation.isPending}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+              className="px-4 py-2 bg-[var(--pro-azure)] text-white rounded-lg text-sm font-medium hover:bg-[var(--pro-azure-dark)] disabled:opacity-50"
             >
               {pipelineMutation.isPending ? 'Processing...' : 'Run Pipeline'}
             </button>
@@ -268,7 +270,7 @@ export function OvdsPipelineConsole() {
               type="button"
               onClick={handleDualPost}
               disabled={!result || dualLedgerMutation.isPending}
-              className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 disabled:opacity-50"
+              className="px-4 py-2 bg-[var(--pro-azure)] text-white rounded-lg text-sm font-medium hover:bg-[var(--pro-azure-dark)] disabled:opacity-50"
             >
               {dualLedgerMutation.isPending ? 'Posting...' : 'Post to Dual Ledger'}
             </button>

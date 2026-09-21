@@ -11,8 +11,9 @@
  *  - Connection hint: VITE_AUTH0_CONNECTION lets you pre-select an enterprise
  *    connection (e.g. "google-apps", "samlp-ovds") on the Universal Login page
  */
-import React, { useCallback } from 'react';
 import { Auth0Provider, type AppState } from '@auth0/auth0-react';
+import React, { useCallback } from 'react';
+
 import { Auth0LogoutHandler } from './auth0LogoutHandler';
 
 const AUTH0_ENABLED = import.meta.env.VITE_AUTH0_ENABLED === 'true';

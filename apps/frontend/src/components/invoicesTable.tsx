@@ -1,5 +1,3 @@
-import React, { useMemo, useCallback, memo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   Search, FileText, CheckCircle2, AlertTriangle, Send, Trash2,
   Printer, ChevronLeft, ChevronRight, ArrowDownToLine, RefreshCw, Repeat2,
@@ -7,13 +5,17 @@ import {
   Bell, Filter, X, Banknote, Tag, Zap, Archive, Flame, CircleDollarSign,
   TrendingDown, Sparkles, ShieldCheck, Keyboard,
 } from 'lucide-react';
+import React, { useMemo, useCallback, memo, useState } from 'react';
 import toast from 'react-hot-toast';
-import { confirm } from '../utils/confirm';
-import ColumnToggle from './columnToggle';
+import { useTranslation } from 'react-i18next';
+
 import type { Invoice } from '../pages/Invoices';
-import { fmtDate, fmtDateShort, fmtDecimal } from '../utils/fmt';
+import { confirm } from '../utils/confirm';
 import type { EimsFilter } from '../utils/eimsBadge';
-import { eimsBadgeLabel, eimsBadgeClass } from '../utils/eimsBadge';
+import { eimsBadgeLabel } from '../utils/eimsBadge';
+import { fmtDate, fmtDateShort, fmtDecimal } from '../utils/fmt';
+
+import ColumnToggle from './columnToggle';
 
 // -- Types ---------------------------------------------------------------------
 type StatusTab = 'ALL' | 'DRAFT' | 'PENDING' | 'PAID' | 'OVERDUE' | 'CANCELLED';
@@ -39,7 +41,7 @@ const INVOICE_COLUMNS = [
 export const DEFAULT_INVOICE_COLUMN_KEYS = INVOICE_COLUMNS.map((c) => c.key);
 
 const STATUS_META: Record<string, { badge: string; dot: string; label: string }> = {
-  PAID:      { badge: 'solid-success', dot: 'bg-emerald-500', label: 'Paid' },
+  PAID:      { badge: 'solid-success', dot: 'bg-[var(--pro-azure-50)]0', label: 'Paid' },
   PENDING:   { badge: 'solid-warning', dot: 'bg-amber-500',   label: 'Pending' },
   OVERDUE:   { badge: 'solid-danger',  dot: 'bg-rose-500',     label: 'Overdue' },
   DRAFT:     { badge: 'solid-default', dot: 'bg-slate-400',   label: 'Draft' },

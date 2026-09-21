@@ -1,14 +1,14 @@
 /**
- * @ovds/modules-banking
+ * @ovds/modules/banking
  *
  * Canonical DDD module: "Banking, Transactions & Reconciliation".
  *
  * Public surface:
- *   import { ... } from '@ovds/modules-banking';        // domain types & logic
- *   import { web } from '@ovds/modules-banking';        // namespaced UI slice
- *   import ... from '@ovds/modules-banking/web';         // UI subpath
- *   import ... from '@ovds/modules-banking/domain';      // types subpath
- *   import ... from '@ovds/modules-banking/dto';         // contracts subpath
+ *   import { ... } from '@ovds/modules/banking';        // domain types & logic
+ *   import { web } from '@ovds/modules/banking';        // namespaced UI slice
+ *   import ... from '@ovds/modules/banking/web';         // UI subpath
+ *   import ... from '@ovds/modules/banking/domain';      // types subpath
+ *   import ... from '@ovds/modules/banking/dto';         // contracts subpath
  */
 
 // Domain types & logic (the bounded context's single source of truth).

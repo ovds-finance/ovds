@@ -2,10 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr, Btn } from '@ovds/ui';
 import { Download, RefreshCw, Calendar, BarChart3, FileText, Loader } from 'lucide-react';
 import toast from 'react-hot-toast';
-// @ts-ignore app-level dependency
-import { useBusiness } from '../../../context/businessContext';
-// @ts-ignore app-level dependency
-import { downloadBlob } from '../../../utils/download';
 import type { ReportTemplate, ReportConfig, AccountingBasis, ExportFormat, ReportPeriod } from '../types/reporting.types';
 import { fetchReport, downloadReportData, exportReportBlob } from '../services/reportsService';
 import { normalizeReport, fmtCell } from '../lib/normalizers';
@@ -16,10 +12,11 @@ interface Props {
   config: ReportConfig;
   onBack: () => void;
   onSchedule: () => void;
+  companyId?: string | null;
+  onDownloadBlob?: (blob: Blob, filename: string) => void;
 }
 
-export default function ReportViewer({ template, config, onBack, onSchedule }: Props) {
-  const { selectedCompanyId: companyId } = useBusiness();
+export default function ReportViewer({ template, config, onBack, onSchedule, companyId, onDownloadBlob }: Props) {
   const [data, setData] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
   const [period, setPeriod] = useState<ReportPeriod>(config.period);
@@ -66,7 +63,9 @@ export default function ReportViewer({ template, config, onBack, onSchedule }: P
     }
     try {
       const blob = await exportReportBlob(template.id, { ...config, period, basis }, companyId ?? '', format);
-      downloadBlob(blob, `${baseName}-${stamp}.pdf`);
+      if (onDownloadBlob) {
+        onDownloadBlob(blob, `${baseName}-${stamp}.pdf`);
+      }
       toast.success('PDF exported');
     } catch {
       toast.error('PDF export is not yet available on this endpoint.');
@@ -78,7 +77,7 @@ export default function ReportViewer({ template, config, onBack, onSchedule }: P
       title={template.title}
       subtitle={template.description}
       icon={<BarChart3 size={16} className="text-white" />}
-      iconBg="bg-indigo-600"
+      iconBg="bg-[var(--pro-azure)]"
       crumbs={[
         { label: 'Reports', to: '/reports-dashboard' },
         { label: template.category === 'standard' ? 'Standard' : 'Modular' },

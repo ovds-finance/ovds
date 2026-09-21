@@ -1,17 +1,19 @@
-import React, { useState, useMemo } from 'react';
 import {
   useEimsBulkJobs,
   useEimsRegistrations,
   useEimsBulkRegister,
 } from '@ovds/features/eims';
-import toast from 'react-hot-toast';
-import { useBusiness } from '../../context/businessContext';
 import { Layers, Upload, XCircle, RefreshCw } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
+
+import { useBusiness } from '../../context/businessContext';
+
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING: 'text-amber-600 bg-amber-50',
-  PROCESSING: 'text-blue-600 bg-blue-50',
-  COMPLETED: 'text-emerald-600 bg-emerald-50',
+  PROCESSING: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
+  COMPLETED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   FAILED: 'text-rose-600 bg-rose-50',
   CANCELLED: 'text-slate-600 bg-slate-100',
 };
@@ -184,7 +186,7 @@ const BulkOperationsPage: React.FC = () => {
                 <tr key={job.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                   <td className="px-4 py-3">{job.jobType?.replace('_', ' ') ?? 'Bulk Job'}</td>
                   <td className="px-4 py-3">{job.requestCount}</td>
-                  <td className="px-4 py-3 text-emerald-600">{job.successCount ?? 0}</td>
+                  <td className="px-4 py-3 text-[var(--pro-azure)]">{job.successCount ?? 0}</td>
                   <td className="px-4 py-3 text-rose-600">{job.failureCount ?? 0}</td>
                   <td className="px-4 py-3"><Badge status={job.status} /></td>
                   <td className="px-4 py-3">{new Date(job.createdAt).toLocaleString()}</td>

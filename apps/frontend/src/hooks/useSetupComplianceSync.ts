@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+
 import { setupApi, type CompanySetupProgress } from '../services/setupApi';
 
 /** Auto-mark setup wizard steps complete when compliance readiness is met */

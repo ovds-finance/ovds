@@ -1,6 +1,6 @@
-﻿/**
+/**
  * NotificationBanner — ovds-style contextual banners
- * White background · Emerald/Amber/Rose accents
+ * White background · green/Amber/Rose accents
  * Used for: tax deadlines, IFRS alerts, compliance warnings, system notices
  */
 import React, { useState } from 'react';
@@ -26,8 +26,8 @@ const VARIANT_CONFIG: Record<BannerVariant, {
   bg: string; border: string; icon: React.ReactNode; titleCls: string; msgCls: string;
 }> = {
   success: {
-    bg: 'bg-emerald-200/10', border: 'border-emerald-200/20',
-    icon: <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />,
+    bg: 'bg-[var(--pro-azure-200)]/10', border: 'border-[var(--pro-azure-100)]/20',
+    icon: <CheckCircle2 size={14} className="text-[var(--pro-azure-dark)] shrink-0" />,
     titleCls: 'text-slate-800', msgCls: 'text-slate-800/80',
   },
   warning: {
@@ -46,8 +46,8 @@ const VARIANT_CONFIG: Record<BannerVariant, {
     titleCls: 'text-sky-600', msgCls: 'text-sky-500',
   },
   tax: {
-    bg: 'bg-emerald-200/10', border: 'border-emerald-200/20',
-    icon: <ShieldCheck size={14} className="text-emerald-600 shrink-0" />,
+    bg: 'bg-[var(--pro-azure-200)]/10', border: 'border-[var(--pro-azure-100)]/20',
+    icon: <ShieldCheck size={14} className="text-[var(--pro-azure-dark)] shrink-0" />,
     titleCls: 'text-slate-800', msgCls: 'text-slate-800/80',
   },
   ifrs: {
@@ -98,17 +98,18 @@ export const Banner: React.FC<BannerProps> = ({
 // -- Sticker / badge chip ------------------------------------------------------
 export const Sticker: React.FC<{
   label: string;
-  variant?: 'emerald' | 'blue' | 'amber' | 'violet' | 'rose' | 'slate';
+  variant?: 'green' | 'indigo' | 'blue' | 'amber' | 'violet' | 'rose' | 'slate';
   icon?: React.ReactNode;
   pulse?: boolean;
-}> = ({ label, variant = 'emerald', icon, pulse }) => {
+}> = ({ label, variant = 'green', icon, pulse }) => {
   const cls: Record<string, string> = {
-    emerald: 'bg-emerald-200/10 text-slate-800 border-emerald-200/20',
+    green:   'bg-[var(--pro-azure-200)]/10 text-slate-800 border-[var(--pro-azure-100)]/20',
+    indigo:  'bg-[var(--pro-azure-200)]/10 text-slate-800 border-[var(--pro-azure-100)]/20',
     blue:    'bg-sky-50 text-sky-600 border-sky-200',
     amber:   'bg-amber-50 text-amber-600 border-amber-200',
     violet:  'bg-violet-50 text-violet-700 border-violet-200',
     rose:    'bg-rose-50 text-rose-600 border-rose-200',
-    slate:   'bg-white text-emerald-600 border-emerald-200/20',
+    slate:   'bg-white text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]/20',
   };
   return (
     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${cls[variant]} ${pulse ? 'animate-pulse' : ''}`}>
@@ -166,7 +167,7 @@ export const InlineAlert: React.FC<{
   className?: string;
 }> = ({ type, message, className }) => {
   const cfg = {
-    success: { cls: 'bg-emerald-200/10 text-slate-800 border-emerald-200/20', icon: <CheckCircle2 size={12} /> },
+    success: { cls: 'bg-[var(--pro-azure-200)]/10 text-slate-800 border-[var(--pro-azure-100)]/20', icon: <CheckCircle2 size={12} /> },
     error:   { cls: 'bg-rose-50 text-rose-600 border-rose-200',          icon: <XCircle size={12} /> },
     warning: { cls: 'bg-amber-50 text-amber-600 border-amber-200',       icon: <AlertTriangle size={12} /> },
     info:    { cls: 'bg-sky-50 text-sky-600 border-sky-200',             icon: <Info size={12} /> },

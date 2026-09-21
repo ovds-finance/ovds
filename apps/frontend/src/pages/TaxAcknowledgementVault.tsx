@@ -11,22 +11,23 @@
  *
  * Ovds-inspired UI: white cards · teal accents · status pills
  */
-import React, { useState, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   ShieldCheck, Download, RefreshCw, Search, CheckCircle2,
   XCircle, Clock, AlertTriangle, FileText, ExternalLink,
   Copy, Filter, ChevronDown, Archive, Send, MessageSquare,
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import api from '../services/api';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { fmtDate, fmtCurrency } from '../utils/fmt';
+
 import {
   AppPage, AppTable, AppTh, AppTd, AppTr,
   EmptyState, Pagination, SearchBar,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { fmtDate, fmtCurrency } from '../utils/fmt';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -49,7 +50,7 @@ interface SubmissionRecord {
 // ── Status meta ────────────────────────────────────────────────────────────
 
 const STATUS_META: Record<string, { label: string; dot: string; bg: string; text: string; icon: React.ReactNode }> = {
-  ACCEPTED:  { label: 'Accepted',  dot: 'bg-emerald-400', bg: 'bg-emerald-50', text: 'text-emerald-700', icon: <CheckCircle2 size={12} /> },
+  ACCEPTED:  { label: 'Accepted',  dot: 'bg-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)]', text: 'text-[var(--pro-azure-dark)]', icon: <CheckCircle2 size={12} /> },
   SUBMITTED: { label: 'Submitted', dot: 'bg-sky-400',     bg: 'bg-sky-50',     text: 'text-sky-700',     icon: <Send size={12} /> },
   PENDING:   { label: 'Pending',   dot: 'bg-amber-400',   bg: 'bg-amber-50',   text: 'text-amber-700',   icon: <Clock size={12} /> },
   REJECTED:  { label: 'Rejected',  dot: 'bg-rose-400',    bg: 'bg-rose-50',    text: 'text-rose-700',    icon: <XCircle size={12} /> },
@@ -122,6 +123,7 @@ const TaxAcknowledgementVault: React.FC = () => {
       }).then((r: any) => r.data?.data ?? r.data),
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const records: SubmissionRecord[] = Array.isArray(data?.data) ? data.data
     : Array.isArray(data) ? data : [];
   const total: number  = data?.total ?? records.length;
@@ -225,7 +227,7 @@ const TaxAcknowledgementVault: React.FC = () => {
         <KpiCard label="Accepted"       value={kpis.accepted}
           sub="by MoR portal"
           icon={<CheckCircle2 size={18} />}
-          accent="bg-emerald-50" textColor="text-emerald-600" />
+          accent="bg-[var(--pro-azure-50)]" textColor="text-[var(--pro-azure)]" />
         <KpiCard label="Pending / Draft" value={kpis.pending}
           icon={<Clock size={18} />}
           accent="bg-amber-50" textColor="text-amber-600" />
@@ -384,7 +386,7 @@ const TaxAcknowledgementVault: React.FC = () => {
                 {/* Accepted at */}
                 <AppTd>
                   {record.acceptedAt ? (
-                    <span className="text-xs text-emerald-600 font-semibold">
+                    <span className="text-xs text-[var(--pro-azure)] font-semibold">
                       {fmtDate(record.acceptedAt)}
                     </span>
                   ) : record.rejectedAt ? (
@@ -399,7 +401,7 @@ const TaxAcknowledgementVault: React.FC = () => {
                 {/* Mode */}
                 <AppTd>
                   <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
-                    record.mode === 'live'    ? 'bg-emerald-50 text-emerald-600' :
+                    record.mode === 'live'    ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' :
                     record.mode === 'sandbox' ? 'bg-amber-50 text-amber-600'    :
                                                 'bg-slate-100 text-slate-500'
                   }`}>
@@ -444,7 +446,7 @@ const TaxAcknowledgementVault: React.FC = () => {
 
 const MOR_SMS_EVENT_META: Record<string, { label: string; color: string }> = {
   FILING_SUBMITTED: { label: 'Filing Received',  color: 'bg-sky-500' },
-  ACK_RECEIVED:     { label: 'Acknowledgement',  color: 'bg-emerald-500' },
+  ACK_RECEIVED:     { label: 'Acknowledgement',  color: 'bg-[var(--pro-azure-50)]0' },
   PAYMENT_DUE:      { label: 'Payment Reminder', color: 'bg-amber-500' },
   OVERDUE:          { label: 'Overdue Notice',   color: 'bg-rose-500' },
   PENALTY:          { label: 'Penalty Assessed', color: 'bg-rose-600' },

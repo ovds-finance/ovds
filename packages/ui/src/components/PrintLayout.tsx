@@ -230,7 +230,7 @@ export const PrintLayout: React.FC<PrintLayoutProps> = ({
               <p className="text-[11px] text-slate-500 mt-0.5 print:text-[10px]">{subtitle}</p>
             )}
             {docNumber && (
-              <p className="text-[14px] font-bold text-emerald-600 mt-1 print:text-[12px]">{docNumber}</p>
+              <p className="text-[14px] font-bold text-[var(--pro-azure-dark)] mt-1 print:text-[12px]">{docNumber}</p>
             )}
             {docDate && (
               <p className="text-[11px] text-slate-500 print:text-[10px]">
@@ -264,9 +264,9 @@ export const PrintLayout: React.FC<PrintLayoutProps> = ({
             </p>
           )}
           {showErcaStamp && (
-            <div className="shrink-0 border-2 border-emerald-500 rounded px-3 py-1.5 text-center">
-              <p className="text-[9px] font-bold text-emerald-700 uppercase tracking-wider">ERCA Compliant</p>
-              <p className="text-[8px] text-emerald-600">e-Tax Ready</p>
+            <div className="shrink-0 border-2 border-[var(--pro-azure)] rounded px-3 py-1.5 text-center">
+              <p className="text-[9px] font-bold text-[var(--pro-azure-dark)] uppercase tracking-wider">ERCA Compliant</p>
+              <p className="text-[8px] text-[var(--pro-azure-dark)]">e-Tax Ready</p>
             </div>
           )}
         </div>

@@ -1,25 +1,26 @@
 /**
  * Vendors — ovds-style vendor/supplier management
  * Inherits: AppPage · AppKpi · AppTable · useApiCrud
- * White background · Emerald text · White-blue icons
+ * White background · indigo text · White-blue icons
  * Ethiopian WHT · TIN validation · ERCA compliance
  */
 import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import { fmtETB, calcWHT, getWhtLabel } from '../utils/ethiopianTax';
-import type { WhtType } from '../utils/ethiopianTax';
+
+import { OvdsEmptyState } from '../components/ovds';
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select, Textarea,
   SearchBar, EthTaxBadge, Amount, Pagination,
   Icon,
 } from '../components/ui';
-import { OvdsEmptyState } from '../components/ovds';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
+import { fmtETB, calcWHT, getWhtLabel } from '../utils/ethiopianTax';
+import type { WhtType } from '../utils/ethiopianTax';
 
 // -- Types ---------------------------------------------------------------------
 interface Vendor {
@@ -76,7 +77,7 @@ const VendorForm: React.FC<{
             type="button"
             onClick={() => setFormTab(t)}
             className={`px-3 py-2 text-[10px] font-bold uppercase tracking-wider border-b-2 transition-all ${
-              formTab === t ? 'border-emerald-600 text-emerald-700' : 'border-transparent text-slate-400 hover:text-slate-600'
+              formTab === t ? 'border-[var(--pro-azure)] text-[var(--pro-azure-dark)]' : 'border-transparent text-slate-400 hover:text-slate-600'
             }`}
           >
             {t}
@@ -116,7 +117,7 @@ const VendorForm: React.FC<{
               id="isActive"
               checked={data.isActive !== false}
               onChange={e => set('isActive', e.target.checked)}
-              className="accent-emerald-600"
+              className="accent-green-600"
             />
             <label htmlFor="isActive" className="text-[12px] font-semibold text-slate-700 cursor-pointer">Active vendor</label>
           </div>
@@ -229,7 +230,7 @@ const Vendors: React.FC = () => {
 
   // -- KPI cells -------------------------------------------------------------
   const kpiCells = useMemo(() => [
-    { label: 'Total',       value: rows.length,                                                    color: 'emerald' as const, tooltip: 'All registered vendors and suppliers' },
+    { label: 'Total',       value: rows.length,                                                    color: 'green' as const, tooltip: 'All registered vendors and suppliers' },
     { label: 'Active',      value: rows.filter(v => v.isActive !== false).length,                  color: 'sky' as const,     tooltip: 'Vendors currently active and available for billing' },
     { label: 'WHT Vendors', value: rows.filter(v => v.whtApplicable).length,                       color: 'amber' as const,   tooltip: 'Vendors subject to 3% Withholding Tax (Proclamation 1395/2025)' },
     { label: 'Net Payables',value: fmtETB(rows.reduce((s, v) => s + (v.outstandingBalance ?? 0), 0)), color: 'violet' as const, tooltip: 'Total outstanding balance owed to all vendors' },
@@ -379,7 +380,7 @@ const Vendors: React.FC = () => {
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {can('bills:write') && (
                     <>
-                      <button onClick={() => openEdit(v)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Edit">
+                      <button onClick={() => openEdit(v)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Edit">
                         <Icon name="EDIT" size={11} />
                       </button>
                       <button onClick={() => handleDelete(v)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Delete">

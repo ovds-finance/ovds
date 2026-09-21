@@ -262,7 +262,7 @@ export interface TaxRateConfig {
   updatedAt?: Date | string;
 }
 
-/** @deprecated Use TaxRateConfig */
+/** @deprecated Use TaxRateConfig — this alias will be removed in a future release. */
 export type TaxType = TaxRateConfig;
 
 export interface IFRSCompliance {

@@ -18,8 +18,9 @@
  *     )}
  *   </PermissionTooltip>
  */
-import React, { useState, useRef } from 'react';
 import { ShieldOff, Lock } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+
 import { usePermissionGuard, type PermissionGuardOptions } from '../hooks/usePermissionGuard';
 import type { Permission } from '../rbac/rbac';
 

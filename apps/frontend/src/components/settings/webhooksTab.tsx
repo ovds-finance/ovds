@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
 import { CheckCircle2, Info, Plus, RefreshCw, Send, Trash2, Webhook, XCircle, Copy, Shield, AlertTriangle, Clock, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+
 import api from '../../services/api';
 import { confirm } from '../../utils/confirm';
 
@@ -127,29 +128,29 @@ const WebhooksTab: React.FC<Props> = ({ canWrite }) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start gap-3 p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl">
-        <Info size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+      <div className="flex items-start gap-3 p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl">
+        <Info size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5" />
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 mb-0.5">Real-time event notifications</p>
-          <p className="text-xs text-emerald-600 dark:text-emerald-400">
+          <p className="text-xs font-semibold text-[var(--pro-azure-dark)] dark:text-green-300 mb-0.5">Real-time event notifications</p>
+          <p className="text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
             OVDS sends HTTP POST requests to your endpoints when events occur. Payloads are signed with
             <strong> HMAC-SHA256</strong> using your secret — always verify the signature before processing.
           </p>
         </div>
         <a href="https://ovds.com.et/docs/webhooks" target="_blank" rel="noopener noreferrer"
-          className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline shrink-0">
+          className="flex items-center gap-1 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline shrink-0">
           Docs <ExternalLink size={9} />
         </a>
       </div>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-1 h-4 rounded-full bg-emerald-500 shrink-0" />
+          <div className="w-1 h-4 rounded-full bg-[var(--pro-azure-50)]0 shrink-0" />
           <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{hooks.length} Webhook{hooks.length !== 1 ? 's' : ''}</p>
         </div>
         {canWrite && (
           <button onClick={() => setShowForm(v => !v)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-[10px] font-semibold hover:bg-emerald-600 transition-colors">
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-lg text-[10px] font-semibold hover:bg-[var(--pro-azure-dark)] transition-colors">
             <Plus size={11} /> Add Webhook
           </button>
         )}
@@ -158,7 +159,7 @@ const WebhooksTab: React.FC<Props> = ({ canWrite }) => {
       {showForm && (
         <div className="p-5 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-4">
           <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-2.5">
-            <span className="w-1 h-4 rounded-full bg-emerald-500 shrink-0 inline-block" />New Webhook
+            <span className="w-1 h-4 rounded-full bg-[var(--pro-azure-50)]0 shrink-0 inline-block" />New Webhook
           </p>
 
           <div className="ovds-grid-layout cols-2">
@@ -194,7 +195,7 @@ const WebhooksTab: React.FC<Props> = ({ canWrite }) => {
                 </button>
                 <button type="button"
                   onClick={() => { const s = crypto.randomUUID().replace(/-/g, ''); setForm(f => ({ ...f, secret: s })); setShowSecret(true); }}
-                  className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline px-1.5 py-1 rounded transition-colors">
+                  className="text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline px-1.5 py-1 rounded transition-colors">
                   Generate
                 </button>
               </div>
@@ -209,7 +210,7 @@ const WebhooksTab: React.FC<Props> = ({ canWrite }) => {
               <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Events <span className="text-rose-400">*</span></label>
               <button type="button"
                 onClick={() => setForm(f => ({ ...f, events: f.events.length === WEBHOOK_EVENTS.length ? [] : WEBHOOK_EVENTS.map(e => e.id) }))}
-                className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                className="text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
                 {form.events.length === WEBHOOK_EVENTS.length ? 'Deselect all' : 'Select all'}
               </button>
             </div>
@@ -222,14 +223,14 @@ const WebhooksTab: React.FC<Props> = ({ canWrite }) => {
                     <div className="flex items-center justify-between">
                       <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{group}</p>
                       <button type="button" onClick={() => toggleGroupEvents(group)}
-                        className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                        className="text-[9px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
                         {allGroupSelected ? 'None' : 'All'}
                       </button>
                     </div>
                     {events.map(e => (
                       <label key={e.id} className="flex items-start gap-2 cursor-pointer group">
                         <div onClick={() => toggleEvent(e.id)}
-                          className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all shrink-0 mt-0.5 ${form.events.includes(e.id) ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300 dark:border-slate-600 group-hover:border-emerald-400'}`}>
+                          className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all shrink-0 mt-0.5 ${form.events.includes(e.id) ? 'bg-[var(--pro-azure-50)]0 border-[var(--pro-azure)]' : 'border-slate-300 dark:border-slate-600 group-hover:border-[var(--pro-azure)]'}`}>
                           {form.events.includes(e.id) && <CheckCircle2 size={10} className="text-white" />}
                         </div>
                         <div>
@@ -246,7 +247,7 @@ const WebhooksTab: React.FC<Props> = ({ canWrite }) => {
 
           <div className="flex gap-2 pt-2">
             <button onClick={handleCreate} disabled={saving}
-              className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 text-white rounded-lg text-xs font-medium hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30 disabled:opacity-50">
+              className="flex items-center gap-2 px-5 py-2.5 bg-[var(--pro-azure)] text-white rounded-lg text-xs font-medium hover:bg-[var(--pro-azure-dark)] transition-colors shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30 disabled:opacity-50">
               {saving ? <RefreshCw size={13} className="animate-spin" /> : <Webhook size={13} />}
               {saving ? 'Creating...' : 'Create Webhook'}
             </button>
@@ -264,27 +265,27 @@ const WebhooksTab: React.FC<Props> = ({ canWrite }) => {
         <div className="ovds-empty">
           <Webhook size={32} strokeWidth={1.5} className="mx-auto mb-3 opacity-30" />
           <p className="text-sm">No webhooks configured</p>
-          {canWrite && <button onClick={() => setShowForm(true)} className="mt-2 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">Add your first webhook</button>}
+          {canWrite && <button onClick={() => setShowForm(true)} className="mt-2 text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold hover:underline">Add your first webhook</button>}
         </div>
       ) : (
         <div className="space-y-3">
           {hooks.map(h => (
             <div key={h.id} className={`rounded-xl border transition-all ${h.isActive ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700' : 'bg-white dark:bg-slate-800/50 border-slate-100 dark:border-slate-800 opacity-70'}`}>
               <div className="flex items-start gap-3 p-4">
-                <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${h.isActive ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${h.isActive ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-300 dark:bg-slate-600'}`} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">{h.url}</p>
                       {h.description && <p className="ovds-caption mt-0.5">{h.description}</p>}
                     </div>
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${h.isActive ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${h.isActive ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)]' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
                       {h.isActive ? 'Active' : 'Disabled'}
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {h.events?.slice(0, 5).map(e => (
-                      <span key={e} className="text-[9px] font-semibold px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-full border border-emerald-100 dark:border-emerald-900">{e}</span>
+                      <span key={e} className="text-[9px] font-semibold px-1.5 py-0.5 bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] rounded-full border border-[var(--pro-azure-100)] dark:border-green-900">{e}</span>
                     ))}
                     {(h.events?.length ?? 0) > 5 && (
                       <span className="text-[9px] font-semibold px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded-full">+{h.events.length - 5} more</span>
@@ -295,7 +296,7 @@ const WebhooksTab: React.FC<Props> = ({ canWrite }) => {
                       <p className="text-[9px] text-slate-400 flex items-center gap-1">
                         <Clock size={9} /> Last delivery: {new Date(h.lastDeliveryAt).toLocaleString()}
                         {h.lastStatus && (
-                          <span className={`ml-1 font-bold px-1.5 py-0.5 rounded ${h.lastStatus >= 200 && h.lastStatus < 300 ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-rose-50 text-rose-600 dark:bg-rose-950/30 dark:text-rose-400'}`}>
+                          <span className={`ml-1 font-bold px-1.5 py-0.5 rounded ${h.lastStatus >= 200 && h.lastStatus < 300 ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)]' : 'bg-rose-50 text-rose-600 dark:bg-rose-950/30 dark:text-rose-400'}`}>
                             {h.lastStatus}
                           </span>
                         )}
@@ -319,7 +320,7 @@ const WebhooksTab: React.FC<Props> = ({ canWrite }) => {
                     {testing === h.id ? <RefreshCw size={10} className="animate-spin" /> : <Send size={10} />} Send test
                   </button>
                   <button onClick={() => handleToggle(h.id, h.isActive)}
-                    className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-colors ${h.isActive ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 hover:bg-amber-100' : 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100'}`}>
+                    className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-colors ${h.isActive ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 hover:bg-amber-100' : 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] hover:bg-[var(--pro-azure-100)]'}`}>
                     {h.isActive ? 'Disable' : 'Enable'}
                   </button>
                   <button onClick={() => handleDelete(h.id)}
@@ -344,11 +345,11 @@ const WebhooksTab: React.FC<Props> = ({ canWrite }) => {
                 navigator.clipboard.writeText(payload).then(() => { setCopiedCode(true); setTimeout(() => setCopiedCode(false), 2000); });
               }}
               className="flex items-center gap-1 text-[10px] font-bold text-slate-500 hover:text-white transition-colors">
-              {copiedCode ? <CheckCircle2 size={10} className="text-emerald-400" /> : <Copy size={10} />}
+              {copiedCode ? <CheckCircle2 size={10} className="text-[var(--pro-azure-light)]" /> : <Copy size={10} />}
               {copiedCode ? 'Copied!' : 'Copy'}
             </button>
           </div>
-          <pre className="p-4 text-[11px] font-mono text-emerald-400 overflow-x-auto leading-relaxed">{JSON.stringify({
+          <pre className="p-4 text-[11px] font-mono text-[var(--pro-azure-light)] overflow-x-auto leading-relaxed">{JSON.stringify({
             event: 'invoice.paid',
             timestamp: new Date().toISOString(),
             companyId: 'comp_abc123',
@@ -360,7 +361,7 @@ const WebhooksTab: React.FC<Props> = ({ canWrite }) => {
           <div className="px-4 py-2.5 bg-[#161b22] border-b border-slate-700">
             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Signature Verification — Node.js</p>
           </div>
-          <pre className="p-4 text-[11px] font-mono text-emerald-300 overflow-x-auto leading-relaxed">{`const crypto = require('crypto');
+          <pre className="p-4 text-[11px] font-mono text-green-300 overflow-x-auto leading-relaxed">{`const crypto = require('crypto');
 
 function verifyWebhook(rawBody, signature, secret) {
   const expected = crypto

@@ -1,19 +1,20 @@
-/**
+﻿/**
  * IFRS Compliance Matrix
  * Maps Ethiopian tax proclamations to IFRS standards
  * Provides a visual compliance lifecycle from purchase to audit
  * Enhanced with IASB 2024–2027 update banner and role-based access.
  */
-import React, { useState } from 'react';
 import {
   CheckCircle2, AlertCircle, Clock, ChevronDown, ChevronUp,
   BookOpen, Shield, Scale, Package,
   FileText, Globe, BarChart3, ArrowRight,
   Info, Zap, Lock, Sparkles,
 } from 'lucide-react';
-import IASBUpdateBanner from '../iasbUpdateBanner';
-import { useIFRSAccess } from '../../hooks/useIfrsAccess';
+import React, { useState } from 'react';
+
 import { useBusiness } from '../../context/businessContext';
+import { useIFRSAccess } from '../../hooks/useIfrsAccess';
+import IASBUpdateBanner from '../iasbUpdateBanner';
 
 interface ProclamationMapping {
   proclamation: string;
@@ -281,9 +282,9 @@ const LIFECYCLE_STEPS: LifecycleStep[] = [
     title: 'Journal Entry',
     subtitle: 'IAS 1 · Double-entry',
     icon: <BookOpen size={16} />,
-    color: 'text-emerald-600 dark:text-emerald-400',
-    bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-    border: 'border-emerald-200 dark:border-emerald-800',
+    color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+    bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
+    border: 'border-[var(--pro-azure-100)] dark:border-green-800',
     ifrsRef: 'IAS 1.46 — Accrual basis of accounting',
     proclamation: 'AABE IFRS Adoption Directive',
     actions: ['Auto-post on invoice/bill creation', 'Balanced debits = credits (tolerance < 0.01 ETB)', 'Period locking prevents backdating', 'Recurring templates for depreciation/rent'],
@@ -320,9 +321,9 @@ const LIFECYCLE_STEPS: LifecycleStep[] = [
     title: 'Audit & Reporting',
     subtitle: 'IAS 1 · IFRS 7 · AABE',
     icon: <BarChart3 size={16} />,
-    color: 'text-emerald-700',
-    bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-    border: 'border-emerald-200 dark:border-emerald-800',
+    color: 'text-[var(--pro-azure-dark)]',
+    bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
+    border: 'border-[var(--pro-azure-100)] dark:border-green-800',
     ifrsRef: 'IAS 1.10 — Complete set of financial statements',
     proclamation: 'AABE IFRS Adoption Directive',
     actions: ['Balance Sheet (IAS 1.54)', 'P&L / OCI (IAS 1.81A)', 'Cash Flow Statement (IAS 7)', 'Notes to Financials (IAS 1.112-138)'],
@@ -348,7 +349,7 @@ const LIFECYCLE_STEPS: LifecycleStep[] = [
 ];
 
 const statusConfig = {
-  compliant: { icon: <CheckCircle2 size={13} />, label: 'Compliant', cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-600 dark:text-emerald-300' },
+  compliant: { icon: <CheckCircle2 size={13} />, label: 'Compliant', cls: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300' },
   partial:   { icon: <Clock size={13} />,        label: 'Partial',   cls: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300' },
   pending:   { icon: <AlertCircle size={13} />,  label: 'Pending',   cls: 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300' },
 };
@@ -386,15 +387,15 @@ const IFRSComplianceMatrix: React.FC = () => {
       <IASBUpdateBanner businessType={businessType} />
 
       {/* Header */}
-      <div className="bg-emerald-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 rounded-xl p-5 text-white relative overflow-hidden">
+      <div className="bg-[var(--pro-azure-50)] dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 rounded-xl p-5 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500 rounded-full translate-y-1/2 -translate-x-1/2" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--pro-azure-50)]0 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-[var(--pro-azure-50)]0 rounded-full translate-y-1/2 -translate-x-1/2" />
         </div>
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-xl flex items-center justify-center shrink-0">
-              <Globe size={22} className="text-emerald-600 dark:text-emerald-400" />
+            <div className="w-12 h-12 bg-[var(--pro-azure-100)] dark:bg-green-900/30 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl flex items-center justify-center shrink-0">
+              <Globe size={22} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
             </div>
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-white/40 mb-0.5">IFRS + Ethiopian Law</p>
@@ -404,20 +405,20 @@ const IFRSComplianceMatrix: React.FC = () => {
           </div>
           <div className="flex items-center gap-3">
             <div className="text-center">
-              <p className="text-2xl font-semibold text-emerald-400">{compliantCount}</p>
+              <p className="text-2xl font-semibold text-[var(--pro-azure-light)]">{compliantCount}</p>
               <p className="text-[9px] text-slate-500 dark:text-white/40 uppercase tracking-wider">Compliant</p>
             </div>
-            <div className="w-px h-8 bg-emerald-100 dark:bg-white/10" />
+            <div className="w-px h-8 bg-[var(--pro-azure-100)] dark:bg-white/10" />
             <div className="text-center">
               <p className="text-2xl font-semibold text-amber-400">{partialCount}</p>
               <p className="text-[9px] text-slate-500 dark:text-white/40 uppercase tracking-wider">Partial</p>
             </div>
-            <div className="w-px h-8 bg-emerald-100 dark:bg-white/10" />
+            <div className="w-px h-8 bg-[var(--pro-azure-100)] dark:bg-white/10" />
             <div className="text-center">
               <p className="text-2xl font-semibold text-rose-400">{pendingCount}</p>
               <p className="text-[9px] text-slate-500 dark:text-white/40 uppercase tracking-wider">Pending</p>
             </div>
-            <div className="w-px h-8 bg-emerald-100 dark:bg-white/10" />
+            <div className="w-px h-8 bg-[var(--pro-azure-100)] dark:bg-white/10" />
             <div className="text-center">
               <p className="text-xl font-semibold text-white">{PROCLAMATION_MAPPINGS.length}</p>
               <p className="text-[9px] text-slate-500 dark:text-white/40 uppercase tracking-wider">Standards</p>
@@ -425,7 +426,7 @@ const IFRSComplianceMatrix: React.FC = () => {
           </div>
         </div>
         {/* View toggle */}
-        <div className="relative mt-4 flex gap-1 bg-emerald-100 dark:bg-white/10 p-1 rounded-xl w-fit">
+        <div className="relative mt-4 flex gap-1 bg-[var(--pro-azure-100)] dark:bg-white/10 p-1 rounded-xl w-fit">
           {(['lifecycle', 'matrix'] as ViewMode[]).map(v => (
             <button key={v} onClick={() => setView(v)}
               className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all capitalize ${view === v ? 'bg-white text-slate-900' : 'text-slate-500 dark:text-white/60 hover:text-white'}`}>
@@ -447,7 +448,7 @@ const IFRSComplianceMatrix: React.FC = () => {
                 onClick={() => setExpandedStep(expandedStep === s.id ? null : s.id)}
                 className={`w-full flex items-center gap-4 p-4 text-left ${s.bg} hover:opacity-90 transition-opacity`}
               >
-                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${s.color} bg-white/60 dark:bg-emerald-100 dark:bg-white/10`}>
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${s.color} bg-white/60 dark:bg-[var(--pro-azure-100)] dark:bg-white/10`}>
                   {s.icon}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -474,15 +475,15 @@ const IFRSComplianceMatrix: React.FC = () => {
                       <ul className="space-y-1.5">
                         {s.actions.map(a => (
                           <li key={a} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
-                            <CheckCircle2 size={12} className="text-emerald-500 mt-0.5 shrink-0" />
+                            <CheckCircle2 size={12} className="text-[var(--pro-azure)] mt-0.5 shrink-0" />
                             {a}
                           </li>
                         ))}
                       </ul>
                     </div>
                     <div className="space-y-2">
-                      <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-xl p-3 border border-emerald-100 dark:border-emerald-900">
-                        <p className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">IFRS Reference</p>
+                      <div className="bg-[var(--pro-azure-50)] dark:bg-green-950/30 rounded-xl p-3 border border-[var(--pro-azure-100)] dark:border-green-900">
+                        <p className="text-[10px] font-medium text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] uppercase tracking-wider mb-1">IFRS Reference</p>
                         <p className="text-xs font-bold text-slate-700 dark:text-slate-200">{s.ifrsRef}</p>
                       </div>
                       <div className="bg-orange-50 dark:bg-orange-950/30 rounded-xl p-3 border border-orange-100 dark:border-orange-900">
@@ -521,7 +522,7 @@ const IFRSComplianceMatrix: React.FC = () => {
                       <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{m.shortName}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded-lg">{m.ifrsStandard}</span>
+                      <span className="text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 px-2 py-0.5 rounded-lg">{m.ifrsStandard}</span>
                       <span className="text-[10px] text-slate-500 dark:text-slate-400">{m.ifrsTitle}</span>
                       {m.ethiopianRate && m.ethiopianRate !== 'N/A' && (
                         <span className="text-[10px] font-bold text-orange-600 bg-orange-50 dark:bg-orange-950/30 px-2 py-0.5 rounded-lg">{m.ethiopianRate}</span>
@@ -539,7 +540,7 @@ const IFRSComplianceMatrix: React.FC = () => {
                         <ul className="space-y-1">
                           {m.keyRequirements.map(r => (
                             <li key={r} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
-                              <Zap size={11} className="text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
+                              <Zap size={11} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] mt-0.5 shrink-0" />
                               {r}
                             </li>
                           ))}
@@ -548,7 +549,7 @@ const IFRSComplianceMatrix: React.FC = () => {
                       <div className="bg-white dark:bg-slate-800 rounded-xl p-3">
                         <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Full Proclamation</p>
                         <p className="text-xs font-bold text-slate-700 dark:text-slate-200">{m.proclamation}</p>
-                        <p className="text-[10px] text-slate-400 mt-1">Maps to: <span className="font-bold text-emerald-600 dark:text-emerald-400">{m.ifrsStandard} — {m.ifrsTitle}</span></p>
+                        <p className="text-[10px] text-slate-400 mt-1">Maps to: <span className="font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{m.ifrsStandard} — {m.ifrsTitle}</span></p>
                       </div>
                     </div>
                   </div>
@@ -560,8 +561,8 @@ const IFRSComplianceMatrix: React.FC = () => {
       )}
 
       {/* Footer note */}
-      <div className="flex items-start gap-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900 rounded-xl p-3">
-        <Info size={14} className="text-emerald-500 mt-0.5 shrink-0" />
+      <div className="flex items-start gap-2 bg-[var(--pro-azure-50)] dark:bg-green-950/30 border border-[var(--pro-azure-100)] dark:border-green-900 rounded-xl p-3">
+        <Info size={14} className="text-[var(--pro-azure)] mt-0.5 shrink-0" />
         <p className="text-xs text-slate-600 dark:text-slate-300">
           <strong>AABE Compliance:</strong> Ethiopian businesses are required to adopt IFRS as issued by the IASB. Large public interest entities use full IFRS; smaller entities may use IFRS for SMEs. All financial statements must be filed with the Accounting and Auditing Board of Ethiopia (AABE).
         </p>

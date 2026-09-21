@@ -11,9 +11,6 @@
  *   6. App selection  — 2FA + Address Finder (pre-installed), Calendar + Live Currency (optional)
  *                       + featured recommended apps
  */
-import React, { useRef, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../rbac/AuthContext';
 import {
   ArrowLeft, ArrowRight, Check, CheckCircle2, Cloud, Server,
   Building2, Landmark, Sparkles, Moon, Sun,
@@ -23,7 +20,11 @@ import {
   ShieldCheck, Banknote, Fingerprint,
   RefreshCw, Loader2, Download, Crown,
 } from 'lucide-react';
+import React, { useRef, useCallback } from 'react';
 import toast from 'react-hot-toast';
+import { useNavigate, Link } from 'react-router-dom';
+
+import { useAuth } from '../rbac/AuthContext';
 import api from '../services/api';
 
 // -----------------------------------------------------------------------------
@@ -120,7 +121,7 @@ const OVDS_APPS: OvdsApp[] = [
     name: '2FA',
     description: 'Two-factor authentication protects your financial data from unauthorized access.',
     icon: <Shield size={20} />,
-    iconBg: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+    iconBg: 'bg-[var(--pro-azure-100)] dark:bg-green-900/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
     preInstalled: true,
     recommended: true,
     category: 'Security',
@@ -131,7 +132,7 @@ const OVDS_APPS: OvdsApp[] = [
     name: 'Address Finder',
     description: 'Auto-complete addresses on invoices and bills, saving time on data entry.',
     icon: <MapPin size={20} />,
-    iconBg: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+    iconBg: 'bg-[var(--pro-azure-100)] dark:bg-green-900/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
     preInstalled: true,
     recommended: true,
     category: 'Utility',
@@ -162,7 +163,7 @@ const OVDS_APPS: OvdsApp[] = [
     name: 'Telebirr Payments',
     description: 'Accept Ethio Telecom telebirr payments with QR code generation on invoices.',
     icon: <Zap size={20} />,
-    iconBg: 'bg-emerald-100 dark:bg-green-900/30 text-emerald-700 dark:text-green-400',
+    iconBg: 'bg-[var(--pro-azure-100)] dark:bg-green-900/30 text-[var(--pro-azure-dark)] dark:text-green-400',
     preInstalled: false,
     recommended: true,
     category: 'Payments',
@@ -195,7 +196,7 @@ const OVDS_APPS: OvdsApp[] = [
     name: 'Biometric Attendance',
     description: 'Fingerprint and face recognition for workforce attendance verification.',
     icon: <Fingerprint size={20} />,
-    iconBg: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400',
+    iconBg: 'bg-[var(--pro-azure-100)] dark:bg-green-900/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
     preInstalled: false,
     recommended: false,
     category: 'HR & Payroll',
@@ -230,9 +231,9 @@ const Err: React.FC<{ msg?: string }> = ({ msg }) =>
 
 function pwStrength(pw: string) {
   const score = PW_RULES.filter(r => r.test(pw)).length;
-  const bars  = ['bg-slate-200 dark:bg-slate-700', 'bg-rose-500', 'bg-amber-500', 'bg-emerald-500', 'bg-emerald-500'];
+  const bars  = ['bg-slate-200 dark:bg-slate-700', 'bg-rose-500', 'bg-amber-500', 'bg-[var(--pro-azure-50)]0', 'bg-[var(--pro-azure-50)]0'];
   const texts = ['', 'Weak', 'Fair', 'Good', 'Strong'];
-  const cols  = ['text-slate-400', 'text-rose-500', 'text-amber-500', 'text-emerald-600 dark:text-emerald-400', 'text-emerald-500'];
+  const cols  = ['text-slate-400', 'text-rose-500', 'text-amber-500', 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', 'text-[var(--pro-azure)]'];
   return { score, bar: bars[score], label: texts[score], col: cols[score] };
 }
 
@@ -254,11 +255,11 @@ const ProgressBar: React.FC<{ screen: ScreenId }> = ({ screen }) => {
         <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
           {SCREEN_LABELS[screen]}
         </span>
-        <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">{pct}%</span>
+        <span className="text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{pct}%</span>
       </div>
       <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
         <div
-          className="h-full bg-emerald-500 rounded-full transition-all duration-500 ease-out"
+          className="h-full bg-[var(--pro-azure-50)]0 rounded-full transition-all duration-500 ease-out"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -269,7 +270,7 @@ const ProgressBar: React.FC<{ screen: ScreenId }> = ({ screen }) => {
             key={s}
             title={SCREEN_LABELS[s]}
             className={`w-1.5 h-1.5 rounded-full transition-all ${
-              i < idx ? 'bg-emerald-500' : i === idx ? 'bg-emerald-500 scale-125' : 'bg-slate-200 dark:bg-slate-700'
+              i < idx ? 'bg-[var(--pro-azure-50)]0' : i === idx ? 'bg-[var(--pro-azure-50)]0 scale-125' : 'bg-slate-200 dark:bg-slate-700'
             }`}
           />
         ))}
@@ -286,7 +287,7 @@ const ScreenHero: React.FC<{ onStart: () => void }> = ({ onStart }) => (
   <div className="p-5 space-y-5">
     {/* Logo */}
     <div className="text-center">
-      <div className="w-16 h-16 bg-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30">
+      <div className="w-16 h-16 bg-[var(--pro-azure-50)]0 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30">
         <Landmark size={28} className="text-white" />
       </div>
       <h1 className="text-xl font-semibold text-slate-800 dark:text-slate-100 tracking-tight">
@@ -301,8 +302,8 @@ const ScreenHero: React.FC<{ onStart: () => void }> = ({ onStart }) => (
     <div className="grid grid-cols-2 gap-3">
       {[
         { icon: <Zap size={14} />, label: 'Up in 60 seconds', color: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' },
-        { icon: <RefreshCw size={14} />, label: 'Auto updates', color: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' },
-        { icon: <Shield size={14} />, label: 'Managed backups', color: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' },
+        { icon: <RefreshCw size={14} />, label: 'Auto updates', color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-900/20' },
+        { icon: <Shield size={14} />, label: 'Managed backups', color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-900/20' },
         { icon: <Lock size={14} />, label: 'SSL included', color: 'text-violet-500 bg-violet-50 dark:bg-violet-900/20' },
       ].map(f => (
         <div key={f.label} className={`flex items-center gap-2 p-3 rounded-xl ${f.color}`}>
@@ -322,8 +323,8 @@ const ScreenHero: React.FC<{ onStart: () => void }> = ({ onStart }) => (
         'Send your first invoice',
       ].map((step, i) => (
         <div key={i} className="flex items-center gap-3">
-          <div className="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center shrink-0">
-            <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">{i + 1}</span>
+          <div className="w-5 h-5 rounded-full bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 flex items-center justify-center shrink-0">
+            <span className="text-[10px] font-medium text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{i + 1}</span>
           </div>
           <span className="text-xs text-slate-600 dark:text-slate-300">{step}</span>
         </div>
@@ -332,14 +333,14 @@ const ScreenHero: React.FC<{ onStart: () => void }> = ({ onStart }) => (
 
     <button
       onClick={onStart}
-      className="w-full py-4 bg-emerald-500 text-white font-semibold rounded-xl text-sm hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/25 flex items-center justify-center gap-2"
+      className="w-full py-4 bg-[var(--pro-azure)] text-white font-semibold rounded-xl text-sm hover:bg-[var(--pro-azure-dark)] transition-all shadow-lg shadow-green-500/20 dark:shadow-green-500/10/25 flex items-center justify-center gap-2"
     >
       <Sparkles size={16} /> Get Started
     </button>
 
     <p className="text-center text-xs text-slate-400">
       Already have an account?{' '}
-      <Link to="/login" className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline">Sign in</Link>
+      <Link to="/login" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold hover:underline">Sign in</Link>
     </p>
   </div>
 );
@@ -369,7 +370,7 @@ const ScreenStart: React.FC<{
           title: 'Ovds Cloud',
           desc: 'Hosted by Ovds. Maintenance, updates, and backups handled for you. Ideal SaaS-Based Cloud Deployment for Banking & ovds, Retail & E-commerce, IT & Software.',
           badge: 'Recommended',
-          badgeCls: 'bg-emerald-500 text-white',
+          badgeCls: 'bg-[var(--pro-azure)] text-white',
           pros: ['Up in 60 seconds', 'Automatic updates', 'Managed backups', 'SSL included'],
         },
         {
@@ -396,18 +397,18 @@ const ScreenStart: React.FC<{
           onClick={() => onSelect(opt.id)}
           className={`w-full text-left rounded-2xl border-2 p-5 transition-all ${
             deploy === opt.id
-              ? 'border-emerald-600 bg-emerald-50/50 dark:bg-emerald-50 dark:bg-emerald-950/20'
-              : 'border-slate-200 dark:border-slate-700 hover:border-emerald-500/40 dark:border-emerald-700 bg-white dark:bg-slate-800'
+              ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]/50 dark:bg-[var(--pro-azure-50)] dark:bg-green-950/20'
+              : 'border-slate-200 dark:border-slate-700 hover:border-[var(--pro-azure)]/40 dark:border-green-700 bg-white dark:bg-slate-800'
           }`}
         >
           <div className="flex items-start gap-4">
             <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all ${
-              deploy === opt.id ? 'border-emerald-600 bg-emerald-500' : 'border-slate-300 dark:border-slate-600'
+              deploy === opt.id ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]0' : 'border-slate-300 dark:border-slate-600'
             }`}>
               {deploy === opt.id && <div className="w-2 h-2 rounded-full bg-white" />}
             </div>
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-              deploy === opt.id ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500'
+              deploy === opt.id ? 'bg-[var(--pro-azure)] text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500'
             }`}>
               {opt.icon}
             </div>
@@ -422,7 +423,7 @@ const ScreenStart: React.FC<{
               <div className="flex flex-wrap gap-x-3 gap-y-1">
                 {opt.pros.map(p => (
                   <span key={p} className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
-                    <Check size={9} className="text-emerald-500" /> {p}
+                    <Check size={9} className="text-[var(--pro-azure)]" /> {p}
                   </span>
                 ))}
               </div>
@@ -468,7 +469,7 @@ const ScreenStart: React.FC<{
       </button>
       <button
         onClick={onNext}
-        className="flex-1 py-3 bg-emerald-500 text-white font-semibold rounded-xl text-sm hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30"
+        className="flex-1 py-3 bg-[var(--pro-azure)] text-white font-semibold rounded-xl text-sm hover:bg-[var(--pro-azure-dark)] transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30"
       >
         Continue <ArrowRight size={15} />
       </button>
@@ -575,7 +576,7 @@ const ScreenCreate: React.FC<{
             </div>
             <div className="flex flex-wrap gap-x-3 gap-y-0.5">
               {PW_RULES.map(r => (
-                <span key={r.label} className={`flex items-center gap-1 text-[10px] ${r.test(form.password) ? 'text-emerald-500' : 'text-slate-400'}`}>
+                <span key={r.label} className={`flex items-center gap-1 text-[10px] ${r.test(form.password) ? 'text-[var(--pro-azure)]' : 'text-slate-400'}`}>
                   {r.test(form.password) ? <Check size={9} /> : <X size={9} />} {r.label}
                 </span>
               ))}
@@ -606,7 +607,7 @@ const ScreenCreate: React.FC<{
         <button
           onClick={onNext}
           disabled={loading}
-          className="flex-1 py-3 bg-emerald-500 text-white font-semibold rounded-xl text-sm hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30 disabled:opacity-60"
+          className="flex-1 py-3 bg-[var(--pro-azure)] text-white font-semibold rounded-xl text-sm hover:bg-[var(--pro-azure-dark)] transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30 disabled:opacity-60"
         >
           {loading ? <Loader2 size={15} className="animate-spin" /> : <><Sparkles size={15} /> Create Account</>}
         </button>
@@ -614,7 +615,7 @@ const ScreenCreate: React.FC<{
 
       <p className="text-center text-xs text-slate-400">
         Already have an account?{' '}
-        <Link to="/login" className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline">Sign in instead</Link>
+        <Link to="/login" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold hover:underline">Sign in instead</Link>
       </p>
     </div>
   );
@@ -630,8 +631,8 @@ const ScreenConfirm: React.FC<{
   onResend: () => void;
 }> = ({ email, companyName, onNext }) => (
   <div className="p-5 space-y-5 text-center">
-    <div className="w-20 h-20 bg-emerald-50 dark:bg-emerald-950/20 rounded-2xl flex items-center justify-center mx-auto border border-emerald-200 dark:border-emerald-800">
-      <CheckCircle2 size={36} className="text-emerald-600 dark:text-emerald-400" />
+    <div className="w-20 h-20 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-2xl flex items-center justify-center mx-auto border border-[var(--pro-azure-100)] dark:border-green-800">
+      <CheckCircle2 size={36} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
     </div>
     <div>
       <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Account Created!</h2>
@@ -652,8 +653,8 @@ const ScreenConfirm: React.FC<{
         'Send your first invoice',
       ].map((s, i) => (
         <div key={i} className="flex items-start gap-3">
-          <div className="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
-            <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">{i + 1}</span>
+          <div className="w-5 h-5 rounded-full bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 flex items-center justify-center shrink-0 mt-0.5">
+            <span className="text-[10px] font-medium text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{i + 1}</span>
           </div>
           <span className="text-xs text-slate-600 dark:text-slate-300">{s}</span>
         </div>
@@ -662,7 +663,7 @@ const ScreenConfirm: React.FC<{
 
     <button
       onClick={onNext}
-      className="w-full py-3.5 bg-emerald-500 text-white font-semibold rounded-xl text-sm hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+      className="w-full py-3.5 bg-[var(--pro-azure)] text-white font-semibold rounded-xl text-sm hover:bg-[var(--pro-azure-dark)] transition-all shadow-lg shadow-green-500/20 flex items-center justify-center gap-2"
     >
       Continue to Company Setup <ArrowRight size={15} />
     </button>
@@ -704,7 +705,7 @@ const ScreenWizard: React.FC<{
         <div className="flex items-center gap-4">
           <div
             onClick={() => fileRef.current?.click()}
-            className="w-16 h-16 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 flex items-center justify-center cursor-pointer hover:border-emerald-600 transition-colors overflow-hidden bg-white dark:bg-slate-800 shrink-0"
+            className="w-16 h-16 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 flex items-center justify-center cursor-pointer hover:border-[var(--pro-azure)] transition-colors overflow-hidden bg-white dark:bg-slate-800 shrink-0"
           >
             {form.logoPreview
               ? <img src={form.logoPreview} alt="Logo" className="w-full h-full object-cover" />
@@ -714,7 +715,7 @@ const ScreenWizard: React.FC<{
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
+              className="text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline"
             >
               Upload your company logo
             </button>
@@ -825,7 +826,7 @@ const ScreenWizard: React.FC<{
         </button>
         <button
           onClick={onNext}
-          className="flex-1 py-3 bg-emerald-500 text-white font-semibold rounded-xl text-sm hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30"
+          className="flex-1 py-3 bg-[var(--pro-azure)] text-white font-semibold rounded-xl text-sm hover:bg-[var(--pro-azure-dark)] transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30"
         >
           Continue <ArrowRight size={15} />
         </button>
@@ -870,7 +871,7 @@ const ScreenApps: React.FC<{
           {preInstalled.map(app => (
             <div
               key={app.id}
-              className="flex items-center gap-3 p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-900/10"
+              className="flex items-center gap-3 p-3.5 rounded-xl border border-[var(--pro-azure-100)] dark:border-green-800 bg-[var(--pro-azure-50)]/50 dark:bg-green-900/10"
             >
               <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${app.iconBg}`}>
                 {app.icon}
@@ -878,13 +879,13 @@ const ScreenApps: React.FC<{
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{app.name}</span>
-                  <span className="px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-[10px] font-medium rounded uppercase tracking-wider">
+                  <span className="px-1.5 py-0.5 bg-[var(--pro-azure-100)] dark:bg-green-900/40 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] text-[10px] font-medium rounded uppercase tracking-wider">
                     Installed
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">{app.description}</p>
               </div>
-              <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+              <CheckCircle2 size={18} className="text-[var(--pro-azure)] shrink-0" />
             </div>
           ))}
         </div>
@@ -893,7 +894,7 @@ const ScreenApps: React.FC<{
       {/* Recommended for industry section */}
       {industry && recommended.length > 0 && (
         <div>
-          <p className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-2.5">
+          <p className="text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] uppercase tracking-wider mb-2.5">
             Recommended for {industry}
           </p>
           <div className="space-y-2">
@@ -905,8 +906,8 @@ const ScreenApps: React.FC<{
                   onClick={() => onToggle(app.id)}
                   className={`w-full flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all ${
                     active
-                      ? 'border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/20'
-                      : 'border-slate-200 dark:border-slate-700 hover:border-emerald-500/40 bg-white dark:bg-slate-800'
+                      ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/20'
+                      : 'border-slate-200 dark:border-slate-700 hover:border-[var(--pro-azure)]/40 bg-white dark:bg-slate-800'
                   }`}
                 >
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${app.iconBg}`}>
@@ -921,7 +922,7 @@ const ScreenApps: React.FC<{
                             ? 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400'
                             : app.badge === 'Trending'
                             ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
-                            : 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                            : 'bg-[var(--pro-azure-100)] dark:bg-green-900/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                         }`}>
                           {app.badge}
                         </span>
@@ -931,7 +932,7 @@ const ScreenApps: React.FC<{
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">{app.description}</p>
                   </div>
                   <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                    active ? 'border-emerald-600 bg-emerald-500' : 'border-slate-300 dark:border-slate-600'
+                    active ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]0' : 'border-slate-300 dark:border-slate-600'
                   }`}>
                     {active && <Check size={10} className="text-white" />}
                   </div>
@@ -956,8 +957,8 @@ const ScreenApps: React.FC<{
                 onClick={() => onToggle(app.id)}
                 className={`w-full flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all ${
                   active
-                    ? 'border-emerald-600 bg-emerald-50/50 dark:bg-emerald-50 dark:bg-emerald-950/20'
-                    : 'border-slate-200 dark:border-slate-700 hover:border-emerald-500/40 dark:border-emerald-700 bg-white dark:bg-slate-800'
+                    ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]/50 dark:bg-[var(--pro-azure-50)] dark:bg-green-950/20'
+                    : 'border-slate-200 dark:border-slate-700 hover:border-[var(--pro-azure)]/40 dark:border-green-700 bg-white dark:bg-slate-800'
                 }`}
               >
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${app.iconBg}`}>
@@ -972,7 +973,7 @@ const ScreenApps: React.FC<{
                           ? 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400'
                           : app.badge === 'Trending'
                           ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
-                          : 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                          : 'bg-[var(--pro-azure-100)] dark:bg-green-900/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                       }`}>
                         {app.badge}
                       </span>
@@ -982,7 +983,7 @@ const ScreenApps: React.FC<{
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">{app.description}</p>
                 </div>
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                  active ? 'border-emerald-600 bg-emerald-500' : 'border-slate-300 dark:border-slate-600'
+                  active ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]0' : 'border-slate-300 dark:border-slate-600'
                 }`}>
                   {active && <Check size={10} className="text-white" />}
                 </div>
@@ -997,7 +998,7 @@ const ScreenApps: React.FC<{
         <Package size={16} className="text-slate-400 shrink-0" />
         <p className="text-xs text-slate-500 dark:text-slate-400">
           You can also add <strong className="text-slate-700 dark:text-slate-200">featured apps</strong> from the{' '}
-          <Link to="/settings/app-store" className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline">App Store</Link> at any time.
+          <Link to="/settings/app-store" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold hover:underline">App Store</Link> at any time.
           Recommended apps are based on user installation data.
         </p>
       </div>
@@ -1009,7 +1010,7 @@ const ScreenApps: React.FC<{
         <button
           onClick={onFinish}
           disabled={loading}
-          className="flex-1 py-3 bg-emerald-500 text-white font-semibold rounded-xl text-sm hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30 disabled:opacity-60"
+          className="flex-1 py-3 bg-[var(--pro-azure)] text-white font-semibold rounded-xl text-sm hover:bg-[var(--pro-azure-dark)] transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30 disabled:opacity-60"
         >
           {loading
             ? <><Loader2 size={15} className="animate-spin" /> Setting up…</>
@@ -1165,8 +1166,8 @@ const GettingStartedPublic: React.FC = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 flex flex-col justify-center items-center p-4 sm:p-6 relative overflow-hidden transition-colors duration-200">
       {/* Background blobs */}
-      <div className="absolute top-[-15%] left-[-10%] w-[45%] h-[45%] bg-emerald-50/50 dark:bg-emerald-50 dark:bg-emerald-950/20 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-[-15%] right-[-10%] w-[45%] h-[45%] bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-[-15%] left-[-10%] w-[45%] h-[45%] bg-[var(--pro-azure-50)]/50 dark:bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-[-15%] right-[-10%] w-[45%] h-[45%] bg-[var(--pro-azure-50)]0/5 dark:bg-[var(--pro-azure-50)]0/10 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10">
         {/* Top bar */}
@@ -1174,7 +1175,7 @@ const GettingStartedPublic: React.FC = () => {
           {screen === 'hero' ? (
             <Link
               to="/"
-              className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors group"
+              className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors group"
             >
               <ArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
               Back to Ovds
@@ -1186,7 +1187,7 @@ const GettingStartedPublic: React.FC = () => {
                 const idx = SCREENS.indexOf(screen);
                 if (idx > 0) setScreen(SCREENS[idx - 1]);
               }}
-              className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors group"
+              className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors group"
             >
               <ArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
               Back
@@ -1198,14 +1199,14 @@ const GettingStartedPublic: React.FC = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={toggleDark}
-              className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-emerald-600 dark:text-emerald-400 hover:border-emerald-500/40 dark:border-emerald-700 transition-all"
+              className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:border-[var(--pro-azure)]/40 dark:border-green-700 transition-all"
               aria-label="Toggle dark mode"
             >
               {dark ? <Sun size={13} /> : <Moon size={13} />}
             </button>
             <Link
               to="/login"
-              className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors"
+              className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors"
             >
               Sign in
             </Link>

@@ -25,10 +25,11 @@
  *   // Paginate
  *   setFilters({ page: String(page + 1) });
  */
-import { useCallback, useMemo } from 'react';
-import { useApiQuery } from './useApiQuery';
 import { useUrlState } from '@ovds/ui';
 import type { PaginatedResult } from '@ovds/ui';
+import { useCallback, useMemo } from 'react';
+
+import { useApiQuery } from './useApiQuery';
 
 export interface UseApiPaginatedDefaults {
   page?:      string;

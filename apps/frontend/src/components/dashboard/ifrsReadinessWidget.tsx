@@ -4,9 +4,10 @@
  * Covers: IAS 1, IFRS 15, IAS 12, IAS 19, IAS 37, VAT 1341/2024, DRRF 570/2025
  * Fetches live compliance data from the tax dashboard API
  */
-import React, { useState, useEffect } from 'react';
 import { CheckCircle2, AlertCircle, Clock, Globe, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { useAuth } from '../../rbac/AuthContext';
 import api from '../../services/api';
 
@@ -37,7 +38,7 @@ const BASE_CHECKS: CheckItem[] = [
 const IFRS_CHECKS = BASE_CHECKS;
 
 const statusIcon = {
-  ok:      <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />,
+  ok:      <CheckCircle2 size={13} className="text-[var(--pro-azure)] shrink-0" />,
   warn:    <AlertCircle  size={13} className="text-amber-500 shrink-0" />,
   pending: <Clock        size={13} className="text-slate-400 shrink-0" />,
 };
@@ -72,16 +73,16 @@ const IFRSReadinessWidget: React.FC = () => {
   const score     = Math.round((okCount / checks.length) * 100);
 
   const grade = score >= 90 ? 'A' : score >= 75 ? 'B' : score >= 60 ? 'C' : 'D';
-  const gradeColor = grade === 'A' ? 'text-emerald-600' : grade === 'B' ? 'text-emerald-600' : grade === 'C' ? 'text-amber-600' : 'text-rose-600';
-  const gradeBg    = grade === 'A' ? 'bg-emerald-50 dark:bg-emerald-950/30' : grade === 'B' ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-amber-50 dark:bg-amber-950/30';
+  const gradeColor = grade === 'A' ? 'text-[var(--pro-azure)]' : grade === 'B' ? 'text-[var(--pro-azure)]' : grade === 'C' ? 'text-amber-600' : 'text-rose-600';
+  const gradeBg    = grade === 'A' ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30' : grade === 'B' ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30' : 'bg-amber-50 dark:bg-amber-950/30';
 
   return (
     <div className="ovds-widget-card overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl flex items-center justify-center">
-            <Globe size={16} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="w-8 h-8 bg-[var(--pro-azure-50)] dark:bg-green-950/30 rounded-xl flex items-center justify-center">
+            <Globe size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div>
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">IFRS Readiness</p>
@@ -100,7 +101,7 @@ const IFRSReadinessWidget: React.FC = () => {
       {/* Progress bar */}
       <div className="h-1.5 bg-slate-100 dark:bg-slate-800">
         <div
-          className={`h-full transition-all duration-700 ${grade === 'A' ? 'bg-emerald-500' : grade === 'B' ? 'bg-emerald-500' : 'bg-amber-500'}`}
+          className={`h-full transition-all duration-700 ${grade === 'A' ? 'bg-[var(--pro-azure-50)]0' : grade === 'B' ? 'bg-[var(--pro-azure-50)]0' : 'bg-amber-500'}`}
           style={{ width: `${score}%` }}
         />
       </div>
@@ -113,7 +114,7 @@ const IFRSReadinessWidget: React.FC = () => {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{c.label}</span>
-                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${c.id === 'ifrs18' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' : 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30'}`}>{c.ref}</span>
+                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${c.id === 'ifrs18' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' : 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/30'}`}>{c.ref}</span>
               </div>
               <p className="text-[10px] text-slate-400 truncate">{c.detail}</p>
             </div>

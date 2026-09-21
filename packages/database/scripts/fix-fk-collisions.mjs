@@ -20,7 +20,7 @@
 import { readFileSync, existsSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import mysql from 'mysql2/promise';
+import mysql from 'mariadb';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dbPkg     = resolve(__dirname, '..');
@@ -59,16 +59,41 @@ if (!dbNameMatch) {
 }
 const targetDb = dbNameMatch[1];
 
+// Parse the DATABASE_URL into mariadb connection options.
+// mariadb's createConnection() accepts an object; URL string support is unreliable.
+function parseDbUrl(url) {
+  const parsed = new URL(url);
+  const opts = {
+    host:     parsed.hostname || '127.0.0.1',
+    port:     parsed.port ? Number(parsed.port) : 3306,
+    user:     parsed.username || 'root',
+    password: parsed.password || '',
+    // strip leading slash
+    database: parsed.pathname ? parsed.pathname.slice(1) : undefined,
+    // Needed so mariadb does not reject bigint results as strings
+    bigNumberStrings: false,
+  };
+  return opts;
+}
+
 // Connect via information_schema for cross-db access
-const rootUrl = dbUrl.replace(/\/[^/?]+(\?|$)/, '/information_schema$1');
-const conn = await mysql.createConnection(rootUrl).catch(() =>
-  mysql.createConnection(dbUrl)
+const baseOpts = parseDbUrl(dbUrl);
+const connOpts = { ...baseOpts, database: 'information_schema' };
+const conn = await mysql.createConnection(connOpts).catch(() =>
+  mysql.createConnection(baseOpts)
 );
+
+// mariadb returns rows directly from query(), unlike mysql2 which returns [rows, fields].
+// Wrap to normalise so the rest of the script works the same way.
+async function dbQuery(sql, params) {
+  const rows = await conn.query(sql, params);
+  return [rows];
+}
 
 console.log(`fix-fk-collisions: target DB = ${targetDb}`);
 
 // ── 1. Drop leftover Prisma shadow databases ────────────────────────────────
-const [allDbs] = await conn.query(`SHOW DATABASES`);
+const [allDbs] = await dbQuery(`SHOW DATABASES`);
 const shadowDbs = allDbs
   .map(r => Object.values(r)[0])
   .filter(n => n.startsWith('prisma_migrate_shadow_db_'));
@@ -107,16 +132,63 @@ for (const [, modelName, body] of modelBlocks) {
   }
 }
 
-// ── 3. Get FK names already in the target DB ───────────────────────────────
-const [targetFkRows] = await conn.query(`
-  SELECT CONSTRAINT_NAME
-  FROM information_schema.TABLE_CONSTRAINTS
-  WHERE CONSTRAINT_SCHEMA = ? AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+// ── 3. Get FK names already in the target DB (with full details for renaming) ─
+const [targetFkRows] = await dbQuery(`
+  SELECT tc.TABLE_NAME, tc.CONSTRAINT_NAME,
+         kcu.COLUMN_NAME, kcu.REFERENCED_TABLE_NAME, kcu.REFERENCED_COLUMN_NAME,
+         rc.UPDATE_RULE, rc.DELETE_RULE
+  FROM information_schema.TABLE_CONSTRAINTS tc
+  JOIN information_schema.KEY_COLUMN_USAGE kcu
+    ON  kcu.CONSTRAINT_SCHEMA = tc.CONSTRAINT_SCHEMA
+    AND kcu.CONSTRAINT_NAME   = tc.CONSTRAINT_NAME
+    AND kcu.TABLE_NAME        = tc.TABLE_NAME
+    AND kcu.REFERENCED_TABLE_NAME IS NOT NULL
+  JOIN information_schema.REFERENTIAL_CONSTRAINTS rc
+    ON  rc.CONSTRAINT_SCHEMA = tc.CONSTRAINT_SCHEMA
+    AND rc.CONSTRAINT_NAME   = tc.CONSTRAINT_NAME
+  WHERE tc.CONSTRAINT_SCHEMA = ? AND tc.CONSTRAINT_TYPE = 'FOREIGN KEY'
 `, [targetDb]);
-const targetFkNames = new Set(targetFkRows.map(r => r.CONSTRAINT_NAME));
 
-// FKs Prisma will try to ADD (schema defines them but they're not in target DB yet)
-const pendingFks = [...allSchemaFkNames].filter(n => !targetFkNames.has(n));
+// Build a map: lowercase FK name -> full FK info (for detecting case variants)
+const targetFkByLower = new Map();
+for (const r of targetFkRows) {
+  targetFkByLower.set(r.CONSTRAINT_NAME.toLowerCase(), r);
+}
+
+// ── 3b. Rename case-variant FKs in target DB so Prisma can push cleanly ────
+// If the target DB has 'notification_employeeId_fkey' but schema expects
+// 'Notification_employeeId_fkey', MySQL treats them the same — rename to exact case.
+let caseFixed = 0;
+for (const schemaFkName of allSchemaFkNames) {
+  const existing = targetFkByLower.get(schemaFkName.toLowerCase());
+  if (!existing) continue; // Not in target DB at all — will be added by Prisma
+  if (existing.CONSTRAINT_NAME === schemaFkName) continue; // Already correct case
+
+  // Rename the existing FK to match the schema's expected name exactly
+  try {
+    await conn.query(
+      `ALTER TABLE \`${targetDb}\`.\`${existing.TABLE_NAME}\` DROP FOREIGN KEY \`${existing.CONSTRAINT_NAME}\``
+    );
+    await conn.query(`
+      ALTER TABLE \`${targetDb}\`.\`${existing.TABLE_NAME}\`
+      ADD CONSTRAINT \`${schemaFkName}\`
+      FOREIGN KEY (\`${existing.COLUMN_NAME}\`)
+      REFERENCES \`${targetDb}\`.\`${existing.REFERENCED_TABLE_NAME}\` (\`${existing.REFERENCED_COLUMN_NAME}\`)
+      ON DELETE ${existing.DELETE_RULE} ON UPDATE ${existing.UPDATE_RULE}
+    `);
+    console.log(`  Renamed case variant: ${existing.CONSTRAINT_NAME} -> ${schemaFkName}`);
+    caseFixed++;
+    // Update the map so pendingFks filtering below sees the corrected name
+    targetFkByLower.set(schemaFkName.toLowerCase(), { ...existing, CONSTRAINT_NAME: schemaFkName });
+  } catch (err) {
+    console.warn(`  WARNING renaming ${existing.CONSTRAINT_NAME}: ${err.message}`);
+  }
+}
+if (caseFixed > 0) console.log(`  Fixed ${caseFixed} case-variant FK name(s) in ${targetDb}.`);
+
+// FKs Prisma will try to ADD (schema defines them but they're not in target DB yet,
+// compared case-insensitively to avoid false "not found" for case-variant names)
+const pendingFks = [...allSchemaFkNames].filter(n => !targetFkByLower.has(n.toLowerCase()));
 
 if (pendingFks.length === 0) {
   console.log('  DB is already in sync — no new FKs to add.');
@@ -138,7 +210,7 @@ for (let i = 0; i < pendingFks.length; i += BATCH) {
   const batch = pendingFks.slice(i, i + BATCH);
   const ph = batch.map(() => '?').join(',');
   const skipPh = [...skipSchemas].map(() => '?').join(',');
-  const [rows] = await conn.query(`
+  const [rows] = await dbQuery(`
     SELECT tc.CONSTRAINT_SCHEMA, tc.TABLE_NAME, tc.CONSTRAINT_NAME,
            kcu.COLUMN_NAME, kcu.REFERENCED_TABLE_NAME, kcu.REFERENCED_COLUMN_NAME,
            rc.UPDATE_RULE, rc.DELETE_RULE

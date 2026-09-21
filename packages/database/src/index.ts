@@ -39,6 +39,13 @@ export { PrismaClient, Prisma } from '@prisma/client';
 // Tenant scoping helpers (application code should use these for hard multi-tenancy guarantees)
 export * from './tenant-scoped';
 
+// Shared request context for tenant scoping
+export * from './tenant-context.middleware';
+
+// Shared tenant extension builder — used by both PrismaService and TenantPrismaClient
+export { buildTenantScopedExtension } from './tenant-extension-builder';
+export type { DeploymentMode } from './tenant-extension-builder';
+
 
 
 

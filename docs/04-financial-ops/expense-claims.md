@@ -13,7 +13,7 @@ This section covers employee expense claims and the two main HR-related financia
 
 Navigate to **My Workspace → Expenses** (`/expenses`) — requires `expenses:read`.
 
-Employees submit expense claims for out-of-pocket spending incurred on behalf of the company. ovds or HR reviews and approves them before reimbursement is processed.
+Employees submit expense claims for out-of-pocket spending incurred on behalf of the company. The Finance team or HR reviews and approves them before reimbursement is processed.
 
 ### Submitting an Expense Claim
 
@@ -48,7 +48,7 @@ Employees submit expense claims for out-of-pocket spending incurred on behalf of
 
 ### Approval Workflow
 
-1. HR or ovds receives a notification of the pending claim.
+1. HR or the Finance team receives a notification of the pending claim.
 2. The reviewer opens **Expenses → Pending** and clicks the claim to review.
 3. Available actions:
    - **Approve** — moves the claim to Approved status
@@ -104,7 +104,7 @@ When recruitment is outsourced to a staffing or placement agency, the agency iss
 4. HR raises the bill under **Purchases → Bills** — select the agency as the vendor.
 5. Use expense category `6012 Recruitment & HR Expenses` — sub-type: *Agency Placement Fee*.
 6. If WHT applies (agency TIN on file + bill amount ≥ ETB 500), the system auto-calculates 2% WHT — deducted from the payment.
-7. ovds approves and schedules payment via the standard Bill Payment workflow.
+7. The Finance team approves and schedules payment via the standard Bill Payment workflow.
 8. If the placed candidate leaves within the **guarantee period** (typically 30–90 days), raise a **Debit Note** against the agency for a refund or replacement credit.
 
 #### Agency Fee Fields to Record
@@ -147,7 +147,7 @@ HR may advance or incur costs on behalf of candidates during recruitment — suc
 #### Workflow — Advancing and Recovering Costs
 
 1. HR documents the cost agreement in the **offer letter** or a signed **cost recovery letter**.
-2. ovds advances the cost via **Fund Transfer** or direct payment to the service provider.
+2. The Finance team advances the cost via **Fund Transfer** or direct payment to the service provider.
 3. Record the advance under `1030 Staff Advance — Recruitment` in the GL.
 4. Once the candidate joins, link the advance to their **Employee** record.
 5. Set up a **payroll deduction** to recover the balance monthly:
@@ -164,7 +164,7 @@ Where the company agrees to cover a candidate's travel or accommodation:
 
 1. Candidate submits receipts to HR (email or upload).
 2. HR creates an **Expense Claim** on behalf of the candidate at `/expenses` (requires HR role).
-3. ovds approves and pays via **Fund Transfer** to the candidate's bank account.
+3. The Finance team approves and pays via **Fund Transfer** to the candidate's bank account.
 4. Post to `6012 Recruitment & HR Expenses — Interview Reimbursement`.
 5. If the candidate later joins as an employee, the reimbursement is already expensed — no further action needed.
 6. If the candidate declines and a recovery clause applies, follow the receivable workflow above.

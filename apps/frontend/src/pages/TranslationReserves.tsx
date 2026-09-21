@@ -3,16 +3,17 @@
  *
  * Backend: TranslationReserveController @Controller('ovds/accounting/translation-reserves')
  */
-import React, { useState } from 'react';
 import { Plus, RefreshCw, Globe } from 'lucide-react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { translationReservesApi } from '../services/ovdsApi';
+
 import {
   AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, Modal, FormField, Input, Select, EmptyState, SearchBar,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { translationReservesApi } from '../services/ovdsApi';
 
 interface TranslationReserve {
   id: string;
@@ -45,6 +46,7 @@ const TranslationReserves: React.FC = () => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(() => { load(); }, []);
 
   const handleSave = async () => {
@@ -93,7 +95,7 @@ const TranslationReserves: React.FC = () => {
       }
     >
       <AppKpi cells={[
-        { label: 'Total Entries', value: reserves.length, color: 'emerald' as const },
+        { label: 'Total Entries', value: reserves.length, color: 'green' as const },
         { label: 'Total Amount', value: `ETB ${reserves.reduce((s, r) => s + Number(r.amount), 0).toLocaleString('en-ET', { minimumFractionDigits: 2 })}`, color: 'sky' as const },
       ]} />
 

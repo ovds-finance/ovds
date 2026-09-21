@@ -5,7 +5,7 @@
 >
 > **Requires:** Login · `purchase_orders:read` · `purchase_orders:write` · `purchase_orders:approve`
 
-Purchase Orders (POs) give your business a structured way to commit to purchases, track delivery, and ensure vendor bills match what was actually ordered and received. OVDS enforces a three-way match — PO ↔ GRN ↔ Bill — before payment is approved.
+Purchase Orders (POs) give your business a structured way to commit to purchases, track delivery, and ensure vendor bills match what was actually ordered and received. Ovds enforces a three-way match — PO ↔ GRN ↔ Bill — before payment is approved.
 
 ---
 
@@ -55,7 +55,7 @@ Requires `purchase_orders:approve`.
 3. Click **Approve** — the PO moves to **Approved** status.
 4. To return for revision, click **Reject** with a comment.
 
-> Configure approval thresholds in **Settings → Approval Workflows** — e.g. POs above ETB 50,000 require ovds Director approval.
+> Configure approval thresholds in **Settings → Approval Workflows** — e.g. POs above ETB 50,000 require Finance Director approval.
 
 ---
 
@@ -94,7 +94,7 @@ When goods arrive, record the receipt against the PO:
 
 ## Three-Way Match: PO ↔ GRN ↔ Bill
 
-OVDS automatically compares:
+Ovds automatically compares:
 1. **PO** — what was ordered and at what price
 2. **GRN** — what was physically received
 3. **Bill** — what the vendor is charging

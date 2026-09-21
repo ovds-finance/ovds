@@ -4,12 +4,13 @@
  * Shows low-stock and out-of-stock items with severity badges,
  * and allows sending notifications to ovds users.
  */
-import React, { useState } from 'react';
-import { AlertTriangle, AlertCircle, Bell, BellOff, RefreshCw } from 'lucide-react';
-import toast from 'react-hot-toast';
 import { Btn } from '@ovds/ui';
-import { useAllAlerts, useAlertNotifications } from '../../services/inventoryApi';
+import { AlertTriangle, AlertCircle, Bell, BellOff, RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+
 import { useBusiness } from '../../context/businessContext';
+import { useAllAlerts, useAlertNotifications } from '../../services/inventoryApi';
 import { fmtCurrency } from '../../utils/fmt';
 
 type SeverityFilter = 'ALL' | 'LOW' | 'OUT';
@@ -96,8 +97,8 @@ const StockAlertsPanel: React.FC = () => {
 
       {totalAlerts === 0 ? (
         <div className="py-8 text-center">
-          <BellOff size={28} className="mx-auto text-emerald-400 mb-2" />
-          <p className="text-sm font-semibold text-emerald-700">All stock levels are healthy</p>
+          <BellOff size={28} className="mx-auto text-[var(--pro-azure-light)] mb-2" />
+          <p className="text-sm font-semibold text-[var(--pro-azure-dark)]">All stock levels are healthy</p>
           <p className="text-xs text-slate-400 mt-1">No low-stock or out-of-stock items detected.</p>
         </div>
       ) : (

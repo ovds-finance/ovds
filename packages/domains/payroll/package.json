@@ -1,5 +1,5 @@
 {
-  "name": "@ovds/domains/payroll",
+  "name": "@ovds/domains-payroll",
   "version": "0.0.1",
   "private": true,
   "main": "./dist/index.js",
@@ -10,12 +10,13 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@ovds/core": "*",
-    "@ovds/shared": "*",
-    "@ovds/database": "*",
-    "@ovds/domains/hr": "*"
+    "@ovds/core": "workspace:*",
+    "@ovds/shared": "workspace:*",
+    "@ovds/database": "workspace:*",
+    "@ovds/domains-hr": "workspace:*"
   },
   "devDependencies": {
     "@nestjs/common": "*"
   }
 }
+

@@ -319,7 +319,7 @@ export function EnterpriseTable<T extends Record<string, any>>({
         key={key}
         className={cn(
           'flex items-center border-b border-slate-50 dark:border-slate-900/50 transition-colors',
-          selected && 'bg-aki-blue-50/50 dark:bg-aki-blue-950/20',
+          selected && 'bg-[var(--pro-azure-50)]/50 dark:bg-[var(--pro-azure)]-950/20',
           onRowClick && 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/30',
         )}
         style={{ height: rowHeight }}
@@ -332,7 +332,7 @@ export function EnterpriseTable<T extends Record<string, any>>({
             checked={selected}
             onChange={() => handleSelect(String(key), index)}
             onClick={(e) => e.stopPropagation()}
-            className="w-3.5 h-3.5 rounded border-slate-300 text-aki-blue focus:ring-aki-blue/30"
+            className="w-3.5 h-3.5 rounded border-slate-300 text-[var(--pro-azure)] focus:ring-[var(--pro-azure)]/30"
           />
         </div>
 
@@ -407,14 +407,14 @@ export function EnterpriseTable<T extends Record<string, any>>({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search..."
-          className="flex-1 max-w-[240px] px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[12px] text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-aki-blue/20 focus:border-aki-blue"
+          className="flex-1 max-w-[240px] px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[12px] text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)]"
         />
 
         {enableGrouping && (
           <select
             value={groupBy ?? ''}
             onChange={(e) => setGroupBy(e.target.value || undefined)}
-            className="px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[11px] text-slate-600 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-aki-blue/20"
+            className="px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[11px] text-slate-600 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20"
           >
             <option value="">No grouping</option>
             {columns
@@ -479,7 +479,7 @@ export function EnterpriseTable<T extends Record<string, any>>({
                 if (el) el.indeterminate = selection.size > 0 && !isAllSelected;
               }}
               onChange={selectAll}
-              className="w-3.5 h-3.5 rounded border-slate-300 text-aki-blue focus:ring-aki-blue/30"
+              className="w-3.5 h-3.5 rounded border-slate-300 text-[var(--pro-azure)] focus:ring-[var(--pro-azure)]/30"
             />
           </div>
 
@@ -510,7 +510,7 @@ export function EnterpriseTable<T extends Record<string, any>>({
             {search && (
               <button
                 onClick={() => setSearch('')}
-                className="mt-2 text-[11px] font-medium text-aki-blue hover:text-aki-blue-dark transition-colors"
+                className="mt-2 text-[11px] font-medium text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] transition-colors"
               >
                 Clear search
               </button>
@@ -559,7 +559,7 @@ function ColumnVisibilityMenu({
         className={cn(
           'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold transition-all',
           hiddenCount > 0
-            ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400'
+            ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-[var(--pro-azure-100)] dark:border-green-800 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
             : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800',
         )}
         title="Columns"
@@ -572,7 +572,7 @@ function ColumnVisibilityMenu({
         </svg>
         <span>Columns</span>
         {hiddenCount > 0 && (
-          <span className="px-1.5 py-0.5 bg-emerald-500 text-white text-[9px] font-bold rounded-full">
+          <span className="px-1.5 py-0.5 bg-[var(--pro-azure)] text-white text-[9px] font-bold rounded-full">
             {hiddenCount}
           </span>
         )}
@@ -584,7 +584,7 @@ function ColumnVisibilityMenu({
             <p className="text-[11px] font-bold text-slate-700 dark:text-slate-200">Visible Columns</p>
             <button
               onClick={onReset}
-              className="text-[10px] font-bold text-aki-blue hover:text-aki-blue-dark transition-colors"
+              className="text-[10px] font-bold text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] transition-colors"
             >
               Reset
             </button>
@@ -609,7 +609,7 @@ function ColumnVisibilityMenu({
                     className={cn(
                       'shrink-0 w-3.5 h-3.5 rounded border-2 flex items-center justify-center transition-all',
                       isVisible
-                        ? 'bg-aki-blue border-aki-blue'
+                        ? 'bg-[var(--pro-azure)] border-[var(--pro-azure)]'
                         : 'border-slate-300 dark:border-slate-600',
                     )}
                   >

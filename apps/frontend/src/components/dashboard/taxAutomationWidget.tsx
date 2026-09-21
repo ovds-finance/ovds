@@ -1,9 +1,11 @@
-import React from 'react';
-import { useTaxAutomationStatus } from '../../services/taxApi';
 import { submitToETax } from '@ovds/features/tax';
-import { useWebSocket } from '../../hooks/useWebSocket';
-import { Card, Btn, Icon, StatusBadge } from '../ui';
+import React from 'react';
 import toast from 'react-hot-toast';
+
+import { useWebSocket } from '../../hooks/useWebSocket';
+import { useTaxAutomationStatus } from '../../services/taxApi';
+import { Card, Btn, Icon, StatusBadge } from '../ui';
+
 
 export const TaxAutomationWidget: React.FC<{ companyId?: string }> = ({ companyId }) => {
   const { status, loading, refetch } = useTaxAutomationStatus(companyId);
@@ -12,7 +14,7 @@ export const TaxAutomationWidget: React.FC<{ companyId?: string }> = ({ companyI
   useWebSocket({
     rooms: companyId ? [`company_${companyId}`] : ['dashboard'],
     events: {
-      taxUpdate: (data) => {
+      taxUpdate: (data: any) => {
         refetch(); // Trigger re-fetch when automation happens in backend
         if (data.type === 'VAT_AUTO_SUBMITTED') {
           toast.success(`VAT for ${data.period} auto-submitted to eTax portal!`);
@@ -53,18 +55,18 @@ export const TaxAutomationWidget: React.FC<{ companyId?: string }> = ({ companyI
           <StatusBadge status={status.vatFilingStatus} />
         </div>
 
-        <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg border border-emerald-100 dark:border-emerald-800">
+        <div className="p-3 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-lg border border-[var(--pro-azure-100)] dark:border-green-800">
            <div className="flex justify-between items-center mb-1">
-             <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase">VAT Threshold</span>
-             <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400">{status.vatThresholdPct}%</span>
+             <span className="text-[10px] font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] uppercase">VAT Threshold</span>
+             <span className="text-[10px] font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">{status.vatThresholdPct}%</span>
            </div>
            <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
              <div 
-               className="bg-emerald-500 h-full transition-all duration-1000" 
+               className="bg-[var(--pro-azure-50)]0 h-full transition-all duration-1000" 
                style={{ width: `${status.vatThresholdPct}%` }}
              />
            </div>
-           <p className="text-[9px] text-emerald-600 dark:text-emerald-500 mt-1.5">
+           <p className="text-[9px] text-[var(--pro-azure)] dark:text-[var(--pro-azure)] mt-1.5">
              Approaching ETB 2M annual revenue limit for mandatory VAT registration.
            </p>
         </div>

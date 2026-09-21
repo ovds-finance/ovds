@@ -14,12 +14,13 @@
  * Also shows the Dual-Ledger status (Management/Tax book vs IFRS Statutory book)
  * and a link to the AABE Disclosure Package.
  */
-import { useState } from 'react';
 import { PageHeader, EmptyState, StatusBadge } from '@ovds/ui';
+import { useState } from 'react';
+
 import { Can } from '../components/can';
 import { useBusiness } from '../context/businessContext';
 import { useAabeAuditReadiness, useDualLedgerStatus } from '../features/accounting/hooks/useGlCompliance';
-import { useAabeDisclosure, useIfrsDashboard } from '../features/accounting/hooks/useIfrs';
+import { useIfrsDashboard } from '../features/accounting/hooks/useIfrs';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -29,15 +30,15 @@ function currentPeriod() {
 }
 
 function scoreColor(score: number) {
-  if (score >= 90) return 'text-emerald-600 dark:text-emerald-400';
+  if (score >= 90) return 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]';
   if (score >= 75) return 'text-amber-500 dark:text-amber-400';
   return 'text-red-500 dark:text-red-400';
 }
 
 function gradeBg(grade: string) {
   const map: Record<string, string> = {
-    A: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300',
-    B: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
+    A: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300',
+    B: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
     C: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
     F: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
   };
@@ -84,7 +85,7 @@ function CriterionRow({ criterion }: {
       <div className="flex items-center gap-3 px-4 py-3">
         <span className={`flex-none w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
           criterion.passed
-            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+            ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300'
             : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
         }`}>
           {criterion.passed ? '✓' : '✗'}
@@ -161,12 +162,12 @@ function IfrsDashboardCard() {
     <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-5 space-y-4">
       <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">IFRS Live Balances</h3>
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-3 text-center">
-          <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">IFRS 15</p>
-          <p className="text-lg font-bold text-blue-800 dark:text-blue-200 tabular-nums">
+        <div className="rounded-lg bg-[var(--pro-azure-50)] p-3 text-center">
+          <p className="text-xs text-[var(--pro-azure)] font-medium">IFRS 15</p>
+          <p className="text-lg font-bold text-[var(--pro-azure-dark)] tabular-nums">
             {Number(d.ifrs15?.totalDeferredRevenue ?? 0).toLocaleString('en-ET', { maximumFractionDigits: 0 })}
           </p>
-          <p className="text-xs text-blue-500 dark:text-blue-400">ETB deferred</p>
+          <p className="text-xs text-[var(--pro-azure)]">ETB deferred</p>
         </div>
         <div className="rounded-lg bg-purple-50 dark:bg-purple-900/20 p-3 text-center">
           <p className="text-xs text-purple-600 dark:text-purple-400 font-medium">IFRS 16</p>
@@ -175,12 +176,12 @@ function IfrsDashboardCard() {
           </p>
           <p className="text-xs text-purple-500 dark:text-purple-400">ETB ROU asset</p>
         </div>
-        <div className="rounded-lg bg-emerald-50 dark:bg-emerald-900/20 p-3 text-center">
-          <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">IAS 38</p>
-          <p className="text-lg font-bold text-emerald-800 dark:text-emerald-200 tabular-nums">
+        <div className="rounded-lg bg-[var(--pro-azure-50)] dark:bg-green-900/20 p-3 text-center">
+          <p className="text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-medium">IAS 38</p>
+          <p className="text-lg font-bold text-[var(--pro-azure-dark)] dark:text-green-200 tabular-nums">
             {Number(d.ias38?.totalCapitalizedSoftware ?? 0).toLocaleString('en-ET', { maximumFractionDigits: 0 })}
           </p>
-          <p className="text-xs text-emerald-500 dark:text-emerald-400">ETB capitalized</p>
+          <p className="text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">ETB capitalized</p>
         </div>
       </div>
     </div>
@@ -208,7 +209,7 @@ export default function AabeAuditReadinessPage() {
     );
   }
   if (error || !data) {
-    return <EmptyState message="Could not load audit readiness data." action={refetch} />;
+    return <EmptyState message="Could not load audit readiness data." action={{ label: 'Retry', onClick: () => refetch() }} />;
   }
 
   const d = data as any;
@@ -217,29 +218,28 @@ export default function AabeAuditReadinessPage() {
     <div className="p-4 sm:p-6 lg:p-8 max-w-[1200px] mx-auto space-y-6">
       <PageHeader
         title="AABE Audit Readiness"
-        actions={
-          <div className="flex items-center gap-2">
-            <label className="text-xs text-slate-500 dark:text-slate-400">Period</label>
-            <input
-              type="month"
-              value={period}
-              onChange={(e) => setPeriod(e.target.value)}
-              className="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5
-                         bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none
-                         focus:ring-2 focus:ring-emerald-500"
-            />
-            <Can permission="reports:read">
-              <button
-                onClick={() => refetch()}
-                className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800
-                           text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-              >
-                Refresh
-              </button>
-            </Can>
-          </div>
-        }
-      />
+      >
+        <div className="flex items-center gap-2">
+          <label className="text-xs text-slate-500 dark:text-slate-400">Period</label>
+          <input
+            type="month"
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
+            className="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5
+                       bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none
+                       focus:ring-2 focus:ring-[var(--pro-azure)]"
+          />
+          <Can permission="reports:read">
+            <button
+              onClick={() => refetch()}
+              className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800
+                         text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            >
+              Refresh
+            </button>
+          </Can>
+        </div>
+      </PageHeader>
 
       {/* Score + summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -248,7 +248,7 @@ export default function AabeAuditReadinessPage() {
           <ScoreRing score={d.score} grade={d.grade} />
           <div className="text-center space-y-1">
             <p className={`text-sm font-semibold ${
-              d.riskLevel === 'LOW' ? 'text-emerald-600 dark:text-emerald-400'
+              d.riskLevel === 'LOW' ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
               : d.riskLevel === 'MEDIUM' ? 'text-amber-500 dark:text-amber-400'
               : 'text-red-500 dark:text-red-400'
             }`}>

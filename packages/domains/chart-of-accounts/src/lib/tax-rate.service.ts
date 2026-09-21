@@ -9,7 +9,7 @@
  *   WITHHOLDING — withheld by payer, remitted to authority
  *
  * Migrated from apps/backend/src/accounting/tax-rate.service.ts into the
- * @ovds/domains/accounting library following the thin-apps-thick-libs pattern.
+ * @ovds/domains-accounting library following the thin-apps-thick-libs pattern.
  */
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { randomUUID } from "crypto";

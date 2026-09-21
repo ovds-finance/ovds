@@ -1,5 +1,3 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Menu, X, Moon, Sun, ArrowRight, Check,
   FileText, Calculator, Users, BarChart3, Shield,
@@ -7,15 +5,18 @@ import {
   Package, Receipt, ScanLine, Anchor, Ship, Star,
   Globe, TrendingUp, Lock, Repeat, CreditCard, BookOpen,
 } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 
 /* ─────────────────────────────────────────────────────────────────────────
-   Akaunting-inspired: clean white surfaces, indigo-violet primary,
+   Ovds SaaS: clean white surfaces, indigo-violet primary,
    large product mockups, generous radius, soft gradient backgrounds.
    ───────────────────────────────────────────────────────────────────────── */
 const GLOBAL_CSS = `
-.lp { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: #fff; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+.lp { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; background: var(--bg-main); -webkit-font-smoothing:antialiased; }
 .lp h1,.lp h2,.lp h3,.lp h4 {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   letter-spacing: -0.025em;
   text-wrap: balance;
 }
@@ -59,9 +60,9 @@ const GLOBAL_CSS = `
   cursor: default;
 }
 .feat-card:hover {
-  box-shadow: 0 12px 32px -8px rgba(99,102,241,.12), 0 2px 8px -2px rgba(0,0,0,.06);
+  box-shadow: 0 12px 32px -8px rgba(79,186,111,.12), 0 2px 8px -2px rgba(0,0,0,.06);
   transform: translateY(-2px);
-  border-color: oklch(0.82 0.08 278);
+  border-color: oklch(0.82 0.08 145);
 }
 
 /* pill badge */
@@ -77,7 +78,7 @@ const GLOBAL_CSS = `
 .ss-shadow {
   box-shadow:
     0 0 0 1px oklch(0.88 0.02 258),
-    0 24px 64px -12px rgba(99,102,241,.18),
+    0 24px 64px -12px rgba(79,186,111,.18),
     0 8px 24px -4px rgba(0,0,0,.10);
 }
 
@@ -146,7 +147,7 @@ const TICKER_ITEMS = [
 function TickerBar() {
   const items = [...TICKER_ITEMS, ...TICKER_ITEMS];
   return (
-    <div style={{ background:'oklch(0.55 0.22 278)', overflow:'hidden', height:'36px', display:'flex', alignItems:'center' }}>
+    <div style={{ background:'oklch(0.59 0.19 145)', overflow:'hidden', height:'36px', display:'flex', alignItems:'center' }}>
       <div className="ticker-track">
         {items.map((item, i) => (
           <span key={i} style={{ display:'inline-flex', alignItems:'center', gap:'0.5rem', padding:'0 1.5rem', whiteSpace:'nowrap', fontSize:'0.75rem', fontWeight:600, color:'rgba(255,255,255,0.9)' }}>
@@ -196,14 +197,10 @@ function Navbar({ dark, toggleDark }: { dark: boolean; toggleDark: () => void })
   return (
     <nav style={navStyle}>
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px' }}>
-        {/* Logo */}
+        {/* Logo / Brand */}
         <Link to="/" style={{ display:'flex', alignItems:'center', gap:'0.625rem', textDecoration:'none' }}>
-          <div style={{ width:38, height:38, borderRadius:'0.75rem', background:'oklch(0.55 0.22 278)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 4px 12px oklch(0.55 0.22 278 / .3)' }}>
-            <Landmark size={18} style={{ color:'#fff' }} />
-          </div>
           <div style={{ lineHeight:1.1 }}>
-            <div style={{ fontWeight:800, fontSize:'1rem', color:'oklch(0.18 0.02 258)', letterSpacing:'-0.02em' }}>OVDS</div>
-            <div style={{ fontSize:'0.625rem', fontWeight:700, color:'oklch(0.55 0.22 278)', letterSpacing:'0.06em' }}>finCloud</div>
+            <div style={{ fontWeight:800, fontSize:'1rem', color:'oklch(0.18 0.02 258)', letterSpacing:'-0.02em' }}>OVDS FINCLOUD</div>
           </div>
         </Link>
 
@@ -279,7 +276,7 @@ function DashboardMockup() {
       <div style={{ display:'flex', height:'360px' }}>
         {/* Mini sidebar */}
         <div style={{ width:'52px', background:'oklch(0.18 0.02 258)', display:'flex', flexDirection:'column', alignItems:'center', padding:'0.75rem 0', gap:'1.25rem', flexShrink:0 }}>
-          <div style={{ width:28, height:28, borderRadius:'0.5rem', background:'oklch(0.55 0.22 278)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+          <div style={{ width:28, height:28, borderRadius:'0.5rem', background:'oklch(0.59 0.19 145)', display:'flex', alignItems:'center', justifyContent:'center' }}>
             <Landmark size={14} style={{ color:'#fff' }}/>
           </div>
           {[BarChart3, FileText, Users, Receipt, Shield, Database].map((Icon, i) => (
@@ -294,7 +291,7 @@ function DashboardMockup() {
             <span style={{ fontSize:'0.8125rem', fontWeight:700, color:'oklch(0.18 0.02 258)' }}>Dashboard</span>
             <div style={{ display:'flex', gap:'0.5rem' }}>
               <span style={{ background:'#fff', border:'1px solid oklch(0.88 0.01 258)', borderRadius:'0.5rem', padding:'0.25rem 0.625rem', fontSize:'0.6875rem', color:'oklch(0.45 0.02 258)' }}>Jul 2026</span>
-              <div style={{ width:24, height:24, borderRadius:'0.5rem', background:'oklch(0.55 0.22 278)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <div style={{ width:24, height:24, borderRadius:'0.5rem', background:'oklch(0.59 0.19 145)', display:'flex', alignItems:'center', justifyContent:'center' }}>
                 <TrendingUp size={12} style={{ color:'#fff' }}/>
               </div>
             </div>
@@ -303,7 +300,7 @@ function DashboardMockup() {
           {/* KPI row */}
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'0.5rem' }}>
             {[
-              { label:'Revenue',  value:'ETB 482K', delta:'+12%', up:true, accent:'oklch(0.55 0.22 278)' },
+              { label:'Revenue',  value:'ETB 482K', delta:'+12%', up:true, accent:'oklch(0.59 0.19 145)' },
               { label:'Expenses', value:'ETB 138K', delta:'-4%',  up:false, accent:'oklch(0.59 0.19 155)' },
               { label:'Net Tax',  value:'ETB 54K',  delta:'+7%',  up:true, accent:'oklch(0.72 0.16 50)' },
             ].map(k => (
@@ -323,7 +320,7 @@ function DashboardMockup() {
               <div style={{ display:'flex', alignItems:'flex-end', gap:'4px', height:'80px' }}>
                 {[35,55,42,70,48,82,60,78,54,68,88,100].map((h,i) => (
                   <div key={i} style={{ flex:1, borderRadius:'3px 3px 0 0', height:`${h}%`,
-                    background: i===11 ? 'oklch(0.55 0.22 278)' : `oklch(0.55 0.22 278 / ${0.15 + i*0.05})` }}/>
+                    background: i===11 ? 'oklch(0.59 0.19 145)' : `oklch(0.55 0.22 278 / ${0.15 + i*0.05})` }}/>
                 ))}
               </div>
               <div style={{ display:'flex', justifyContent:'space-between', fontSize:'0.5rem', color:'oklch(0.65 0.01 258)', marginTop:'4px' }}>
@@ -352,7 +349,7 @@ function DashboardMockup() {
 
           {/* Status bar */}
           <div style={{ background:'oklch(0.94 0.04 278)', borderRadius:'0.625rem', padding:'0.5rem 0.75rem', display:'flex', alignItems:'center', gap:'0.5rem' }}>
-            <div style={{ width:6, height:6, borderRadius:'50%', background:'oklch(0.55 0.22 278)', animation:'pulseDot 2s infinite' }}/>
+            <div style={{ width:6, height:6, borderRadius:'50%', background:'oklch(0.59 0.19 145)', animation:'pulseDot 2s infinite' }}/>
             <span style={{ fontSize:'0.6rem', fontWeight:600, color:'oklch(0.40 0.18 278)' }}>VAT Apr 2026 filed · TASS validated · 3 pending invoices</span>
           </div>
         </div>
@@ -365,10 +362,10 @@ function DashboardMockup() {
 function Hero() {
   return (
     <section style={{ position:'relative', overflow:'hidden', padding:'5rem 0 0', background:'#fff' }}>
-      {/* Gradient blobs — Akaunting-style soft colour fields */}
+      {/* Gradient blobs — Ovds SaaS style soft colour fields */}
       <div className="blob" style={{
         position:'absolute', top:'-15%', right:'-8%', width:'580px', height:'580px',
-        borderRadius:'50%', background:'radial-gradient(circle, oklch(0.55 0.22 278 / .10) 0%, transparent 68%)',
+        borderRadius:'50%', background:'radial-gradient(circle, oklch(0.59 0.19 145 / .10) 0%, transparent 68%)',
         pointerEvents:'none',
       }}/>
       <div className="blob" style={{
@@ -387,7 +384,7 @@ function Hero() {
         {/* Centre headline */}
         <div style={{ textAlign:'center', maxWidth:'780px', margin:'0 auto 3.5rem' }}>
           <div className="su1 badge badge-v" style={{ marginBottom:'1.25rem' }}>
-            <span style={{ width:6, height:6, borderRadius:'50%', background:'oklch(0.55 0.22 278)', display:'inline-block', animation:'pulseDot 2s infinite' }}/>
+            <span style={{ width:6, height:6, borderRadius:'50%', background:'oklch(0.59 0.19 145)', display:'inline-block', animation:'pulseDot 2s infinite' }}/>
             MoR Proclamation 1341/2024 · Tax Compliant
           </div>
 
@@ -396,7 +393,7 @@ function Hero() {
             color:'oklch(0.18 0.02 258)', lineHeight:1.1, marginBottom:'1.375rem',
           }}>
              Accounting Software<br/>
-            <span style={{ color:'oklch(0.55 0.22 278)' }}>Built for Ethiopia</span>
+            <span style={{ color:'oklch(0.59 0.19 145)' }}>Built for Ethiopia</span>
           </h1>
 
           <p className="su3" style={{
@@ -437,7 +434,7 @@ function Hero() {
           <div className="float-b" style={{
             position:'absolute', left:'-48px', top:'18%', zIndex:2,
             background:'#fff', borderRadius:'1rem', padding:'0.875rem 1rem',
-            boxShadow:'0 8px 32px rgba(99,102,241,.15)', border:'1px solid oklch(0.91 0.01 258)',
+            boxShadow:'0 8px 32px rgba(79,186,111,.15)', border:'1px solid oklch(0.91 0.01 258)',
             minWidth:'148px',
           }}>
             <div style={{ fontSize:'0.625rem', color:'oklch(0.52 0.02 258)', marginBottom:'0.25rem', fontWeight:600 }}>VAT FILED</div>
@@ -448,12 +445,12 @@ function Hero() {
           <div className="float-c" style={{
             position:'absolute', right:'-44px', top:'30%', zIndex:2,
             background:'#fff', borderRadius:'1rem', padding:'0.875rem 1rem',
-            boxShadow:'0 8px 32px rgba(99,102,241,.15)', border:'1px solid oklch(0.91 0.01 258)',
+            boxShadow:'0 8px 32px rgba(79,186,111,.15)', border:'1px solid oklch(0.91 0.01 258)',
             minWidth:'138px',
           }}>
             <div style={{ fontSize:'0.625rem', color:'oklch(0.52 0.02 258)', marginBottom:'0.25rem', fontWeight:600 }}>AI OCR</div>
             <div style={{ display:'flex', alignItems:'center', gap:'0.375rem' }}>
-              <ScanLine size={14} style={{ color:'oklch(0.55 0.22 278)' }}/>
+              <ScanLine size={14} style={{ color:'oklch(0.59 0.19 145)' }}/>
               <span style={{ fontSize:'0.875rem', fontWeight:700, color:'oklch(0.18 0.02 258)' }}>Receipt scanned</span>
             </div>
             <div style={{ fontSize:'0.625rem', color:'oklch(0.50 0.17 155)', marginTop:'0.25rem', fontWeight:600 }}>ETB 4,200 · Supplies</div>
@@ -497,7 +494,7 @@ function TrustBar() {
                 color: 'oklch(0.45 0.03 258)', opacity: 0.7,
               }}>
                 <div style={{ width: 24, height: 24, borderRadius: '0.4rem', background: 'oklch(0.91 0.02 278)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Landmark size={11} style={{ color: 'oklch(0.55 0.22 278)' }} />
+                  <Landmark size={11} style={{ color: 'oklch(0.59 0.19 145)' }} />
                 </div>
                 {name}
               </div>
@@ -534,10 +531,10 @@ function StatsRow() {
               animation: fired ? `slideUp .55s ${i * 0.07}s cubic-bezier(.16,1,.3,1) both` : 'none',
               transition: 'box-shadow .2s, transform .2s',
             }}
-              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 28px rgba(99,102,241,.1)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 28px rgba(79,186,111,.1)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = ''; e.currentTarget.style.transform = ''; }}>
               <div style={{ width: 44, height: 44, borderRadius: '0.875rem', background: 'oklch(0.94 0.04 278)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-                <Icon size={20} style={{ color: 'oklch(0.55 0.22 278)' }} />
+                <Icon size={20} style={{ color: 'oklch(0.59 0.19 145)' }} />
               </div>
               <div style={{ fontSize: 'clamp(1.75rem,3.5vw,2.25rem)', fontWeight: 800, color: 'oklch(0.18 0.02 258)', letterSpacing: '-0.03em', lineHeight: 1 }}>
                 {value}
@@ -553,7 +550,7 @@ function StatsRow() {
   );
 }
 
-/* ── Platform section — Akaunting-style alternating screenshot + copy ─── */
+/* ── Platform section — Ovds SaaS style alternating screenshot + copy ─── */
 
 /* Invoice SVG mockup */
 function InvoiceMockup() {
@@ -639,7 +636,7 @@ function ReceiptMockup() {
     <div style={{ position: 'relative', display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
       {/* Receipt card */}
       <div className="ss-shadow float-a" style={{ borderRadius: '1rem', overflow: 'hidden', background: '#fff', border: '1px solid oklch(0.91 0.01 258)', minWidth: '200px' }}>
-        <div style={{ background: 'oklch(0.55 0.22 278)', padding: '0.875rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div style={{ background: 'oklch(0.59 0.19 145)', padding: '0.875rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <ScanLine size={16} style={{ color: '#fff' }} />
           <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#fff' }}>AI Receipt Scan</span>
         </div>
@@ -663,7 +660,7 @@ function ReceiptMockup() {
         </div>
       </div>
       {/* Confidence badge */}
-      <div className="float-b" style={{ background: '#fff', borderRadius: '1rem', padding: '0.875rem 1rem', boxShadow: '0 8px 24px rgba(99,102,241,.12)', border: '1px solid oklch(0.91 0.01 258)', minWidth: '148px' }}>
+      <div className="float-b" style={{ background: '#fff', borderRadius: '1rem', padding: '0.875rem 1rem', boxShadow: '0 8px 24px rgba(79,186,111,.12)', border: '1px solid oklch(0.91 0.01 258)', minWidth: '148px' }}>
         <div style={{ fontSize: '0.625rem', color: 'oklch(0.52 0.02 258)', marginBottom: '0.5rem', fontWeight: 600 }}>CONFIDENCE</div>
         <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'oklch(0.50 0.17 155)', letterSpacing: '-0.03em', lineHeight: 1 }}>98%</div>
         <div style={{ height: 6, background: 'oklch(0.91 0.01 258)', borderRadius: '999px', marginTop: '0.5rem', overflow: 'hidden' }}>
@@ -683,7 +680,7 @@ function PlatformSection() {
   const SectionRow = ({
     revealRef, fired, flip, badge, badgeClass, title, desc, bullets, mockup, id,
   }: {
-    revealRef: React.RefObject<HTMLDivElement>; fired: boolean; flip?: boolean;
+    revealRef: React.RefObject<HTMLDivElement | null>; fired: boolean; flip?: boolean;
     badge: string; badgeClass: string; title: React.ReactNode; desc: string;
     bullets: string[]; mockup: React.ReactNode; id?: string;
   }) => (
@@ -706,7 +703,7 @@ function PlatformSection() {
           {bullets.map(b => (
             <div key={b} style={{ display: 'flex', gap: '0.625rem', alignItems: 'flex-start' }}>
               <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'oklch(0.94 0.04 278)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '0.1rem' }}>
-                <Check size={10} style={{ color: 'oklch(0.55 0.22 278)' }} />
+                <Check size={10} style={{ color: 'oklch(0.59 0.19 145)' }} />
               </div>
               <span style={{ fontSize: '0.9375rem', color: 'oklch(0.35 0.02 258)', lineHeight: 1.55 }}>{b}</span>
             </div>
@@ -735,7 +732,7 @@ function PlatformSection() {
           <SectionRow
             revealRef={r1.ref} fired={r1.fired} flip={false}
             badge="e-invoice" badgeClass="badge-v"
-            title={<>Professional invoices with<br /><span style={{ color: 'oklch(0.55 0.22 278)' }}>ERCA QR &amp; TASS validation</span></>}
+            title={<>Professional invoices with<br /><span style={{ color: 'oklch(0.59 0.19 145)' }}>ERCA QR &amp; TASS validation</span></>}
             desc="Send professional invoices to clients, auto-calculate VAT at 15%, and embed ERCA-compliant QR codes with TASS SRM validation — all without leaving the platform."
             bullets={[
               'TIN validation against ERCA database',
@@ -765,7 +762,7 @@ function PlatformSection() {
           <SectionRow
             revealRef={r3.ref} fired={r3.fired} flip={false}
             badge="Bank Integration" badgeClass="badge-v"
-            title={<>Bank accounts synced.<br /><span style={{ color: 'oklch(0.55 0.22 278)' }}>Reconciliation automatic.</span></>}
+            title={<>Bank accounts synced.<br /><span style={{ color: 'oklch(0.59 0.19 145)' }}>Reconciliation automatic.</span></>}
             desc="Connect CBE, Awash, Dashen, and Amole to get real-time transaction feeds. Every bank movement is matched to invoices and bills automatically — no manual reconciliation needed."
             bullets={[
               'CBE, Awash, Dashen, Telebirr, Amole',
@@ -785,7 +782,7 @@ function PlatformSection() {
                   <div key={a.bank} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid oklch(0.94 0.005 258)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
                       <div style={{ width: 32, height: 32, borderRadius: '0.5rem', background: 'oklch(0.94 0.04 278)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <CreditCard size={14} style={{ color: 'oklch(0.55 0.22 278)' }} />
+                        <CreditCard size={14} style={{ color: 'oklch(0.59 0.19 145)' }} />
                       </div>
                       <div>
                         <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'oklch(0.22 0.02 258)' }}>{a.bank}</div>
@@ -838,7 +835,7 @@ function TaxSection() {
             <div className="section-pill">Tax Engine</div>
             <h2 style={{ fontSize: 'clamp(1.75rem,3.5vw,2.5rem)', fontWeight: 800, color: 'oklch(0.18 0.02 258)', marginBottom: '1rem', letterSpacing: '-0.025em' }}>
               Every Ethiopian tax rate.<br />
-              <span style={{ color: 'oklch(0.55 0.22 278)' }}>Applied automatically.</span>
+              <span style={{ color: 'oklch(0.59 0.19 145)' }}>Applied automatically.</span>
             </h2>
             <p style={{ fontSize: '1rem', color: 'oklch(0.45 0.02 258)', lineHeight: 1.72, marginBottom: '1.75rem', maxWidth: '44ch' }}>
               VAT, PIT, WHT, MAT, TOT, DRRF, BIT, Schedule D — all built in and auto-applied based on your business type, turnover, and transaction data.
@@ -853,7 +850,7 @@ function TaxSection() {
               ].map(b => (
                 <div key={b} style={{ display: 'flex', gap: '0.625rem', alignItems: 'flex-start' }}>
                   <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'oklch(0.94 0.04 278)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '0.1rem' }}>
-                    <Check size={10} style={{ color: 'oklch(0.55 0.22 278)' }} />
+                    <Check size={10} style={{ color: 'oklch(0.59 0.19 145)' }} />
                   </div>
                   <span style={{ fontSize: '0.9375rem', color: 'oklch(0.35 0.02 258)', lineHeight: 1.55 }}>{b}</span>
                 </div>
@@ -866,17 +863,17 @@ function TaxSection() {
             {TAX_RATES.map((t, i) => (
               <div key={t.label}
                 style={{
-                  background: t.accent ? 'oklch(0.55 0.22 278)' : '#fff',
-                  border: `1px solid ${t.accent ? 'oklch(0.55 0.22 278)' : 'oklch(0.91 0.01 258)'}`,
+                  background: t.accent ? 'oklch(0.59 0.19 145)' : '#fff',
+                  border: `1px solid ${t.accent ? 'oklch(0.59 0.19 145)' : 'oklch(0.91 0.01 258)'}`,
                   borderRadius: '1rem', padding: '1.125rem 0.75rem', textAlign: 'center',
                   opacity: fired ? 1 : 1,
                   animation: fired ? `slideUp .5s ${i * 0.055}s cubic-bezier(.16,1,.3,1) both` : 'none',
                   transition: 'transform .2s, box-shadow .2s',
                   cursor: 'default',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(99,102,241,.14)'; }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(79,186,111,.14)'; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}>
-                <div style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1, marginBottom: '0.375rem', color: t.accent ? '#fff' : 'oklch(0.55 0.22 278)' }}>
+                <div style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1, marginBottom: '0.375rem', color: t.accent ? '#fff' : 'oklch(0.59 0.19 145)' }}>
                   {t.value}
                 </div>
                 <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: t.accent ? 'rgba(255,255,255,0.9)' : 'oklch(0.22 0.02 258)', lineHeight: 1.3, marginBottom: '0.25rem' }}>
@@ -895,7 +892,7 @@ function TaxSection() {
   );
 }
 
-/* ── Features grid — Akaunting app-store tile style ──────────────────── */
+/* ── Features grid — Ovds SaaS app-store tile style ──────────────────── */
 const FEATURES = [
   { icon: FileText,   title: 'e-invoice',         desc: 'ERCA QR codes, TIN validation, TASS SRM. Auto VAT calculation.' },
   { icon: Calculator, title: 'Payroll & PIT',        desc: 'ETB 2K threshold, pension 7%/11%, DRRF, graduate tax automated.' },
@@ -938,7 +935,7 @@ function FeaturesSection() {
                 animation: fired ? `slideUp .5s ${i * 0.04}s cubic-bezier(.16,1,.3,1) both` : 'none',
               }}>
               <div style={{ width: 44, height: 44, borderRadius: '0.875rem', background: 'oklch(0.94 0.04 278)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
-                <f.icon size={20} style={{ color: 'oklch(0.55 0.22 278)' }} />
+                <f.icon size={20} style={{ color: 'oklch(0.59 0.19 145)' }} />
               </div>
               <div style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'oklch(0.18 0.02 258)', marginBottom: '0.375rem' }}>
                 {f.title}
@@ -997,7 +994,7 @@ function Testimonials() {
                 &ldquo;{t.text}&rdquo;
               </p>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', borderTop: '1px solid oklch(0.91 0.01 258)', paddingTop: '1rem' }}>
-                <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'oklch(0.55 0.22 278)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, color: '#fff', flexShrink: 0 }}>
+                <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'oklch(0.59 0.19 145)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, color: '#fff', flexShrink: 0 }}>
                   {t.avatar}
                 </div>
                 <div>
@@ -1058,20 +1055,20 @@ function Pricing() {
                 borderRadius: '1.5rem',
                 padding: '2rem',
                 display: 'flex', flexDirection: 'column',
-                background: p.highlight ? 'oklch(0.55 0.22 278)' : '#fff',
-                border: `1px solid ${p.highlight ? 'oklch(0.55 0.22 278)' : 'oklch(0.91 0.01 258)'}`,
+                background: p.highlight ? 'oklch(0.59 0.19 145)' : '#fff',
+                border: `1px solid ${p.highlight ? 'oklch(0.59 0.19 145)' : 'oklch(0.91 0.01 258)'}`,
                 boxShadow: p.highlight ? '0 24px 60px oklch(0.55 0.22 278 / .28), 0 4px 16px rgba(0,0,0,.08)' : '0 1px 4px rgba(0,0,0,.04)',
                 transform: p.highlight ? 'scale(1.03)' : '',
                 opacity: fired ? 1 : 1,
                 animation: fired ? `slideUp .6s ${i * 0.1}s cubic-bezier(.16,1,.3,1) both` : 'none',
                 transition: 'box-shadow .25s, transform .25s',
               }}
-              onMouseEnter={e => { if (!p.highlight) { e.currentTarget.style.boxShadow = '0 12px 36px rgba(99,102,241,.12)'; e.currentTarget.style.transform = 'translateY(-3px)'; } }}
+              onMouseEnter={e => { if (!p.highlight) { e.currentTarget.style.boxShadow = '0 12px 36px rgba(79,186,111,.12)'; e.currentTarget.style.transform = 'translateY(-3px)'; } }}
               onMouseLeave={e => { if (!p.highlight) { e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,.04)'; e.currentTarget.style.transform = ''; } }}>
 
               {p.badge && (
                 <div style={{ position: 'absolute', top: '-13px', left: '50%', transform: 'translateX(-50%)' }}>
-                  <span style={{ background: '#fff', color: 'oklch(0.55 0.22 278)', fontSize: '0.6875rem', fontWeight: 800, padding: '0.25rem 1rem', borderRadius: '999px', boxShadow: '0 2px 12px rgba(99,102,241,.25)', border: '1px solid oklch(0.88 0.06 278)' }}>
+                  <span style={{ background: '#fff', color: 'oklch(0.59 0.19 145)', fontSize: '0.6875rem', fontWeight: 800, padding: '0.25rem 1rem', borderRadius: '999px', boxShadow: '0 2px 12px rgba(79,186,111,.25)', border: '1px solid oklch(0.88 0.06 145)' }}>
                     {p.badge}
                   </span>
                 </div>
@@ -1094,7 +1091,7 @@ function Pricing() {
                 {p.features.map(f => (
                   <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
                     <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0, background: p.highlight ? 'rgba(255,255,255,.2)' : 'oklch(0.94 0.04 278)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Check size={11} style={{ color: p.highlight ? '#fff' : 'oklch(0.55 0.22 278)' }} />
+                      <Check size={11} style={{ color: p.highlight ? '#fff' : 'oklch(0.59 0.19 145)' }} />
                     </div>
                     <span style={{ fontSize: '0.9375rem', color: p.highlight ? 'rgba(255,255,255,0.88)' : 'oklch(0.35 0.02 258)' }}>{f}</span>
                   </li>
@@ -1105,8 +1102,8 @@ function Pricing() {
                 style={{
                   display: 'block', textAlign: 'center', padding: '0.875rem',
                   borderRadius: '0.875rem', fontSize: '0.9375rem', fontWeight: 700,
-                  background: p.highlight ? '#fff' : 'oklch(0.55 0.22 278)',
-                  color: p.highlight ? 'oklch(0.55 0.22 278)' : '#fff',
+                  background: p.highlight ? '#fff' : 'oklch(0.59 0.19 145)',
+                  color: p.highlight ? 'oklch(0.59 0.19 145)' : '#fff',
                   boxShadow: p.highlight ? '0 4px 16px rgba(0,0,0,.12)' : '0 4px 16px oklch(0.55 0.22 278 / .35)',
                   transition: 'all .2s', textDecoration: 'none',
                 }}>
@@ -1143,7 +1140,7 @@ function FAQ() {
           </h2>
           <p style={{ fontSize: '1rem', color: 'oklch(0.45 0.02 258)' }}>
             Can't find the answer?{' '}
-            <a href="mailto:hello@ovds.et" style={{ color: 'oklch(0.55 0.22 278)', fontWeight: 600, textDecoration: 'none' }}>Email us</a>
+            <a href="mailto:hello@ovds.et" style={{ color: 'oklch(0.59 0.19 145)', fontWeight: 600, textDecoration: 'none' }}>Email us</a>
           </p>
         </div>
 
@@ -1152,9 +1149,9 @@ function FAQ() {
             <div key={i} style={{
               background: '#fff',
               borderRadius: '1rem',
-              border: `1px solid ${open === i ? 'oklch(0.82 0.08 278)' : 'oklch(0.91 0.01 258)'}`,
+              border: `1px solid ${open === i ? 'oklch(0.82 0.08 145)' : 'oklch(0.91 0.01 258)'}`,
               overflow: 'hidden',
-              boxShadow: open === i ? '0 4px 16px rgba(99,102,241,.08)' : 'none',
+              boxShadow: open === i ? '0 4px 16px rgba(79,186,111,.08)' : 'none',
               transition: 'border-color .2s, box-shadow .2s',
             }}>
               <button
@@ -1164,12 +1161,12 @@ function FAQ() {
                 <span style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'oklch(0.18 0.02 258)', paddingRight: '1rem', lineHeight: 1.5 }}>{f.q}</span>
                 <div style={{
                   width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
-                  background: open === i ? 'oklch(0.55 0.22 278)' : 'oklch(0.94 0.04 278)',
+                  background: open === i ? 'oklch(0.59 0.19 145)' : 'oklch(0.94 0.04 278)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transform: open === i ? 'rotate(180deg)' : 'rotate(0deg)',
                   transition: 'transform .25s cubic-bezier(.16,1,.3,1), background .2s',
                 }}>
-                  <ChevronDown size={14} style={{ color: open === i ? '#fff' : 'oklch(0.55 0.22 278)' }} />
+                  <ChevronDown size={14} style={{ color: open === i ? '#fff' : 'oklch(0.59 0.19 145)' }} />
                 </div>
               </button>
               {open === i && (
@@ -1193,7 +1190,7 @@ function FAQ() {
 /* ── CTA Banner ───────────────────────────────────────────────────────── */
 function CTABanner() {
   return (
-    <section style={{ padding: '5rem 0', background: 'oklch(0.55 0.22 278)', position: 'relative', overflow: 'hidden' }}>
+    <section style={{ padding: '5rem 0', background: 'oklch(0.59 0.19 145)', position: 'relative', overflow: 'hidden' }}>
       <div className="blob" style={{ position: 'absolute', top: '-30%', right: '-8%', width: '520px', height: '520px', borderRadius: '50%', background: 'oklch(0.62 0.20 278 / .35)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize: '24px 24px', pointerEvents: 'none' }} />
       <div style={{ position: 'relative', maxWidth: '720px', margin: '0 auto', padding: '0 1.5rem', textAlign: 'center' }}>
@@ -1210,7 +1207,7 @@ function CTABanner() {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.875rem', justifyContent: 'center' }}>
           <Link to="/register" style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-            background: '#fff', color: 'oklch(0.55 0.22 278)',
+            background: '#fff', color: 'oklch(0.59 0.19 145)',
             padding: '0.875rem 1.875rem', borderRadius: '0.875rem', fontWeight: 800, fontSize: '0.9375rem',
             boxShadow: '0 8px 28px rgba(0,0,0,.18)', textDecoration: 'none', transition: 'all .2s',
           }}>
@@ -1248,15 +1245,11 @@ function Footer() {
         <div style={{ display: 'grid', gridTemplateColumns: '1.2fr repeat(4, 1fr)', gap: '2.5rem', marginBottom: '3rem' }} className="footer-grid">
           {/* Brand column */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '1rem' }}>
-              <div style={{ width: 36, height: 36, borderRadius: '0.75rem', background: 'oklch(0.55 0.22 278)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Landmark size={16} style={{ color: '#fff' }} />
-              </div>
-              <div style={{ lineHeight: 1.1 }}>
-                <div style={{ fontWeight: 800, color: '#fff', fontSize: '0.9375rem' }}>OVDS</div>
-                <div style={{ fontSize: '0.625rem', color: 'oklch(0.68 0.18 278)', fontWeight: 700, letterSpacing: '0.06em' }}>finCloud</div>
-              </div>
-            </div>
+         <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '1rem' }}>
+             <div style={{ lineHeight: 1.1 }}>
+               <div style={{ fontWeight: 800, color: '#fff', fontSize: '0.9375rem' }}>OVDS FINCLOUD</div>
+             </div>
+           </div>
             <p style={{ fontSize: '0.8125rem', color: 'oklch(0.50 0.02 258)', lineHeight: 1.72, marginBottom: '1.25rem', maxWidth: '28ch' }}>
               , open-source accounting for Ethiopian SMEs — MoR and Customs compliant from day one.
             </p>
@@ -1290,7 +1283,7 @@ function Footer() {
 
         <div style={{ borderTop: '1px solid oklch(0.18 0.01 258)', paddingTop: '1.75rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
           <div style={{ fontSize: '0.8125rem', color: 'oklch(0.45 0.02 258)' }}>
-            © {new Date().getFullYear()} OVDS finCloud. Built for Ethiopia 🇪🇹 &middot; Open-source on GitHub
+            © {new Date().getFullYear()} OVDS FINCLOUD. Built for Ethiopia 🇪🇹 &middot; Open-source on GitHub
           </div>
           <div style={{ display: 'flex', gap: '1.5rem' }}>
             {['Privacy', 'Terms', 'hello@ovds.et'].map(l => (

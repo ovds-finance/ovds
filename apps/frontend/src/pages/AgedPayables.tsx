@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
 import {
   Download, RefreshCw, ChevronDown, ChevronRight,
   Clock, AlertTriangle, FileText, DollarSign,
   TrendingUp, CheckCircle2,
 } from 'lucide-react';
-import { usePageTitle } from '../hooks/usePageTitle';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
+
+import { OvdsPageHeader, OvdsStatsStrip } from '../components/ovds';
 import { useBusiness } from '../context/businessContext';
 import { useApiQuery } from '../hooks';
-import { fmtCurrency } from '../utils/fmt';
-import { OvdsPageHeader, OvdsStatsStrip } from '../components/ovds';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { downloadCSV } from '../utils/download';
+import { fmtCurrency } from '../utils/fmt';
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
 const BUCKET_LABELS: Record<string, { label: string; color: string }> = {
-  current: { label: 'Current', color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
+  current: { label: 'Current', color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' },
   days30: { label: '1–30 Days', color: 'text-amber-600 bg-amber-50 border-amber-200' },
   days60: { label: '31–60 Days', color: 'text-orange-600 bg-orange-50 border-orange-200' },
   days90: { label: '61+ Days', color: 'text-rose-600 bg-rose-50 border-rose-200' },
@@ -94,8 +95,8 @@ const AgedPayables: React.FC = () => {
               value: fmt(summary.current ?? 0),
               sub: `${byVendor.reduce((s: number, v: any) => s + (v.buckets?.count ?? 0), 0)} bills`,
               icon: <Clock size={15} />,
-              iconBg: 'bg-emerald-50',
-              iconColor: 'text-emerald-600',
+              iconBg: 'bg-[var(--pro-azure-50)]',
+              iconColor: 'text-[var(--pro-azure)]',
             },
             {
               label: '1–30 Days',
@@ -146,7 +147,7 @@ const AgedPayables: React.FC = () => {
             </div>
           ) : byVendor.length === 0 ? (
             <div className="py-12 text-center">
-              <CheckCircle2 size={32} className="text-emerald-300 mx-auto mb-2" />
+              <CheckCircle2 size={32} className="text-green-300 mx-auto mb-2" />
               <p className="text-xs text-slate-400">No outstanding payables</p>
             </div>
           ) : (
@@ -186,13 +187,13 @@ const AgedPayables: React.FC = () => {
                             <div key={bill.id} className="flex items-center justify-between py-1.5 border-t border-slate-100">
                               <div className="flex items-center gap-2">
                                 <FileText size={12} className="text-slate-300" />
-                                <Link to={`/purchases/bills/${bill.id}`} className="text-xs font-mono text-slate-700 hover:text-emerald-600 transition-colors">
+                                <Link to={`/purchases/bills/${bill.id}`} className="text-xs font-mono text-slate-700 hover:text-[var(--pro-azure)] transition-colors">
                                   {bill.billNumber}
                                 </Link>
                                 <span className="text-[10px] text-slate-400">{bill.category}</span>
                               </div>
                               <div className="flex items-center gap-3">
-                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${bill.daysOverdue > 60 ? 'bg-rose-50 text-rose-700' : bill.daysOverdue > 30 ? 'bg-orange-50 text-orange-700' : bill.daysOverdue > 0 ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'}`}>
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${bill.daysOverdue > 60 ? 'bg-rose-50 text-rose-700' : bill.daysOverdue > 30 ? 'bg-orange-50 text-orange-700' : bill.daysOverdue > 0 ? 'bg-amber-50 text-amber-700' : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]'}`}>
                                   {bill.daysOverdue > 0 ? `${bill.daysOverdue}d overdue` : 'Current'}
                                 </span>
                                 <span className="text-xs font-bold text-slate-800 tabular-nums w-20 text-right">{fmt(bill.remaining)}</span>

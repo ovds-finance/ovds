@@ -55,7 +55,7 @@ export const ovdsSummaryBar: React.FC<ovdsSummaryBarProps> = ({
         </div>
         <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold ${
           isProfit
-            ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+            ?               'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)]'
             : 'bg-rose-50 text-rose-700 border border-rose-100'
         }`}>
           {isProfit ? <TrendingUp size={13} /> : <TrendingDown size={13} />}
@@ -66,8 +66,8 @@ export const ovdsSummaryBar: React.FC<ovdsSummaryBarProps> = ({
       {/* Split bar — visual income vs expense */}
       <div className="px-5 mb-4">
         <div className="flex items-center justify-between text-[10px] font-semibold mb-1.5">
-          <span className="text-emerald-600 flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+          <span className="text-[var(--pro-azure-dark)] flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-[var(--pro-azure)] inline-block" />
             Money In ({inPct}%)
           </span>
           <span className="text-rose-500 flex items-center gap-1">
@@ -77,7 +77,7 @@ export const ovdsSummaryBar: React.FC<ovdsSummaryBarProps> = ({
         </div>
         <div className="h-3 rounded-full overflow-hidden flex bg-slate-100">
           <div
-            className="bg-emerald-500 transition-all duration-700 ease-out"
+            className="bg-[var(--pro-azure)] transition-all duration-700 ease-out"
             style={{ width: `${inPct}%` }}
           />
           <div
@@ -94,8 +94,8 @@ export const ovdsSummaryBar: React.FC<ovdsSummaryBarProps> = ({
             sublabel: 'Total revenue',
             value: fmt(moneyIn, currency),
             icon: <TrendingUp size={14} />,
-            iconCls: 'bg-emerald-50 text-emerald-600',
-            valueCls: 'text-emerald-600',
+            iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
+            valueCls: 'text-[var(--pro-azure-dark)]',
           },
           {
             label: 'Money Out',
@@ -110,8 +110,8 @@ export const ovdsSummaryBar: React.FC<ovdsSummaryBarProps> = ({
             sublabel: isProfit ? 'You\'re in the green' : 'Spending more than earning',
             value: fmt(netProfit, currency),
             icon: isProfit ? <TrendingUp size={14} /> : <AlertCircle size={14} />,
-            iconCls: isProfit ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600',
-            valueCls: isProfit ? 'text-emerald-600' : 'text-rose-600',
+            iconCls: isProfit ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]' : 'bg-rose-50 text-rose-600',
+            valueCls: isProfit ? 'text-[var(--pro-azure-dark)]' : 'text-rose-600',
           },
           {
             label: 'Cash Balance',

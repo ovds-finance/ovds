@@ -3,22 +3,6 @@
  * Proclamation No. 1186/2020 + Amendment Proclamation No. 1239/2021
  * Administered by: ERCA
  */
-import React, { useState, useCallback, useEffect } from 'react';
-import {
-  AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
-  Btn, Modal, FormField, Input, Select, Icon, StatusBadge, Amount,
-} from '../components/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
-import { useInterval } from '../hooks';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import {
-  useExciseDashboard,
-  useExciseRecords,
-  useExciseFilings,
-} from '../services/newTaxApi';
 import {
   calculateExciseTax,
   EXCISE_RATES,
@@ -26,8 +10,25 @@ import {
   type ExciseTaxOrigin,
   type ExciseTaxStatus,
 } from '@ovds/ui';
+import React, { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 
-const today = new Date().toISOString().slice(0, 10);
+import {
+  AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
+  Btn, Modal, FormField, Input, Select, Icon, StatusBadge, Amount,
+} from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useInterval } from '../hooks';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import {
+  useExciseDashboard,
+  useExciseRecords,
+  useExciseFilings,
+} from '../services/newTaxApi';
+
+const _today = new Date().toISOString().slice(0, 10);
 const currentPeriod = new Date().toISOString().slice(0, 7);
 
 const GOODS_CATEGORIES: { value: ExciseGoodsCategory; label: string; group: string }[] = [
@@ -55,8 +56,8 @@ const GOODS_CATEGORIES: { value: ExciseGoodsCategory; label: string; group: stri
 const STATUS_COLORS: Record<string, string> = {
   DRAFT:     'bg-slate-100 text-slate-600',
   PENDING:   'bg-amber-50 text-amber-700',
-  PAID:      'bg-emerald-50 text-emerald-700',
-  FILED:     'bg-emerald-50 text-emerald-700',
+  PAID:      'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
+  FILED:     'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
   OVERDUE:   'bg-rose-50 text-rose-700',
   EXEMPTED:  'bg-white text-slate-400',
 };
@@ -143,7 +144,7 @@ const ExciseCalculator: React.FC = () => {
       </div>
 
       <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
-        <input type="checkbox" checked={applyVat} onChange={e => setApplyVat(e.target.checked)} className="rounded accent-emerald-500" />
+        <input type="checkbox" checked={applyVat} onChange={e => setApplyVat(e.target.checked)} className="rounded accent-indigo-500" />
         Also calculate VAT on (base value + excise) — applicable to most excisable goods
       </label>
 
@@ -333,9 +334,9 @@ const ExciseTax: React.FC = () => {
     >
       <AppKpi cells={[
         { label: 'Excise Due',     value: `ETB ${fmtK(totalDue)}`,        icon: <Icon name="RECEIPT" size={14} />, color: 'rose' },
-        { label: 'Total Paid',     value: `ETB ${fmtK(totalPaid)}`,        icon: <Icon name="SUCCESS" size={14} />, color: 'emerald' },
-        { label: 'Outstanding',    value: `ETB ${fmtK(totalOutstanding)}`, icon: <Icon name="WARNING" size={14} />, color: totalOutstanding > 0 ? 'amber' : 'emerald' },
-        { label: 'Penalties',      value: `ETB ${fmtK(penaltiesAccrued)}`, icon: <Icon name="ALERT_TRIANGLE" size={14} />, color: penaltiesAccrued > 0 ? 'rose' : 'emerald' },
+        { label: 'Total Paid',     value: `ETB ${fmtK(totalPaid)}`,        icon: <Icon name="SUCCESS" size={14} />, color: 'green' },
+        { label: 'Outstanding',    value: `ETB ${fmtK(totalOutstanding)}`, icon: <Icon name="WARNING" size={14} />, color: totalOutstanding > 0 ? 'amber' : 'indigo' },
+        { label: 'Penalties',      value: `ETB ${fmtK(penaltiesAccrued)}`, icon: <Icon name="ALERT_TRIANGLE" size={14} />, color: penaltiesAccrued > 0 ? 'rose' : 'indigo' },
       ]} />
 
       {activeTab === 'overview' && (

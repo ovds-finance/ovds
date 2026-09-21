@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from 'react';
 import { BarChart3, AlertCircle, Users, Clock, XCircle } from 'lucide-react';
+import React, { useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface WeeklyActivityChartProps {
@@ -36,9 +36,9 @@ const StackedBar: React.FC<{
   }, [presentH, lateH, absentH]);
 
   const rateColor = attendanceRate > 90
-    ? 'bg-emerald-400 dark:bg-emerald-500'
+    ? 'bg-[var(--pro-azure-light)] dark:bg-[var(--pro-azure-50)]0'
     : attendanceRate > 70
-      ? 'bg-emerald-500'
+      ? 'bg-[var(--pro-azure-50)]0'
       : 'bg-amber-400 dark:bg-amber-500';
 
   return (
@@ -95,8 +95,8 @@ const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({ reports, erro
       {/* Header */}
       <div className="flex justify-between items-center mb-5">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl flex items-center justify-center">
-            <BarChart3 size={14} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="w-8 h-8 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl flex items-center justify-center">
+            <BarChart3 size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-none">{t('admin.weekly_rate')}</h3>
@@ -107,16 +107,16 @@ const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({ reports, erro
           {stats.length > 0 && (
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-lg border uppercase tracking-wider ${
               avgRate >= 90
-                ? 'text-emerald-600 bg-emerald-50 border-emerald-100 dark:bg-emerald-950/40 dark:border-emerald-800 dark:text-emerald-400'
+                ? 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] dark:bg-green-950/40 dark:border-green-800 dark:text-[var(--pro-azure-light)]'
                 : avgRate >= 70
-                  ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 border-emerald-100 dark:bg-emerald-950/40 dark:border-emerald-800'
+                  ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] dark:bg-green-950/40 dark:border-green-800'
                   : 'text-amber-600 bg-amber-50 border-amber-100 dark:bg-amber-950/40 dark:border-amber-800'
             }`}>
               {avgRate}% avg
             </span>
           )}
-          <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400 px-2 py-0.5 rounded-lg border border-emerald-100 dark:border-emerald-800">
-            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+          <span className="flex items-center gap-1 text-[10px] font-semibold text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/40 dark:text-[var(--pro-azure-light)] px-2 py-0.5 rounded-lg border border-[var(--pro-azure-100)] dark:border-green-800">
+            <span className="w-1.5 h-1.5 bg-[var(--pro-azure-50)]0 rounded-full animate-pulse" />
             {t('admin.live_metrics')}
           </span>
         </div>
@@ -162,7 +162,7 @@ const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({ reports, erro
           {stats.length > 0 && (
             <div className="flex items-center gap-5 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex-wrap">
               {[
-                { label: 'Present', count: totals.present, pct: Math.round((totals.present / grandTotal) * 100), color: 'bg-emerald-400', icon: <Users size={9} /> },
+                { label: 'Present', count: totals.present, pct: Math.round((totals.present / grandTotal) * 100), color: 'bg-[var(--pro-azure-light)]', icon: <Users size={9} /> },
                 { label: 'Late', count: totals.late, pct: Math.round((totals.late / grandTotal) * 100), color: 'bg-amber-400', icon: <Clock size={9} /> },
                 { label: 'Absent', count: totals.absent, pct: Math.round((totals.absent / grandTotal) * 100), color: 'bg-rose-300', icon: <XCircle size={9} /> },
               ].map(item => (

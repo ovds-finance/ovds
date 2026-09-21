@@ -71,8 +71,9 @@
     "typecheck": "node ../../../scripts/bin-run.mjs typescript/bin/tsc --noEmit"
   },
   "dependencies": {
-    "@ovds/shared": "*",
+    "@ovds/shared": "workspace:*",
     "class-transformer": "0.5.1",
-    "class-validator": "0.14.4"
+    "class-validator": "0.14.4",
+    "zod": "4.4.3"
   }
 }

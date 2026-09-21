@@ -1,4 +1,4 @@
-/**
+﻿/**
  * useApiCrud — generic CRUD hook
  * Eliminates the repetitive fetch/save/delete pattern across all pages.
  *
@@ -10,6 +10,7 @@
  */
 import { useState, useCallback, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
+
 import api from '../services/api';
 
 export interface CrudOptions {
@@ -55,14 +56,14 @@ export function useApiCrud<T extends { id: string }>(opts: CrudOptions): CrudSta
     //    createdAt, updatedAt, etc.).
     // 3. Prisma relation/computed fields (_count, nested objects that are relations).
     const {
-      id, status, companyId,
+      _id, _status, _companyId,
       // Prisma computed fields
       _count,
       // Common Prisma relation fields that should never be sent back
-      leasePayment, leaseJournalEntry,
-      employee, department, company,
-      user, vendor, customer,
-      items, payments, invoices,
+      _leasePayment, _leaseJournalEntry,
+      _employee, _department, _company,
+      _user, _vendor, _customer,
+      _items, _payments, _invoices,
       ...rest
     } = obj;
     // Also strip any remaining keys that start with _ (Prisma internals)

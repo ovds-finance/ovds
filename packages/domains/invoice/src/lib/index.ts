@@ -1,4 +1,4 @@
-// @ovds/domains/invoice lib exports
+// @ovds/domains-invoice lib exports
 export { InvoiceService } from './invoice.service';
 export type { CreateInvoiceInput, PaginationQuery, Invoice } from './invoice.service';
 export type {

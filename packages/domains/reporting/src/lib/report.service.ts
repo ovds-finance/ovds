@@ -1,6 +1,6 @@
 /**
  * ReportService — Ethiopian IFRS financial statements + MoR submission package.
- * Migrated from apps/backend/src/reporting/report.service.ts into @ovds/domains/reporting.
+ * Migrated from apps/backend/src/reporting/report.service.ts into @ovds/domains-reporting.
  *
  * Delegates statement building to the pure builders in @ovds/shared.
  * Accounting data is fetched via IReportAccountingDeps (injected at app level).
@@ -10,7 +10,7 @@ import {
   BaseService,
   IAuditLogger,
   IPrismaClient,
-} from '@ovds/domains/infrastructure';
+} from '@ovds/domains-infrastructure';
 import {
   buildAccountingCycle,
   buildIncomeStatement,

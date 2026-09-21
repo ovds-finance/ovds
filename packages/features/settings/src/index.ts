@@ -10,6 +10,10 @@ export type {
   SettingDefinition,
   SettingValueResponse,
   SettingOption,
+  RbacRoleDTO,
+  RbacPermissionDTO,
+  SodRuleDTO,
+  AuditEventCatalogDTO,
 } from './types/settings.types';
 
 // ── Page content ───────────────────────────────────────────────────────────────
@@ -29,6 +33,10 @@ export {
   localizationSettingsApi, businessIdentityApi, systemSettingsApi, integrationsSettingsApi,
   maintainingTechnologyApi,
   advancedAccessApi,
+  rolesApi,
+  permissionsApi,
+  sodRulesApi,
+  auditEventCatalogApi,
 } from './services/settingsApi';
 
 // ── Hooks ──────────────────────────────────────────────────────────────────────
@@ -41,5 +49,4 @@ export {
 } from './hooks/useSettings';
 
 // ── Components ────────────────────────────────────────────────────────────────
-export { FieldRow, TextInput, SelectInput, ToggleInput, SetupChecklist } from './components/settingsForms';
 export { SettingsCard } from './components/SettingsCard';

@@ -3,24 +3,25 @@
  * AppPage · AppKpi · AppTable · useApiCrud
  * Ethiopian payroll: PIT, pension, DRRF
  */
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   Users, Plus, Edit2, Trash2, Download, RefreshCw,
   Mail, Phone, Building2, Banknote, Calendar, Upload,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { departmentsApi, employeesApi } from '../services/hrApi';
-import { confirm } from '../utils/confirm';
-import { fmtETB, calculatePIT } from '../utils/ethiopianTax';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select,
   SearchBar, EmptyState, Pagination, EthTaxBadge, Amount,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { departmentsApi, employeesApi } from '../services/hrApi';
+import { confirm } from '../utils/confirm';
+import { fmtETB, calculatePIT } from '../utils/ethiopianTax';
 
 interface Employee {
   id: string;
@@ -135,12 +136,12 @@ const EmployeeForm: React.FC<{
       </div>
       {/* PIT preview */}
       {pitPreview && (
-        <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 space-y-1.5">
-          <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Ethiopian PIT Preview</p>
+        <div className="p-3 bg-[var(--pro-azure-50)] rounded-xl border border-[var(--pro-azure-100)] space-y-1.5">
+          <p className="text-[10px] font-bold text-[var(--pro-azure-dark)] uppercase tracking-wider">Ethiopian PIT Preview</p>
           <div className="grid grid-cols-3 gap-2 text-[10px]">
             <div><p className="text-slate-500">Gross</p><p className="font-bold text-slate-700">{fmtETB(pitPreview.grossSalary)}</p></div>
             <div><p className="text-slate-500">Income Tax</p><p className="font-bold text-rose-600">{fmtETB(pitPreview.incomeTax)}</p></div>
-            <div><p className="text-slate-500">Net Pay</p><p className="font-bold text-emerald-700">{fmtETB(pitPreview.netSalary)}</p></div>
+            <div><p className="text-slate-500">Net Pay</p><p className="font-bold text-[var(--pro-azure-dark)]">{fmtETB(pitPreview.netSalary)}</p></div>
             <div><p className="text-slate-500">Pension (7%)</p><p className="font-bold text-violet-600">{fmtETB(pitPreview.pensionEmployee)}</p></div>
             <div><p className="text-slate-500">Employer (11%)</p><p className="font-bold text-amber-600">{fmtETB(pitPreview.pensionEmployer)}</p></div>
             <div><p className="text-slate-500">DRRF (1%)</p><p className="font-bold text-orange-600">{fmtETB(pitPreview.drrf)}</p></div>
@@ -206,7 +207,7 @@ const Employees: React.FC = () => {
       {
         label: 'Total',
         value: summary?.total ?? total,
-        color: 'emerald' as const,
+        color: 'green' as const,
       },
       {
         label: 'Active',
@@ -306,7 +307,7 @@ const Employees: React.FC = () => {
             <AppTr key={e.id}>
               <AppTd>
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-[11px] font-bold shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--pro-azure)] to-teal-500 flex items-center justify-center text-white text-[11px] font-bold shrink-0">
                     {e.firstName.charAt(0)}{e.lastName.charAt(0)}
                   </div>
                   <div>
@@ -330,7 +331,7 @@ const Employees: React.FC = () => {
               <AppTd><span className="text-[11px] text-slate-600">{e.designation ?? '—'}</span></AppTd>
               <AppTd>
                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold border ${
-                  e.employmentNature === 'Permanent' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                  e.employmentNature === 'Permanent' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' :
                   e.employmentNature === 'Contract' ? 'bg-sky-50 text-sky-700 border-sky-100' :
                   'bg-white text-slate-600 border-slate-200'
                 }`}>{(e.employmentNature ?? 'Permanent').replace(/_/g, ' ')}</span>
@@ -346,7 +347,7 @@ const Employees: React.FC = () => {
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {can('employees:write') && (
                     <>
-                      <button onClick={() => setModal({ open: true, data: { ...e } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all"><Edit2 size={11} /></button>
+                      <button onClick={() => setModal({ open: true, data: { ...e } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all"><Edit2 size={11} /></button>
                       <button onClick={async () => { if (await confirm({ title: `Delete "${e.firstName} ${e.lastName}"?`, variant: 'danger' })) remove(e.id); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all"><Trash2 size={11} /></button>
                     </>
                   )}

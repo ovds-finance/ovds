@@ -1,11 +1,12 @@
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
 import type { ApiResponse } from '@ovds/ui';
-import i18n from '../i18n';
+import axios, { type AxiosInstance } from 'axios';
+import { toast } from 'react-hot-toast';
 import type { NavigateFunction } from 'react-router-dom';
-import { attachRequestSignature } from '../utils/requestSigning';
+
+import i18n from '../i18n';
 import { isHttpOnlyAuth, getCsrfToken } from '../utils/authMode';
 import { BEARER_PREFIX } from '../utils/constants';
+import { attachRequestSignature } from '../utils/requestSigning';
 
 /** Wired by NavigateInjector in app.tsx after BrowserRouter initialises. */
 export const navigateRef: { current: NavigateFunction | null } = { current: null };
@@ -23,7 +24,7 @@ const JITTER_CAP_MS = parseInt(import.meta.env.VITE_JITTER_CAP_MS || '1000', 10)
 const NETWORK_RETRY_BASE_MS = parseInt(import.meta.env.VITE_NETWORK_RETRY_BASE_MS || '500', 10);
 const NETWORK_RETRY_JITTER_MS = parseInt(import.meta.env.VITE_NETWORK_RETRY_JITTER_MS || '250', 10);
 
-const api: any = axios.create({
+const api: AxiosInstance = axios.create({
   baseURL: API_BASE,
   timeout: API_TIMEOUT,
   withCredentials: USE_HTTPONLY,
@@ -32,24 +33,44 @@ const api: any = axios.create({
 
 // -- Status code → user-friendly message map ---------------------------------
 const STATUS_MESSAGES: Record<number, string> = {
+  // 4xx Client Errors
   400: 'Invalid request — please check your input.',
   401: 'Your session has expired. Please log in again.',
   402: 'This feature requires an active subscription.',
   403: 'You don\'t have permission to perform this action.',
   404: 'The requested resource was not found.',
   405: 'This action is not supported here.',
+  406: 'The requested format is not supported.',
+  407: 'Proxy authentication required.',
   408: 'The request timed out. Please try again.',
   409: 'A conflict occurred — this record may already exist.',
   410: 'This resource is no longer available.',
+  411: 'Content-Length header is required.',
+  412: 'Precondition failed — the resource has been modified.',
   413: 'The file or payload is too large.',
+  414: 'The request URI is too long.',
   415: 'Unsupported file type.',
+  416: 'The requested range cannot be satisfied.',
+  417: 'Expectation failed — server cannot meet request headers.',
+  421: 'Request was directed to a server that cannot respond.',
   422: 'The data provided could not be processed.',
+  423: 'The resource is locked.',
+  424: 'A dependent request failed.',
+  428: 'Precondition required — If-Match or If-None-Match header needed.',
   429: 'Too many requests — please wait a moment and try again.',
+  431: 'Request header fields are too large.',
+  451: 'This resource is unavailable for legal reasons.',
+  // 5xx Server Errors
   500: 'A server error occurred. Our team has been notified.',
   501: 'This feature is not yet implemented.',
   502: 'The server received an invalid response from an upstream service.',
   503: 'The service is temporarily unavailable. Please try again shortly.',
   504: 'The server took too long to respond. Please try again.',
+  505: 'HTTP version not supported.',
+  507: 'Insufficient storage to complete the request.',
+  508: 'Loop detected while processing the request.',
+  510: 'Further extensions required to fulfill the request.',
+  511: 'Network authentication required.',
 };
 
 // -- Jitter helper — prevents thundering herd on concurrent retries -----------
@@ -554,15 +575,33 @@ export async function apiGetPaginated<T>(
 export const apiGetBackground = <T>(url: string, params?: Record<string, unknown>) =>
   api.get(url, { params, headers: { 'x-background': 'true' } }).then(extractData<T>);
 
+// -- Background request config — typed alternative to `as any` casts ----------
+
+/**
+ * Returns a properly-typed Axios request config that marks the request as a
+ * background fetch (suppresses global error toasts and the loading indicator).
+ *
+ * Use this instead of `{ headers: { 'x-background': '1' } } as any`:
+ *
+ *   // Before — loses type safety:
+ *   api.get('/path', { headers: { 'x-background': '1' } } as any)
+ *
+ *   // After — fully typed:
+ *   api.get('/path', bgConfig())
+ */
+export function bgConfig(extra?: Record<string, unknown>): { headers: Record<string, string> } & Record<string, unknown> {
+  return { ...extra, headers: { 'x-background': '1' } };
+}
+
 // -- Offline Resilience (MoR Regulation No. 570/2025) -------------------------
 
 export async function getOfflineCapabilities() {
-  const res = await api.get('/offline/capabilities', { headers: { 'x-background': '1' } } as any);
+  const res = await api.get('/offline/capabilities', bgConfig());
   return res.data?.data ?? res.data;
 }
 
 export async function getOfflineSLAReport() {
-  const res = await api.get('/offline/sla-report', { headers: { 'x-background': '1' } } as any);
+  const res = await api.get('/offline/sla-report', bgConfig());
   return res.data?.data ?? res.data;
 }
 

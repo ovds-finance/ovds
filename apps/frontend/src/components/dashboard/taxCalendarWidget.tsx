@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Calendar, AlertTriangle, CheckCircle2, ArrowRight,
   Globe, Shield, Banknote, FileText, ChevronRight,
 } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 
 interface Deadline {
   id: string;
@@ -53,7 +53,7 @@ const TaxCalendarWidget: React.FC<TaxCalendarWidgetProps> = ({ compact = false }
       if (days < 0) return { color: 'text-rose-700 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-950/30', border: 'border-rose-200 dark:border-rose-800' };
       if (days <= 3) return { color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-950/30', border: 'border-rose-200 dark:border-rose-800' };
       if (days <= 7) return { color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200 dark:border-amber-800' };
-      return { color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-800' };
+      return { color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30', border: 'border-[var(--pro-azure-100)] dark:border-green-800' };
     };
 
     const items: Deadline[] = [
@@ -166,7 +166,7 @@ const TaxCalendarWidget: React.FC<TaxCalendarWidgetProps> = ({ compact = false }
               <AlertTriangle size={9} /> {urgentCount} urgent
             </span>
           )}
-          <Link to="/tax/dashboard" className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+          <Link to="/tax/dashboard" className="flex items-center gap-1 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
             Tax Dashboard <ChevronRight size={10} />
           </Link>
         </div>
@@ -209,13 +209,13 @@ const TaxCalendarWidget: React.FC<TaxCalendarWidgetProps> = ({ compact = false }
 
       {/* PIT reminder */}
       <div className="px-4 pb-4">
-        <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl border border-emerald-100 dark:border-emerald-900/40">
-          <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+        <div className="flex items-center gap-3 px-4 py-3 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl border border-[var(--pro-azure-100)] dark:border-green-900/40">
+          <CheckCircle2 size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0" />
           <div className="flex-1">
             <p className="text-xs font-bold text-slate-700 dark:text-slate-300">PIT Brackets Active</p>
             <p className="ovds-caption">Progressive 0–35% · Pension 7%/11% · Auto-calculated in payroll</p>
           </div>
-          <Link to="/hr/payroll" className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-0.5">
+          <Link to="/hr/payroll" className="text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline flex items-center gap-0.5">
             Payroll <ArrowRight size={9} />
           </Link>
         </div>

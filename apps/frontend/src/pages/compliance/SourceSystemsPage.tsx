@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
   useEimsSourceSystems,
   useEimsEnterprises,
@@ -6,16 +5,19 @@ import {
   useRegisterSourceSystem,
   useUpdateSourceSystemStep,
 } from '@ovds/features/eims';
-import toast from 'react-hot-toast';
-import { useBusiness } from '../../context/businessContext';
 import {
   Server, Plus, ChevronRight, ChevronLeft, AlertTriangle, CheckCircle2, Circle, Building2, MapPin,
 } from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+
+import { useBusiness } from '../../context/businessContext';
+
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING: 'text-amber-600 bg-amber-50',
-  ACTIVE: 'text-emerald-600 bg-emerald-50',
-  APPROVED: 'text-emerald-600 bg-emerald-50',
+  ACTIVE: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
+  APPROVED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   REJECTED: 'text-rose-600 bg-rose-50',
   INACTIVE: 'text-slate-600 bg-slate-100',
 };
@@ -43,7 +45,7 @@ const SourceSystemsPage: React.FC = () => {
   const { data: enterprises = [] } = useEimsEnterprises();
   const { data: establishments = [] } = useEimsEstablishments(selectedEnterpriseId);
   const registerSource = useRegisterSourceSystem();
-  const updateStep = useUpdateSourceSystemStep();
+  const _updateStep = useUpdateSourceSystemStep();
 
   const handleRegister = async () => {
     if (!form.systemNumber) {
@@ -96,7 +98,7 @@ const SourceSystemsPage: React.FC = () => {
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
             {['Enterprise', 'Establishment', 'Details', 'Approval'].map((label, i) => (
               <React.Fragment key={label}>
-                <span className={`px-2 py-1 rounded-lg ${i < step ? 'bg-emerald-100 text-emerald-700' : i === step ? 'bg-teal-100 text-teal-700' : 'bg-slate-200 text-slate-500'}`}>
+                <span className={`px-2 py-1 rounded-lg ${i < step ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : i === step ? 'bg-teal-100 text-teal-700' : 'bg-slate-200 text-slate-500'}`}>
                   {i + 1}. {label}
                 </span>
                 {i < 3 && <ChevronRight size={12} className="text-slate-300" />}
@@ -235,7 +237,7 @@ const SourceSystemsPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleApprove(s.id)}
-                        className="text-xs px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100"
+                        className="text-xs px-2 py-1 bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] rounded-lg hover:bg-[var(--pro-azure-100)]"
                       >
                         Approve
                       </button>

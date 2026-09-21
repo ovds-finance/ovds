@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { useBusiness } from '../../context/businessContext';
-import { useGovernanceList, useCreateGovernance, useDeleteGovernance } from '@ovds/features/compliance';
-import toast from 'react-hot-toast';
+﻿import { useGovernanceList, useCreateGovernance, useDeleteGovernance } from '@ovds/features/compliance';
 import { Shield, Users, FileCheck, Plus, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+
+import { useBusiness } from '../../context/businessContext';
 
 const GovernancePage: React.FC = () => {
   const { selectedCompanyId } = useBusiness();
@@ -20,7 +21,7 @@ const GovernancePage: React.FC = () => {
       setNewKey('');
       setNewValue('');
       refetch();
-    } catch (e) {
+    } catch (_e) {
       toast.error('Failed to create governance record');
     }
   };
@@ -30,7 +31,7 @@ const GovernancePage: React.FC = () => {
       await deleteMutation.mutateAsync(key);
       toast.success('Governance record deleted');
       refetch();
-    } catch (e) {
+    } catch (_e) {
       toast.error('Failed to delete governance record');
     }
   };
@@ -40,8 +41,8 @@ const GovernancePage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/30">
-          <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+        <div className="p-2.5 rounded-xl bg-[var(--pro-azure-50)] ">
+          <Shield className="w-6 h-6 text-[var(--pro-azure)]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">
@@ -55,7 +56,7 @@ const GovernancePage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-          <Users className="w-5 h-5 text-indigo-500 mb-2" />
+          <Users className="w-5 h-5 text-[var(--pro-azure)] mb-2" />
           <h3 className="font-semibold text-slate-800 dark:text-slate-100">Board Structure</h3>
           <p className="text-xs text-slate-500 mt-1">Directors, committees, and independence matrix</p>
         </div>
@@ -78,7 +79,7 @@ const GovernancePage: React.FC = () => {
           <p className="text-sm text-slate-500">No governance records yet.</p>
         )}
         <div className="space-y-2">
-          {records.map((r) => (
+          {records.map((r: { id: string; key: string; value: string }) => (
             <div key={r.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50">
               <div>
                 <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{r.key}</p>
@@ -111,7 +112,7 @@ const GovernancePage: React.FC = () => {
           <button
             onClick={handleCreate}
             disabled={createMutation.isPending}
-            className="px-4 py-2 text-sm font-semibold bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 flex items-center gap-1"
+            className="px-4 py-2 text-sm font-semibold bg-[var(--pro-azure)] text-white rounded-lg hover:bg-[var(--pro-azure)] disabled:opacity-50 flex items-center gap-1"
           >
             <Plus className="w-4 h-4" /> Add
           </button>

@@ -1,18 +1,20 @@
 /**
  * Purchase Receipts — save time recording receipts by uploading images
  */
-import React, { useState, useRef, useMemo } from 'react';
-import { Receipt, RefreshCw, Download, Camera, Calendar, X, Upload, Loader2, FileImage } from 'lucide-react';
-import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Receipt, RefreshCw, Download, Camera, Calendar, X, Upload, Loader2, FileImage } from 'lucide-react';
+import React, { useState, useRef, useMemo } from 'react';
+import toast from 'react-hot-toast';
+
 import {
   AppPage, AppTabs, AppTable, AppTh, AppTd, AppTr,
   Btn, SearchBar, EmptyState, Pagination, Amount,
 } from '../components/ui';
-import { fmtETB } from '../utils/ethiopianTax';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
 import api from '../services/api';
+import { normalizeOcrError } from '../utils';
+import { fmtETB } from '../utils/ethiopianTax';
 
 interface PurchaseReceipt {
   id: string;
@@ -94,7 +96,7 @@ const UploadReceiptModal: React.FC<UploadReceiptModalProps> = ({ open, onClose, 
       onClose();
       reset();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? 'Upload failed');
+      toast.error(normalizeOcrError(err?.response?.data?.message ?? 'Upload failed'));
     } finally {
       setUploading(false);
     }
@@ -223,7 +225,7 @@ const PurchaseReceipts: React.FC = () => {
   }, [rows, tab, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total',    value: rows.length,                                                    color: 'emerald' as const },
+    { label: 'Total',    value: rows.length,                                                    color: 'green' as const },
     { label: 'Cash',     value: rows.filter(r => r.paymentMethod === 'CASH').length,            color: 'sky' as const },
     { label: 'Bank',     value: rows.filter(r => ['BANK_TRANSFER','CHEQUE'].includes(r.paymentMethod ?? '')).length, color: 'violet' as const },
     { label: 'Total ETB',value: fmtETB(rows.reduce((s, r) => s + Number(r.amount ?? 0), 0)),   color: 'amber' as const },
@@ -243,7 +245,7 @@ const PurchaseReceipts: React.FC = () => {
   };
 
   const METHOD_CLS: Record<string, string> = {
-    CASH:          'bg-emerald-50 text-emerald-700 border-emerald-100',
+    CASH:          'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
     BANK_TRANSFER: 'bg-sky-50 text-sky-700 border-sky-100',
     CHEQUE:        'bg-white text-slate-600 border-slate-200',
     TELEBIRR:      'bg-violet-50 text-violet-700 border-violet-100',

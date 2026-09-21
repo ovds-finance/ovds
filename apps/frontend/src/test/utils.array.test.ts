@@ -3,6 +3,7 @@
  * Covers safe array extraction from OVDS API response shapes.
  */
 import { describe, it, expect } from 'vitest';
+
 import { toArray, unwrapArray, unwrapNestedArray } from '../utils/array';
 
 // -- toArray() -----------------------------------------------------------------

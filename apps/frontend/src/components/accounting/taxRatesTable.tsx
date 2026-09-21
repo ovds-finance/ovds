@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../rbac/AuthContext';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
+import { Button } from '@ovds/ui';
+import { Badge } from '@ovds/ui';
 import {
   Plus, Trash2, Edit3, Paperclip
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+
+import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
 import AttachmentModal from '../banking/attachmentModal';
-import { Button } from '@ovds/ui';
-import { Badge } from '@ovds/ui';
+
+
 import TaxRateModal from './taxRateModal';
 
 interface TaxRate {
@@ -50,7 +53,9 @@ const TaxRatesTable: React.FC = () => {
   const loadRates = async () => {
     try {
       const res = await api.get('/ovds/tax-rates');
-      setRates(res.data);
+      // The endpoint wraps data: { success: true, data: [...] } or returns an array directly
+      const payload = res.data?.data ?? res.data;
+      setRates(Array.isArray(payload) ? payload : []);
     } catch {
       toast.error('Failed to load tax rates');
     } finally {
@@ -212,7 +217,7 @@ const TaxRatesTable: React.FC = () => {
                   type="checkbox"
                   checked={selectedRates.length === paginatedRates.length && paginatedRates.length > 0}
                   onChange={(e) => selectAll(e.target.checked)}
-                  className="rounded border-slate-300 text-emerald-600 dark:text-emerald-400 focus:ring-teal-400"
+                  className="rounded border-slate-300 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] focus:ring-teal-400"
                 />
               </th>
               <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Name</th>
@@ -232,11 +237,11 @@ const TaxRatesTable: React.FC = () => {
                     type="checkbox"
                     checked={selectedRates.includes(rate.id)}
                     onChange={() => toggleSelection(rate.id)}
-                    className="rounded border-slate-300 text-emerald-600 dark:text-emerald-400 focus:ring-teal-400 w-4 h-4"
+                    className="rounded border-slate-300 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] focus:ring-teal-400 w-4 h-4"
                   />
                 </td>
                 <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">{rate.name}</td>
-                <td className="px-4 py-3 text-right font-mono text-sm text-emerald-700">
+                <td className="px-4 py-3 text-right font-mono text-sm text-[var(--pro-azure-dark)]">
                   {rate.calculationType === 'FIXED'
                     ? `ETB ${(rate.specificAmount || 0).toFixed(2)}`
                     : `${(rate.rate * 100).toFixed(1)}%`}

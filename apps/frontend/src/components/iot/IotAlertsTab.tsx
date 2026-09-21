@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { useIotAlerts, useAcknowledgeAlert, useResolveAlert } from '../../services/iotApi';
-import { AppTable, AppTh, AppTd, AppTr, Btn, Icon, Input } from '../ui';
-import { useAuth } from '../../rbac/AuthContext';
 import toast from 'react-hot-toast';
-import { fmtDateTime } from '../../utils/fmt';
+
 import { SEVERITY_COLOR } from '../../pages/IotHub';
+import { useAuth } from '../../rbac/AuthContext';
+import { useIotAlerts, useAcknowledgeAlert, useResolveAlert } from '../../services/iotApi';
+import { fmtDateTime } from '../../utils/fmt';
+import { AppTable, AppTh, AppTd, AppTr, Btn, Icon, Input } from '../ui';
+
 
 const STATUS_TABS = ['OPEN', 'ACKNOWLEDGED', 'RESOLVED', 'SUPPRESSED', ''] as const;
 
@@ -45,7 +47,7 @@ const IotAlertsTab: React.FC = () => {
               className={[
                 'px-3 py-1.5 text-[11px] font-semibold transition-colors',
                 statusFilter === s
-                  ? 'bg-emerald-500 text-white'
+                  ? 'bg-[var(--pro-azure)] text-white'
                   : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800',
               ].join(' ')}
             >
@@ -128,7 +130,7 @@ const IotAlertsTab: React.FC = () => {
                   <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
                     a.status === 'OPEN' ? 'bg-rose-100 text-rose-700' :
                     a.status === 'ACKNOWLEDGED' ? 'bg-amber-100 text-amber-700' :
-                    a.status === 'RESOLVED' ? 'bg-emerald-100 text-emerald-700' :
+                    a.status === 'RESOLVED' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' :
                     'bg-slate-100 text-slate-500'
                   }`}>
                     {a.status}
@@ -154,7 +156,7 @@ const IotAlertsTab: React.FC = () => {
                         <button
                           onClick={() => handleResolve(a.id)}
                           disabled={resolveMutation.isPending}
-                          className="text-[10px] font-bold text-emerald-600 hover:text-emerald-700 disabled:opacity-50"
+                          className="text-[10px] font-bold text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] disabled:opacity-50"
                           title="Resolve alert"
                         >
                           Resolve

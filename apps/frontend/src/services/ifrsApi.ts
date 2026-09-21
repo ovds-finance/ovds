@@ -4,7 +4,7 @@
  * Covers: IAS 1, IFRS 15, IAS 12, IAS 19, IAS 37, IFRS 18 (2027)
  * Ethiopian context: AABE Tier 1/2/3, Proclamation 1341/2024, Regulation 570/2025
  */
-import api from './api';
+import api, { bgConfig } from './api';
 
 // -- Types ---------------------------------------------------------------------
 
@@ -307,7 +307,6 @@ export interface ReportParams { [k: string]: string | undefined;
 }
 
 const BASE = '/ovds/ifrs-ethiopia';
-const bg   = { headers: { 'x-background': '1' } } as any;
 
 function buildQ(p: ReportParams & { [k: string]: string | undefined }) {
   const q = new URLSearchParams();
@@ -317,55 +316,55 @@ function buildQ(p: ReportParams & { [k: string]: string | undefined }) {
 
 /** Full MoR submission package — all 4 statements + Schedule A + HR + compliance */
 export async function getMoRPackage(params: ReportParams = {}): Promise<any> {
-  const res = await api.get(`${BASE}/package${buildQ(params)}`, bg).catch(() => ({ data: null }));
+  const res = await api.get(`${BASE}/package${buildQ(params)}`, bgConfig()).catch(() => ({ data: null }));
   return res.data?.data ?? res.data ?? null;
 }
 
 /** Bilingual Income Statement — IFRS 18 categories */
 export async function getMoRIncomeStatement(params: ReportParams = {}): Promise<any> {
-  const res = await api.get(`${BASE}/income-statement${buildQ(params)}`, bg).catch(() => ({ data: null }));
+  const res = await api.get(`${BASE}/income-statement${buildQ(params)}`, bgConfig()).catch(() => ({ data: null }));
   return res.data?.data ?? res.data ?? null;
 }
 
 /** Statement of Financial Position — IAS 1.54 with all Ethiopian tax liabilities */
 export async function getMoRBalanceSheet(params: ReportParams = {}): Promise<any> {
-  const res = await api.get(`${BASE}/balance-sheet${buildQ(params)}`, bg).catch(() => ({ data: null }));
+  const res = await api.get(`${BASE}/balance-sheet${buildQ(params)}`, bgConfig()).catch(() => ({ data: null }));
   return res.data?.data ?? res.data ?? null;
 }
 
 /** Statement of Cash Flows — IAS 7 indirect method */
 export async function getMoRCashFlow(params: ReportParams = {}): Promise<any> {
-  const res = await api.get(`${BASE}/cash-flow${buildQ(params)}`, bg).catch(() => ({ data: null }));
+  const res = await api.get(`${BASE}/cash-flow${buildQ(params)}`, bgConfig()).catch(() => ({ data: null }));
   return res.data?.data ?? res.data ?? null;
 }
 
 /** Schedule A — CIT / MAT computation (Proc. 979/2016 / 1395/2025) */
 export async function getMoRScheduleA(params: ReportParams = {}): Promise<any> {
-  const res = await api.get(`${BASE}/schedule-a${buildQ(params)}`, bg).catch(() => ({ data: null }));
+  const res = await api.get(`${BASE}/schedule-a${buildQ(params)}`, bgConfig()).catch(() => ({ data: null }));
   return res.data?.data ?? res.data ?? null;
 }
 
 /** Compliance dashboard — VAT / PAYE / Pension / CIT / WHT */
 export async function getMoRCompliance(params: ReportParams = {}): Promise<any> {
-  const res = await api.get(`${BASE}/compliance${buildQ(params)}`, bg).catch(() => ({ data: null }));
+  const res = await api.get(`${BASE}/compliance${buildQ(params)}`, bgConfig()).catch(() => ({ data: null }));
   return res.data?.data ?? res.data ?? null;
 }
 
 /** HR & Payroll MoR reconciliation — IAS 19 + PAYE + Pension */
 export async function getMoRHRPayroll(params: ReportParams = {}): Promise<any> {
-  const res = await api.get(`${BASE}/hr-payroll${buildQ(params)}`, bg).catch(() => ({ data: null }));
+  const res = await api.get(`${BASE}/hr-payroll${buildQ(params)}`, bgConfig()).catch(() => ({ data: null }));
   return res.data?.data ?? res.data ?? null;
 }
 
 /** Accounting cycle audit trail — 7 steps IoT/SRM → MoR */
 export async function getMoRAccountingCycle(params: ReportParams = {}): Promise<any> {
-  const res = await api.get(`${BASE}/accounting-cycle${buildQ(params)}`, bg).catch(() => ({ data: null }));
+  const res = await api.get(`${BASE}/accounting-cycle${buildQ(params)}`, bgConfig()).catch(() => ({ data: null }));
   return res.data?.data ?? res.data ?? null;
 }
 
 /** Notes to Financial Statements — 11 IFRS disclosure notes */
 export async function getMoRNotes(params: ReportParams = {}): Promise<any> {
-  const res = await api.get(`${BASE}/notes${buildQ(params)}`, bg).catch(() => ({ data: null }));
+  const res = await api.get(`${BASE}/notes${buildQ(params)}`, bgConfig()).catch(() => ({ data: null }));
   return res.data?.data ?? res.data ?? null;
 }
 

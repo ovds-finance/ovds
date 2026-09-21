@@ -8,7 +8,7 @@
 >
 > **Lifecycle phase:** [Phase 1 — Data Capture](./../FILING-LIFECYCLE.md#2-phase-1--data-capture) &middot; [Phase 2 — Tax Calculation](./../FILING-LIFECYCLE.md#3-phase-2--tax-calculation--accrual) | Rates: [`CORE-CONFIG.md`](./../CORE-CONFIG.md#7-tax-rate--deadline-summary)
 
-It is easy to start creating an invoice on OVDS using the OVDS-style UI. You can add recipients, apply global or line discounts, and assign taxes — all from a single invoice creation page.
+It is easy to start creating an invoice on Ovds. You can add recipients, global/line discounts, and taxes.
 
 ---
 
@@ -27,72 +27,48 @@ Before creating your first invoice, confirm the following are already configured
 
 ## Creating an Invoice
 
-### Step 1 — Navigate to Invoices
+Once you log in to your dashboard, go to **Sales** on the navigation menu bar.
 
-1. Log in to your OVDS Dashboard.
-2. On the main navigation menu bar, click **Sales**.
-3. Click **Sales** to reveal the drop-down menu.
-4. Select **Invoices**.
-5. From the Invoices dashboard, click **New Invoice** in the top-right corner.
+1. Click **Sales** to reveal a drop-down menu.
+2. Select **Invoices**.
+3. From the Invoices dashboard, click **New Invoice**.
+4. Enter the required details on the Invoice creation page.
 
----
+Invoice creation details include but are not limited to **Customer**, **Title**, **Logo**, **Billing information**, **Date**, **Order number**, and more.
 
-### Step 2 — Fill in Invoice Details
-
-On the invoice creation page, enter the following details:
-
-| Field | Required | Notes |
-|-------|----------|-------|
-| Customer | ✅ | TIN required for B2B VAT invoices |
-| Title | Optional | e.g. *Invoice #1024* or a descriptive label |
-| Invoice Date | ✅ | Date of issue — defaults to today |
-| Due Date | ✅ | Calculated from your default payment terms |
-| Invoice Number | Auto | System-generated; you can override it manually |
-| Order Number | Optional | Reference number from the customer's purchase order |
-| Currency | ✅ | Defaults to ETB; change per customer if needed |
-| VAT Rate (per item) | ✅ | 15%, 0%, or Exempt — assigned at the line item level |
-| ERCA QR Code | Auto | NBE-IQR format — generated automatically on every invoice PDF |
-
-> **Logo** is set globally in **Settings → Company**, not per invoice. It appears automatically on every invoice PDF once configured.
+![New Invoice page showing Company, Billing, and Items sections](../../docs/images/new-invoice.png)
 
 ---
 
-### Step 3 — Add a Customer
+### Add a Customer
 
-1. In the **Billing** section, click **Add a Customer**.
-2. Select an existing customer from the dropdown, or click **New Customer** to create one.
-3. On the New Customer form, enter the customer's details.
+1. Add a recipient to the invoice by selecting **Add a Customer**.
+2. Click **New Customer** and enter the customer details.
    - **Customer Name** and **Payment Currency** are required fields.
-4. Click **Save**.
+3. Click **Save**.
 
 ---
 
-### Step 4 — Add Items or Services
+### Add Items or Services
 
-1. Click **Add an Item**.
-2. Enter the following for each item:
-   - **Item Name**
-   - **Description**
-   - **Quantity**
-   - **Unit Price**
-3. The invoice total is automatically calculated as you add items.
-4. Repeat for each additional product or service.
-
-> You can apply a **discount** or assign a **tax** directly on each item line. See the sections below for details.
+1. Click **Add an Item** to add services or products.
+2. Enter the **item name**, **description**, **quantity**, and **price**.
+3. The invoice total price is automatically calculated.
+4. After entering the necessary details, click **Save**.
 
 ---
 
-### Step 5 — Notes, Footer, and Attachments
+### Notes and Advanced Options
 
-1. In the **Notes** field, add any instructions or information for the recipient — for example, payment instructions or late fee policies.
-2. Scroll down and click **Advanced** to expand additional options:
-   - **Footer** — add text that appears at the bottom of the invoice PDF (e.g., bank details, registration number)
-   - **Category** — assign the invoice to an accounting category
-   - **Attachments** — upload supporting documents or receipts
+You can add **Notes** to invoices for instructions to the recipient.
+
+The **Advanced** option lets you define a **Footer**, **Category**, and upload **Attachments** where necessary.
+
+![Invoice bottom section showing Notes and Advanced fields](../../docs/images/invoice-advanced.png)
 
 ---
 
-### Step 6 — Save or Send
+### Save or Send
 
 - Click **Save** to store the invoice as a **Draft** for review before distributing.
 - Click **Send To** to email the invoice directly to the customer as a PDF.
@@ -122,7 +98,7 @@ Once saved or sent, each invoice carries a colored status badge visible in **Sal
 
 ## Adding Discounts to Invoices
 
-You can apply a **global discount** to the entire invoice total, or limit discounts to specific line items. Line-level discounts are called **line discounts**.
+When creating an invoice, you can apply a **global discount** to the entire invoice total, or limit the discount to specific invoice items. Discounts applied to specific invoice items are called **line discounts**.
 
 ### Enable Line Discounts First
 
@@ -137,11 +113,12 @@ Line discounts are disabled by default. To turn them on:
 
 Once line discounts are enabled:
 
-1. While creating an invoice, click **Add an Item** (or **New Item**).
-2. Enter the item details — name, description, quantity, and price.
-3. Below the **Quantity** field on the item row, click **Add Discount**.
-4. Enter the discount as a **percentage** or a **fixed currency amount**.
-5. The discounted total is automatically recalculated on the invoice.
+1. While creating an invoice, click **New Item**. Enter the item details — name, description, quantity, and amount.
+2. Below the **Quantity** input box, click **Add Discount**.
+3. Enter the discount as a **percentage** or a **fixed currency amount**.
+4. The total discount is automatically calculated on the invoice.
+
+![Invoice item row with Add Discount highlighted below the Quantity field](../../docs/images/invoice-line-discount.png)
 
 > Global discounts (applied to the whole invoice total) are available without any settings change and can be entered in the discount field at the bottom of the line items section.
 
@@ -149,17 +126,15 @@ Once line discounts are enabled:
 
 ## Adding Taxes to Invoices
 
-> **Prerequisite:** Tax rates must be pre-configured in **Settings → Taxes** before they can be assigned to invoice items. If you have not done this yet, go to **Settings → Taxes** and create the applicable rates (e.g., VAT 15%, TOT, Exempt) first.
+1. While creating an invoice, click **New Item**. Enter the item details — name, description, quantity, and amount.
+2. Below the **Price** input box, click **Add Tax**.
+3. Click **New Tax** from the dropdown option and enter the required details:
+   - **Name** — e.g. *VAT 20%*
+   - **Rate** — entered as a percentage (e.g. `20`)
+4. Click **Save**.
+5. The added tax is automatically applied to the total invoice amount.
 
-1. While creating an invoice, click **Add an Item** (or **New Item**).
-2. Enter the item details — name, description, quantity, and price.
-3. Below the **Price** field on the item row, click **Add Tax**.
-4. Click **New Tax** from the dropdown.
-5. Enter the required details:
-   - **Name** — e.g. *VAT 15%*
-   - **Rate** — entered as a percentage (e.g. `15`)
-6. Click **Save**.
-7. The tax is automatically applied to that item and reflected in the invoice total.
+![Invoice item row with Add Tax button highlighted below the Price field](../../docs/images/invoice-add-tax.png)
 
 > You can assign multiple tax rates to a single line item (e.g., VAT + TOT). Each tax is calculated independently and shown in the invoice PDF breakdown.
 
@@ -167,14 +142,14 @@ Once line discounts are enabled:
 
 ## Changing the Color of an Invoice
 
-While creating an invoice, you can customize the accent color of the invoice PDF to match your customer's brand or your own.
-
-> Note: This color change applies to the **invoice PDF and print layout** only — it does not change the appearance of the invoice record in your dashboard list.
+While creating an invoice, you can customize the color to match your customer's brand colors.
 
 1. On the **New Invoice** page, scroll down to **Advanced**.
 2. Click **Advanced** to expand the section.
-3. Click the **Color** icon to open an extended color palette, or type a hex color code manually (e.g., `#2563EB`).
+3. Click the **Color** icon to see an extended color palette, or enter the color code manually.
 4. Click **Save**.
+
+> Note: This color change applies to the **invoice PDF and print layout** only — it does not change the appearance of the invoice record in your dashboard list.
 
 ---
 

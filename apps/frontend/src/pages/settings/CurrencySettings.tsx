@@ -1,13 +1,17 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { orpc } from '../../lib/orpc';
-import toast from 'react-hot-toast';
-import { usePageTitle } from '../../hooks/usePageTitle';
-import { useBusiness } from '../../context/businessContext';
 import {
   DollarSign, ArrowRight, Settings, RefreshCw, Save,
 } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+
+import { useBusiness } from '../../context/businessContext';
+import { usePageTitle } from '../../hooks/usePageTitle';
+import { orpc } from '../../lib/orpc';
+
+
+
 
 const CurrencySettings: React.FC = () => {
   usePageTitle('Currency Settings');
@@ -27,7 +31,7 @@ const CurrencySettings: React.FC = () => {
 
   const updateMutation = useMutation({
     mutationFn: ({ section, data }: { section: string; data: Record<string, string> }) =>
-      orpc.settings.profile.update({ companyId: companyId!, section, data }),
+      orpc.settings.profile.update({ companyId: companyId!, section: section as any, data }),
     onSuccess: () => {
       toast.success('Currency settings saved');
       qc.invalidateQueries({ queryKey: ['settings', 'profile', companyId] });
@@ -135,7 +139,7 @@ const CurrencySettings: React.FC = () => {
               role="switch"
               aria-checked={autoUpdate}
               onClick={() => setAutoUpdate(!autoUpdate)}
-              className={`relative inline-flex w-9 h-5 rounded-full transition-colors ${autoUpdate ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`}
+              className={`relative inline-flex w-9 h-5 rounded-full transition-colors ${autoUpdate ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-300 dark:bg-slate-600'}`}
             >
               <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${autoUpdate ? 'translate-x-4' : 'translate-x-0.5'}`} />
             </button>
@@ -165,7 +169,7 @@ const CurrencySettings: React.FC = () => {
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() => navigate('/banking/fx-rates')}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-lg text-sm font-medium hover:bg-[var(--pro-azure-dark)] transition-colors"
           >
             <DollarSign size={16} />
             Manage Exchange Rates

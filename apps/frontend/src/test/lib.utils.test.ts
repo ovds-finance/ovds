@@ -3,6 +3,7 @@
  * cn() — Tailwind class merging utility
  */
 import { describe, it, expect } from 'vitest';
+
 import { cn } from '../lib/utils';
 
 describe('cn()', () => {

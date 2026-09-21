@@ -1,18 +1,22 @@
 import { Module } from '@nestjs/common';
+import { VatService } from '@ovds/domains-vat';
+
+import { AuditLogModule } from '../audit-log/audit-log.module';
+import { AuditLogService } from '../audit-log/audit-log.service';
+import { AuthModule } from '../auth/auth.module';
+import { PrismaModule } from '../common/prisma.module';
+import { PrismaService } from '../common/prisma.service';
+
 import { TaxController } from './tax.controller';
 import { TaxService } from './tax.service';
 import { VatController } from './vat.controller';
-import { VatService } from '@ovds/domains/vat';
-import { PrismaModule } from '../common/prisma.module';
-import { PrismaService } from '../common/prisma.service';
-import { AuditLogModule } from '../audit-log/audit-log.module';
-import { AuditLogService } from '../audit-log/audit-log.service';
 
 @Module({
-  imports: [PrismaModule, AuditLogModule],
+  imports: [PrismaModule, AuditLogModule, AuthModule],
   controllers: [TaxController, VatController],
   providers: [
     TaxService,
+    PrismaService,
     {
       provide: VatService,
       useFactory: (prisma: PrismaService) => {

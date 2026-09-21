@@ -14,11 +14,12 @@
  * StrictMode note: the `exchanged` ref is reset on unmount so React's
  * double-invocation in development doesn't silently skip the exchange.
  */
-import { useEffect, useRef } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
+import { useEffect, useRef } from 'react';
+import toast from 'react-hot-toast';
+
 import { useAuth } from '../rbac/AuthContext';
 import type { AuthUser } from '../rbac/AuthContext';
-import toast from 'react-hot-toast';
 import { BEARER_PREFIX } from '../utils/constants';
 
 const AUTH0_ENABLED = import.meta.env.VITE_AUTH0_ENABLED === 'true';

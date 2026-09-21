@@ -3,17 +3,19 @@
  * Mirrors AddInvoiceModal layout: full-screen form-document + right summary sidebar
  * IFRS 15 compliant · ERCA-ready · Ethiopian ETB
  */
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { evalMath } from '@ovds/ui';
 import {
   X, Plus, Trash2, FileText, Send, Eye, Percent,
   ChevronDown, ChevronRight, StickyNote, Mail, Phone, MapPin,
   CheckCircle2, Info, Loader2, Hash, User, Tag, Save,
   AlertTriangle, RefreshCw,
 } from 'lucide-react';
-import { estimatesApi } from '../../services/ovdsApi';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+
 import { useBusiness } from '../../context/businessContext';
-import toast from 'react-hot-toast';
-import { evalMath } from '@ovds/ui';
+import { estimatesApi } from '../../services/ovdsApi';
+
 
 interface EstimateModalProps {
   show: boolean;
@@ -37,6 +39,7 @@ const inp = 'aki-input';
 const lbl = 'aki-label';
 
 // ── Collapsible section ──────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Sec: React.FC<{
   title: string; icon: React.ReactNode; open?: boolean; children: React.ReactNode;
 }> = ({ title, icon, open: initOpen = false, children }) => {
@@ -147,8 +150,8 @@ const EstimateModal: React.FC<EstimateModalProps> = ({
 
   if (!show) return null;
 
-  return (
-    <div className="fixed inset-0 z-[60] flex items-stretch bg-slate-900/70 backdrop-blur-sm overflow-hidden"
+  return createPortal(
+    <div className="fixed inset-0 z-[310] flex items-stretch bg-slate-900/70 backdrop-blur-sm overflow-hidden"
       role="dialog" aria-modal="true" aria-label={isEditing ? 'Edit Estimate' : 'New Estimate'}>
       <div className="bg-white dark:bg-slate-950 w-full flex flex-col overflow-hidden">
 
@@ -167,7 +170,7 @@ const EstimateModal: React.FC<EstimateModalProps> = ({
           {/* Right actions */}
           <div className="flex items-center gap-1.5">
             {estimate.status === 'ACCEPTED' && (
-              <span className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-emerald-200 dark:border-emerald-800">
+              <span className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-50)] dark:bg-green-900/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] rounded-lg text-[10px] font-bold uppercase tracking-wider border border-[var(--pro-azure-100)] dark:border-green-800">
                 <CheckCircle2 size={11} /> Accepted — Ready to Convert
               </span>
             )}
@@ -587,7 +590,8 @@ const EstimateModal: React.FC<EstimateModalProps> = ({
         </div>
 
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 

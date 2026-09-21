@@ -1,5 +1,6 @@
-import api from './api';
 import type { SetupStepDefinition, SetupStepStatus, CompanySetupProgress, SetupWizardCompleteResponse } from '@ovds/shared';
+
+import api from './api';
 
 export type { SetupStepDefinition, SetupStepStatus, CompanySetupProgress, SetupWizardCompleteResponse };
 
@@ -55,6 +56,17 @@ export const setupApi = {
   ): Promise<{ progress: CompanySetupProgress; synced: string[] }> => {
     const res = await api.post(`/settings/setup/sync-compliance/${companyId}`, opts ?? {});
     return res.data?.data ?? res.data;
+  },
+
+  seedRbac: async (companyId: string): Promise<{ roles: { created: number; skipped: number }; permissions: { created: number; skipped: number } }> => {
+    const [rolesRes, permsRes] = await Promise.all([
+      api.post('/settings/rbac/roles/seed', { companyId }),
+      api.post('/settings/rbac/permissions/seed', { companyId }),
+    ]);
+    return {
+      roles: rolesRes.data?.data ?? rolesRes.data,
+      permissions: permsRes.data?.data ?? permsRes.data,
+    };
   },
 };
 

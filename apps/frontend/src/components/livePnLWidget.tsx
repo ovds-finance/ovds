@@ -1,12 +1,13 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import {
   TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight,
   RefreshCw, BarChart3,
 } from 'lucide-react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+
+import { useInterval } from '../hooks';
 import api from '../services/api';
 import { fmtCurrency } from '../utils/fmt';
-import { useInterval } from '../hooks';
 
 interface PnLData {
   revenue: number;
@@ -34,7 +35,7 @@ const Trend: React.FC<{ value: number | null; suffix?: string }> = ({ value, suf
   if (value === null) return null;
   const up = value >= 0;
   return (
-    <span className={`inline-flex items-center gap-0.5 text-[10px] font-semibold ${up ? 'text-emerald-600' : 'text-rose-500'}`}>
+    <span className={`inline-flex items-center gap-0.5 text-[10px] font-semibold ${up ? 'text-[var(--pro-azure)]' : 'text-rose-500'}`}>
       {up ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
       {Math.abs(value)}{suffix}
     </span>
@@ -93,7 +94,7 @@ const LivePnLWidget: React.FC<LivePnLWidgetProps> = ({
 
   if (compact) {
     return (
-      <div className={`flex items-center gap-4 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-all ${pulse ? 'ring-2 ring-emerald-400/40' : ''}`}>
+      <div className={`flex items-center gap-4 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-all ${pulse ? 'ring-2 ring-[var(--pro-azure)]/40' : ''}`}>
         {loading ? (
           <div className="flex gap-4">
             {[1,2,3].map(i => <div key={i} className="h-4 w-20 ovds-shimmer rounded" />)}
@@ -102,7 +103,7 @@ const LivePnLWidget: React.FC<LivePnLWidgetProps> = ({
           <>
             <div className="flex items-center gap-1.5">
               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Revenue</span>
-              <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">{fmt(data.revenue)}</span>
+              <span className="text-sm font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">{fmt(data.revenue)}</span>
               <Trend value={pct(data.revenue, data.prevRevenue ?? 0)} />
             </div>
             <div className="w-px h-4 bg-slate-200 dark:bg-slate-700" />
@@ -117,7 +118,7 @@ const LivePnLWidget: React.FC<LivePnLWidgetProps> = ({
               <Trend value={pct(data.netProfit, data.prevNetProfit ?? 0)} />
             </div>
             <div className="ml-auto flex items-center gap-1 text-[9px] text-slate-300 dark:text-slate-600">
-              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+              <span className="w-1.5 h-1.5 bg-[var(--pro-azure-light)] rounded-full animate-pulse" />
               Live
             </div>
           </>
@@ -127,12 +128,12 @@ const LivePnLWidget: React.FC<LivePnLWidgetProps> = ({
   }
 
   return (
-    <div className={`ovds-widget-card shadow-sm overflow-hidden transition-all ${pulse ? 'ring-2 ring-emerald-400/30' : ''}`}>
+    <div className={`ovds-widget-card shadow-sm overflow-hidden transition-all ${pulse ? 'ring-2 ring-[var(--pro-azure)]/30' : ''}`}>
       {/* ovds-style income/expense split bar */}
       {data && !loading && (
         <div className="flex h-1.5">
           <div
-            className="bg-emerald-500 transition-all duration-700"
+            className="bg-[var(--pro-azure-50)]0 transition-all duration-700"
             style={{ width: `${data.revenue + data.expenses > 0 ? Math.round((data.revenue / (data.revenue + data.expenses)) * 100) : 50}%` }}
           />
           <div className="bg-rose-400 flex-1" />
@@ -142,8 +143,8 @@ const LivePnLWidget: React.FC<LivePnLWidgetProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-950/50 rounded-xl flex items-center justify-center">
-            <BarChart3 size={14} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="w-8 h-8 bg-[var(--pro-azure-100)] dark:bg-green-950/50 rounded-xl flex items-center justify-center">
+            <BarChart3 size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-none">P&L Summary</h3>
@@ -153,8 +154,8 @@ const LivePnLWidget: React.FC<LivePnLWidgetProps> = ({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1 text-[10px] font-medium text-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-            <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+          <span className="flex items-center gap-1 text-[10px] font-medium text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 px-2 py-0.5 rounded-full border border-[var(--pro-azure-100)] dark:border-green-800">
+            <span className="w-1.5 h-1.5 bg-[var(--pro-azure-light)] rounded-full animate-pulse" />
             Live
           </span>
           <button onClick={fetch} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-400">
@@ -174,9 +175,9 @@ const LivePnLWidget: React.FC<LivePnLWidgetProps> = ({
               label: 'Revenue',
               value: data.revenue,
               prev: data.prevRevenue,
-              color: 'text-emerald-700 dark:text-emerald-400',
-              bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-              icon: <TrendingUp size={13} className="text-emerald-600" />,
+              color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
+              bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
+              icon: <TrendingUp size={13} className="text-[var(--pro-azure)]" />,
             },
             {
               label: 'Expenses',
@@ -211,13 +212,13 @@ const LivePnLWidget: React.FC<LivePnLWidgetProps> = ({
           <div className="pt-2">
             <div className="flex items-center justify-between mb-1">
               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Gross Margin</span>
-              <span className={`text-[10px] font-semibold ${data.grossMargin >= 20 ? 'text-emerald-600' : data.grossMargin >= 0 ? 'text-amber-600' : 'text-rose-600'}`}>
+              <span className={`text-[10px] font-semibold ${data.grossMargin >= 20 ? 'text-[var(--pro-azure)]' : data.grossMargin >= 0 ? 'text-amber-600' : 'text-rose-600'}`}>
                 {data.grossMargin}%
               </span>
             </div>
             <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all duration-700 ${data.grossMargin >= 20 ? 'bg-emerald-500' : data.grossMargin >= 0 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                className={`h-full rounded-full transition-all duration-700 ${data.grossMargin >= 20 ? 'bg-[var(--pro-azure-50)]0' : data.grossMargin >= 0 ? 'bg-amber-500' : 'bg-rose-500'}`}
                 style={{ width: `${Math.max(0, Math.min(100, data.grossMargin))}%` }}
               />
             </div>
@@ -231,7 +232,7 @@ const LivePnLWidget: React.FC<LivePnLWidgetProps> = ({
         <span className="ovds-caption">
           {lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : ''}
         </span>
-        <Link to="/reports" className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-0.5">
+        <Link to="/reports" className="text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline flex items-center gap-0.5">
           Full Report <ArrowUpRight size={9} />
         </Link>
       </div>

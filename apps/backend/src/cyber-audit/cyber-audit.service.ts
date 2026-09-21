@@ -1,14 +1,15 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../common/prisma.service';
 import { INSA_CYBER_AUDIT_CHECKLIST, PAGINATION_DEFAULT_LIMIT } from '@ovds/shared';
+
+import { PrismaService } from '../common/prisma.service';
 
 @Injectable()
 export class CyberAuditService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAudits(query: { page?: number; limit?: number; status?: string }) {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? PAGINATION_DEFAULT_LIMIT;
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || PAGINATION_DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
@@ -105,8 +106,8 @@ export class CyberAuditService {
   }
 
   async findFindings(query: { page?: number; limit?: number; severity?: string; status?: string; auditId?: string }) {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? PAGINATION_DEFAULT_LIMIT;
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || PAGINATION_DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};

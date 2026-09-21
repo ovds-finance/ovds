@@ -1,30 +1,32 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { Pagination, SearchBar, Btn, EmptyState } from '@ovds/ui';
 import {
   Plus, Download, RefreshCw, Building2, X,
   CreditCard, FileText,
 } from 'lucide-react';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiQuery, usePagination } from '../hooks';
-import { OvdsPageHeader, OvdsStatsStrip } from '../components/ovds';
-import { downloadCSV } from '../utils/download';
-import { fmtDate, fmtCurrency } from '../utils/fmt';
-import { Pagination, SearchBar, Btn, EmptyState } from '@ovds/ui';
-import api from '../services/api';
+import React, { useState, useMemo, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 
+import { OvdsPageHeader, OvdsStatsStrip } from '../components/ovds';
+import { useBusiness } from '../context/businessContext';
+import { useApiQuery, usePagination } from '../hooks';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { downloadCSV } from '../utils/download';
+import { fmtDate, fmtCurrency } from '../utils/fmt';
+
+
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
 const METHOD_COLORS: Record<string, string> = {
-  CASH: 'bg-emerald-50 text-emerald-700',
+  CASH: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
   BANK_TRANSFER: 'bg-sky-50 text-sky-700',
   CHEQUE: 'bg-violet-50 text-violet-700',
-  CARD: 'bg-indigo-50 text-indigo-700',
+  CARD: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
   MOBILE_MONEY: 'bg-amber-50 text-amber-700',
   OTHER: 'bg-slate-50 text-slate-600',
 };
@@ -37,8 +39,8 @@ const Payments: React.FC = () => {
 
   const [search, setSearch] = useState('');
   const [methodFilter, setMethodFilter] = useState('');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
+  const [dateFrom, _setDateFrom] = useState('');
+  const [dateTo, _setDateTo] = useState('');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentForm, setPaymentForm] = useState({ billId: '', amount: '', method: 'CASH', paidAt: '', reference: '', notes: '' });
   const [bills, setBills] = useState<any[]>([]);
@@ -210,7 +212,7 @@ const Payments: React.FC = () => {
                 />
                 <Bar dataKey="amount" radius={[3, 3, 0, 0]}>
                   {methodBreakdown.map((entry) => (
-                    <Bar key={entry.method} dataKey="amount" fill={METHOD_COLORS[entry.method]?.includes('emerald') ? '#10b981' : METHOD_COLORS[entry.method]?.includes('sky') ? '#0ea5e9' : METHOD_COLORS[entry.method]?.includes('violet') ? '#8b5cf6' : METHOD_COLORS[entry.method]?.includes('indigo') ? '#6366f1' : METHOD_COLORS[entry.method]?.includes('amber') ? '#f59e0b' : '#64748b'} radius={[3, 3, 0, 0]} />
+                    <Bar key={entry.method} dataKey="amount" fill={METHOD_COLORS[entry.method]?.includes('indigo') ? '#10b981' : METHOD_COLORS[entry.method]?.includes('sky') ? '#0ea5e9' : METHOD_COLORS[entry.method]?.includes('violet') ? '#8b5cf6' : METHOD_COLORS[entry.method]?.includes('indigo') ? '#4FBA6F' : METHOD_COLORS[entry.method]?.includes('amber') ? '#f59e0b' : '#64748b'} radius={[3, 3, 0, 0]} />
                   ))}
                 </Bar>
               </BarChart>
@@ -270,7 +272,7 @@ const Payments: React.FC = () => {
                   {filtered.map((p: any) => (
                     <tr key={p.id} className="hover:bg-slate-50 transition-colors group">
                       <td className="px-5 py-3">
-                        <Link to={`/purchases/bills/${p.billId}`} className="text-xs font-bold text-slate-800 hover:text-emerald-600 transition-colors font-mono">
+                        <Link to={`/purchases/bills/${p.billId}`} className="text-xs font-bold text-slate-800 hover:text-[var(--pro-azure)] transition-colors font-mono">
                           {p.bill?.billNumber ?? p.billId?.slice(0, 8)}
                         </Link>
                       </td>

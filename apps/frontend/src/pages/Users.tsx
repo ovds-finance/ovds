@@ -3,20 +3,22 @@
  * Rich data table · Role distribution chart · Activity heatmap
  * Inline editing · Bulk actions · App access control
  */
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import { type AppRole, ROLE_METADATA, ROLE_GROUPS } from '../rbac/rbac';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input,
   SearchBar, EmptyState, Pagination, Icon,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { type AppRole, ROLE_METADATA, ROLE_GROUPS } from '../rbac/rbac';
 import api from '../services/api';
+import { confirm } from '../utils/confirm';
 
 /* ── Types ──────────────────────────────────────────────────────────────────── */
 interface SystemUser {
@@ -39,7 +41,7 @@ type SortField = 'username' | 'role' | 'createdAt' | 'lastLoginAt';
 type SortDir   = 'asc' | 'desc';
 
 /* ── Constants ──────────────────────────────────────────────────────────────── */
-const ROLES: AppRole[] = [
+const SYSTEM_ROLES: AppRole[] = [
   'ADMIN', 'OVDS', 'ACCOUNTING', 'HR', 'EMPLOYEE',
   'DATA_CLERK', 'AUDITOR', 'IFRS_OFFICER', 'BANK_LIAISON', 'CRM', 'DEVELOPER',
 ];
@@ -49,31 +51,31 @@ const ROLE_BADGE: Record<string, { bg: string; text: string; border: string; dot
   SPURADMIN:    { bg: 'bg-rose-50',    text: 'text-rose-700',    border: 'border-rose-200',    dot: 'bg-rose-500'    },
   SUPERADMIN:   { bg: 'bg-rose-50',    text: 'text-rose-700',    border: 'border-rose-200',    dot: 'bg-rose-500'    },
   DEVELOPER:    { bg: 'bg-rose-50',    text: 'text-rose-700',    border: 'border-rose-200',    dot: 'bg-rose-500'    },
-  ovds:         { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', dot: 'bg-emerald-500' },
+  ovds:         { bg: 'bg-[var(--pro-azure-50)]', text: 'text-[var(--pro-azure-dark)]', border: 'border-[var(--pro-azure-100)]', dot: 'bg-[var(--pro-azure)]' },
   ACCOUNTING:   { bg: 'bg-teal-50',    text: 'text-teal-700',    border: 'border-teal-200',    dot: 'bg-teal-500'    },
   HR:           { bg: 'bg-sky-50',     text: 'text-sky-700',     border: 'border-sky-200',     dot: 'bg-sky-500'     },
   EMPLOYEE:     { bg: 'bg-slate-50',   text: 'text-slate-600',   border: 'border-slate-200',   dot: 'bg-slate-400'   },
   DATA_CLERK:   { bg: 'bg-lime-50',    text: 'text-lime-700',    border: 'border-lime-200',    dot: 'bg-lime-500'    },
   AUDITOR:      { bg: 'bg-amber-50',   text: 'text-amber-700',   border: 'border-amber-200',   dot: 'bg-amber-500'   },
-  IFRS_OFFICER: { bg: 'bg-indigo-50',  text: 'text-indigo-700',  border: 'border-indigo-200',  dot: 'bg-indigo-500'  },
+  IFRS_OFFICER: { bg: 'bg-[var(--pro-azure-50)]',  text: 'text-[var(--pro-azure-dark)]',  border: 'border-[var(--pro-azure-100)]',  dot: 'bg-[var(--pro-azure)]'  },
   BANK_LIAISON: { bg: 'bg-cyan-50',    text: 'text-cyan-700',    border: 'border-cyan-200',    dot: 'bg-cyan-500'    },
   CRM:          { bg: 'bg-orange-50',  text: 'text-orange-700',  border: 'border-orange-200',  dot: 'bg-orange-500'  },
 };
 
 const AVATAR_GRADIENTS = [
   'from-violet-500 to-purple-600',
-  'from-emerald-500 to-teal-600',
+  'from-green-500 to-green-600',
   'from-sky-500 to-blue-600',
   'from-rose-500 to-pink-600',
   'from-amber-500 to-orange-600',
-  'from-indigo-500 to-violet-600',
-  'from-teal-500 to-emerald-600',
+  'from-[var(--pro-azure)] to-violet-600',
+  'from-teal-500 to-indigo-600',
   'from-cyan-500 to-sky-600',
 ];
 
 const APP_ACCESS_LEVELS = [
   { value: 'none',  label: 'No Access', cls: 'bg-slate-100 text-slate-500 border-slate-200' },
-  { value: 'read',  label: 'Read',      cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  { value: 'read',  label: 'Read',      cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' },
   { value: 'write', label: 'Write',     cls: 'bg-amber-50 text-amber-700 border-amber-200' },
   { value: 'admin', label: 'Admin',     cls: 'bg-rose-50 text-rose-700 border-rose-200' },
 ];
@@ -119,7 +121,7 @@ const Avatar: React.FC<{ username: string; size?: 'sm' | 'md' | 'lg'; isYou?: bo
     <div className={`${sz} rounded-full bg-gradient-to-br ${avatarGradient(username)} flex items-center justify-center text-white font-bold shrink-0 relative`}>
       {username.charAt(0).toUpperCase()}
       {isYou && (
-        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 border-2 border-white rounded-full" />
+        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-[var(--pro-azure)] border-2 border-white rounded-full" />
       )}
     </div>
   );
@@ -188,9 +190,9 @@ const RoleDistributionBar: React.FC<{ rows: SystemUser[] }> = ({ rows }) => {
 const ActivityHeatmap: React.FC<{ rows: SystemUser[] }> = ({ rows }) => {
   const now = Date.now();
   const buckets = [
-    { label: 'Today',   max: 86_400_000,     color: 'bg-emerald-500', count: 0 },
-    { label: '7d',      max: 7 * 86_400_000, color: 'bg-emerald-300', count: 0 },
-    { label: '30d',     max: 30 * 86_400_000,color: 'bg-emerald-200', count: 0 },
+    { label: 'Today',   max: 86_400_000,     color: 'bg-[var(--pro-azure)]', count: 0 },
+    { label: '7d',      max: 7 * 86_400_000, color: 'bg-[var(--pro-azure-light)]', count: 0 },
+    { label: '30d',     max: 30 * 86_400_000,color: 'bg-[var(--pro-azure-100)]', count: 0 },
     { label: 'Older',   max: Infinity,        color: 'bg-slate-200 dark:bg-slate-700', count: 0 },
     { label: 'Never',   max: -1,              color: 'bg-slate-100 dark:bg-slate-800', count: 0 },
   ];
@@ -236,7 +238,7 @@ const SortableTh: React.FC<{
   return (
     <AppTh align={align}>
       <button
-        className={`flex items-center gap-1 ${align === 'right' ? 'ml-auto' : ''} hover:text-slate-900 dark:hover:text-white transition-colors ${active ? 'text-emerald-600 dark:text-emerald-400' : ''}`}
+        className={`flex items-center gap-1 ${align === 'right' ? 'ml-auto' : ''} hover:text-slate-900 dark:hover:text-white transition-colors ${active ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : ''}`}
         onClick={() => onSort(field)}
       >
         {children}
@@ -272,7 +274,7 @@ const UserForm: React.FC<{
             onChange={e => set('role', e.target.value)}
             className="w-full h-9 text-[12px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-400/20 focus:border-violet-400 transition-all"
           >
-            {ROLES.map(r => (
+            {SYSTEM_ROLES.map(r => (
               <option key={r} value={r}>{getRoleDisplay(r)}</option>
             ))}
           </select>
@@ -373,16 +375,17 @@ const BulkBar: React.FC<{
   selected: Set<string>;
   onLock: () => void;
   onUnlock: () => void;
+  onBulkRoles: () => void;
   onClear: () => void;
   loading?: boolean;
-}> = ({ selected, onLock, onUnlock, onClear, loading }) => {
+}> = ({ selected, onLock, onUnlock, onBulkRoles, onClear, loading }) => {
   if (selected.size === 0) return null;
   return (
-    <div className="flex items-center gap-3 px-4 py-2.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl mb-3 animate-in slide-in-from-top-1 duration-200">
-      <div className="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center">
+    <div className="flex items-center gap-3 px-4 py-2.5 bg-[var(--pro-azure-50)] dark:bg-green-950/40 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl mb-3 animate-in slide-in-from-top-1 duration-200">
+      <div className="w-5 h-5 rounded bg-[var(--pro-azure)] flex items-center justify-center">
         <span className="text-[9px] text-white font-bold">{selected.size}</span>
       </div>
-      <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+      <span className="text-[11px] font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
         {selected.size} user{selected.size > 1 ? 's' : ''} selected
       </span>
       <div className="flex-1" />
@@ -393,8 +396,15 @@ const BulkBar: React.FC<{
         Unlock all
       </Btn>
       <button
+        onClick={onBulkRoles}
+        className="text-[11px] px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-violet-400 hover:text-violet-700 transition-all"
+        title="Assign custom roles to selected users"
+      >
+        Assign Roles
+      </button>
+      <button
         onClick={onClear}
-        className="w-5 h-5 rounded flex items-center justify-center text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900 transition-all"
+        className="w-5 h-5 rounded flex items-center justify-center text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-900 transition-all"
         title="Clear selection"
       >
         <Icon name="CLOSE" size={11} />
@@ -425,6 +435,33 @@ const Users: React.FC = () => {
   const [apps,          setApps         ] = useState<Array<{ id: string; name: string; slug: string }>>([]);
   const [userAppAccess, setUserAppAccess] = useState<Record<string, string>>({});
 
+  /* ── Custom roles state ── */
+  const [customRoles, setCustomRoles] = useState<Array<{ id: string; name: string; description?: string }>>([]);
+  const [userCustomRoles, setUserCustomRoles] = useState<Set<string>>(new Set());
+  const [bulkRoleModal, setBulkRoleModal] = useState<{ open: boolean; roleIds: string[] }>({ open: false, roleIds: [] });
+  const qc = useQueryClient();
+
+  const { data: rolesData } = useQuery({
+    queryKey: ['custom-roles-list'],
+    queryFn: async () => {
+      const res = await api.get('/settings/rbac/roles');
+      return (res.data?.data ?? res.data ?? []) as Array<{ id: string; name: string; description?: string }>;
+    },
+    staleTime: 5 * 60_000,
+  });
+
+  useEffect(() => {
+    if (rolesData) setCustomRoles(rolesData);
+  }, [rolesData]);
+
+  const assignRolesMutation = useMutation({
+    mutationFn: async ({ userId, roleIds }: { userId: string; roleIds: string[] }) =>
+      api.post(`/auth/users/${userId}/roles`, { roleIds }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['custom-roles-list'] });
+    },
+  });
+
   /* ── Data ── */
   const { rows, total, page, loading, saving, save, remove, refetch, setPage } =
     useApiCrud<SystemUser>({
@@ -433,6 +470,23 @@ const Users: React.FC = () => {
       pageSize:   25,
       pollMs:     120_000,
     });
+
+  /* ── Roles (system + custom) ── */
+  const { data: allRoles } = useQuery({
+    queryKey: ['all-roles'],
+    queryFn: async () => {
+      const [systemRes, customRes] = await Promise.all([
+        api.get('/settings/rbac/hierarchy'),
+        api.get('/settings/rbac/roles'),
+      ]);
+      const systemRoles = (systemRes.data?.data?.roles ?? []).map((r: any) => ({ id: r.role, name: r.label, isSystem: true }));
+      const customRoles = (customRes.data?.data ?? customRes.data ?? []).map((r: any) => ({ id: r.id, name: r.name, isSystem: false }));
+      return [...systemRoles, ...customRoles];
+    },
+    staleTime: 5 * 60_000,
+  });
+
+  const availableRoles = useMemo(() => (allRoles ?? []).map(r => r.id), [allRoles]);
 
   /* ── Load installable apps ── */
   useEffect(() => {
@@ -502,7 +556,7 @@ const Users: React.FC = () => {
 
   /* ── KPIs ── */
   const kpiCells = useMemo(() => [
-    { label: 'Total',   value: rows.length,                                                                              color: 'emerald' as const },
+    { label: 'Total',   value: rows.length,  color: 'green' as const },
     { label: 'Active',  value: rows.filter(u => !u.isLocked && (u.failedLoginAttempts ?? 0) < 5).length,                color: 'sky'     as const },
     { label: 'Admins',  value: rows.filter(u => ['ADMIN', 'SPURADMIN', 'SUPERADMIN'].includes(u.role)).length,          color: 'violet'  as const },
     { label: 'Locked',  value: rows.filter(u => u.isLocked || (u.failedLoginAttempts ?? 0) >= 5).length,                color: 'rose'    as const },
@@ -530,10 +584,51 @@ const Users: React.FC = () => {
     }
   }, [modal.data, save, refetch]);
 
+  const loadUserCustomRoles = useCallback(async (userId: string) => {
+    try {
+      const res = await api.get(`/auth/users/${userId}/roles`);
+      const roles = (res.data?.data ?? res.data ?? []) as Array<{ id: string }>;
+      setUserCustomRoles(new Set(roles.map(r => r.id)));
+    } catch {
+      setUserCustomRoles(new Set());
+    }
+  }, []);
+
   const handleEdit = useCallback((u: SystemUser) => {
     setModal({ open: true, data: { ...u } });
     if (can('apps:read')) loadUserAppAccess(u.id);
-  }, [can, loadUserAppAccess]);
+    loadUserCustomRoles(u.id);
+  }, [can, loadUserAppAccess, loadUserCustomRoles]);
+
+  const handleQuickRoleChange = useCallback(async (u: SystemUser, newRole: string) => {
+    try {
+      await api.patch(`/auth/users/${u.id}`, { role: newRole });
+      toast.success(`Role updated to ${getRoleDisplay(newRole)}`);
+      refetch();
+    } catch { toast.error('Failed to update role'); }
+  }, [refetch]);
+
+  const handleSaveCustomRoles = useCallback(async (userId: string) => {
+    try {
+      await assignRolesMutation.mutateAsync({ userId, roleIds: Array.from(userCustomRoles) });
+      toast.success('Custom roles updated');
+    } catch { toast.error('Failed to update roles'); }
+  }, [userCustomRoles, assignRolesMutation]);
+
+  const handleBulkAssignRoles = useCallback(async () => {
+    if (bulkRoleModal.roleIds.length === 0) { toast.error('Select at least one role'); return; }
+    setBulkLoading(true);
+    try {
+      await Promise.all(Array.from(selected).map(userId =>
+        api.post(`/auth/users/${userId}/roles`, { roleIds: bulkRoleModal.roleIds })
+      ));
+      toast.success(`Roles assigned to ${selected.size} users`);
+      setSelected(new Set());
+      setBulkRoleModal({ open: false, roleIds: [] });
+      refetch();
+    } catch { toast.error('Bulk role assignment failed'); }
+    finally { setBulkLoading(false); }
+  }, [selected, bulkRoleModal.roleIds, refetch]);
 
   /* ── Lock / unlock ── */
   const handleLockToggle = async (u: SystemUser) => {
@@ -666,7 +761,7 @@ const Users: React.FC = () => {
           className="h-8 text-[11px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 text-slate-600 dark:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400/20 focus:border-violet-400 transition-all"
         >
           <option value="">All roles</option>
-          {ROLES.map(r => (
+          {(availableRoles.length > 0 ? availableRoles : SYSTEM_ROLES).map(r => (
             <option key={r} value={r}>{getRoleDisplay(r)}</option>
           ))}
         </select>
@@ -681,6 +776,7 @@ const Users: React.FC = () => {
         selected={selected}
         onLock={() => handleBulkLock(true)}
         onUnlock={() => handleBulkLock(false)}
+        onBulkRoles={() => setBulkRoleModal({ open: true, roleIds: [] })}
         onClear={() => setSelected(new Set())}
         loading={bulkLoading}
       />
@@ -762,9 +858,9 @@ const Users: React.FC = () => {
                   <div className="flex items-center gap-2.5">
                     <Avatar username={u.username} isYou={isMe} />
                     <div className="min-w-0">
-                      <p className={`text-[12px] font-semibold leading-tight truncate ${isMe ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-100'}`}>
+                      <p className={`text-[12px] font-semibold leading-tight truncate ${isMe ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-slate-800 dark:text-slate-100'}`}>
                         {u.username}
-                        {isMe && <span className="ml-1 text-[9px] font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-950 px-1 py-0.5 rounded">you</span>}
+                        {isMe && <span className="ml-1 text-[9px] font-bold text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950 px-1 py-0.5 rounded">you</span>}
                       </p>
                       {u.email && (
                         <p className="text-[10px] text-slate-400 truncate">{u.email}</p>
@@ -775,7 +871,22 @@ const Users: React.FC = () => {
                 </AppTd>
 
                 {/* Role */}
-                <AppTd><RoleBadge role={u.role} /></AppTd>
+                <AppTd>
+                  <div className="flex items-center gap-1.5">
+                    <RoleBadge role={u.role} />
+                    {can('users:write') && !isMe && (
+                      <select
+                        value={u.role}
+                        onChange={e => handleQuickRoleChange(u, e.target.value)}
+                        className="text-[9px] bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-1 py-0.5 text-slate-600 dark:text-slate-300 focus:outline-none"
+                      >
+                        {(availableRoles.length > 0 ? availableRoles : SYSTEM_ROLES).map(r => (
+                          <option key={r} value={r}>{getRoleDisplay(r)}</option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                </AppTd>
 
                 {/* Group */}
                 <AppTd>
@@ -837,7 +948,7 @@ const Users: React.FC = () => {
                           onClick={() => handleLockToggle(u)}
                           className={`w-6 h-6 rounded flex items-center justify-center transition-all ${
                             isLocked
-                              ? 'text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950'
+                              ? 'text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] dark:hover:bg-green-950'
                               : 'text-slate-400 hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-950'
                           }`}
                           title={isLocked ? 'Unlock user' : 'Lock user'}
@@ -920,7 +1031,107 @@ const Users: React.FC = () => {
             onRemove={handleRemoveUserAppAccess}
           />
         )}
+        {modal.data.id && customRoles.length > 0 && (
+          <div className="mt-5 pt-5 border-t border-slate-200 dark:border-slate-700">
+            <p className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
+              <Icon name="SHIELD" size={12} />
+              Custom Roles
+            </p>
+            <div className="space-y-2">
+              {customRoles.map(role => {
+                const isSelected = userCustomRoles.has(role.id);
+                return (
+                  <label key={role.id} className="flex items-center gap-2 cursor-pointer py-1.5 border-b border-slate-100 dark:border-slate-800 last:border-0">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => {
+                        setUserCustomRoles(prev => {
+                          const next = new Set(prev);
+                          if (next.has(role.id)) next.delete(role.id);
+                          else next.add(role.id);
+                          return next;
+                        });
+                      }}
+                      className="rounded border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-violet-600 focus:ring-violet-500"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">{role.name}</span>
+                      {role.description && (
+                        <span className="text-[10px] text-slate-400 ml-1.5 truncate">{role.description}</span>
+                      )}
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+            <div className="mt-3">
+              <Btn
+                variant="secondary"
+                size="sm"
+                loading={assignRolesMutation.isPending}
+                onClick={() => handleSaveCustomRoles(modal.data.id)}
+              >
+                Save Custom Roles
+              </Btn>
+            </div>
+          </div>
+        )}
       </Modal>
+
+      {bulkRoleModal.open && (
+        <Modal
+          open={bulkRoleModal.open}
+          onClose={() => setBulkRoleModal({ open: false, roleIds: [] })}
+          title="Bulk Assign Custom Roles"
+          subtitle={`Assign roles to ${selected.size} selected users`}
+          footer={
+            <>
+              <Btn variant="secondary" onClick={() => setBulkRoleModal({ open: false, roleIds: [] })}>
+                Cancel
+              </Btn>
+              <Btn variant="primary" loading={bulkLoading} onClick={handleBulkAssignRoles}>
+                Assign Roles
+              </Btn>
+            </>
+          }
+        >
+          <div className="space-y-3">
+            <p className="text-xs text-slate-500">Select the custom roles to assign to all selected users. This will replace any existing custom role assignments for these users.</p>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {customRoles.map(role => {
+                const isSelected = bulkRoleModal.roleIds.includes(role.id);
+                return (
+                  <label key={role.id} className="flex items-center gap-2 cursor-pointer py-1.5 border-b border-slate-100 dark:border-slate-800 last:border-0">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => {
+                        setBulkRoleModal(prev => ({
+                          ...prev,
+                          roleIds: isSelected
+                            ? prev.roleIds.filter(id => id !== role.id)
+                            : [...prev.roleIds, role.id],
+                        }));
+                      }}
+                      className="rounded border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-violet-600 focus:ring-violet-500"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">{role.name}</span>
+                      {role.description && (
+                        <span className="text-[10px] text-slate-400 ml-1.5 truncate">{role.description}</span>
+                      )}
+                    </div>
+                  </label>
+                );
+              })}
+              {customRoles.length === 0 && (
+                <p className="text-xs text-slate-400">No custom roles available. Create roles first in Roles & Permissions.</p>
+              )}
+            </div>
+          </div>
+        </Modal>
+      )}
     </AppPage>
   );
 };

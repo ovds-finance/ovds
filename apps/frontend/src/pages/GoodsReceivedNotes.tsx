@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+
 import {
   AppPage, AppTable, AppTh, AppTd, AppTr,
   Btn, Icon, Modal, FormField, Input, Select,
 } from '../components/ui';
 import { useBusiness } from '../context/businessContext';
 import api from '../services/api';
-import toast from 'react-hot-toast';
 
 interface GrnItem {
   id?: string;
@@ -76,13 +77,13 @@ interface ThreeWayMatchResult {
 
 const STATUS_STYLE: Record<string, { icon: React.ReactNode; cls: string }> = {
   DRAFT: { icon: <Icon name="EDIT" size={11} />, cls: 'text-slate-700 bg-slate-100 border-slate-200 dark:text-slate-300 dark:bg-slate-800 dark:border-slate-600' },
-  CONFIRMED: { icon: <Icon name="CHECK_CIRCLE" size={11} />, cls: 'text-blue-700 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-950/20 dark:border-blue-800' },
-  BILLED: { icon: <Icon name="FILE_TEXT" size={11} />, cls: 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/20 dark:border-emerald-800' },
+  CONFIRMED: { icon: <Icon name="CHECK_CIRCLE" size={11} />, cls: 'text-[var(--pro-azure-dark)] bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] dark:text-[var(--pro-azure-light)] dark:bg-[var(--pro-azure-50)]/10 dark:border-[var(--pro-azure)]/20' },
+  BILLED: { icon: <Icon name="FILE_TEXT" size={11} />, cls: 'text-[var(--pro-azure-dark)] bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] dark:text-[var(--pro-azure-light)] dark:bg-green-950/20 dark:border-green-800' },
   CANCELLED: { icon: <Icon name="X_CIRCLE" size={11} />, cls: 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/20 dark:border-rose-800' },
 };
 
 const RECOMMENDATION_STYLE: Record<string, string> = {
-  APPROVE: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+  APPROVE: 'text-[var(--pro-azure-dark)] bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]',
   REVIEW: 'text-amber-700 bg-amber-50 border-amber-200',
   REJECT: 'text-rose-700 bg-rose-50 border-rose-200',
 };
@@ -257,8 +258,8 @@ interface CreateGrnDto {
           {[
             { label: 'Total GRNs', value: stats.total, color: 'text-slate-700' },
             { label: 'Draft', value: stats.pending, color: 'text-amber-600' },
-            { label: 'Confirmed', value: stats.confirmed, color: 'text-blue-600' },
-            { label: 'Billed', value: stats.billed, color: 'text-emerald-600' },
+            { label: 'Confirmed', value: stats.confirmed, color: 'text-[var(--pro-azure)]' },
+            { label: 'Billed', value: stats.billed, color: 'text-[var(--pro-azure)]' },
             { label: 'Awaiting Bill', value: stats.awaitingBill, color: 'text-violet-600' },
           ].map((k, i) => (
             <div key={i} className="ovds-widget-card p-4">
@@ -353,7 +354,7 @@ interface CreateGrnDto {
                           <Btn variant="ghost" size="sm" onClick={() => handleConfirm(grn)} icon={<Icon name="CHECK" size={11} />} />
                         )}
                         {grn.status === 'CONFIRMED' && !grn.billId && (
-                          <Btn variant="ghost" size="sm" onClick={() => handleLinkBill(grn)} icon={<Icon name="LINK" size={11} />} />
+                          <Btn variant="ghost" size="sm" onClick={() => handleLinkBill(grn)} icon={<Icon name="LINK_2" size={11} />} />
                         )}
                       </div>
                     </AppTd>
@@ -379,7 +380,7 @@ interface CreateGrnDto {
       {/* Detail Modal */}
       {modalOpen && selectedGrn && (
         <Modal
-          isOpen={modalOpen}
+          open={modalOpen}
           onClose={() => { setModalOpen(false); setSelectedGrn(null); setMatchResult(null); }}
           title={`GRN ${selectedGrn.grnNumber}`}
           footer={
@@ -467,7 +468,7 @@ interface CreateGrnDto {
             {selectedGrn.purchaseOrder && (
               <div>
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Linked Purchase Order</p>
-                <Link to={`/purchases/orders`} className="text-xs text-blue-600 hover:underline">
+                <Link to={`/purchases/orders`} className="text-xs text-[var(--pro-azure)] hover:underline">
                   {selectedGrn.purchaseOrder.poNumber || selectedGrn.purchaseOrder.id}
                 </Link>
               </div>
@@ -476,7 +477,7 @@ interface CreateGrnDto {
             {selectedGrn.bill && (
               <div>
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Linked Bill</p>
-                <Link to={`/purchases/bills`} className="text-xs text-blue-600 hover:underline">
+                <Link to={`/purchases/bills`} className="text-xs text-[var(--pro-azure)] hover:underline">
                   {selectedGrn.bill.billNumber || selectedGrn.bill.id}
                 </Link>
               </div>
@@ -510,7 +511,7 @@ interface CreateGrnDto {
       {/* Create Modal */}
       {createOpen && (
         <Modal
-          isOpen={createOpen}
+          open={createOpen}
           onClose={() => setCreateOpen(false)}
           title="New Goods Received Note"
           footer={
@@ -583,7 +584,7 @@ interface CreateGrnDto {
       {/* Link Bill Modal */}
       {linkBillOpen && selectedGrn && (
         <Modal
-          isOpen={linkBillOpen}
+          open={linkBillOpen}
           onClose={() => setLinkBillOpen(false)}
           title={`Link Bill to ${selectedGrn.grnNumber}`}
           footer={

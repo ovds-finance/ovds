@@ -8,13 +8,6 @@ import { Link } from 'react-router-dom';
 // Lazy-load the chart component so recharts + d3 are deferred until after
 // the initial Dashboard render (saves ~816 kB from the first-load critical path).
 const DashboardTrendChart = lazy(() => import('../components/dashboard/DashboardTrendChart'));
-import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
-import { useApiQuery } from '../hooks/useApiQuery';
-import { useDebounce } from '../hooks';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import { fmtCompact } from '../utils/fmt';
 import {
   FinancialHealthWidget,
   CashFlowWidget,
@@ -58,15 +51,25 @@ import {
   ModuleQuickAccessPanel,
   QuickActionFAB,
 } from '../components/dashboard';
-import { OvdsKpiCard, OvdsSummaryBar, PaymentVerificationPanel } from '../components/ovds';
 import CustomerSummaryCard from '../components/dashboard/CustomerSummaryCard';
-import OvdsSummary from '../components/dashboard/OvdsSummary';
 import LatestTransactions from '../components/dashboard/LatestTransactions';
-import { EthTaxDeadlines } from '../components/ui';
+import OvdsSummary from '../components/dashboard/OvdsSummary';
+import { OvdsKpiCard, OvdsSummaryBar, PaymentVerificationPanel } from '../components/ovds';
 import SoftwareUpdateBanner from '../components/softwareUpdateBanner';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { EthTaxDeadlines } from '../components/ui';
 import { Icon } from '../components/ui';
-import { Role, useLocalStorage, DashboardSlider, GridLayout, ContextPill, ContextStrip, SectionTitle } from '@ovds/ui';
+import { useBusiness } from '../context/businessContext';
+import { useDebounce } from '../hooks';
+import { useApiQuery } from '../hooks/useApiQuery';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+
+import toast from 'react-hot-toast';
+
+import { fmtCompact } from '../utils/fmt';
+
+import { Role, useLocalStorage, DashboardSlider, GridLayout } from '@ovds/ui';
 
 // -- Gauge / Speedometer SVG component (CycleIQ-style) ------------------------
 interface GaugeProps {
@@ -74,6 +77,7 @@ interface GaugeProps {
   color?: string;
   size?: number;
 }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Gauge: React.FC<GaugeProps> = ({ value, color = '#00E784', size = 56 }) => {
   const [animated, setAnimated] = useState(0);
   useEffect(() => {
@@ -103,7 +107,7 @@ const Gauge: React.FC<GaugeProps> = ({ value, color = '#00E784', size = 56 }) =>
     </svg>
   );
 };
-// -- Akaunting-style KPI Stat Card --------------------------------------------
+// -- Ovds SaaS style KPI Stat Card --------------------------------------------
 interface StatCardProps {
   label: string;
   value: string | number;
@@ -206,7 +210,7 @@ interface ComplianceItemProps {
 }
 const ComplianceItem: React.FC<ComplianceItemProps> = ({ label, expires, status }) => {
   const cfg = {
-    valid:    { dot: 'bg-emerald-500', bar: 'border-emerald-400', badge: 'bg-emerald-100 text-emerald-700', label: 'Valid',          icon: '✓' },
+    valid:    { dot: 'bg-[var(--pro-azure-50)]0', bar: 'border-[var(--pro-azure)]', badge: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]', label: 'Valid',          icon: '✓' },
     expiring: { dot: 'bg-amber-400',   bar: 'border-amber-400',   badge: 'bg-amber-100 text-amber-700',   label: 'Expiring Soon',  icon: '⚠' },
     expired:  { dot: 'bg-slate-400',   bar: 'border-rose-400',    badge: 'bg-rose-100 text-rose-700',     label: 'Expired',        icon: '✕' },
   }[status];
@@ -245,10 +249,10 @@ const ForecastCard: React.FC<ForecastCardProps> = ({ nextWeekVolume, forecastPay
       <div className="relative">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-7 h-7 rounded-xl bg-slate-800 flex items-center justify-center">
-            <Icon name="SPARKLES" size={14} className="text-emerald-400" />
+            <Icon name="SPARKLES" size={14} className="text-[var(--pro-azure-light)]" />
           </div>
           <h3 className="ovds-card-title">AI Forecast</h3>
-          <span className="ml-auto text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+          <span className="ml-auto text-[9px] font-bold px-2 py-0.5 rounded-full bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)]">
             87% confidence
           </span>
         </div>
@@ -259,7 +263,7 @@ const ForecastCard: React.FC<ForecastCardProps> = ({ nextWeekVolume, forecastPay
             <div key={b.i} className="flex-1 rounded-t-sm transition-all"
               style={{ height: `${b.v}%`, background: b.i === bars.length - 1 ? '#10b981' : '#e2e8f0' }} />
           ))}
-          <div className="flex-1 rounded-t-sm border-2 border-dashed border-emerald-400"
+          <div className="flex-1 rounded-t-sm border-2 border-dashed border-[var(--pro-azure)]"
             style={{ height: '95%', background: 'rgba(16,185,129,0.08)' }} />
         </div>
 
@@ -270,7 +274,7 @@ const ForecastCard: React.FC<ForecastCardProps> = ({ nextWeekVolume, forecastPay
             </div>
             <p className="text-[10px] text-slate-400 mb-0.5 uppercase tracking-wider">Next Week</p>
             <p className="text-[22px] font-extrabold text-slate-800 tabular-nums leading-none">{nextWeekVolume}</p>
-            <p className="text-[10px] text-emerald-500 font-semibold mt-1 flex items-center gap-0.5">
+            <p className="text-[10px] text-[var(--pro-azure)] font-semibold mt-1 flex items-center gap-0.5">
               ↑ +{trend}% <span className="text-slate-400 font-normal">vs this week</span>
             </p>
           </div>
@@ -280,7 +284,7 @@ const ForecastCard: React.FC<ForecastCardProps> = ({ nextWeekVolume, forecastPay
             </div>
             <p className="text-[10px] text-slate-400 mb-0.5 uppercase tracking-wider">Forecast Payout</p>
             <p className="text-[22px] font-extrabold text-slate-800 tabular-nums leading-none">{forecastPayout}</p>
-            <p className="text-[10px] text-emerald-500 font-semibold mt-1 flex items-center gap-0.5">
+            <p className="text-[10px] text-[var(--pro-azure)] font-semibold mt-1 flex items-center gap-0.5">
               ↑ +{trend}% <span className="text-slate-400 font-normal">vs this week</span>
             </p>
           </div>
@@ -326,8 +330,8 @@ const ImpactCard: React.FC<ImpactCardProps> = ({
         style={{ background: `radial-gradient(circle, ${color} 0%, transparent 70%)`, transform: 'translate(30%,30%)' }} />
       <div className="relative">
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-7 h-7 rounded-xl bg-emerald-50 flex items-center justify-center">
-            <Icon name="TREND_UP" size={14} className="text-emerald-600" />
+          <div className="w-7 h-7 rounded-xl bg-[var(--pro-azure-50)] flex items-center justify-center">
+            <Icon name="TREND_UP" size={14} className="text-[var(--pro-azure)]" />
           </div>
           <h3 className="ovds-card-title">{title}</h3>
         </div>
@@ -350,7 +354,7 @@ const ImpactCard: React.FC<ImpactCardProps> = ({
         <p className="text-[10px] text-slate-400 mb-4">{progressLabel}</p>
         <div className="grid grid-cols-2 gap-3 pt-3 border-t border-slate-100">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+            <div className="w-2 h-2 rounded-full bg-[var(--pro-azure-50)]0 shrink-0" />
             <div>
               <p className="text-[14px] font-extrabold text-slate-700 leading-none">{stat1Value}</p>
               <p className="ovds-caption mt-0.5">{stat1Label}</p>
@@ -370,6 +374,7 @@ const ImpactCard: React.FC<ImpactCardProps> = ({
 };
 
 // -- Live Clock + Greeting ------------------------------------------------------
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const LiveClock: React.FC<{ name: string }> = ({ name }) => {
   const [now, setNow] = useState(new Date());
   useEffect(() => {
@@ -386,12 +391,12 @@ const LiveClock: React.FC<{ name: string }> = ({ name }) => {
       <div className="flex items-center gap-2.5 mb-1">
         {/* Live status dot */}
         <div className="relative w-2 h-2 shrink-0">
-          <div className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-60" style={{ animationDuration: '2s' }} />
-          <div className="relative w-2 h-2 rounded-full bg-emerald-500" />
+          <div className="absolute inset-0 rounded-full bg-[var(--pro-azure-50)]0 animate-ping opacity-60" style={{ animationDuration: '2s' }} />
+          <div className="relative w-2 h-2 rounded-full bg-[var(--pro-azure-50)]0" />
         </div>
         <span className="text-xl select-none" role="img" aria-label="greeting">{emoji}</span>
         <h1 className="text-[21px] font-extrabold text-slate-900 tracking-tight leading-none" style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
-          {greeting}, <span style={{ color: 'oklch(0.55 0.22 278)' }}>{name.split('@')[0]}</span>
+          {greeting}, <span style={{ color: 'oklch(0.59 0.19 145)' }}>{name.split('@')[0]}</span>
         </h1>
       </div>
       <p className="text-[12px] text-slate-400 flex items-center gap-2 pl-[22px]">
@@ -576,7 +581,7 @@ const Dashboard: React.FC = () => {
 
   const trendTotal = fmt(trendData.reduce((s: number, d: any) => s + d.value, 0));
 
-  const MiniSparkline: React.FC<{ data: number[]; color: string; stroke?: string }> = ({ data, color, stroke = '#fff' }) => {
+  const _MiniSparkline: React.FC<{ data: number[]; color: string; stroke?: string }> = ({ data, color, stroke = '#fff' }) => {
     const w = 64, h = 28;
     const min = Math.min(...data), max = Math.max(...data);
     const range = max - min || 1;
@@ -591,9 +596,9 @@ const Dashboard: React.FC = () => {
     );
   };
 
-  const makeSpark = (total: number, count: number) => {
+  const _makeSpark = (total: number, count: number) => {
     const base = total / Math.max(count, 1);
-    return Array.from({ length: 7 }, (_, i) => base * (0.7 + Math.random() * 0.6));
+    return Array.from({ length: 7 }, (_, _i) => base * (0.7 + Math.random() * 0.6));
   };
 
   // -- Compliance items -------------------------------------------------------
@@ -705,7 +710,7 @@ const Dashboard: React.FC = () => {
           border-color: oklch(0.89 0.012 258);
         }
         .db-tab.active {
-          color: oklch(0.55 0.22 278);
+          color: oklch(0.59 0.19 145);
           background: oklch(0.94 0.04 278);
           border-color: oklch(0.84 0.09 278);
           box-shadow: 0 2px 8px oklch(0.55 0.22 278 / .14);
@@ -745,7 +750,7 @@ const Dashboard: React.FC = () => {
         .db-section-pill {
           display: inline-flex; align-items: center; gap: .375rem;
           font-size: .6875rem; font-weight: 700; letter-spacing: .04em;
-          color: oklch(0.55 0.22 278);
+          color: oklch(0.59 0.19 145);
           background: oklch(0.94 0.04 278);
           border: 1px solid oklch(0.84 0.09 278);
           border-radius: 999px; padding: .1875rem .625rem;
@@ -764,7 +769,7 @@ const Dashboard: React.FC = () => {
         .db-section-action {
           display: inline-flex; align-items: center; gap: .25rem;
           font-size: .8125rem; font-weight: 700;
-          color: oklch(0.55 0.22 278); text-decoration: none;
+          color: oklch(0.59 0.19 145); text-decoration: none;
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
           white-space: nowrap; flex-shrink: 0;
         }
@@ -852,7 +857,7 @@ const Dashboard: React.FC = () => {
       {/* -- Software update banner -- */}
       {isAdmin && <SoftwareUpdateBanner onNavigate={(path) => window.__ovds_navigate?.(path)} />}
 
-      {/* ── Akaunting-style Dashboard Sub-header ── */}
+      {/* ── Ovds SaaS style Dashboard Sub-header ── */}
       <div className="sticky top-0 z-30 dark:bg-slate-950/90" style={{ background: 'rgba(255,255,255,.92)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid oklch(0.91 0.01 258)' }}>
 
         {/* Main header row */}
@@ -891,7 +896,7 @@ const Dashboard: React.FC = () => {
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('ovds:open-dashboard-manager'))}
               className="hidden sm:inline-flex items-center gap-1.5 px-3.5 h-8 text-white rounded-xl text-[12px] font-bold transition-all hover:-translate-y-0.5 active:translate-y-0"
-              style={{ background: 'oklch(0.55 0.22 278)', boxShadow: '0 2px 8px oklch(0.55 0.22 278 / .30)' }}
+              style={{ background: 'oklch(0.59 0.19 145)', boxShadow: '0 2px 8px oklch(0.55 0.22 278 / .30)' }}
             >
               <Icon name="LAYOUT_GRID" size={13}/>
               Widgets
@@ -942,7 +947,7 @@ const Dashboard: React.FC = () => {
         {/* -- OVERVIEW TAB -- */}
         {activeTab === 'overview' && (
           <>
-            {/* ── Akaunting-style Welcome Hero ── */}
+            {/* ── Ovds SaaS style Welcome Hero ── */}
             <div className="db-hero">
               <div className="db-hero-glow"/>
               {/* Dot texture */}
@@ -1008,7 +1013,7 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* ── Akaunting-style KPI Strip (OvdsSummary) ── */}
+            {/* ── Ovds SaaS style KPI Strip (OvdsSummary) ── */}
             <div>
               <OvdsSummary />
             </div>
@@ -1046,8 +1051,8 @@ const Dashboard: React.FC = () => {
                   label="Total Employees"
                   value={totalEmployees}
                   trend={12}
-                  icon={<Icon name="USERS" size={19} className="text-emerald-600"/>}
-                  iconBg="bg-emerald-50"
+                  icon={<Icon name="USERS" size={19} className="text-[var(--pro-azure)]"/>}
+                  iconBg="bg-[var(--pro-azure-50)]"
                   gaugeValue={attendancePct}
                   gaugeColor="#10b981"
                   accent="#10b981"
@@ -1058,10 +1063,10 @@ const Dashboard: React.FC = () => {
                   label="Present Today"
                   value={presentToday}
                   trend={-5}
-                  icon={<Icon name="CHECK_CIRCLE" size={19} className="text-blue-500"/>}
-                  iconBg="bg-blue-50"
+                  icon={<Icon name="CHECK_CIRCLE" size={19} className="text-[var(--pro-azure)]"/>}
+                  iconBg="bg-[var(--pro-azure-50)]"
                   gaugeValue={attendancePct}
-                  gaugeColor="#3b82f6"
+                  gaugeColor="var(--pro-azure)"
                   accent="#3b82f6"
                   sublabel={`of ${totalEmployees} total`}
                   to="/hr/attendance"
@@ -1101,8 +1106,8 @@ const Dashboard: React.FC = () => {
                 style={{ textDecoration: 'none' }}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                    <Icon name="ITEM" size={22} className="text-emerald-600 dark:text-emerald-400" />
+                  <div className="w-12 h-12 rounded-2xl bg-[var(--pro-azure-50)] dark:bg-green-900/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <Icon name="ITEM" size={22} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="ovds-card-title mb-0.5">Explore Modules & Extensions</p>
@@ -1110,7 +1115,7 @@ const Dashboard: React.FC = () => {
                       Extend your workspace with apps for payments, payroll, VAT, inventory, and more.
                     </p>
                   </div>
-                  <div className="shrink-0 flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform">
+                  <div className="shrink-0 flex items-center gap-1 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] group-hover:translate-x-0.5 transition-transform">
                     Browse <Icon name="ARROW_RIGHT" size={13} />
                   </div>
                 </div>
@@ -1149,7 +1154,7 @@ const Dashboard: React.FC = () => {
             {/* Latest Transactions */}
             {widgetVisible('recent-invoices') && (
               <LatestTransactions
-                transactions={recentTransactions?.data ?? recentTransactions ?? []}
+                transactions={recentTransactions ?? []}
                 currency={currency}
                 onViewAll={() => window.__ovds_navigate?.('/sales/invoices')}
               />
@@ -1275,12 +1280,12 @@ const Dashboard: React.FC = () => {
             {/* HR mini hero strip */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', flexWrap: 'wrap', padding: '.875rem 1.25rem', background: '#fff', borderRadius: 14, border: '1px solid oklch(0.91 0.01 258)', boxShadow: '0 1px 2px rgba(0,0,0,.04)', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '.375rem', fontSize: '.8125rem', fontWeight: 700, color: 'oklch(0.15 0.02 258)' }}>
-                <Icon name="USERS" size={14} style={{ color: 'oklch(0.55 0.22 278)' }}/>
+                <Icon name="USERS" size={14} style={{ color: 'oklch(0.59 0.19 145)' }}/>
                 HR & Attendance
               </div>
               <div style={{ width: 1, height: 14, background: 'oklch(0.89 0.012 258)', margin: '0 .125rem' }}/>
               {[
-                { label: `${totalEmployees} employees`, color: 'oklch(0.55 0.22 278)' },
+                { label: `${totalEmployees} employees`, color: 'oklch(0.59 0.19 145)' },
                 { label: `${presentToday} present`, color: 'oklch(0.48 0.16 155)' },
                 ...(dashStats?.lateToday > 0 ? [{ label: `${dashStats.lateToday} late`, color: '#f59e0b' }] : []),
                 ...(dashStats?.absentToday > 0 ? [{ label: `${dashStats.absentToday} absent`, color: '#ef4444' }] : []),
@@ -1297,7 +1302,7 @@ const Dashboard: React.FC = () => {
             {/* HR KPI strip */}
             <div className="dash-stat-grid db-stagger">
               <StatCard label="Present Today" value={presentToday} trend={5}
-                icon={<Icon name="CHECK_CIRCLE" size={19} className="text-emerald-600"/>} iconBg="bg-emerald-50"
+                icon={<Icon name="CHECK_CIRCLE" size={19} className="text-[var(--pro-azure)]"/>} iconBg="bg-[var(--pro-azure-50)]"
                 gaugeValue={attendancePct} gaugeColor="#10b981" accent="#10b981" sublabel={`${attendancePct}% attendance rate`} to="/hr/attendance"/>
               <StatCard label="Late Arrivals" value={dashStats?.lateToday ?? 0}
                 icon={<Icon name="CLOCK" size={19} className="text-amber-500"/>} iconBg="bg-amber-50"
@@ -1339,12 +1344,12 @@ const Dashboard: React.FC = () => {
             {/* ovds mini hero strip */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', flexWrap: 'wrap', padding: '.875rem 1.25rem', background: '#fff', borderRadius: 14, border: '1px solid oklch(0.91 0.01 258)', boxShadow: '0 1px 2px rgba(0,0,0,.04)', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '.375rem', fontSize: '.8125rem', fontWeight: 700, color: 'oklch(0.15 0.02 258)' }}>
-                <Icon name="WALLET" size={14} style={{ color: 'oklch(0.55 0.22 278)' }}/> Finance & ovds
+                <Icon name="WALLET" size={14} style={{ color: 'oklch(0.59 0.19 145)' }}/> Finance & ovds
               </div>
               <div style={{ width: 1, height: 14, background: 'oklch(0.89 0.012 258)', margin: '0 .125rem' }}/>
               {[
                 { label: `Revenue: ${fmt(thisTotal)}`, color: 'oklch(0.48 0.16 155)' },
-                { label: `${collectionPct}% collected`, color: 'oklch(0.55 0.22 278)' },
+                { label: `${collectionPct}% collected`, color: 'oklch(0.59 0.19 145)' },
                 ...(overdueCount > 0 ? [{ label: `${overdueCount} overdue`, color: '#ef4444' }] : []),
                 { label: monthName, color: 'oklch(0.60 0.015 258)' },
               ].map((p, i) => (
@@ -1358,7 +1363,7 @@ const Dashboard: React.FC = () => {
 
             {/* ovds summary bar */}
             {widgetVisible('revenue') && (
-              <ovdsSummaryBar
+              <OvdsSummaryBar
                 moneyIn={thisTotal}
                 moneyOut={invoiceStats?.totalBills ?? 0}
                 netProfit={thisTotal - (invoiceStats?.totalBills ?? 0)}
@@ -1372,26 +1377,26 @@ const Dashboard: React.FC = () => {
             {/* ovds KPI cards */}
             {widgetVisible('invoices') && (
               <div className="dash-stat-grid mt-5 aki-stagger">
-                <ovdsKpiCard label="This Month Revenue" tooltip="Total amount invoiced to customers this month"
+                <OvdsKpiCard label="This Month Revenue" tooltip="Total amount invoiced to customers this month"
                   value={fmt(thisTotal)} trend={invoiceStats?.trend ?? 0}
-                  icon={<Icon name="TREND_UP" size={16} />} iconBg="bg-emerald-50" iconColor="text-emerald-600"
-                  accentColor="border-emerald-500" loading={!invoiceStats} onClick={() => window.__ovds_navigate?.('/sales/invoices')} />
-                <ovdsKpiCard label="Collected" tooltip="Amount already paid by customers"
+                  icon={<Icon name="TREND_UP" size={16} />} iconBg="bg-[var(--pro-azure-50)]" iconColor="text-[var(--pro-azure)]"
+                  accentColor="border-[var(--pro-azure)]" loading={!invoiceStats} onClick={() => window.__ovds_navigate?.('/sales/invoices')} />
+                <OvdsKpiCard label="Collected" tooltip="Amount already paid by customers"
                   value={fmt(paidAmount)} icon={<Icon name="CHECK_CIRCLE" size={16} />}
                   iconBg="bg-sky-50" iconColor="text-sky-600" accentColor="border-sky-500" loading={!invoiceStats}
                   onClick={() => window.__ovds_navigate?.('/sales/invoices')} />
-                <ovdsKpiCard label="Overdue Invoices" tooltip="Invoices past their payment due date — needs attention"
+                <OvdsKpiCard label="Overdue Invoices" tooltip="Invoices past their payment due date — needs attention"
                   value={overdueCount.toLocaleString()} subValue={`${fmt(overdueAmount)}`} icon={<Icon name="ALERT_CIRCLE" size={16} />}
                   iconBg="bg-rose-50" iconColor="text-rose-600" accentColor="border-rose-500" loading={!invoiceStats}
                   onClick={() => window.__ovds_navigate?.('/sales/invoices')} />
-                <ovdsKpiCard label="Pending" tooltip="Invoices sent but not yet paid"
+                <OvdsKpiCard label="Pending" tooltip="Invoices sent but not yet paid"
                   value={pendingCount.toLocaleString()} subValue={fmt(pendingAmount)} icon={<Icon name="CLOCK" size={16} />}
                   iconBg="bg-amber-50" iconColor="text-amber-600" accentColor="border-amber-500" loading={!invoiceStats}
                   onClick={() => window.__ovds_navigate?.('/sales/invoices')} />
               </div>
             )}
 
-            {/* Akaunting-style ovds Summary (Revenue / Expenses / Profit) */}
+            {/* Ovds SaaS style ovds Summary (Revenue / Expenses / Profit) */}
             {widgetVisible('revenue') && (
               <div className="mt-5">
                 <OvdsSummary
@@ -1470,11 +1475,11 @@ const Dashboard: React.FC = () => {
             {/* Insights mini strip */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', flexWrap: 'wrap', padding: '.875rem 1.25rem', background: '#fff', borderRadius: 14, border: '1px solid oklch(0.91 0.01 258)', boxShadow: '0 1px 2px rgba(0,0,0,.04)', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '.375rem', fontSize: '.8125rem', fontWeight: 700, color: 'oklch(0.15 0.02 258)' }}>
-                <Icon name="SPARKLES" size={14} style={{ color: 'oklch(0.55 0.22 278)' }}/> Executive Insights
+                <Icon name="SPARKLES" size={14} style={{ color: 'oklch(0.59 0.19 145)' }}/> Executive Insights
               </div>
               <div style={{ width: 1, height: 14, background: 'oklch(0.89 0.012 258)', margin: '0 .125rem' }}/>
               {[
-                { label: 'Executive view', color: 'oklch(0.55 0.22 278)' },
+                { label: 'Executive view', color: 'oklch(0.59 0.19 145)' },
                 { label: monthName, color: 'oklch(0.60 0.015 258)' },
               ].map((p, i) => (
                 <span key={i} style={{ fontSize: '.75rem', fontWeight: 600, color: p.color, padding: '2px 8px', background: `${p.color}12`, border: `1px solid ${p.color}28`, borderRadius: 999 }}>{p.label}</span>

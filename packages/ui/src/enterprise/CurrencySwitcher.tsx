@@ -74,12 +74,12 @@ export function CurrencySwitcher({
         className={cn(
           'flex items-center gap-2 px-3 py-2 rounded-xl border text-[12px] font-semibold transition-all',
           currentCurrency === baseCurrency
-            ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400'
-            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-aki-blue dark:hover:border-aki-blue',
+            ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-[var(--pro-azure-100)] dark:border-green-800 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
+            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-[var(--pro-azure)] dark:hover:border-[var(--pro-azure)]',
           disabled && 'opacity-50 cursor-not-allowed',
         )}
       >
-        <DollarSign size={14} className={currentCurrency === baseCurrency ? 'text-emerald-500' : 'text-slate-400'} />
+        <DollarSign size={14} className={currentCurrency === baseCurrency ? 'text-[var(--pro-azure)]' : 'text-slate-400'} />
         <span>{symbol}</span>
         <span className="text-[10px] font-mono text-slate-400">{currentCurrency}</span>
         {currentRate !== null && showRate && (
@@ -98,7 +98,7 @@ export function CurrencySwitcher({
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Display Currency</p>
               <p className="text-[10px] text-slate-400 mt-0.5">Base: {baseCurrency}</p>
             </div>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+            <div className="w-8 h-8 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/30 flex items-center justify-center text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
               <DollarSign size={14} />
             </div>
           </div>
@@ -125,14 +125,14 @@ export function CurrencySwitcher({
                   className={cn(
                     'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all',
                     isSelected
-                      ? 'bg-aki-blue-50 dark:bg-aki-blue-950/30'
+                      ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]-950/30'
                       : 'hover:bg-slate-50 dark:hover:bg-slate-800',
                   )}
                 >
                   <div className={cn(
                     'w-8 h-8 rounded-xl flex items-center justify-center shrink-0 font-mono text-[11px] font-bold',
                     isSelected
-                      ? 'bg-aki-blue-100 dark:bg-aki-blue-900/50 text-aki-blue dark:text-blue-400'
+                      ? 'bg-[var(--pro-azure-100)] dark:bg-[var(--pro-azure)]-900/50 text-[var(--pro-azure)] dark:text-blue-400'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400',
                   )}>
                     {currency.slice(0, 2)}
@@ -141,7 +141,7 @@ export function CurrencySwitcher({
                     <div className="flex items-center gap-2">
                       <span className="text-[12px] font-semibold text-slate-700 dark:text-slate-200">{currency}</span>
                       {currency === baseCurrency && (
-                        <span className="px-1.5 py-0.5 rounded-full text-[8px] font-bold bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400">
+                        <span className="px-1.5 py-0.5 rounded-full text-[8px] font-bold bg-[var(--pro-azure-100)] dark:bg-green-900/50 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
                           Base
                         </span>
                       )}
@@ -155,7 +155,7 @@ export function CurrencySwitcher({
                     </div>
                   )}
                   {isSelected && (
-                    <div className="w-2 h-2 rounded-full bg-aki-blue dark:bg-blue-400 shrink-0" />
+                    <div className="w-2 h-2 rounded-full bg-[var(--pro-azure)] dark:bg-blue-400 shrink-0" />
                   )}
                 </button>
               );

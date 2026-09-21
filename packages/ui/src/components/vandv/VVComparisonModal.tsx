@@ -32,7 +32,7 @@ const STATUS_STYLE: Record<
   FieldDiff['status'],
   { row: string; chip: string; icon: React.ReactNode; label: string }
 > = {
-  added: { row: 'bg-emerald-50/60 dark:bg-emerald-950/30', chip: 'bg-emerald-100 text-emerald-700', icon: <Plus size={11} />, label: 'Added' },
+  added: { row: 'bg-[var(--pro-azure-50)]/60 dark:bg-green-950/30', chip: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]', icon: <Plus size={11} />, label: 'Added' },
   edited: { row: 'bg-amber-50/60 dark:bg-amber-950/30', chip: 'bg-amber-100 text-amber-700', icon: <Pencil size={11} />, label: 'Edited' },
   removed: { row: 'bg-slate-100/60 dark:bg-slate-800/40', chip: 'bg-slate-200 text-slate-500', icon: <Minus size={11} />, label: 'Removed' },
   unchanged: { row: '', chip: 'bg-slate-100 text-slate-400', icon: null, label: 'Unchanged' },
@@ -48,7 +48,7 @@ const Cell: React.FC<{ diff: FieldDiff; side: 'original' | 'validated' }> = ({ d
   }
   const tone =
     side === 'validated' && diff.status === 'edited' ? 'text-amber-700 dark:text-amber-300 font-semibold'
-      : side === 'validated' && diff.status === 'added' ? 'text-emerald-700 dark:text-emerald-300 font-semibold'
+      : side === 'validated' && diff.status === 'added' ? 'text-[var(--pro-azure-dark)] dark:text-green-300 font-semibold'
       : 'text-slate-700 dark:text-slate-200';
   return <span className={cn('text-[13px] tabular-nums', tone)}>{fmtVV(v)}</span>;
 };
@@ -114,7 +114,7 @@ export const VVComparisonModal: React.FC<VVComparisonModalProps> = ({
             className={cn(
               'inline-flex items-center gap-1.5 text-[11px] font-semibold',
               totals.balanced
-                ? 'text-emerald-600 dark:text-emerald-400'
+                ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
                 : 'text-rose-600 dark:text-rose-400',
             )}
           >
@@ -130,7 +130,7 @@ export const VVComparisonModal: React.FC<VVComparisonModalProps> = ({
             className={cn(
               'inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-oki px-2.5 py-1.5 border transition-colors',
               onlyChanges
-                ? 'border-aki-blue/40 text-aki-blue bg-aki-blue/10'
+                ? 'border-[var(--pro-azure)]/40 text-[var(--pro-azure)] bg-[var(--pro-azure)]/10'
                 : 'border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800',
             )}
           >
@@ -142,7 +142,7 @@ export const VVComparisonModal: React.FC<VVComparisonModalProps> = ({
         {/* Split header */}
         <div className="grid grid-cols-2 gap-px bg-slate-100 dark:bg-slate-800 text-[10px] font-bold uppercase tracking-widest">
           <div className="bg-white dark:bg-slate-900 px-5 py-2 text-slate-400">Original</div>
-          <div className="bg-white dark:bg-slate-900 px-5 py-2 text-aki-blue dark:text-blue-400">Validated</div>
+          <div className="bg-white dark:bg-slate-900 px-5 py-2 text-[var(--pro-azure)] dark:text-blue-400">Validated</div>
         </div>
 
         {/* Rows */}
@@ -194,7 +194,7 @@ export const VVComparisonModal: React.FC<VVComparisonModalProps> = ({
         <div className="flex items-center justify-between gap-3 px-5 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60">
           <span className="text-[11px] text-slate-400 flex items-center gap-1.5">
             <span className="inline-flex items-center gap-1">
-              <span className="text-emerald-600">green = added</span> ·{' '}
+              <span className="text-[var(--pro-azure-dark)]">green = added</span> ·{' '}
               <span className="text-amber-600">yellow = edited</span> ·{' '}
               <span className="text-slate-500">gray = removed</span>
             </span>
@@ -211,7 +211,7 @@ export const VVComparisonModal: React.FC<VVComparisonModalProps> = ({
               <button
                 type="button"
                 onClick={onConfirm}
-                className="px-4 py-2 text-[12px] font-bold rounded-oki bg-aki-blue text-white hover:bg-aki-blue-dark transition-colors"
+                className="px-4 py-2 text-[12px] font-bold rounded-oki bg-[var(--pro-azure)] text-white hover:bg-[var(--pro-azure-dark)] transition-colors"
               >
                 Looks Correct
               </button>

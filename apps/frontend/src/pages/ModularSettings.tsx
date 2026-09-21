@@ -1,19 +1,20 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useSearchParams, Link, useBlocker } from 'react-router-dom';
-import { Skeleton, GridHero, ContextStrip, ContextPill, Modal } from '@ovds/ui';
-import { settingsCatalogApi } from '@ovds/features/settings';
-import api from '../services/api';
-import { setupApi, type CompanySetupProgress, type SetupStepDefinition } from '../services/setupApi';
 import { moduleManagerApi } from '@ovds/features/appstore';  
-import toast from 'react-hot-toast';
-import { useAuth } from '../rbac';
-import { useBusiness } from '../context/businessContext';
+import { settingsCatalogApi, settingsCatalogCategoriesApi, settingsCatalogValuesApi } from '@ovds/features/settings';
 import type { SettingCategory } from '@ovds/shared';
+import { Skeleton, GridHero, ContextStrip, ContextPill, Modal } from '@ovds/ui';
 import {
   Settings2, Save, Search, RefreshCw, ArrowRight,
   CheckCircle2, AlertTriangle, Eye, EyeOff, ChevronDown,
   SlidersHorizontal,
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import toast from 'react-hot-toast';
+import { useSearchParams, Link, useBlocker } from 'react-router-dom';
+
+import { useBusiness } from '../context/businessContext';
+import { useAuth } from '../rbac';
+import api from '../services/api';
+import { setupApi, type CompanySetupProgress, type SetupStepDefinition } from '../services/setupApi';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -39,7 +40,7 @@ const Toggle: React.FC<ToggleProps> = ({ checked, onChange, disabled }) => (
   <button
     type="button" role="switch" aria-checked={checked} disabled={disabled}
     onClick={() => onChange(!checked)}
-    className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 disabled:opacity-40 disabled:cursor-not-allowed ${checked ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}
+    className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pro-azure)]/30 disabled:opacity-40 disabled:cursor-not-allowed ${checked ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-200 dark:bg-slate-700'}`}
   >
     <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${checked ? 'translate-x-6' : 'translate-x-1'}`} />
   </button>
@@ -103,7 +104,7 @@ const ModularSettings: React.FC = () => {
     (async () => {
       setLoading(true);
       try {
-        const cats = await settingsCatalogApi.categories.list() as EnrichedSettingCategory[];
+        const cats = await settingsCatalogCategoriesApi.list() as EnrichedSettingCategory[];
         setCategories(cats ?? []);
         const firstCat = cats?.[0]?.key ?? '';
         const urlCat = searchParams.get('category');
@@ -150,7 +151,7 @@ const ModularSettings: React.FC = () => {
     (async () => {
       if (!activeCategory) return;
       try {
-        const values = await settingsCatalogApi.values.list(companyId);
+        const values = await settingsCatalogValuesApi.list(companyId);
         const obj: Record<string, string> = {};
         for (const k of Object.keys(values)) obj[k] = values[k].value;
         setSettings(obj);
@@ -183,7 +184,7 @@ const ModularSettings: React.FC = () => {
     if (!isDirty || !canWrite) return;
     setSaving(true);
     try {
-      await settingsCatalogApi.values.bulkUpdate(settings, companyId);
+       await settingsCatalogValuesApi.bulkUpdate(settings, companyId);
       setIsDirty(false);
       toast.success('Settings saved');
     } catch { toast.error('Failed to save settings'); }
@@ -472,7 +473,7 @@ const ModularSettings: React.FC = () => {
           <div className="ovds-widget-card p-4">
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${pct === 100 ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600'}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${pct === 100 ? 'bg-[var(--pro-azure-100)] dark:bg-green-900/30 text-[var(--pro-azure)]' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600'}`}>
                   {pct === 100 ? <CheckCircle2 size={20} /> : <AlertTriangle size={20} />}
                 </div>
                 <div className="min-w-0">
@@ -502,7 +503,7 @@ const ModularSettings: React.FC = () => {
               {profileSnapshot.profile?.companyLogoUrl ? (
                 <img src={profileSnapshot.profile.companyLogoUrl} alt="logo" className="h-10 w-10 rounded-lg object-cover border border-slate-200 dark:border-slate-700" />
               ) : (
-                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-sm">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-[var(--pro-azure)] to-teal-600 flex items-center justify-center text-white font-bold text-sm">
                   {profileSnapshot.profile?.companyName?.charAt(0)?.toUpperCase() ?? 'O'}
                 </div>
               )}
@@ -514,7 +515,7 @@ const ModularSettings: React.FC = () => {
             <div className="hidden md:flex items-center gap-4 ml-auto text-[10px] font-medium text-slate-600 dark:text-slate-400">
               <span>{profileSnapshot.localization?.language?.toUpperCase() ?? 'EN'}</span>
               <span>{profileSnapshot.financial?.defaultCurrency ?? 'ETB'}</span>
-              <span className="flex items-center gap-1"><span className={`w-1.5 h-1.5 rounded-full ${profileSnapshot.taxes?.vatEnabled === 'true' ? 'bg-emerald-500' : 'bg-slate-300'}`} /> VAT {profileSnapshot.taxes?.vatEnabled === 'true' ? 'ON' : 'OFF'}</span>
+              <span className="flex items-center gap-1"><span className={`w-1.5 h-1.5 rounded-full ${profileSnapshot.taxes?.vatEnabled === 'true' ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-300'}`} /> VAT {profileSnapshot.taxes?.vatEnabled === 'true' ? 'ON' : 'OFF'}</span>
             </div>
           </div>
           {isCompanyProfileRoute && activeCategory === 'company' && (
@@ -523,7 +524,7 @@ const ModularSettings: React.FC = () => {
                 const isActive = activeSection === sec.key;
                 return (
                   <button key={sec.key} onClick={() => setActiveSection(sec.key)}
-                    className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${isActive ? 'bg-emerald-500 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
+                    className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${isActive ? 'bg-[var(--pro-azure)] text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
                     {sec.label}
                   </button>
                 );
@@ -565,13 +566,13 @@ const ModularSettings: React.FC = () => {
                     onClick={() => handleCategoryChange(cat.key)}
                     className={`w-full flex items-center gap-2.5 px-4 py-2.5 transition-all ${
                       isActive
-                        ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 font-semibold'
+                        ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] font-semibold'
                         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
                     <span className="text-sm shrink-0">{cat.icon || '⚙️'}</span>
                     <span className="text-[12px] flex-1 text-left truncate">{cat.name}</span>
-                    {isActive && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />}
+                    {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[var(--pro-azure-50)]0 shrink-0" />}
                   </button>
                 );
               })}
@@ -607,7 +608,7 @@ const ModularSettings: React.FC = () => {
                       key={mod.name}
                       className={`flex items-center justify-between px-4 py-3.5 rounded-xl border transition-colors ${
                         mod.isEnabled
-                          ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800'
+                          ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-[var(--pro-azure-100)] dark:border-green-800'
                           : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700'
                       }`}
                     >
@@ -615,7 +616,7 @@ const ModularSettings: React.FC = () => {
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{mod.displayName}</span>
                           {mod.isCore && (
-                            <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded font-bold uppercase tracking-wide">
+                            <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]/10 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] rounded font-bold uppercase tracking-wide">
                               Core
                             </span>
                           )}
@@ -687,7 +688,7 @@ const ModularSettings: React.FC = () => {
                       onClick={() => setCollapsedGroups(prev => ({ ...prev, [group.id]: !isCollapsed }))}
                       className="w-full flex items-center gap-3 mb-4 group"
                     >
-                      <div className="w-1 h-4 rounded-full bg-emerald-500 shrink-0" />
+                      <div className="w-1 h-4 rounded-full bg-[var(--pro-azure-50)]0 shrink-0" />
                       <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex-1 text-left">
                         {group.name}
                       </p>
@@ -792,7 +793,7 @@ const ModularSettings: React.FC = () => {
                           role="switch"
                           aria-checked={moduleSettings[s.key] === 'true'}
                           onClick={() => setModuleSettings(prev => ({ ...prev, [s.key]: prev[s.key] === 'true' ? 'false' : 'true' }))}
-                          className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${moduleSettings[s.key] === 'true' ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}
+                          className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${moduleSettings[s.key] === 'true' ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-200 dark:bg-slate-700'}`}
                         >
                           <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${moduleSettings[s.key] === 'true' ? 'translate-x-5' : 'translate-x-1'}`} />
                         </button>

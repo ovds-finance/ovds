@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import {
   ShieldCheck, ArrowRight,
   FileText, BookOpen, Banknote, Shield, Globe, TrendingUp,
   RefreshCw,
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
+import { useBusiness } from '../../context/businessContext';
 import api from '../../services/api';
 import { fmtCurrency } from '../../utils/fmt';
-import { useBusiness } from '../../context/businessContext';
 
 interface ComplianceStatus {
   vatFiled: boolean;
@@ -22,9 +23,9 @@ interface ComplianceStatus {
 }
 
 const CHAIN_STEPS = [
-  { key: 'item',     label: 'Item',          icon: <FileText size={13} />,    color: 'text-emerald-600 dark:text-emerald-400',    bg: 'bg-emerald-50 dark:bg-emerald-950/30',    link: '/items' },
+  { key: 'item',     label: 'Item',          icon: <FileText size={13} />,    color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',    bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',    link: '/items' },
   { key: 'invoice',  label: 'Invoice/Bill',  icon: <FileText size={13} />,    color: 'text-amber-600 dark:text-amber-400',  bg: 'bg-amber-50 dark:bg-amber-950/30',  link: '/sales/invoices' },
-  { key: 'journal',  label: 'Journal Entry', icon: <BookOpen size={13} />,    color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30', link: '/accounting?tab=journal' },
+  { key: 'journal',  label: 'Journal Entry', icon: <BookOpen size={13} />,    color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30', link: '/accounting?tab=journal' },
   { key: 'vat',      label: 'VAT 15%',       icon: <ShieldCheck size={13} />, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-950/30', link: '/tax/vat' },
   { key: 'drrf',     label: 'DRRF Levy',     icon: <Shield size={13} />,      color: 'text-rose-600 dark:text-rose-400',      bg: 'bg-rose-50 dark:bg-rose-950/30',      link: '/disaster-fund' },
   { key: 'tax',      label: 'BIT / MAT',     icon: <Banknote size={13} />,    color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-950/30', link: '/tax/business-income' },
@@ -81,10 +82,10 @@ const LiveComplianceWidget: React.FC = () => {
   useEffect(() => { load(); }, [selectedCompanyId]);  // eslint-disable-line react-hooks/exhaustive-deps
 
   const score = status?.complianceScore ?? 85;
-  const scoreColor = score >= 90 ? 'text-emerald-600 dark:text-emerald-400'
+  const scoreColor = score >= 90 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
     : score >= 70 ? 'text-amber-600 dark:text-amber-400'
     : 'text-rose-600 dark:text-rose-400';
-  const scoreBg = score >= 90 ? 'bg-emerald-500' : score >= 70 ? 'bg-amber-500' : 'bg-rose-500';
+  const scoreBg = score >= 90 ? 'bg-[var(--pro-azure-50)]0' : score >= 70 ? 'bg-amber-500' : 'bg-rose-500';
 
   // Compute days until next VAT deadline (30th of next month)
   const now = new Date();
@@ -115,7 +116,7 @@ const LiveComplianceWidget: React.FC = () => {
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5">
-            <div className={`w-1.5 h-1.5 rounded-full ${score >= 90 ? 'bg-emerald-500' : score >= 70 ? 'bg-amber-500' : 'bg-rose-500'} animate-pulse`} />
+            <div className={`w-1.5 h-1.5 rounded-full ${score >= 90 ? 'bg-[var(--pro-azure-50)]0' : score >= 70 ? 'bg-amber-500' : 'bg-rose-500'} animate-pulse`} />
             <span className={`text-sm font-semibold ${scoreColor}`}>{score}%</span>
           </div>
           <button
@@ -205,7 +206,7 @@ const LiveComplianceWidget: React.FC = () => {
               : 'bg-white dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 hover:border-amber-200 dark:hover:border-amber-800'
           }`}>
           <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Overdue</p>
-          <p className={`text-sm font-semibold mt-0.5 ${(status?.overdueInvoices ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+          <p className={`text-sm font-semibold mt-0.5 ${(status?.overdueInvoices ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'}`}>
             {loading ? '—' : status?.overdueInvoices ?? 0}
           </p>
           <p className="ovds-caption">invoices</p>
@@ -214,7 +215,7 @@ const LiveComplianceWidget: React.FC = () => {
 
       {/* Footer */}
       <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <Link to="/tax/dashboard" className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+        <Link to="/tax/dashboard" className="flex items-center gap-1.5 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
           <TrendingUp size={12} /> Full Tax Dashboard
         </Link>
         <a href="https://etax.erca.gov.et" target="_blank" rel="noopener noreferrer"

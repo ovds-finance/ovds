@@ -2,6 +2,20 @@ import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
+/**
+ * Dialog — Ovds SaaS modal.
+ *
+ * Design:
+ *  - White surface card, 1px border, 12px radius
+ *  - Header: bottom border, 14px bold title, muted description
+ *  - Footer: top border, slate-50 bg, right-aligned action buttons
+ *  - Close button: ghost, 28px icon button, green focus ring
+ *  - Backdrop: slate-900/45 + backdrop-blur(3px)
+ *  - Entry: fade + scale-in 200ms ease-spring
+ *  - Scroll lock on body while open
+ *  - Full ARIA + focus trap + Escape
+ */
+
 export interface DialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -9,21 +23,22 @@ export interface DialogProps {
   description?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
-  /** Max width class */
-  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
-  /** Prevent closing on overlay click or Escape */
+  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
   closeOnOverlay?: boolean;
   closeOnEscape?: boolean;
   className?: string;
+  /** Hide the close × button */
+  hideClose?: boolean;
 }
 
-const SIZE_MAP: Record<string, string> = {
-  sm: 'max-w-sm',
-  md: 'max-w-md',
-  lg: 'max-w-lg',
-  xl: 'max-w-xl',
-  '2xl': 'max-w-2xl',
-  full: 'max-w-5xl',
+const MAX_W: Record<string, string> = {
+  xs:   'max-w-xs',
+  sm:   'max-w-sm',
+  md:   'max-w-md',
+  lg:   'max-w-lg',
+  xl:   'max-w-xl',
+  '2xl':'max-w-2xl',
+  full: 'max-w-4xl',
 };
 
 export const Dialog: React.FC<DialogProps> = ({
@@ -37,33 +52,62 @@ export const Dialog: React.FC<DialogProps> = ({
   closeOnOverlay = true,
   closeOnEscape = true,
   className,
+  hideClose = false,
 }) => {
   const panelRef = useRef<HTMLDivElement>(null);
+  const firstFocusRef = useRef<HTMLElement | null>(null);
 
+  /* ── Focus trap ──────────────────────────────────────────────────── */
   useEffect(() => {
     if (!open || !panelRef.current) return;
+    const panel = panelRef.current;
+
+    // Restore focus on close
+    const prevFocus = document.activeElement as HTMLElement | null;
+
+    // Auto-focus first focusable element
+    const focusable = () =>
+      Array.from(
+        panel.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+
+    const first = focusable()[0];
+    if (first) {
+      firstFocusRef.current = first;
+      requestAnimationFrame(() => first.focus());
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && closeOnEscape) {
         e.preventDefault();
         onOpenChange(false);
+        return;
       }
       if (e.key === 'Tab') {
-        const focusable = panelRef.current!.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])') as NodeListOf<HTMLElement>;
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
+        const items = focusable();
+        if (items.length === 0) return;
+        const last  = items[items.length - 1];
+        const firstEl = items[0];
+        if (e.shiftKey && document.activeElement === firstEl) {
           e.preventDefault();
           last.focus();
         } else if (!e.shiftKey && document.activeElement === last) {
           e.preventDefault();
-          first.focus();
+          firstEl.focus();
         }
       }
     };
+
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      prevFocus?.focus();
+    };
   }, [open, closeOnEscape, onOpenChange]);
 
+  /* ── Body scroll lock ─────────────────────────────────────────────── */
   useEffect(() => {
     if (!open) return;
     const original = document.body.style.overflow;
@@ -74,44 +118,107 @@ export const Dialog: React.FC<DialogProps> = ({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[700] flex items-center justify-center p-4">
+    /* Portal layer */
+    <div className="fixed inset-0 z-[700] flex items-center justify-center p-4" role="presentation">
+
+      {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-slate-900/40 dark:bg-slate-900/70 backdrop-blur-sm"
+        className="absolute inset-0 animate-[aki-fade-in_160ms_ease_both]"
+        style={{
+          background: 'rgba(17,24,39,0.45)',
+          backdropFilter: 'blur(3px)',
+          WebkitBackdropFilter: 'blur(3px)',
+        }}
         onClick={() => closeOnOverlay && onOpenChange(false)}
+        aria-hidden="true"
       />
+
+      {/* Panel */}
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
-        aria-label={title}
+        aria-labelledby={title ? 'dialog-title' : undefined}
+        aria-describedby={description ? 'dialog-desc' : undefined}
         className={cn(
-          'relative w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden',
-          'animate-in fade-in zoom-in-95 duration-150',
-          SIZE_MAP[maxWidth],
+          'relative w-full flex flex-col overflow-hidden',
+          'bg-white dark:bg-[var(--surface)]',
+          'border border-[var(--border)] dark:border-[var(--border)]',
+          'rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.14),0_4px_16px_rgba(0,0,0,0.07)]',
+          'animate-[aki-enter_200ms_cubic-bezier(0.16,1,0.3,1)_both]',
+          MAX_W[maxWidth],
           className,
         )}
+        style={{ maxHeight: 'calc(100vh - 64px)' }}
       >
-        {(title || description) && (
-          <div className="flex items-start justify-between gap-4 px-5 py-4 border-b border-slate-100 dark:border-slate-800">
-            <div className="min-w-0">
-              {title && <h2 className="text-[14px] font-bold text-slate-900 dark:text-slate-100">{title}</h2>}
-              {description && <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>}
+
+        {/* Header */}
+        {(title || description || !hideClose) && (
+          <div
+            className="flex items-start justify-between gap-4 px-5 py-4 shrink-0"
+            style={{ borderBottom: '1px solid var(--border-alt)' }}
+          >
+            <div className="min-w-0 flex-1">
+              {title && (
+                <h2
+                  id="dialog-title"
+                  className="text-[14px] font-bold leading-tight"
+                  style={{ color: 'var(--text)', letterSpacing: '-0.01em' }}
+                >
+                  {title}
+                </h2>
+              )}
+              {description && (
+                <p
+                  id="dialog-desc"
+                  className="text-[11px] mt-0.5"
+                  style={{ color: 'var(--text-4)' }}
+                >
+                  {description}
+                </p>
+              )}
             </div>
-            <button
-              onClick={() => onOpenChange(false)}
-              className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shrink-0"
-              aria-label="Close dialog"
-            >
-              <X size={14} />
-            </button>
+
+            {!hideClose && (
+              <button
+                onClick={() => onOpenChange(false)}
+                aria-label="Close dialog"
+                className={cn(
+                  'w-7 h-7 rounded-lg flex items-center justify-center shrink-0',
+                  'transition-all duration-100',
+                  'hover:bg-[var(--surface-alt)]',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pro-azure)] focus-visible:ring-offset-1',
+                  'active:scale-95',
+                )}
+                style={{ color: 'var(--text-4)' }}
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
         )}
-        <div ref={panelRef} className="px-5 py-4 max-h-[70vh] overflow-y-auto">{children}</div>
+
+        {/* Body — scrollable */}
+        <div
+          className="flex-1 overflow-y-auto overscroll-contain px-5 py-4"
+          style={{ minHeight: 0 }}
+        >
+          {children}
+        </div>
+
+        {/* Footer */}
         {footer && (
-          <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2 bg-slate-50/50 dark:bg-slate-900/50">
+          <div
+            className="shrink-0 px-5 py-3 flex items-center justify-end gap-2"
+            style={{
+              borderTop: '1px solid var(--border-alt)',
+              background: 'var(--surface-alt)',
+            }}
+          >
             {footer}
           </div>
         )}
+
       </div>
     </div>
   );

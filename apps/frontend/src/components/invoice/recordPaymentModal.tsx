@@ -1,12 +1,15 @@
-﻿import React, { useState, useMemo } from 'react';
 import { X, Trash2, Loader2, CheckCircle2, Wifi, QrCode, ShieldCheck, ShieldAlert, Plus, Split, FileDown, Tag, CalendarRange, Percent, TrendingUp, AlertCircle, Receipt } from 'lucide-react';
-import api from '../../services/api';
-import { invoicesApi } from '../../services/ovdsApi';
+import React, { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
+
 import { useAuth } from '../../rbac/AuthContext';
-import { PAYMENT_METHODS, NBE_INTERACTION_TYPES, ARCH_INTEGRATION_TYPES, PROCESS_INTEGRATION_TYPES } from './constants';
-import TelecomReceiptViewer, { type ReceiptEvidence } from '../receiptViewer';
+import { invoicesApi } from '../../services/ovdsApi';
 import { computeReceiptConfidence } from '../../utils/fmt';
+import TelecomReceiptViewer, { type ReceiptEvidence } from '../receiptViewer';
+
+import { PAYMENT_METHODS, NBE_INTERACTION_TYPES, ARCH_INTEGRATION_TYPES, PROCESS_INTEGRATION_TYPES } from './constants';
+
 
 interface RecordPaymentModalProps {
   invoice: any;
@@ -236,10 +239,10 @@ const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({
     ? Math.min(100, Math.round((totalPaid / Number(invoice.totalAmount)) * 100))
     : 0;
 
-  return (
+  return createPortal(
     <>
       <div
-        className="fixed inset-0 z-[55] flex items-center justify-center p-4"
+        className="fixed inset-0 z-[310] flex items-center justify-center p-4"
         style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(4px)' }}
         role="dialog"
         aria-modal="true"
@@ -397,7 +400,7 @@ const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({
                      <button
                        type="button"
                        onClick={() => { setPlanMode(v => !v); setSplitMode(false); }}
-                       className={`aki-btn xs ${planMode ? 'aki-btn-soft-emerald' : 'aki-btn-secondary'}`}
+                       className={`aki-btn xs ${planMode ? 'aki-btn-soft-indigo' : 'aki-btn-secondary'}`}
                      >
                        <CalendarRange size={11} /> Plan
                      </button>
@@ -790,7 +793,8 @@ const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({
           invoiceId={invoice.id}
         />
       )}
-    </>
+    </>,
+    document.body,
   );
 };
 

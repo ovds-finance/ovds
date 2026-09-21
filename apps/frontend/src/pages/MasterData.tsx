@@ -1,20 +1,20 @@
 /**
  * MasterData — Unified ovds-style automated accounting pipeline
- * Pure white · Emerald text · Calibri/Arial/Helvetica/Georgia/Garamond
+ * Pure white · indigo text · Calibri/Arial/Helvetica/Georgia/Garamond
  * White-blue icons · Items · Customers · Vendors · Tax Types · Banks · Companies
  * Ethiopian ERCA tax rules · IFRS compliance · Zero duplication
  */
-import React, { useState, useCallback, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Package, Users2, Building2, ShieldCheck, Landmark, Briefcase,
   Plus, Edit2, Trash2, RefreshCw, Download, Upload,
   CheckCircle2, AlertCircle, TrendingUp, ArrowRight,
   Phone, Mail, Hash, Globe, Zap, FileText, BarChart3,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState, useCallback, useMemo } from 'react';
 import toast from 'react-hot-toast';
-import api from '../services/api';
+import { useNavigate } from 'react-router-dom';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn,
@@ -22,7 +22,8 @@ import {
   Input, Select, Textarea, IconBox, EthTaxBadge, Amount,
   PipelineBar, Pagination, Breadcrumb, BlueIcon, confirm,
 } from '../components/ui';
-import { fmtETB, ETH_TAX, calcVAT, calcWHT, getWhtLabel } from '../utils/ethiopianTax';
+import api from '../services/api';
+import { fmtETB, calcVAT, calcWHT } from '../utils/ethiopianTax';
 import type { WhtType } from '../utils/ethiopianTax';
 
 // -----------------------------------------------------------------------------
@@ -31,16 +32,16 @@ import type { WhtType } from '../utils/ethiopianTax';
 const S = {
   // Font stack: Calibri → Arial → Helvetica → Georgia → Garamond → serif
   font: 'font-[Calibri,Arial,Helvetica,Georgia,Garamond,serif]',
-  // White card with emerald border
-  card: 'bg-white border border-emerald-100 rounded-xl shadow-[0_1px_4px_0_rgb(5_150_105/0.06)]',
-  // Emerald text hierarchy
-  h1:   'text-[15px] font-bold text-emerald-900 leading-tight',
-  h2:   'text-[13px] font-bold text-emerald-800',
-  h3:   'text-[11px] font-semibold text-emerald-700',
-  body: 'text-[12px] text-emerald-800',
-  muted:'text-[11px] text-emerald-600/60',
+  // White card with indigo border
+  card: 'bg-white border border-[var(--pro-azure-100)] rounded-xl shadow-[0_1px_4px_0_rgb(5_150_105/0.06)]',
+  // indigo text hierarchy
+  h1:   'text-[15px] font-bold text-[var(--pro-azure-dark)] leading-tight',
+  h2:   'text-[13px] font-bold text-[var(--pro-azure-dark)]',
+  h3:   'text-[11px] font-semibold text-[var(--pro-azure-dark)]',
+  body: 'text-[12px] text-[var(--pro-azure-dark)]',
+  muted:'text-[11px] text-[var(--pro-azure)]/60',
   // White-blue icon boxes
-  iconEmerald: 'w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0',
+  iconindigo: 'w-8 h-8 rounded-lg bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] text-[var(--pro-azure)] flex items-center justify-center shrink-0',
   iconSky:     'w-8 h-8 rounded-lg bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center shrink-0',
   iconAmber:   'w-8 h-8 rounded-lg bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0',
   iconViolet:  'w-8 h-8 rounded-lg bg-violet-50 border border-violet-100 text-violet-600 flex items-center justify-center shrink-0',
@@ -48,7 +49,7 @@ const S = {
   iconSlate:   'w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-500 flex items-center justify-center shrink-0',
   // Row action buttons
   rowBtn: 'w-6 h-6 rounded flex items-center justify-center transition-all',
-  rowEdit:   'text-slate-400 hover:bg-emerald-50 hover:text-emerald-600',
+  rowEdit:   'text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)]',
   rowDelete: 'text-slate-400 hover:bg-rose-50 hover:text-rose-600',
 };
 
@@ -64,11 +65,11 @@ interface TabConfig {
   iconCls: string;
   endpoint: string;
   description: string;
-  color: 'emerald' | 'sky' | 'amber' | 'violet' | 'rose' | 'slate';
+  color: 'green' | 'sky' | 'amber' | 'violet' | 'rose' | 'slate';
 }
 
 const TABS: TabConfig[] = [
-  { key: 'items',      label: 'Items',      icon: <BlueIcon icon={<Package size={14}/>} size="sm" />,     iconCls: '', endpoint: '/ovds/items',          description: 'Products & services catalog',       color: 'emerald' },
+  { key: 'items',      label: 'Items',      icon: <BlueIcon icon={<Package size={14}/>} size="sm" />,     iconCls: '', endpoint: '/ovds/items',          description: 'Products & services catalog',       color: 'green' },
   { key: 'customers',  label: 'Customers',  icon: <BlueIcon icon={<Users2 size={14}/>} size="sm" />,      iconCls: '',     endpoint: '/ovds/customers',      description: 'Customer accounts & contacts',      color: 'sky'     },
   { key: 'vendors',    label: 'Vendors',    icon: <BlueIcon icon={<Building2 size={14}/>} size="sm" />,   iconCls: '',   endpoint: '/ovds/vendors',        description: 'Supplier & vendor accounts',        color: 'amber'   },
   { key: 'tax-types',  label: 'Tax Types',  icon: <BlueIcon icon={<ShieldCheck size={14}/>} size="sm" />, iconCls: '',  endpoint: '/ovds/tax-rates',      description: 'Ethiopian ERCA tax rates & rules',  color: 'violet'  },
@@ -93,18 +94,18 @@ function useTabCols(tab: TabKey, onEdit: (r: any) => void, onDelete: (r: any) =>
     items: [
       { key: 'name',      label: 'Item',       render: (r: any) => (
         <div className="flex items-center gap-2">
-          <div className={S.iconEmerald}><Package size={12}/></div>
+          <div className={S.iconindigo}><Package size={12}/></div>
           <div>
             <p className={S.h3}>{r.name}</p>
             {r.description && <p className={S.muted + ' truncate max-w-[160px]'}>{r.description}</p>}
           </div>
         </div>
       )},
-      { key: 'sku',       label: 'SKU',        render: (r: any) => <span className="font-mono text-[11px] text-emerald-700">{r.sku ?? r.code ?? '—'}</span> },
+      { key: 'sku',       label: 'SKU',        render: (r: any) => <span className="font-mono text-[11px] text-[var(--pro-azure-dark)]">{r.sku ?? r.code ?? '—'}</span> },
       { key: 'type',      label: 'Type',       render: (r: any) => <StatusBadge status={r.itemType ?? r.type ?? 'PRODUCT'} label={r.itemType ?? r.type ?? 'Product'}/> },
       { key: 'salePrice', label: 'Sale Price', align: 'right' as const, render: (r: any) => <Amount value={r.salePrice ?? r.price ?? 0} size="sm"/> },
       { key: 'vatRate',   label: 'VAT',        render: (r: any) => r.vatApplicable !== false ? <EthTaxBadge type="VAT" rate={r.vatRate ?? 15}/> : <span className={S.muted}>Exempt</span> },
-      { key: 'stock',     label: 'Stock',      align: 'right' as const, render: (r: any) => r.itemType === 'SERVICE' ? <span className={S.muted}>N/A</span> : <span className="font-bold text-[12px] text-emerald-700 tabular-nums">{r.stock ?? 0} {r.unit ?? ''}</span> },
+      { key: 'stock',     label: 'Stock',      align: 'right' as const, render: (r: any) => r.itemType === 'SERVICE' ? <span className={S.muted}>N/A</span> : <span className="font-bold text-[12px] text-[var(--pro-azure-dark)] tabular-nums">{r.stock ?? 0} {r.unit ?? ''}</span> },
       { key: 'isActive',  label: 'Status',     render: (r: any) => <StatusBadge status={r.isActive !== false ? 'ACTIVE' : 'INACTIVE'}/> },
     ],
     customers: [
@@ -112,14 +113,14 @@ function useTabCols(tab: TabKey, onEdit: (r: any) => void, onDelete: (r: any) =>
         <button onClick={() => navigate(`/customer-summary/${r.id}`)} className="flex items-center gap-2 group text-left">
           <div className={S.iconSky}><Users2 size={12}/></div>
           <div>
-            <p className={S.h3 + ' group-hover:text-emerald-600 transition-colors'}>{r.name}</p>
+            <p className={S.h3 + ' group-hover:text-[var(--pro-azure)] transition-colors'}>{r.name}</p>
             {r.businessType && <p className={S.muted}>{r.businessType}</p>}
           </div>
         </button>
       )},
-      { key: 'email',       label: 'Email',        render: (r: any) => r.email ? <span className="flex items-center gap-1 text-[11px] text-emerald-700"><Mail size={10}/>{r.email}</span> : <span className={S.muted}>—</span> },
-      { key: 'phone',       label: 'Phone',        render: (r: any) => r.phone ? <span className="flex items-center gap-1 text-[11px] text-emerald-700"><Phone size={10}/>{r.phone}</span> : <span className={S.muted}>—</span> },
-      { key: 'tin',         label: 'TIN',          render: (r: any) => r.tin ? <span className="flex items-center gap-1 font-mono text-[11px] text-emerald-700"><Hash size={10}/>{r.tin}</span> : <span className={S.muted}>—</span> },
+      { key: 'email',       label: 'Email',        render: (r: any) => r.email ? <span className="flex items-center gap-1 text-[11px] text-[var(--pro-azure-dark)]"><Mail size={10}/>{r.email}</span> : <span className={S.muted}>—</span> },
+      { key: 'phone',       label: 'Phone',        render: (r: any) => r.phone ? <span className="flex items-center gap-1 text-[11px] text-[var(--pro-azure-dark)]"><Phone size={10}/>{r.phone}</span> : <span className={S.muted}>—</span> },
+      { key: 'tin',         label: 'TIN',          render: (r: any) => r.tin ? <span className="flex items-center gap-1 font-mono text-[11px] text-[var(--pro-azure-dark)]"><Hash size={10}/>{r.tin}</span> : <span className={S.muted}>—</span> },
       { key: 'creditLimit', label: 'Credit Limit', align: 'right' as const, render: (r: any) => r.creditLimit ? <Amount value={r.creditLimit} size="sm"/> : <span className={S.muted}>—</span> },
       { key: 'kycStatus',   label: 'KYC',          render: (r: any) => <StatusBadge status={r.kycStatus ?? 'PENDING'}/> },
     ],
@@ -133,11 +134,11 @@ function useTabCols(tab: TabKey, onEdit: (r: any) => void, onDelete: (r: any) =>
           </div>
         </div>
       )},
-      { key: 'email',        label: 'Email',        render: (r: any) => r.email ? <span className="flex items-center gap-1 text-[11px] text-emerald-700"><Mail size={10}/>{r.email}</span> : <span className={S.muted}>—</span> },
-      { key: 'phone',        label: 'Phone',        render: (r: any) => r.phone ? <span className="flex items-center gap-1 text-[11px] text-emerald-700"><Phone size={10}/>{r.phone}</span> : <span className={S.muted}>—</span> },
-      { key: 'tin',          label: 'TIN',          render: (r: any) => r.tin ? <span className="flex items-center gap-1 font-mono text-[11px] text-emerald-700"><Hash size={10}/>{r.tin}</span> : <span className={S.muted}>—</span> },
+      { key: 'email',        label: 'Email',        render: (r: any) => r.email ? <span className="flex items-center gap-1 text-[11px] text-[var(--pro-azure-dark)]"><Mail size={10}/>{r.email}</span> : <span className={S.muted}>—</span> },
+      { key: 'phone',        label: 'Phone',        render: (r: any) => r.phone ? <span className="flex items-center gap-1 text-[11px] text-[var(--pro-azure-dark)]"><Phone size={10}/>{r.phone}</span> : <span className={S.muted}>—</span> },
+      { key: 'tin',          label: 'TIN',          render: (r: any) => r.tin ? <span className="flex items-center gap-1 font-mono text-[11px] text-[var(--pro-azure-dark)]"><Hash size={10}/>{r.tin}</span> : <span className={S.muted}>—</span> },
       { key: 'whtApplicable',label: 'WHT',          render: (r: any) => r.whtApplicable ? <EthTaxBadge type="WHT" rate={3}/> : <span className={S.muted}>N/A</span> },
-      { key: 'billCount',    label: 'Bills',        align: 'right' as const, render: (r: any) => <span className="font-bold text-[12px] text-emerald-700">{r.billCount ?? 0}</span> },
+      { key: 'billCount',    label: 'Bills',        align: 'right' as const, render: (r: any) => <span className="font-bold text-[12px] text-[var(--pro-azure-dark)]">{r.billCount ?? 0}</span> },
       { key: 'isActive',     label: 'Status',       render: (r: any) => <StatusBadge status={r.isActive !== false ? 'ACTIVE' : 'INACTIVE'}/> },
     ],
     'tax-types': [
@@ -155,13 +156,13 @@ function useTabCols(tab: TabKey, onEdit: (r: any) => void, onDelete: (r: any) =>
         return <EthTaxBadge type={t} rate={r.rate ? +(r.rate * 100).toFixed(1) : undefined}/>;
       }},
       { key: 'rate',        label: 'Rate',       align: 'right' as const, render: (r: any) => (
-        <span className="font-bold text-[13px] text-emerald-700 tabular-nums">{((r.rate ?? 0) * 100).toFixed(1)}%</span>
+        <span className="font-bold text-[13px] text-[var(--pro-azure-dark)] tabular-nums">{((r.rate ?? 0) * 100).toFixed(1)}%</span>
       )},
       { key: 'appliesTo',   label: 'Applies To', render: (r: any) => {
         const arr = Array.isArray(r.appliesTo) ? r.appliesTo : [];
         return arr.length ? (
           <div className="flex gap-1 flex-wrap">
-            {arr.map((a: string) => <span key={a} className="px-1.5 py-0.5 bg-emerald-50 text-emerald-700 rounded text-[9px] font-bold border border-emerald-100">{a}</span>)}
+            {arr.map((a: string) => <span key={a} className="px-1.5 py-0.5 bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] rounded text-[9px] font-bold border border-[var(--pro-azure-100)]">{a}</span>)}
           </div>
         ) : <span className={S.muted}>All</span>;
       }},
@@ -177,7 +178,7 @@ function useTabCols(tab: TabKey, onEdit: (r: any) => void, onDelete: (r: any) =>
           </div>
         </div>
       )},
-      { key: 'accountNumber', label: 'Account No.',  render: (r: any) => <span className="font-mono text-[11px] text-emerald-700">{r.accountNumber}</span> },
+      { key: 'accountNumber', label: 'Account No.',  render: (r: any) => <span className="font-mono text-[11px] text-[var(--pro-azure-dark)]">{r.accountNumber}</span> },
       { key: 'currencyCode',  label: 'Currency',     render: (r: any) => (
         <span className="px-2 py-0.5 bg-sky-50 text-sky-700 rounded-full text-[10px] font-bold border border-sky-100">{r.currencyCode ?? 'ETB'}</span>
       )},
@@ -186,7 +187,7 @@ function useTabCols(tab: TabKey, onEdit: (r: any) => void, onDelete: (r: any) =>
         const n = r.unreconciledCount ?? 0;
         return n > 0
           ? <span className="px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full text-[10px] font-bold border border-amber-100">{n} pending</span>
-          : <span className="flex items-center gap-1 text-[10px] text-emerald-600 font-bold"><CheckCircle2 size={10}/>Reconciled</span>;
+          : <span className="flex items-center gap-1 text-[10px] text-[var(--pro-azure)] font-bold"><CheckCircle2 size={10}/>Reconciled</span>;
       }},
     ],
     companies: [
@@ -263,13 +264,13 @@ const ItemForm: React.FC<{ data: any; onChange: (d: any) => void }> = ({ data, o
         </FormField>
       </div>
       {/* VAT toggle with live preview */}
-      <div className={`flex items-center justify-between p-3 rounded-xl border transition-all ${data.vatApplicable !== false ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-slate-200'}`}>
+      <div className={`flex items-center justify-between p-3 rounded-xl border transition-all ${data.vatApplicable !== false ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' : 'bg-white border-slate-200'}`}>
         <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" checked={data.vatApplicable !== false} onChange={e => set('vatApplicable', e.target.checked)} className="accent-emerald-600 w-4 h-4"/>
-          <span className="text-[12px] font-semibold text-emerald-800">VAT Applicable — 15% (ERCA Proclamation 285/2002)</span>
+          <input type="checkbox" checked={data.vatApplicable !== false} onChange={e => set('vatApplicable', e.target.checked)} className="accent-indigo-600 w-4 h-4"/>
+          <span className="text-[12px] font-semibold text-[var(--pro-azure-dark)]">VAT Applicable — 15% (ERCA Proclamation 285/2002)</span>
         </label>
         {vatPreview && (
-          <span className="text-[10px] font-bold text-emerald-700 tabular-nums">
+          <span className="text-[10px] font-bold text-[var(--pro-azure-dark)] tabular-nums">
             +{fmtETB(vatPreview.vatAmount)} → {fmtETB(vatPreview.grossAmount)}
           </span>
         )}
@@ -288,8 +289,8 @@ const ItemForm: React.FC<{ data: any; onChange: (d: any) => void }> = ({ data, o
         <Textarea value={data.description ?? ''} onChange={e => set('', e)} rows={2} placeholder="Optional description"/>
       </FormField>
       <label className="flex items-center gap-2 cursor-pointer">
-        <input type="checkbox" checked={data.isActive !== false} onChange={e => set('isActive', e.target.checked)} className="accent-emerald-600 w-4 h-4"/>
-        <span className="text-[12px] font-semibold text-emerald-700">Active item</span>
+        <input type="checkbox" checked={data.isActive !== false} onChange={e => set('isActive', e.target.checked)} className="accent-indigo-600 w-4 h-4"/>
+        <span className="text-[12px] font-semibold text-[var(--pro-azure-dark)]">Active item</span>
       </label>
     </div>
   );
@@ -444,8 +445,8 @@ const VendorForm: React.FC<{ data: any; onChange: (d: any) => void }> = ({ data,
         <Textarea value={data.address ?? ''} onChange={e => set('', e)} rows={2} placeholder="Street, City, Region"/>
       </FormField>
       <label className="flex items-center gap-2 cursor-pointer">
-        <input type="checkbox" checked={data.isActive !== false} onChange={e => set('isActive', e.target.checked)} className="accent-emerald-600 w-4 h-4"/>
-        <span className="text-[12px] font-semibold text-emerald-700">Active vendor</span>
+        <input type="checkbox" checked={data.isActive !== false} onChange={e => set('isActive', e.target.checked)} className="accent-indigo-600 w-4 h-4"/>
+        <span className="text-[12px] font-semibold text-[var(--pro-azure-dark)]">Active vendor</span>
       </label>
     </div>
   );
@@ -467,19 +468,19 @@ const TaxTypeForm: React.FC<{ data: any; onChange: (d: any) => void }> = ({ data
     <div className="space-y-3">
       {/* Quick presets */}
       <div>
-        <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider mb-2">Ethiopian Tax Presets (ERCA)</p>
+        <p className="text-[10px] font-bold text-[var(--pro-azure-dark)] uppercase tracking-wider mb-2">Ethiopian Tax Presets (ERCA)</p>
         <div className="grid grid-cols-2 gap-1.5">
           {PRESETS.map(p => (
             <button key={p.label} type="button"
               onClick={() => onChange({ ...data, name: p.label, type: p.type, rate: p.rate, description: p.desc })}
-              className="text-left px-2.5 py-2 rounded-lg border border-emerald-100 bg-emerald-50/50 hover:bg-emerald-100 hover:border-emerald-500/40 transition-all">
-              <p className="text-[11px] font-bold text-emerald-800">{p.label}</p>
-              <p className="text-[9px] text-emerald-600/70 truncate">{p.desc}</p>
+              className="text-left px-2.5 py-2 rounded-lg border border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/50 hover:bg-[var(--pro-azure-100)] hover:border-[var(--pro-azure)]/40 transition-all">
+              <p className="text-[11px] font-bold text-[var(--pro-azure-dark)]">{p.label}</p>
+              <p className="text-[9px] text-[var(--pro-azure)]/70 truncate">{p.desc}</p>
             </button>
           ))}
         </div>
       </div>
-      <div className="h-px bg-emerald-100"/>
+      <div className="h-px bg-[var(--pro-azure-100)]"/>
       <div className="grid grid-cols-2 gap-3">
         <FormField label="Tax Name" required>
           <Input value={data.name ?? ''} onChange={e => set('', e)} placeholder="e.g. VAT Standard Rate"/>
@@ -497,9 +498,9 @@ const TaxTypeForm: React.FC<{ data: any; onChange: (d: any) => void }> = ({ data
         <Input type="number" step="0.001" min="0" max="1" value={data.rate ?? ''} onChange={e => set('rate', parseFloat(e.target.value) || 0)} placeholder="0.15"/>
       </FormField>
       {data.rate > 0 && (
-        <div className="flex items-center gap-2 p-2 bg-emerald-50 rounded-lg border border-emerald-100">
-          <CheckCircle2 size={12} className="text-emerald-600"/>
-          <span className="text-[11px] text-emerald-700 font-semibold">
+        <div className="flex items-center gap-2 p-2 bg-[var(--pro-azure-50)] rounded-lg border border-[var(--pro-azure-100)]">
+          <CheckCircle2 size={12} className="text-[var(--pro-azure)]"/>
+          <span className="text-[11px] text-[var(--pro-azure-dark)] font-semibold">
             Rate: {(data.rate * 100).toFixed(2)}% — On ETB 1,000: tax = {fmtETB(data.rate * 1000)}
           </span>
         </div>
@@ -508,8 +509,8 @@ const TaxTypeForm: React.FC<{ data: any; onChange: (d: any) => void }> = ({ data
         <Textarea value={data.description ?? ''} onChange={e => set('', e)} rows={2} placeholder="ERCA regulation reference"/>
       </FormField>
       <label className="flex items-center gap-2 cursor-pointer">
-        <input type="checkbox" checked={data.isActive !== false} onChange={e => set('isActive', e.target.checked)} className="accent-emerald-600 w-4 h-4"/>
-        <span className="text-[12px] font-semibold text-emerald-700">Active tax rate</span>
+        <input type="checkbox" checked={data.isActive !== false} onChange={e => set('isActive', e.target.checked)} className="accent-indigo-600 w-4 h-4"/>
+        <span className="text-[12px] font-semibold text-[var(--pro-azure-dark)]">Active tax rate</span>
       </label>
     </div>
   );
@@ -618,7 +619,7 @@ function buildKpis(tab: TabKey, rows: any[], tabCfg: TabConfig) {
 
   const base = [
     { label: 'Total',    value: count,  icon: tabCfg.icon, color: tabCfg.color as any },
-    { label: 'Active',   value: active, color: 'emerald' as const },
+    { label: 'Active',   value: active, color: 'green' as const },
     { label: 'Inactive', value: count - active, color: 'rose' as const },
   ];
 
@@ -628,7 +629,7 @@ function buildKpis(tab: TabKey, rows: any[], tabCfg: TabConfig) {
     const vatItems = rows.filter(r => r.vatApplicable !== false).length;
     const lowStock = rows.filter(r => (r.itemType ?? r.type) !== 'SERVICE' && (r.stock ?? r.stockQuantity ?? 0) <= (r.reorderLevel ?? 5)).length;
     return [
-      { label: 'Total Items', value: count,    color: 'emerald' as const },
+      { label: 'Total Items', value: count,    color: 'green' as const },
       { label: 'Products',    value: products, color: 'sky' as const },
       { label: 'Services',    value: services, color: 'violet' as const },
       { label: 'VAT Items',   value: vatItems, color: 'amber' as const },
@@ -659,17 +660,17 @@ function buildKpis(tab: TabKey, rows: any[], tabCfg: TabConfig) {
     const totalBal = rows.reduce((s, r) => s + parseFloat(String(r.computedBalance ?? r.balance ?? 0)), 0);
     const unreconciled = rows.reduce((s, r) => s + (r.unreconciledCount ?? 0), 0);
     return [
-      { label: 'Accounts',     value: count,              color: 'emerald' as const },
+      { label: 'Accounts',     value: count,              color: 'green' as const },
       { label: 'Total Balance',value: fmtETB(totalBal),   color: 'sky' as const },
-      { label: 'Unreconciled', value: unreconciled,       color: unreconciled > 0 ? 'amber' as const : 'emerald' as const },
+      { label: 'Unreconciled', value: unreconciled,       color: unreconciled > 0 ? 'amber' as const : 'indigo' as const },
     ];
   }
   if (tab === 'tax-types') {
     const vatRates = rows.filter(r => r.type === 'VAT').length;
     const whtRates = rows.filter(r => r.type === 'WITHHOLDING').length;
     return [
-      { label: 'Total Rates', value: count,    color: 'emerald' as const },
-      { label: 'Active',      value: active,   color: 'emerald' as const },
+      { label: 'Total Rates', value: count,    color: 'green' as const },
+      { label: 'Active',      value: active,   color: 'green' as const },
       { label: 'VAT Rates',   value: vatRates, color: 'violet' as const },
       { label: 'WHT Rates',   value: whtRates, color: 'amber' as const },
     ];
@@ -684,25 +685,25 @@ function buildPipeline(tab: TabKey, rows: any[]) {
   if (tab === 'customers') return [
     { key: 'lead',    label: 'Leads',    count: rows.filter(r => r.kycStatus === 'PENDING').length,  color: 'bg-slate-400',   icon: <AlertCircle size={12}/> },
     { key: 'kyc',     label: 'KYC Done', count: rows.filter(r => r.kycStatus === 'VERIFIED').length, color: 'bg-sky-500',     icon: <CheckCircle2 size={12}/> },
-    { key: 'active',  label: 'Active',   count: rows.filter(r => r.isActive !== false).length,       color: 'bg-emerald-500', icon: <TrendingUp size={12}/> },
+    { key: 'active',  label: 'Active',   count: rows.filter(r => r.isActive !== false).length,       color: 'bg-[var(--pro-azure-50)]0', icon: <TrendingUp size={12}/> },
     { key: 'onhold',  label: 'On Hold',  count: rows.filter(r => r.riskLevel === 'HIGH').length,     color: 'bg-amber-500',   icon: <AlertCircle size={12}/> },
   ];
   if (tab === 'vendors') return [
     { key: 'all',    label: 'All',     count: rows.length,                                          color: 'bg-slate-400',   icon: <Building2 size={12}/> },
     { key: 'wht',    label: 'WHT',     count: rows.filter(r => r.whtApplicable).length,             color: 'bg-amber-500',   icon: <ShieldCheck size={12}/> },
-    { key: 'active', label: 'Active',  count: rows.filter(r => r.isActive !== false).length,        color: 'bg-emerald-500', icon: <CheckCircle2 size={12}/> },
+    { key: 'active', label: 'Active',  count: rows.filter(r => r.isActive !== false).length,        color: 'bg-[var(--pro-azure-50)]0', icon: <CheckCircle2 size={12}/> },
   ];
   if (tab === 'items') return [
     { key: 'all',      label: 'All',       count: rows.length,                                                                                                    color: 'bg-slate-400',   icon: <Package size={12}/> },
-    { key: 'products', label: 'Products',  count: rows.filter(r => (r.itemType ?? r.type) !== 'SERVICE').length,                                                  color: 'bg-emerald-500', icon: <Package size={12}/> },
+    { key: 'products', label: 'Products',  count: rows.filter(r => (r.itemType ?? r.type) !== 'SERVICE').length,                                                  color: 'bg-[var(--pro-azure-50)]0', icon: <Package size={12}/> },
     { key: 'services', label: 'Services',  count: rows.filter(r => (r.itemType ?? r.type) === 'SERVICE').length,                                                  color: 'bg-sky-500',     icon: <Zap size={12}/> },
     { key: 'lowstock', label: 'Low Stock', count: rows.filter(r => (r.itemType ?? r.type) !== 'SERVICE' && (r.stock ?? 0) <= (r.reorderLevel ?? 5)).length,       color: 'bg-rose-500',    icon: <AlertCircle size={12}/> },
   ];
   if (tab === 'banks') return [
     { key: 'all',    label: 'All Accounts', count: rows.length,                                                                                                   color: 'bg-slate-400',   icon: <Landmark size={12}/> },
-    { key: 'etb',    label: 'ETB',          count: rows.filter(r => (r.currencyCode ?? 'ETB') === 'ETB').length,                                                  color: 'bg-emerald-500', icon: <FileText size={12}/> },
+    { key: 'etb',    label: 'ETB',          count: rows.filter(r => (r.currencyCode ?? 'ETB') === 'ETB').length,                                                  color: 'bg-[var(--pro-azure-50)]0', icon: <FileText size={12}/> },
     { key: 'fx',     label: 'Foreign',      count: rows.filter(r => r.currencyCode && r.currencyCode !== 'ETB').length,                                           color: 'bg-sky-500',     icon: <Globe size={12}/> },
-    { key: 'recon',  label: 'Reconciled',   count: rows.filter(r => (r.unreconciledCount ?? 0) === 0).length,                                                    color: 'bg-emerald-500', icon: <CheckCircle2 size={12}/> },
+    { key: 'recon',  label: 'Reconciled',   count: rows.filter(r => (r.unreconciledCount ?? 0) === 0).length,                                                    color: 'bg-[var(--pro-azure-50)]0', icon: <CheckCircle2 size={12}/> },
   ];
   return [];
 }
@@ -722,12 +723,12 @@ const IFRSBanner: React.FC<{ tab: TabKey }> = ({ tab }) => {
   const m = messages[tab];
   if (!m) return null;
   return (
-    <div className="flex items-start gap-2.5 px-3 py-2.5 bg-emerald-50 border border-emerald-200 rounded-xl mb-3">
-      <div className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">{m.icon}</div>
+    <div className="flex items-start gap-2.5 px-3 py-2.5 bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-xl mb-3">
+      <div className="w-6 h-6 rounded-lg bg-[var(--pro-azure-100)] text-[var(--pro-azure)] flex items-center justify-center shrink-0 mt-0.5">{m.icon}</div>
       <div className="flex-1 min-w-0">
-        <p className="text-[11px] text-emerald-800 leading-relaxed">{m.text}</p>
+        <p className="text-[11px] text-[var(--pro-azure-dark)] leading-relaxed">{m.text}</p>
       </div>
-      <span className="text-[9px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded shrink-0">{m.ref}</span>
+      <span className="text-[9px] font-bold text-[var(--pro-azure)] bg-[var(--pro-azure-100)] px-1.5 py-0.5 rounded shrink-0">{m.ref}</span>
     </div>
   );
 };
@@ -755,6 +756,7 @@ const MasterData: React.FC = () => {
 
   // Normalise response shape — handles plain array, { data }, { items }, { rows }
   const rawRows = Array.isArray(raw) ? raw : (raw?.data ?? raw?.items ?? raw?.rows ?? []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const rows: any[] = Array.isArray(rawRows) ? rawRows : [];
   const total: number = raw?.total ?? rows.length;
 

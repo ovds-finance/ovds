@@ -23,5 +23,6 @@ export interface EventBusInterface {
   removeListener(listenerId: string): void;
   removeListeners(eventName: string, source?: string): void;
   getListeners(eventName: string): EventListener[];
+  getAllListeners(): Array<EventListener & { eventName: string }>;
   getHistory(eventName?: string): Event[];
 }

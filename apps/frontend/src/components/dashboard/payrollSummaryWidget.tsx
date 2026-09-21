@@ -1,6 +1,6 @@
-﻿import React, { useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { TrendingUp, Banknote, ArrowRight } from 'lucide-react';
+import React, { useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 interface PayrollSummaryWidgetProps {
   payrollCurrent: any;
@@ -83,8 +83,8 @@ const PayrollSummaryWidget: React.FC<PayrollSummaryWidgetProps> = ({
       label: 'Net Pay',
       value: `${currency} ${net.toLocaleString()}`,
       sub: 'Total disbursement',
-      color: 'text-emerald-700 dark:text-emerald-400',
-      bar: { pct: pct(net), color: 'bg-emerald-500' },
+      color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
+      bar: { pct: pct(net), color: 'bg-[var(--pro-azure-50)]0' },
       highlight: true,
     },
   ];
@@ -94,7 +94,7 @@ const PayrollSummaryWidget: React.FC<PayrollSummaryWidgetProps> = ({
       {/* ovds-style gross/net split bar */}
       {gross > 0 && !loading && (
         <div className="flex h-1.5">
-          <div className="bg-emerald-500 transition-all duration-700" style={{ width: `${pct(net)}%` }} />
+          <div className="bg-[var(--pro-azure-50)]0 transition-all duration-700" style={{ width: `${pct(net)}%` }} />
           <div className="bg-rose-400 transition-all duration-700" style={{ width: `${pct(tax)}%` }} />
           <div className="bg-violet-400 transition-all duration-700" style={{ width: `${pct(pension)}%` }} />
           <div className="bg-amber-400 flex-1" />
@@ -103,8 +103,8 @@ const PayrollSummaryWidget: React.FC<PayrollSummaryWidgetProps> = ({
       {/* Header */}
       <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/30 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl flex items-center justify-center">
-            <TrendingUp size={14} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="w-8 h-8 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl flex items-center justify-center">
+            <TrendingUp size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div>
             <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-sm leading-none">
@@ -117,7 +117,7 @@ const PayrollSummaryWidget: React.FC<PayrollSummaryWidgetProps> = ({
         </div>
         <Link
           to="/hr/payroll"
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all active:scale-95 shadow-sm shadow-emerald-500/20"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all active:scale-95 shadow-sm shadow-green-500/20"
         >
           <Banknote size={12} /> Full Payroll <ArrowRight size={11} />
         </Link>
@@ -128,10 +128,10 @@ const PayrollSummaryWidget: React.FC<PayrollSummaryWidgetProps> = ({
         {cols.map((s, i) => (
           <div
             key={s.label}
-            className={`px-5 py-4 relative ${s.highlight ? 'bg-emerald-50/60 dark:bg-emerald-950/15' : ''}`}
+            className={`px-5 py-4 relative ${s.highlight ? 'bg-[var(--pro-azure-50)]/60 dark:bg-green-950/15' : ''}`}
           >
             {s.highlight && (
-              <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-400 to-emerald-500" />
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[var(--pro-azure)] to-[var(--pro-azure-dark)]" />
             )}
             <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 leading-none">
               {s.label}

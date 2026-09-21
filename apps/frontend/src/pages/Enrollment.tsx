@@ -1,11 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import { confirm } from '../utils/confirm';
-import {
-  useDebounce,
-  usePageTitle,
-} from '../hooks';
+import { usePagination } from '@ovds/ui';
 import {
   UserPlus,
   Camera,
@@ -20,9 +13,17 @@ import {
   ShieldCheck,
   Search,
 } from 'lucide-react';
-import { usePagination } from '@ovds/ui';
+import React, { useState, useEffect, useRef } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+
+import {
+  useDebounce,
+  usePageTitle,
+} from '../hooks';
 import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { confirm } from '../utils/confirm';
 const Enrollment: React.FC = () => {
   usePageTitle('Enrollment');
 const { t } = useTranslation();
@@ -325,7 +326,7 @@ return (
       <div className="ovds-grid-layout cols-2 gap-lg items-stretch">
         <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-full transition-colors">
           <div className="flex items-center gap-4 mb-8">
-            <div className="p-3 bg-emerald-500 text-white rounded-2xl shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30">
+            <div className="p-3 bg-[var(--pro-azure)] text-white rounded-2xl shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30">
               <UserPlus size={24} />
             </div>
             <div>
@@ -347,7 +348,7 @@ return (
                 <div className="relative flex-1 min-w-[200px] max-w-md group">
                   <Search
                     size={16}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-600 dark:text-emerald-400 transition-colors"
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors"
                   />
                   <input
                     type="text"
@@ -398,7 +399,7 @@ return (
                       }
                     >
                       <div className="flex items-center gap-3 flex-1">
-                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-emerald-600 text-white rounded-xl flex items-center justify-center font-bold text-sm shadow-lg">
+                        <div className="w-10 h-10 bg-gradient-to-br from-[var(--pro-azure)] to-indigo-600 text-white rounded-xl flex items-center justify-center font-bold text-sm shadow-lg">
                           {e.firstName?.[0]}
                           {e.lastName?.[0]}
                         </div>
@@ -425,7 +426,7 @@ return (
                             behavior: 'smooth',
                           });
                         }}
-                        className="px-4 py-2 bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-emerald-600 transition-all shadow-lg hover:shadow-xl whitespace-nowrap"
+                        className="px-4 py-2 bg-[var(--pro-azure)] text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-[var(--pro-azure-dark)] transition-all shadow-lg hover:shadow-xl whitespace-nowrap"
                       >
                         Enroll Now
                       </button>
@@ -477,8 +478,8 @@ return (
                     (e) => e.id === formData.employeeId,
                   );
 return sel ? (
-                    <div className="flex items-center gap-3 p-3 bg-emerald-50/50 border border-emerald-200 dark:border-emerald-800 rounded-xl mb-2">
-                      <div className="w-8 h-8 bg-emerald-500 text-white rounded-lg flex items-center justify-center font-bold text-xs shrink-0">
+                    <div className="flex items-center gap-3 p-3 bg-[var(--pro-azure-50)]/50 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl mb-2">
+                      <div className="w-8 h-8 bg-[var(--pro-azure)] text-white rounded-lg flex items-center justify-center font-bold text-xs shrink-0">
                         {sel.firstName?.[0]}
                         {sel.lastName?.[0]}
                       </div>
@@ -517,7 +518,7 @@ type="button"
                     onClick={() => setBioType(type.value)}
                     className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all ${
                       bioType === type.value
-                        ? 'bg-emerald-50/50 border-emerald-600 text-emerald-600 dark:text-emerald-400 shadow-md'
+                        ? 'bg-[var(--pro-azure-50)]/50 border-[var(--pro-azure)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shadow-md'
                         : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-200 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700'
                     }`}
                   >
@@ -537,7 +538,7 @@ type="button"
               <div className="relative group">
                 <Hash
                   size={16}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-600 dark:text-emerald-400 transition-colors"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors"
                 />
                 <input
                   type="text"
@@ -555,7 +556,7 @@ type="button"
             <button
               type="submit"
               disabled={isSubmitting || !formData.employeeId}
-              className="w-full py-4 px-6 bg-emerald-500 text-white rounded-lg text-sm font-medium uppercase tracking-wider shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30 hover:bg-emerald-600 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:scale-100 flex items-center justify-center gap-3"
+              className="w-full py-4 px-6 bg-[var(--pro-azure)] text-white rounded-lg text-sm font-medium uppercase tracking-wider shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30 hover:bg-[var(--pro-azure-dark)] transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:scale-100 flex items-center justify-center gap-3"
             >
               {isSubmitting ? (
                 <RefreshCw size={20} className="animate-spin" />
@@ -571,7 +572,7 @@ type="button"
               <div
                 className={`p-4 rounded-2xl border flex items-center gap-3 animate-in slide-in-from-bottom-2 ${
                   message.type === 'success'
-                    ? 'bg-emerald-50 border-emerald-100 text-emerald-700'
+                    ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'
                     : 'bg-rose-50 border-rose-100 text-rose-700'
                 }`}
               >
@@ -596,10 +597,10 @@ type="button"
                 {existingBio.map((bio) => (
                   <div
                     key={bio.id}
-                    className="flex items-center justify-between p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 transition-colors"
+                    className="flex items-center justify-between p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-[var(--pro-azure-50)]/50 dark:hover:bg-green-950/20 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-white dark:bg-slate-700 rounded-lg text-emerald-600 dark:text-emerald-400 shadow-sm">
+                      <div className="p-2 bg-white dark:bg-slate-700 rounded-lg text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shadow-sm">
                         {bio.type === 'FINGERPRINT' && <Fingerprint size={16} />}
                         {bio.type === 'FACE_RECOGNITION' && <Camera size={16} />}
                         {bio.type === 'IRIS_SCAN' && <Eye size={16} />}
@@ -620,7 +621,7 @@ type="button"
                           setFormData({ ...formData, template: bio.template });
                           setEditingId(bio.id);
                         }}
-                        className="p-2 text-slate-400 hover:text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:bg-emerald-950/20 rounded-xl transition-all"
+                        className="p-2 text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl transition-all"
                       >
                         <FileEdit size={16} />
                       </button>
@@ -682,7 +683,7 @@ type="button"
                   muted
                   className="w-full h-full object-cover scale-x-[-1]"
                 ></video>
-                <div className="absolute inset-0 border-[2px] border-emerald-200 dark:border-emerald-800 rounded-2xl pointer-events-none"></div>
+                <div className="absolute inset-0 border-[2px] border-[var(--pro-azure-100)] dark:border-green-800 rounded-2xl pointer-events-none"></div>
 
                 {/* Visual effects overlay */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -690,9 +691,9 @@ type="button"
                     className={`w-64 h-64 border-2 border-dashed border-white/20 rounded-full animate-spin-slow ${bioType === 'IRIS_SCAN' ? 'scale-50' : ''}`}
                   ></div>
                   <div
-                    className={`absolute w-48 h-48 border border-emerald-300 dark:border-emerald-700 rounded-2xl ${bioType === 'FACE_RECOGNITION' ? 'opacity-100' : 'opacity-0'}`}
+                    className={`absolute w-48 h-48 border border-[var(--pro-azure-light)] dark:border-green-700 rounded-2xl ${bioType === 'FACE_RECOGNITION' ? 'opacity-100' : 'opacity-0'}`}
                   ></div>
-                  <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-emerald-600/50 to-transparent animate-scan"></div>
+                  <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-indigo-600/50 to-transparent animate-scan"></div>
                 </div>
               </div>
 
@@ -709,7 +710,7 @@ type="button"
                   type="button"
                   onClick={enrollHardware}
                   disabled={isScanning || !formData.employeeId}
-                  className="flex-1 py-5 bg-emerald-500 text-white rounded-xl text-[10px] font-semibold uppercase tracking-wider hover:bg-emerald-600 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 shadow-xl disabled:opacity-50"
+                  className="flex-1 py-5 bg-[var(--pro-azure)] text-white rounded-xl text-[10px] font-semibold uppercase tracking-wider hover:bg-[var(--pro-azure-dark)] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 shadow-xl disabled:opacity-50"
                 >
                   {isScanning ? (
                     <RefreshCw size={16} className="animate-spin" />
@@ -724,11 +725,11 @@ type="button"
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center space-y-5">
               <div
-                className={`w-32 h-32 bg-white/5 rounded-full flex items-center justify-center border border-white/10 shadow-inner transition-all ${isScanning ? 'animate-pulse bg-emerald-100 dark:bg-emerald-900/30 border-emerald-400' : 'group-hover:bg-emerald-50 dark:bg-emerald-950/20'}`}
+                className={`w-32 h-32 bg-white/5 rounded-full flex items-center justify-center border border-white/10 shadow-inner transition-all ${isScanning ? 'animate-pulse bg-[var(--pro-azure-100)] dark:bg-green-900/30 border-[var(--pro-azure)]' : 'group-hover:bg-[var(--pro-azure-50)] dark:bg-green-950/20'}`}
               >
                 <Fingerprint
                   size={64}
-                  className={`transition-all ${isScanning ? 'text-emerald-600 dark:text-emerald-400' : 'text-white/20 group-hover:text-emerald-300'}`}
+                  className={`transition-all ${isScanning ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-white/20 group-hover:text-green-300'}`}
                 />
               </div>
               <div>
@@ -757,7 +758,7 @@ type="button"
               </button>
 
               <div className="px-6 py-3 bg-white/5 rounded-2xl border border-white/10 text-white/60 text-[10px] font-bold flex items-center gap-3">
-                <ShieldCheck size={14} className="text-emerald-600 dark:text-emerald-400" />
+                <ShieldCheck size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                 {isScanning
                   ? t('enroll.waiting_hardware')
                   : t('enroll.system_ready')}

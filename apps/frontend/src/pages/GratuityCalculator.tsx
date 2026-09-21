@@ -13,16 +13,14 @@
  * - Unused annual leave: paid out at daily rate
  * - Outstanding wages: all due unpaid wages
  */
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, Modal, FormField, Input, Select, Icon, Amount,
 } from '../components/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useAuth } from '../rbac/AuthContext';
 import { useBusiness } from '../context/businessContext';
-import api from '../services/api';
-import toast from 'react-hot-toast';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { useGratuityRecords } from '../services/newTaxApi';
 
 // -- Ethiopian Labour Act Constants --------------------------------------------
@@ -187,9 +185,9 @@ const OvertimeCalculator: React.FC = () => {
       </div>
 
       {totalOT > 0 && (
-        <div className="flex justify-between p-4 bg-emerald-50 border border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-800 rounded-xl">
-          <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Total Overtime Pay</span>
-          <span className="text-xl font-bold tabular-nums text-emerald-700 dark:text-emerald-300">ETB {fmt(totalOT)}</span>
+        <div className="flex justify-between p-4 bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] dark:bg-green-950/20 dark:border-green-800 rounded-xl">
+          <span className="text-sm font-semibold text-[var(--pro-azure-dark)] dark:text-green-300">Total Overtime Pay</span>
+          <span className="text-xl font-bold tabular-nums text-[var(--pro-azure-dark)] dark:text-green-300">ETB {fmt(totalOT)}</span>
         </div>
       )}
     </div>
@@ -243,8 +241,8 @@ const AnnualLeaveCalculator: React.FC = () => {
           {[
             { label: 'Entitled Days',    value: `${entitledDays} days`,     accent: 'bg-sky-500' },
             { label: 'Used',             value: `${used} days`,             accent: 'bg-amber-500' },
-            { label: 'Remaining',        value: `${remainingDays} days`,    accent: remainingDays > 0 ? 'bg-emerald-500' : 'bg-slate-400' },
-            { label: 'Cash Value',       value: `ETB ${fmt(cashValue)}`,    accent: cashValue > 0 ? 'bg-emerald-500' : 'bg-slate-300' },
+            { label: 'Remaining',        value: `${remainingDays} days`,    accent: remainingDays > 0 ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-400' },
+            { label: 'Cash Value',       value: `ETB ${fmt(cashValue)}`,    accent: cashValue > 0 ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-300' },
           ].map(k => (
             <div key={k.label} className="ovds-widget-card p-4">
               <div className={`w-1.5 h-8 rounded-full ${k.accent} mb-2`} />
@@ -261,7 +259,7 @@ const AnnualLeaveCalculator: React.FC = () => {
 // -- Gratuity Records Table ----------------------------------------------------
 const GratuityRecordsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
   const { records, loading, refetch } = useGratuityRecords(companyId);
-  const fmt = (n: number) => new Intl.NumberFormat('en-ET', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+  const _fmt = (n: number) => new Intl.NumberFormat('en-ET', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 
   return (
     <div className="space-y-3">
@@ -295,7 +293,7 @@ const GratuityRecordsTab: React.FC<{ companyId?: string }> = ({ companyId }) => 
               <AppTd align="right"><Amount value={r.unusedLeavePay ?? 0} size="sm" /></AppTd>
               <AppTd align="right" className="font-bold"><Amount value={r.totalGratuity ?? 0} size="sm" /></AppTd>
               <AppTd>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${r.paid ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${r.paid ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]' : 'bg-amber-50 text-amber-700'}`}>
                   {r.paid ? 'PAID' : 'PENDING'}
                 </span>
               </AppTd>
@@ -364,7 +362,7 @@ const GratuityCalcTab: React.FC = () => {
       </div>
 
       <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
-        <input type="checkbox" checked={noticePeriod} onChange={e => setNoticePeriod(e.target.checked)} className="rounded accent-emerald-500" />
+        <input type="checkbox" checked={noticePeriod} onChange={e => setNoticePeriod(e.target.checked)} className="rounded accent-indigo-500" />
         Proper notice period was given (1 month for &gt;1 year service)
       </label>
 
@@ -375,7 +373,7 @@ const GratuityCalcTab: React.FC = () => {
               { label: 'Years of Service', value: `${result.yearsOfService} yrs`, accent: 'bg-sky-500' },
               { label: 'Severance Pay',    value: `ETB ${fmt(result.basicSeverancePay)}`, accent: 'bg-violet-500' },
               { label: 'Notice Pay',       value: `ETB ${fmt(result.noticePay)}`,         accent: 'bg-amber-500' },
-              { label: 'Total Gratuity',   value: `ETB ${fmt(result.totalGratuity)}`,     accent: result.totalGratuity > 0 ? 'bg-emerald-500' : 'bg-slate-400' },
+              { label: 'Total Gratuity',   value: `ETB ${fmt(result.totalGratuity)}`,     accent: result.totalGratuity > 0 ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-400' },
             ].map(k => (
               <div key={k.label} className="ovds-widget-card p-4">
                 <div className={`w-1.5 h-8 rounded-full ${k.accent} mb-2`} />
@@ -396,10 +394,10 @@ const GratuityCalcTab: React.FC = () => {
                 { label: 'Unused Leave Pay',   value: fmt(result.unusedLeavePay),     sub: result.unusedLeavePay > 0 ? `${unusedLeave} days × ETB ${fmt(result.dailyRate)}/day` : 'No unused leave' },
                 { label: 'TOTAL GRATUITY',     value: fmt(result.totalGratuity),      sub: 'Sum of all entitlements', bold: true },
               ].map(r => (
-                <div key={r.label} className={`flex justify-between items-center px-4 py-2.5 rounded-xl ${r.bold ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-slate-800/50'}`}>
+                <div key={r.label} className={`flex justify-between items-center px-4 py-2.5 rounded-xl ${r.bold ? 'bg-[var(--pro-azure)] text-white' : 'bg-white dark:bg-slate-800/50'}`}>
                   <div>
                     <p className={`text-[12px] font-bold ${r.bold ? 'text-white' : 'text-slate-700 dark:text-slate-200'}`}>{r.label}</p>
-                    <p className={`text-[10px] ${r.bold ? 'text-emerald-100' : 'text-slate-400'}`}>{r.sub}</p>
+                    <p className={`text-[10px] ${r.bold ? 'text-green-100' : 'text-slate-400'}`}>{r.sub}</p>
                   </div>
                   <span className={`tabular-nums font-bold text-sm ${r.bold ? 'text-white' : 'text-slate-800 dark:text-slate-100'}`}>ETB {r.value}</span>
                 </div>
@@ -411,7 +409,7 @@ const GratuityCalcTab: React.FC = () => {
           <div className="space-y-1.5">
             {result.notes.map((n, i) => (
               <p key={i} className="text-[11px] text-slate-500 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--pro-azure-light)] shrink-0" />
                 {n}
               </p>
             ))}
@@ -453,7 +451,7 @@ const GratuityCalculator: React.FC = () => {
         <div className="space-y-4 max-w-3xl">
           {[
             { ref: 'Art. 28', title: 'Employment Contract Types', color: 'border-sky-200 bg-sky-50', content: 'Three types: (1) Indefinite — no end date, most protections apply. (2) Fixed-term — for specific tasks or replacements; max 2 renewals before deemed indefinite. (3) Piece-rate/task-based — payment per output, still subject to minimum wage and overtime rules.' },
-            { ref: 'Art. 40', title: 'Severance Pay (Termination Without Cause)', color: 'border-emerald-200 bg-emerald-50', content: 'When employer terminates without valid cause: 30 days salary per year of service. Fractions of a year are prorated. Minimum: 1 month salary. Also payable on retirement, incapacity, or employer misconduct.' },
+            { ref: 'Art. 40', title: 'Severance Pay (Termination Without Cause)', color: 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]', content: 'When employer terminates without valid cause: 30 days salary per year of service. Fractions of a year are prorated. Minimum: 1 month salary. Also payable on retirement, incapacity, or employer misconduct.' },
             { ref: 'Art. 43', title: 'Termination for Cause (No Severance)', color: 'border-rose-200 bg-rose-50', content: 'No severance payable when employee is dismissed for: theft, assault, serious misconduct, unauthorized disclosure, habitual negligence. Employer must give employee the right to be heard before dismissal. Notice required even for cause (unless grave misconduct).' },
             { ref: 'Art. 33', title: 'Notice Period Requirements', color: 'border-amber-200 bg-amber-50', content: '< 1 year: 30 days notice. 1–9 years: 60 days notice. > 10 years: 90 days notice. Either party may substitute with payment in lieu of notice (1 month salary for most cases).' },
             { ref: 'Art. 68', title: 'Overtime Rules', color: 'border-violet-200 bg-violet-50', content: 'Maximum: 2 hours/day, 20 hours/month, 100 hours/year. Rates: weekday 125%, weekend/rest day 150%, public holiday 200%. Employer needs employee consent (except emergency/force majeure). All overtime must be recorded and paid in same payroll period.' },
@@ -470,7 +468,7 @@ const GratuityCalculator: React.FC = () => {
           ))}
           <div className="text-center mt-4">
             <a href="https://www.ilo.org/dyn/natlex/docs/ELECTRONIC/109956" target="_blank" rel="noopener noreferrer"
-              className="text-xs text-emerald-600 underline flex items-center justify-center gap-1">
+              className="text-xs text-[var(--pro-azure)] underline flex items-center justify-center gap-1">
               <Icon name="EXTERNAL_LINK" size={11} /> View full Labour Proclamation No. 1156/2019 (ILO database)
             </a>
           </div>

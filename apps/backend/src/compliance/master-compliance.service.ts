@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../common/prisma.service';
 import { MASTER_COMPLIANCE_CHECKLIST_TEMPLATE, PAGINATION_DEFAULT_LIMIT } from '@ovds/shared';
+
+import { PrismaService } from '../common/prisma.service';
 
 @Injectable()
 export class MasterComplianceService {

@@ -1,14 +1,18 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
-import { PrismaService } from '../common/prisma.service';
-import { CertificateEncryptionService } from './certificate-encryption.service';
+
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   generatePrivateKeyPem,
   generateCsrPem,
   generateCsrConfig,
   encodeCertificateForEims,
 } from '@ovds/shared';
+
+import { PrismaService } from '../common/prisma.service';
+
+import { CertificateEncryptionService } from './certificate-encryption.service';
+
 
 export interface GenerateCsrResult {
   id: string;
@@ -50,12 +54,17 @@ export class EimsCertificateService {
     organizationName: string;
     email: string;
     organizationalUnitName?: string;
+    countryName?: string;
+    stateOrProvinceName?: string;
+    localityName?: string;
     sourceSystemId?: string;
   }): Promise<GenerateCsrResult> {
     const ou = dto.organizationalUnitName || dto.organizationName;
-    const countryName = this.config.get<string>('EIMS_DEFAULT_COUNTRY', 'ET');
-    const stateOrProvinceName = this.config.get<string>('EIMS_DEFAULT_STATE', 'Addis Ababa');
-    const localityName = this.config.get<string>('EIMS_DEFAULT_CITY', 'Addis Ababa');
+    // DTO values take precedence so operators can override per-submission.
+    // Fall back to env vars for country/state/city to match INSA defaults.
+    const countryName        = dto.countryName        || this.config.get<string>('EIMS_DEFAULT_COUNTRY', 'ET');
+    const stateOrProvinceName = dto.stateOrProvinceName || this.config.get<string>('EIMS_DEFAULT_STATE',   'Addis Ababa');
+    const localityName       = dto.localityName       || this.config.get<string>('EIMS_DEFAULT_CITY',    'Addis Ababa');
 
     const privateKeyPem = await generatePrivateKeyPem(2048);
     const privateKeyEnc = this.encryption.encrypt(privateKeyPem);
@@ -108,7 +117,7 @@ export class EimsCertificateService {
       where: { id, companyId },
     });
     if (!record) {
-      throw new Error('Certificate not found');
+      throw new NotFoundException('Certificate not found');
     }
 
     const certificateB64 = encodeCertificateForEims(certificatePem);
@@ -141,7 +150,7 @@ export class EimsCertificateService {
       where: { id, companyId },
     });
     if (!record) {
-      throw new Error('Certificate not found');
+      throw new NotFoundException('Certificate not found');
     }
 
     const updated = await this.prisma.eimsCertificate.update({

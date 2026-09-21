@@ -4,15 +4,16 @@
  * IAS 12 — Income Taxes, IFRS 15 — Revenue, IAS 19 — Employee Benefits
  * Enhanced with IASB 2024–2027 update banner and role-based access.
  */
-import React, { useState } from 'react';
 import {
   Calculator, ChevronDown, ChevronUp, Info, TrendingUp,
   Users, Shield, Scale, Package, Globe, Lock,
 } from 'lucide-react';
-import IASBUpdateBanner from '../iasbUpdateBanner';
-import { useIFRSAccess } from '../../hooks/useIfrsAccess';
+import React, { useState } from 'react';
+
 import { useBusiness } from '../../context/businessContext';
+import { useIFRSAccess } from '../../hooks/useIfrsAccess';
 import { PIT_BRACKETS as SHARED_PIT } from '../../utils/ethiopianTax';
+import IASBUpdateBanner from '../iasbUpdateBanner';
 
 // PIT display table derived from shared PIT_BRACKETS (single source of truth)
 const PIT_BRACKETS: PITBracket[] = [
@@ -205,9 +206,9 @@ const TAX_RATES: TaxRate[] = [
 ];
 
 const CATEGORY_CONFIG = {
-  vat:     { label: 'VAT',          color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',     icon: <Scale size={12} /> },
+  vat:     { label: 'VAT',          color: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300',     icon: <Scale size={12} /> },
   income:  { label: 'Income Tax',   color: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300', icon: <TrendingUp size={12} /> },
-  payroll: { label: 'Payroll',      color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300', icon: <Users size={12} /> },
+  payroll: { label: 'Payroll',      color: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300', icon: <Users size={12} /> },
   drrf:    { label: 'DRRF',         color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300', icon: <Shield size={12} /> },
   excise:  { label: 'Excise',       color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',  icon: <Package size={12} /> },
   customs: { label: 'Customs',      color: 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300',     icon: <Globe size={12} /> },
@@ -256,7 +257,7 @@ const IFRSTaxRateReference: React.FC = () => {
         </div>
         <button
           onClick={() => setShowPIT(!showPIT)}
-          className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900 text-indigo-700 dark:text-indigo-300 rounded-xl text-xs font-bold hover:bg-indigo-100 transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 bg-[var(--pro-azure-50)] dark:bg-green-950/30 border border-[var(--pro-azure-100)] dark:border-green-900 text-[var(--pro-azure-dark)] dark:text-green-300 rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-100)] transition-colors"
         >
           <Users size={13} />
           PIT Brackets
@@ -266,26 +267,26 @@ const IFRSTaxRateReference: React.FC = () => {
 
       {/* PIT Brackets */}
       {showPIT && (
-        <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900 rounded-xl p-4">
+        <div className="bg-[var(--pro-azure-50)] dark:bg-green-950/30 border border-[var(--pro-azure-100)] dark:border-green-900 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-3">
-            <p className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Personal Income Tax Brackets (ETB/month)</p>
-            <span className="text-[9px] font-bold text-emerald-500 bg-emerald-100 dark:bg-emerald-900/50 px-2 py-0.5 rounded-full">IAS 19.11</span>
+            <p className="text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] uppercase tracking-wider">Personal Income Tax Brackets (ETB/month)</p>
+            <span className="text-[9px] font-bold text-[var(--pro-azure)] bg-[var(--pro-azure-100)] dark:bg-green-900/50 px-2 py-0.5 rounded-full">IAS 19.11</span>
           </div>
           <div className="overflow-x-auto">
             <table className="ovds-table w-full text-xs">
               <thead>
-                <tr className="border-b border-indigo-200 dark:border-indigo-800">
-                  <th className="text-left py-2 pr-4 font-semibold text-indigo-700 dark:text-indigo-300">Income Range</th>
-                  <th className="text-center py-2 px-4 font-semibold text-indigo-700 dark:text-indigo-300">Rate</th>
-                  <th className="text-left py-2 pl-4 font-semibold text-indigo-700 dark:text-indigo-300">Tax Formula</th>
+                <tr className="border-b border-[var(--pro-azure-100)] dark:border-green-800">
+                  <th className="text-left py-2 pr-4 font-semibold text-[var(--pro-azure-dark)] dark:text-green-300">Income Range</th>
+                  <th className="text-center py-2 px-4 font-semibold text-[var(--pro-azure-dark)] dark:text-green-300">Rate</th>
+                  <th className="text-left py-2 pl-4 font-semibold text-[var(--pro-azure-dark)] dark:text-green-300">Tax Formula</th>
                 </tr>
               </thead>
               <tbody>
                 {PIT_BRACKETS.map((b, i) => (
-                  <tr key={i} className="border-b border-indigo-100 dark:border-indigo-900/50">
+                  <tr key={i} className="border-b border-[var(--pro-azure-100)] dark:border-green-900/50">
                     <td className="py-2 pr-4 font-mono text-slate-700 dark:text-slate-200">{b.range}</td>
                     <td className="py-2 px-4 text-center">
-                      <span className={`font-semibold px-2 py-0.5 rounded-full ${b.rate === '0%' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'}`}>
+                      <span className={`font-semibold px-2 py-0.5 rounded-full ${b.rate === '0%' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300' : 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300'}`}>
                         {b.rate}
                       </span>
                     </td>
@@ -295,7 +296,7 @@ const IFRSTaxRateReference: React.FC = () => {
               </tbody>
             </table>
           </div>
-          <p className="text-[10px] text-indigo-500 dark:text-indigo-400 mt-2 flex items-center gap-1">
+          <p className="text-[10px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] mt-2 flex items-center gap-1">
             <Info size={11} />
             Cumulative calculation — each bracket applies only to income within that range.
           </p>
@@ -335,13 +336,13 @@ const IFRSTaxRateReference: React.FC = () => {
                     <span className="text-sm font-bold text-slate-800 dark:text-slate-100">{rate.name}</span>
                   </div>
                   <div className="flex items-center gap-3 mt-1 flex-wrap">
-                    <span className="text-lg font-semibold text-emerald-600 dark:text-emerald-400">{rate.rate}</span>
+                    <span className="text-lg font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{rate.rate}</span>
                     <span className="ovds-caption">{rate.basis}</span>
                     <span className="text-[10px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg">{rate.frequency}</span>
                   </div>
                 </div>
                 <div className="text-right shrink-0">
-                  <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded-lg block mb-1">{rate.ifrsRef}</span>
+                  <span className="text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 px-2 py-0.5 rounded-lg block mb-1">{rate.ifrsRef}</span>
                   {isOpen ? <ChevronUp size={14} className="text-slate-400 ml-auto" /> : <ChevronDown size={14} className="text-slate-400 ml-auto" />}
                 </div>
               </button>

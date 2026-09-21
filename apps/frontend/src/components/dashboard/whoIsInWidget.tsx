@@ -1,8 +1,9 @@
+import { Search, RefreshCw, Users, Building2, Clock, Wifi, WifiOff } from 'lucide-react';
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getLocale } from '../../lib/locale';
-import { Search, RefreshCw, Users, Building2, Clock, Wifi, WifiOff } from 'lucide-react';
+
 import { useWebSocket } from '../../hooks/useWebSocket';
+import { getLocale } from '../../lib/locale';
 import { useAuth } from '../../rbac/AuthContext';
 
 interface WhoIsInWidgetProps {
@@ -13,8 +14,8 @@ interface WhoIsInWidgetProps {
 /** Deterministic color from a string — keeps avatars visually distinct */
 function avatarColor(name: string): string {
   const colors = [
-    'bg-emerald-500', 'bg-violet-500', 'bg-emerald-500', 'bg-amber-500',
-    'bg-rose-500', 'bg-teal-500', 'bg-indigo-500', 'bg-orange-500',
+    'bg-[var(--pro-azure-50)]0', 'bg-violet-500', 'bg-[var(--pro-azure-50)]0', 'bg-amber-500',
+    'bg-rose-500', 'bg-teal-500', 'bg-[var(--pro-azure-50)]0', 'bg-orange-500',
   ];
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -54,7 +55,7 @@ const EmployeeCard: React.FC<{ item: any; groupByDept: boolean; locale: string }
         <div className={`w-9 h-9 ${bgColor} rounded-xl flex items-center justify-center text-white font-semibold text-xs shadow-sm group-hover:scale-105 transition-transform`}>
           {initials}
         </div>
-        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 border-2 border-white dark:border-slate-900 rounded-full" />
+        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-[var(--pro-azure-light)] border-2 border-white dark:border-slate-900 rounded-full" />
       </div>
 
       <div className="flex-1 min-w-0">
@@ -67,7 +68,7 @@ const EmployeeCard: React.FC<{ item: any; groupByDept: boolean; locale: string }
       </div>
 
       <div className="text-right shrink-0">
-        <p className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">
+        <p className="text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] tabular-nums">
           {checkInTime}
         </p>
         <div className="flex items-center gap-0.5 justify-end mt-0.5">
@@ -141,11 +142,11 @@ const WhoIsInWidget: React.FC<WhoIsInWidgetProps> = ({ whoIsIn, fetchData }) => 
       <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="relative">
-            <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-950/50 rounded-xl flex items-center justify-center">
-              <Users size={14} className="text-emerald-600 dark:text-emerald-400" />
+            <div className="w-8 h-8 bg-[var(--pro-azure-100)] dark:bg-green-950/50 rounded-xl flex items-center justify-center">
+              <Users size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
             </div>
             {whoIsIn.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 text-white text-[8px] font-semibold rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[var(--pro-azure)] text-white text-[8px] font-semibold rounded-full flex items-center justify-center">
                 {liveData.length > 99 ? '99+' : liveData.length}
               </span>
             )}
@@ -161,13 +162,13 @@ const WhoIsInWidget: React.FC<WhoIsInWidgetProps> = ({ whoIsIn, fetchData }) => 
           {/* WebSocket live indicator */}
           <span title={connected ? 'Live updates active' : 'Polling mode'} className="mr-1">
             {connected
-              ? <Wifi size={11} className="text-emerald-400" />
+              ? <Wifi size={11} className="text-[var(--pro-azure-light)]" />
               : <WifiOff size={11} className="text-slate-300 dark:text-slate-600" />}
           </span>
           <button
             onClick={() => setGroupByDept(v => !v)}
             title="Group by department"
-            className={`p-1.5 rounded-lg transition-all ${groupByDept ? 'bg-emerald-500 text-white shadow-sm' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'}`}
+            className={`p-1.5 rounded-lg transition-all ${groupByDept ? 'bg-[var(--pro-azure)] text-white shadow-sm' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'}`}
           >
             <Building2 size={13} />
           </button>
@@ -233,7 +234,7 @@ const WhoIsInWidget: React.FC<WhoIsInWidgetProps> = ({ whoIsIn, fetchData }) => 
         <div className="px-4 py-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <span className="flex items-center gap-1.5 text-[10px] text-slate-400 dark:text-slate-500">
             {connected
-              ? <><Wifi size={9} className="text-emerald-400" /> Live</>
+              ? <><Wifi size={9} className="text-[var(--pro-azure-light)]" /> Live</>
               : 'Auto-refreshes every 30s'}
           </span>
           <span className="text-[10px] text-slate-400 dark:text-slate-500 tabular-nums">

@@ -22,7 +22,7 @@
     "incremental": true,
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "paths": {
-      "@ovds/domains/banking": [
+      "@ovds/domains-banking": [
         "packages/domains/banking/dist/index.d.ts"
       ]
     }

@@ -1,6 +1,3 @@
-import React, { useState, useEffect, useRef } from 'react';
-import api from '../services/api';
-import { io, Socket } from 'socket.io-client';
 import {
   Clock,
   MapPin,
@@ -21,12 +18,14 @@ import {
   Info,
   WifiOff,
 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EmptyState } from '../components';
-import { useApiQuery } from '../hooks/useApiQuery';
+import { io, Socket } from 'socket.io-client';
+
 import LanguageSwitcher from '../components/languageSwitcher';
-import { getLocale } from '../lib/locale';
 import { useOfflineQueue } from '../hooks/useOfflineQueue';
+import { getLocale } from '../lib/locale';
+import api from '../services/api';
 
 // Target Location loaded from settings API
 const getDistance = (
@@ -180,7 +179,7 @@ if (targetRef.current) {
 
     // Socket.io
     const token = localStorage.getItem('ovds_token') || localStorage.getItem('auth0_token') || sessionStorage.getItem('auth0_token') || '';
-    socketRef.current = io('/realtime', { path: '/socket.io', transports: ['websocket'], auth: { token } });
+    socketRef.current = io('/realtime', { path: '/socket.io', transports: ['polling', 'websocket'], auth: { token } });
 
     socketRef.current.on('newCheckin', (log) => {
       setRecentLogs((prev) => [log, ...prev].slice(0, 5));
@@ -310,7 +309,7 @@ const toggleTheme = () => {
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
   };
-const changeLanguage = (_lng: string) => {
+const _changeLanguage = (_lng: string) => {
     i18n.changeLanguage(_lng);
     localStorage.setItem('i18nextLng', _lng);
   };
@@ -320,7 +319,7 @@ return (
     >
       {/* Kiosk mode overlay indicator */}
       {kioskMode && (
-        <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-1.5 bg-emerald-500 text-white text-[10px] font-semibold uppercase tracking-wider">
+        <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-1.5 bg-[var(--pro-azure)] text-white text-[10px] font-semibold uppercase tracking-wider">
           <span className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
             Kiosk Mode Active — Auto-reset in {KIOSK_RESET_MS / 1000}s of inactivity
@@ -335,18 +334,18 @@ return (
       )}
 
       {/* Decorative elements */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-600 via-emerald-500 to-amber-500"></div>
-      <div className="absolute top-10 left-10 w-64 h-64 bg-emerald-50 dark:bg-emerald-950/20 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-10 right-10 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--pro-azure)] via-indigo-500 to-amber-500"></div>
+      <div className="absolute top-10 left-10 w-64 h-64 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-10 right-10 w-96 h-96 bg-[var(--pro-azure-50)]0/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
       <div className={`w-full max-w-xl relative z-10 ${kioskMode ? 'mt-6' : ''}`}>
         <div className="flex justify-between items-center mb-10 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl p-4 rounded-2xl border border-slate-200/50 dark:border-white/5 shadow-sm">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-emerald-500 text-white rounded-xl shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30">
+            <div className="p-2 bg-[var(--pro-azure)] text-white rounded-xl shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30">
               <Zap size={18} fill="currentColor" />
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                 {t('entry.live_portal')}
               </span>
               <span className="text-xs font-bold opacity-60">
@@ -372,7 +371,7 @@ return (
             <button
               onClick={toggleKioskMode}
               title={kioskMode ? 'Exit Kiosk Mode' : 'Enter Kiosk Mode (full-screen lock)'}
-              className={`px-3 py-1.5 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${kioskMode ? 'bg-emerald-500 text-white border-emerald-600' : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10'}`}
+              className={`px-3 py-1.5 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${kioskMode ? 'bg-[var(--pro-azure)] text-white border-[var(--pro-azure)]' : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10'}`}
             >
               {kioskMode ? '⊠ Kiosk' : '⊡ Kiosk'}
             </button>
@@ -383,13 +382,11 @@ return (
           className={`rounded-2xl shadow-2xl border transition-all overflow-hidden ${theme === 'dark' ? 'bg-slate-900/80 border-white/5' : 'bg-white border-slate-100'}`}
         >
           <div className="p-10 text-center">
-            <div className="mb-6 flex flex-col items-center">
-              <img
-                src="/assets/logo.jpg"
-                alt="OVDS"
-                className="w-16 h-16 mb-4 drop-shadow-2xl object-contain rounded-xl"
-              />
-              <p className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.4em] mb-2">
+             <div className="mb-6 flex flex-col items-center">
+               <div className="mb-4 flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-br from-[var(--pro-azure)] to-purple-500 shadow-2xl">
+                 <span className="text-white font-bold text-2xl">OVDS</span>
+               </div>
+              <p className="text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] uppercase tracking-[0.4em] mb-2">
                 {t('subtitle')}
               </p>
               <h1 className="text-2xl font-semibold tracking-tight uppercase">
@@ -398,7 +395,7 @@ return (
             </div>
 
             <div className="py-6 mb-8 rounded-2xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 flex flex-col items-center">
-              <div className="flex items-center gap-3 text-emerald-600 dark:text-emerald-400 mb-2">
+              <div className="flex items-center gap-3 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] mb-2">
                 <Clock size={20} className="animate-pulse" />
                 <span className="text-[10px] font-semibold uppercase tracking-wider leading-none">
                   {t('entry.network_time')}
@@ -430,7 +427,7 @@ return (
               <div className="relative group">
                 <User
                   size={16}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-600 dark:text-emerald-400 transition-colors"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors"
                 />
                 <select
                   value={selectedEmployee}
@@ -474,13 +471,13 @@ return (
                   onClick={() => setBioType(method.type)}
                   className={`flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all relative ${
                     bioType === method.type
-                      ? 'bg-emerald-500 border-emerald-500 text-white shadow-xl shadow-emerald-500/20 dark:shadow-emerald-500/10/30 scale-105'
+                      ? 'bg-[var(--pro-azure-50)]0 border-[var(--pro-azure)] text-white shadow-xl shadow-green-500/20 dark:shadow-green-500/10/30 scale-105'
                       : 'bg-white dark:bg-white/5 border-slate-100 dark:border-white/5 text-slate-400 hover:border-slate-200 dark:hover:border-white/10'
                   }`}
                 >
                   {bioType === method.type &&
                     template.startsWith('WEBAUTHN_') && (
-                      <div className="absolute -top-2 -right-2 bg-emerald-500 text-white p-1 rounded-full shadow-lg animate-bounce">
+                      <div className="absolute -top-2 -right-2 bg-[var(--pro-azure)] text-white p-1 rounded-full shadow-lg animate-bounce">
                         <ShieldCheck size={14} />
                       </div>
                     )}
@@ -497,7 +494,7 @@ return (
                 <button
                   disabled={loading || inRange === false || !selectedEmployee}
                   onClick={() => handleAction('check-in')}
-                  className="group relative h-20 bg-emerald-500 text-white rounded-2xl font-semibold uppercase tracking-wider overflow-hidden transition-all hover:bg-emerald-500 hover:scale-[1.02] active:scale-95 shadow-xl shadow-emerald-500/20 disabled:opacity-50 disabled:grayscale disabled:scale-100"
+                  className="group relative h-20 bg-[var(--pro-azure)] text-white rounded-2xl font-semibold uppercase tracking-wider overflow-hidden transition-all hover:bg-[var(--pro-azure-dark)] hover:scale-[1.02] active:scale-95 shadow-xl shadow-green-500/20 disabled:opacity-50 disabled:grayscale disabled:scale-100"
                 >
                   <div className="flex items-center justify-center gap-3">
                     {loading ? (
@@ -531,7 +528,7 @@ return (
                   inRange === null
                     ? 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400'
                     : inRange
-                      ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                      ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10 border-[var(--pro-azure-100)] dark:border-[var(--pro-azure)]/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
                       : 'bg-rose-50 dark:bg-rose-500/10 border-rose-100 dark:border-rose-500/20 text-rose-600 dark:text-rose-400'
                 }`}
               >
@@ -555,7 +552,7 @@ return (
                   <div
                     className={`px-3 py-1 rounded-lg text-[10px] font-medium uppercase tracking-wider border ${
                       inRange
-                        ? 'bg-emerald-500 text-white border-emerald-400 shadow-lg shadow-emerald-500/20'
+                        ? 'bg-[var(--pro-azure)] text-white border-[var(--pro-azure)] shadow-lg shadow-green-500/20'
                         : 'bg-rose-500 text-white border-rose-400 shadow-lg shadow-rose-500/20'
                     }`}
                   >
@@ -568,7 +565,7 @@ return (
                 <div
                   className={`p-6 rounded-2xl border flex items-center gap-4 animate-in slide-in-from-top-4 duration-500 ${
                     message.type === 'success'
-                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
+                      ? 'bg-[var(--pro-azure-50)]0/10 border-[var(--pro-azure)]/20 text-[var(--pro-azure)]'
                       : message.type === 'queued'
                         ? 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400'
                         : 'bg-rose-500/10 border-rose-500/20 text-rose-500'
@@ -577,7 +574,7 @@ return (
                   <div
                     className={`p-3 rounded-2xl shadow-lg ${
                       message.type === 'success'
-                        ? 'bg-emerald-500 text-white'
+                        ? 'bg-[var(--pro-azure)] text-white'
                         : message.type === 'queued'
                           ? 'bg-amber-500 text-white'
                           : 'bg-rose-500 text-white'
@@ -623,8 +620,8 @@ return (
                 {t('recent_checkins')}
               </h3>
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                <span className="text-[10px] font-medium uppercase tracking-wider text-emerald-500">
+                <span className="w-1.5 h-1.5 bg-[var(--pro-azure-50)]0 rounded-full animate-pulse"></span>
+                <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--pro-azure)]">
                   {t('entry.live_stream')}
                 </span>
               </div>
@@ -645,7 +642,7 @@ return (
                     className="p-4 bg-white dark:bg-slate-800/50 rounded-2xl border border-slate-200/50 dark:border-white/5 flex items-center justify-between shadow-sm animate-in slide-in-from-left-4 transition-all hover:scale-[1.02]"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center font-semibold">
+                      <div className="w-10 h-10 bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] rounded-xl flex items-center justify-center font-semibold">
                         {log.employee?.firstName[0]}
                         {log.employee?.lastName[0]}
                       </div>
@@ -659,14 +656,14 @@ return (
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-[10px] font-semibold text-emerald-500 tabular-nums">
+                      <p className="text-[10px] font-semibold text-[var(--pro-azure)] tabular-nums">
                         {new Date(log.checkIn).toLocaleTimeString([], {
                           hour: '2-digit',
                           minute: '2-digit',
                         })}
                       </p>
                       <div className="flex items-center gap-1 justify-end mt-0.5">
-                        <ShieldCheck size={10} className="text-emerald-500" />
+                        <ShieldCheck size={10} className="text-[var(--pro-azure)]" />
                         <span className="text-[8px] font-semibold uppercase tracking-wider text-slate-400">
                           {t('entry.verified')}
                         </span>
@@ -678,8 +675,8 @@ return (
             </div>
 
             <div className="mt-8 pt-8 border-t border-slate-200 dark:border-white/5">
-              <div className="p-5 rounded-2xl bg-emerald-50/50 border border-emerald-100 dark:border-emerald-900 text-left">
-                <div className="flex items-center gap-2 mb-3 text-emerald-600 dark:text-emerald-400">
+              <div className="p-5 rounded-2xl bg-[var(--pro-azure-50)]/50 border border-[var(--pro-azure-100)] dark:border-green-900 text-left">
+                <div className="flex items-center gap-2 mb-3 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                   <Info size={16} />
                   <span className="text-[10px] font-semibold uppercase tracking-wider">About This Kiosk</span>
                 </div>
@@ -687,7 +684,7 @@ return (
                   A <strong>kiosk</strong> is a small, open-fronted booth or structure used for retail, information, or self-service, 
                   often featuring touchscreen technology. This entry portal provides self-service check-in/out and biometric verification.
                 </p>
-                <div className="grid grid-cols-2 gap-y-2 mt-4 pt-4 border-t border-emerald-50">
+                <div className="grid grid-cols-2 gap-y-2 mt-4 pt-4 border-t border-[var(--pro-azure-50)]">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-[8px] font-semibold uppercase tracking-wider opacity-40">Modern Types</span>
                     <span className="text-[10px] font-bold">Self-Service & Ordering</span>
@@ -711,7 +708,7 @@ return (
             <div className="mt-8 pt-8 border-t border-slate-200 dark:border-white/5 text-center">
               <a
                 href="/login"
-                className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400 hover:text-emerald-600 transition-colors flex items-center justify-center gap-2"
+                className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:text-[var(--pro-azure)] transition-colors flex items-center justify-center gap-2"
               >
                 {t('backend_login')}
                 <ArrowRight size={14} />

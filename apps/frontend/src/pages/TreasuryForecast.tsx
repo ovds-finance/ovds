@@ -1,25 +1,28 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { AppPage, Btn, Icon } from '@ovds/ui';
-import CashForecastChart from '../components/cashForecastChart';
-import PaymentBatchModal from '../components/paymentBatchModal';
+import { AppPage, Btn } from '@ovds/ui';
+import { ContextualInsight } from '@ovds/ui';
 import {
   RefreshCw, Zap, TrendingUp, BarChart3,
   ChevronUp, ChevronDown, AlertTriangle, CheckCircle,
 } from 'lucide-react';
-import { usePageTitle } from '../hooks/usePageTitle';
+import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
+import CashForecastChart from '../components/cashForecastChart';
+import PaymentBatchModal from '../components/paymentBatchModal';
+import { useBusiness } from '../context/businessContext';
 import { useLocalStorage } from '../hooks';
 import { useInterval } from '../hooks';
 import { useAuditLog } from '../hooks/useAuditLog';
+import { usePageTitle } from '../hooks/usePageTitle';
 import api from '../services/api';
-import toast from 'react-hot-toast';
-import { ContextualInsight } from '@ovds/ui';
-import { useBusiness } from '../context/businessContext';
+
+
 
 // -- Types ---------------------------------------------------------------------
 type Scenario = 'base' | 'optimistic' | 'pessimistic';
 const SCENARIO_META: Record<Scenario, { label: string; color: string; multiplier: number; desc: string }> = {
-  base:        { label: 'Base Case',   color: 'text-emerald-600 dark:text-emerald-400',   multiplier: 1.0,  desc: 'Current trajectory maintained' },
-  optimistic:  { label: 'Optimistic',  color: 'text-emerald-600', multiplier: 1.25, desc: '25% revenue uplift, costs stable' },
+  base:        { label: 'Base Case',   color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',   multiplier: 1.0,  desc: 'Current trajectory maintained' },
+  optimistic:  { label: 'Optimistic',  color: 'text-[var(--pro-azure)]', multiplier: 1.25, desc: '25% revenue uplift, costs stable' },
   pessimistic: { label: 'Pessimistic', color: 'text-rose-600',    multiplier: 0.75, desc: '25% revenue decline, costs +10%' },
 };
 const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -99,7 +102,7 @@ return (
       title="Treasury Forecast"
       subtitle="Cash flow projections, scenario planning, and payment batch management · Investment Trends · Revenue Analytics · Market Value · Market Size · Banking & ovds"
       icon={<TrendingUp size={16} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       crumbs={[{ label: 'ovds' }, { label: 'Treasury' }]}
       actions={
         <>
@@ -115,15 +118,15 @@ return (
       <div className="ovds-widget-card overflow-hidden shadow-sm">{/* Inflow/outflow split bar */}
         {!loading && (inflows + outflows) > 0 && (
           <div className="flex h-1.5">
-            <div className="bg-emerald-500 transition-all duration-700" style={{ width: `${Math.round((inflows / (inflows + outflows)) * 100)}%` }} />
+            <div className="bg-[var(--pro-azure-50)]0 transition-all duration-700" style={{ width: `${Math.round((inflows / (inflows + outflows)) * 100)}%` }} />
             <div className="bg-rose-400 flex-1" />
           </div>
         )}
         <div className="ovds-grid-layout cols-4 gap-sm">
           {[
-            { label: 'Total Inflows',  value: loading ? '—' : fmt(inflows),     color: 'text-emerald-600 dark:text-emerald-400', sub: 'Cash received' },
+            { label: 'Total Inflows',  value: loading ? '—' : fmt(inflows),     color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', sub: 'Cash received' },
             { label: 'Total Outflows', value: loading ? '—' : fmt(outflows),    color: 'text-rose-600 dark:text-rose-400',     sub: 'Cash paid out' },
-            { label: 'Net Cash Flow',  value: loading ? '—' : fmt(netPosition), color: netPosition >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400', sub: netPosition >= 0 ? 'Positive' : 'Negative' },
+            { label: 'Net Cash Flow',  value: loading ? '—' : fmt(netPosition), color: netPosition >= 0 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-rose-600 dark:text-rose-400', sub: netPosition >= 0 ? 'Positive' : 'Negative' },
             { label: '6-Mo Forecast',  value: loading ? '—' : fmt(forecastNet), color: 'text-violet-600 dark:text-violet-400', sub: `${SCENARIO_META[scenario].label}` },
           ].map(k => (
             <div key={k.label} className="p-4">
@@ -147,8 +150,8 @@ return (
               onClick={() => setScenario(key)}
               className={`flex-1 min-w-[140px] p-4 rounded-xl border-2 text-left transition-all ${
                 scenario === key
-                  ? 'border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/10 dark:bg-emerald-50 dark:bg-emerald-950/20'
-                  : 'border-slate-200 dark:border-slate-700 hover:border-emerald-500/40 dark:border-emerald-700'
+                  ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 dark:bg-[var(--pro-azure-50)] dark:bg-green-950/20'
+                  : 'border-slate-200 dark:border-slate-700 hover:border-[var(--pro-azure)]/40 dark:border-green-700'
               }`}
             >
               <p className={`text-sm font-semibold ${meta.color}`}>{meta.label}</p>
@@ -169,7 +172,7 @@ return (
           className="w-full flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
         >
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-            <BarChart3 size={15} className="text-emerald-600 dark:text-emerald-400" />
+            <BarChart3 size={15} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
             6-Month Projection — <span className={SCENARIO_META[scenario].color}>{SCENARIO_META[scenario].label}</span>
           </h3>
           {showForecastTable ? <ChevronUp size={15} className="text-slate-400" /> : <ChevronDown size={15} className="text-slate-400" />}
@@ -188,14 +191,14 @@ return (
                 {forecast.map((row, i) => (
                   <tr key={i} className="border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                     <td className="px-4 py-3 font-bold text-slate-700 dark:text-slate-300">{row.month}</td>
-                    <td className="px-4 py-3 text-emerald-600 dark:text-emerald-400 font-bold">{fmt(row.inflows)}</td>
+                    <td className="px-4 py-3 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold">{fmt(row.inflows)}</td>
                     <td className="px-4 py-3 text-rose-600 dark:text-rose-400 font-bold">{fmt(row.outflows)}</td>
-                    <td className={`px-4 py-3 font-semibold ${row.net >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                    <td className={`px-4 py-3 font-semibold ${row.net >= 0 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-rose-600 dark:text-rose-400'}`}>
                       {row.net >= 0 ? '+' : '-'}{fmt(row.net)}
                     </td>
                     <td className="px-4 py-3">
                       {row.net >= 0
-                        ? <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400"><CheckCircle size={11} /> Surplus</span>
+                        ? <span className="flex items-center gap-1 text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]"><CheckCircle size={11} /> Surplus</span>
                         : <span className="flex items-center gap-1 text-[10px] font-semibold text-rose-600 dark:text-rose-400"><AlertTriangle size={11} /> Deficit</span>
                       }
                     </td>
@@ -203,9 +206,9 @@ return (
                 ))}
                 <tr className="bg-white dark:bg-slate-800/50 border-t-2 border-slate-200 dark:border-slate-700">
                   <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-200">6-Month Total</td>
-                  <td className="px-4 py-3 font-semibold text-emerald-600 dark:text-emerald-400">{fmt(forecast.reduce((s, m) => s + m.inflows, 0))}</td>
+                  <td className="px-4 py-3 font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{fmt(forecast.reduce((s, m) => s + m.inflows, 0))}</td>
                   <td className="px-4 py-3 font-semibold text-rose-600 dark:text-rose-400">{fmt(forecast.reduce((s, m) => s + m.outflows, 0))}</td>
-                  <td className={`px-4 py-3 font-semibold ${forecastNet >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                  <td className={`px-4 py-3 font-semibold ${forecastNet >= 0 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-rose-600 dark:text-rose-400'}`}>
                     {forecastNet >= 0 ? '+' : '-'}{fmt(forecastNet)}
                   </td>
                   <td className="px-4 py-3" />

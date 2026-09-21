@@ -1,8 +1,10 @@
 import { Injectable, ConflictException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from './prisma.service';
 import { ConfigService } from '@nestjs/config';
-import { generateSecureToken, secureCompare } from './security-utils';
 import { OTP_MAX_REQUESTS } from '@ovds/shared';
+
+import { PrismaService } from './prisma.service';
+import { generateSecureToken, secureCompare } from './security-utils';
+
 
 @Injectable()
 export class OtpService {

@@ -1,6 +1,6 @@
-﻿import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { AlertTriangle, Info, X, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 interface PayrollActionItemsProps {
   payrollCurrent: any;
@@ -106,12 +106,12 @@ const PayrollActionItems: React.FC<PayrollActionItemsProps> = ({
       btn: 'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900',
     },
     info: {
-      wrap: 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60',
-      bar: 'bg-emerald-400',
-      icon: 'bg-emerald-100 dark:bg-emerald-900/50',
-      iconEl: <Info size={13} className="text-emerald-600 dark:text-emerald-400 dark:text-emerald-400" />,
-      title: 'text-emerald-800 dark:text-emerald-300',
-      btn: 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900',
+      wrap: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-[var(--pro-azure-100)] dark:border-green-800/60',
+      bar: 'bg-[var(--pro-azure-light)]',
+      icon: 'bg-[var(--pro-azure-100)] dark:bg-green-900/50',
+      iconEl: <Info size={13} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />,
+      title: 'text-[var(--pro-azure-dark)] dark:text-green-300',
+      btn: 'bg-[var(--pro-azure-100)] dark:bg-green-900/50 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] dark:text-green-300 hover:bg-[var(--pro-azure-200)] dark:hover:bg-green-900',
     },
   };
 

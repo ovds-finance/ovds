@@ -1,0 +1,10 @@
+export declare enum LoyaltyTransactionType {
+    EARN_PURCHASE = "EARN_PURCHASE",
+    EARN_REFERRAL = "EARN_REFERRAL",
+    EARN_BONUS = "EARN_BONUS",
+    REDEEM_REWARD = "REDEEM_REWARD",
+    ADJUST_MANUAL = "ADJUST_MANUAL",
+    EXPIRE = "EXPIRE",
+    FRAUD_REVERSAL = "FRAUD_REVERSAL"
+}
+//# sourceMappingURL=loyalty.d.ts.map

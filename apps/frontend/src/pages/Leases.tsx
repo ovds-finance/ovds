@@ -4,24 +4,25 @@
  * Right-of-use assets · Lease liabilities · Ethiopian IFRS adoption
  * New: Amortisation Schedule tab — effective interest method
  */
-import React, { useState, useMemo, useCallback } from 'react';
 import {
   ScrollText, Plus, Edit2, Trash2, RefreshCw, Download,
   Calendar, Building2, BarChart3,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import { fmtETB } from '../utils/ethiopianTax';
-import api from '../services/api';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select, Textarea,
   SearchBar, EmptyState, Pagination, Amount, IFRSBadge,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { confirm } from '../utils/confirm';
+import { fmtETB } from '../utils/ethiopianTax';
 
 interface Lease {
   id: string;
@@ -92,11 +93,11 @@ const LeaseForm: React.FC<{ data: Partial<Lease>; onChange: (d: Partial<Lease>) 
       </div>
       {/* IFRS 16 preview */}
       {ifrs16 && months > 0 && (
-        <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-100 space-y-1.5">
-          <p className="text-[10px] font-bold text-indigo-700 uppercase tracking-wider">IFRS 16 Calculation ({months} months)</p>
+        <div className="p-3 bg-[var(--pro-azure-50)] rounded-xl border border-[var(--pro-azure-100)] space-y-1.5">
+          <p className="text-[10px] font-bold text-[var(--pro-azure-dark)] uppercase tracking-wider">IFRS 16 Calculation ({months} months)</p>
           <div className="grid grid-cols-2 gap-2 text-[10px]">
-            <div><p className="text-slate-500">ROU Asset</p><p className="font-bold text-indigo-700">{fmtETB(ifrs16.rou)}</p></div>
-            <div><p className="text-slate-500">Lease Liability</p><p className="font-bold text-indigo-700">{fmtETB(ifrs16.liability)}</p></div>
+            <div><p className="text-slate-500">ROU Asset</p><p className="font-bold text-[var(--pro-azure-dark)]">{fmtETB(ifrs16.rou)}</p></div>
+            <div><p className="text-slate-500">Lease Liability</p><p className="font-bold text-[var(--pro-azure-dark)]">{fmtETB(ifrs16.liability)}</p></div>
             <div><p className="text-slate-500">Total Payments</p><p className="font-bold text-slate-700">{fmtETB(Number(data.monthlyPayment) * months)}</p></div>
             <div><p className="text-slate-500">Lease Term</p><p className="font-bold text-slate-700">{months} months</p></div>
           </div>
@@ -140,7 +141,7 @@ const Leases: React.FC = () => {
     const totalLiability = rows.reduce((s, l) => s + (l.totalLeaseLiability ?? 0), 0);
     const totalROU       = rows.reduce((s, l) => s + (l.rouAssetValue ?? 0), 0);
     return [
-      { label: 'Total',       value: rows.length,                                                    color: 'emerald' as const },
+      { label: 'Total',       value: rows.length,                                                    color: 'green' as const },
       { label: 'Active',      value: rows.filter(l => l.status === 'ACTIVE').length,                 color: 'sky' as const },
       { label: 'ROU Assets',  value: fmtETB(totalROU),                                               color: 'violet' as const },
       { label: 'Liabilities', value: fmtETB(totalLiability),                                         color: 'rose' as const },
@@ -250,7 +251,7 @@ const Leases: React.FC = () => {
               <AppTr key={l.id}>
                 <AppTd>
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0"><Building2 size={12} className="text-indigo-600" /></div>
+                    <div className="w-7 h-7 rounded-lg bg-[var(--pro-azure-50)] flex items-center justify-center shrink-0"><Building2 size={12} className="text-[var(--pro-azure)]" /></div>
                     <div>
                       <p className="text-[12px] font-semibold text-slate-800 truncate max-w-[160px]">{l.assetDescription}</p>
                     </div>
@@ -270,7 +271,7 @@ const Leases: React.FC = () => {
                 </AppTd>
                 <AppTd align="right"><Amount value={l.monthlyPayment} size="sm" /></AppTd>
                 <AppTd align="right">
-                  {l.rouAssetValue ? <span className="text-[11px] font-bold text-indigo-600 tabular-nums">{fmtETB(l.rouAssetValue)}</span> : <span className="text-[10px] text-slate-300">—</span>}
+                  {l.rouAssetValue ? <span className="text-[11px] font-bold text-[var(--pro-azure)] tabular-nums">{fmtETB(l.rouAssetValue)}</span> : <span className="text-[10px] text-slate-300">—</span>}
                 </AppTd>
                 <AppTd align="right">
                   {l.totalLeaseLiability ? <span className="text-[11px] font-bold text-rose-600 tabular-nums">{fmtETB(l.totalLeaseLiability)}</span> : <span className="text-[10px] text-slate-300">—</span>}
@@ -280,7 +281,7 @@ const Leases: React.FC = () => {
                   <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     {can('ovds:write') && (
                       <>
-                        <button onClick={() => setModal({ open: true, data: { ...l } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all"><Edit2 size={11} /></button>
+                        <button onClick={() => setModal({ open: true, data: { ...l } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all"><Edit2 size={11} /></button>
                         <button onClick={async () => { if (await confirm({ title: `Delete lease?`, variant: 'danger' })) remove(l.id); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all"><Trash2 size={11} /></button>
                       </>
                     )}
@@ -381,7 +382,7 @@ const LeaseScheduleTab: React.FC<{ leases: Lease[]; companyId?: string }> = ({ l
           <select
             value={selectedId}
             onChange={e => setSelectedId(e.target.value)}
-            className="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 outline-none hover:border-indigo-300 transition-colors w-full max-w-sm"
+            className="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 outline-none hover:border-[var(--pro-azure-light)] transition-colors w-full max-w-sm"
           >
             {leases.map(l => (
               <option key={l.id} value={l.id}>{l.assetDescription} — {l.lessor ?? 'unknown lessor'}</option>
@@ -399,7 +400,7 @@ const LeaseScheduleTab: React.FC<{ leases: Lease[]; companyId?: string }> = ({ l
       {schedule?.lease && (
         <div className="ovds-grid-layout cols-4 gap-sm">
           {[
-            { label: 'ROU Asset',        value: fmtETB(schedule.lease.rouAssetValue ?? 0),          accent: 'bg-indigo-500' },
+            { label: 'ROU Asset',        value: fmtETB(schedule.lease.rouAssetValue ?? 0),          accent: 'bg-[var(--pro-azure-50)]0' },
             { label: 'Lease Liability',  value: fmtETB(schedule.lease.totalLeaseLiability ?? 0),    accent: 'bg-rose-500'   },
             { label: 'Interest Rate',    value: `${((schedule.lease.interestRate ?? 0) * 100).toFixed(1)}% p.a.`, accent: 'bg-amber-500' },
             { label: 'Monthly Payment',  value: fmtETB(schedule.lease.monthlyPayment ?? 0),          accent: 'bg-slate-500'  },
@@ -416,7 +417,7 @@ const LeaseScheduleTab: React.FC<{ leases: Lease[]; companyId?: string }> = ({ l
       {/* Schedule table */}
       <div className="ovds-widget-card overflow-hidden">
         <div className="ovds-widget-header">
-          <BarChart3 size={13} className="text-indigo-500" />
+          <BarChart3 size={13} className="text-[var(--pro-azure)]" />
           <p className="ovds-card-title">Amortisation Schedule — Effective Interest Method</p>
           <p className="ovds-caption ml-auto">IFRS 16.26 · All amounts in ETB</p>
         </div>
@@ -439,17 +440,17 @@ const LeaseScheduleTab: React.FC<{ leases: Lease[]; companyId?: string }> = ({ l
                   const isPaid   = row.status === 'PAID';
                   const isOverdue = row.status === 'OVERDUE';
                   return (
-                    <tr key={row.period} className={`hover:bg-indigo-50/30 dark:hover:bg-indigo-950/10 transition-colors ${isPaid ? 'opacity-60' : ''} ${isOverdue ? 'bg-rose-50/40 dark:bg-rose-950/10' : ''}`}>
+                    <tr key={row.period} className={`hover:bg-[var(--pro-azure-50)]/30 dark:hover:bg-green-950/10 transition-colors ${isPaid ? 'opacity-60' : ''} ${isOverdue ? 'bg-rose-50/40 dark:bg-rose-950/10' : ''}`}>
                       <td className="px-3 py-2 font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">{row.period}</td>
                       <td className="px-3 py-2 tabular-nums text-slate-600 dark:text-slate-300 text-right">{fmtETB(Number(row.openingLiability))}</td>
                       <td className="px-3 py-2 tabular-nums font-bold text-slate-700 dark:text-slate-200 text-right">{fmtETB(Number(row.totalPayment))}</td>
                       <td className="px-3 py-2 tabular-nums text-rose-500 text-right">{fmtETB(Number(row.interestPortion))}</td>
-                      <td className="px-3 py-2 tabular-nums text-emerald-600 text-right">{fmtETB(Number(row.principalPortion))}</td>
-                      <td className="px-3 py-2 tabular-nums font-bold text-indigo-600 dark:text-indigo-400 text-right">{fmtETB(Number(row.closingLiability))}</td>
+                      <td className="px-3 py-2 tabular-nums text-[var(--pro-azure)] text-right">{fmtETB(Number(row.principalPortion))}</td>
+                      <td className="px-3 py-2 tabular-nums font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] text-right">{fmtETB(Number(row.closingLiability))}</td>
                       <td className="px-3 py-2 tabular-nums text-amber-600 text-right">{fmtETB(Number(row.rouDepreciation))}</td>
                       <td className="px-3 py-2">
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                          isPaid    ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                          isPaid    ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' :
                           isOverdue ? 'bg-rose-50 text-rose-700 border-rose-200' :
                                       'bg-white text-slate-500 border-slate-200'
                         }`}>
@@ -461,7 +462,7 @@ const LeaseScheduleTab: React.FC<{ leases: Lease[]; companyId?: string }> = ({ l
                           <button
                             onClick={() => handlePost(row.period)}
                             disabled={posting === row.period}
-                            className="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-[10px] font-bold rounded-lg transition-colors whitespace-nowrap"
+                            className="px-2 py-1 bg-[var(--pro-azure)] hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 text-white text-[10px] font-bold rounded-lg transition-colors whitespace-nowrap"
                           >
                             {posting === row.period ? '…' : 'Post'}
                           </button>
@@ -475,13 +476,13 @@ const LeaseScheduleTab: React.FC<{ leases: Lease[]; companyId?: string }> = ({ l
                 <tfoot>
                   <tr className="bg-slate-800 dark:bg-slate-700 text-white">
                     <td className="px-3 py-2.5 text-[11px] font-black" colSpan={2}>TOTALS</td>
-                    <td className="px-3 py-2.5 tabular-nums text-[11px] font-black text-emerald-400 text-right">
+                    <td className="px-3 py-2.5 tabular-nums text-[11px] font-black text-[var(--pro-azure-light)] text-right">
                       {fmtETB(schedule.schedule.reduce((s: number, r: ScheduleRow) => s + Number(r.totalPayment), 0))}
                     </td>
                     <td className="px-3 py-2.5 tabular-nums text-[11px] font-bold text-rose-300 text-right">
                       {fmtETB(schedule.schedule.reduce((s: number, r: ScheduleRow) => s + Number(r.interestPortion), 0))}
                     </td>
-                    <td className="px-3 py-2.5 tabular-nums text-[11px] font-bold text-emerald-300 text-right">
+                    <td className="px-3 py-2.5 tabular-nums text-[11px] font-bold text-green-300 text-right">
                       {fmtETB(schedule.schedule.reduce((s: number, r: ScheduleRow) => s + Number(r.principalPortion), 0))}
                     </td>
                     <td colSpan={4} />
@@ -493,7 +494,7 @@ const LeaseScheduleTab: React.FC<{ leases: Lease[]; companyId?: string }> = ({ l
         )}
       </div>
 
-      <div className="flex gap-3 px-4 py-3 bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900 rounded-xl text-[10px] text-indigo-700 dark:text-indigo-300">
+      <div className="flex gap-3 px-4 py-3 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900 rounded-xl text-[10px] text-[var(--pro-azure-dark)] dark:text-green-300">
         <BarChart3 size={12} className="shrink-0 mt-0.5" />
         <span><strong>IFRS 16.26</strong>: The lease liability is measured using the effective interest method — interest is allocated over the lease term to produce a constant periodic rate. Click <strong>Post</strong> on a period to record Dr Interest Expense + Dr Lease Liability / Cr Cash in the GL.</span>
       </div>

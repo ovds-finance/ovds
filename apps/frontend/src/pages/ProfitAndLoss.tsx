@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
+
 import {
   AppPage, Btn, Icon, FormField, Input,
 } from '../components/ui';
 import { useBusiness } from '../context/businessContext';
 import api from '../services/api';
 import { downloadBlob } from '../utils/download';
-import toast from 'react-hot-toast';
 
 interface PLLine {
   id?: string;
@@ -238,9 +239,9 @@ const ProfitAndLoss: React.FC = () => {
       {data && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           {[
-            { label: 'Revenue', value: totalRevenue, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200' },
-            { label: 'Gross Profit', value: grossProfit, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' },
-            { label: 'Net Profit', value: netProfit, color: netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600', bg: netProfit >= 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200' },
+            { label: 'Revenue', value: totalRevenue, color: 'text-[var(--pro-azure)]', bg: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' },
+            { label: 'Gross Profit', value: grossProfit, color: 'text-[var(--pro-azure)]', bg: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' },
+            { label: 'Net Profit', value: netProfit, color: netProfit >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600', bg: netProfit >= 0 ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' : 'bg-rose-50 border-rose-200' },
             { label: 'Margin', value: totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0, suffix: '%', color: 'text-violet-600', bg: 'bg-violet-50 border-violet-200' },
           ].map((k, i) => (
             <div key={i} className={`rounded-xl border p-4 ${k.bg}`}>
@@ -263,8 +264,8 @@ const ProfitAndLoss: React.FC = () => {
             'Revenue',
             data?.income?.items ?? [],
             totalRevenue,
-            'bg-emerald-50 border border-emerald-100',
-            'bg-emerald-600',
+            'bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)]',
+            'bg-[var(--pro-azure)]',
             comparative ? priorData?.income?.items : undefined,
             comparative ? priorData?.income?.total : undefined,
           )}
@@ -286,7 +287,7 @@ const ProfitAndLoss: React.FC = () => {
         <div className="mt-6 p-4 rounded-xl border bg-slate-800 dark:bg-slate-700">
           <div className="flex justify-between items-center">
             <span className="text-sm font-black text-white">NET PROFIT / (LOSS)</span>
-            <span className={`text-2xl font-black tabular-nums ${netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+            <span className={`text-2xl font-black tabular-nums ${netProfit >= 0 ? 'text-[var(--pro-azure-light)]' : 'text-rose-400'}`}>
               {fmt(netProfit)}
             </span>
           </div>

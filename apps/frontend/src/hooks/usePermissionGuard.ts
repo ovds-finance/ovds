@@ -14,8 +14,9 @@
  *   if (!allowed) return <AccessDenied reason={reason} />;
  */
 import { useMemo } from 'react';
-import { useAuth } from '../rbac/AuthContext';
+
 import { useBusiness } from '../context/businessContext';
+import { useAuth } from '../rbac/AuthContext';
 import { ROLE_HIERARCHY, type Permission, type AppRole } from '../rbac/rbac';
 
 export interface PermissionGuardOptions {

@@ -13,8 +13,9 @@ import {
   type DeleteManyParams,
   type CustomParams,
 } from "@refinedev/core";
+import type { AxiosResponse, AxiosRequestConfig } from "axios";
+
 import api, { extractData, apiGetPaginated, API_BASE } from "../services/api";
-import type { AxiosResponse } from "axios";
 const RESOURCE_MAP: Record<string, string> = {
   companies: "/ovds/companies",
   invoices: "/sales/invoices",
@@ -90,7 +91,7 @@ const refineDataProvider: DataProvider = {
 
   getOne: async <TData extends BaseRecord = BaseRecord>({ resource, id, meta }: GetOneParams) => {
     const path = resolvePath(resource);
-    const response = await api.get(`${path}/${id}`, { ...meta });
+    const response = await api.get(`${path}/${id}`, { ...meta } as AxiosRequestConfig);
     const data = extractData<TData>(response);
     return { data };
   },
@@ -98,7 +99,7 @@ const refineDataProvider: DataProvider = {
   getMany: async <TData extends BaseRecord = BaseRecord>({ resource, ids, meta }: GetManyParams) => {
     const path = resolvePath(resource);
     const promises = ids.map((id: string | number) =>
-      api.get(`${path}/${id}`, { ...meta }).then((r: AxiosResponse) => extractData<TData>(r)),
+      api.get(`${path}/${id}`, { ...meta } as AxiosRequestConfig).then((r: AxiosResponse) => extractData<TData>(r)),
     );
     const data = await Promise.all(promises);
     return { data };
@@ -106,7 +107,7 @@ const refineDataProvider: DataProvider = {
 
   create: async <TData extends BaseRecord = BaseRecord, TVariables = unknown>({ resource, variables, meta }: CreateParams<TVariables>) => {
     const path = resolvePath(resource);
-    const response = await api.post(path, variables, { ...meta });
+    const response = await api.post(path, variables, { ...meta } as AxiosRequestConfig);
     const data = extractData<TData>(response);
     return { data };
   },
@@ -114,7 +115,7 @@ const refineDataProvider: DataProvider = {
   createMany: async <TData extends BaseRecord = BaseRecord, TVariables = unknown>({ resource, variables, meta }: CreateManyParams<TVariables>) => {
     const path = resolvePath(resource);
     const promises = variables.map((vars: TVariables) =>
-      api.post(path, vars, { ...meta }).then((r: AxiosResponse) => extractData<TData>(r)),
+      api.post(path, vars, { ...meta } as AxiosRequestConfig).then((r: AxiosResponse) => extractData<TData>(r)),
     );
     const data = await Promise.all(promises);
     return { data };
@@ -122,7 +123,7 @@ const refineDataProvider: DataProvider = {
 
   update: async <TData extends BaseRecord = BaseRecord, TVariables = unknown>({ resource, id, variables, meta }: UpdateParams<TVariables>) => {
     const path = resolvePath(resource);
-    const response = await api.patch(`${path}/${id}`, variables, { ...meta });
+    const response = await api.patch(`${path}/${id}`, variables, { ...meta } as AxiosRequestConfig);
     const data = extractData<TData>(response);
     return { data };
   },
@@ -130,7 +131,7 @@ const refineDataProvider: DataProvider = {
   updateMany: async <TData extends BaseRecord = BaseRecord, TVariables = unknown>({ resource, ids, variables, meta }: UpdateManyParams<TVariables>) => {
     const path = resolvePath(resource);
     const promises = ids.map((id: string | number) =>
-      api.patch(`${path}/${id}`, variables, { ...meta }).then((r: AxiosResponse) => extractData<TData>(r)),
+      api.patch(`${path}/${id}`, variables, { ...meta } as AxiosRequestConfig).then((r: AxiosResponse) => extractData<TData>(r)),
     );
     const data = await Promise.all(promises);
     return { data };
@@ -138,7 +139,7 @@ const refineDataProvider: DataProvider = {
 
   deleteOne: async <TData extends BaseRecord = BaseRecord, TVariables = unknown>({ resource, id, variables, meta }: DeleteOneParams<TVariables>) => {
     const path = resolvePath(resource);
-    const response = await api.delete(`${path}/${id}`, { ...meta, data: variables });
+    const response = await api.delete(`${path}/${id}`, { ...meta, data: variables } as AxiosRequestConfig);
     const data = extractData<TData>(response);
     return { data };
   },
@@ -146,7 +147,7 @@ const refineDataProvider: DataProvider = {
   deleteMany: async <TData extends BaseRecord = BaseRecord, TVariables = unknown>({ resource, ids, variables, meta }: DeleteManyParams<TVariables>) => {
     const path = resolvePath(resource);
     const promises = ids.map((id: string | number) =>
-      api.delete(`${path}/${id}`, { ...meta, data: variables }).then((r: AxiosResponse) => extractData<TData>(r)),
+      api.delete(`${path}/${id}`, { ...meta, data: variables } as AxiosRequestConfig).then((r: AxiosResponse) => extractData<TData>(r)),
     );
     const data = await Promise.all(promises);
     return { data };

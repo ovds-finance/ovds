@@ -20,9 +20,10 @@
  *     <BiometricButton />
  *   </EntitlementGate>
  */
+import { Lock, ArrowRight, Sparkles, Clock } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, ArrowRight, Sparkles, Clock } from 'lucide-react';
+
 import { useEntitlement } from '../context/entitlementContext';
 
 // -- Feature key → human-readable label map ------------------------------------
@@ -99,7 +100,7 @@ const UpgradeWall: React.FC<UpgradeWallProps> = ({
         </h2>
         <p className="text-sm text-slate-500 font-medium mb-2">
           requires the{' '}
-          <span className="font-black text-emerald-500">{meta.plan} plan</span>
+          <span className="font-black text-[var(--pro-azure)]">{meta.plan} plan</span>
         </p>
         <p className="text-xs text-slate-400 mb-8 leading-relaxed">
           Upgrade your plan to unlock this feature and get access to the full
@@ -109,7 +110,7 @@ const UpgradeWall: React.FC<UpgradeWallProps> = ({
         {/* CTA */}
         <button
           onClick={() => navigate('/plans', { state: { requiredFeature: featureKey } })}
-          className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
+          className="w-full py-3.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white font-black text-xs uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/20"
         >
           <Sparkles size={14} />
           View Plans & Upgrade
@@ -122,7 +123,7 @@ const UpgradeWall: React.FC<UpgradeWallProps> = ({
             Not ready?{' '}
             <button
               onClick={() => navigate('/plans', { state: { startTrial: true } })}
-              className="text-emerald-500 font-bold hover:underline"
+              className="text-[var(--pro-azure)] font-bold hover:underline"
             >
               Start a 14-day free trial
             </button>

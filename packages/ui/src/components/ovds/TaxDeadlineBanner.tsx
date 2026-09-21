@@ -179,7 +179,7 @@ export const TaxDeadlineBanner: React.FC<TaxDeadlineBannerProps> = ({
           );
         })}
         {deadlines.every(d => !d.isOverdue) && (
-          <div className="flex items-center gap-2 px-4 py-2.5 text-[10px] text-emerald-600 dark:text-emerald-400">
+          <div className="flex items-center gap-2 px-4 py-2.5 text-[10px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
             <CheckCircle size={11} />
             All upcoming deadlines within schedule
           </div>

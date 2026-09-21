@@ -199,7 +199,7 @@ export const BentoStatCell: React.FC<BentoStatCellProps> = ({
         {trend !== undefined && trend !== 0 && (
           <span className={cn(
             'text-[10px] font-bold ml-auto',
-            trend > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500',
+            trend > 0 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-rose-500',
           )}>
             {trend > 0 ? '↑' : '↓'} {Math.abs(trend).toFixed(1)}%
           </span>

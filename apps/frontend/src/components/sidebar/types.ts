@@ -1,5 +1,6 @@
+﻿import type { IconType } from '@ovds/ui';
 import type React from 'react';
-import type { IconType } from '@ovds/ui';
+
 import type { Permission } from '../../rbac/rbac';
 
 export interface SidebarProps {
@@ -8,7 +9,7 @@ export interface SidebarProps {
   onNavClick?: () => void;
   onOpenSearch?: () => void;
   onAction?: (action: string) => void;
-  /** Akaunting-style semantic clustering (default true). */
+  /** Ovds SaaS style semantic clustering (default true). */
   consolidated?: boolean;
 }
 

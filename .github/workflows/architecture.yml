@@ -1,0 +1,40 @@
+name: Architecture Validation
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  validate-architecture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/check-arch.mjs
+      - run: npx nx run-many --target=typecheck --projects=design-tokens,shared,dto,contracts,ui --parallel=4
+      - run: npx nx run-many --target=lint --projects=frontend,backend --parallel=2
+
+  token-sync-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: node packages/design-tokens/scripts/sync-css-variables.mjs
+      - run: git diff --exit-code packages/ui/src/styles/tokens.css || (echo "❌ tokens.css is out of sync with tokens.ts" && exit 1)
+      - run: echo "✅ tokens.css is in sync with tokens.ts"

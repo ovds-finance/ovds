@@ -15,7 +15,7 @@ This monorepo follows the **"thin apps, thick libraries"** architecture:
 
 ## Core Module System
 
-The core platform is built around a modular framework inspired by Akaunting's modular UI/UX logic. The `@ovds/core` package provides:
+The core platform is built around the Ovds SaaS modular framework. The `@ovds/core` package provides:
 
 - **ModuleApp** — Abstract base class that every installable module extends. Includes blueprint metadata: `installType`, `subscriptionTiers`, `complianceStandards`, `dataFlow`.
 - **ModuleRegistry** — Singleton registry that manages module lifecycle (register, boot, dependency ordering, entitlement gating).

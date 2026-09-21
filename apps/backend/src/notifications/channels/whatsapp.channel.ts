@@ -12,8 +12,10 @@
  */
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { INotificationChannel } from './notification-channel.interface';
+
 import type { WhatsAppJobData } from '../notification.jobs';
+
+import type { INotificationChannel } from './notification-channel.interface';
 
 @Injectable()
 export class WhatsAppChannel implements INotificationChannel<WhatsAppJobData> {

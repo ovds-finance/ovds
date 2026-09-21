@@ -1,11 +1,13 @@
-import React from 'react';
-import { Modal, Btn, Textarea, FormField, StatusBadge } from '@ovds/ui';
 import {
   DEVICE_CONTROL_CATEGORY_META,
   type DeviceControlChangeRequestDTO as DeviceControlChangeRequest,
 } from '@ovds/shared';
-import { PolicySettingsForm } from './PolicySettingsForm';
+import { Modal, Btn, Textarea, FormField, StatusBadge } from '@ovds/ui';
+import React from 'react';
+
 import { useReviewChangeRequest } from '../../services/deviceControlApi';
+
+import { PolicySettingsForm } from './PolicySettingsForm';
 
 interface Props {
   open: boolean;

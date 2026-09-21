@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+
 import {
   AppPage, AppTable, AppTh, AppTd, AppTr,
   Btn, Icon,
 } from '../components/ui';
 import { useBusiness } from '../context/businessContext';
-import api from '../services/api';
-import toast from 'react-hot-toast';
 import { useAabeAuditReadiness, useDualLedgerStatus } from '../features/accounting/hooks/useGlCompliance';
+import api from '../services/api';
 
 // ── AABE Score Widget (injected at top of existing dashboard) ─────────────────
 
@@ -42,7 +43,7 @@ function AabeScoreWidget({ companyId }: { companyId: string }) {
         </h3>
         <Link
           to="/accounting/aabe-audit"
-          className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+          className="text-xs text-[var(--pro-azure)] hover:underline"
         >
           Full report →
         </Link>
@@ -70,7 +71,7 @@ function AabeScoreWidget({ companyId }: { companyId: string }) {
         {/* Criteria summary */}
         <div className="flex gap-3">
           <div className="text-center">
-            <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{r.passed}</p>
+            <p className="text-lg font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{r.passed}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400">passed</p>
           </div>
           <div className="text-center">
@@ -188,7 +189,7 @@ const GeneralLedgerCompliance: React.FC = () => {
         return 'text-amber-700 bg-amber-50 border-amber-200';
       case 'LOW':
       default:
-        return 'text-emerald-700 bg-emerald-50 border-emerald-200';
+        return 'text-[var(--pro-azure-dark)] bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]';
     }
   };
 
@@ -223,10 +224,10 @@ const GeneralLedgerCompliance: React.FC = () => {
           {/* KPI Strip */}
           <div className="ovds-grid-layout cols-5 gap-sm">
             {[
-              { label: 'Assets', value: totals?.assets ?? 0, color: 'text-emerald-600' },
+              { label: 'Assets', value: totals?.assets ?? 0, color: 'text-[var(--pro-azure)]' },
               { label: 'Liabilities', value: totals?.liabilities ?? 0, color: 'text-rose-600' },
               { label: 'Equity', value: totals?.equity ?? 0, color: 'text-violet-600' },
-              { label: 'Income', value: totals?.income ?? 0, color: 'text-blue-600' },
+              { label: 'Income', value: totals?.income ?? 0, color: 'text-[var(--pro-azure)]' },
               { label: 'Expenses', value: totals?.expenses ?? 0, color: 'text-amber-600' },
             ].map((k, i) => (
               <div key={i} className="ovds-widget-card p-4">
@@ -296,8 +297,8 @@ const GeneralLedgerCompliance: React.FC = () => {
                   <p className="ovds-card-title">Tax & Compliance Status</p>
                 </div>
                 <div className="p-4 space-y-3">
-                  {compliance?.issues?.length > 0 ? (
-                    compliance.issues.map((issue, i) => (
+                  {(compliance?.issues?.length ?? 0) > 0 ? (
+                    compliance!.issues!.map((issue, i) => (
                       <div
                         key={i}
                         className={`p-3 rounded-xl border text-xs ${getSeverityColor(issue.severity)}`}

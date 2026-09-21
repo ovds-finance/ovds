@@ -2,9 +2,9 @@
  * AccountingService — Core accounting domain logic.
  *
  * Migrated from apps/backend/src/accounting/accounting.service.ts into
- * the @ovds/domains/accounting library following the thin-apps-thick-libs pattern.
+ * the @ovds/domains-accounting library following the thin-apps-thick-libs pattern.
  *
- * This service extends BaseService from @ovds/domains/infrastructure and accepts
+ * This service extends BaseService from @ovds/domains-infrastructure and accepts
  * PrismaService and AuditLogService via dependency injection from the NestJS app.
  */
 import {
@@ -22,7 +22,7 @@ import {
   buildPrismaPage,
   paginate,
   ListOptions,
-} from '@ovds/domains/infrastructure';
+} from '@ovds/domains-infrastructure';
 import {
   CreateAccountDto,
   UpdateAccountDto,
@@ -695,29 +695,132 @@ export class AccountingService extends BaseService {
 
   // ── Additional methods (placeholder — migrate on demand) ──────────────────
 
-  /**
-   * The original AccountingService has 40+ additional methods for:
-   * - Trial balance
-   * - Period close
-   * - Bank transactions
-   * - Reconciliation
-   * - Locked periods
-   *
-   * These are migrated on-demand as part of incremental refactoring.
-   * For now, stub them here to preserve the public API:
-   */
+  // ── Trial Balance ──────────────────────────────────────────────────────────
 
+  /**
+   * Builds a trial balance as of `date` by summing all posted LedgerEntry rows
+   * against their Account, scoped to `companyId`.
+   *
+   * Each row: { accountId, code, name, type, category, debit, credit, balance }
+   * where balance = debit - credit (positive = debit-normal, negative = credit-normal).
+   */
   async getTrialBalance(companyId: string, date: string): Promise<any> {
-    throw new BadRequestException('Not yet migrated to domain lib');
+    const asOf = date ? new Date(date) : new Date();
+
+    // Pull all accounts for the company
+    const accounts = await this.prisma.account.findMany({
+      where: { companyId },
+      orderBy: { code: 'asc' },
+    });
+
+    if (accounts.length === 0) return { asOf, rows: [], totals: { debit: 0, credit: 0 } };
+
+    const accountIds = accounts.map((a: any) => a.id);
+
+    // Aggregate posted ledger entries up to the date
+    const entries = await this.prisma.ledgerEntry.groupBy({
+      by: ['accountId'],
+      where: {
+        accountId: { in: accountIds },
+        journalEntry: { date: { lte: asOf }, status: 'POSTED' },
+      },
+      _sum: { debit: true, credit: true },
+    } as any);
+
+    // Build lookup: accountId → { debit, credit }
+    const entryMap = new Map<string, { debit: number; credit: number }>();
+    for (const e of entries as any[]) {
+      entryMap.set(e.accountId, {
+        debit:  Number(e._sum.debit  ?? 0),
+        credit: Number(e._sum.credit ?? 0),
+      });
+    }
+
+    const rows = accounts.map((acc: any) => {
+      const sums = entryMap.get(acc.id) ?? { debit: 0, credit: 0 };
+      return {
+        accountId: acc.id,
+        code:      acc.code,
+        name:      acc.name,
+        type:      acc.type,
+        category:  acc.category,
+        debit:     sums.debit,
+        credit:    sums.credit,
+        balance:   sums.debit - sums.credit,
+      };
+    });
+
+    const totals = rows.reduce(
+      (acc: { debit: number; credit: number }, r: any) => {
+        acc.debit  += r.debit;
+        acc.credit += r.credit;
+        return acc;
+      },
+      { debit: 0, credit: 0 },
+    );
+
+    return { asOf, rows, totals };
   }
+
+  // ── Locked Periods ─────────────────────────────────────────────────────────
 
   async getLockedPeriods(companyId?: string): Promise<string[]> {
-    return [];
+    const where: Record<string, unknown> = { isLocked: true };
+    if (companyId) where.companyId = companyId;
+    const periods = await this.prisma.fiscalPeriod.findMany({
+      where: where as any,
+      select: { name: true },
+      orderBy: { startDate: 'asc' } as any,
+    }).catch(() => [] as any[]);
+    return (periods as any[]).map((p: any) => p.name as string);
   }
 
+  // ── Period Close Health ─────────────────────────────────────────────────────
+
+  /**
+   * Returns a close-readiness snapshot for the current open fiscal period:
+   * - unpostedJournals: count of DRAFT journal entries
+   * - unreconciled: count of bank accounts with unreconciled transactions
+   * - openPeriod: the name of the current open period (if any)
+   * - isReadyToClose: true when both counts are zero
+   */
   async getCloseHealth(companyId?: string): Promise<any> {
-    throw new BadRequestException('Not yet migrated to domain lib');
+    const where: Record<string, unknown> = {};
+    if (companyId) where.companyId = companyId;
+
+    const [unpostedJournals, unreconciledAccounts, openPeriod] = await Promise.all([
+      // Count DRAFT journal entries that have not been posted yet
+      this.prisma.journalEntry.count({
+        where: { ...where, status: 'DRAFT' } as any,
+      }).catch(() => 0),
+
+      // Count bank accounts that have transactions not yet matched to a statement line
+      this.prisma.bankAccount.count({
+        where: {
+          ...where,
+          bankTransaction: {
+            some: { isReconciled: false } as any,
+          },
+        } as any,
+      }).catch(() => 0),
+
+      // The currently open fiscal period (status = OPEN)
+      this.prisma.fiscalPeriod.findFirst({
+        where: { ...where, isLocked: false } as any,
+        orderBy: { startDate: 'desc' } as any,
+        select: { name: true, startDate: true, endDate: true } as any,
+      }).catch(() => null),
+    ]);
+
+    return {
+      openPeriod:        openPeriod ?? null,
+      unpostedJournals,
+      unreconciledAccounts,
+      isReadyToClose:    unpostedJournals === 0 && unreconciledAccounts === 0,
+    };
   }
+
+  // ── Bank Transactions (migrated from original service) ────────────────────
 
   async recordBankTransaction(
     id: string,
@@ -731,8 +834,27 @@ export class AccountingService extends BaseService {
     userId: string,
     companyId: string,
   ): Promise<any> {
-    // TODO: migrate from original service
-    throw new BadRequestException('Not yet migrated to domain lib');
+    const account = await this.prisma.bankAccount.findFirst({
+      where: { id, companyId } as any,
+    });
+    if (!account) throw new NotFoundException('Bank account not found');
+
+    const transaction = await this.prisma.bankTransaction.create({
+      data: {
+        bankAccountId: id,
+        companyId,
+        date:        new Date(data.date),
+        description: data.description,
+        amount:      data.amount,
+        reference:   data.reference,
+        notes:       data.notes,
+        type:        data.amount >= 0 ? 'CREDIT' : 'DEBIT',
+        status:      'CLEARED',
+      } as any,
+    });
+
+    this.audit(userId, 'RECORD_BANK_TRANSACTION', `Transaction recorded on account ${id}`, companyId);
+    return transaction;
   }
 
   async getBankTransactions(
@@ -740,8 +862,29 @@ export class AccountingService extends BaseService {
     params: PaginationQueryDto,
     companyId?: string,
   ): Promise<PaginatedResult<any>> {
-    // TODO: migrate from original service
-    return { data: [], total: 0, page: 1, limit: 20, totalPages: 0, pagination: { page: 1, take: 20, total: 0, pages: 0 } };
+    const page  = Number(params.page)  || 1;
+    const limit = Number(params.limit) || 20;
+    const where: Record<string, unknown> = { bankAccountId: id };
+    if (companyId) where.companyId = companyId;
+
+    const [data, total] = await Promise.all([
+      this.prisma.bankTransaction.findMany({
+        where: where as any,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { date: 'desc' } as any,
+      }),
+      this.prisma.bankTransaction.count({ where: where as any }),
+    ]);
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      pagination: { page, take: limit, total, pages: Math.ceil(total / limit) },
+    };
   }
 
   async getAllBankTransactions(
@@ -754,8 +897,38 @@ export class AccountingService extends BaseService {
     },
     companyId?: string,
   ): Promise<PaginatedResult<any>> {
-    // TODO: migrate from original service
-    return { data: [], total: 0, page: 1, limit: 20, totalPages: 0, pagination: { page: 1, take: 20, total: 0, pages: 0 } };
+    const page  = Number(params.page)  || 1;
+    const limit = Number(params.limit) || 20;
+    const effectiveCompany = params.companyId ?? companyId;
+    const where: Record<string, unknown> = {};
+    if (effectiveCompany) where.companyId = effectiveCompany;
+    if (params.type)      where.type      = params.type;
+    if (params.status)    where.status    = params.status;
+    if (params.dateFrom || params.dateTo) {
+      const date: Record<string, unknown> = {};
+      if (params.dateFrom) date.gte = new Date(params.dateFrom);
+      if (params.dateTo)   date.lte = new Date(params.dateTo);
+      where.date = date;
+    }
+
+    const [data, total] = await Promise.all([
+      this.prisma.bankTransaction.findMany({
+        where: where as any,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { date: 'desc' } as any,
+      }),
+      this.prisma.bankTransaction.count({ where: where as any }),
+    ]);
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      pagination: { page, take: limit, total, pages: Math.ceil(total / limit) },
+    };
   }
 
   async updateBankTransaction(
@@ -764,8 +937,17 @@ export class AccountingService extends BaseService {
     userId: string,
     companyId?: string,
   ): Promise<any> {
-    // TODO: migrate from original service
-    throw new BadRequestException('Not yet migrated to domain lib');
+    const where: Record<string, unknown> = { id };
+    if (companyId) where.companyId = companyId;
+    const existing = await this.prisma.bankTransaction.findFirst({ where: where as any });
+    if (!existing) throw new NotFoundException('Bank transaction not found');
+
+    const updated = await this.prisma.bankTransaction.update({
+      where: { id },
+      data: data as any,
+    });
+    this.audit(userId, 'UPDATE_BANK_TRANSACTION', `Transaction ${id} updated`, companyId);
+    return updated;
   }
 
   async flagOverdueInvoices(userId: string, companyId?: string) {

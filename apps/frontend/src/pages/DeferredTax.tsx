@@ -8,62 +8,33 @@
  *
  * Ethiopian BIT rate: 30% (Proclamation No. 979/2016)
  */
-import React, { useState, useEffect, useCallback } from 'react';
+import type { TemporaryDifference } from '@ovds/features/reporting';
+import { AppPage, Btn, AppTabs, TAX_DEPRECIATION_RATES, TAX_DEPRECIATION_CATEGORY_LABELS } from '@ovds/ui';
 import {
   RefreshCw, BookOpen, AlertTriangle, CheckCircle2,
   TrendingUp, TrendingDown, Minus, Info, ChevronDown,
   ChevronRight, Send, GitBranch, BarChart3, ArrowRight,
 } from 'lucide-react';
-import { AppPage, Btn, AppTabs, GridStatBar, TAX_DEPRECIATION_RATES, TAX_DEPRECIATION_CATEGORY_LABELS } from '@ovds/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { fmtCurrency } from '../utils/fmt';
-import { Icon } from '../components/ui';
-import { useDeferredTax, postDeferredTaxEntry } from '../services/reportsApi';
-import type { DeferredTaxSummary, TemporaryDifference } from '@ovds/features/reporting';
-import api from '../services/api';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+
+import { Icon } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { useDeferredTax, postDeferredTaxEntry } from '../services/reportsApi';
+import { fmtCurrency } from '../utils/fmt';
+
+
+
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
-// -- Types ---------------------------------------------------------------------
-interface TemporaryDifference {
-  source: string;
-  assetId?: string;
-  carryingAmount: number;
-  taxBase: number;
-  difference: number;
-  type: 'TAXABLE' | 'DEDUCTIBLE';
-  deferredTax: number;
-  deferredTaxType: 'DTA' | 'DTL';
-  reversalPeriod?: string;
-  notes?: string;
-}
-
-interface RecognitionAssessment {
+// -- Local-only types (not in @ovds/features/reporting) -----------------------
+interface _RecognitionAssessment {
   dtaRecognisable: boolean;
   rationale: string;
   profitabilityScore: number;
-}
-
-interface DeferredTaxSummary {
-  companyId: string;
-  asOf: string;
-  taxRate: number;
-  differences: TemporaryDifference[];
-  totalDta: number;
-  totalDtl: number;
-  netDeferredTax: number;
-  netPosition: 'NET_DTA' | 'NET_DTL' | 'ZERO';
-  recognitionAssessment: RecognitionAssessment;
-  journalEntry?: {
-    debitAccount: string;
-    creditAccount: string;
-    amount: number;
-    description: string;
-  };
-  ifrsReference: string;
-  generatedAt: string;
 }
 
 // -- Source icon mapping -------------------------------------------------------
@@ -116,7 +87,7 @@ const DiffRow: React.FC<{
       </td>
       <td className="px-4 py-3 text-xs font-medium tabular-nums text-right">
         <span
-          className={diff.difference > 0 ? 'text-rose-600' : 'text-emerald-600'}
+          className={diff.difference > 0 ? 'text-rose-600' : 'text-[var(--pro-azure)]'}
         >
           {diff.difference > 0 ? '+' : ''}
           {fmt(diff.difference)}
@@ -127,7 +98,7 @@ const DiffRow: React.FC<{
           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
             diff.type === 'TAXABLE'
               ? 'bg-rose-50 text-rose-600 border border-rose-100'
-              : 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+              : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] border border-[var(--pro-azure-100)]'
           }`}
         >
           {diff.type === 'TAXABLE' ? (
@@ -203,7 +174,7 @@ const ReconciliationBridge: React.FC<ReconBridgeProps> = ({ accountingProfit, ta
   const BridgeRow: React.FC<{ step: string; label: string; value?: string; sub?: string; cls?: string; arrow?: boolean }> =
     ({ step, label, value, sub, cls = 'text-slate-700', arrow }) => (
     <div className={`flex items-center gap-3 px-4 py-3 border-b border-slate-50 dark:border-slate-800 last:border-0 ${arrow ? '' : ''}`}>
-      <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 text-[10px] font-black flex items-center justify-center shrink-0">{step}</div>
+      <div className="w-7 h-7 rounded-lg bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure)] text-[10px] font-black flex items-center justify-center shrink-0">{step}</div>
       <div className="flex-1 min-w-0">
         <p className={`text-xs font-semibold ${cls}`}>{label}</p>
         {sub && <p className="text-[10px] text-slate-400 mt-0.5">{sub}</p>}
@@ -217,7 +188,7 @@ const ReconciliationBridge: React.FC<ReconBridgeProps> = ({ accountingProfit, ta
       {/* Bridge visual */}
       <div className="ovds-widget-card overflow-hidden">
         <div className="ovds-widget-header">
-          <GitBranch size={14} className="text-indigo-500" />
+          <GitBranch size={14} className="text-[var(--pro-azure)]" />
           <h3 className="ovds-card-title">IAS 12.79 — Tax Reconciliation Bridge</h3>
           <span className="ovds-caption ml-auto">Accounting profit → Taxable income → CIT 30%</span>
         </div>
@@ -231,7 +202,7 @@ const ReconciliationBridge: React.FC<ReconBridgeProps> = ({ accountingProfit, ta
           </div>
           {PERMANENT_ITEMS.map((item, i) => (
             <div key={i} className="flex items-center gap-3 px-4 py-2.5">
-              <span className={`text-[10px] font-bold w-4 shrink-0 ${item.adj === '+' ? 'text-rose-500' : 'text-emerald-500'}`}>{item.adj}</span>
+              <span className={`text-[10px] font-bold w-4 shrink-0 ${item.adj === '+' ? 'text-rose-500' : 'text-[var(--pro-azure)]'}`}>{item.adj}</span>
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] font-medium text-slate-600 dark:text-slate-300">{item.label}</p>
                 <p className="text-[10px] text-slate-400">{item.note}</p>
@@ -244,7 +215,7 @@ const ReconciliationBridge: React.FC<ReconBridgeProps> = ({ accountingProfit, ta
           </div>
           {TEMPORARY_ITEMS.map((item, i) => (
             <div key={i} className="flex items-center gap-3 px-4 py-2.5">
-              <span className={`text-[10px] font-bold w-4 shrink-0 ${item.adj === '+' ? 'text-rose-500' : item.adj === '−' ? 'text-emerald-500' : 'text-slate-400'}`}>{item.adj}</span>
+              <span className={`text-[10px] font-bold w-4 shrink-0 ${item.adj === '+' ? 'text-rose-500' : item.adj === '−' ? 'text-[var(--pro-azure)]' : 'text-slate-400'}`}>{item.adj}</span>
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] font-medium text-slate-600 dark:text-slate-300">{item.label}</p>
                 <p className="text-[10px] text-slate-400">{item.note}</p>
@@ -294,8 +265,8 @@ const ReconciliationBridge: React.FC<ReconBridgeProps> = ({ accountingProfit, ta
             </tbody>
           </table>
         </div>
-        <div className="px-4 py-3 bg-indigo-50 border-t border-indigo-100">
-          <p className="text-[10px] text-indigo-600">
+        <div className="px-4 py-3 bg-[var(--pro-azure-50)] border-t border-[var(--pro-azure-100)]">
+          <p className="text-[10px] text-[var(--pro-azure)]">
             IAS 12.81(c) requires disclosure of the numerical reconciliation between tax expense and accounting profit × statutory rate. MAT applies if 2.5% × gross turnover &gt; regular CIT.
           </p>
         </div>
@@ -340,7 +311,7 @@ const DualDepreciationTab: React.FC<{ companyId?: string }> = ({ companyId }) =>
   const rows = assets.map((a: any) => {
     const cost     = Number(a.purchaseCost ?? 0);
     const nbv      = Number(a.netBookValue ?? cost);
-    const accDepr  = Number(a.accumulatedDepreciation ?? 0);
+    const _accDepr  = Number(a.accumulatedDepreciation ?? 0);
     const taxCat   = mapCategory(a.category ?? '');
     const taxRate  = TAX_DEPRECIATION_RATES[taxCat];
     const taxDepr  = nbv * taxRate;          // declining balance on NBV
@@ -381,10 +352,10 @@ const DualDepreciationTab: React.FC<{ companyId?: string }> = ({ companyId }) =>
         <div className="ovds-widget-card p-4">
           <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">IFRS Book — IAS 16</p>
           <ul className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
-            <li className="flex gap-2"><span className="text-emerald-500 font-bold shrink-0">✓</span>Component-based straight-line depreciation</li>
-            <li className="flex gap-2"><span className="text-emerald-500 font-bold shrink-0">✓</span>Based on specific useful life per component</li>
-            <li className="flex gap-2"><span className="text-emerald-500 font-bold shrink-0">✓</span>Revaluation model allowed (IAS 16.31)</li>
-            <li className="flex gap-2"><span className="text-emerald-500 font-bold shrink-0">✓</span>Impairment testing required (IAS 36)</li>
+            <li className="flex gap-2"><span className="text-[var(--pro-azure)] font-bold shrink-0">✓</span>Component-based straight-line depreciation</li>
+            <li className="flex gap-2"><span className="text-[var(--pro-azure)] font-bold shrink-0">✓</span>Based on specific useful life per component</li>
+            <li className="flex gap-2"><span className="text-[var(--pro-azure)] font-bold shrink-0">✓</span>Revaluation model allowed (IAS 16.31)</li>
+            <li className="flex gap-2"><span className="text-[var(--pro-azure)] font-bold shrink-0">✓</span>Impairment testing required (IAS 36)</li>
             <li className="flex gap-2"><span className="text-sky-500 font-bold shrink-0">→</span>Drives IFRS financial statements</li>
           </ul>
         </div>
@@ -440,10 +411,10 @@ const DualDepreciationTab: React.FC<{ companyId?: string }> = ({ companyId }) =>
                         </span>
                       </td>
                       <td className="px-3 py-2.5 tabular-nums text-right text-slate-600">{fmt(r.nbv)}</td>
-                      <td className="px-3 py-2.5 tabular-nums text-right text-emerald-700 dark:text-emerald-400 font-semibold">{fmt(r.ifrsDepr)}</td>
+                      <td className="px-3 py-2.5 tabular-nums text-right text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] font-semibold">{fmt(r.ifrsDepr)}</td>
                       <td className="px-3 py-2.5 tabular-nums text-right text-amber-700 dark:text-amber-400 font-semibold">{fmt(r.taxDepr)}</td>
                       <td className="px-3 py-2.5 tabular-nums text-right">
-                        <span className={r.tempDiff > 0 ? 'text-rose-600' : r.tempDiff < 0 ? 'text-emerald-600' : 'text-slate-300'}>
+                        <span className={r.tempDiff > 0 ? 'text-rose-600' : r.tempDiff < 0 ? 'text-[var(--pro-azure)]' : 'text-slate-300'}>
                           {r.tempDiff > 0 ? '+' : ''}{fmt(r.tempDiff)}
                         </span>
                       </td>
@@ -462,10 +433,10 @@ const DualDepreciationTab: React.FC<{ companyId?: string }> = ({ companyId }) =>
               <tfoot>
                 <tr className="bg-slate-800 dark:bg-slate-700 border-t border-slate-200">
                   <td colSpan={4} className="px-3 py-3 text-white font-black text-[11px] uppercase">Total</td>
-                  <td className="px-3 py-3 tabular-nums text-right font-black text-emerald-400">{fmt(totIfrs)}</td>
+                  <td className="px-3 py-3 tabular-nums text-right font-black text-[var(--pro-azure-light)]">{fmt(totIfrs)}</td>
                   <td className="px-3 py-3 tabular-nums text-right font-black text-amber-400">{fmt(totTax)}</td>
                   <td className="px-3 py-3 tabular-nums text-right font-black">
-                    <span className={totDiff > 0 ? 'text-rose-400' : totDiff < 0 ? 'text-emerald-400' : 'text-slate-400'}>
+                    <span className={totDiff > 0 ? 'text-rose-400' : totDiff < 0 ? 'text-[var(--pro-azure-light)]' : 'text-slate-400'}>
                       {totDiff > 0 ? '+' : ''}{fmt(totDiff)}
                     </span>
                   </td>
@@ -514,6 +485,7 @@ const DeferredTax: React.FC = () => {
   // Re-fetch when date changes
   useEffect(() => {
     refetch();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asOf]);
 
   // Load reconciliation data from BIT endpoint
@@ -566,7 +538,7 @@ const DeferredTax: React.FC = () => {
       title="Deferred Tax"
       subtitle="IAS 12 — Temporary differences · Reconciliation bridge · Dual depreciation (Art. 25) · Accounting & ovds Software · Banking & ovds · Healthcare & Pharmaceuticals · Market Value · Strategic Insights"
       icon={<BookOpen size={18} />}
-      iconBg="bg-indigo-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       crumbs={[{ label: 'IFRS & Standards' }, { label: 'Deferred Tax' }]}
       tabs={
         <AppTabs
@@ -586,7 +558,7 @@ const DeferredTax: React.FC = () => {
             type="date"
             value={asOf}
             onChange={(e) => setAsOf(e.target.value)}
-            className="px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+            className="px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)]"
           />
           {activeTab === 'position' && (
             <>
@@ -696,14 +668,14 @@ const DeferredTax: React.FC = () => {
           <div
             className={`flex items-start gap-3 px-4 py-3 rounded-xl border text-sm ${
               data.recognitionAssessment.dtaRecognisable
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'
                 : 'bg-amber-50 border-amber-200 text-amber-800'
             }`}
           >
             {data.recognitionAssessment.dtaRecognisable ? (
               <CheckCircle2
                 size={16}
-                className="shrink-0 mt-0.5 text-emerald-600"
+                className="shrink-0 mt-0.5 text-[var(--pro-azure)]"
               />
             ) : (
               <AlertTriangle
@@ -930,7 +902,7 @@ const DeferredTax: React.FC = () => {
 
         {/* -- IFRS reference footer -- */}
         {data?.ifrsReference && (
-          <div className="flex gap-3 px-4 py-3 bg-indigo-50 border border-indigo-100 rounded-xl text-xs text-indigo-600">
+          <div className="flex gap-3 px-4 py-3 bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-xl text-xs text-[var(--pro-azure)]">
             <Info size={13} className="shrink-0 mt-0.5" />
             <span>{data.ifrsReference}</span>
           </div>
@@ -957,7 +929,7 @@ const DeferredTax: React.FC = () => {
                     value={f.val || ''}
                     onChange={e => f.setter(parseFloat(e.target.value) || 0)}
                     placeholder="0.00"
-                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400/20"
+                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20"
                   />
                 </div>
               ))}

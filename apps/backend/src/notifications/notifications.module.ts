@@ -1,27 +1,29 @@
-import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
-import { JwtModule } from '@nestjs/jwt';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 
 import { PrismaModule } from '../common/prisma.module';
-import { NOTIFICATION_QUEUE } from './notification.jobs';
+
 
 // Gateway
-import { NotificationGateway }          from './notification.gateway';
 // Channels
 import { EmailChannel }                 from './channels/email.channel';
-import { WhatsAppChannel }              from './channels/whatsapp.channel';
-import { SmsChannel }                   from './channels/sms.channel';
-import { PushChannel }                  from './channels/push.channel';
 import { InAppChannel }                 from './channels/in-app.channel';
+import { PushChannel }                  from './channels/push.channel';
+import { SmsChannel }                   from './channels/sms.channel';
+import { WhatsAppChannel }              from './channels/whatsapp.channel';
 // Core services
-import { NotificationDispatchService }  from './notification-dispatch.service';
-import { NotificationService }          from './notification.service';
-import { NotificationProcessor }        from './notification.processor';
-import { NotificationEventListener }    from './notification-event.listener';
-import { NotificationScheduler }        from './notification.scheduler';
-import { NotificationController }       from './notification.controller';
 import { NotificationAdminService }     from './notification-admin.service';
+import { NotificationDispatchService }  from './notification-dispatch.service';
+import { NotificationEventListener }    from './notification-event.listener';
+import { NotificationController }       from './notification.controller';
+import { NotificationGateway }          from './notification.gateway';
+import { NOTIFICATION_QUEUE } from './notification.jobs';
+import { NotificationProcessor }        from './notification.processor';
+import { NotificationScheduler }        from './notification.scheduler';
+import { NotificationService }          from './notification.service';
+import { RealtimeGateway }              from './realtime.gateway';
 
 /** Injection token so services can check at runtime whether Redis is available. */
 export const REDIS_ENABLED_TOKEN = 'REDIS_ENABLED';
@@ -49,6 +51,7 @@ const redisEnabled = process.env['REDIS_ENABLED'] === 'true';
     { provide: REDIS_ENABLED_TOKEN, useValue: redisEnabled },
     // Gateway (WebSocket)
     NotificationGateway,
+    RealtimeGateway,
     // Channels
     EmailChannel,
     WhatsAppChannel,
@@ -65,6 +68,6 @@ const redisEnabled = process.env['REDIS_ENABLED'] === 'true';
     NotificationScheduler,
     NotificationAdminService,
   ],
-  exports: [NotificationService],
+  exports: [NotificationService, RealtimeGateway],
 })
 export class NotificationsModule {}

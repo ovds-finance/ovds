@@ -114,7 +114,7 @@ export function ExportMenu({
             <Download size={14} />
             <span>Export</span>
             {selectedCount > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full bg-aki-blue-50 dark:bg-aki-blue-950/30 text-aki-blue dark:text-blue-400 text-[10px] font-bold">
+              <span className="px-1.5 py-0.5 rounded-full bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]-950/30 text-[var(--pro-azure)] dark:text-blue-400 text-[10px] font-bold">
                 {selectedCount}
               </span>
             )}
@@ -137,7 +137,7 @@ export function ExportMenu({
                 className={cn(
                   'w-7 h-7 rounded-lg flex items-center justify-center transition-all',
                   showAdvanced
-                    ? 'bg-aki-blue-50 dark:bg-aki-blue-950/30 text-aki-blue dark:text-blue-400'
+                    ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]-950/30 text-[var(--pro-azure)] dark:text-blue-400'
                     : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800',
                 )}
               >
@@ -157,14 +157,14 @@ export function ExportMenu({
                   className={cn(
                     'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all',
                     format === f.value
-                      ? 'bg-aki-blue-50 dark:bg-aki-blue-950/30 text-aki-blue dark:text-blue-400'
+                      ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]-950/30 text-[var(--pro-azure)] dark:text-blue-400'
                       : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800',
                   )}
                 >
                   <div className={cn(
                     'w-8 h-8 rounded-xl flex items-center justify-center shrink-0',
                     format === f.value
-                      ? 'bg-aki-blue-100 dark:bg-aki-blue-900/50'
+                      ? 'bg-[var(--pro-azure-100)] dark:bg-[var(--pro-azure)]-900/50'
                       : 'bg-slate-100 dark:bg-slate-800',
                   )}>
                     <f.icon size={14} />
@@ -191,7 +191,7 @@ export function ExportMenu({
                         className={cn(
                           'px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all',
                           selectedCols.includes(col.key) || selectedCols.length === 0
-                            ? 'bg-aki-blue-50 dark:bg-aki-blue-950/30 text-aki-blue dark:text-blue-400 border border-aki-blue-200 dark:border-aki-blue-800'
+                            ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]-950/30 text-[var(--pro-azure)] dark:text-blue-400 border border-[var(--pro-azure)]-200 dark:border-[var(--pro-azure)]-800'
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-transparent',
                         )}
                       >
@@ -208,7 +208,7 @@ export function ExportMenu({
                   onClick={() => setIncludeHeaders(!includeHeaders)}
                   className={cn(
                     'w-9 h-5 rounded-full transition-all relative',
-                    includeHeaders ? 'bg-aki-blue' : 'bg-slate-200 dark:bg-slate-700',
+                    includeHeaders ? 'bg-[var(--pro-azure)]' : 'bg-slate-200 dark:bg-slate-700',
                   )}
                 >
                   <span
@@ -227,7 +227,7 @@ export function ExportMenu({
                 <select
                   value={dateFormat}
                   onChange={(e) => setDateFormat(e.target.value)}
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[12px] text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-aki-blue/20"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[12px] text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20"
                 >
                   <option value="YYYY-MM-DD">YYYY-MM-DD</option>
                   <option value="DD/MM/YYYY">DD/MM/YYYY</option>
@@ -242,7 +242,7 @@ export function ExportMenu({
             <button
               onClick={handleExport}
               disabled={exporting}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-aki-blue text-white rounded-xl text-[12px] font-semibold hover:bg-aki-blue-dark disabled:opacity-50 transition-all shadow-sm shadow-aki-blue/20"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-[12px] font-semibold hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 transition-all shadow-sm shadow-[var(--pro-azure)]/20"
             >
               <Download size={14} />
               Export as {format}

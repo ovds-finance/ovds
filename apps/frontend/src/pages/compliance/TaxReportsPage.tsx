@@ -1,16 +1,17 @@
-import React from 'react';
-import toast from 'react-hot-toast';
-import { useBusiness } from '../../context/businessContext';
 import { useEimsRegistrations, useEimsCertificateExpiry } from '@ovds/features/eims';
 import {
   BarChart2, ExternalLink, FileText, Shield, AlertTriangle, CheckCircle2,
 } from 'lucide-react';
+import React from 'react';
+import toast from 'react-hot-toast';
+
+import { useBusiness } from '../../context/businessContext';
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING: 'text-amber-600 bg-amber-50',
-  REGISTERED: 'text-emerald-600 bg-emerald-50',
+  REGISTERED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   FAILED: 'text-rose-600 bg-rose-50',
-  COMPLETED: 'text-emerald-600 bg-emerald-50',
+  COMPLETED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   CANCELLED: 'text-slate-600 bg-slate-100',
 };
 
@@ -22,7 +23,7 @@ const Badge: React.FC<{ status: string }> = ({ status }) => (
 
 const TaxReportsPage: React.FC = () => {
   const { selectedCompanyId } = useBusiness();
-  const { data: registrations = [], refetch: refetchRegs } = useEimsRegistrations();
+  const { data: registrations = [], refetch: _refetchRegs } = useEimsRegistrations();
   const { data: expiringCerts = [] } = useEimsCertificateExpiry();
 
   const registered = registrations.filter((r: any) => r.status === 'REGISTERED').length;
@@ -57,7 +58,7 @@ const TaxReportsPage: React.FC = () => {
 
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Registered', value: registered, color: 'text-emerald-600' },
+          { label: 'Registered', value: registered, color: 'text-[var(--pro-azure)]' },
           { label: 'Pending', value: pending, color: 'text-amber-600' },
           { label: 'Failed', value: failed, color: 'text-rose-600' },
         ].map((s) => (

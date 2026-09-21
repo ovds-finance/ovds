@@ -1,10 +1,11 @@
-import React, { useCallback, useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Sparkles,
   CheckCircle2, ArrowRight, Zap, Receipt,
   Banknote, ShieldAlert, X, RotateCcw, ShieldCheck, Globe, FileText,
 } from 'lucide-react';
+import React, { useCallback, useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+
 import { useLocalStorage } from '../../hooks';
 import { useFinancialAlerts, type AlertSeverity } from '../../hooks/useFinancialAlerts';
 
@@ -55,20 +56,20 @@ const SEVERITY_STYLES: Record<AlertSeverity, {
     leftBar: 'bg-amber-400',
   },
   info: {
-    bg: 'bg-emerald-50 dark:bg-emerald-950/20',
-    border: 'border-emerald-200 dark:border-emerald-800/60',
-    iconBg: 'bg-emerald-100 dark:bg-emerald-900/50',
-    iconText: 'text-emerald-600 dark:text-emerald-400 dark:text-emerald-400',
-    badge: 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900',
-    leftBar: 'bg-emerald-400',
+    bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20',
+    border: 'border-[var(--pro-azure-100)] dark:border-green-800/60',
+    iconBg: 'bg-[var(--pro-azure-100)] dark:bg-green-900/50',
+    iconText: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+    badge: 'bg-[var(--pro-azure-100)] dark:bg-green-900/50 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] dark:text-green-300 hover:bg-[var(--pro-azure-200)] dark:hover:bg-green-900',
+    leftBar: 'bg-[var(--pro-azure-light)]',
   },
   success: {
-    bg: 'bg-emerald-50 dark:bg-emerald-950/20',
-    border: 'border-emerald-200 dark:border-emerald-800/60',
-    iconBg: 'bg-emerald-100 dark:bg-emerald-900/50',
-    iconText: 'text-emerald-600 dark:text-emerald-400',
-    badge: 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300',
-    leftBar: 'bg-emerald-400',
+    bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20',
+    border: 'border-[var(--pro-azure-100)] dark:border-green-800/60',
+    iconBg: 'bg-[var(--pro-azure-100)] dark:bg-green-900/50',
+    iconText: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+    badge: 'bg-[var(--pro-azure-100)] dark:bg-green-900/50 text-[var(--pro-azure-dark)] dark:text-green-300',
+    leftBar: 'bg-[var(--pro-azure-light)]',
   },
 };
 
@@ -177,8 +178,8 @@ const SmartAlertsWidget: React.FC<SmartAlertsWidgetProps> = ({
             </span>
           )}
           {criticalCount === 0 && warningCount === 0 && (
-            <span className="flex items-center gap-1 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 text-[10px] font-medium rounded-full">
-              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+            <span className="flex items-center gap-1 px-2 py-0.5 bg-[var(--pro-azure-100)] dark:bg-green-950/50 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] text-[10px] font-medium rounded-full">
+              <span className="w-1.5 h-1.5 bg-[var(--pro-azure-50)]0 rounded-full animate-pulse" />
               All clear
             </span>
           )}
@@ -224,7 +225,7 @@ const SmartAlertsWidget: React.FC<SmartAlertsWidgetProps> = ({
             <p className="text-xs text-slate-500 dark:text-slate-400">All alerts dismissed.</p>
             <button
               onClick={handleRestoreAll}
-              className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+              className="flex items-center gap-1.5 text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline"
             >
               <RotateCcw size={10} /> Restore
             </button>
@@ -241,7 +242,7 @@ const SmartAlertsWidget: React.FC<SmartAlertsWidgetProps> = ({
           </p>
         </div>
         {dismissedIds.size > 0 && (
-          <button onClick={handleRestoreAll} className="flex items-center gap-0.5 text-[9px] font-bold text-slate-400 hover:text-emerald-600 transition-colors">
+          <button onClick={handleRestoreAll} className="flex items-center gap-0.5 text-[9px] font-bold text-slate-400 hover:text-[var(--pro-azure)] transition-colors">
             <RotateCcw size={8} /> {dismissedIds.size} hidden · restore
           </button>
         )}

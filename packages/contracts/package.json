@@ -49,5 +49,8 @@
     "@orpc/contract": "1.15.0",
     "@orpc/zod": "1.15.0",
     "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "tsx": "4.23.12"
   }
 }

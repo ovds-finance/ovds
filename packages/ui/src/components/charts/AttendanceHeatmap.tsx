@@ -21,8 +21,8 @@ export const AttendanceHeatmap: React.FC<WeeklyHeatmapProps> = ({ data, loading 
     if (!row) return 'bg-slate-100 dark:bg-slate-800';
     const total = row.present + row.late + row.absent || 1;
     const rate = (row.present + row.late) / total;
-    if (rate >= 0.9) return 'bg-emerald-500';
-    if (rate >= 0.7) return 'bg-emerald-300';
+    if (rate >= 0.9) return 'bg-[var(--pro-azure)]';
+    if (rate >= 0.7) return 'bg-[var(--pro-azure-light)]';
     if (rate >= 0.5) return 'bg-amber-400';
     if (rate > 0) return 'bg-rose-400';
     return 'bg-slate-100 dark:bg-slate-800';
@@ -36,7 +36,7 @@ export const AttendanceHeatmap: React.FC<WeeklyHeatmapProps> = ({ data, loading 
           <p className="text-sm font-semibold text-ovds-text-main dark:text-ovds-surface mt-0.5">Last 4 Weeks</p>
         </div>
         <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400">
-          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-emerald-500 inline-block" />High</span>
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-[var(--pro-azure)] inline-block" />High</span>
           <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-amber-400 inline-block" />Mid</span>
           <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-rose-400 inline-block" />Low</span>
         </div>

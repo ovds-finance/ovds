@@ -1,11 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import api from '../services/api';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useAuditLog } from '../hooks/useAuditLog';
-import { useInterval } from '../hooks';
-import { AppPage, Btn } from '../components/ui';
-import {
+﻿import {
   Activity, AlertTriangle, ArrowUp, BarChart3, Banknote,
   Building2, CheckCircle2, ChevronDown, ChevronUp,
   ExternalLink, FileText, HeartHandshake, Landmark,
@@ -13,6 +6,13 @@ import {
   ShieldAlert, ShieldCheck, Star, TrendingUp, User,
   Users, Zap, Download,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+
+import { AppPage, Btn } from '../components/ui';
+import { useAuditLog } from '../hooks/useAuditLog';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('en-ET', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n);
@@ -107,24 +107,24 @@ const CredibilityDashboard: React.FC<{ refetchInterval?: number }> = ({ refetchI
       value: s.activePartnerships ?? '—',
       sub: `of ${s.totalPartnerships ?? 0} total`,
       icon: <HeartHandshake size={15} />,
-      iconBg: 'bg-emerald-50 dark:bg-emerald-950/30',
-      color: 'text-emerald-600 dark:text-emerald-400',
+      iconBg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
+      color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
     },
     {
       label: 'Credibility Score',
       value: `${s.avgCredibilityScore ?? '—'}/100`,
       sub: 'partnership health',
       icon: <Star size={15} />,
-      iconBg: s.avgCredibilityScore >= 70 ? 'bg-emerald-50' : 'bg-amber-50',
-      color: s.avgCredibilityScore >= 70 ? 'text-emerald-600' : 'text-amber-600',
+      iconBg: s.avgCredibilityScore >= 70 ? 'bg-[var(--pro-azure-50)]' : 'bg-amber-50',
+      color: s.avgCredibilityScore >= 70 ? 'text-[var(--pro-azure)]' : 'text-amber-600',
     },
     {
       label: 'Credit Score',
       value: `${s.avgCreditScore ?? '—'}/100`,
       sub: 'bank loan scoring',
       icon: <Landmark size={15} />,
-      iconBg: s.avgCreditScore >= 70 ? 'bg-emerald-50' : 'bg-amber-50',
-      color: s.avgCreditScore >= 70 ? 'text-emerald-600' : 'text-amber-600',
+      iconBg: s.avgCreditScore >= 70 ? 'bg-[var(--pro-azure-50)]' : 'bg-amber-50',
+      color: s.avgCreditScore >= 70 ? 'text-[var(--pro-azure)]' : 'text-amber-600',
     },
     {
       label: 'Total Investment',
@@ -152,8 +152,8 @@ const CredibilityDashboard: React.FC<{ refetchInterval?: number }> = ({ refetchI
       {/* Header */}
       <div className="ovds-toolbar px-5 py-3">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg flex items-center justify-center">
-            <Activity size={14} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="w-7 h-7 bg-[var(--pro-azure-50)] dark:bg-green-950/30 rounded-lg flex items-center justify-center">
+            <Activity size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-800 dark:text-slate-100">Live Credibility Dashboard</p>
@@ -212,7 +212,7 @@ const CredibilityDashboard: React.FC<{ refetchInterval?: number }> = ({ refetchI
           <div className="flex flex-wrap gap-2 mt-3">
             {data.topCustomers.map((c: any) => (
               <div key={c.id} className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg">
-                <div className="w-6 h-6 bg-indigo-100 dark:bg-indigo-900/40 rounded-md flex items-center justify-center text-[10px] font-bold text-indigo-700 dark:text-indigo-300">
+                <div className="w-6 h-6 bg-[var(--pro-azure-100)] dark:bg-green-900/40 rounded-md flex items-center justify-center text-[10px] font-bold text-[var(--pro-azure-dark)] dark:text-green-300">
                   {c.name[0]}
                 </div>
                 <div>
@@ -227,13 +227,13 @@ const CredibilityDashboard: React.FC<{ refetchInterval?: number }> = ({ refetchI
 
       {/* Quick links */}
       <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 flex gap-2 flex-wrap">
-        <Link to="/ovds/partnerships" className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-[11px] font-semibold hover:bg-emerald-600 transition-colors">
+        <Link to="/ovds/partnerships" className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-50)]0 text-white rounded-lg text-[11px] font-semibold hover:bg-[var(--pro-azure)] transition-colors">
           <HeartHandshake size={12} /> Partnerships
         </Link>
         <Link to="/ovds/loans" className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 dark:bg-slate-700 text-white rounded-lg text-[11px] font-semibold hover:bg-slate-700 transition-colors">
           <Landmark size={12} /> Business Loans
         </Link>
-        <Link to="/ovds/investments" className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-[11px] font-semibold hover:bg-emerald-600 transition-colors">
+        <Link to="/ovds/investments" className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-50)]0 text-white rounded-lg text-[11px] font-semibold hover:bg-[var(--pro-azure)] transition-colors">
           <TrendingUp size={12} /> Investments
         </Link>
       </div>
@@ -245,7 +245,7 @@ const CredibilityDashboard: React.FC<{ refetchInterval?: number }> = ({ refetchI
 const sections = [
   {
     id: 'partnerships',
-    icon: <HeartHandshake size={18} className="text-emerald-600 dark:text-emerald-400" />,
+    icon: <HeartHandshake size={18} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />,
     title: '1. Partnerships',
     points: [
       'Business partnerships (co-founders, suppliers, joint ventures) strengthen organizational capacity.',
@@ -255,7 +255,7 @@ const sections = [
   },
   {
     id: 'customers',
-    icon: <Users size={18} className="text-emerald-600" />,
+    icon: <Users size={18} className="text-[var(--pro-azure)]" />,
     title: '2. Customers',
     points: [
       'A loyal customer base demonstrates market demand and revenue stability.',
@@ -291,33 +291,33 @@ const advice = [
 ];
 
 const tableRows = [
-  { factor: 'Partnerships', role: 'Formal agreements, clear management', impact: 'Builds trust with banks & investors', badge: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-600 dark:text-emerald-300' },
-  { factor: 'Customers', role: 'Proof of demand, loyalty, contracts', impact: 'Demonstrates repayment capacity', badge: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-600 dark:text-emerald-300' },
+  { factor: 'Partnerships', role: 'Formal agreements, clear management', impact: 'Builds trust with banks & investors', badge: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:text-[var(--pro-azure)] dark:text-green-300' },
+  { factor: 'Customers', role: 'Proof of demand, loyalty, contracts', impact: 'Demonstrates repayment capacity', badge: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:text-[var(--pro-azure)] dark:text-green-300' },
   { factor: 'Bank Loans', role: 'Require strong governance & records', impact: 'Provide capital for growth', badge: 'bg-violet-50 text-violet-700 dark:bg-violet-950/30 dark:text-violet-300' },
   { factor: 'Investments', role: 'Attracted by credibility & demand', impact: 'Fuel expansion beyond loans', badge: 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300' },
 ];
 
 const payrollRoles = [
   { key: 'payroll_admin', label: 'Payroll Admin', badge: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300', desc: 'Configure all settings, generate & approve salaries, and fetch all reports.' },
-  { key: 'payroll_pcm', label: 'Payroll Change Manager', badge: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-600 dark:text-emerald-300', desc: 'Responsible for bulk updating salary heads and configurations.' },
-  { key: 'payroll_pda', label: 'Payroll Dealing Assistant', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-600 dark:text-emerald-300', desc: 'Responsible for the initial generation of salaries.' },
+  { key: 'payroll_pcm', label: 'Payroll Change Manager', badge: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure)] dark:text-green-300', desc: 'Responsible for bulk updating salary heads and configurations.' },
+  { key: 'payroll_pda', label: 'Payroll Dealing Assistant', badge: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure)] dark:text-green-300', desc: 'Responsible for the initial generation of salaries.' },
   { key: 'payroll_pvo', label: 'Payroll Verifying Officer', badge: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300', desc: 'Reviews and verifies the generated salary details.' },
   { key: 'payroll_pfo', label: 'Payroll Finalizing Officer', badge: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/30 dark:text-orange-300', desc: 'Finalizes verified salaries for the approval stage.' },
   { key: 'payroll_ar', label: 'Payroll Approving Officer', badge: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300', desc: 'Gives final approval (AR Salary); after this, payslips are public.' },
 ];
 
 const workflowSteps = [
-  { step: 1, label: 'Generate', desc: 'PDA generates salary based on logs', color: 'bg-emerald-500' },
+  { step: 1, label: 'Generate', desc: 'PDA generates salary based on logs', color: 'bg-[var(--pro-azure-50)]0' },
   { step: 2, label: 'Verify', desc: 'PVO reviews and verifies details', color: 'bg-amber-500' },
   { step: 3, label: 'Finalize', desc: 'PFO finalizes verified salaries', color: 'bg-orange-500' },
-  { step: 4, label: 'Approve', desc: 'AR gives final approval for release', color: 'bg-emerald-500' },
+  { step: 4, label: 'Approve', desc: 'AR gives final approval for release', color: 'bg-[var(--pro-azure-50)]0' },
 ];
 
 const orgMechanisms = [
   {
     id: 'parent-subsidiary',
-    icon: <Layers size={16} className="text-emerald-600 dark:text-emerald-400" />,
-    iconBg: 'bg-emerald-50 dark:bg-emerald-950/30',
+    icon: <Layers size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />,
+    iconBg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
     title: 'Parent Company with Subsidiaries',
     desc: 'A parent company oversees several sub-companies, each focusing on a specific sector (agriculture, manufacturing, logistics).',
     advantages: ['Diversification reduces risk — banks see stability if one sector struggles.', 'Easier to attract different customer bases across industries.'],
@@ -325,8 +325,8 @@ const orgMechanisms = [
   },
   {
     id: 'partnership-group',
-    icon: <HeartHandshake size={16} className="text-emerald-600" />,
-    iconBg: 'bg-emerald-50 dark:bg-emerald-950/30',
+    icon: <HeartHandshake size={16} className="text-[var(--pro-azure)]" />,
+    iconBg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
     title: 'Partnership-Based Groups',
     desc: 'Partnerships can evolve into holding structures, where partners manage multiple ventures under one umbrella.',
     impact: ['Banks assess the strength of the partnership agreement and whether profits are reinvested.', 'Customers benefit from integrated services (e.g., a construction company with a materials subsidiary).'],
@@ -368,7 +368,7 @@ export const ESGSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'e' | 's' | 'g'>('e');
 
   const tabs: { key: 'e' | 's' | 'g'; label: string; icon: string; color: string }[] = [
-    { key: 'e', label: 'Environmental', icon: '🌿', color: 'emerald' },
+    { key: 'e', label: 'Environmental', icon: '🌿', color: 'green' },
     { key: 's', label: 'Social', icon: '🤝', color: 'blue' },
     { key: 'g', label: 'Governance', icon: '🏛️', color: 'violet' },
   ];
@@ -407,8 +407,8 @@ export const ESGSection: React.FC = () => {
   };
 
   const colorMap: Record<string, { bg: string; text: string; border: string; badge: string }> = {
-    emerald: { bg: 'bg-emerald-50 dark:bg-emerald-950/20', text: 'text-emerald-700 dark:text-emerald-600 dark:text-emerald-300', border: 'border-emerald-200 dark:border-emerald-800', badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-600 dark:text-emerald-300' },
-    blue: { bg: 'bg-emerald-50 dark:bg-emerald-950/20', text: 'text-emerald-700 dark:text-emerald-600 dark:text-emerald-300', border: 'border-emerald-200 dark:border-emerald-800', badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-600 dark:text-emerald-300' },
+    indigo: { bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20', text: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure)] dark:text-green-300', border: 'border-[var(--pro-azure-100)] dark:border-green-800', badge: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-[var(--pro-azure)] dark:text-green-300' },
+    blue: { bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20', text: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure)] dark:text-green-300', border: 'border-[var(--pro-azure-100)] dark:border-green-800', badge: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-[var(--pro-azure)] dark:text-green-300' },
     violet: { bg: 'bg-violet-50 dark:bg-violet-950/20', text: 'text-violet-700 dark:text-violet-300', border: 'border-violet-200 dark:border-violet-800', badge: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300' },
   };
 
@@ -417,11 +417,11 @@ export const ESGSection: React.FC = () => {
   const section = content[activeTab];
 
   return (
-    <div id="esg-section" className="card-accent-left accent-emerald bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+    <div id="esg-section" className="card-accent-left accent-indigo bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
       {/* Header */}
       <div className="ovds-toolbar px-5 py-4 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/30 flex items-center justify-center">
             <span className="text-base">🌍</span>
           </div>
           <div>
@@ -429,7 +429,7 @@ export const ESGSection: React.FC = () => {
             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">IFRS S1 & S2 — Sustainability Disclosures</p>
           </div>
         </div>
-        <span className="ml-auto text-[10px] font-medium px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+        <span className="ml-auto text-[10px] font-medium px-2.5 py-1 rounded-full bg-[var(--pro-azure-100)] dark:bg-green-900/40 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure)] dark:text-green-300 border border-[var(--pro-azure-100)] dark:border-green-800">
           IFRS S1 · IFRS S2 · 2024
         </span>
       </div>
@@ -486,8 +486,8 @@ export const ESGSection: React.FC = () => {
           {[
             { pillar: 'Governance', icon: '🏛️', desc: 'Board oversight of sustainability risks', color: 'violet' },
             { pillar: 'Strategy', icon: '🎯', desc: 'How risks affect business model & plans', color: 'blue' },
-            { pillar: 'Risk Mgmt', icon: '🛡️', desc: 'Processes to identify & manage risks', color: 'emerald' },
-            { pillar: 'Metrics', icon: '📊', desc: 'Quantitative targets & performance data', color: 'emerald' },
+            { pillar: 'Risk Mgmt', icon: '🛡️', desc: 'Processes to identify & manage risks', color: 'green' },
+            { pillar: 'Metrics', icon: '📊', desc: 'Quantitative targets & performance data', color: 'green' },
           ].map(({ pillar, icon, desc, color }) => {
             const pc = colorMap[color] ?? colorMap.blue;
             return (
@@ -544,7 +544,7 @@ const BusinessInsights: React.FC = () => {
       title="Business Insights"
       subtitle="Partnerships · Customers · Loans · Investments · ESG · Payroll Analytics · Business Intelligence & Analytics · Market Segmentation · Investment Trends · Revenue · Growth · Strategic Insights · Market Share · Competitive Landscape"
       icon={<BarChart3 size={18} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       crumbs={[{ label: 'Business Insights' }]}
       actions={
         <>
@@ -561,8 +561,8 @@ const BusinessInsights: React.FC = () => {
       {/* Overview accordion */}
       <AccordionCard
         id="overview"
-        icon={<Building2 size={16} className="text-emerald-600 dark:text-emerald-400" />}
-        iconBg="bg-emerald-50 dark:bg-emerald-950/30"
+        icon={<Building2 size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />}
+        iconBg="bg-[var(--pro-azure-50)] dark:bg-green-950/30"
         title="Business Credibility Overview"
         subtitle="Partnerships · Customers · Loans"
         expanded={expanded.overview}
@@ -579,7 +579,7 @@ const BusinessInsights: React.FC = () => {
                 <ul className="space-y-1">
                   {s.points.map((pt, i) => (
                     <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
-                      <CheckCircle2 size={12} className="text-emerald-500 shrink-0 mt-0.5" />
+                      <CheckCircle2 size={12} className="bg-[var(--pro-azure-50)]0 shrink-0 mt-0.5" />
                       {pt}
                     </li>
                   ))}
@@ -638,7 +638,7 @@ const BusinessInsights: React.FC = () => {
           <ul className="mt-3 space-y-2">
             {advice.map((a, i) => (
               <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
-                <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0 text-[10px] font-bold text-emerald-700 dark:text-emerald-600 dark:text-emerald-300">
+                <div className="w-5 h-5 rounded-full bg-[var(--pro-azure-100)] dark:bg-green-900/40 flex items-center justify-center shrink-0 text-[10px] font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure)] dark:text-green-300">
                   {i + 1}
                 </div>
                 {a}
@@ -670,7 +670,7 @@ const BusinessInsights: React.FC = () => {
               {m.advantages && (
                 <div className="space-y-1">
                   {m.advantages.map((a, i) => (
-                    <div key={i} className="flex items-start gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400">
+                    <div key={i} className="flex items-start gap-1.5 text-[11px] text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
                       <ShieldCheck size={11} className="shrink-0 mt-0.5" /> {a}
                     </div>
                   ))}
@@ -688,7 +688,7 @@ const BusinessInsights: React.FC = () => {
               {m.impact && (
                 <div className="space-y-1 mt-1">
                   {m.impact.map((imp, i) => (
-                    <div key={i} className="flex items-start gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400">
+                    <div key={i} className="flex items-start gap-1.5 text-[11px] text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
                       <Zap size={11} className="shrink-0 mt-0.5" /> {imp}
                     </div>
                   ))}
@@ -730,9 +730,9 @@ const BusinessInsights: React.FC = () => {
           <SectionLabel>Ethiopian Context</SectionLabel>
           <div className="ovds-grid-layout cols-3 mt-3">
             {ethiopianContext.map((ctx) => (
-              <div key={ctx.title} className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 rounded-xl">
-                <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-600 dark:text-emerald-300 mb-1">{ctx.title}</p>
-                <p className="text-[11px] text-emerald-700 dark:text-emerald-400">{ctx.desc}</p>
+              <div key={ctx.title} className="p-3 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900/40 rounded-xl">
+                <p className="text-xs font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure)] dark:text-green-300 mb-1">{ctx.title}</p>
+                <p className="text-[11px] text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">{ctx.desc}</p>
               </div>
             ))}
           </div>
@@ -742,13 +742,13 @@ const BusinessInsights: React.FC = () => {
       {/* Payroll accordion */}
       <AccordionCard
         id="payroll"
-        icon={<Banknote size={16} className="text-emerald-600 dark:text-emerald-400" />}
-        iconBg="bg-emerald-50 dark:bg-emerald-950/30"
+        icon={<Banknote size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />}
+        iconBg="bg-[var(--pro-azure-50)] dark:bg-green-950/30"
         title="Payroll Workflow & Roles"
         subtitle="RBAC · Approval Pipeline"
         expanded={expanded.payroll}
         onToggle={() => toggle('payroll')}
-        accentColor="accent-emerald"
+        accentColor="accent-indigo"
       >
         {/* Workflow steps */}
         <div>
@@ -825,13 +825,13 @@ const BusinessInsights: React.FC = () => {
       {/* ESG accordion */}
       <AccordionCard
         id="esg"
-        icon={<Shield size={16} className="text-emerald-600 dark:text-emerald-400" />}
-        iconBg="bg-emerald-50 dark:bg-emerald-950/30"
+        icon={<Shield size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />}
+        iconBg="bg-[var(--pro-azure-50)] dark:bg-green-950/30"
         title="ESG & Sustainability"
         subtitle="IFRS S1 · IFRS S2"
         expanded={expanded.esg}
         onToggle={() => toggle('esg')}
-        accentColor="accent-emerald"
+        accentColor="accent-indigo"
       >
         <ESGSection />
       </AccordionCard>

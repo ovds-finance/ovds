@@ -1,14 +1,16 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+﻿import { useTheme } from '@ovds/ui';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../rbac/AuthContext';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+
 import { useBusiness } from '../context/businessContext';
-import { useTheme } from '@ovds/ui';
 import { useClickOutside } from '../hooks';
-import LanguageSwitcher from './languageSwitcher';
-import api from '../services/api';
-import { Icon } from './ui';
 import { useNotifications } from '../hooks/useNotifications';
+import { useAuth } from '../rbac/AuthContext';
+
+import LanguageSwitcher from './languageSwitcher';
+import { Icon } from './ui';
+
 
 export interface HeaderProps {
   title: string;
@@ -17,17 +19,17 @@ export interface HeaderProps {
   onOpenSearch?: () => void;
 }
 
-// -- Quick Create Actions ------------------------------------------------------
+/* ── Quick-create items — Ovds SaaS colour vocabulary ─────────────── */
 const QUICK_CREATE = [
-  { label: 'Invoice',       icon: 'INVOICE',    to: '/sales/invoices',       color: 'bg-sky-500 text-white' },
-  { label: 'Bill',          icon: 'VENDOR',     to: '/purchases/bills',          color: 'bg-sky-500 text-white' },
-  { label: 'Expense',       icon: 'MONEY',      to: '/purchases/expenses',       color: 'bg-sky-500 text-white' },
-  { label: 'Customer',      icon: 'CUSTOMER',   to: '/accounting/hub?tab=CUSTOMERS', color: 'bg-sky-500 text-white' },
-  { label: 'Vendor',        icon: 'COMPANY',    to: '/accounting/hub?tab=VENDORS',   color: 'bg-sky-500 text-white' },
-  { label: 'Fund Transfer', icon: 'REFRESH',    to: '/banking/transfers', color: 'bg-sky-500 text-white' },
-];
+  { label: 'Invoice',       icon: 'INVOICE',  to: '/sales/invoices?action=new',          color: '#4FBA6F', bg: '#F0FDF4' },
+  { label: 'Bill',          icon: 'VENDOR',   to: '/purchases/bills?action=new',          color: '#7C3AED', bg: '#F5F3FF' },
+  { label: 'Expense',       icon: 'MONEY',    to: '/purchases/expenses?action=new',       color: '#E67E22', bg: '#FFFBEB' },
+  { label: 'Customer',      icon: 'CUSTOMER', to: '/accounting/hub?tab=CUSTOMERS',        color: '#2980B9', bg: '#EFF6FF' },
+  { label: 'Vendor',        icon: 'COMPANY',  to: '/accounting/hub?tab=VENDORS',          color: '#0891B2', bg: '#ECFEFF' },
+  { label: 'Fund Transfer', icon: 'REFRESH',  to: '/banking/transfers?action=new',        color: '#E74C3C', bg: '#FEF2F2' },
+] as const;
 
-// -- Notification Item ---------------------------------------------------------
+/* ── Notification item type ───────────────────────────────────────────── */
 interface NotifItem {
   id: string;
   title: string;
@@ -38,14 +40,44 @@ interface NotifItem {
   actionUrl?: string;
 }
 
-const NOTIF_ICON: Record<string, any> = {
-  info:    'INFO',
-  warning: 'WARNING',
-  success: 'SUCCESS',
-  error:   'DANGER',
+const _NOTIF_ICON: Record<string, string> = {
+  info: 'INFO', warning: 'WARNING', success: 'SUCCESS', error: 'DANGER',
 };
 
-// -- Header --------------------------------------------------------------------
+/* ── Notification type badge colours — green for info ───── */
+const NOTIF_DOT: Record<string, string> = {
+  info: '#4FBA6F', warning: '#E67E22', success: '#059669', error: '#E74C3C',
+};
+
+/* ── Role badge map ───────────────────────────────────────────────────── */
+const ROLE_BADGE: Record<string, { label: string; color: string; bg: string }> = {
+  SPURADMIN:    { label: 'SysAdmin',   color: '#BE123C',          bg: '#FFF1F2' },
+  SUPERADMIN:   { label: 'SuperAdmin', color: '#BE123C',          bg: '#FFF1F2' },
+  ADMIN:        { label: 'Admin',      color: '#4FBA6F',          bg: '#F0FDF4' },
+  HR:           { label: 'HR',         color: '#065F46',          bg: '#ECFDF5' },
+  ovds:         { label: 'OVDS',       color: '#4FBA6F',       bg: '#F0FDF4' },
+  ACCOUNTING:   { label: 'Accounting', color: '#5B21B6',          bg: '#F5F3FF' },
+  EMPLOYEE:     { label: 'Employee',   color: '#065F46',          bg: '#ECFDF5' },
+  AUDITOR:      { label: 'Auditor',    color: '#92400E',          bg: '#FFFBEB' },
+  IFRS_OFFICER: { label: 'IFRS',       color: '#4FBA6F',       bg: '#F0FDF4' },
+};
+
+/* ── Shared dropdown container styles — Ovds SaaS clean white card ── */
+const DROPDOWN_STYLE: React.CSSProperties = {
+  position: 'absolute',
+  right: 0,
+  top: 'calc(100% + 6px)',
+  background: 'var(--surface)',
+  border: '1px solid var(--border)',
+  borderRadius: 8,
+  boxShadow: '0 8px 24px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)',
+  zIndex: 200,
+  overflow: 'hidden',
+  animation: 'aki-enter 150ms cubic-bezier(0.16,1,0.3,1) both',
+};
+
+/* ─────────────────────────────────────────────────────────────────────── */
+
 const Header: React.FC<HeaderProps> = ({
   title,
   onMobileMenuToggle,
@@ -61,13 +93,11 @@ const Header: React.FC<HeaderProps> = ({
 
   const company = companies.find(c => c.id === selectedCompanyId);
 
-  // -- Dropdown states --------------------------------------------------------
-  const [showNotifs, setShowNotifs]       = useState(false);
-  const [showProfile, setShowProfile]     = useState(false);
+  const [showNotifs,      setShowNotifs]      = useState(false);
+  const [showProfile,     setShowProfile]     = useState(false);
   const [showQuickCreate, setShowQuickCreate] = useState(false);
-  const [showCompany, setShowCompany]     = useState(false);
+  const [showCompany,     setShowCompany]     = useState(false);
 
-  // -- Notifications (real-time via WebSocket + REST fallback) ---------------
   const {
     notifications: notifItems,
     unreadCount,
@@ -77,18 +107,12 @@ const Header: React.FC<HeaderProps> = ({
     refresh: fetchNotifs,
   } = useNotifications(!!user);
 
-  // Map hook notifications to the header's internal shape
-  const notifs = notifItems.map(n => ({
-    id:        n.id,
-    title:     n.title,
-    body:      n.message,
-    type:      'info' as const,
-    read:      n.isRead,
-    createdAt: n.createdAt,
-    actionUrl: n.link,
+  const notifs: NotifItem[] = notifItems.map(n => ({
+    id: n.id, title: n.title, body: n.message,
+    type: 'info' as const, read: n.isRead,
+    createdAt: n.createdAt, actionUrl: n.link,
   }));
 
-  // -- Click-outside refs -----------------------------------------------------
   const notifsRef      = useRef<HTMLDivElement>(null);
   const profileRef     = useRef<HTMLDivElement>(null);
   const quickCreateRef = useRef<HTMLDivElement>(null);
@@ -99,7 +123,6 @@ const Header: React.FC<HeaderProps> = ({
   useClickOutside(quickCreateRef, () => setShowQuickCreate(false));
   useClickOutside(companyRef,     () => setShowCompany(false));
 
-  // Close all dropdowns on route change
   useEffect(() => {
     setShowNotifs(false);
     setShowProfile(false);
@@ -107,107 +130,213 @@ const Header: React.FC<HeaderProps> = ({
     setShowCompany(false);
   }, [location.pathname]);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  const handleLogout = () => { logout(); navigate('/login'); };
+  const roleBadge = ROLE_BADGE[user?.role ?? ''] ?? { label: user?.role ?? '', color: '#64748B', bg: '#F1F5F9' };
 
-  const ROLE_BADGE: Record<string, { label: string; cls: string }> = {
-    SPURADMIN:  { label: 'SysAdmin',  cls: 'bg-rose-50 text-rose-600' },
-    SUPERADMIN: { label: 'SuperAdmin',cls: 'bg-rose-50 text-rose-600' },
-    ADMIN:      { label: 'Admin',     cls: 'bg-sky-50 text-sky-600' },
-    HR:        { label: 'HR',       cls: 'bg-emerald-200/20 text-slate-800' },
-    ovds:   { label: 'ovds',  cls: 'bg-emerald-200/20 text-slate-800' },
-    ACCOUNTING:{ label: 'Accounting',cls:'bg-emerald-200/20 text-slate-800' },
-    EMPLOYEE:  { label: 'Employee', cls: 'bg-emerald-200/10 text-emerald-600' },
-    AUDITOR:   { label: 'Auditor',  cls: 'bg-amber-50 text-amber-600' },
-    IFRS_OFFICER: { label: 'IFRS', cls: 'bg-sky-50 text-sky-600' },
-  };
-  const roleBadge = ROLE_BADGE[user?.role ?? ''] ?? { label: user?.role ?? '', cls: 'bg-ovds-muted text-slate-800' };
+  /* ── icon button shared style ─────────────────────────────────────── */
+  const iconBtnCls = `
+    w-8 h-8 flex items-center justify-center rounded-lg transition-all
+    hover:bg-[var(--surface-alt)] active:scale-95
+  `;
 
   return (
-    <header 
-      style={{ zIndex: 80 }}
-      className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 lg:px-5 sticky top-0 h-12 transition-colors duration-200"
+    <header
+      style={{
+        zIndex: 80,
+        height: 'var(--header-h)',
+        background: 'var(--header-bg)',
+        borderBottom: '1px solid var(--header-border)',
+        boxShadow: 'var(--header-shadow)',
+        position: 'sticky',
+        top: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 24px',
+        gap: 8,
+      }}
     >
+      {/* ── Left ────────────────────────────────────────────────────── */}
+      <div className="flex items-center gap-3 min-w-0">
 
-      {/* -- Left: Mobile Toggle + Page Title + Search --------------- */}
-      <div className="flex items-center gap-2 min-w-0">
+        {/* Mobile hamburger */}
         <button
           onClick={onMobileMenuToggle}
-          className="lg:hidden p-1.5 rounded-lg text-ovds-text-muted dark:text-ovds-text-subtle hover:bg-ovds-muted dark:hover:bg-ovds-muted-dark transition-colors"
+          className={`${iconBtnCls} lg:hidden`}
           aria-label="Toggle menu"
+          style={{ color: 'var(--text-3)' }}
         >
-          {sidebarOpen ? <Icon name="CLOSE" size={16} /> : <Icon name="MENU" size={16} />}
+          {sidebarOpen
+            ? <Icon name="CLOSE" size={16} />
+            : <Icon name="MENU" size={16} />}
         </button>
 
-        {/* Page title — shown on mobile where sidebar breadcrumb is hidden */}
+        {/* Desktop page title — Ovds SaaS shows current page name in header */}
         {title && (
-          <span className="md:hidden ovds-card-title truncate max-w-[140px] ovds-module-title">
+          <span
+            className="hidden lg:block truncate max-w-[200px] font-semibold text-[14px]"
+            style={{ color: 'var(--text)', letterSpacing: '-0.01em' }}
+          >
             {title}
           </span>
         )}
 
-        {/* Search pill — desktop */}
+        {/* Mobile page title */}
+        {title && (
+          <span
+            className="lg:hidden truncate max-w-[140px] font-semibold text-[13px]"
+            style={{ color: 'var(--text)', letterSpacing: '-0.01em' }}
+          >
+            {title}
+          </span>
+        )}
+
+        {/* ── Search pill — desktop ─────────────────────────────────── */}
         <button
           onClick={onOpenSearch}
-          className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-ovds-muted dark:bg-ovds-muted-dark border border-ovds-border-subtle dark:border-ovds-muted-dark rounded-xl text-ovds-text-muted dark:text-ovds-text-subtle hover:border-ovds-accent/30 hover:bg-ovds-surface dark:hover:bg-ovds-surface-dark transition-all group min-w-[220px]"
-          aria-label="Open search"
+          className="hidden md:flex items-center gap-2.5 rounded-lg transition-all"
+          style={{
+            minWidth: 220,
+            padding: '7px 12px',
+            background: 'var(--sys-bg-subtle)',
+            border: '1px solid var(--border)',
+            color: 'var(--text-4)',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--pro-azure)';
+            (e.currentTarget as HTMLButtonElement).style.background  = 'var(--surface)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
+            (e.currentTarget as HTMLButtonElement).style.background  = 'var(--sys-bg-subtle)';
+          }}
+          aria-label="Open command palette"
         >
-          <Icon name="SEARCH" size={13} className="text-slate-400 shrink-0" />
-          <span className="text-[12px] text-slate-400 flex-1 text-left">
-            {t('header.search_placeholder') || 'Search customers, tickets, routes...'}
+          <Icon name="SEARCH" size={13} style={{ color: 'var(--text-4)', flexShrink: 0 }} />
+          <span
+            className="flex-1 text-left text-[12px] font-medium"
+            style={{ color: 'var(--text-4)' }}
+          >
+            {t('header.search_placeholder') || 'Search anything…'}
           </span>
-          <kbd className="hidden lg:flex items-center gap-0.5 px-1.5 py-0.5 bg-ovds-surface dark:bg-ovds-surface-dark border border-ovds-border rounded-md text-[9px] font-mono leading-none text-ovds-text-muted dark:text-ovds-text-subtle shrink-0">
+          <kbd
+            className="hidden lg:flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono leading-none"
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              color: 'var(--text-4)',
+              flexShrink: 0,
+            }}
+          >
             ⌘K
           </kbd>
         </button>
       </div>
 
-      {/* -- Right: Actions -------------------------------------------------- */}
-      <div className="flex items-center gap-1">
+      {/* ── Right ───────────────────────────────────────────────────── */}
+      <div className="flex items-center gap-0.5">
 
-        {/* Company switcher */}
+        {/* Company switcher — desktop only */}
         {companies.length > 0 && (
-          <div ref={companyRef} className="relative hidden lg:block">
+          <div ref={companyRef} className="relative hidden lg:block mx-1">
             <button
               onClick={() => setShowCompany(v => !v)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all text-[11px] font-medium border border-transparent hover:border-slate-200"
+              className="flex items-center gap-1.5 rounded-lg transition-all text-[12px] font-semibold"
+              style={{
+                padding: '5px 10px',
+                color: 'var(--text-3)',
+                border: '1px solid transparent',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.background    = 'var(--surface-alt)';
+                (e.currentTarget as HTMLButtonElement).style.borderColor   = 'var(--border)';
+                (e.currentTarget as HTMLButtonElement).style.color         = 'var(--text)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.background    = 'transparent';
+                (e.currentTarget as HTMLButtonElement).style.borderColor   = 'transparent';
+                (e.currentTarget as HTMLButtonElement).style.color         = 'var(--text-3)';
+              }}
             >
-              <Icon name="COMPANY" size={13} className="text-slate-400 shrink-0" />
-              <span className="truncate max-w-[90px]">{company?.name ?? t('header.select_company')}</span>
-              <Icon name="CHEVRON_DOWN" size={10} className={`text-slate-400 transition-transform ${showCompany ? 'rotate-180' : ''}`} />
+              {/* Company avatar */}
+              <div
+                className="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-bold shrink-0"
+                style={{ background: 'var(--pro-azure-50)', color: 'var(--pro-azure)' }}
+              >
+                {company?.name?.charAt(0)?.toUpperCase() ?? 'C'}
+              </div>
+              <span className="truncate max-w-[96px]">
+                {company?.name ?? t('header.select_company')}
+              </span>
+              <Icon
+                name="CHEVRON_DOWN" size={11}
+                style={{
+                  color: 'var(--text-5)',
+                  transform: showCompany ? 'rotate(180deg)' : 'rotate(0)',
+                  transition: 'transform 150ms',
+                  flexShrink: 0,
+                }}
+              />
             </button>
 
             {showCompany && (
-              <div className="absolute right-0 top-full mt-1 w-52 bg-white dark:bg-slate-900 border border-emerald-200/30 dark:border-slate-700 rounded-lg shadow-lg z-[200] overflow-hidden animate-aki-enter">
-                <div className="px-3 py-1.5 border-b border-emerald-200/20 dark:border-slate-800">
-                  <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider">{t('header.switch_company')}</p>
+              <div style={{ ...DROPDOWN_STYLE, width: 220 }}>
+                <div
+                  className="px-3 py-2 flex items-center gap-2"
+                  style={{ borderBottom: '1px solid var(--border-alt)' }}
+                >
+                  <Icon name="COMPANY" size={11} style={{ color: 'var(--text-5)' }} />
+                  <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-4)' }}>
+                    {t('header.switch_company')}
+                  </p>
                 </div>
-                <div className="py-0.5 max-h-44 overflow-y-auto">
+                <div className="py-1 max-h-48 overflow-y-auto">
                   {companies.map(c => (
                     <button
                       key={c.id}
                       onClick={() => { setSelectedCompanyId(c.id); setShowCompany(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-emerald-200/10 dark:hover:bg-slate-800 transition-colors text-left"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 transition-colors text-left"
+                      style={{ background: 'transparent' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-alt)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                     >
-                      <div className="w-5 h-5 rounded bg-emerald-200/20 dark:bg-emerald-200/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-[9px] font-bold shrink-0">
+                      <div
+                        className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0"
+                        style={{ background: 'var(--pro-azure-50)', color: 'var(--pro-azure)' }}
+                      >
                         {c.name?.charAt(0)?.toUpperCase() ?? 'C'}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[11px] font-semibold text-ovds-text-main dark:text-ovds-text-subtle truncate">{c.name}</p>
-                        {c.tin && <p className="text-[9px] text-emerald-400 truncate">TIN: {c.tin}</p>}
+                        <p className="text-[12px] font-semibold truncate" style={{ color: 'var(--text)' }}>
+                          {c.name}
+                        </p>
+                        {c.tin && (
+                          <p className="text-[10px]" style={{ color: 'var(--text-4)' }}>
+                            TIN: {c.tin}
+                          </p>
+                        )}
                       </div>
-                      {c.id === selectedCompanyId && <Icon name="SUCCESS" size={11} className="text-emerald-600 shrink-0" />}
+                      {c.id === selectedCompanyId && (
+                        <div
+                          className="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
+                          style={{ background: 'var(--pro-azure)', color: '#fff' }}
+                        >
+                          <Icon name="SUCCESS" size={9} />
+                        </div>
+                      )}
                     </button>
                   ))}
                 </div>
-                <div className="border-t border-emerald-200/20 dark:border-slate-800 p-1.5">
+                <div style={{ borderTop: '1px solid var(--border-alt)', padding: '6px' }}>
                   <button
                     onClick={() => { navigate('/companies'); setShowCompany(false); }}
-                    className="w-full flex items-center gap-1.5 px-2 py-1 text-[11px] text-emerald-600 dark:text-emerald-400 hover:bg-emerald-200/10 dark:hover:bg-emerald-200/10 rounded-md transition-colors font-medium"
+                    className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[12px] font-semibold transition-colors"
+                    style={{ color: 'var(--pro-azure)' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'var(--pro-azure-50)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
-                    <Icon name="ADD" size={10} /> {t('header.manage_companies')}
+                    <Icon name="ADD" size={11} />
+                    {t('header.manage_companies')}
                   </button>
                 </div>
               </div>
@@ -215,125 +344,227 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         )}
 
-        <div className="h-4 w-px bg-slate-200 mx-1 hidden sm:block" />
+        {/* Separator */}
+        <div
+          className="hidden sm:block mx-1"
+          style={{ width: 1, height: 18, background: 'var(--border)' }}
+        />
 
         {/* Notifications */}
         <div ref={notifsRef} className="relative">
           <button
             onClick={() => { setShowNotifs(v => !v); if (!showNotifs) fetchNotifs(); }}
-            className="relative w-8 h-8 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
+            className={`${iconBtnCls} relative`}
             aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+            style={{ color: 'var(--text-3)' }}
           >
             <Icon name="NOTIFICATION" size={16} />
             {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white" />
+              <span
+                className="absolute flex items-center justify-center font-bold"
+                style={{
+                  top: 4, right: 4,
+                  minWidth: 14, height: 14,
+                  fontSize: 8, lineHeight: 1,
+                  borderRadius: 99,
+                  background: 'var(--pro-rose)',
+                  color: '#fff',
+                  border: '1.5px solid var(--surface)',
+                  padding: '0 2px',
+                }}
+              >
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
             )}
           </button>
 
           {showNotifs && (
-            <div className="absolute right-0 top-full mt-1 w-72 bg-white dark:bg-slate-900 border border-emerald-200/30 dark:border-slate-700 rounded-lg shadow-lg z-[200] overflow-hidden animate-aki-enter">
-              <div className="flex items-center justify-between px-3 py-2 border-b border-emerald-200/20 dark:border-slate-800">
-                <div className="flex items-center gap-1.5">
-                  <Icon name="NOTIFICATION" size={11} className="text-emerald-600" />
-                  <p className="text-[11px] font-semibold text-ovds-text-main dark:text-ovds-text-subtle">{t('header.notifications')}</p>
+            <div style={{ ...DROPDOWN_STYLE, width: 320, right: 0 }}>
+              {/* Header */}
+              <div
+                className="flex items-center justify-between px-4 py-2.5"
+                style={{ borderBottom: '1px solid var(--border-alt)' }}
+              >
+                <div className="flex items-center gap-2">
+                  <Icon name="NOTIFICATION" size={13} style={{ color: 'var(--pro-azure)' }} />
+                  <span className="text-[13px] font-bold" style={{ color: 'var(--text)' }}>
+                    {t('header.notifications')}
+                  </span>
                   {unreadCount > 0 && (
-                    <span className="px-1 py-0.5 bg-rose-50 text-rose-600 dark:bg-rose-500/30 dark:text-rose-600 text-[9px] font-bold rounded-full">
+                    <span
+                      className="px-1.5 py-0.5 rounded-full text-[10px] font-bold"
+                      style={{ background: 'var(--pro-azure-50)', color: 'var(--pro-azure)' }}
+                    >
                       {unreadCount}
                     </span>
                   )}
                 </div>
                 {unreadCount > 0 && (
-                  <button onClick={markAllRead} className="text-[10px] text-emerald-600 dark:text-emerald-400 hover:underline font-medium">
+                  <button
+                    onClick={markAllRead}
+                    className="text-[11px] font-semibold transition-colors"
+                    style={{ color: 'var(--pro-azure)' }}
+                    onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
+                    onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                  >
                     {t('header.mark_all_read')}
                   </button>
                 )}
               </div>
 
-              <div className="max-h-60 overflow-y-auto">
+              {/* List */}
+              <div className="overflow-y-auto" style={{ maxHeight: 280 }}>
                 {notifsLoading ? (
-                  <div className="flex items-center justify-center py-6">
-                    <Icon name="REFRESH" size={13} className="animate-spin text-emerald-400" />
+                  <div className="flex items-center justify-center py-8">
+                    <Icon name="REFRESH" size={14} className="animate-aki-spin" style={{ color: 'var(--text-4)' }} />
                   </div>
                 ) : notifs.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-6 gap-1.5">
-                    <Icon name="SUCCESS" size={16} className="text-emerald-400" />
-                    <p className="text-[11px] text-emerald-400">{t('header.all_caught_up')}</p>
+                  <div className="flex flex-col items-center justify-center py-8 gap-2">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ background: 'var(--surface-alt)', color: 'var(--text-4)' }}
+                    >
+                      <Icon name="SUCCESS" size={18} />
+                    </div>
+                    <p className="text-[12px] font-medium" style={{ color: 'var(--text-4)' }}>
+                      {t('header.all_caught_up')}
+                    </p>
                   </div>
                 ) : (
                   notifs.map(n => (
-                    <div
+                    <button
                       key={n.id}
-                      className={`flex items-start gap-2.5 px-3 py-2 border-b border-ovds-border dark:border-ovds-border-subtle/60 hover:bg-emerald-200/10 dark:hover:bg-ovds-muted-dark/40 transition-colors cursor-pointer ${!n.read ? 'bg-emerald-200/5 dark:bg-emerald-200/5' : ''}`}
-                      onClick={() => { if (!n.read) markOneRead(n.id); if (n.actionUrl) navigate(n.actionUrl); setShowNotifs(false); }}
+                      className="w-full flex items-start gap-3 px-4 py-3 text-left transition-colors"
+                      style={{
+                        background: !n.read ? 'var(--sys-bg-accent)' : 'transparent',
+                        borderBottom: '1px solid var(--border-alt)',
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-alt)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = !n.read ? 'var(--sys-bg-accent)' : 'transparent')}
+                      onClick={() => {
+                        if (!n.read) markOneRead(n.id);
+                        if (n.actionUrl) navigate(n.actionUrl);
+                        setShowNotifs(false);
+                      }}
                     >
-                      <div className="mt-0.5 shrink-0"><Icon name={NOTIF_ICON[n.type] ?? NOTIF_ICON.info} size={13} /></div>
+                      {/* Type dot */}
+                      <div
+                        className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
+                        style={{ background: NOTIF_DOT[n.type] ?? 'var(--pro-azure)' }}
+                      />
                       <div className="flex-1 min-w-0">
-                        <p className={`text-[11px] font-semibold truncate ${!n.read ? 'text-ovds-text-main dark:text-ovds-text-subtle' : 'text-slate-800 dark:text-ovds-text-muted'}`}>
+                        <p
+                          className="text-[12px] font-semibold truncate"
+                          style={{ color: n.read ? 'var(--text-3)' : 'var(--text)' }}
+                        >
                           {n.title}
                         </p>
-                        <p className="text-[10px] text-emerald-400 mt-0.5 line-clamp-2">{n.body}</p>
-                        <p className="text-[9px] text-ovds-text-subtle dark:text-slate-800 mt-0.5">
+                        <p className="text-[11px] mt-0.5 line-clamp-2" style={{ color: 'var(--text-4)' }}>
+                          {n.body}
+                        </p>
+                        <p className="text-[10px] mt-1" style={{ color: 'var(--text-5)' }}>
                           {new Date(n.createdAt).toLocaleString()}
                         </p>
                       </div>
-                      {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1 shrink-0" />}
-                    </div>
+                      {!n.read && (
+                        <div
+                          className="w-2 h-2 rounded-full mt-1 shrink-0"
+                          style={{ background: 'var(--pro-azure)' }}
+                        />
+                      )}
+                    </button>
                   ))
                 )}
               </div>
 
-              <div className="border-t border-emerald-200/20 dark:border-slate-800 p-1.5">
+              {/* Footer */}
+              <div style={{ borderTop: '1px solid var(--border-alt)', padding: '6px' }}>
                 <button
                   onClick={() => { navigate('/notifications'); setShowNotifs(false); }}
-                  className="w-full flex items-center justify-center gap-1 py-1 text-[11px] text-emerald-600 dark:text-emerald-400 hover:bg-emerald-200/10 dark:hover:bg-emerald-200/10 rounded-md transition-colors font-medium"
+                  className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[12px] font-semibold transition-colors"
+                  style={{ color: 'var(--pro-azure)' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--pro-azure-50)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
-                  {t('header.view_all_notifications')} <Icon name="CHEVRON_RIGHT" size={10} />
+                  {t('header.view_all_notifications')}
+                  <Icon name="CHEVRON_RIGHT" size={11} />
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        {/* Language Switcher */}
+        {/* Language switcher */}
         <LanguageSwitcher variant="dropdown" />
 
-        {/* Theme Toggle */}
+        {/* Theme toggle */}
         <button
           onClick={toggleTheme}
-          className="w-8 h-8 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
+          className={iconBtnCls}
           aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          style={{ color: isDark ? '#FCD34D' : 'var(--text-3)' }}
+          title={isDark ? 'Light mode' : 'Dark mode'}
         >
-          {isDark ? <Icon name="SUN" size={15} className="text-amber-400" /> : <Icon name="MOON" size={15} className="text-slate-500" />}
+          {isDark
+            ? <Icon name="SUN"  size={15} />
+            : <Icon name="MOON" size={15} />}
         </button>
 
-        {/* Quick Create — CycleIQ "Start Shift" style CTA */}
-        <div ref={quickCreateRef} className="relative">
+        {/* Separator */}
+        <div
+          className="hidden sm:block mx-0.5"
+          style={{ width: 1, height: 18, background: 'var(--border)' }}
+        />
+
+        {/* ── Quick Create — Ovds SaaS green "New" button ───────────── */}
+        <div ref={quickCreateRef} className="relative ml-0.5">
           <button
             onClick={() => setShowQuickCreate(v => !v)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-[12px] font-semibold transition-all shadow-sm shadow-emerald-500/20"
+            className="flex items-center gap-1.5 rounded-lg text-[12px] font-bold transition-all"
+            style={{
+              padding: '6px 14px',
+              background: showQuickCreate ? 'var(--pro-azure-dark)' : 'var(--pro-azure)',
+              color: '#fff',
+              boxShadow: '0 1px 4px rgba(79,186,111,0.35)',
+              letterSpacing: '-0.01em',
+            }}
+            onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 12px rgba(79,186,111,0.45)')}
+            onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.boxShadow = '0 1px 4px rgba(79,186,111,0.35)')}
             aria-label="Quick create"
-            title="Quick Create"
           >
             <Icon name="ADD" size={14} strokeWidth={2.5} />
-            <span className="hidden sm:inline">Quick Add</span>
+            <span className="hidden sm:inline">New</span>
           </button>
 
           {showQuickCreate && (
-            <div className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-900 border border-emerald-200/40 dark:border-slate-700 rounded-lg shadow-lg z-[200] overflow-hidden animate-aki-enter">
-              <div className="px-2.5 py-1.5 border-b border-emerald-200/20 dark:border-slate-800">
-                <p className="text-[9px] font-semibold text-emerald-400 uppercase tracking-wider">{t('header.quick_create')}</p>
+            <div style={{ ...DROPDOWN_STYLE, width: 196 }}>
+              <div
+                className="px-3 py-2"
+                style={{ borderBottom: '1px solid var(--border-alt)' }}
+              >
+                <p className="text-[9px] font-black uppercase tracking-widest" style={{ color: 'var(--text-5)' }}>
+                  {t('header.quick_create')}
+                </p>
               </div>
-              <div className="py-0.5">
+              <div className="py-1">
                 {QUICK_CREATE.map(a => (
                   <button
                     key={a.to}
                     onClick={() => { navigate(a.to); setShowQuickCreate(false); }}
-                    className="w-full flex items-center gap-2 px-2.5 py-1.5 hover:bg-emerald-200/10 dark:hover:bg-slate-800 transition-colors"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 transition-colors"
+                    style={{ background: 'transparent' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-alt)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
-                    <span className={`w-5 h-5 rounded flex items-center justify-center shrink-0 ${a.color}`}>
-                      <Icon name={a.icon as any} size={11} />
+                    <span
+                      className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+                      style={{ background: a.bg, color: a.color }}
+                    >
+                      <Icon name={a.icon as any} size={12} />
                     </span>
-                    <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-200">{a.label}</span>
+                    <span className="text-[12px] font-semibold" style={{ color: 'var(--text)' }}>
+                      {a.label}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -341,37 +572,92 @@ const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        <div className="h-4 w-px bg-slate-200 mx-1" />
+        {/* Separator */}
+        <div
+          className="hidden sm:block mx-1"
+          style={{ width: 1, height: 18, background: 'var(--border)' }}
+        />
 
-        {/* User Profile */}
+        {/* ── User profile ──────────────────────────────────────────── */}
         <div ref={profileRef} className="relative">
           <button
             onClick={() => setShowProfile(v => !v)}
-            className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-200"
+            className="flex items-center gap-2 rounded-lg transition-all"
+            style={{
+              padding: '5px 8px',
+              border: '1px solid transparent',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.background    = 'var(--surface-alt)';
+              (e.currentTarget as HTMLButtonElement).style.borderColor   = 'var(--border)';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.background    = 'transparent';
+              (e.currentTarget as HTMLButtonElement).style.borderColor   = 'transparent';
+            }}
             aria-label="User menu"
           >
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-[11px] font-bold shrink-0">
+            {/* Avatar */}
+            <div
+              className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] font-bold shrink-0"
+              style={{
+                background: 'var(--pro-gradient-primary)',
+                boxShadow: '0 2px 8px rgba(79,186,111,0.30)',
+              }}
+            >
               {user?.username?.charAt(0)?.toUpperCase() ?? 'U'}
             </div>
+            {/* Name — desktop */}
             <div className="hidden md:block text-left">
-              <p className="text-[12px] font-semibold text-slate-700 leading-none truncate max-w-[80px]">
+              <p
+                className="text-[12px] font-semibold leading-tight truncate max-w-[80px]"
+                style={{ color: 'var(--text)' }}
+              >
                 {user?.username ?? 'User'}
               </p>
             </div>
-            <Icon name="CHEVRON_DOWN" size={11} className={`text-slate-400 hidden md:block transition-transform ${showProfile ? 'rotate-180' : ''}`} />
+            <Icon
+              name="CHEVRON_DOWN" size={11}
+              className="hidden md:block"
+              style={{
+                color: 'var(--text-5)',
+                transform: showProfile ? 'rotate(180deg)' : 'rotate(0)',
+                transition: 'transform 150ms',
+              }}
+            />
           </button>
 
           {showProfile && (
-            <div className="absolute right-0 top-full mt-1 w-52 bg-white dark:bg-slate-900 border border-emerald-200/40 dark:border-slate-700 rounded-lg shadow-lg z-[200] overflow-hidden animate-aki-enter">
+            <div style={{ ...DROPDOWN_STYLE, width: 224 }}>
               {/* User info */}
-              <div className="px-3 py-2.5 border-b border-emerald-200/20 dark:border-slate-800 bg-emerald-200/5 dark:bg-white/[0.02]">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+              <div
+                className="px-4 py-3"
+                style={{
+                  borderBottom: '1px solid var(--border-alt)',
+                  background: 'var(--surface-alt)',
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-white text-[13px] font-bold shrink-0"
+                    style={{
+                      background: 'var(--pro-gradient-primary)',
+                      boxShadow: '0 2px 10px rgba(79,186,111,0.30)',
+                    }}
+                  >
                     {user?.username?.charAt(0)?.toUpperCase() ?? 'U'}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate">{user?.username}</p>
-                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded mt-0.5 inline-block ${roleBadge.cls}`}>
+                    <p
+                      className="text-[13px] font-bold truncate"
+                      style={{ color: 'var(--text)' }}
+                    >
+                      {user?.username}
+                    </p>
+                    <span
+                      className="inline-block mt-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold"
+                      style={{ background: roleBadge.bg, color: roleBadge.color }}
+                    >
                       {roleBadge.label}
                     </span>
                   </div>
@@ -379,57 +665,81 @@ const Header: React.FC<HeaderProps> = ({
               </div>
 
               {/* Menu items */}
-              <div className="py-0.5">
+              <div className="py-1">
                 {[
-                  { icon: 'CUSTOMER', label: t('header.my_profile'), to: '/settings?tab=profile' },
-                  { icon: 'SETTINGS', label: t('header.settings'), to: '/settings' },
-                  { icon: 'SHIELD',  label: t('header.security'), to: '/settings?tab=taxes' },
-                  { icon: 'KEYBOARD', label: t('header.keyboard_shortcuts'), action: () => window.dispatchEvent(new KeyboardEvent('keydown', { key: '?' })) },
-                  { icon: 'ACTIVITY', label: t('header.activity_feed'), action: () => window.dispatchEvent(new CustomEvent('ovds:toggle-activity')) },
+                  { icon: 'CUSTOMER',  label: t('header.my_profile'),        to: '/settings?tab=profile' },
+                  { icon: 'SETTINGS',  label: t('header.settings'),           to: '/settings' },
+                  { icon: 'SHIELD',    label: t('header.security'),           to: '/settings?tab=taxes' },
+                  { icon: 'KEYBOARD',  label: t('header.keyboard_shortcuts'), action: () => window.dispatchEvent(new KeyboardEvent('keydown', { key: '?' })) },
+                  { icon: 'ACTIVITY',  label: t('header.activity_feed'),      action: () => window.dispatchEvent(new CustomEvent('ovds:toggle-activity')) },
                 ].map((item, i) => (
                   item.to ? (
                     <Link
                       key={i}
                       to={item.to}
                       onClick={() => setShowProfile(false)}
-                      className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-emerald-200/10 dark:hover:bg-ovds-muted-dark transition-colors text-[11px] text-slate-800 dark:text-ovds-text-muted hover:text-ovds-text-main dark:hover:text-ovds-text-subtle"
+                      className="flex items-center gap-2.5 px-4 py-2 transition-colors text-[12px] font-medium"
+                      style={{ color: 'var(--text-2)' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-alt)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                     >
-                      <span className="text-emerald-400"><Icon name={item.icon as any} size={12} /></span>
+                      <Icon name={item.icon as any} size={13} style={{ color: 'var(--text-4)', flexShrink: 0 }} />
                       {item.label}
                     </Link>
                   ) : (
                     <button
                       key={i}
                       onClick={() => { item.action?.(); setShowProfile(false); }}
-                      className="w-full flex items-center gap-2.5 px-3 py-1.5 hover:bg-emerald-200/10 dark:hover:bg-ovds-muted-dark transition-colors text-[11px] text-slate-800 dark:text-ovds-text-muted hover:text-ovds-text-main dark:hover:text-ovds-text-subtle"
+                      className="w-full flex items-center gap-2.5 px-4 py-2 transition-colors text-[12px] font-medium"
+                      style={{ background: 'transparent', color: 'var(--text-2)' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-alt)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                     >
-                      <span className="text-emerald-400"><Icon name={item.icon as any} size={12} /></span>
+                      <Icon name={item.icon as any} size={13} style={{ color: 'var(--text-4)', flexShrink: 0 }} />
                       {item.label}
                     </button>
                   )
                 ))}
               </div>
 
-              {/* Company info */}
+              {/* Company strip */}
               {company && (
-                <div className="border-t border-emerald-200/20 dark:border-slate-800 px-3 py-2 bg-emerald-200/5 dark:bg-white/[0.01]">
-                  <div className="flex items-center gap-1.5">
-                    <Icon name="COMPANY" size={10} className="text-emerald-400 shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-semibold text-slate-800 dark:text-ovds-text-muted truncate">{company.name}</p>
-                      {company.tin && <p className="text-[9px] text-emerald-400">TIN: {company.tin}</p>}
-                    </div>
+                <div
+                  className="px-4 py-2.5 flex items-center gap-2"
+                  style={{
+                    borderTop: '1px solid var(--border-alt)',
+                    background: 'var(--surface-alt)',
+                  }}
+                >
+                  <div
+                    className="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-bold shrink-0"
+                    style={{ background: 'var(--pro-azure-50)', color: 'var(--pro-azure)' }}
+                  >
+                    {company.name?.charAt(0)?.toUpperCase() ?? 'C'}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold truncate" style={{ color: 'var(--text-2)' }}>
+                      {company.name}
+                    </p>
+                    {company.tin && (
+                      <p className="text-[9px]" style={{ color: 'var(--text-4)' }}>
+                        TIN: {company.tin}
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
 
               {/* Logout */}
-              <div className="border-t border-emerald-200/20 dark:border-slate-800 p-1.5">
+              <div style={{ borderTop: '1px solid var(--border-alt)', padding: '6px' }}>
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors text-[11px] text-rose-600 dark:text-rose-400 font-semibold"
+                  className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-colors text-[12px] font-semibold"
+                  style={{ color: '#BE123C', background: 'transparent' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#FFF1F2')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
-                  <Icon name="LOGOUT" size={12} />
+                  <Icon name="LOGOUT" size={13} />
                   {t('header.sign_out')}
                 </button>
               </div>
@@ -442,5 +752,3 @@ const Header: React.FC<HeaderProps> = ({
 };
 
 export default Header;
-
-

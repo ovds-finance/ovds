@@ -4,7 +4,6 @@
  * Portal integrations: ESLSE · Ethiopian Airlines Cargo · Cheche · EBP · verify.leul.et
  * Renamed from "Trade" — consolidates all supply chain operations in one module.
  */
-import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Ship, Plane, FileText, RefreshCw, Plus, Search,
@@ -13,14 +12,15 @@ import {
   ExternalLink, Info, X, ChevronDown, ChevronUp,
   Anchor,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, SearchBar, EmptyState, Modal, FormField, Input, Select,
   Textarea, Amount,
 } from '../components/ui';
+import { usePageTitle } from '../hooks/usePageTitle';
 import {
   shipmentsApi, stepsApi, tradeDashboardApi, portalsApi,
   type TradeShipment, type TradeShipmentStep, type CreateShipmentDto,
@@ -31,21 +31,21 @@ import {
 // -- Helpers -------------------------------------------------------------------
 
 const STEP_STATUS_CLS: Record<string, string> = {
-  COMPLETED:   'bg-emerald-50 text-emerald-700 border-emerald-200',
+  COMPLETED:   'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
   IN_PROGRESS: 'bg-sky-50 text-sky-700 border-sky-200',
   BLOCKED:     'bg-rose-50 text-rose-700 border-rose-200',
   PENDING:     'bg-white text-slate-500 border-slate-200',
 };
 
 const STEP_STATUS_ICON: Record<string, React.ReactNode> = {
-  COMPLETED:   <CheckCircle2 size={11} className="text-emerald-500" />,
+  COMPLETED:   <CheckCircle2 size={11} className="text-[var(--pro-azure)]" />,
   IN_PROGRESS: <Clock size={11} className="text-sky-500" />,
   BLOCKED:     <AlertTriangle size={11} className="text-rose-500" />,
   PENDING:     <Clock size={11} className="text-slate-300" />,
 };
 
 const SOURCE_CLS: Record<string, string> = {
-  live:  'bg-emerald-50 text-emerald-700 border-emerald-200',
+  live:  'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
   cache: 'bg-sky-50 text-sky-700 border-sky-200',
   stub:  'bg-amber-50 text-amber-700 border-amber-200',
 };
@@ -93,11 +93,11 @@ function EslsePanel() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-100 rounded-xl">
-        <Anchor size={16} className="text-blue-500 shrink-0 mt-0.5" />
+      <div className="flex items-start gap-3 p-3 bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-xl">
+        <Anchor size={16} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
         <div>
-          <p className="text-[12px] font-semibold text-blue-800">ESLSE Sea-Freight Tracking</p>
-          <p className="text-[11px] text-blue-600 mt-0.5">
+          <p className="text-[12px] font-semibold text-[var(--pro-azure-dark)]">ESLSE Sea-Freight Tracking</p>
+          <p className="text-[11px] text-[var(--pro-azure)] mt-0.5">
             Track shipments via Ethiopian Shipping and Logistics Services Enterprise (eslse.et).
             Enter your Bill of Lading number below.
           </p>
@@ -133,7 +133,7 @@ function EslsePanel() {
             <div className="flex items-center gap-2">
               <SourceBadge source={result.source} />
               {result.status && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]">
                   {result.status}
                 </span>
               )}
@@ -356,11 +356,11 @@ function EbpPanel() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start gap-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
-        <Building2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+      <div className="flex items-start gap-3 p-3 bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-xl">
+        <Building2 size={16} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
         <div>
-          <p className="text-[12px] font-semibold text-emerald-800">Ethiopia Business Portal — TIN / VAT Status</p>
-          <p className="text-[11px] text-emerald-600 mt-0.5">
+          <p className="text-[12px] font-semibold text-[var(--pro-azure-dark)]">Ethiopia Business Portal — TIN / VAT Status</p>
+          <p className="text-[11px] text-[var(--pro-azure)] mt-0.5">
             Check TIN and VAT registration status via the Ethiopia Business Portal.
             Enter a 10-digit Ethiopian TIN number.
           </p>
@@ -402,7 +402,7 @@ function EbpPanel() {
               {result.registrationStatus && (
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                   result.registrationStatus === 'ACTIVE'
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]'
                     : 'bg-rose-50 text-rose-700 border-rose-200'
                 }`}>
                   {result.registrationStatus}
@@ -491,7 +491,7 @@ function LeulVerifyPanel() {
           <div className="flex items-center justify-between px-4 py-2.5 bg-white border-b border-slate-200">
             <div className="flex items-center gap-2">
               {result.verified
-                ? <CheckCircle2 size={14} className="text-emerald-500" />
+                ? <CheckCircle2 size={14} className="text-[var(--pro-azure)]" />
                 : <AlertTriangle size={14} className="text-rose-500" />}
               <span className="text-[12px] font-semibold text-slate-700">{result.reference}</span>
             </div>
@@ -499,7 +499,7 @@ function LeulVerifyPanel() {
               <SourceBadge source={result.source} />
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                 result.verified
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]'
                   : 'bg-rose-50 text-rose-700 border-rose-200'
               }`}>
                 {result.verified ? 'VERIFIED' : 'NOT VERIFIED'}
@@ -616,7 +616,7 @@ function ShipmentDetail({ shipment, onClose }: { shipment: TradeShipment; onClos
           <div className="flex items-center gap-3">
             {shipment.direction === 'IMPORT'
               ? <Ship size={16} className="text-sky-500" />
-              : <Plane size={16} className="text-emerald-500" />}
+              : <Plane size={16} className="text-[var(--pro-azure)]" />}
             <div>
               <p className="ovds-card-title">{shipment.referenceNo}</p>
               <p className="ovds-caption">{shipment.direction} · {shipment.status}</p>
@@ -786,7 +786,7 @@ function DashboardTab() {
 
   const kpis = useMemo(() => [
     { label: 'Imports',    value: data?.imports    ?? 0, color: 'sky'     as const },
-    { label: 'Exports',    value: data?.exports    ?? 0, color: 'emerald' as const },
+    { label: 'Exports',    value: data?.exports    ?? 0, color: 'green' as const },
     { label: 'In Transit', value: data?.inTransit  ?? 0, color: 'amber'   as const },
     { label: 'Proformas',  value: data?.proformas  ?? 0, color: 'violet'  as const },
   ], [data]);
@@ -816,11 +816,11 @@ function DashboardTab() {
               return (
                 <div key={s.id} className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl hover:border-slate-300 transition-colors">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                    s.direction === 'IMPORT' ? 'bg-sky-50' : 'bg-emerald-50'
+                    s.direction === 'IMPORT' ? 'bg-sky-50' : 'bg-[var(--pro-azure-50)]'
                   }`}>
                     {s.direction === 'IMPORT'
                       ? <Ship size={14} className="text-sky-500" />
-                      : <Plane size={14} className="text-emerald-500" />}
+                      : <Plane size={14} className="text-[var(--pro-azure)]" />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -828,13 +828,13 @@ function DashboardTab() {
                       <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
                         s.direction === 'IMPORT'
                           ? 'bg-sky-50 text-sky-600'
-                          : 'bg-emerald-50 text-emerald-600'
+                          : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]'
                       }`}>{s.direction}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-1">
                       <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-emerald-400 rounded-full transition-all"
+                          className="h-full bg-[var(--pro-azure-light)] rounded-full transition-all"
                           style={{ width: `${pct}%` }}
                         />
                       </div>
@@ -858,7 +858,7 @@ function DashboardTab() {
 
 function ShipmentsTab() {
   const qc = useQueryClient();
-  const [_direction, setDirection] = useState<'ALL' | 'IMPORT' | 'EXPORT'>('ALL');
+  const [_direction, _setDirection] = useState<'ALL' | 'IMPORT' | 'EXPORT'>('ALL');
   const [search, setSearch]       = useState('');
   const [selected, setSelected]   = useState<TradeShipment | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -938,7 +938,7 @@ function ShipmentsTab() {
                   <div className="flex items-center gap-1.5">
                     {s.direction === 'IMPORT'
                       ? <Ship size={11} className="text-sky-400 shrink-0" />
-                      : <Plane size={11} className="text-emerald-400 shrink-0" />}
+                      : <Plane size={11} className="text-[var(--pro-azure-light)] shrink-0" />}
                     <span className="font-mono text-[11px] font-semibold text-slate-700">{s.referenceNo}</span>
                   </div>
                 </AppTd>
@@ -946,7 +946,7 @@ function ShipmentsTab() {
                   <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
                     s.direction === 'IMPORT'
                       ? 'bg-sky-50 text-sky-600'
-                      : 'bg-emerald-50 text-emerald-600'
+                      : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]'
                   }`}>{s.direction}</span>
                 </AppTd>
                 <AppTd>
@@ -966,7 +966,7 @@ function ShipmentsTab() {
                 <AppTd>
                   <div className="flex items-center gap-1.5 min-w-[80px]">
                     <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-400 rounded-full" style={{ width: `${pct}%` }} />
+                      <div className="h-full bg-[var(--pro-azure-light)] rounded-full" style={{ width: `${pct}%` }} />
                     </div>
                     <span className="text-[9px] text-slate-400 shrink-0">{pct}%</span>
                   </div>
@@ -1006,10 +1006,10 @@ function ShipmentsTab() {
 // -- Portals tab ---------------------------------------------------------------
 
 const PORTAL_TABS: { key: PortalTab; label: string; icon: React.ReactNode; color: string }[] = [
-  { key: 'eslse',  label: 'ESLSE',          icon: <Anchor size={12} />,    color: 'text-blue-600' },
+  { key: 'eslse',  label: 'ESLSE',          icon: <Anchor size={12} />,    color: 'text-[var(--pro-azure)]' },
   { key: 'eal',    label: 'EAL Cargo',      icon: <Plane size={12} />,     color: 'text-sky-600' },
   { key: 'cheche', label: 'Cheche Permits', icon: <FileText size={12} />,  color: 'text-violet-600' },
-  { key: 'ebp',    label: 'Business Portal',icon: <Building2 size={12} />, color: 'text-emerald-600' },
+  { key: 'ebp',    label: 'Business Portal',icon: <Building2 size={12} />, color: 'text-[var(--pro-azure)]' },
   { key: 'leul',   label: 'verify.leul.et', icon: <ShieldCheck size={12} />, color: 'text-teal-600' },
 ];
 
@@ -1053,8 +1053,8 @@ function PortalsTab() {
             desc: 'Sea-freight shipment tracking via eslse.et',
             env: 'ESLSE_API_URL',
             icon: <Anchor size={14} />,
-            color: 'bg-blue-50 border-blue-100',
-            iconCls: 'text-blue-500',
+            color: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]',
+            iconCls: 'text-[var(--pro-azure)]',
           },
           {
             name: 'Ethiopian Airlines Cargo',
@@ -1077,8 +1077,8 @@ function PortalsTab() {
             desc: 'TIN / VAT registration status',
             env: 'EBP_API_URL',
             icon: <Building2 size={14} />,
-            color: 'bg-emerald-50 border-emerald-100',
-            iconCls: 'text-emerald-500',
+            color: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]',
+            iconCls: 'text-[var(--pro-azure)]',
           },
           {
             name: 'verify.leul.et',

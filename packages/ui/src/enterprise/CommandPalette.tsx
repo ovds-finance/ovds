@@ -193,14 +193,14 @@ function CommandPaletteItem({
       className={cn(
         'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all',
         selected
-          ? 'bg-aki-blue-50 dark:bg-aki-blue-950/30 text-aki-blue dark:text-blue-400'
+          ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]-950/30 text-[var(--pro-azure)] dark:text-blue-400'
           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800',
       )}
     >
       <div className={cn(
         'w-8 h-8 rounded-xl flex items-center justify-center shrink-0',
         selected
-          ? 'bg-aki-blue-100 dark:bg-aki-blue-900/50 text-aki-blue dark:text-blue-400'
+          ? 'bg-[var(--pro-azure-100)] dark:bg-[var(--pro-azure)]-900/50 text-[var(--pro-azure)] dark:text-blue-400'
           : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400',
       )}>
         {action.icon}

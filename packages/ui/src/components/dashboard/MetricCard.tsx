@@ -12,7 +12,7 @@ export interface MetricCardProps {
   color?: string;
   active?: boolean;
   sub?: React.ReactNode;
-  variant?: 'default' | 'highlight-success' | 'highlight-warning' | 'highlight-danger' | 'highlight-purple' | 'highlight-amber' | 'highlight-rose' | 'highlight-emerald' | 'highlight-indigo' | 'highlight-teal' | 'highlight-sky';
+  variant?: 'default' | 'highlight-success' | 'highlight-warning' | 'highlight-danger' | 'highlight-purple' | 'highlight-amber' | 'highlight-rose' | 'highlight-indigo' | 'highlight-indigo' | 'highlight-teal' | 'highlight-sky';
   subtitle?: string;
   sparkline?: number[];
   loading?: boolean;
@@ -24,7 +24,7 @@ export interface MetricCardProps {
 
 const trendColor = (isPositive?: boolean) => {
   if (isPositive === false) return { text: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200', icon: 'arrow-down-right' };
-  if (isPositive === true) return { text: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200', icon: 'arrow-up-right' };
+  if (isPositive === true) return { text: 'text-[var(--pro-azure-dark)]', bg: 'bg-[var(--pro-azure-50)]', border: 'border-[var(--pro-azure-100)]', icon: 'arrow-up-right' };
   return { text: 'text-slate-500', bg: 'bg-white', border: 'border-slate-200', icon: 'minus' };
 };
 
@@ -62,7 +62,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     });
   };
 
-  const cardCls = `aki-kpi-card ${variant} ${active ? 'ring-1 ring-aki-blue' : ''} ${onClick ? 'cursor-pointer group' : ''} ${className}`.trim();
+  const cardCls = `aki-kpi-card ${variant} ${active ? 'ring-1 ring-[var(--pro-azure)]' : ''} ${onClick ? 'cursor-pointer group' : ''} ${className}`.trim();
 
   return (
     <div className={cardCls} onClick={onClick} role={onClick ? 'button' : undefined} style={color ? { borderColor: color } : undefined}>
@@ -72,7 +72,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
           <span className="aki-kpi-label">{title}</span>
         </div>
         {icon && (
-          <div className="w-10 h-10 rounded-oki flex items-center justify-center bg-aki-blue-50 text-aki-blue shrink-0">
+          <div className="w-10 h-10 rounded-oki flex items-center justify-center bg-[var(--pro-azure-50)] text-[var(--pro-azure)] shrink-0">
             {icon}
           </div>
         )}
@@ -86,7 +86,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
           <>
             <span className="aki-kpi-value text-2xl">{displayValue}</span>
             <button onClick={handleCopy} className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" aria-label="Copy value">
-              {copied ? <Icon name="CHECK" size={12} className="text-emerald-500" /> : <Icon name="CLIPBOARD_COPY" size={12} className="text-slate-400" />}
+              {copied ? <Icon name="CHECK" size={12} className="text-[var(--pro-azure)]" /> : <Icon name="CLIPBOARD_COPY" size={12} className="text-slate-400" />}
             </button>
           </>
         )}
@@ -96,7 +96,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       <div className="flex items-center gap-2 flex-wrap">
         {trend && (
           <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-1.5 py-0.5 rounded-oki ${trend.bg} ${trend.text} border ${trend.border}`}>
-            {trend.icon === 'arrow-up-right' && <Icon name="ARROW_UP_RIGHT" size={10} className="text-emerald-500" />}
+            {trend.icon === 'arrow-up-right' && <Icon name="ARROW_UP_RIGHT" size={10} className="text-[var(--pro-azure)]" />}
             {trend.icon === 'arrow-down-right' && <Icon name="ARROW_DOWN_RIGHT" size={10} className="text-red-500" />}
             {trend.icon === 'minus' && <Icon name="MINUS" size={10} />}
             <span>{metricChange.value > 0 ? '+' : ''}{metricChange.value}%</span>
@@ -104,7 +104,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
           </span>
         )}
         {!trend && (percentage !== undefined || isPositive !== undefined) && (
-          <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-1.5 py-0.5 rounded-oki ${isPositive === false ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`}>
+          <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-1.5 py-0.5 rounded-oki ${isPositive === false ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]'}`}>
             {isPositive === false ? '−' : '+'}{percentage}%
           </span>
         )}
@@ -113,7 +113,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         {actionLabel && onAction && (
           <button
             onClick={(e) => { e.stopPropagation(); onAction(); }}
-            className="text-[11px] font-semibold text-aki-blue hover:text-aki-blue-dark transition-colors ml-auto"
+            className="text-[11px] font-semibold text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] transition-colors ml-auto"
           >
             {actionLabel}
           </button>
@@ -145,7 +145,7 @@ interface StatCardProps {
   format?: 'number' | 'currency' | 'percent';
   sub?: React.ReactNode;
   icon?: React.ReactNode;
-  color?: 'blue' | 'emerald' | 'amber' | 'rose' | 'indigo' | 'slate';
+  color?: 'blue' | 'indigo' | 'amber' | 'rose' | 'indigo' | 'slate';
   compact?: boolean;
   onClick?: () => void;
 }

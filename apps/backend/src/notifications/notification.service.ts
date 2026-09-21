@@ -5,6 +5,9 @@
  */
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+
+import { PrismaService } from '../common/prisma.service';
+
 import { NotificationDispatchService } from './notification-dispatch.service';
 import {
   NotificationEvent,
@@ -12,7 +15,6 @@ import {
   type NotificationPayload,
   type NotificationEventType,
 } from './notification.events';
-import { PrismaService } from '../common/prisma.service';
 
 @Injectable()
 export class NotificationService {
@@ -27,7 +29,7 @@ export class NotificationService {
    * The event listener (NotificationEventListener) will enqueue the dispatch job.
    */
   async notify(type: NotificationEventType, payload: NotificationPayload): Promise<void> {
-    await this.emitter.emitAsync(type, new NotificationEvent(type, payload));
+    await (this.emitter as any).emitAsync(type, new NotificationEvent(type, payload));
   }
 
   /** Convenience: task assigned notification */

@@ -1,6 +1,7 @@
-import React from 'react';
-import { Icon } from '../ui';
 import type { IconType } from '@ovds/ui';
+import React from 'react';
+
+import { Icon } from '../ui';
 
 export function companyInitials(name: string): string {
   return name

@@ -13,14 +13,15 @@
  */
 import React from 'react';
 import { Link } from 'react-router-dom';
+
 import {
   useIotDashboard,
   useIotAlerts,
   useIotBillingTriggers,
   useETaxSubmissions,
 } from '../../services/iotApi';
-import { Icon } from '../ui';
 import { fmtCurrency } from '../../utils/fmt';
+import { Icon } from '../ui';
 
 // ── Shared primitives ─────────────────────────────────────────────────────────
 
@@ -31,7 +32,7 @@ const WidgetShell: React.FC<{
   to?: string;
   children: React.ReactNode;
   loading?: boolean;
-}> = ({ title, icon, iconColor = 'text-emerald-500', to, children, loading }) => (
+}> = ({ title, icon, iconColor = 'text-[var(--pro-azure)]', to, children, loading }) => (
   <div className="ovds-widget-card h-full flex flex-col overflow-hidden">
     <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
       <div className="flex items-center gap-2">
@@ -39,7 +40,7 @@ const WidgetShell: React.FC<{
         <p className="text-[12px] font-bold text-slate-800 dark:text-slate-100">{title}</p>
       </div>
       {to && (
-        <Link to={to} className="text-[10px] font-bold text-emerald-600 hover:underline">
+        <Link to={to} className="text-[10px] font-bold text-[var(--pro-azure)] hover:underline">
           View all →
         </Link>
       )}
@@ -47,7 +48,7 @@ const WidgetShell: React.FC<{
     <div className="flex-1 p-4">
       {loading ? (
         <div className="flex items-center justify-center h-full">
-          <div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-[var(--pro-azure)] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : children}
     </div>
@@ -82,7 +83,7 @@ export const IotOverviewWidget: React.FC = () => {
                   strokeDasharray={`${2 * Math.PI * 30}`}
                   strokeDashoffset={`${2 * Math.PI * 30 * (1 - data.uptimePct / 100)}`}
                   strokeLinecap="round"
-                  className={data.uptimePct >= 95 ? 'text-emerald-500' : data.uptimePct >= 80 ? 'text-amber-500' : 'text-rose-500'}
+                  className={data.uptimePct >= 95 ? 'text-[var(--pro-azure)]' : data.uptimePct >= 80 ? 'text-amber-500' : 'text-rose-500'}
                   style={{ transition: 'stroke-dashoffset 0.8s ease-out' }}
                 />
               </svg>
@@ -92,7 +93,7 @@ export const IotOverviewWidget: React.FC = () => {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Stat label="Total" value={data.totalDevices} />
-              <Stat label="Online" value={data.activeDevices} color="text-emerald-600" />
+              <Stat label="Online" value={data.activeDevices} color="text-[var(--pro-azure)]" />
               <Stat label="Offline" value={data.offlineDevices} color={data.offlineDevices > 0 ? 'text-rose-600' : 'text-slate-400'} />
               <Stat label="OTA Pending" value={data.pendingOta} color={data.pendingOta > 0 ? 'text-sky-600' : 'text-slate-400'} />
             </div>
@@ -154,7 +155,7 @@ export const IotAlertsWidget: React.FC = () => {
     <WidgetShell title="Live Device Alerts" icon="BELL" iconColor="text-amber-500" to="/iot/alerts" loading={isLoading}>
       {recent.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full gap-2 py-4">
-          <Icon name="CHECK_CIRCLE" size={24} className="text-emerald-500" />
+          <Icon name="CHECK_CIRCLE" size={24} className="text-[var(--pro-azure)]" />
           <p className="text-[11px] font-semibold text-slate-500">All devices clear</p>
         </div>
       ) : (
@@ -169,7 +170,7 @@ export const IotAlertsWidget: React.FC = () => {
                 <p className="text-[9px] text-slate-400 truncate">{a.device?.name}</p>
               </div>
               <Link to="/iot/alerts"
-                className="shrink-0 text-[9px] font-bold text-emerald-600 hover:underline">
+                className="shrink-0 text-[9px] font-bold text-[var(--pro-azure)] hover:underline">
                 →
               </Link>
             </div>
@@ -232,7 +233,7 @@ export const IotBillingWidget: React.FC = () => {
 // ── etax_status ───────────────────────────────────────────────────────────────
 
 const ETAX_STATUS_CLS: Record<string, string> = {
-  ACCEPTED:  'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300',
+  ACCEPTED:  'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:text-green-300',
   SUBMITTED: 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300',
   REJECTED:  'bg-rose-100 text-rose-700 dark:bg-rose-950/30 dark:text-rose-300',
   PENDING:   'bg-sky-100 text-sky-700 dark:bg-sky-950/30 dark:text-sky-300',
@@ -246,13 +247,13 @@ export const ETaxStatusWidget: React.FC = () => {
   const accepted = submissions.filter(s => s.status === 'ACCEPTED').length;
 
   return (
-    <WidgetShell title="e-Tax Submissions" icon="SHIELD_CHECK" iconColor="text-emerald-500" to="/tax/etax-declaration" loading={isLoading}>
+    <WidgetShell title="e-Tax Submissions" icon="SHIELD_CHECK" iconColor="text-[var(--pro-azure)]" to="/tax/etax-declaration" loading={isLoading}>
       <div className="space-y-3">
         {/* Summary */}
         <div className="grid grid-cols-2 gap-2">
-          <div className="px-2 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 text-center">
-            <p className="text-[16px] font-bold text-emerald-600">{accepted}</p>
-            <p className="text-[9px] text-emerald-500 font-semibold uppercase tracking-wider">Accepted</p>
+          <div className="px-2 py-2 rounded-lg bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-center">
+            <p className="text-[16px] font-bold text-[var(--pro-azure)]">{accepted}</p>
+            <p className="text-[9px] text-[var(--pro-azure)] font-semibold uppercase tracking-wider">Accepted</p>
           </div>
           <div className="px-2 py-2 rounded-lg bg-white dark:bg-slate-800/50 text-center">
             <p className="text-[16px] font-bold text-slate-700 dark:text-slate-300">{submissions.length}</p>
@@ -270,7 +271,7 @@ export const ETaxStatusWidget: React.FC = () => {
                   {s.status}
                 </span>
                 {s.ercaReferenceNo && (
-                  <span className="font-mono text-[9px] text-emerald-600 truncate">{s.ercaReferenceNo}</span>
+                  <span className="font-mono text-[9px] text-[var(--pro-azure)] truncate">{s.ercaReferenceNo}</span>
                 )}
               </div>
             ))}
@@ -279,7 +280,7 @@ export const ETaxStatusWidget: React.FC = () => {
           <div className="text-center py-2">
             <p className="text-[11px] text-slate-400">No submissions yet</p>
             <Link to="/tax/etax-declaration"
-              className="text-[10px] font-bold text-emerald-600 hover:underline mt-1 inline-block">
+              className="text-[10px] font-bold text-[var(--pro-azure)] hover:underline mt-1 inline-block">
               Submit VAT Return →
             </Link>
           </div>

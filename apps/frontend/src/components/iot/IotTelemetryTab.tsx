@@ -3,13 +3,14 @@
  * Uses Recharts (already in @ovds/ui) for live sparklines and area charts.
  */
 import React, { useState, useMemo } from 'react';
-import { useIotDevices, useDeviceTelemetry, useLatestTelemetry, type IotTelemetry } from '../../services/iotApi';
-import { Btn, Icon, FormField } from '../ui';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, LineChart, Line,
 } from 'recharts';
+
+import { useIotDevices, useDeviceTelemetry, useLatestTelemetry } from '../../services/iotApi';
 import { fmtDateTime } from '../../utils/fmt';
+import { Icon, FormField } from '../ui';
 
 const METRIC_COLORS: Record<string, string> = {
   ENERGY_KWH:     '#10b981',
@@ -19,7 +20,7 @@ const METRIC_COLORS: Record<string, string> = {
   FLOW_RATE:      '#06b6d4',
   CURRENT_A:      '#ef4444',
   VOLTAGE_V:      '#f97316',
-  BANDWIDTH_MBPS: '#6366f1',
+  BANDWIDTH_MBPS: '#4FBA6F',
   PACKET_LOSS_PCT:'#e11d48',
 };
 
@@ -36,7 +37,7 @@ const METRIC_UNITS: Record<string, string> = {
 };
 
 const QUALITY_DOT: Record<string, string> = {
-  NORMAL:   'bg-emerald-500',
+  NORMAL:   'bg-[var(--pro-azure-50)]0',
   WARNING:  'bg-amber-500',
   CRITICAL: 'bg-rose-500',
   FAULT:    'bg-slate-400',
@@ -137,8 +138,8 @@ const IotTelemetryTab: React.FC = () => {
               className={[
                 'flex flex-col items-start p-3 rounded-xl border transition-all text-left',
                 selectedMetric === t.metricKey
-                  ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20'
-                  : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-emerald-300',
+                  ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/20'
+                  : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-[var(--pro-azure-light)]',
               ].join(' ')}
             >
               <div className="flex items-center gap-1.5 mb-1.5">
@@ -164,7 +165,7 @@ const IotTelemetryTab: React.FC = () => {
         </div>
       ) : isLoading ? (
         <div className="ovds-card py-12 flex items-center justify-center">
-          <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-[var(--pro-azure)] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : chartData.length === 0 ? (
         <div className="ovds-card py-12 text-center text-slate-400 text-[13px]">

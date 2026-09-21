@@ -1,5 +1,5 @@
 /**
- * @ovds/domains/infrastructure
+ * @ovds/domains-infrastructure
  *
  * Backend infrastructure primitives shared by all domain libraries.
  * Import from this package — never copy these into domain-specific code.

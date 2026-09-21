@@ -174,7 +174,7 @@ const InfiniteList: React.FC<{ rows?: number; showAvatar?: boolean }> = ({
     <List rows={rows} showAvatar={showAvatar} />
     <div className="flex flex-col items-center gap-2 py-3">
       <div className="w-48 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-        <div className="h-full w-1/3 bg-emerald-100 dark:bg-emerald-900/40 rounded-full ovds-shimmer" />
+        <div className="h-full w-1/3 bg-[var(--pro-azure-100)] dark:bg-green-900/40 rounded-full ovds-shimmer" />
       </div>
       <Line w="w-24" h="h-3" />
     </div>

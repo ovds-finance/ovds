@@ -2,17 +2,18 @@
  * AccountDashboard — ovds-style account overview widget.
  * Shows key financial KPIs, quick actions, and setup status.
  */
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import {
   TrendingUp, TrendingDown, Wallet, Receipt,
   Banknote, ArrowRight, ShieldCheck,
   BarChart3, Landmark, Send, Plus, ChevronRight,
   Sparkles, Activity, Users
 } from 'lucide-react';
-import { useAuth } from '../../rbac/AuthContext';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { useBusiness } from '../../context/businessContext';
 import { useApiQuery } from '../../hooks/useApiQuery';
+import { useAuth } from '../../rbac/AuthContext';
 import { fmtCompact } from '../../utils/fmt';
 
 interface AccountDashboardProps {
@@ -49,8 +50,8 @@ const AccountDashboard: React.FC<AccountDashboardProps> = ({
   const grade = healthScore?.grade ?? null;
   const overall = healthScore?.overall ?? null;
 
-  const gradeColor = grade === 'A' ? 'text-emerald-500' : grade === 'B' ? 'text-emerald-500' : grade === 'C' ? 'text-amber-500' : 'text-rose-500';
-  const gradeBg = grade === 'A' ? 'bg-emerald-500/10' : grade === 'B' ? 'bg-emerald-500/10' : grade === 'C' ? 'bg-amber-500/10' : 'bg-rose-500/10';
+  const gradeColor = grade === 'A' ? 'text-[var(--pro-azure)]' : grade === 'B' ? 'text-[var(--pro-azure)]' : grade === 'C' ? 'text-amber-500' : 'text-rose-500';
+  const gradeBg = grade === 'A' ? 'bg-[var(--pro-azure-50)]0/10' : grade === 'B' ? 'bg-[var(--pro-azure-50)]0/10' : grade === 'C' ? 'bg-amber-500/10' : 'bg-rose-500/10';
 
   const hasCompany = companies.length > 0;
 
@@ -58,9 +59,9 @@ const AccountDashboard: React.FC<AccountDashboardProps> = ({
   const quickActions = [
     { label: 'New Invoice', icon: <Send size={14} />, to: '/sales/invoices?action=new', color: 'text-teal-600 dark:text-teal-400', show: can('invoices:write') },
     { label: 'Add Employee', icon: <Users size={14} />, to: '/hr/employees?action=new', color: 'text-violet-600 dark:text-violet-400', show: can('employees:write') },
-    { label: 'Run Payroll', icon: <Banknote size={14} />, to: '/hr/payroll?action=generate', color: 'text-emerald-600 dark:text-emerald-400', show: can('payroll:generate') },
+    { label: 'Run Payroll', icon: <Banknote size={14} />, to: '/hr/payroll?action=generate', color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', show: can('payroll:generate') },
     { label: 'VAT Filing', icon: <ShieldCheck size={14} />, to: '/tax/vat', color: 'text-orange-600 dark:text-orange-400', show: can('vat:read') },
-    { label: 'Bank Accounts', icon: <Landmark size={14} />, to: '/banking/accounts', color: 'text-emerald-600 dark:text-emerald-400', show: can('bank_reconciliation:read') },
+    { label: 'Bank Accounts', icon: <Landmark size={14} />, to: '/banking/accounts', color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', show: can('bank_reconciliation:read') },
     { label: 'Reports', icon: <BarChart3 size={14} />, to: '/reports', color: 'text-slate-600 dark:text-slate-400', show: can('reports:read') },
   ].filter(a => a.show);
 
@@ -69,7 +70,7 @@ const AccountDashboard: React.FC<AccountDashboardProps> = ({
       {/* Account overview header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-slate-900 border border-emerald-200 dark:border-slate-800 flex items-center justify-center text-emerald-600 dark:text-slate-400">
+          <div className="w-10 h-10 rounded-xl bg-[var(--pro-azure-50)] dark:bg-slate-900 border border-[var(--pro-azure-100)] dark:border-slate-800 flex items-center justify-center text-[var(--pro-azure)] dark:text-slate-400">
              <Activity size={20} />
           </div>
           <div>
@@ -88,7 +89,7 @@ const AccountDashboard: React.FC<AccountDashboardProps> = ({
           )}
           <button
             onClick={() => navigate('/getting-started')}
-            className="group flex items-center gap-2 px-3 py-1.5 bg-emerald-500 dark:bg-slate-900 text-white rounded-xl text-[10px] font-bold hover:bg-emerald-600 dark:hover:bg-slate-800 transition-all border border-emerald-700 dark:border-slate-800"
+            className="group flex items-center gap-2 px-3 py-1.5 bg-[var(--pro-azure-50)]0 dark:bg-slate-900 text-white rounded-xl text-[10px] font-bold hover:bg-[var(--pro-azure-dark)] dark:hover:bg-slate-800 transition-all border border-[var(--pro-azure-dark)] dark:border-slate-800"
           >
             Guide <ChevronRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
           </button>
@@ -103,17 +104,17 @@ const AccountDashboard: React.FC<AccountDashboardProps> = ({
               label: 'Cash & Bank',
               value: fmt(summary.cash ?? 0),
               icon: <Wallet size={16} />,
-              color: 'text-emerald-600 dark:text-emerald-400',
-              bg: 'bg-emerald-500/5',
-              border: 'border-emerald-500/10'
+              color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+              bg: 'bg-[var(--pro-azure-50)]0/5',
+              border: 'border-[var(--pro-azure)]/10'
             },
             {
               label: 'Receivables',
               value: fmt(summary.ar ?? 0),
               icon: <TrendingUp size={16} />,
-              color: 'text-emerald-600 dark:text-emerald-400',
-              bg: 'bg-emerald-500/5',
-              border: 'border-emerald-500/10'
+              color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+              bg: 'bg-[var(--pro-azure-50)]0/5',
+              border: 'border-[var(--pro-azure)]/10'
             },
             {
               label: 'Payables',
@@ -155,7 +156,7 @@ const AccountDashboard: React.FC<AccountDashboardProps> = ({
       ) : (
         /* No financial data yet — show setup prompt */
         <div className="flex items-center gap-5 p-6 bg-white dark:bg-slate-900 rounded-[1.5rem] border border-slate-200 dark:border-slate-800 group/setup">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20 group-hover/setup:scale-110 transition-transform">
+          <div className="w-14 h-14 rounded-2xl bg-[var(--pro-azure-50)]0 flex items-center justify-center shrink-0 shadow-lg shadow-green-500/20 group-hover/setup:scale-110 transition-transform">
             <Sparkles size={24} className="text-white" />
           </div>
           <div className="flex-1 min-w-0">
@@ -170,7 +171,7 @@ const AccountDashboard: React.FC<AccountDashboardProps> = ({
           </div>
           <button
             onClick={() => navigate(hasCompany ? '/accounting' : '/companies/new')}
-            className="px-6 py-3 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all flex items-center gap-2 shrink-0 shadow-lg shadow-emerald-500/20 active:scale-95"
+            className="px-6 py-3 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all flex items-center gap-2 shrink-0 shadow-lg shadow-green-500/20 active:scale-95"
           >
             <Plus size={16} /> {hasCompany ? 'Start Seeding' : 'Create Company'}
           </button>
@@ -200,7 +201,7 @@ const AccountDashboard: React.FC<AccountDashboardProps> = ({
               <div className="text-right shrink-0">
                 <p className="text-lg font-bold text-slate-900 dark:text-white tabular-nums">{fmt(invoiceStats.thisTotal ?? 0)}</p>
                 {invoiceStats.trend !== undefined && (
-                  <p className={`text-[10px] font-bold mt-0.5 ${invoiceStats.trend >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                  <p className={`text-[10px] font-bold mt-0.5 ${invoiceStats.trend >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-500'}`}>
                     {invoiceStats.trend >= 0 ? '+' : '-'}{Math.abs(invoiceStats.trend)}% vs last month
                   </p>
                 )}
@@ -215,7 +216,7 @@ const AccountDashboard: React.FC<AccountDashboardProps> = ({
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-slate-900 dark:text-white">Monthly Payroll</p>
                 <div className="flex items-center gap-3 mt-1">
-                  <span className="text-[10px] font-bold text-emerald-500 uppercase">{payrollCurrent.configured ?? 0} Staff Active</span>
+                  <span className="text-[10px] font-bold text-[var(--pro-azure)] uppercase">{payrollCurrent.configured ?? 0} Staff Active</span>
                   <span className="text-slate-300 dark:text-slate-800">|</span>
                   <span className="text-[10px] font-bold text-slate-500 uppercase">May 2024</span>
                 </div>
@@ -238,7 +239,7 @@ const AccountDashboard: React.FC<AccountDashboardProps> = ({
               <button
                 key={action.to}
                 onClick={() => navigate(action.to)}
-                className="flex flex-col items-center justify-center gap-3 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all group"
+                className="flex flex-col items-center justify-center gap-3 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-[var(--pro-azure)]/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all group"
               >
                 <div className={`w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center transition-all group-hover:scale-110 ${action.color}`}>
                   {action.icon}
@@ -252,9 +253,9 @@ const AccountDashboard: React.FC<AccountDashboardProps> = ({
 
       {/* Health score bar */}
       {overall !== null && (
-        <div className="flex items-center gap-5 p-5 bg-emerald-50 dark:bg-slate-900 rounded-2xl border border-emerald-200 dark:border-slate-800 shadow-sm dark:shadow-xl overflow-hidden relative group/health">
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/5 to-transparent pointer-events-none" />
-          <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-white/5 flex items-center justify-center shrink-0 text-emerald-600 dark:text-white group-hover/health:rotate-12 transition-transform">
+        <div className="flex items-center gap-5 p-5 bg-[var(--pro-azure-50)] dark:bg-slate-900 rounded-2xl border border-[var(--pro-azure-100)] dark:border-slate-800 shadow-sm dark:shadow-xl overflow-hidden relative group/health">
+          <div className="absolute inset-0 bg-gradient-to-r from-[var(--pro-azure)]/5 to-transparent pointer-events-none" />
+          <div className="w-12 h-12 rounded-xl bg-[var(--pro-azure-100)] dark:bg-white/5 flex items-center justify-center shrink-0 text-[var(--pro-azure)] dark:text-white group-hover/health:rotate-12 transition-transform">
              <Activity size={20} />
           </div>
           <div className="flex-1">
@@ -268,13 +269,13 @@ const AccountDashboard: React.FC<AccountDashboardProps> = ({
             <div className="h-2 bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden shadow-inner">
               <div
                 className={`h-full rounded-full transition-all duration-1000 ease-out ${
-                  overall >= 80 ? 'bg-emerald-500' : overall >= 65 ? 'bg-emerald-500' : overall >= 50 ? 'bg-amber-500' : 'bg-rose-500'
+                  overall >= 80 ? 'bg-[var(--pro-azure-50)]0' : overall >= 65 ? 'bg-[var(--pro-azure-50)]0' : overall >= 50 ? 'bg-amber-500' : 'bg-rose-500'
                 }`}
                 style={{ width: `${overall}%` }}
               />
             </div>
           </div>
-          <Link to="/reports?type=health" className="p-3 bg-emerald-100 dark:bg-white/5 rounded-xl text-emerald-600 dark:text-white hover:bg-emerald-200 dark:hover:bg-white/10 transition-all shrink-0 border border-emerald-200 dark:border-white/5">
+          <Link to="/reports?type=health" className="p-3 bg-[var(--pro-azure-100)] dark:bg-white/5 rounded-xl text-[var(--pro-azure)] dark:text-white hover:bg-[var(--pro-azure-200)] dark:hover:bg-white/10 transition-all shrink-0 border border-[var(--pro-azure-100)] dark:border-white/5">
             <ArrowRight size={16} />
           </Link>
         </div>

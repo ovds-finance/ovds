@@ -3,12 +3,12 @@
  * Shows Ethiopian tax rates, deadlines, and regulatory links.
  * Can be embedded in any page or opened as a modal.
  */
-import React, { useState } from 'react';
 import {
   BookOpen, ChevronDown, ChevronUp, Globe, Shield,
   Banknote, Users, Calendar, ExternalLink, CheckCircle2,
   AlertTriangle, FileText, X, Bell, Sparkles,
 } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface Section {
   id: string;
@@ -45,7 +45,7 @@ const SECTIONS: Section[] = [
           </div>
         ))}
         <a href="https://etax.erca.gov.et" target="_blank" rel="noopener noreferrer"
-          className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 hover:underline font-bold mt-2">
+          className="flex items-center gap-1 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline font-bold mt-2">
           eTax Portal <ExternalLink size={10} />
         </a>
       </div>
@@ -55,7 +55,7 @@ const SECTIONS: Section[] = [
     id: 'pit',
     title: 'Personal Income Tax (PIT)',
     icon: <Users size={14} />,
-    color: 'text-emerald-600 dark:text-emerald-400',
+    color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
     content: (
       <div className="space-y-1.5 text-xs">
         {[
@@ -68,10 +68,10 @@ const SECTIONS: Section[] = [
         ].map(b => (
           <div key={b.range} className="flex items-center justify-between px-2 py-1.5 bg-white dark:bg-slate-800/50 rounded-lg">
             <span className="font-mono text-slate-600 dark:text-slate-300">{b.range}</span>
-            <span className="font-semibold text-emerald-600 dark:text-emerald-400">{b.rate}</span>
+            <span className="font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{b.rate}</span>
           </div>
         ))}
-        <div className="flex items-center gap-2 px-2 py-2 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg mt-2">
+        <div className="flex items-center gap-2 px-2 py-2 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-lg mt-2">
           <span className="text-slate-600 dark:text-slate-300">Pension: Employee <strong>7%</strong> + Employer <strong>11%</strong> · Cap: ETB 15,000 insurable earnings</span>
         </div>
         <p className="text-[10px] text-slate-400 mt-1">Proclamation No. 1395/2025 — effective July 7, 2025. Tax-free threshold raised from ETB 600 → ETB 2,000.</p>
@@ -144,7 +144,7 @@ const SECTIONS: Section[] = [
     id: 'deadlines',
     title: 'Filing Calendar 2026',
     icon: <Calendar size={14} />,
-    color: 'text-emerald-600 dark:text-emerald-400',
+    color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
     content: (
       <div className="space-y-1.5 text-xs">
         {[
@@ -165,7 +165,7 @@ const SECTIONS: Section[] = [
           }`}>
             {d.severity === 'critical' ? <AlertTriangle size={10} className="text-rose-500 shrink-0" /> :
              d.severity === 'warning' ? <AlertTriangle size={10} className="text-amber-500 shrink-0" /> :
-             <CheckCircle2 size={10} className="text-emerald-500 shrink-0" />}
+             <CheckCircle2 size={10} className="text-[var(--pro-azure)] shrink-0" />}
             <div className="flex-1">
               <span className="font-bold text-slate-700 dark:text-slate-300">{d.event}</span>
               <span className="text-slate-400 ml-1">({d.month})</span>
@@ -268,12 +268,12 @@ const SECTIONS: Section[] = [
     id: 'etax',
     title: 'E-Tax Portal — Online Filing Guide',
     icon: <Globe size={14} />,
-    color: 'text-emerald-600 dark:text-emerald-400',
+    color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
     content: (
       <div className="space-y-3 text-xs">
-        <div className="flex items-start gap-2 px-3 py-2.5 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl border border-emerald-100 dark:border-emerald-900">
-          <Globe size={12} className="text-emerald-500 shrink-0 mt-0.5" />
-          <p className="text-emerald-700 dark:text-emerald-300">
+        <div className="flex items-start gap-2 px-3 py-2.5 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl border border-[var(--pro-azure-100)] dark:border-green-900">
+          <Globe size={12} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
+          <p className="text-[var(--pro-azure-dark)] dark:text-green-300">
             File VAT, TOT, WHT, and BIT electronically at{' '}
             <a href="https://etax.erca.gov.et" target="_blank" rel="noopener noreferrer" className="font-bold underline">etax.erca.gov.et</a>{' '}
             using your TIN and password. Filing is required every month — even with zero transactions.
@@ -292,7 +292,7 @@ const SECTIONS: Section[] = [
             { n: 6, label: 'Pay', detail: 'Use the payment slip at a commercial bank or via Telebirr / CBE Pay' },
           ].map(s => (
             <div key={s.n} className="flex items-start gap-2 px-2 py-1.5 bg-white dark:bg-slate-800/50 rounded-lg">
-              <span className="w-4 h-4 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold flex items-center justify-center shrink-0 mt-0.5">{s.n}</span>
+              <span className="w-4 h-4 rounded-full bg-[var(--pro-azure-100)] dark:bg-green-900/40 text-[var(--pro-azure-dark)] dark:text-green-300 text-[9px] font-bold flex items-center justify-center shrink-0 mt-0.5">{s.n}</span>
               <div>
                 <span className="font-semibold text-slate-700 dark:text-slate-300">{s.label}</span>
                 <span className="text-slate-400 ml-1">— {s.detail}</span>
@@ -321,7 +321,7 @@ const SECTIONS: Section[] = [
                 <span className="font-semibold text-slate-700 dark:text-slate-300">{item.label}</span>
                 <span className="text-slate-400 ml-1">— {item.note}</span>
               </div>
-              <span className="font-semibold text-emerald-600 dark:text-emerald-400 shrink-0 ml-2">{item.value}</span>
+              <span className="font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 ml-2">{item.value}</span>
             </div>
           ))}
         </div>
@@ -360,10 +360,10 @@ const SECTIONS: Section[] = [
           <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
             className="flex items-center justify-between px-2 py-2 bg-white dark:bg-slate-800/50 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group">
             <div>
-              <span className="font-bold text-slate-700 dark:text-slate-300 group-hover:text-emerald-600 dark:text-emerald-400 transition-colors">{link.label}</span>
+              <span className="font-bold text-slate-700 dark:text-slate-300 group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">{link.label}</span>
               <span className="text-slate-400 ml-1">— {link.desc}</span>
             </div>
-            <ExternalLink size={10} className="text-slate-300 group-hover:text-emerald-600 dark:text-emerald-400 transition-colors shrink-0" />
+            <ExternalLink size={10} className="text-slate-300 group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors shrink-0" />
           </a>
         ))}
       </div>
@@ -387,8 +387,8 @@ const EthiopianComplianceGuide: React.FC<EthiopianComplianceGuideProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800/50 dark:to-slate-900">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl flex items-center justify-center">
-            <BookOpen size={15} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="w-8 h-8 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl flex items-center justify-center">
+            <BookOpen size={15} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div>
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Ethiopian Compliance Guide</p>

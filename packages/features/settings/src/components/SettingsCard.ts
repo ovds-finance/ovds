@@ -1,1 +1,0 @@
-export const SettingsCard = () => null;

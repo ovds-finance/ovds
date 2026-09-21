@@ -17,9 +17,9 @@
  *   logDenied('payroll:approve', '/hr/payroll-administration');
  */
 import { useCallback } from 'react';
-import { useAuth } from '../rbac/AuthContext';
-import api from '../services/api';
 
+import { useAuth } from '../rbac/AuthContext';
+import api, { bgConfig } from '../services/api';
 export type AuditAction =
   // Auth
   | 'LOGIN' | 'LOGOUT' | 'LOGIN_FAILED' | 'PASSWORD_RESET' | 'ROLE_CHANGED'
@@ -100,7 +100,7 @@ export function useAuditLog(): UseAuditLogReturn {
       };
       // Fire-and-forget — never await, never block the UI
       api
-        .post('/dashboard/audit-logs/client', payload, { headers: { 'x-background': '1' } } as any)
+        .post('/dashboard/audit-logs/client', payload, bgConfig())
         .catch((err: any) => {
           // Log to console in dev so audit gaps are visible during development
           if (import.meta.env.DEV) {

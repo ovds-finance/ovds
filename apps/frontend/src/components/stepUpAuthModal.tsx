@@ -1,4 +1,4 @@
-/**
+﻿/**
  * StepUpAuthModal — re-authentication gate for sensitive operations.
  *
  * Shows when an Auth0 SSO user tries to access a sensitive route/action
@@ -15,10 +15,11 @@
  *   const ok = await requireStepUp();
  *   if (ok) doSensitiveAction();
  */
-import React, { createContext, useCallback, useContext, useState } from 'react';
 import { ShieldCheck, Lock, X, Loader2, AlertTriangle } from 'lucide-react';
-import { useAuth } from '../rbac/AuthContext';
+import React, { createContext, useCallback, useContext, useState } from 'react';
+
 import { getAuth0Client } from '../rbac/auth0Client';
+import { useAuth } from '../rbac/AuthContext';
 
 const AUTH0_ENABLED = import.meta.env.VITE_AUTH0_ENABLED === 'true';
 
@@ -47,7 +48,7 @@ const Modal: React.FC<ModalProps> = ({ reason, onConfirm, onCancel, loading, fai
   <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[300] flex items-center justify-center p-6 animate-aki-fade-in">
     <div className="bg-white dark:bg-slate-900 rounded-xl w-full max-w-sm shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-aki-scale-in">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 to-violet-600 p-6 text-white">
+      <div className="bg-gradient-to-r from-[var(--pro-azure)] to-violet-600 p-6 text-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
@@ -99,7 +100,7 @@ const Modal: React.FC<ModalProps> = ({ reason, onConfirm, onCancel, loading, fai
         <button
           onClick={onConfirm}
           disabled={loading}
-          className="flex-1 py-2.5 bg-emerald-500 text-white rounded-lg text-sm font-medium hover:bg-emerald-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+          className="flex-1 py-2.5 bg-[var(--pro-azure)] text-white rounded-lg text-sm font-medium hover:bg-[var(--pro-azure-dark)] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {loading ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />}
           {loading ? 'Verifying…' : 'Verify Identity'}
@@ -173,7 +174,7 @@ export const StepUpProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           <div className="absolute inset-0 flex items-center justify-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm rounded-xl">
             <button
               onClick={() => requireStepUp(gateReason)}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg text-xs font-medium hover:bg-emerald-600 transition-colors shadow-lg"
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-lg text-xs font-medium hover:bg-[var(--pro-azure-dark)] transition-colors shadow-lg"
             >
               <Lock size={13} /> Verify Identity to Access
             </button>
@@ -200,6 +201,7 @@ export const StepUpProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useStepUp(): StepUpContextValue {
   const ctx = useContext(StepUpContext);
   if (!ctx) throw new Error('useStepUp must be used inside <StepUpProvider>');

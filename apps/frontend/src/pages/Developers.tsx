@@ -1,5 +1,3 @@
-import React, { useState } from 'react';
-import { usePageTitle } from '../hooks/usePageTitle';
 import {
   Code,
   Book,
@@ -27,7 +25,10 @@ import {
   Star,
   Send,
 } from 'lucide-react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+
+import { usePageTitle } from '../hooks/usePageTitle';
 import { FRONTEND_URL, API_URL } from '../utils/constants';
 
 interface DocSection {
@@ -38,15 +39,15 @@ interface DocSection {
 }
 
 const DOC_SECTIONS: DocSection[] = [
-  { id: 'readme',       title: 'Read Me',                icon: React.createElement(Book, { size: 15 }),     color: 'text-emerald-600 dark:text-emerald-400' },
+  { id: 'readme',       title: 'Read Me',                icon: React.createElement(Book, { size: 15 }),     color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
   { id: 'hierarchy',    title: 'Understanding Hierarchy', icon: React.createElement(Layers, { size: 15 }),   color: 'text-violet-600' },
-  { id: 'modules',      title: 'Modules',                icon: React.createElement(Package, { size: 15 }),  color: 'text-emerald-600' },
+  { id: 'modules',      title: 'Modules',                icon: React.createElement(Package, { size: 15 }),  color: 'text-[var(--pro-azure)]' },
   { id: 'menu',         title: 'Menu & Navigation',      icon: React.createElement(Globe, { size: 15 }),    color: 'text-teal-600' },
   { id: 'settings',     title: 'Settings',               icon: React.createElement(Settings, { size: 15 }), color: 'text-amber-600' },
   { id: 'permissions',  title: 'Permissions & RBAC',     icon: React.createElement(Shield, { size: 15 }),   color: 'text-rose-600' },
   { id: 'bulk-actions', title: 'Bulk Actions',           icon: React.createElement(Zap, { size: 15 }),      color: 'text-orange-600' },
   { id: 'search',       title: 'Search String',          icon: React.createElement(Terminal, { size: 15 }), color: 'text-cyan-600' },
-  { id: 'overriding',   title: 'Overriding Output',      icon: React.createElement(Code, { size: 15 }),     color: 'text-emerald-600' },
+  { id: 'overriding',   title: 'Overriding Output',      icon: React.createElement(Code, { size: 15 }),     color: 'text-[var(--pro-azure)]' },
   { id: 'hooking',      title: 'Hooking Models',         icon: React.createElement(GitBranch, { size: 15 }),color: 'text-pink-600' },
   { id: 'api',          title: 'RESTful API',            icon: React.createElement(Database, { size: 15 }), color: 'text-sky-600' },
   { id: 'beyond-crud',  title: 'Beyond CRUD',            icon: React.createElement(Cpu, { size: 15 }),      color: 'text-lime-600' },
@@ -54,14 +55,14 @@ const DOC_SECTIONS: DocSection[] = [
   { id: 'versioning',   title: 'Version Compatibility',  icon: React.createElement(GitBranch, { size: 15 }),color: 'text-slate-600' },
   { id: 'become-dev',   title: 'Become a Developer',     icon: React.createElement(Star, { size: 15 }),     color: 'text-yellow-600' },
   { id: 'faq',          title: 'FAQ & Troubleshooting',  icon: React.createElement(AlertCircle, { size: 15 }), color: 'text-rose-500' },
-  { id: 'testing',      title: 'Testing',                icon: React.createElement(CheckCircle, { size: 15 }), color: 'text-emerald-500' },
+  { id: 'testing',      title: 'Testing',                icon: React.createElement(CheckCircle, { size: 15 }), color: 'text-[var(--pro-azure)]' },
   { id: 'i18n',         title: 'Internationalization',   icon: React.createElement(Globe, { size: 15 }),       color: 'text-teal-500' },
-  { id: 'platform',     title: 'Platform Reference',     icon: React.createElement(Layers, { size: 15 }),      color: 'text-emerald-600 dark:text-emerald-400' },
+  { id: 'platform',     title: 'Platform Reference',     icon: React.createElement(Layers, { size: 15 }),      color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
 ];
 
 const METHOD_COLORS: Record<string, string> = {
-  GET:    'bg-emerald-50 text-emerald-700 border border-emerald-200',
-  POST:   'bg-emerald-50 text-emerald-600 dark:text-emerald-400 border border-emerald-200',
+  GET:    'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)]',
+  POST:   'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-[var(--pro-azure-100)]',
   PATCH:  'bg-amber-50 text-amber-700 border border-amber-200',
   DELETE: 'bg-rose-50 text-rose-700 border border-rose-200',
   PUT:    'bg-purple-50 text-purple-700 border border-purple-200',
@@ -80,9 +81,9 @@ const rbacRoles = [
   { role: 'SUPERADMIN', weight: 190, scope: 'Company super admin — full access',           color: 'bg-rose-100 text-rose-700' },
   { role: 'DEVELOPER',  weight: 150, scope: 'Full API + system, read-only audit',          color: 'bg-orange-100 text-orange-700' },
   { role: 'ADMIN',      weight: 100, scope: 'Full operations, read ovds/HR',            color: 'bg-violet-100 text-violet-700' },
-  { role: 'OVDS',       weight: 60,  scope: 'Full OVDS, VAT, payroll approve',         color: 'bg-emerald-100 text-emerald-700' },
+  { role: 'OVDS',       weight: 60,  scope: 'Full OVDS, VAT, payroll approve',         color: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' },
   { role: 'ACCOUNTING', weight: 55,  scope: 'Bookkeeping, bank reconciliation, VAT calc',  color: 'bg-teal-100 text-teal-700' },
-  { role: 'HR',         weight: 50,  scope: 'Full HRIS, payroll generate',                 color: 'bg-indigo-100 text-indigo-700' },
+  { role: 'HR',         weight: 50,  scope: 'Full HRIS, payroll generate',                 color: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' },
   { role: 'AUDITOR',    weight: 30,  scope: 'Read-only all domains + annotate audit logs', color: 'bg-slate-100 text-slate-700' },
   { role: 'EMPLOYEE',   weight: 10,  scope: 'Self-service: leaves, payslips, expenses',    color: 'bg-sky-100 text-sky-700' },
   { role: 'CRM',        weight: 25,  scope: 'Customer management, invoice read',           color: 'bg-pink-100 text-pink-700' },
@@ -120,7 +121,7 @@ const CodeBlock: React.FC<{ code: string; language?: string }> = ({ code, langua
       <div className="flex items-center justify-between px-4 py-2 bg-slate-800 dark:bg-slate-900">
         <span className="text-xs text-slate-400 font-mono">{language}</span>
         <button onClick={handleCopy} className="flex items-center gap-1 text-xs text-slate-400 hover:text-white transition-colors" aria-label="Copy code">
-          {copied ? <CheckCheck size={13} className="text-emerald-400" /> : <Copy size={13} />}
+          {copied ? <CheckCheck size={13} className="text-[var(--pro-azure-light)]" /> : <Copy size={13} />}
           {copied ? 'Copied' : 'Copy'}
         </button>
       </div>
@@ -131,9 +132,9 @@ const CodeBlock: React.FC<{ code: string; language?: string }> = ({ code, langua
 
 const InfoBox: React.FC<{ type?: 'info' | 'warning' | 'success'; children: React.ReactNode }> = ({ type = 'info', children }) => {
   const styles = {
-    info:    'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-900/20 dark:border-emerald-700 dark:text-emerald-600 dark:text-emerald-300',
+    info:    'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/20 dark:border-green-700 dark:text-[var(--pro-azure)] dark:text-green-300',
     warning: 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-700 dark:text-amber-300',
-    success: 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-900/20 dark:border-emerald-700 dark:text-emerald-600 dark:text-emerald-300',
+    success: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/20 dark:border-green-700 dark:text-[var(--pro-azure)] dark:text-green-300',
   };
   const icons = {
     info:    <Info size={15} className="shrink-0 mt-0.5" />,
@@ -148,7 +149,7 @@ const InfoBox: React.FC<{ type?: 'info' | 'warning' | 'success'; children: React
   );
 };
 
-const SectionHeading: React.FC<{ id: string; icon: React.ReactNode; title: string; color?: string }> = ({ id, icon, title, color = 'text-emerald-600 dark:text-emerald-400' }) => (
+const SectionHeading: React.FC<{ id: string; icon: React.ReactNode; title: string; color?: string }> = ({ id, icon, title, color = 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' }) => (
   <div id={id} className="flex items-center gap-2 mb-4 pt-2 scroll-mt-20">
     <span className={color}>{icon}</span>
     <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">{title}</h2>
@@ -165,7 +166,7 @@ const Paragraph: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 const Divider = () => <hr className="my-8 border-slate-200 dark:border-slate-700" />;
 
-const Badge: React.FC<{ label: string; color?: string }> = ({ label, color = 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400' }) => (
+const Badge: React.FC<{ label: string; color?: string }> = ({ label, color = 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' }) => (
   <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${color}`}>{label}</span>
 );
 
@@ -227,7 +228,7 @@ const Developers: React.FC = () => {
       <aside className="hidden lg:flex flex-col w-60 shrink-0 border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 sticky top-0 h-screen overflow-y-auto">
         <div className="px-4 py-5 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[var(--pro-azure-50)]0 flex items-center justify-center">
               <Code size={16} className="text-white" />
             </div>
             <div>
@@ -243,11 +244,11 @@ const Developers: React.FC = () => {
               onClick={() => scrollToSection(sec.id)}
               className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors text-left ${
                 activeSection === sec.id
-                  ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400'
+                  ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
-              <span className={activeSection === sec.id ? 'text-emerald-600 dark:text-emerald-400' : sec.color}>{sec.icon}</span>
+              <span className={activeSection === sec.id ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : sec.color}>{sec.icon}</span>
               {sec.title}
             </button>
           ))}
@@ -257,7 +258,7 @@ const Developers: React.FC = () => {
             href={`${import.meta.env.VITE_API_URL ?? '/api'}/docs`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 hover:underline"
+            className="flex items-center gap-1.5 text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline"
           >
             <ExternalLink size={12} />
             Swagger API Docs
@@ -269,36 +270,36 @@ const Developers: React.FC = () => {
       <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-8 py-8 overflow-y-auto">
 
         {/* Hero */}
-        <div className="mb-8 relative rounded-2xl overflow-hidden border border-emerald-500/20 bg-white dark:bg-gradient-to-r dark:from-emerald-950/60 dark:via-slate-900 dark:to-slate-900 p-6">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-transparent pointer-events-none" />
-          <div className="absolute top-0 left-0 w-64 h-px bg-gradient-to-r from-emerald-500/60 to-transparent" />
+        <div className="mb-8 relative rounded-2xl overflow-hidden border border-[var(--pro-azure)]/20 bg-white dark:bg-gradient-to-r dark:from-green-950/60 dark:via-slate-900 dark:to-slate-900 p-6">
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--pro-azure)]/5 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute top-0 left-0 w-64 h-px bg-gradient-to-r from-[var(--pro-azure)]/60 to-transparent" />
           <div className="relative flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/15 border border-slate-200 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/10">
-              <Code size={24} className="text-emerald-400" />
+            <div className="w-12 h-12 rounded-xl bg-[var(--pro-azure-50)]0/15 border border-slate-200 flex items-center justify-center shrink-0 shadow-lg shadow-green-500/10">
+              <Code size={24} className="text-[var(--pro-azure-light)]" />
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="ovds-hero-title text-white">OVDS Developer Hub</h1>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-slate-200 uppercase tracking-wider">v2.0</span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure)] dark:text-green-300 border border-slate-200 uppercase tracking-wider">v2.0</span>
               </div>
-              <p className="text-emerald-400/70 text-sm leading-relaxed">
+              <p className="text-[var(--pro-azure-light)]/70 text-sm leading-relaxed">
                 Build modules, extend the API, and integrate with the OVDS ERP platform.
                 OVDS is a production-ready, multi-tenant ERP for Ethiopian businesses — built on
                 NestJS 11 + React 18 + Prisma 7 + MySQL/MariaDB.
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
-                <Badge label="NestJS 11" color="bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-slate-200" />
-                <Badge label="React 18" color="bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-slate-200" />
-                <Badge label="Prisma 7" color="bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-slate-200" />
-                <Badge label="TypeScript" color="bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-slate-200" />
-                <Badge label="MySQL/MariaDB" color="bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-slate-200" />
+                <Badge label="NestJS 11" color="bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure)] dark:text-green-300 border border-slate-200" />
+                <Badge label="React 18" color="bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure)] dark:text-green-300 border border-slate-200" />
+                <Badge label="Prisma 7" color="bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure)] dark:text-green-300 border border-slate-200" />
+                <Badge label="TypeScript" color="bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure)] dark:text-green-300 border border-slate-200" />
+                <Badge label="MySQL/MariaDB" color="bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure)] dark:text-green-300 border border-slate-200" />
               </div>
             </div>
           </div>
         </div>
 
         {/* -- READ ME -- */}
-        <SectionHeading id="readme" icon={<Book size={20} />} title="Read Me" color="text-emerald-600 dark:text-emerald-400" />
+        <SectionHeading id="readme" icon={<Book size={20} />} title="Read Me" color="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
         <Paragraph>
           OVDS (Online VAT Declaration System) is a production-ready, multi-tenant ERP platform built for Ethiopian
           businesses. It provides full HR, payroll, accounting, tax compliance (VAT/ERCA), invoice, CRM, and business
@@ -367,7 +368,7 @@ npm run dev:all`} />
                 ['npm run test:e2e',                   'Run end-to-end tests'],
               ].map(([cmd, desc]) => (
                 <tr key={cmd} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700 whitespace-nowrap">{cmd}</td>
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700 whitespace-nowrap">{cmd}</td>
                   <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{desc}</td>
                 </tr>
               ))}
@@ -389,8 +390,8 @@ npm run dev:all`} />
               {[
                 ['SPURADMIN',  'superadmin@ovds.com', 'SuperAdmin@2026!',  'bg-rose-100 text-rose-700'],
                 ['ADMIN',      'admin@ovds.com',      'changeme123',       'bg-violet-100 text-violet-700'],
-                ['HR',         'hr@ovds.com',         'hr_pass_2026',      'bg-indigo-100 text-indigo-700'],
-                ['OVDS', 'ovds@ovds.com',    'fin_pass_2026',     'bg-emerald-100 text-emerald-700'],
+                ['HR',         'hr@ovds.com',         'hr_pass_2026',      'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'],
+                ['OVDS', 'ovds@ovds.com',    'fin_pass_2026',     'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'],
                 ['ACCOUNTING', 'selam@ovds.com',      'acct_pass_2026',    'bg-teal-100 text-teal-700'],
                 ['AUDITOR',    'bereket@ovds.com',    'audit_pass_2026',   'bg-slate-100 text-slate-700'],
                 ['EMPLOYEE',   'employee@ovds.com',   'emp_pass_2026',     'bg-sky-100 text-sky-700'],
@@ -421,7 +422,7 @@ npm run dev:all`} />
             { port: '5555', service: 'Prisma Studio',     fix: 'npx kill-port 5555' },
           ].map(p => (
             <div key={p.port} className="flex-1 min-w-[160px] rounded-lg border border-slate-200 dark:border-slate-700 p-3 bg-white dark:bg-slate-900">
-              <p className="text-lg font-bold font-mono text-emerald-600 dark:text-emerald-400">{p.port}</p>
+              <p className="text-lg font-bold font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{p.port}</p>
               <p className="text-xs font-medium text-slate-700 dark:text-slate-200">{p.service}</p>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{p.fix}</p>
             </div>
@@ -440,8 +441,8 @@ npm run dev:all`} />
         <div className="ovds-grid-layout cols-3 my-4">
           {[
             { icon: <Users size={20} />, title: 'Users', desc: 'Located at the top of the OVDS pyramid. Each user has a single role that determines their access across all companies they belong to.', color: 'border-violet-200 bg-violet-50 dark:bg-violet-900/20' },
-            { icon: <Database size={20} />, title: 'Companies', desc: 'A company (business) is where accounting records such as invoices, customers, employees, and payroll live. Multi-tenant isolation enforced via CompanyGuard.', color: 'border-emerald-200 bg-emerald-50 dark:bg-emerald-900/20' },
-            { icon: <Package size={20} />, title: 'Modules / Apps', desc: 'Extend OVDS with custom modules. Each module has routes, services, controllers, and models. Installed per company via the App Store.', color: 'border-emerald-200 bg-emerald-50 dark:bg-emerald-900/20' },
+            { icon: <Database size={20} />, title: 'Companies', desc: 'A company (business) is where accounting records such as invoices, customers, employees, and payroll live. Multi-tenant isolation enforced via CompanyGuard.', color: 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)] dark:bg-green-900/20' },
+            { icon: <Package size={20} />, title: 'Modules / Apps', desc: 'Extend OVDS with custom modules. Each module has routes, services, controllers, and models. Installed per company via the App Store.', color: 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)] dark:bg-green-900/20' },
           ].map(item => (
             <div key={item.title} className={`rounded-xl border p-4 ${item.color}`}>
               <div className="text-slate-600 dark:text-slate-300 mb-2">{item.icon}</div>
@@ -495,7 +496,7 @@ npm run dev:all`} />
                 <tr key={entity} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
                   <td className="px-3 py-2 font-semibold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700">{entity}</td>
                   <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{belongs}</td>
-                  <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700">{key}</td>
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700">{key}</td>
                 </tr>
               ))}
             </tbody>
@@ -530,7 +531,7 @@ findAll(@Req() req: Request) {
         <Divider />
 
         {/* -- MODULES -- */}
-        <SectionHeading id="modules" icon={<Package size={20} />} title="Modules" color="text-emerald-600" />
+        <SectionHeading id="modules" icon={<Package size={20} />} title="Modules" color="text-[var(--pro-azure)]" />
         <Paragraph>
           OVDS ships with core accounting tools needed to manage money. It also has a modular structure so you can extend
           it. A module is like a NestJS feature module combined with a React page — it has routes, views, controllers,
@@ -659,7 +660,7 @@ export class AppModule {}`} />
             'Add i18n keys to all 3 sections in i18n.json',
           ].map((item, i) => (
             <div key={i} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
-              <CheckCircle size={14} className="text-emerald-500 shrink-0 mt-0.5" />
+              <CheckCircle size={14} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
               <span>{item}</span>
             </div>
           ))}
@@ -751,7 +752,7 @@ interface NavItem {
                 ['payroll',          'violet',  'Payroll, PayrollAdministration'],
                 ['sales',            'teal',    'Invoices, Customers, Items'],
                 ['purchases',        'rose',    'Bills, Vendors, PurchaseOrders'],
-                ['banking_treasury', 'emerald', 'BankAccounts, FundTransfers, BankStatementImport'],
+                ['banking_treasury', 'indigo', 'BankAccounts, FundTransfers, BankStatementImport'],
                 ['accounting',       'cyan',    'ChartOfAccounts, JournalEntries, PeriodClose'],
                 ['tax_compliance',   'orange',  'VatAdministration, DisasterFund, TaxFiling'],
                 ['crm_domain',       'purple',  'CRM, CustomerSummary, Partnerships'],
@@ -759,7 +760,7 @@ interface NavItem {
                 ['system',           'slate',   'Users, Settings, RolePermissions, AppStore'],
               ].map(([key, color, pages]) => (
                 <tr key={key} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700">{key}</td>
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700">{key}</td>
                   <td className="px-3 py-2 border border-slate-200 dark:border-slate-700">
                     <Badge label={color} color="bg-slate-100 text-slate-600" />
                   </td>
@@ -799,7 +800,7 @@ const ROUTE_BREADCRUMBS: Record<string, { domain: string; label: string }> = {
         <SubHeading>Icons</SubHeading>
         <Paragraph>
           OVDS uses <strong>lucide-react</strong> exclusively. Browse all icons at{' '}
-          <a href="https://lucide.dev/icons" target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1">
+          <a href="https://lucide.dev/icons" target="_blank" rel="noopener noreferrer" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline inline-flex items-center gap-1">
             lucide.dev/icons <ExternalLink size={11} />
           </a>. Import directly from the package:
         </Paragraph>
@@ -920,7 +921,7 @@ export const MyModuleSettings: React.FC = () => {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="px-4 py-2 rounded-lg bg-emerald-500 text-white text-sm font-medium hover:bg-emerald-600 disabled:opacity-50"
+          className="px-4 py-2 rounded-lg bg-[var(--pro-azure)] text-white text-sm font-medium hover:bg-[var(--pro-azure-dark)] disabled:opacity-50"
         >
           {saving ? 'Saving…' : 'Save Settings'}
         </button>
@@ -955,7 +956,7 @@ export const MyModuleSettings: React.FC = () => {
                 ['company_logo_url',     '—',                   'Invoice PDFs + payslips'],
               ].map(([key, def, used]) => (
                 <tr key={key} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700">{key}</td>
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700">{key}</td>
                   <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{def}</td>
                   <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{used}</td>
                 </tr>
@@ -1121,7 +1122,7 @@ if (canCrud('employees', 'delete')) { /* delete button */ }
               <ul className="space-y-1.5">
                 {card.points.map((p, i) => (
                   <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400">
-                    <CheckCircle size={12} className="text-emerald-500 shrink-0 mt-0.5" />
+                    <CheckCircle size={12} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
                     {p}
                   </li>
                 ))}
@@ -1165,7 +1166,7 @@ if (canCrud('employees', 'delete')) { /* delete button */ }
                 ['skip', 'boolean', 'Always allow — bypass all checks'],
               ].map(([opt, type, desc]) => (
                 <tr key={opt} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700">{opt}</td>
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700">{opt}</td>
                   <td className="px-3 py-2 text-slate-500 dark:text-slate-500 border border-slate-200 dark:border-slate-700 italic">{type}</td>
                   <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{desc}</td>
                 </tr>
@@ -1302,7 +1303,7 @@ async getIfrsReport(companyId: string) {
               { q: 'Does the access depend on whether a company is selected?', a: 'Use ABAC — add requireCompany to <Can>. This prevents actions before onboarding is complete.' },
               { q: 'Does the access depend on a combination of the above?', a: 'Layer them — RBAC sets the baseline, ABAC adds the contextual conditions. All conditions must pass.' },
             ].map(({ q, a }, i) => (
-              <div key={i} className="border-l-2 border-emerald-600 pl-3">
+              <div key={i} className="border-l-2 border-[var(--pro-azure)] pl-3">
                 <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-0.5">{q}</p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">{a}</p>
               </div>
@@ -1399,10 +1400,10 @@ const handleBulkApprove = async () => {
 
 // Bulk action toolbar — only visible when rows are selected
 {selected.length > 0 && (
-  <div className="flex items-center gap-3 p-3 bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-200 dark:border-emerald-800 rounded-lg">
-    <span className="text-sm text-emerald-600 dark:text-emerald-600 dark:text-emerald-400 font-medium">{selected.length} selected</span>
+  <div className="flex items-center gap-3 p-3 bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-lg">
+    <span className="text-sm text-[var(--pro-azure)] dark:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-medium">{selected.length} selected</span>
     <Can permission="my_module:write">
-      <button onClick={handleBulkApprove} className="text-sm text-emerald-600 hover:underline">
+      <button onClick={handleBulkApprove} className="text-sm text-[var(--pro-azure)] hover:underline">
         Approve all
       </button>
     </Can>
@@ -1556,7 +1557,7 @@ const where = {
         <Divider />
 
         {/* -- OVERRIDING OUTPUT -- */}
-        <SectionHeading id="overriding" icon={<Code size={20} />} title="Overriding Output" color="text-emerald-600" />
+        <SectionHeading id="overriding" icon={<Code size={20} />} title="Overriding Output" color="text-[var(--pro-azure)]" />
         <Paragraph>
           To extend OVDS core functionality without modifying core files, use React component composition
           and NestJS service extension. This keeps OVDS upgradeable — you can pull upstream changes without
@@ -1806,7 +1807,7 @@ export class NotificationListener {
         <Paragraph>
           OVDS provides a RESTful API to create, read, update, and delete (CRUD) all entities. The API uses JWT Bearer
           authentication. Access the interactive Swagger docs at{' '}
-          <a href={`${API_URL}/docs`} target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1">
+          <a href={`${API_URL}/docs`} target="_blank" rel="noopener noreferrer" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline inline-flex items-center gap-1">
             /api/docs <ExternalLink size={12} />
           </a>.
         </Paragraph>
@@ -1990,7 +1991,7 @@ export class MyModuleService {
                 ['@ApiQuery({ name, required, type })',   'Method',            'Documents query parameter'],
               ].map(([dec, where, purpose]) => (
                 <tr key={dec} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700 whitespace-nowrap">{dec}</td>
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700 whitespace-nowrap">{dec}</td>
                   <td className="px-3 py-2 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{where}</td>
                   <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{purpose}</td>
                 </tr>
@@ -2542,7 +2543,7 @@ try {
                 ['<PermissionTooltip />', '../rbac',                     '"Why denied" tooltip on hover over any element'],
               ].map(([comp, path, purpose]) => (
                 <tr key={comp} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700 whitespace-nowrap">{comp}</td>
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700 whitespace-nowrap">{comp}</td>
                   <td className="px-3 py-2 font-mono text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 whitespace-nowrap">{path}</td>
                   <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{purpose}</td>
                 </tr>
@@ -2556,7 +2557,7 @@ try {
   value="ETB 1,250,000"
   trend={+12.4}          // positive = green arrow up, negative = red arrow down
   icon={<TrendingUp size={20} />}
-  color="emerald"
+  color="indigo"
 />
 
 // ColumnToggle — show/hide table columns
@@ -2818,10 +2819,10 @@ GET /api/ovds/invoices/telecom-receipt/:ref
             <tbody>
               {versionRows.map((row, i) => (
                 <tr key={i} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700">{row.module}</td>
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700">{row.module}</td>
                   <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{row.ovdsReleased}</td>
                   <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{row.userVersion}</td>
-                  <td className="px-3 py-2 font-mono text-emerald-600 border border-slate-200 dark:border-slate-700">{row.gets}</td>
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure)] border border-slate-200 dark:border-slate-700">{row.gets}</td>
                 </tr>
               ))}
             </tbody>
@@ -2862,7 +2863,7 @@ GET /api/ovds/invoices/telecom-receipt/:ref
                 ['NODE_ENV', 'No', 'production disables ms field in responses'],
               ].map(([key, req, desc]) => (
                 <tr key={key} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700">{key}</td>
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700">{key}</td>
                   <td className="px-3 py-2 border border-slate-200 dark:border-slate-700">
                     <Badge label={req} color={req === 'Yes' ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'} />
                   </td>
@@ -2906,7 +2907,7 @@ docker-compose down`} />
             { text: 'Firewall: expose only ports 80/443 externally; 3001/3306 internal only', done: false },
           ].map((item, i) => (
             <div key={i} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
-              <ArrowRight size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+              <ArrowRight size={13} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5" />
               <span>{item.text}</span>
             </div>
           ))}
@@ -2987,7 +2988,7 @@ mysqldump -u root -p ovds > backup_$(date +%Y%m%d_%H%M%S).sql
 mysql -u root -p ovds < backup_20260418_120000.sql
 
 # Automated daily backup via cron (crontab -e)
-0 2 * * * mysqldump -u root -p'yourpassword' ovds | gzip > /backups/ovds_$(date +\%Y\%m\%d).sql.gz
+0 2 * * * mysqldump -u root -p'yourpassword' ovds | gzip > /backups/ovds_$(date +%Y%m%d).sql.gz
 
 # Keep last 30 days only
 0 3 * * * find /backups -name "ovds_*.sql.gz" -mtime +30 -delete
@@ -3018,8 +3019,8 @@ npx prisma migrate status                        # check pending migrations
 
         <div className="ovds-grid-layout cols-3 my-4">
           {[
-            { icon: <Code size={20} />, title: 'Build Modules', desc: 'Create React + NestJS modules that extend OVDS for Ethiopian businesses.', color: 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20' },
-            { icon: <Globe size={20} />, title: 'Publish to App Store', desc: 'List your module in the OVDS App Store and reach thousands of Ethiopian SMEs.', color: 'border-emerald-200 bg-emerald-50 dark:bg-emerald-900/20' },
+            { icon: <Code size={20} />, title: 'Build Modules', desc: 'Create React + NestJS modules that extend OVDS for Ethiopian businesses.', color: 'border-[var(--pro-azure-100)] dark:border-green-800 bg-[var(--pro-azure-50)] dark:bg-green-900/20' },
+            { icon: <Globe size={20} />, title: 'Publish to App Store', desc: 'List your module in the OVDS App Store and reach thousands of Ethiopian SMEs.', color: 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)] dark:bg-green-900/20' },
             { icon: <Star size={20} />, title: 'Earn Revenue', desc: 'Monetize your modules through the OVDS marketplace and developer fund.', color: 'border-amber-200 bg-amber-50 dark:bg-amber-900/20' },
           ].map(item => (
             <div key={item.title} className={`rounded-xl border p-4 ${item.color}`}>
@@ -3031,10 +3032,10 @@ npx prisma migrate status                        # check pending migrations
         </div>
 
         {formSubmitted ? (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 dark:bg-emerald-900/20 p-6 text-center">
-            <CheckCircle size={32} className="text-emerald-500 mx-auto mb-3" />
-            <p className="font-semibold text-emerald-800 dark:text-emerald-600 dark:text-emerald-300 text-base mb-1">Application Submitted!</p>
-            <p className="text-sm text-emerald-700 dark:text-emerald-400">
+          <div className="rounded-xl border border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)] dark:bg-green-900/20 p-6 text-center">
+            <CheckCircle size={32} className="text-[var(--pro-azure)] mx-auto mb-3" />
+            <p className="font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure)] dark:text-green-300 text-base mb-1">Application Submitted!</p>
+            <p className="text-sm text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
               Thank you for your interest. We will review your application and get back to you shortly.
             </p>
           </div>
@@ -3162,7 +3163,7 @@ npx prisma migrate status                        # check pending migrations
             <div className="flex justify-end pt-2">
               <button
                 type="submit"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-500 text-white text-sm font-medium hover:bg-emerald-600 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--pro-azure)] text-white text-sm font-medium hover:bg-[var(--pro-azure-dark)] transition-colors focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2"
               >
                 <Send size={15} />
                 Submit Application
@@ -3177,7 +3178,7 @@ npx prisma migrate status                        # check pending migrations
         <SectionHeading id="faq" icon={<AlertCircle size={20} />} title="FAQ & Troubleshooting" color="text-rose-500" />
         <Paragraph>
           Common questions and issues developers run into when building on OVDS. If your issue is
-          not listed here, check the <a href={`${API_URL}/docs`} target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 hover:underline">Swagger docs</a> or
+          not listed here, check the <a href={`${API_URL}/docs`} target="_blank" rel="noopener noreferrer" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">Swagger docs</a> or
           the <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded text-xs">AGENTS.md</code> reference in the repository root.
         </Paragraph>
 
@@ -3246,7 +3247,7 @@ npm run seed      # then seed data`} />
             <p>Check these in order:</p>
             <ol className="list-decimal list-inside space-y-1">
               <li>Token missing — check <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded text-xs">localStorage.ovds_token</code> in DevTools</li>
-              <li>Token expired — decode at <a href="https://jwt.io" target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 hover:underline">jwt.io</a> and check the <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded text-xs">exp</code> field</li>
+              <li>Token expired — decode at <a href="https://jwt.io" target="_blank" rel="noopener noreferrer" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">jwt.io</a> and check the <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded text-xs">exp</code> field</li>
               <li>Wrong <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded text-xs">JWT_SECRET</code> — check <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded text-xs">.env</code> matches what was used to sign tokens</li>
             </ol>
             <CodeBlock language="bash" code={`# Quick test — get a fresh token
@@ -3310,7 +3311,7 @@ const items = await this.prisma.myModel.findMany({
               'Add to ROUTE_BREADCRUMBS in Header.tsx',
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400">
-                <ArrowRight size={12} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <ArrowRight size={12} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5" />
                 <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">{item}</code>
               </div>
             ))}
@@ -3425,7 +3426,7 @@ const employerPension   = insurableEarnings * 0.11;`} />
                   ['LOAN_VALUE', 'BusinessLoan with status DISBURSED for the period'],
                 ].map(([src, req]) => (
                   <tr key={src} className="border-b border-slate-100 dark:border-slate-800">
-                    <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700">{src}</td>
+                    <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700">{src}</td>
                     <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{req}</td>
                   </tr>
                 ))}
@@ -3551,7 +3552,7 @@ npx vite-bundle-visualizer --prefix frontend
         </InfoBox>
 
         {/* -- TESTING -- */}
-        <SectionHeading id="testing" icon={<CheckCircle size={20} />} title="Testing" color="text-emerald-500" />
+        <SectionHeading id="testing" icon={<CheckCircle size={20} />} title="Testing" color="text-[var(--pro-azure)]" />
         <Paragraph>
           OVDS uses Jest for backend unit tests and Vitest for frontend tests. Write tests alongside
           your module files — <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded text-xs">feature.service.spec.ts</code> and <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded text-xs">feature.controller.spec.ts</code>.
@@ -3831,7 +3832,7 @@ i18n.changeLanguage('en');  // English`} />
                 ['nav.module_name', 'nav.payroll', 'Sidebar navigation label'],
               ].map(([pattern, example, usage]) => (
                 <tr key={pattern} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700">{pattern}</td>
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700">{pattern}</td>
                   <td className="px-3 py-2 font-mono text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{example}</td>
                   <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{usage}</td>
                 </tr>
@@ -3857,7 +3858,7 @@ i18n.changeLanguage('en');  // English`} />
         <CodeBlock language="typescript" code={`// ✅ Always pair light and dark variants
 <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">
   <p className="text-slate-600 dark:text-slate-400">Description</p>
-  <button className="bg-emerald-500 hover:bg-emerald-600 text-white">
+  <button className="bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white">
     Action
   </button>
 </div>
@@ -3876,9 +3877,9 @@ i18n.changeLanguage('en');  // English`} />
         <SubHeading>Brand Color Tokens</SubHeading>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 my-3">
           {[
-            { token: 'emerald-500',    hex: '#00E784', usage: 'Careem Green — primary brand color', bg: 'bg-[#00E784]' },
-            { token: 'emerald-600', hex: '#00C96E', usage: 'Hover / dark variant',             bg: 'bg-[#00C96E]' },
-            { token: 'emerald-200', hex: '#6EFFC0', usage: 'Light tint / dark mode accent',   bg: 'bg-[#6EFFC0]' },
+            { token: 'indigo-500',    hex: '#00E784', usage: 'Careem Green — primary brand color', bg: 'bg-[#00E784]' },
+            { token: 'indigo-600', hex: '#00C96E', usage: 'Hover / dark variant',             bg: 'bg-[#00C96E]' },
+            { token: 'indigo-200', hex: '#6EFFC0', usage: 'Light tint / dark mode accent',   bg: 'bg-[#6EFFC0]' },
             { token: 'ovds-sidebar',    hex: '#1e293b', usage: 'Sidebar background (navy)',           bg: 'bg-[#1e293b]' },
             { token: 'ovds-success',    hex: '#00C96E', usage: 'Success / settled states',           bg: 'bg-[#00C96E]' },
             { token: 'ovds-warning',    hex: '#d97706', usage: 'Warning states',                     bg: 'bg-[#d97706]' },
@@ -3931,7 +3932,7 @@ navigator.serviceWorker?.addEventListener('message', (event) => {
         <Divider />
 
         {/* -- PLATFORM REFERENCE -- */}
-        <SectionHeading id="platform" icon={<Layers size={20} />} title="Platform Reference" color="text-emerald-600 dark:text-emerald-400" />
+        <SectionHeading id="platform" icon={<Layers size={20} />} title="Platform Reference" color="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
         <Paragraph>
           Quick reference for the most-used platform concepts when building modules for OVDS.
         </Paragraph>
@@ -3962,7 +3963,7 @@ navigator.serviceWorker?.addEventListener('message', (event) => {
               ].map(([tax, rate, deadline, basis]) => (
                 <tr key={tax} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
                   <td className="px-3 py-2 font-semibold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700">{tax}</td>
-                  <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700">{rate}</td>
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700">{rate}</td>
                   <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{deadline}</td>
                   <td className="px-3 py-2 text-slate-500 dark:text-slate-500 border border-slate-200 dark:border-slate-700">{basis}</td>
                 </tr>
@@ -4012,20 +4013,20 @@ const incomeTax         = calcEthiopianPIT(taxableIncome);
                 ['GOVERNMENT',       'Tier 1 — Full IFRS',     'slate',  'Government-owned — mandatory'],
                 ['MANUFACTURING',    'Tier 1 or Tier 2',       'orange', 'Depends on AABE thresholds'],
                 ['MEDIUM_ENTERPRISE','Tier 1 or Tier 2',       'blue',   'Straddles both thresholds'],
-                ['SMALL_BUSINESS',   'Tier 2 — IFRS for SMEs', 'emerald','Typically meets Threshold 2'],
+                ['SMALL_BUSINESS',   'Tier 2 — IFRS for SMEs', 'indigo','Typically meets Threshold 2'],
                 ['FREELANCER',       'Tier 3 — Micro-entity',  'amber',  'Outside IFRS scope'],
               ].map(([type, tier, color, note]) => {
                 const colorMap: Record<string, string> = {
                   violet:  'bg-violet-100 dark:bg-violet-950/30 text-violet-700 dark:text-violet-400',
                   slate:   'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400',
                   orange:  'bg-orange-100 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400',
-                  blue:    'bg-blue-100 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400',
-                  emerald: 'bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400',
+                  blue:    'bg-[var(--pro-azure-50)]  text-[var(--pro-azure-dark)]',
+                  indigo: 'bg-[var(--pro-azure-100)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
                   amber:   'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400',
                 };
                 return (
                   <tr key={type} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700">{type}</td>
+                    <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700">{type}</td>
                     <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{tier}</td>
                     <td className="px-3 py-2 border border-slate-200 dark:border-slate-700">
                       <Badge label={color} color={colorMap[color] ?? colorMap.slate} />
@@ -4188,9 +4189,9 @@ POST /notifications/test  { channel: 'email' | 'slack' | 'intercom' }
                 ['Escape',     'Close menus / clear search', '—',   '—'],
               ].map(([s1, a1, s2, a2], i) => (
                 <tr key={i} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700">{s1}</td>
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700">{s1}</td>
                   <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{a1}</td>
-                  <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700">{s2}</td>
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700">{s2}</td>
                   <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{a2}</td>
                 </tr>
               ))}
@@ -4226,7 +4227,7 @@ POST /notifications/test  { channel: 'email' | 'slack' | 'intercom' }
                 ['onlineUsers',       'broadcast',         'Connected client count',                               'Client connect/disconnect'],
               ].map(([event, room, payload, trigger]) => (
                 <tr key={event} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="px-3 py-2 font-mono text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700">{event}</td>
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-slate-200 dark:border-slate-700">{event}</td>
                   <td className="px-3 py-2 font-mono text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{room}</td>
                   <td className="px-3 py-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">{payload}</td>
                   <td className="px-3 py-2 text-slate-500 dark:text-slate-500 border border-slate-200 dark:border-slate-700">{trigger}</td>
@@ -4244,10 +4245,10 @@ POST /notifications/test  { channel: 'email' | 'slack' | 'intercom' }
             OVDS Developer Hub · v2.0.0 · Built with NestJS 11 + React 18 + Prisma 7
           </p>
           <div className="flex justify-center gap-4 mt-2">
-            <a href={`${API_URL}/docs`} target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1">
+            <a href={`${API_URL}/docs`} target="_blank" rel="noopener noreferrer" className="text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline flex items-center gap-1">
               <ExternalLink size={11} /> Swagger Docs
             </a>
-            <a href="https://github.com/ovds/ovds" target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1">
+            <a href="https://github.com/ovds/ovds" target="_blank" rel="noopener noreferrer" className="text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline flex items-center gap-1">
               <ExternalLink size={11} /> GitHub
             </a>
           </div>

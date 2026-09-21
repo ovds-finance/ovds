@@ -7,18 +7,16 @@
  * GL Inquiry:    full general ledger drill-through per account
  */
 import React, { useState, useCallback, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, Icon, Amount, StatusBadge,
 } from '../components/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useAuth } from '../rbac/AuthContext';
 import { useBusiness } from '../context/businessContext';
-import { useInterval } from '../hooks';
+import { usePageTitle } from '../hooks/usePageTitle';
 import api from '../services/api';
-import toast from 'react-hot-toast';
-import { downloadBlob } from '../utils/download';
 import {
   useArSummary,
   useArCustomers,
@@ -27,13 +25,14 @@ import {
   fetchGlEntries,
   fetchArTransactions,
 } from '../services/newTaxApi';
+import { downloadBlob } from '../utils/download';
 
 const today  = new Date().toISOString().slice(0, 10);
 const fmt    = (n: number) => new Intl.NumberFormat('en-ET', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 const fmtK   = (n: number) => Math.abs(n) >= 1_000_000 ? `${(n / 1_000_000).toFixed(2)}M` : Math.abs(n) >= 1_000 ? `${(n / 1_000).toFixed(1)}K` : fmt(n);
 
 const AGING_BUCKETS = [
-  { label: 'Current',   max: 0,   color: 'bg-emerald-500', text: 'text-emerald-700', bg: 'bg-emerald-50' },
+  { label: 'Current',   max: 0,   color: 'bg-[var(--pro-azure-50)]0', text: 'text-[var(--pro-azure-dark)]', bg: 'bg-[var(--pro-azure-50)]' },
   { label: '1–30 days', max: 30,  color: 'bg-amber-400',   text: 'text-amber-700',   bg: 'bg-amber-50' },
   { label: '31–60',     max: 60,  color: 'bg-orange-500',  text: 'text-orange-700',  bg: 'bg-orange-50' },
   { label: '61–90',     max: 90,  color: 'bg-rose-500',    text: 'text-rose-700',    bg: 'bg-rose-50' },
@@ -43,7 +42,7 @@ const AGING_BUCKETS = [
 // -- AR Sub-Ledger Tab ---------------------------------------------------------
 const ARTab: React.FC<{ companyId?: string; asOf: string }> = ({ companyId, asOf }) => {
   const { data: summary }                           = useArSummary(asOf, companyId);
-  const { customers: data, loading, refetch: fetch } = useArCustomers(asOf, companyId);
+  const { customers: data, loading, refetch: _fetch } = useArCustomers(asOf, companyId);
   const [search, setSearch]   = useState('');
   const [selected, setSelected] = useState<string | null>(null);
   const [txns, setTxns]       = useState<any[]>([]);
@@ -68,7 +67,7 @@ const ARTab: React.FC<{ companyId?: string; asOf: string }> = ({ companyId, asOf
       <div className="ovds-grid-layout cols-4 gap-sm">
         {[
           { label: 'Total AR',      value: totalAR,      accent: 'bg-slate-500' },
-          { label: 'Current',       value: totalCurrent, accent: 'bg-emerald-500' },
+          { label: 'Current',       value: totalCurrent, accent: 'bg-[var(--pro-azure-50)]0' },
           { label: 'Overdue',       value: totalOverdue, accent: 'bg-rose-500' },
           { label: 'Customers',     value: data.length,  isCount: true, accent: 'bg-sky-500' },
         ].map(k => (
@@ -142,17 +141,17 @@ const ARTab: React.FC<{ companyId?: string; asOf: string }> = ({ companyId, asOf
           ) : filtered.map((r: any) => (
             <AppTr key={r.customerId}>
               <AppTd>
-                <Link to={`/customer-summary/${r.customerId}`} className="font-semibold text-emerald-600 hover:underline">{r.customerName}</Link>
+                <Link to={`/customer-summary/${r.customerId}`} className="font-semibold text-[var(--pro-azure)] hover:underline">{r.customerName}</Link>
                 <p className="text-[10px] text-slate-400 font-mono">{r.customerId}</p>
               </AppTd>
               <AppTd align="right"><Amount value={r.outstanding ?? 0} size="sm" /></AppTd>
-              <AppTd align="right" className="text-emerald-700"><Amount value={r.current ?? 0} size="sm" /></AppTd>
+              <AppTd align="right" className="text-[var(--pro-azure-dark)]"><Amount value={r.current ?? 0} size="sm" /></AppTd>
               <AppTd align="right" className="text-amber-700"><Amount value={r.days1_30 ?? 0} size="sm" /></AppTd>
               <AppTd align="right" className="text-orange-700"><Amount value={r.days31_90 ?? 0} size="sm" /></AppTd>
               <AppTd align="right" className="text-rose-700"><Amount value={r.days90Plus ?? 0} size="sm" /></AppTd>
               <AppTd>{r.lastInvoiceDate ? new Date(r.lastInvoiceDate).toLocaleDateString() : '—'}</AppTd>
               <AppTd>
-                <button onClick={() => openDrillDown(r.customerId)} className="text-[10px] font-bold text-emerald-600 hover:underline">View →</button>
+                <button onClick={() => openDrillDown(r.customerId)} className="text-[10px] font-bold text-[var(--pro-azure)] hover:underline">View →</button>
               </AppTd>
             </AppTr>
           ))}
@@ -161,7 +160,7 @@ const ARTab: React.FC<{ companyId?: string; asOf: string }> = ({ companyId, asOf
           <tfoot>
             <tr className="bg-slate-800">
               <td className="px-4 py-3 text-sm font-black text-white">TOTAL AR</td>
-              <td className="px-4 py-3 text-right tabular-nums text-sm font-black text-emerald-400">{fmt(totalAR)}</td>
+              <td className="px-4 py-3 text-right tabular-nums text-sm font-black text-[var(--pro-azure-light)]">{fmt(totalAR)}</td>
               <td colSpan={6} />
             </tr>
           </tfoot>
@@ -269,11 +268,11 @@ const APTab: React.FC<{ companyId?: string; asOf: string }> = ({ companyId, asOf
           ) : filtered.map((r: any) => (
             <AppTr key={r.vendorId}>
               <AppTd>
-                <Link to="/purchases/vendors" className="font-semibold text-emerald-600 hover:underline">{r.vendorName}</Link>
+                <Link to="/purchases/vendors" className="font-semibold text-[var(--pro-azure)] hover:underline">{r.vendorName}</Link>
                 {r.tin && <p className="text-[10px] text-slate-400 font-mono">TIN: {r.tin}</p>}
               </AppTd>
               <AppTd align="right"><Amount value={r.outstanding ?? 0} size="sm" /></AppTd>
-              <AppTd align="right" className="text-emerald-700"><Amount value={r.current ?? 0} size="sm" /></AppTd>
+              <AppTd align="right" className="text-[var(--pro-azure-dark)]"><Amount value={r.current ?? 0} size="sm" /></AppTd>
               <AppTd align="right" className="text-amber-700"><Amount value={r.days1_30 ?? 0} size="sm" /></AppTd>
               <AppTd align="right" className="text-orange-700"><Amount value={r.days31_60 ?? 0} size="sm" /></AppTd>
               <AppTd align="right" className="text-rose-700"><Amount value={r.days60Plus ?? 0} size="sm" /></AppTd>
@@ -285,7 +284,7 @@ const APTab: React.FC<{ companyId?: string; asOf: string }> = ({ companyId, asOf
           <tfoot>
             <tr className="bg-slate-800">
               <td className="px-4 py-3 text-sm font-black text-white">TOTAL AP</td>
-              <td className="px-4 py-3 text-right tabular-nums text-sm font-black text-emerald-400">{fmt(totalAP)}</td>
+              <td className="px-4 py-3 text-right tabular-nums text-sm font-black text-[var(--pro-azure-light)]">{fmt(totalAP)}</td>
               <td colSpan={5} />
             </tr>
           </tfoot>
@@ -301,7 +300,7 @@ const GLInquiryTab: React.FC<{ companyId?: string; startDate: string; endDate: s
   const [selectedAccount, setSelectedAccount] = useState('');
   const [entries, setEntries] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searching, setSearching] = useState(false);
+  const [_searching, _setSearching] = useState(false);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -353,7 +352,7 @@ const GLInquiryTab: React.FC<{ companyId?: string; startDate: string; endDate: s
           <div className="max-h-48 overflow-y-auto border border-slate-200 dark:border-slate-700 rounded-xl divide-y divide-slate-100 dark:divide-slate-700">
             {filteredAccts.slice(0, 50).map((a: any) => (
               <button key={a.id} onClick={() => setSelectedAccount(a.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2 text-left text-xs transition-colors ${selectedAccount === a.id ? 'bg-emerald-50 text-emerald-700 font-bold' : 'hover:bg-slate-50 text-slate-600'}`}>
+                className={`w-full flex items-center gap-3 px-3 py-2 text-left text-xs transition-colors ${selectedAccount === a.id ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] font-bold' : 'hover:bg-slate-50 text-slate-600'}`}>
                 <span className="font-mono text-[10px] text-slate-400 w-16 shrink-0">{a.code}</span>
                 <span className="truncate">{a.name}</span>
                 <span className="ml-auto shrink-0 text-[9px] text-slate-300">{a.type}</span>
@@ -365,16 +364,16 @@ const GLInquiryTab: React.FC<{ companyId?: string; startDate: string; endDate: s
           {entries.length > 0 && (
             <div className="space-y-3">
               <div className="ovds-grid-layout cols-2 gap-sm">
-                <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-center">
+                <div className="bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-xl p-3 text-center">
                   <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Total Debits</p>
-                  <p className="text-lg font-bold tabular-nums text-emerald-700">ETB {fmtK(totalDebits)}</p>
+                  <p className="text-lg font-bold tabular-nums text-[var(--pro-azure-dark)]">ETB {fmtK(totalDebits)}</p>
                 </div>
                 <div className="bg-rose-50 border border-rose-100 rounded-xl p-3 text-center">
                   <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Total Credits</p>
                   <p className="text-lg font-bold tabular-nums text-rose-700">ETB {fmtK(totalCredits)}</p>
                 </div>
               </div>
-              <div className={`p-3 rounded-xl border text-xs font-semibold ${Math.abs(totalDebits - totalCredits) < 0.01 ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-amber-50 border-amber-200 text-amber-700'}`}>
+              <div className={`p-3 rounded-xl border text-xs font-semibold ${Math.abs(totalDebits - totalCredits) < 0.01 ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : 'bg-amber-50 border-amber-200 text-amber-700'}`}>
                 Net: ETB {fmt(totalDebits - totalCredits)} · {entries.length} transactions
               </div>
             </div>
@@ -404,7 +403,7 @@ const GLInquiryTab: React.FC<{ companyId?: string; startDate: string; endDate: s
                 <AppTd className="font-mono text-[11px]">{e.journalRef ?? '—'}</AppTd>
                 <AppTd className="max-w-[200px] truncate">{e.description ?? '—'}</AppTd>
                 <AppTd className="text-[11px]">{e.postedBy ?? '—'}</AppTd>
-                <AppTd align="right" className={`tabular-nums ${e.debit > 0 ? 'text-emerald-700 font-semibold' : 'text-slate-300'}`}>
+                <AppTd align="right" className={`tabular-nums ${e.debit > 0 ? 'text-[var(--pro-azure-dark)] font-semibold' : 'text-slate-300'}`}>
                   {e.debit > 0 ? fmt(e.debit) : '—'}
                 </AppTd>
                 <AppTd align="right" className={`tabular-nums ${e.credit > 0 ? 'text-rose-600 font-semibold' : 'text-slate-300'}`}>

@@ -13,11 +13,11 @@
  *  - IFRS 18: readiness reminder for ovds roles
  *  - Server-side: DB-backed alerts from /dashboard/alerts
  */
-import { useMemo, useEffect, useState } from 'react';
-import { useAuth } from '../rbac/AuthContext';
 import { Role, Alert as FinancialAlert, AlertSeverity } from '@ovds/ui';
-import api from '../services/api';
+import { useMemo, useEffect, useState } from 'react';
 
+import { useAuth } from '../rbac/AuthContext';
+import api, { bgConfig } from '../services/api';
 export type { AlertSeverity };
 
 interface AlertInputs {
@@ -75,7 +75,7 @@ export function useFinancialAlerts(inputs: AlertInputs = {}) {
     let cancelled = false;
 
     const fetchReleases = () => {
-      api.get('/releases/available', { headers: { 'x-background': '1' } } as any)
+      api.get('/releases/available', bgConfig())
         .then((res: any) => {
           if (cancelled) return;
           const data: any[] = res.data?.data ?? res.data ?? [];

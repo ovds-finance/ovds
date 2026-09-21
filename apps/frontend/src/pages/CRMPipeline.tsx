@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import { DealStage, CRM_STAGES } from '@ovds/ui';
 import {
   Briefcase, Plus, RefreshCw, Search, X, Edit2,
   ArrowRight, TrendingUp, CheckCircle2, Clock,
@@ -8,18 +8,20 @@ import {
   Target, Zap, AlertTriangle, BarChart2, ArrowUpRight,
   Circle, Filter, Eye, Flag, Activity,
 } from "lucide-react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import toast from "react-hot-toast";
+
 import { PipelineStageHeader, PipelineFunnel, PipelineProgressBar } from '../components/pipelineComponents';
 import { AppPage, Btn, MetricCard } from '../components/ui';
-import api from "../services/api";
-import toast from "react-hot-toast";
-import { useAuth } from "../rbac/AuthContext";
 import { useBusiness } from "../context/businessContext";
-import { usePageTitle } from "../hooks/usePageTitle";
 import { useDebounce } from "../hooks";
-import { downloadCSV } from "../utils/download";
+import { usePageTitle } from "../hooks/usePageTitle";
+import { useAuth } from "../rbac/AuthContext";
+import api from "../services/api";
 import { confirm } from "../utils/confirm";
+import { downloadCSV } from "../utils/download";
 import { fmtCurrency } from "../utils/fmt";
-import { DealStage, CRM_STAGES } from '@ovds/ui';
+
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Deal {
@@ -67,7 +69,7 @@ interface CRMActivity {
 const STAGES = Object.values(CRM_STAGES);
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
-const inp = 'w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition-all placeholder:text-slate-400 font-medium';
+const inp = 'w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white outline-none focus:ring-4 focus:ring-[var(--pro-azure)]/10 focus:border-[var(--pro-azure)] transition-all placeholder:text-slate-400 font-medium';
 const lbl = 'block text-[11px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest mb-1.5 ml-1';
 
 const STAGE_HEX: Record<DealStage, string> = {
@@ -82,7 +84,7 @@ const STAGE_HEX: Record<DealStage, string> = {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 const Avatar: React.FC<{ name: string; size?: number }> = ({ name, size = 8 }) => {
   const initials = (name || '?').split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || '?';
-  const palette = ['from-violet-500 to-purple-600','from-emerald-500 to-teal-600','from-orange-500 to-amber-600','from-rose-500 to-pink-600','from-cyan-500 to-sky-600','from-indigo-500 to-blue-600'];
+  const palette = ['from-violet-500 to-purple-600','from-green-500 to-green-600','from-orange-500 to-amber-600','from-rose-500 to-pink-600','from-cyan-500 to-sky-600','from-[var(--pro-azure)] to-blue-600'];
   const color = palette[(name || '?').charCodeAt(0) % palette.length];
   return (
     <div className={`w-${size} h-${size} bg-gradient-to-br ${color} rounded-xl flex items-center justify-center text-white font-black text-[10px] shrink-0`}>
@@ -151,9 +153,9 @@ const DealModal: React.FC<{
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-end bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
       <div className="w-full max-w-xl h-full bg-white dark:bg-slate-900 shadow-2xl flex flex-col border-l border-slate-100 dark:border-slate-800 animate-in slide-in-from-right duration-500">
-        <div className="px-8 py-7 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/20 dark:to-slate-900 border-b border-slate-100 dark:border-slate-800">
+        <div className="px-8 py-7 bg-gradient-to-br from-[var(--pro-azure-50)] to-white dark:from-green-950/20 dark:to-slate-900 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center justify-between mb-5">
-            <div className="w-13 h-13 w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
+            <div className="w-13 h-13 w-12 h-12 bg-[var(--pro-azure-50)]0 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-green-500/30">
               <Briefcase size={24} strokeWidth={2.5} />
             </div>
             <button onClick={onClose} className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-700 transition-all shadow-sm">
@@ -161,7 +163,7 @@ const DealModal: React.FC<{
             </button>
           </div>
           <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{deal ? 'Edit Deal' : 'New Opportunity'}</h2>
-          <p className="text-xs text-emerald-600 font-bold mt-1 uppercase tracking-widest">{deal ? `Updating: ${deal.title}` : 'Capture a new business opportunity'}</p>
+          <p className="text-xs text-[var(--pro-azure)] font-bold mt-1 uppercase tracking-widest">{deal ? `Updating: ${deal.title}` : 'Capture a new business opportunity'}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
@@ -197,7 +199,7 @@ const DealModal: React.FC<{
           </div>
           <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 flex gap-3">
             <button type="button" onClick={onClose} className="flex-1 px-5 py-3.5 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-black text-slate-500 hover:bg-white dark:hover:bg-slate-800 transition-all">Discard</button>
-            <button type="submit" disabled={saving} className="flex-[2] px-5 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-sm font-black disabled:opacity-50 transition-all flex items-center justify-center gap-2.5 shadow-lg shadow-emerald-500/25">
+            <button type="submit" disabled={saving} className="flex-[2] px-5 py-3.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-2xl text-sm font-black disabled:opacity-50 transition-all flex items-center justify-center gap-2.5 shadow-lg shadow-green-500/25">
               {saving ? <RefreshCw size={16} className="animate-spin" /> : <CheckCircle2 size={16} strokeWidth={3} />}
               {saving ? 'Processing…' : deal ? 'Update Deal' : 'Create Deal'}
             </button>
@@ -244,7 +246,7 @@ const DealDetailPanel: React.FC<{
               </div>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              <button onClick={onEdit} className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 hover:bg-emerald-100 transition-all"><Edit2 size={14} strokeWidth={2.5} /></button>
+              <button onClick={onEdit} className="p-2 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-900/20 text-[var(--pro-azure)] hover:bg-[var(--pro-azure-100)] transition-all"><Edit2 size={14} strokeWidth={2.5} /></button>
               <button onClick={onDelete} className="p-2 rounded-xl bg-rose-50 dark:bg-rose-900/20 text-rose-500 hover:bg-rose-100 transition-all"><Trash2 size={14} strokeWidth={2.5} /></button>
               <button onClick={onClose} className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 transition-all"><X size={14} /></button>
             </div>
@@ -254,7 +256,7 @@ const DealDetailPanel: React.FC<{
             <div><p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Deal Value</p>
               <p className="text-base font-black text-slate-900 dark:text-white tabular-nums">{fmt(deal.value)}</p></div>
             <div><p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Weighted</p>
-              <p className="text-base font-black text-emerald-600 tabular-nums">{fmt(weightedValue)}</p></div>
+              <p className="text-base font-black text-[var(--pro-azure)] tabular-nums">{fmt(weightedValue)}</p></div>
             <div><p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Win Rate</p>
               <p className="text-base font-black text-slate-900 dark:text-white">{deal.probability}%</p></div>
           </div>
@@ -274,7 +276,7 @@ const DealDetailPanel: React.FC<{
                 <div><p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sales Rep</p><p className="text-sm font-bold text-slate-700 dark:text-slate-200">{deal.assignedTo}</p></div></div>
             )}
             {deal.expectedCloseDate && (
-              <div className="flex items-center gap-3"><div className={`w-7 h-7 rounded-lg flex items-center justify-center ${daysInfo?.urgent ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600'}`}><Calendar size={12} /></div>
+              <div className="flex items-center gap-3"><div className={`w-7 h-7 rounded-lg flex items-center justify-center ${daysInfo?.urgent ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' : 'bg-[var(--pro-azure-50)] dark:bg-green-900/20 text-[var(--pro-azure)]'}`}><Calendar size={12} /></div>
                 <div><p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Close Date</p>
                   <p className={`text-sm font-bold ${daysInfo?.urgent ? 'text-rose-600' : 'text-slate-700 dark:text-slate-200'}`}>
                     {new Date(deal.expectedCloseDate).toLocaleDateString('en-ET', { day: '2-digit', month: 'long', year: 'numeric' })}
@@ -304,7 +306,7 @@ const DealDetailPanel: React.FC<{
                 return (
                   <button key={s.key} onClick={() => onMove(s.key as DealStage)}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${
-                      isCurrent ? 'text-white shadow-md' : isCompleted ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200'
+                      isCurrent ? 'text-white shadow-md' : isCompleted ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200'
                     }`} style={isCurrent ? { background: STAGE_HEX[s.key as DealStage] } : {}}>
                     {isCompleted && <CheckCircle2 size={9} strokeWidth={3} />}{s.label}
                   </button>
@@ -320,11 +322,11 @@ const DealDetailPanel: React.FC<{
               <div className="space-y-2">
                 {dealActivities.slice(0, 4).map(a => (
                   <div key={a.id} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${a.status === 'DONE' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${a.status === 'DONE' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' : 'bg-amber-50 text-amber-600'}`}>
                       {a.type === 'CALL' ? <Phone size={10} /> : a.type === 'EMAIL' ? <Mail size={10} /> : a.type === 'TASK' ? <CheckSquare size={10} /> : a.type === 'FOLLOW_UP' ? <Bell size={10} /> : <StickyNote size={10} />}
                     </div>
                     <div className="flex-1 min-w-0"><p className={`text-xs font-bold truncate ${a.status === 'DONE' ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-200'}`}>{a.title}</p></div>
-                    <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-lg ${a.status === 'DONE' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>{a.status}</span>
+                    <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-lg ${a.status === 'DONE' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' : 'bg-amber-50 text-amber-600'}`}>{a.status}</span>
                   </div>
                 ))}
               </div>
@@ -380,20 +382,20 @@ const QuickAddRow: React.FC<{
   if (!open) {
     return (
       <button onClick={() => setOpen(true)}
-        className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 border-dashed border-slate-100 dark:border-slate-800 text-slate-400 hover:text-emerald-600 hover:border-emerald-200 dark:hover:border-emerald-800 transition-all group text-[10px] font-black uppercase tracking-widest">
+        className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 border-dashed border-slate-100 dark:border-slate-800 text-slate-400 hover:text-[var(--pro-azure)] hover:border-[var(--pro-azure-100)] dark:hover:border-green-800 transition-all group text-[10px] font-black uppercase tracking-widest">
         <Plus size={14} strokeWidth={2.5} className="group-hover:scale-110 transition-transform" /> Quick Add
       </button>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl border border-emerald-200 dark:border-emerald-700 p-3 shadow-md space-y-2 animate-in slide-in-from-top-2 duration-200">
+    <div className="bg-white dark:bg-slate-800 rounded-xl border border-[var(--pro-azure-100)] dark:border-green-700 p-3 shadow-md space-y-2 animate-in slide-in-from-top-2 duration-200">
       <input ref={inputRef} value={title} onChange={e => setTitle(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSave()} placeholder="Deal title..." className="w-full text-xs font-bold text-slate-900 dark:text-white bg-transparent border-b border-slate-100 dark:border-slate-700 pb-1.5 outline-none placeholder:text-slate-400" />
       <input value={customer} onChange={e => setCustomer(e.target.value)} placeholder="Customer name..." className="w-full text-xs font-bold text-slate-900 dark:text-white bg-transparent border-b border-slate-100 dark:border-slate-700 pb-1.5 outline-none placeholder:text-slate-400" />
       <input type="number" value={value} onChange={e => setValue(e.target.value)} placeholder="Value (ETB)..." className="w-full text-xs font-bold text-slate-900 dark:text-white bg-transparent pb-1.5 outline-none placeholder:text-slate-400" />
       <div className="flex gap-2 pt-1">
         <button onClick={() => setOpen(false)} className="flex-1 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-[10px] font-black text-slate-500 hover:bg-slate-50 transition-all uppercase tracking-widest">Cancel</button>
-        <button onClick={handleSave} disabled={saving} className="flex-[2] py-1.5 rounded-lg bg-emerald-500 text-[10px] font-black text-white hover:bg-emerald-600 transition-all uppercase tracking-widest disabled:opacity-50">
+        <button onClick={handleSave} disabled={saving} className="flex-[2] py-1.5 rounded-lg bg-[var(--pro-azure-50)]0 text-[10px] font-black text-white hover:bg-[var(--pro-azure-dark)] transition-all uppercase tracking-widest disabled:opacity-50">
           {saving ? <RefreshCw size={10} className="animate-spin mx-auto" /> : 'Add Deal'}
         </button>
       </div>
@@ -423,13 +425,13 @@ const DealCard: React.FC<{
   }, []);
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-lg hover:border-emerald-200 dark:hover:border-emerald-800 transition-all group cursor-pointer relative"
+    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-lg hover:border-[var(--pro-azure-100)] dark:hover:border-green-800 transition-all group cursor-pointer relative"
       onClick={() => onView(deal)}
       style={{ borderLeft: `3px solid ${STAGE_HEX[deal.stage]}20` }}>
 
       {/* Top row: title + menu */}
       <div className="flex items-start justify-between gap-3 mb-3">
-        <p className="text-sm font-black text-slate-900 dark:text-white leading-snug line-clamp-2 group-hover:text-emerald-600 transition-colors tracking-tight flex-1">{deal.title}</p>
+        <p className="text-sm font-black text-slate-900 dark:text-white leading-snug line-clamp-2 group-hover:text-[var(--pro-azure)] transition-colors tracking-tight flex-1">{deal.title}</p>
         <div ref={ref} className="relative shrink-0" onClick={e => e.stopPropagation()}>
           <button onClick={() => setMenuOpen(o => !o)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-300 opacity-0 group-hover:opacity-100 transition-all">
             <MoreHorizontal size={14} />
@@ -466,7 +468,7 @@ const DealCard: React.FC<{
           </div>
         </div>
         <div className="text-right"><p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Weighted</p>
-          <p className="text-xs font-black text-emerald-600 tabular-nums">{fmt(weightedValue)}</p></div>
+          <p className="text-xs font-black text-[var(--pro-azure)] tabular-nums">{fmt(weightedValue)}</p></div>
       </div>
 
       {/* Badges row */}
@@ -498,7 +500,7 @@ const DealCard: React.FC<{
           </button>
         )}
         {deal.stage === 'CLOSED_WON' && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[9px] font-black text-white bg-emerald-500 uppercase tracking-widest">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[9px] font-black text-white bg-[var(--pro-azure-50)]0 uppercase tracking-widest">
             <CheckCircle2 size={10} strokeWidth={3} />Won
           </span>
         )}
@@ -521,14 +523,14 @@ const ForecastBar: React.FC<{ deals: Deal[] }> = ({ deals }) => {
     <div className="ovds-panel p-5">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg flex items-center justify-center text-emerald-600"><Target size={14} /></div>
+          <div className="w-7 h-7 bg-[var(--pro-azure-50)] dark:bg-green-900/20 rounded-lg flex items-center justify-center text-[var(--pro-azure)]"><Target size={14} /></div>
           <div>
             <p className="text-[10px] font-black text-slate-700 dark:text-slate-200 uppercase tracking-widest">Revenue Forecast</p>
             <p className="text-[9px] font-bold text-slate-400">Probability-weighted pipeline value</p>
           </div>
         </div>
         <div className="text-right">
-          <p className="text-xl font-black text-emerald-600 tabular-nums">{fmt(totalWeighted)}</p>
+          <p className="text-xl font-black text-[var(--pro-azure)] tabular-nums">{fmt(totalWeighted)}</p>
           <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">of {fmt(totalRaw)} raw</p>
         </div>
       </div>
@@ -571,20 +573,20 @@ const PipelineSwitcher: React.FC<{
   return (
     <div ref={ref} className="relative">
       <button onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-2 px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-[11px] font-black text-slate-700 dark:text-slate-200 uppercase tracking-widest hover:border-emerald-300 transition-all shadow-sm">
-        <Layers size={14} className="text-emerald-600" />
+        className="flex items-center gap-2 px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-[11px] font-black text-slate-700 dark:text-slate-200 uppercase tracking-widest hover:border-[var(--pro-azure-light)] transition-all shadow-sm">
+        <Layers size={14} className="text-[var(--pro-azure)]" />
         {activePipeline?.name ?? 'Default Pipeline'}
         <ChevronDown size={12} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
         <div className="absolute left-0 top-full mt-2 z-30 w-56 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-2xl py-2 animate-in fade-in zoom-in-95 duration-150">
           <button onClick={() => { onChange(null); setOpen(false); }}
-            className={`flex items-center gap-2.5 w-full px-4 py-2.5 text-xs font-black uppercase tracking-widest transition-colors ${activePipeline === null ? 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}>
+            className={`flex items-center gap-2.5 w-full px-4 py-2.5 text-xs font-black uppercase tracking-widest transition-colors ${activePipeline === null ? 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-900/20' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}>
             <Flag size={12} />Default Stages</button>
           {pipelines.map(p => (
             <button key={p.id} onClick={() => { onChange(p); setOpen(false); }}
-              className={`flex items-center gap-2.5 w-full px-4 py-2.5 text-xs font-black uppercase tracking-widest transition-colors ${activePipeline?.id === p.id ? 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}>
-              <Layers size={12} />{p.name}{p.isDefault && <span className="ml-auto text-[8px] bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded">Default</span>}
+              className={`flex items-center gap-2.5 w-full px-4 py-2.5 text-xs font-black uppercase tracking-widest transition-colors ${activePipeline?.id === p.id ? 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-900/20' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}>
+              <Layers size={12} />{p.name}{p.isDefault && <span className="ml-auto text-[8px] bg-[var(--pro-azure-100)] text-[var(--pro-azure)] dark:bg-green-900/30 px-1.5 py-0.5 rounded">Default</span>}
             </button>
           ))}
         </div>
@@ -663,6 +665,7 @@ export default function CRMPipeline() {
       }
     } catch { /* non-blocking */ }
     finally { setLoading(false); }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCompanyId]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
@@ -696,7 +699,7 @@ export default function CRMPipeline() {
   };
 
   // Derive available stages from active pipeline or defaults
-  const activeStages = activePipeline?.stages
+  const _activeStages = activePipeline?.stages
     ? activePipeline.stages.map(s => ({ key: s.name.toUpperCase().replace(/\s+/g, '_'), label: s.name, prob: s.probability, color: s.color, dot: s.color, headerBg: s.color + '15', cardBg: s.color + '08', border: s.color + '30' }))
     : STAGES;
 
@@ -727,7 +730,7 @@ export default function CRMPipeline() {
       title="Sales Pipeline"
       subtitle="Track opportunities, forecast revenue, and close deals faster"
       icon={<Briefcase size={18} />}
-      iconBg="bg-gradient-to-br from-emerald-500 to-teal-600"
+      iconBg="bg-gradient-to-br from-green-500 to-green-600"
       crumbs={[{ label: 'CRM', to: '/crm' }, { label: 'Pipeline' }]}
       actions={
         <>
@@ -777,7 +780,7 @@ export default function CRMPipeline() {
             <div className="relative flex-1 max-w-sm">
               <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search deals or customers..."
-                className="w-full pl-11 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-transparent rounded-xl text-sm font-bold focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-emerald-500/10 transition-all text-slate-800 dark:text-slate-200 placeholder:text-slate-400" />
+                className="w-full pl-11 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-transparent rounded-xl text-sm font-bold focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-[var(--pro-azure)]/10 transition-all text-slate-800 dark:text-slate-200 placeholder:text-slate-400" />
             </div>
             <PipelineSwitcher pipelines={pipelines} activePipeline={activePipeline} onChange={setActivePipeline} />
           </div>
@@ -807,17 +810,17 @@ export default function CRMPipeline() {
             <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl gap-0.5">
               {([['kanban', <LayoutGrid size={15} />], ['list', <List size={15} />], ['funnel', <BarChart2 size={15} />]] as const).map(([v, icon]) => (
                 <button key={v} onClick={() => setView(v)}
-                  className={`p-2 rounded-lg transition-all ${view === v ? 'bg-white dark:bg-slate-700 text-emerald-600 shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'}`}>
+                  className={`p-2 rounded-lg transition-all ${view === v ? 'bg-white dark:bg-slate-700 text-[var(--pro-azure)] shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'}`}>
                   {icon}
                 </button>
               ))}
             </div>
             {/* Forecast toggle */}
             <button onClick={() => setShowForecast(f => !f)} title="Toggle forecast"
-              className={`p-2 rounded-xl transition-all border ${showForecast ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-600' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600'}`}>
+              className={`p-2 rounded-xl transition-all border ${showForecast ? 'bg-[var(--pro-azure-50)] dark:bg-green-900/20 border-[var(--pro-azure-100)] dark:border-green-800 text-[var(--pro-azure)]' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600'}`}>
               <Target size={15} />
             </button>
-            <button onClick={fetchAll} className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-emerald-600 transition-all">
+            <button onClick={fetchAll} className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-[var(--pro-azure)] transition-all">
               <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
             </button>
           </div>
@@ -840,8 +843,8 @@ export default function CRMPipeline() {
           {loading ? (
             <div className="h-full flex flex-col items-center justify-center gap-4 py-32">
               <div className="relative w-16 h-16">
-                <div className="absolute inset-0 rounded-full border-4 border-emerald-100 dark:border-emerald-900/30" />
-                <div className="absolute inset-0 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin" />
+                <div className="absolute inset-0 rounded-full border-4 border-[var(--pro-azure-100)] dark:border-green-900/30" />
+                <div className="absolute inset-0 rounded-full border-4 border-[var(--pro-azure)] border-t-transparent animate-spin" />
               </div>
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Synchronizing Pipeline...</p>
             </div>
@@ -872,7 +875,7 @@ export default function CRMPipeline() {
                       return (
                         <tr key={d.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group cursor-pointer" onClick={() => setViewDeal(d)}>
                           <td className="px-6 py-4">
-                            <p className="text-sm font-black text-slate-900 dark:text-white leading-tight group-hover:text-emerald-600 transition-colors">{d.title}</p>
+                            <p className="text-sm font-black text-slate-900 dark:text-white leading-tight group-hover:text-[var(--pro-azure)] transition-colors">{d.title}</p>
                             {d.assignedTo && <p className="text-[10px] font-bold text-slate-400 mt-0.5">Rep: {d.assignedTo}</p>}
                           </td>
                           <td className="px-6 py-4">
@@ -880,7 +883,7 @@ export default function CRMPipeline() {
                               <span className="text-sm font-bold text-slate-600 dark:text-slate-300">{d.customerName}</span></div>
                           </td>
                           <td className="px-6 py-4 text-right"><p className="text-sm font-black text-slate-900 dark:text-white tabular-nums">{fmt(d.value)}</p><p className="text-[10px] font-bold text-slate-400">{d.probability}% win</p></td>
-                          <td className="px-6 py-4 text-right"><p className="text-sm font-black text-emerald-600 tabular-nums">{fmt((d.value * d.probability) / 100)}</p></td>
+                          <td className="px-6 py-4 text-right"><p className="text-sm font-black text-[var(--pro-azure)] tabular-nums">{fmt((d.value * d.probability) / 100)}</p></td>
                           <td className="px-6 py-4 text-center">
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest" style={{ background: STAGE_HEX[d.stage] + '15', color: STAGE_HEX[d.stage] }}>
                               <Circle size={5} className="fill-current" />{stage?.label}
@@ -896,7 +899,7 @@ export default function CRMPipeline() {
                           </td>
                           <td className="px-6 py-4" onClick={e => e.stopPropagation()}>
                             <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button onClick={() => setViewDeal(d)} className="p-2 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all"><Eye size={14} strokeWidth={2.5} /></button>
+                              <button onClick={() => setViewDeal(d)} className="p-2 rounded-lg text-slate-400 hover:text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-900/20 transition-all"><Eye size={14} strokeWidth={2.5} /></button>
                               <button onClick={() => setEditDeal(d)} className="p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all"><Edit2 size={14} strokeWidth={2.5} /></button>
                               <button onClick={() => handleDelete(d.id)} className="p-2 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all"><Trash2 size={14} strokeWidth={2.5} /></button>
                             </div>
@@ -930,7 +933,7 @@ export default function CRMPipeline() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 tabular-nums">{fmt(stageTotal)}</span>
-                        <span className="text-[9px] font-bold text-emerald-600 tabular-nums">~{fmt(stageWeighted)} weighted</span>
+                        <span className="text-[9px] font-bold text-[var(--pro-azure)] tabular-nums">~{fmt(stageWeighted)} weighted</span>
                       </div>
                     </div>
                     {/* Cards */}
@@ -967,7 +970,7 @@ export default function CRMPipeline() {
           <p className="text-[10px] font-bold text-slate-400">{filtered.length} of {deals.length} deals</p>
           <div className="flex items-center gap-4">
             <span className="text-[10px] font-bold text-slate-500">Total filtered: <span className="font-black text-slate-700 dark:text-slate-200">{fmt(filtered.reduce((s, d) => s + d.value, 0))}</span></span>
-            <span className="text-[10px] font-bold text-slate-500">Weighted: <span className="font-black text-emerald-600">{fmt(filtered.reduce((s, d) => s + (d.value * d.probability) / 100, 0))}</span></span>
+            <span className="text-[10px] font-bold text-slate-500">Weighted: <span className="font-black text-[var(--pro-azure)]">{fmt(filtered.reduce((s, d) => s + (d.value * d.probability) / 100, 0))}</span></span>
           </div>
         </div>
       </div>

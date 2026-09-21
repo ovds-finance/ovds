@@ -1,7 +1,7 @@
-/**
+﻿/**
  * @ovds/ui — TreeViewSidebar
  *
- * Akaunting-inspired enterprise tree-view sidebar.
+ * Ovds SaaS enterprise tree-view sidebar.
  *
  * Layout:  a 56px icon rail (always visible)  +  a 240px navigation panel (expands
  * to the right of the rail).  The rail hosts module/section icons, the company
@@ -10,7 +10,7 @@
  * the top, then regulatory section labels and expandable/collapsible sub-menus.
  *
  * Variants:
- *   - 'default' : clean white nav panel (Akaunting light chrome)
+ *   - 'default' : clean white nav panel (Ovds SaaS light chrome)
  *   - 'sidebar' : dark navy (#0B1221) surface using --sidebar-* tokens
  *
  * Fully responsive: collapses to a 56px rail on demand, and renders as a
@@ -155,8 +155,8 @@ function useDismiss(open: boolean, onClose: () => void) {
 }
 
 const BADGE_STYLES: Record<NonNullable<NavItem['badgeColor']>, string> = {
-  blue: 'bg-aki-blue text-white',
-  green: 'bg-emerald-500 text-white',
+  blue: 'bg-[var(--pro-azure)] text-white',
+  green: 'bg-[var(--pro-azure)] text-white',
   amber: 'bg-amber-500 text-white',
   red: 'bg-rose-500 text-white',
   slate: 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300',
@@ -172,7 +172,7 @@ function NavBadge({ value, color = 'slate' }: { value: number | string; color?: 
 
 function NewPill() {
   return (
-    <span className="px-1.5 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wide bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/30">
+    <span className="px-1.5 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wide bg-[var(--pro-azure)]/15 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] ring-1 ring-[var(--pro-azure)]/30">
       New
     </span>
   );
@@ -313,7 +313,7 @@ function SidebarBody({
             title={company?.name ?? 'Company'}
             className={cn(
               'w-9 h-9 rounded-xl flex items-center justify-center text-white transition-all',
-              isSidebar ? 'bg-[--aki-blue]' : 'bg-aki-blue hover:bg-aki-blue-dark',
+              isSidebar ? 'bg-[--aki-blue]' : 'bg-[var(--pro-azure)] hover:bg-[var(--pro-azure-dark)]',
             )}
           >
             {company?.logoUrl ? (
@@ -355,7 +355,7 @@ function SidebarBody({
                     selected
                       ? isSidebar
                         ? 'bg-[--sidebar-active-bg] text-[--sidebar-active-fg]'
-                        : 'bg-aki-blue-50 text-aki-blue'
+                        : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]'
                       : isSidebar
                         ? 'text-[--sidebar-fg-muted] hover:bg-white/5 hover:text-[--sidebar-fg-hover]'
                         : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700',
@@ -471,7 +471,7 @@ function SidebarBody({
                 profileOpen
                   ? isSidebar
                     ? 'bg-[--sidebar-active-bg] text-[--sidebar-active-fg]'
-                    : 'bg-aki-blue-50 text-aki-blue'
+                    : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]'
                   : isSidebar
                     ? 'text-[--sidebar-fg-muted] hover:bg-white/5 hover:text-[--sidebar-fg-hover]'
                     : 'text-slate-500 hover:bg-slate-100',
@@ -480,7 +480,7 @@ function SidebarBody({
               {profile?.avatarUrl ? (
                 <img src={profile.avatarUrl} alt="" className="w-8 h-8 rounded-full object-cover" />
               ) : profile?.initials ? (
-                <span className="w-8 h-8 rounded-full bg-aki-blue/15 text-aki-blue text-[12px] font-bold flex items-center justify-center">
+                <span className="w-8 h-8 rounded-full bg-[var(--pro-azure)]/15 text-[var(--pro-azure)] text-[12px] font-bold flex items-center justify-center">
                   {profile.initials}
                 </span>
               ) : (
@@ -578,7 +578,7 @@ function RailIcon({
         active
           ? isSidebar
             ? 'bg-[--sidebar-active-bg] text-[--sidebar-active-fg]'
-            : 'bg-aki-blue-50 text-aki-blue'
+            : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]'
           : isSidebar
             ? 'text-[--sidebar-fg-muted] hover:bg-white/5 hover:text-[--sidebar-fg-hover]'
             : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700',
@@ -635,7 +635,7 @@ function NavPanel({
     <div className={cn('w-60 shrink-0 flex flex-col h-full sidebar-nav-panel', panelBg)}>
       {/* Header */}
       <div className={cn('h-14 flex items-center gap-2 px-3 border-b', borderCls)}>
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-aki-blue/10 text-aki-blue">
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-[var(--pro-azure)]/10 text-[var(--pro-azure)]">
           {section?.icon ?? <Layers size={16} />}
         </div>
         <div className="min-w-0 flex-1">
@@ -673,7 +673,7 @@ function NavPanel({
               'w-full pl-8 pr-3 py-1.5 rounded-lg text-[12px] outline-none transition-all',
               isSidebar
                 ? 'bg-white/5 border border-[--sidebar-border] text-[--sidebar-fg] placeholder-[--sidebar-fg-muted] focus:border-[--aki-blue] focus:ring-1 focus:ring-[--aki-blue]/30'
-                : 'bg-slate-50 border border-slate-200 text-slate-700 placeholder-slate-400 focus:border-aki-blue focus:ring-2 focus:ring-aki-blue/20',
+                : 'bg-slate-50 border border-slate-200 text-slate-700 placeholder-slate-400 focus:border-[var(--pro-azure)] focus:ring-2 focus:ring-[var(--pro-azure)]/20',
             )}
           />
           <kbd className={cn('absolute right-2 top-1/2 -translate-y-1/2 hidden lg:flex items-center px-1 py-0.5 rounded text-[9px] font-mono font-bold border', isSidebar ? 'border-[--sidebar-border] text-[--sidebar-fg-muted]' : 'border-slate-200 text-slate-400')}>
@@ -811,7 +811,7 @@ function NavTreeItem({
         ? '!bg-[--sidebar-active-bg] !text-[--sidebar-active-fg]'
         : '!text-[--sidebar-fg-muted] hover:!bg-white/5 hover:!text-[--sidebar-fg-hover]'
       : isActive
-        ? '!bg-aki-blue-50 !text-aki-blue'
+        ? '!bg-[var(--pro-azure-50)] !text-[var(--pro-azure)]'
         : '!text-slate-600 hover:!bg-slate-50 hover:!text-slate-800',
     item.disabled && 'opacity-50 cursor-not-allowed pointer-events-none',
   );
@@ -823,7 +823,7 @@ function NavTreeItem({
         ? '!text-[--sidebar-accent]'
         : '!text-[--sidebar-fg-muted] group-hover:!text-[--sidebar-fg-hover]'
       : isActive
-        ? '!text-aki-blue'
+        ? '!text-[var(--pro-azure)]'
         : 'text-slate-400',
   );
 
@@ -954,10 +954,10 @@ function CompanyRow({ company, selected, onSwitch }: { company: TreeViewCompany;
       onClick={() => onSwitch(company)}
       className={cn(
         'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all',
-        selected ? 'bg-aki-blue-50 dark:bg-aki-blue-950/30 text-aki-blue dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800',
+        selected ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]-950/30 text-[var(--pro-azure)] dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800',
       )}
     >
-      <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center shrink-0', selected ? 'bg-aki-blue-100 text-aki-blue' : 'bg-slate-100 dark:bg-slate-800 text-slate-500')}>
+      <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center shrink-0', selected ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure)]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500')}>
         <Building2 size={14} />
       </div>
       <div className="flex-1 min-w-0">
@@ -968,7 +968,7 @@ function CompanyRow({ company, selected, onSwitch }: { company: TreeViewCompany;
         </div>
       </div>
       {company.isDefault && <Star size={12} className="text-amber-400 fill-amber-400 shrink-0" />}
-      {selected && <span className="w-2 h-2 rounded-full bg-aki-blue shrink-0" />}
+      {selected && <span className="w-2 h-2 rounded-full bg-[var(--pro-azure)] shrink-0" />}
     </button>
   );
 }
@@ -989,7 +989,7 @@ const QuickCreatePopover = React.forwardRef<
             onClick={() => onSelect(a)}
             className="flex flex-col items-start gap-1.5 px-3 py-2.5 rounded-xl text-left transition-all hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
           >
-            <span className="w-8 h-8 rounded-xl bg-aki-blue-50 dark:bg-aki-blue-950/30 text-aki-blue dark:text-blue-400 flex items-center justify-center">
+            <span className="w-8 h-8 rounded-xl bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]-950/30 text-[var(--pro-azure)] dark:text-blue-400 flex items-center justify-center">
               {a.icon ?? <Plus size={15} />}
             </span>
             <span className="text-[12px] font-semibold leading-tight">{a.label}</span>
@@ -1019,7 +1019,7 @@ const NotificationsPopover = React.forwardRef<
             onClick={() => onSelect(n)}
             className={cn(
               'w-full flex items-start gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all hover:bg-slate-50 dark:hover:bg-slate-800',
-              !n.read && 'bg-aki-blue-50/40 dark:bg-aki-blue-950/20',
+              !n.read && 'bg-[var(--pro-azure-50)]/40 dark:bg-[var(--pro-azure)]-950/20',
             )}
           >
             <span className={cn('w-8 h-8 rounded-xl flex items-center justify-center shrink-0', n.priority === 'high' ? 'bg-rose-50 text-rose-500' : 'bg-slate-100 dark:bg-slate-800 text-slate-500')}>
@@ -1030,7 +1030,7 @@ const NotificationsPopover = React.forwardRef<
               {n.body && <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">{n.body}</p>}
               {n.time && <p className="text-[10px] text-slate-400 mt-0.5">{n.time}</p>}
             </div>
-            {!n.read && <span className="w-2 h-2 rounded-full bg-aki-blue shrink-0 mt-1.5" />}
+            {!n.read && <span className="w-2 h-2 rounded-full bg-[var(--pro-azure)] shrink-0 mt-1.5" />}
           </button>
         ))}
       </div>
@@ -1045,7 +1045,7 @@ const ProfilePopover = React.forwardRef<
   return (
     <div ref={ref} className={cn(POPOVER_CLS, 'bottom-2')}>
       <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100 dark:border-slate-800">
-        <div className="w-10 h-10 rounded-full bg-aki-blue/15 text-aki-blue flex items-center justify-center text-[14px] font-bold">
+        <div className="w-10 h-10 rounded-full bg-[var(--pro-azure)]/15 text-[var(--pro-azure)] flex items-center justify-center text-[14px] font-bold">
           {profile?.avatarUrl ? <img src={profile.avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover" /> : profile?.initials ?? <User size={18} />}
         </div>
         <div className="min-w-0">
@@ -1101,7 +1101,7 @@ const SupportPopover = React.forwardRef<HTMLDivElement, { onAction: (a: TreeView
               onClick={() => onAction({ type: 'support', payload: l.label })}
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
             >
-              <span className="w-8 h-8 rounded-xl bg-aki-blue-50 dark:bg-aki-blue-950/30 text-aki-blue dark:text-blue-400 flex items-center justify-center shrink-0">
+              <span className="w-8 h-8 rounded-xl bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]-950/30 text-[var(--pro-azure)] dark:text-blue-400 flex items-center justify-center shrink-0">
                 <HelpCircle size={14} />
               </span>
               <div className="min-w-0">

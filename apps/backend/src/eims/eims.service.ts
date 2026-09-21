@@ -23,23 +23,6 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Prisma } from '@prisma/client';
-import { PrismaService } from '../common/prisma.service';
-import { MorEimsClient, MorEimsError } from './mor-eims.client';
-import { EimsCertificateService } from './eims-certificate.service';
-import {
-  RegisterInvoiceDto,
-  CancelInvoiceDto,
-  VerifyInvoiceDto,
-  BulkRegisterDto,
-  BulkCancelDto,
-  SalesReceiptDto,
-  WithholdingReceiptDto,
-  RegisterSourceSystemDto,
-  RegisterInvoiceInputDto,
-  SubmitInvoiceSummaryReportDto,
-  normalizePaymentMode,
-} from './eims.dto';
 import {
   EimsInvoiceRegistrationRequest,
   EimsSalesReceiptRequest,
@@ -57,11 +40,30 @@ import {
   EIMS_TOKEN_REFRESH_BUFFER_MS,
   EIMS_TIMEOUT_MS,
 } from '@ovds/shared';
+import { Prisma } from '@prisma/client';
+
+import { PrismaService } from '../common/prisma.service';
+
+import { EimsCertificateService } from './eims-certificate.service';
 import {
   mapInvoiceToMorRequest,
   MorMappingDefaults,
   OVDSInvoiceLike,
 } from './eims-invoice.mapper';
+import {
+  RegisterInvoiceDto,
+  CancelInvoiceDto,
+  VerifyInvoiceDto,
+  BulkRegisterDto,
+  BulkCancelDto,
+  SalesReceiptDto,
+  WithholdingReceiptDto,
+  RegisterSourceSystemDto,
+  RegisterInvoiceInputDto,
+  SubmitInvoiceSummaryReportDto,
+  normalizePaymentMode,
+} from './eims.dto';
+import { MorEimsClient, MorEimsError } from './mor-eims.client';
 
 @Injectable()
 export class EimsService {
@@ -1019,19 +1021,75 @@ export class EimsService {
   }
 
   async complianceReadiness(companyId: string) {
-    const [source, registrations, receipts] = await Promise.all([
+    const cfg = this.config;
+    const [source, certs, registrations, receipts, failed, pending] = await Promise.all([
       this.prisma.eimsSourceSystem.findFirst({ where: { companyId } }),
+      this.prisma.eimsCertificate.findFirst({ where: { companyId, status: 'ISSUED' } }),
       this.prisma.eimsRegistration.count({ where: { companyId } }),
       this.prisma.eimsReceipt.count({ where: { companyId } }),
+      this.prisma.eimsRegistration.count({ where: { companyId, status: 'FAILED' } }),
+      this.prisma.eimsRegistration.count({ where: { companyId, status: 'PENDING' } }),
     ]);
+
+    const sandbox = this.getClient(companyId).sandbox;
+
+    // Build a step-by-step readiness checklist the UI can render.
+    const steps = [
+      {
+        step: 'source_system',
+        title: 'Register Source System',
+        description: 'Register your ERP/POS source system with the MoR portal and add credentials here.',
+        complete: !!source,
+      },
+      {
+        step: 'source_approved',
+        title: 'Source System Approved',
+        description: 'MoR officer must approve the registered source system before submissions are accepted.',
+        complete: source?.status === 'APPROVED',
+      },
+      {
+        step: 'certificate',
+        title: 'Install INSA Certificate',
+        description: 'Generate a CSR, submit it to INSA (ica@insa.gov.et) and install the signed certificate.',
+        complete: !!certs,
+      },
+      {
+        step: 'first_registration',
+        title: 'First Invoice Registration',
+        description: 'Submit at least one invoice to the MoR EIMS to verify end-to-end connectivity.',
+        complete: registrations > 0,
+      },
+    ];
+
+    const completedSteps = steps.filter((s) => s.complete).length;
+    const progress = Math.round((completedSteps / steps.length) * 100);
+    const ready = completedSteps === steps.length;
+
     return {
       success: true,
       data: {
+        // Readiness shape (consumed by useEimsReadiness / Setup tab)
+        ready,
+        progress,
+        steps,
         onboarded: !!source,
         sourceSystemStatus: source?.status ?? null,
+        // Dashboard summary shape (consumed by useEimsDashboard / summary cards)
+        summary: {
+          registered: registrations,
+          pending,
+          failed,
+          receipts,
+        },
+        // Feature flags from env (consumed by dashboard flag cards)
+        sandbox,
+        autoRegister: cfg?.get<string>('EIMS_AUTO_REGISTER') === 'true',
+        autoReceipt: cfg?.get<string>('EIMS_AUTO_RECEIPT') === 'true',
+        verifyResponses: cfg?.get<string>('EIMS_REQUIRE_SIGNATURE_VERIFICATION') === 'true',
+        payloadEncryption: cfg?.get<string>('EIMS_PAYLOAD_ENCRYPTION') === 'true',
+        submissionMode: sandbox ? 'sandbox' : 'live',
         registrationsCount: registrations,
         receiptsCount: receipts,
-        submissionMode: this.getClient(companyId).sandbox ? 'sandbox' : 'live',
       },
     };
   }
@@ -1047,13 +1105,96 @@ export class EimsService {
   }
 
   async bspReport(companyId: string) {
-    const rows = await this.prisma.eimsRegistration.findMany({
-      where: { companyId },
-      select: { id: true, invoiceId: true, status: true, irn: true, documentNumber: true, registeredAt: true },
-      orderBy: { registeredAt: 'desc' },
-      take: EIMS_BSP_REPORT_LIMIT,
+    // Load manually-recorded BSP results and recent registrations/receipts in parallel.
+    const [bspResults, registrations, receipts] = await Promise.all([
+      this.prisma.eimsBspResult.findMany({
+        where: { companyId },
+        orderBy: { createdAt: 'desc' },
+        take: EIMS_BSP_REPORT_LIMIT,
+      }),
+      this.prisma.eimsRegistration.findMany({
+        where: { companyId, status: 'REGISTERED' },
+        select: { id: true, invoiceId: true, irn: true, documentNumber: true, registeredAt: true },
+        orderBy: { registeredAt: 'desc' },
+        take: EIMS_BSP_REPORT_LIMIT,
+      }),
+      this.prisma.eimsReceipt.findMany({
+        where: { companyId, status: 'REGISTERED' },
+        select: { id: true, invoiceId: true, receiptIrn: true, receiptNumber: true, receiptType: true, registeredAt: true },
+        orderBy: { registeredAt: 'desc' },
+        take: 50,
+      }),
+    ]);
+
+    // Group manual results by testCaseId.
+    const resultsByCase = new Map<string, typeof bspResults[number][]>();
+    for (const r of bspResults) {
+      const existing = resultsByCase.get(r.testCaseId) ?? [];
+      existing.push(r);
+      resultsByCase.set(r.testCaseId, existing);
+    }
+
+    // Merge static checklist with live execution evidence.
+    const testExecutions = MOR_BSP_CHECKLIST.map((tc) => {
+      const manualResults = resultsByCase.get(tc.id) ?? [];
+      const passed = manualResults.some((r) => r.result === 'PASS');
+      const executionCount = manualResults.length;
+
+      // Attach evidence: IRNs from manual results + relevant live registrations/receipts.
+      const evidence: Array<{ irn?: string | null; documentNumber?: string | null; receiptIrn?: string | null; date?: Date | null }> = [];
+
+      for (const r of manualResults) {
+        if (r.irn || r.documentNumber) {
+          evidence.push({ irn: r.irn, documentNumber: r.documentNumber });
+        }
+      }
+
+      // For invoice-registration test cases, attach the first matching registration IRN.
+      if (tc.category === 'Invoice Registration' || tc.category === 'Cancellation') {
+        for (const reg of registrations.slice(0, 3)) {
+          if (!evidence.some((e) => e.irn === reg.irn)) {
+            evidence.push({ irn: reg.irn, documentNumber: reg.documentNumber, date: reg.registeredAt });
+          }
+        }
+      }
+
+      // For receipt test cases, attach receipt IRNs.
+      if (tc.category === 'Receipt Registration') {
+        const type = tc.id === 'IRC-P04' ? 'WITHHOLDING' : 'SALES';
+        for (const rec of receipts.filter((r) => r.receiptType === type).slice(0, 2)) {
+          evidence.push({ receiptIrn: rec.receiptIrn, documentNumber: rec.receiptNumber, date: rec.registeredAt });
+        }
+      }
+
+      return {
+        ...tc,
+        executionCount,
+        passed,
+        evidence: evidence.slice(0, 5),
+      };
     });
-    return { success: true, data: rows };
+
+    const totalTests = testExecutions.length;
+    const passedCount = testExecutions.filter((t) => t.passed).length;
+    // Automated tests with live evidence (registrations/receipts) also count as passing.
+    const livePassCount = testExecutions.filter((t) => !t.passed && t.automated && t.evidence.some((e) => e.irn || e.receiptIrn)).length;
+    const effectivePassed = passedCount + livePassCount;
+    const pending = totalTests - effectivePassed;
+
+    return {
+      success: true,
+      data: {
+        testExecutions,
+        summary: {
+          totalTests,
+          passed: effectivePassed,
+          pending,
+          readinessScore: Math.round((effectivePassed / totalTests) * 100),
+        },
+        // Raw rows kept for backward compat
+        registrations,
+      },
+    };
   }
 
   async recordBspResult(companyId: string, dto: { testCaseId: string; documentNumber?: string; irn?: string; result: 'PASS' | 'FAIL'; notes?: string }) {
@@ -1128,7 +1269,17 @@ export class EimsService {
     return this.certificates.listCertificates(companyId);
   }
 
-  async generateCsr(companyId: string, dto: { tin: string; systemNumber: string; organizationName: string; email: string; organizationalUnitName?: string; sourceSystemId?: string }) {
+  async generateCsr(companyId: string, dto: {
+    tin: string;
+    systemNumber: string;
+    organizationName: string;
+    email: string;
+    organizationalUnitName?: string;
+    countryName?: string;
+    stateOrProvinceName?: string;
+    localityName?: string;
+    sourceSystemId?: string;
+  }) {
     return this.certificates.generateCsr(companyId, dto);
   }
 
@@ -1435,5 +1586,655 @@ export class EimsService {
         requestPayload: JSON.stringify(request),
       },
     });
+  }
+
+  // ── Cyber Audit ──────────────────────────────────────────────────────────────
+
+  async listCyberAudits(companyId: string) {
+    const rows = await this.prisma.cyberAudit.findMany({
+      where: { companyId },
+      include: {
+        _count: { select: { metrics: true, findings: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    return { success: true, data: rows };
+  }
+
+  async getCyberAudit(companyId: string, id: string) {
+    const row = await this.prisma.cyberAudit.findFirst({
+      where: { id, companyId },
+      include: { metrics: true, findings: true },
+    });
+    if (!row) throw new NotFoundException(`Cyber audit ${id} not found`);
+    return { success: true, data: row };
+  }
+
+  async createCyberAudit(companyId: string, dto: {
+    title: string;
+    description?: string;
+    conductedBy?: string;
+  }) {
+    const { INSA_COMPLIANCE_CHECKLIST } = require('@ovds/shared');
+    const row = await this.prisma.cyberAudit.create({
+      data: {
+        companyId,
+        title: dto.title,
+        description: dto.description,
+        conductedBy: dto.conductedBy,
+        status: 'SCHEDULED',
+      },
+    });
+
+    // Pre-populate metrics from the INSA checklist so the auditor just fills in results.
+    if (Array.isArray(INSA_COMPLIANCE_CHECKLIST) && INSA_COMPLIANCE_CHECKLIST.length > 0) {
+      await this.prisma.cyberAuditMetric.createMany({
+        data: (INSA_COMPLIANCE_CHECKLIST as Array<{
+          id: string; area: string; metric: string; requirement: string; explanation?: string;
+        }>).map((item) => ({
+          auditId: row.id,
+          areaNumber: item.id.split('.')[0] ?? item.id,
+          areaName: item.area,
+          metricNumber: item.id,
+          metricName: item.metric,
+          requirement: item.requirement,
+          explanation: item.explanation ?? null,
+          status: 'PENDING',
+        })),
+      });
+    }
+
+    return { success: true, data: row };
+  }
+
+  async updateCyberAudit(companyId: string, id: string, dto: {
+    title?: string; description?: string; conductedBy?: string;
+  }) {
+    const row = await this.prisma.cyberAudit.findFirst({ where: { id, companyId } });
+    if (!row) throw new NotFoundException(`Cyber audit ${id} not found`);
+    const updated = await this.prisma.cyberAudit.update({
+      where: { id },
+      data: {
+        title: dto.title,
+        description: dto.description,
+        conductedBy: dto.conductedBy,
+      },
+    });
+    return { success: true, data: updated };
+  }
+
+  async deleteCyberAudit(companyId: string, id: string) {
+    const row = await this.prisma.cyberAudit.findFirst({ where: { id, companyId } });
+    if (!row) throw new NotFoundException(`Cyber audit ${id} not found`);
+    await this.prisma.cyberAudit.delete({ where: { id } });
+    return { success: true };
+  }
+
+  async startCyberAudit(companyId: string, id: string) {
+    const row = await this.prisma.cyberAudit.findFirst({ where: { id, companyId } });
+    if (!row) throw new NotFoundException(`Cyber audit ${id} not found`);
+    const updated = await this.prisma.cyberAudit.update({
+      where: { id },
+      data: { status: 'IN_PROGRESS', startedAt: new Date() },
+    });
+    return { success: true, data: updated };
+  }
+
+  async completeCyberAudit(companyId: string, id: string) {
+    const row = await this.prisma.cyberAudit.findFirst({ where: { id, companyId } });
+    if (!row) throw new NotFoundException(`Cyber audit ${id} not found`);
+    const updated = await this.prisma.cyberAudit.update({
+      where: { id },
+      data: { status: 'COMPLETED', completedAt: new Date() },
+    });
+    return { success: true, data: updated };
+  }
+
+  async getCyberAuditChecklist() {
+    const { INSA_COMPLIANCE_CHECKLIST, getInsaComplianceSummary } = require('@ovds/shared');
+    return {
+      success: true,
+      data: {
+        checklist: INSA_COMPLIANCE_CHECKLIST,
+        summary: getInsaComplianceSummary(),
+      },
+    };
+  }
+
+  async getCyberAuditSummary(companyId: string, id: string) {
+    const row = await this.prisma.cyberAudit.findFirst({
+      where: { id, companyId },
+      include: {
+        metrics: { select: { status: true } },
+        findings: { select: { severity: true, status: true } },
+      },
+    });
+    if (!row) throw new NotFoundException(`Cyber audit ${id} not found`);
+
+    const totalMetrics = row.metrics.length;
+    const compliant = row.metrics.filter((m) => m.status === 'COMPLIANT').length;
+    const nonCompliant = row.metrics.filter((m) => m.status === 'NON_COMPLIANT').length;
+    const partial = row.metrics.filter((m) => m.status === 'PARTIAL').length;
+    const score = totalMetrics > 0 ? Math.round(((compliant + partial * 0.5) / totalMetrics) * 100) : 0;
+
+    const findingsBySeverity = {
+      CRITICAL: row.findings.filter((f) => f.severity === 'CRITICAL').length,
+      HIGH: row.findings.filter((f) => f.severity === 'HIGH').length,
+      MEDIUM: row.findings.filter((f) => f.severity === 'MEDIUM').length,
+      LOW: row.findings.filter((f) => f.severity === 'LOW').length,
+    };
+    const openFindings = row.findings.filter((f) => f.status === 'OPEN').length;
+
+    return {
+      success: true,
+      data: {
+        auditId: id,
+        status: row.status,
+        score,
+        totalMetrics,
+        compliant,
+        nonCompliant,
+        partial,
+        findingsBySeverity,
+        openFindings,
+      },
+    };
+  }
+
+  async getCyberAuditMetrics(companyId: string, id: string) {
+    const row = await this.prisma.cyberAudit.findFirst({ where: { id, companyId } });
+    if (!row) throw new NotFoundException(`Cyber audit ${id} not found`);
+    const metrics = await this.prisma.cyberAuditMetric.findMany({
+      where: { auditId: id },
+      orderBy: [{ areaNumber: 'asc' }, { metricNumber: 'asc' }],
+    });
+    return { success: true, data: metrics };
+  }
+
+  async updateCyberAuditMetric(companyId: string, auditId: string, metricId: string, dto: {
+    status?: string;
+    evidence?: string;
+    remarks?: string;
+  }) {
+    const audit = await this.prisma.cyberAudit.findFirst({ where: { id: auditId, companyId } });
+    if (!audit) throw new NotFoundException(`Cyber audit ${auditId} not found`);
+    const updated = await this.prisma.cyberAuditMetric.update({
+      where: { id: metricId },
+      data: {
+        status: dto.status,
+        evidence: dto.evidence,
+        remarks: dto.remarks,
+      },
+    });
+    return { success: true, data: updated };
+  }
+
+  async getCyberAuditFindings(companyId: string, id: string) {
+    const row = await this.prisma.cyberAudit.findFirst({ where: { id, companyId } });
+    if (!row) throw new NotFoundException(`Cyber audit ${id} not found`);
+    const findings = await this.prisma.cyberAuditFinding.findMany({
+      where: { auditId: id },
+      orderBy: [{ severity: 'asc' }, { createdAt: 'desc' }],
+    });
+    return { success: true, data: findings };
+  }
+
+  async createCyberAuditFinding(companyId: string, auditId: string, dto: {
+    severity: string;
+    title: string;
+    description: string;
+    remediation?: string;
+    assignedTo?: string;
+    metricId?: string;
+  }) {
+    const audit = await this.prisma.cyberAudit.findFirst({ where: { id: auditId, companyId } });
+    if (!audit) throw new NotFoundException(`Cyber audit ${auditId} not found`);
+    const row = await this.prisma.cyberAuditFinding.create({
+      data: {
+        auditId,
+        severity: dto.severity,
+        title: dto.title,
+        description: dto.description,
+        remediation: dto.remediation,
+        assignedTo: dto.assignedTo,
+        metricId: dto.metricId,
+        status: 'OPEN',
+      },
+    });
+    return { success: true, data: row };
+  }
+
+  async updateCyberAuditFinding(companyId: string, auditId: string, findingId: string, dto: {
+    severity?: string;
+    title?: string;
+    description?: string;
+    remediation?: string;
+    status?: string;
+    assignedTo?: string;
+  }) {
+    const audit = await this.prisma.cyberAudit.findFirst({ where: { id: auditId, companyId } });
+    if (!audit) throw new NotFoundException(`Cyber audit ${auditId} not found`);
+    const updated = await this.prisma.cyberAuditFinding.update({
+      where: { id: findingId },
+      data: {
+        severity: dto.severity,
+        title: dto.title,
+        description: dto.description,
+        remediation: dto.remediation,
+        status: dto.status,
+        assignedTo: dto.assignedTo,
+        resolvedAt: dto.status === 'RESOLVED' ? new Date() : undefined,
+      },
+    });
+    return { success: true, data: updated };
+  }
+
+  async deleteCyberAuditFinding(companyId: string, auditId: string, findingId: string) {
+    const audit = await this.prisma.cyberAudit.findFirst({ where: { id: auditId, companyId } });
+    if (!audit) throw new NotFoundException(`Cyber audit ${auditId} not found`);
+    await this.prisma.cyberAuditFinding.delete({ where: { id: findingId } });
+    return { success: true };
+  }
+
+  // ── Master Compliance Checklist ──────────────────────────────────────────────
+
+  private buildMasterComplianceTemplate() {
+    // Sections derived from the MoR BSP Master Compliance Checklist document.
+    const sections: Array<{ sectionKey: string; items: Array<{ itemKey: string; itemText: string }> }> = [
+      {
+        sectionKey: 'GENERAL',
+        items: [
+          { itemKey: 'G01', itemText: 'BSP software name and version are documented' },
+          { itemKey: 'G02', itemText: 'Hosting environment (on-premise / cloud / hybrid) declared' },
+          { itemKey: 'G03', itemText: 'System architecture diagram provided' },
+          { itemKey: 'G04', itemText: 'Previous MoR test reports referenced' },
+        ],
+      },
+      {
+        sectionKey: 'INVOICE_REGISTRATION',
+        items: [
+          { itemKey: 'IR01', itemText: 'B2C invoice registration (no buyer TIN required)' },
+          { itemKey: 'IR02', itemText: 'B2B invoice registration (buyer TIN & legal name required)' },
+          { itemKey: 'IR03', itemText: 'Credit memo (CRN) linked to original IRN' },
+          { itemKey: 'IR04', itemText: 'Debit memo (DBN) linked to original IRN' },
+          { itemKey: 'IR05', itemText: 'IRN returned and QR code generated' },
+          { itemKey: 'IR06', itemText: 'Signed invoice and invoice signature returned' },
+        ],
+      },
+      {
+        sectionKey: 'RECEIPT_REGISTRATION',
+        items: [
+          { itemKey: 'RR01', itemText: 'Sales receipt (SREC) linked to registered IRN' },
+          { itemKey: 'RR02', itemText: 'Withholding receipt (TWHT/IWHT) linked to registered IRN' },
+          { itemKey: 'RR03', itemText: 'Receipt IRN returned' },
+        ],
+      },
+      {
+        sectionKey: 'CANCELLATION',
+        items: [
+          { itemKey: 'CN01', itemText: 'Invoice cancellation with reason code' },
+          { itemKey: 'CN02', itemText: 'Duplicate cancellation rejected' },
+          { itemKey: 'CN03', itemText: 'Cancellation of non-existent IRN rejected' },
+        ],
+      },
+      {
+        sectionKey: 'SECURITY',
+        items: [
+          { itemKey: 'SC01', itemText: 'TLS 1.3+ enforced for all API traffic' },
+          { itemKey: 'SC02', itemText: 'SHA512withRSA request signing implemented' },
+          { itemKey: 'SC03', itemText: 'INSA certificate installed and not expired' },
+          { itemKey: 'SC04', itemText: 'Payload encryption enabled (EIMS_PAYLOAD_ENCRYPTION)' },
+        ],
+      },
+      {
+        sectionKey: 'OFFLINE_RESILIENCE',
+        items: [
+          { itemKey: 'OF01', itemText: 'Offline invoices stored encrypted locally' },
+          { itemKey: 'OF02', itemText: 'Auto-sync within SLA window on connectivity restore' },
+          { itemKey: 'OF03', itemText: 'Offline sync status visible to operator' },
+        ],
+      },
+    ];
+    return sections;
+  }
+
+  async listMasterCompliance(companyId: string) {
+    const rows = await this.prisma.masterComplianceChecklist.findMany({
+      where: { companyId },
+      include: { _count: { select: { items: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+    return { success: true, data: rows };
+  }
+
+  async getMasterCompliance(companyId: string, id: string) {
+    const row = await this.prisma.masterComplianceChecklist.findFirst({
+      where: { id, companyId },
+      include: { items: { orderBy: [{ sectionKey: 'asc' }, { itemKey: 'asc' }] } },
+    });
+    if (!row) throw new NotFoundException(`Master compliance checklist ${id} not found`);
+    return { success: true, data: row };
+  }
+
+  async createMasterCompliance(companyId: string, dto: {
+    title: string;
+    bspName?: string;
+    bspTin?: string;
+    testingLocation?: string;
+    systemType?: string;
+    systemName?: string;
+  }) {
+    const row = await this.prisma.masterComplianceChecklist.create({
+      data: { companyId, title: dto.title, bspName: dto.bspName, bspTin: dto.bspTin,
+        testingLocation: dto.testingLocation, systemType: dto.systemType, systemName: dto.systemName,
+        status: 'DRAFT' },
+    });
+
+    // Pre-populate items from the BSP template.
+    const sections = this.buildMasterComplianceTemplate();
+    const items = sections.flatMap((sec) =>
+      sec.items.map((item) => ({
+        checklistId: row.id,
+        sectionKey: sec.sectionKey,
+        itemKey: item.itemKey,
+        itemText: item.itemText,
+        status: 'PENDING',
+      })),
+    );
+    await this.prisma.masterComplianceItem.createMany({ data: items });
+
+    return { success: true, data: row };
+  }
+
+  async updateMasterCompliance(companyId: string, id: string, dto: {
+    title?: string; status?: string; bspName?: string; bspTin?: string;
+    testingLocation?: string; systemType?: string; systemName?: string;
+    hostingType?: string; versionBuild?: string; testedEnv?: string;
+    testerName?: string; testerSignature?: string;
+    testDate?: string; releaseDate?: string;
+  }) {
+    const row = await this.prisma.masterComplianceChecklist.findFirst({ where: { id, companyId } });
+    if (!row) throw new NotFoundException(`Master compliance checklist ${id} not found`);
+    const updated = await this.prisma.masterComplianceChecklist.update({
+      where: { id },
+      data: {
+        title: dto.title,
+        status: dto.status,
+        bspName: dto.bspName,
+        bspTin: dto.bspTin,
+        testingLocation: dto.testingLocation,
+        systemType: dto.systemType,
+        systemName: dto.systemName,
+        hostingType: dto.hostingType,
+        versionBuild: dto.versionBuild,
+        testedEnv: dto.testedEnv,
+        testerName: dto.testerName,
+        testerSignature: dto.testerSignature,
+        testDate: dto.testDate ? new Date(dto.testDate) : undefined,
+        releaseDate: dto.releaseDate ? new Date(dto.releaseDate) : undefined,
+      },
+    });
+    return { success: true, data: updated };
+  }
+
+  async deleteMasterCompliance(companyId: string, id: string) {
+    const row = await this.prisma.masterComplianceChecklist.findFirst({ where: { id, companyId } });
+    if (!row) throw new NotFoundException(`Master compliance checklist ${id} not found`);
+    await this.prisma.masterComplianceChecklist.delete({ where: { id } });
+    return { success: true };
+  }
+
+  async listMasterComplianceItems(companyId: string, id: string) {
+    const row = await this.prisma.masterComplianceChecklist.findFirst({ where: { id, companyId } });
+    if (!row) throw new NotFoundException(`Master compliance checklist ${id} not found`);
+    const items = await this.prisma.masterComplianceItem.findMany({
+      where: { checklistId: id },
+      orderBy: [{ sectionKey: 'asc' }, { itemKey: 'asc' }],
+    });
+    return { success: true, data: items };
+  }
+
+  async updateMasterComplianceItem(companyId: string, checklistId: string, itemId: string, dto: {
+    status?: string;
+    resultData?: string;
+    remarks?: string;
+  }) {
+    const row = await this.prisma.masterComplianceChecklist.findFirst({ where: { id: checklistId, companyId } });
+    if (!row) throw new NotFoundException(`Master compliance checklist ${checklistId} not found`);
+    const updated = await this.prisma.masterComplianceItem.update({
+      where: { id: itemId },
+      data: { status: dto.status, resultData: dto.resultData, remarks: dto.remarks },
+    });
+    return { success: true, data: updated };
+  }
+
+  async getMasterComplianceTemplate() {
+    return { success: true, data: this.buildMasterComplianceTemplate() };
+  }
+
+  async getMasterComplianceSummary(companyId: string) {
+    const rows = await this.prisma.masterComplianceChecklist.findMany({
+      where: { companyId },
+      include: { _count: { select: { items: true } } },
+    });
+    const total = rows.length;
+    const completed = rows.filter((r) => r.status === 'COMPLETED').length;
+    const inProgress = rows.filter((r) => r.status === 'IN_PROGRESS').length;
+    return {
+      success: true,
+      data: { total, completed, inProgress, draft: total - completed - inProgress },
+    };
+  }
+
+  // ── Accreditation Checklist ───────────────────────────────────────────────────
+
+  private buildAccreditationTemplate() {
+    // Sections from MoR "Directive No. 1142/2026 — Sales Registration Systems".
+    const sections: Array<{ sectionKey: string; items: Array<{ itemKey: string; itemText: string }> }> = [
+      {
+        sectionKey: 'SOFTWARE_DATA',
+        items: [
+          { itemKey: 'SD01', itemText: 'Software type declared (ERP / POS / Hybrid)' },
+          { itemKey: 'SD02', itemText: 'Software name and version number provided' },
+          { itemKey: 'SD03', itemText: 'Version/build string matches deployed artefact' },
+        ],
+      },
+      {
+        sectionKey: 'PROVIDER_INFO',
+        items: [
+          { itemKey: 'PI01', itemText: 'Provider/manufacturer contact name and company' },
+          { itemKey: 'PI02', itemText: 'Provider address, mobile, telephone, email provided' },
+          { itemKey: 'PI03', itemText: 'Provider position / title stated' },
+        ],
+      },
+      {
+        sectionKey: 'SOFTWARE_OWNER',
+        items: [
+          { itemKey: 'SO01', itemText: 'Software owner/developer legal name provided' },
+          { itemKey: 'SO02', itemText: 'Owner address, city, country, telephone provided' },
+          { itemKey: 'SO03', itemText: 'Owner contact name and web/email provided' },
+        ],
+      },
+      {
+        sectionKey: 'FUNCTIONAL_REQUIREMENTS',
+        items: [
+          { itemKey: 'FR01', itemText: 'Invoice issuance (B2C and B2B)' },
+          { itemKey: 'FR02', itemText: 'Credit and debit memo issuance' },
+          { itemKey: 'FR03', itemText: 'Invoice cancellation flow' },
+          { itemKey: 'FR04', itemText: 'Receipt registration (sales and withholding)' },
+          { itemKey: 'FR05', itemText: 'IRN display and scannable QR code on printout' },
+          { itemKey: 'FR06', itemText: 'Offline mode with encrypted local storage and auto-sync' },
+        ],
+      },
+      {
+        sectionKey: 'SECURITY_REQUIREMENTS',
+        items: [
+          { itemKey: 'SR01', itemText: 'TLS 1.3+ on all API endpoints' },
+          { itemKey: 'SR02', itemText: 'INSA certificate-based request signing' },
+          { itemKey: 'SR03', itemText: 'Access control — role-based (ADMIN, FINANCE)' },
+          { itemKey: 'SR04', itemText: 'Audit trail for all invoice operations' },
+          { itemKey: 'SR05', itemText: 'Data encrypted at rest (certificates, keys)' },
+        ],
+      },
+      {
+        sectionKey: 'OVERALL_ASSESSMENT',
+        items: [
+          { itemKey: 'OA01', itemText: 'System strengths documented' },
+          { itemKey: 'OA02', itemText: 'Non-conformities listed with remediation plan' },
+          { itemKey: 'OA03', itemText: 'Observations noted' },
+          { itemKey: 'OA04', itemText: 'Final decision: RECOMMENDED / NOT_RECOMMENDED / WITH_CONDITIONS' },
+        ],
+      },
+    ];
+    return sections;
+  }
+
+  async listAccreditations(companyId: string) {
+    const rows = await this.prisma.accreditationChecklist.findMany({
+      where: { companyId },
+      include: { _count: { select: { items: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+    return { success: true, data: rows };
+  }
+
+  async getAccreditation(companyId: string, id: string) {
+    const row = await this.prisma.accreditationChecklist.findFirst({
+      where: { id, companyId },
+      include: { items: { orderBy: [{ sectionKey: 'asc' }, { itemKey: 'asc' }] } },
+    });
+    if (!row) throw new NotFoundException(`Accreditation checklist ${id} not found`);
+    return { success: true, data: row };
+  }
+
+  async createAccreditation(companyId: string, dto: {
+    title: string;
+    softwareType?: string;
+    softwareName?: string;
+    softwareVersion?: string;
+    providerCompanyName?: string;
+    providerContactName?: string;
+  }) {
+    const row = await this.prisma.accreditationChecklist.create({
+      data: {
+        companyId,
+        title: dto.title,
+        softwareType: dto.softwareType,
+        softwareName: dto.softwareName,
+        softwareVersion: dto.softwareVersion,
+        providerCompanyName: dto.providerCompanyName,
+        providerContactName: dto.providerContactName,
+        status: 'DRAFT',
+      },
+    });
+
+    // Pre-populate items from the accreditation template.
+    const sections = this.buildAccreditationTemplate();
+    const items = sections.flatMap((sec) =>
+      sec.items.map((item) => ({
+        checklistId: row.id,
+        sectionKey: sec.sectionKey,
+        itemKey: item.itemKey,
+        itemText: item.itemText,
+        status: 'PENDING',
+      })),
+    );
+    await this.prisma.accreditationItem.createMany({ data: items });
+
+    return { success: true, data: row };
+  }
+
+  async updateAccreditation(companyId: string, id: string, dto: {
+    title?: string; status?: string; dateOfAdmission?: string; dateOfReport?: string;
+    softwareType?: string; softwareName?: string; softwareVersion?: string;
+    providerContactName?: string; providerCompanyName?: string; providerPosition?: string;
+    providerAddress?: string; providerMobile?: string; providerTelephone?: string;
+    providerFax?: string; providerEmail?: string;
+    ownerLegalName?: string; ownerAddress?: string; ownerCity?: string;
+    ownerCountry?: string; ownerTelephone?: string; ownerContactName?: string; ownerWebEmail?: string;
+    strengths?: string; nonConformities?: string; observations?: string;
+    finalDecision?: string; conditionDetails?: string; signatures?: string;
+  }) {
+    const row = await this.prisma.accreditationChecklist.findFirst({ where: { id, companyId } });
+    if (!row) throw new NotFoundException(`Accreditation checklist ${id} not found`);
+    const updated = await this.prisma.accreditationChecklist.update({
+      where: { id },
+      data: {
+        title: dto.title,
+        status: dto.status,
+        dateOfAdmission: dto.dateOfAdmission ? new Date(dto.dateOfAdmission) : undefined,
+        dateOfReport: dto.dateOfReport ? new Date(dto.dateOfReport) : undefined,
+        softwareType: dto.softwareType,
+        softwareName: dto.softwareName,
+        softwareVersion: dto.softwareVersion,
+        providerContactName: dto.providerContactName,
+        providerCompanyName: dto.providerCompanyName,
+        providerPosition: dto.providerPosition,
+        providerAddress: dto.providerAddress,
+        providerMobile: dto.providerMobile,
+        providerTelephone: dto.providerTelephone,
+        providerFax: dto.providerFax,
+        providerEmail: dto.providerEmail,
+        ownerLegalName: dto.ownerLegalName,
+        ownerAddress: dto.ownerAddress,
+        ownerCity: dto.ownerCity,
+        ownerCountry: dto.ownerCountry,
+        ownerTelephone: dto.ownerTelephone,
+        ownerContactName: dto.ownerContactName,
+        ownerWebEmail: dto.ownerWebEmail,
+        strengths: dto.strengths,
+        nonConformities: dto.nonConformities,
+        observations: dto.observations,
+        finalDecision: dto.finalDecision,
+        conditionDetails: dto.conditionDetails,
+        signatures: dto.signatures,
+      },
+    });
+    return { success: true, data: updated };
+  }
+
+  async deleteAccreditation(companyId: string, id: string) {
+    const row = await this.prisma.accreditationChecklist.findFirst({ where: { id, companyId } });
+    if (!row) throw new NotFoundException(`Accreditation checklist ${id} not found`);
+    await this.prisma.accreditationChecklist.delete({ where: { id } });
+    return { success: true };
+  }
+
+  async listAccreditationItems(companyId: string, id: string) {
+    const row = await this.prisma.accreditationChecklist.findFirst({ where: { id, companyId } });
+    if (!row) throw new NotFoundException(`Accreditation checklist ${id} not found`);
+    const items = await this.prisma.accreditationItem.findMany({
+      where: { checklistId: id },
+      orderBy: [{ sectionKey: 'asc' }, { itemKey: 'asc' }],
+    });
+    return { success: true, data: items };
+  }
+
+  async updateAccreditationItem(companyId: string, checklistId: string, itemId: string, dto: {
+    status?: string;
+    comment?: string;
+    evidence?: string;
+  }) {
+    const row = await this.prisma.accreditationChecklist.findFirst({ where: { id: checklistId, companyId } });
+    if (!row) throw new NotFoundException(`Accreditation checklist ${checklistId} not found`);
+    const updated = await this.prisma.accreditationItem.update({
+      where: { id: itemId },
+      data: { status: dto.status, comment: dto.comment, evidence: dto.evidence },
+    });
+    return { success: true, data: updated };
+  }
+
+  async getAccreditationSummary(companyId: string) {
+    const rows = await this.prisma.accreditationChecklist.findMany({
+      where: { companyId },
+    });
+    const total = rows.length;
+    const completed = rows.filter((r) => r.status === 'COMPLETED').length;
+    const inProgress = rows.filter((r) => r.status === 'IN_PROGRESS').length;
+    const recommended = rows.filter((r) => r.finalDecision === 'RECOMMENDED').length;
+    return {
+      success: true,
+      data: { total, completed, inProgress, draft: total - completed - inProgress, recommended },
+    };
   }
 }

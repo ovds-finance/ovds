@@ -3,18 +3,19 @@
  * Management accounting — allocate income/expenses to cost/profit centers
  * Required for multi-department P&L reporting and project costing
  */
-import React, { useState, useCallback, useEffect } from 'react';
+import { evalMath } from '@ovds/ui';
+import React, { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, Modal, FormField, Input, Select, Icon, Amount,
 } from '../components/ui';
-import { evalMath } from '@ovds/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useAuth } from '../rbac/AuthContext';
 import { useBusiness } from '../context/businessContext';
 import { useInterval } from '../hooks';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
 import api from '../services/api';
-import toast from 'react-hot-toast';
 import {
   useCostCenters,
   useCostCenterAllocations,
@@ -59,7 +60,7 @@ const fmtK = (n: number) => Math.abs(n) >= 1_000_000 ? `${(n / 1_000_000).toFixe
 
 const TYPE_COLORS: Record<CenterType, string> = {
   COST:       'bg-rose-50 text-rose-700 border-rose-200',
-  PROFIT:     'bg-emerald-50 text-emerald-700 border-emerald-200',
+  PROFIT:     'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
   INVESTMENT: 'bg-violet-50 text-violet-700 border-violet-200',
 };
 
@@ -167,7 +168,7 @@ const PerformanceTab: React.FC<{ centers: CostCenter[]; period: string; companyI
                 <AppTd align="right"><Amount value={actualExpense} size="sm" /></AppTd>
                 <AppTd align="right"><Amount value={actualRevenue} size="sm" /></AppTd>
                 <AppTd align="right">
-                  <span className={`font-bold tabular-nums text-[12px] ${variance < 0 ? 'text-rose-600' : 'text-emerald-700'}`}>
+                  <span className={`font-bold tabular-nums text-[12px] ${variance < 0 ? 'text-rose-600' : 'text-[var(--pro-azure-dark)]'}`}>
                     {variance < 0 ? `(${fmt(Math.abs(variance))})` : fmt(variance)}
                   </span>
                 </AppTd>
@@ -175,10 +176,10 @@ const PerformanceTab: React.FC<{ centers: CostCenter[]; period: string; companyI
                   {pctUsed !== null && (
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full transition-all ${pctUsed > 100 ? 'bg-rose-500' : pctUsed > 80 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                        <div className={`h-full rounded-full transition-all ${pctUsed > 100 ? 'bg-rose-500' : pctUsed > 80 ? 'bg-amber-500' : 'bg-[var(--pro-azure-50)]0'}`}
                           style={{ width: `${Math.min(pctUsed, 100)}%` }} />
                       </div>
-                      <span className={`text-[11px] font-bold ${pctUsed > 100 ? 'text-rose-600' : pctUsed > 80 ? 'text-amber-600' : 'text-emerald-700'}`}>
+                      <span className={`text-[11px] font-bold ${pctUsed > 100 ? 'text-rose-600' : pctUsed > 80 ? 'text-amber-600' : 'text-[var(--pro-azure-dark)]'}`}>
                         {pctUsed}%
                       </span>
                     </div>
@@ -249,9 +250,9 @@ const CostCenters: React.FC = () => {
     >
       <AppKpi cells={[
         { label: 'Cost Centers',   value: String(centers.filter(c => c.type === 'COST').length),    icon: <Icon name="MONEY" size={14} />, color: 'rose' },
-        { label: 'Profit Centers', value: String(centers.filter(c => c.type === 'PROFIT').length),  icon: <Icon name="TREND_UP" size={14} />, color: 'emerald' },
+        { label: 'Profit Centers', value: String(centers.filter(c => c.type === 'PROFIT').length),  icon: <Icon name="TREND_UP" size={14} />, color: "indigo" },
         { label: 'Total Budget',   value: `ETB ${fmtK(totalBudget)}`,    icon: <Icon name="CHART" size={14} />, color: 'violet' },
-        { label: 'Total Actual',   value: `ETB ${fmtK(totalActual)}`,    icon: <Icon name="RECEIPT" size={14} />, color: totalActual > totalBudget ? 'rose' : 'emerald' },
+        { label: 'Total Actual',   value: `ETB ${fmtK(totalActual)}`,    icon: <Icon name="RECEIPT" size={14} />, color: totalActual > totalBudget ? 'rose' : 'indigo' },
       ]} />
 
       {activeTab === 'centers' && (
@@ -287,7 +288,7 @@ const CostCenters: React.FC = () => {
                   <AppTd>{c.department ?? '—'}</AppTd>
                   <AppTd align="right"><Amount value={c.budget ?? 0} size="sm" /></AppTd>
                   <AppTd>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${c.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-400'}`}>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${c.isActive ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]' : 'bg-slate-100 text-slate-400'}`}>
                       {c.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </AppTd>
@@ -321,7 +322,7 @@ const CostCenters: React.FC = () => {
                 <AppTd className="max-w-[200px] truncate">{a.description}</AppTd>
                 <AppTd className="text-[11px] text-slate-500">{a.accountCode} {a.accountName}</AppTd>
                 <AppTd>
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${a.type === 'INCOME' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${a.type === 'INCOME' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]' : 'bg-rose-50 text-rose-700'}`}>
                     {a.type}
                   </span>
                 </AppTd>
@@ -367,10 +368,10 @@ const CostCenters: React.FC = () => {
                     <AppTd className="font-semibold">{c.name}<br/><span className="text-[10px] font-mono text-slate-400">{c.code}</span></AppTd>
                     <AppTd align="right"><Amount value={rev} size="sm" /></AppTd>
                     <AppTd align="right"><Amount value={cost} size="sm" /></AppTd>
-                    <AppTd align="right"><span className={`font-bold tabular-nums text-[12px] ${cont < 0 ? 'text-rose-600' : 'text-emerald-700'}`}>{cont < 0 ? `(${fmt(Math.abs(cont))})` : fmt(cont)}</span></AppTd>
+                    <AppTd align="right"><span className={`font-bold tabular-nums text-[12px] ${cont < 0 ? 'text-rose-600' : 'text-[var(--pro-azure-dark)]'}`}>{cont < 0 ? `(${fmt(Math.abs(cont))})` : fmt(cont)}</span></AppTd>
                     <AppTd align="right" className="text-slate-400">—</AppTd>
-                    <AppTd align="right"><span className={`font-bold tabular-nums text-[12px] ${net < 0 ? 'text-rose-600' : 'text-emerald-700'}`}>{net < 0 ? `(${fmt(Math.abs(net))})` : fmt(net)}</span></AppTd>
-                    <AppTd align="right"><span className={`font-bold text-[12px] ${margin < 0 ? 'text-rose-600' : margin < 15 ? 'text-amber-600' : 'text-emerald-700'}`}>{margin.toFixed(1)}%</span></AppTd>
+                    <AppTd align="right"><span className={`font-bold tabular-nums text-[12px] ${net < 0 ? 'text-rose-600' : 'text-[var(--pro-azure-dark)]'}`}>{net < 0 ? `(${fmt(Math.abs(net))})` : fmt(net)}</span></AppTd>
+                    <AppTd align="right"><span className={`font-bold text-[12px] ${margin < 0 ? 'text-rose-600' : margin < 15 ? 'text-amber-600' : 'text-[var(--pro-azure-dark)]'}`}>{margin.toFixed(1)}%</span></AppTd>
                   </AppTr>
                 );
               })}

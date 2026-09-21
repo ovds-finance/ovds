@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Skeleton, GridHero, ContextStrip, ContextPill } from '@ovds/ui';
-import settingsCatalogApi from '../../services/settingsCatalogApi';
 import type { SettingDefinition } from '@ovds/shared';
-import toast from 'react-hot-toast';
-import { useAuth } from '../../rbac';
+import { Skeleton, GridHero, ContextStrip, ContextPill } from '@ovds/ui';
 import {
   Settings2, Plus, Trash2, Edit3, LayoutGrid,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
+import { useAuth } from '../../rbac';
+import settingsCatalogApi from '../../services/settingsCatalogApi';
+
 
 type Tab = 'categories' | 'groups' | 'definitions';
 
@@ -224,7 +226,7 @@ const SettingsCatalog: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => { setActiveTab(tab.id); setShowCatForm(false); setShowGroupForm(false); setShowDefForm(false); }}
-                  className={`w-full flex items-center gap-2.5 px-4 py-2.5 transition-all ${activeTab === tab.id ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                  className={`w-full flex items-center gap-2.5 px-4 py-2.5 transition-all ${activeTab === tab.id ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] font-semibold' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
                 >
                   <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">{tab.icon}</div>
                   <div className="text-left">
@@ -375,7 +377,7 @@ const SettingsCatalog: React.FC = () => {
                             <div className="flex items-center gap-2">
                               <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{def.key}</p>
                               <span className="text-[9px] px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded font-mono">{def.type}</span>
-                              {def.isGlobal && <span className="text-[9px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded">GLOBAL</span>}
+                              {def.isGlobal && <span className="text-[9px] px-1.5 py-0.5 bg-[var(--pro-azure-50)] text-[var(--pro-azure)] rounded">GLOBAL</span>}
                             </div>
                             <div className="flex items-center gap-2 mt-1">
                               {cat && <span className="text-[10px] text-slate-400">{cat.name}</span>}

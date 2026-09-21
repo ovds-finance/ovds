@@ -5,8 +5,8 @@
  * Persists active filters to localStorage per page key
  * Emits onChange with the current filter state
  */
-import React, { useState, useCallback, useEffect } from 'react';
 import { Filter, X, ChevronDown, Plus, Trash2, RotateCcw } from 'lucide-react';
+import React, { useState, useCallback, useEffect } from 'react';
 
 export type FilterOperator =
   | 'equals' | 'not_equals'
@@ -150,8 +150,8 @@ const AdvancedFilterBuilder: React.FC<Props> = ({ fields, storageKey, onChange, 
         onClick={() => setOpen(v => !v)}
         className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-bold transition-colors ${
           activeCount > 0
-            ? 'bg-emerald-500 text-white border-emerald-600 shadow-sm'
-            : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-emerald-600 hover:text-emerald-600 dark:text-emerald-400'
+            ? 'bg-[var(--pro-azure)] text-white border-[var(--pro-azure-dark)] shadow-sm'
+            : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-[var(--pro-azure)] hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)]'
         }`}
       >
         <Filter size={14} />
@@ -170,10 +170,10 @@ const AdvancedFilterBuilder: React.FC<Props> = ({ fields, storageKey, onChange, 
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-2">
-              <Filter size={14} className="text-emerald-600 dark:text-emerald-400" />
+              <Filter size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
               <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Advanced Filters</span>
               {activeCount > 0 && (
-                <span className="bg-emerald-500 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+                <span className="bg-[var(--pro-azure)] text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
                   {activeCount} active
                 </span>
               )}
@@ -296,13 +296,13 @@ const AdvancedFilterBuilder: React.FC<Props> = ({ fields, storageKey, onChange, 
           <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 dark:border-slate-700">
             <button
               onClick={addFilter}
-              className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 transition-colors"
+              className="flex items-center gap-1.5 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:text-[var(--pro-azure-dark)] transition-colors"
             >
               <Plus size={13} /> Add filter
             </button>
             <button
               onClick={() => setOpen(false)}
-              className="px-4 py-1.5 bg-emerald-500 text-white rounded-lg text-xs font-medium hover:bg-emerald-600 transition-colors"
+              className="px-4 py-1.5 bg-[var(--pro-azure)] text-white rounded-lg text-xs font-medium hover:bg-[var(--pro-azure-dark)] transition-colors"
             >
               Apply
             </button>

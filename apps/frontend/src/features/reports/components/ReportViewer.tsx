@@ -1,13 +1,14 @@
-import React, { useEffect, useState, useCallback } from 'react';
 import { AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr, Btn } from '@ovds/ui';
 import { Download, RefreshCw, Calendar, BarChart3, FileText, Loader } from 'lucide-react';
+import React, { useEffect, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
+
 import { useBusiness } from '../../../context/businessContext';
 import { downloadBlob } from '../../../utils/download';
-import type { ReportTemplate, ReportConfig, AccountingBasis, ExportFormat, ReportPeriod } from '../types';
-import { fetchReport, downloadReportData, exportReportBlob } from '../services/reportsService';
 import { normalizeReport, fmtCell } from '../normalizers';
 import type { RenderedReport } from '../normalizers';
+import { fetchReport, downloadReportData, exportReportBlob } from '../services/reportsService';
+import type { ReportTemplate, ReportConfig, AccountingBasis, ExportFormat, ReportPeriod } from '../types';
 
 interface Props {
   template: ReportTemplate;
@@ -76,7 +77,7 @@ export default function ReportViewer({ template, config, onBack, onSchedule }: P
       title={template.title}
       subtitle={template.description}
       icon={<BarChart3 size={16} className="text-white" />}
-      iconBg="bg-indigo-600"
+      iconBg="bg-[var(--pro-azure)]"
       crumbs={[
         { label: 'Reports', to: '/reports-dashboard' },
         { label: template.category === 'standard' ? 'Standard' : 'Modular' },

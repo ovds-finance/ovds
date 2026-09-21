@@ -1,5 +1,5 @@
 /**
- * @ovds/domains/invoice
+ * @ovds/domains-invoice
  *
  * Backend domain library for the invoice domain.
  * Exports services and types needed by the thin NestJS app module/controllers.
@@ -26,3 +26,6 @@ export type {
   IinvoiceOfflineDeps,
   IinvoiceQueueDeps,
 } from './lib';
+
+// Domain events — strongly-typed payloads + factory helpers
+export * from './events';

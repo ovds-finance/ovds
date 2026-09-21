@@ -12,7 +12,7 @@ type RawGroup = {
   items: Array<{ to: string; label: string; icon: string; permission?: string; isNew?: boolean; pinnable?: boolean; keywords?: string[] }>;
 };
 
-const AKAUNTING_PARENTS: Array<{
+const OVDS_NAV_PARENTS: Array<{
   id: string;
   label: string;
   icon: React.ReactNode;
@@ -30,7 +30,7 @@ const AKAUNTING_PARENTS: Array<{
     id: 'sales',
     label: 'Sales',
     icon: <span className="text-base">💼</span>,
-    color: 'text-emerald-600',
+    color: 'text-[var(--pro-azure-dark)]',
     childKeys: ['sales'],
   },
   {
@@ -44,7 +44,7 @@ const AKAUNTING_PARENTS: Array<{
     id: 'trade',
     label: 'Trade & Customs',
     icon: <span className="text-base">🌍</span>,
-    color: 'text-aka-emerald-600',
+    color: 'text-[var(--pro-azure)]',
     childKeys: ['trade'],
   },
   {
@@ -86,7 +86,7 @@ const AKAUNTING_PARENTS: Array<{
     id: 'reports',
     label: 'Reports & Analytics',
     icon: <span className="text-base">📈</span>,
-    color: 'text-aka-indigo-600',
+    color: 'text-[var(--pro-azure)]',
     childKeys: ['reports'],
   },
   {
@@ -137,7 +137,7 @@ function mapBackendGroupsToSections(backendGroups: RawGroup[], role: string): Na
 
   const sections: NavSection[] = [];
 
-  for (const parent of AKAUNTING_PARENTS) {
+  for (const parent of OVDS_NAV_PARENTS) {
     const childGroups = parent.childKeys
       .map(key => groupMap.get(key))
       .filter((g): g is RawGroup => !!g);

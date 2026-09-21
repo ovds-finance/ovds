@@ -30,7 +30,11 @@
       "@ovds/features/projects":     ["packages/features/projects/src/index.ts"],
       "@ovds/features/inventory":    ["packages/features/inventory/src/index.ts"],
       "@ovds/features/banking":      ["packages/features/banking/src/index.ts"],
-      "@ovds/features/tax":          ["packages/features/tax/src/index.ts"]
+      "@ovds/features/tax":          ["packages/features/tax/src/index.ts"],
+
+      "react-router-dom":       ["apps/frontend/node_modules/react-router-dom/dist/index.d.ts"],
+      "@tanstack/react-query":  ["apps/frontend/node_modules/@tanstack/react-query/build/legacy/index.d.ts"],
+      "lucide-react":           ["apps/frontend/node_modules/lucide-react/dist/lucide-react.d.ts"]
     }
   }
 }

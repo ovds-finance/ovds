@@ -93,15 +93,34 @@ if (existsSync(fullPath) && !isDirectory(fullPath)) {
 }
 
 if (!resolvedPath) {
-  // Fallback: try resolving via require
+  // Fallback 1: try resolving from CWD's node_modules (for workspace-local packages)
+  const cwdPath = resolve(process.cwd(), 'node_modules', binPath);
+  const cwdPathJs = cwdPath + '.js';
+  if (existsSync(cwdPath) && !isDirectory(cwdPath)) {
+    resolvedPath = cwdPath;
+  } else if (existsSync(cwdPathJs)) {
+    resolvedPath = cwdPathJs;
+  }
+}
+
+if (!resolvedPath) {
+  // Fallback 2: try resolving via require
   try {
     const req = createRequire(import.meta.url);
     const resolved = req.resolve(binPath);
     execFileSync(process.execPath, [...leadingNodeFlags, resolved, ...args], { stdio: 'inherit', env: process.env });
     process.exit(0);
   } catch {
-    console.error(`ERROR: Cannot find binary: ${fullPath}`);
-    process.exit(1);
+    // Also try resolving from CWD via require
+    try {
+      const cwdReq = createRequire(resolve(process.cwd(), '__placeholder__.js'));
+      const resolved = cwdReq.resolve(binPath);
+      execFileSync(process.execPath, [...leadingNodeFlags, resolved, ...args], { stdio: 'inherit', env: process.env });
+      process.exit(0);
+    } catch {
+      console.error(`ERROR: Cannot find binary: ${fullPath}`);
+      process.exit(1);
+    }
   }
 }
 

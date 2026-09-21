@@ -68,7 +68,7 @@ const DashboardWidgetCard: React.FC<{ widget: GridWidget }> = ({ widget }) => {
 
         {widget.trend && (
           <div className={`flex items-center gap-1 mt-2 text-xs font-semibold ${
-            widget.trend.positive ? 'text-emerald-600' : 'text-rose-600'
+            widget.trend.positive ? 'text-[var(--pro-azure)]' : 'text-rose-600'
           }`}>
             <span>{widget.trend.positive ? '↑' : '↓'}</span>
             {Math.abs(widget.trend.value)}%
@@ -98,7 +98,7 @@ export const GridStatsRow: React.FC<{
             {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
           </p>
           {stat.trend !== undefined && (
-            <p className={`text-xs font-semibold ${stat.trend >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+            <p className={`text-xs font-semibold ${stat.trend >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>
               {stat.trend >= 0 ? '+' : ''}{stat.trend}%
             </p>
           )}

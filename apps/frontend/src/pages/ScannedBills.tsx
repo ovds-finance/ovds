@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { GridHero, ContextStrip, ContextPill } from '@ovds/ui';
 import {
   ScanLine,
   Upload,
@@ -33,17 +33,18 @@ import {
   MoreVertical,
   Copy,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import toast from 'react-hot-toast';
-import api from '../services/api';
-import { usePageTitle } from '../hooks/usePageTitle';
+
+import { PipelineStageHeader } from '../components/pipelineComponents';
+import { EmptyState, Pagination } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
 import { useAuditLog } from '../hooks/useAuditLog';
 import { useConfirm } from '../hooks/useConfirm';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
-import { EmptyState, Pagination } from '../components/ui';
-import { GridHero, ContextStrip, ContextPill } from '@ovds/ui';
-import { PipelineStageHeader } from '../components/pipelineComponents';
-import { fmtCurrency } from '../utils/fmt';
+import api from '../services/api';
+import { fmtCurrency, normalizeOcrError } from '../utils';
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
@@ -88,7 +89,7 @@ const TYPE_META: Record<BillType, { label: string; color: string }> = {
   BANK: {
     label: 'Bank',
     color:
-      'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300',
+      'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/40 dark:text-green-300',
   },
   TELECOM: {
     label: 'Telecom',
@@ -111,7 +112,7 @@ const STATUS_META: Record<BillStatus, { label: string; color: string }> = {
   VERIFIED: {
     label: 'Verified',
     color:
-      'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800',
+      'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-300 dark:border-green-800',
   },
   REJECTED: {
     label: 'Rejected',
@@ -163,7 +164,7 @@ const ConfBadge: React.FC<{ v?: number }> = ({ v }) => {
   const p = Math.round(v * 100);
   const c =
     p >= 80
-      ? 'text-emerald-600 bg-emerald-50 border-emerald-200'
+      ? 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]'
       : p >= 50
         ? 'text-amber-600 bg-amber-50 border-amber-200'
         : 'text-rose-600 bg-rose-50 border-rose-200';
@@ -256,7 +257,7 @@ const CaptureModal: React.FC<{
       );
     } catch (err: any) {
       toast.error(
-        err?.response?.data?.message ?? 'OCR failed. Check AI provider config.',
+        normalizeOcrError(err?.response?.data?.message ?? 'OCR failed. Check AI provider config.'),
       );
     } finally {
       setLoading(false);
@@ -546,7 +547,7 @@ const CaptureModal: React.FC<{
                         alt="preview"
                         className="max-h-36 rounded-xl object-contain shadow-md"
                       />
-                      <p className="text-xs font-semibold text-emerald-600 flex items-center gap-1.5">
+                      <p className="text-xs font-semibold text-[var(--pro-azure)] flex items-center gap-1.5">
                         <CheckCircle2 size={13} />
                         Image captured — click to replace
                       </p>
@@ -581,7 +582,7 @@ const CaptureModal: React.FC<{
                 {ocrResult && (
                   <div className="p-4 bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
-                      <CheckCircle2 size={14} className="text-emerald-600" />
+                      <CheckCircle2 size={14} className="text-[var(--pro-azure)]" />
                       <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                         OCR Extracted
                       </span>
@@ -683,7 +684,7 @@ const CaptureModal: React.FC<{
             {/* QR / TELECOM TAB */}
             {tab === 'qr' && (
               <div className="space-y-4">
-                <div className="p-4 bg-blue-50 dark:bg-aki-blue/10 border border-blue-200 dark:border-aki-blue/30 rounded-lg">
+                <div className="p-4 bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-lg">
                   <p className="text-[11px] font-bold text-aki-blue dark:text-aki-blue uppercase tracking-widest mb-1.5">
                     Telebirr / CBE / Bank Reference
                   </p>
@@ -762,8 +763,8 @@ const CaptureModal: React.FC<{
                         </>
                       ) : (
                         <>
-                          <CheckCircle2 size={14} className="text-emerald-600" />
-                          <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-widest">
+                          <CheckCircle2 size={14} className="text-[var(--pro-azure)]" />
+                          <span className="text-[10px] font-bold text-[var(--pro-azure-dark)] dark:text-green-300 uppercase tracking-widest">
                             Receipt Verified
                           </span>
                         </>
@@ -1087,19 +1088,19 @@ const DetailDrawer: React.FC<{
           {(bill.bankName || bill.bankAccountNo) && (
             <div className="space-y-2">
               <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Bank Details</p>
-              <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900 rounded-2xl p-4 space-y-2">
+              <div className="bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900 rounded-2xl p-4 space-y-2">
                 {bill.bankName && (
-                  <p className="text-sm font-bold text-emerald-800 dark:text-emerald-200">
+                  <p className="text-sm font-bold text-[var(--pro-azure-dark)] dark:text-green-200">
                     {bill.bankName}
                   </p>
                 )}
                 {bill.bankAccountNo && (
-                  <p className="text-xs font-mono text-emerald-600 dark:text-emerald-400">
+                  <p className="text-xs font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                     {bill.bankAccountNo}
                   </p>
                 )}
                 {bill.bankAccountName && (
-                  <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                  <p className="text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                     {bill.bankAccountName}
                   </p>
                 )}
@@ -1137,11 +1138,11 @@ const DetailDrawer: React.FC<{
             </div>
           )}
           {bill.bankRef && (
-            <div className="bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900 rounded-2xl p-4">
-              <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1">
+            <div className="bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900 rounded-2xl p-4">
+              <p className="text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-widest mb-1">
                 Bank Portal Reference
               </p>
-              <p className="text-sm font-mono font-bold text-indigo-800 dark:text-indigo-200">
+              <p className="text-sm font-mono font-bold text-[var(--pro-azure-dark)] dark:text-green-200">
                 {bill.bankRef}
               </p>
             </div>
@@ -1213,9 +1214,9 @@ const DetailDrawer: React.FC<{
           {(bill.linkedExpenseId ||
             bill.linkedInvoiceId ||
             bill.linkedBillId) && (
-            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl flex items-center gap-2">
-              <Link2 size={14} className="text-emerald-600" />
-              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
+            <div className="p-3 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl flex items-center gap-2">
+              <Link2 size={14} className="text-[var(--pro-azure)]" />
+              <span className="text-xs font-bold text-[var(--pro-azure-dark)] dark:text-green-300">
                 Linked to{' '}
                 {bill.linkedExpenseId
                   ? 'Expense'
@@ -1338,7 +1339,7 @@ const DetailDrawer: React.FC<{
               <>
                 <button
                   onClick={() => onStatusChange(bill.id, 'VERIFIED')}
-                  className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5"
                 >
                   <CheckCircle2 size={13} />
                   Verify
@@ -1355,7 +1356,7 @@ const DetailDrawer: React.FC<{
             {bill.status === 'VERIFIED' && (
               <button
                 onClick={() => onStatusChange(bill.id, 'EXPORTED')}
-                className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5"
+                className="flex-1 py-2.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5"
               >
                 <Archive size={13} />
                 Mark Exported
@@ -1757,14 +1758,14 @@ export default function ScannedBills() {
                     setStatusFilter(s);
                     setPage(1);
                   }}
-                  className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${statusFilter === s ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                  className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${statusFilter === s ? 'bg-[var(--pro-azure)] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
                   {s || 'All'}
                 </button>
               ),
             )}
             {selected.size > 0 && (
-              <span className="ml-auto text-xs font-bold text-emerald-600 dark:text-emerald-400">
+              <span className="ml-auto text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                 {selected.size} selected
               </span>
             )}
@@ -1775,7 +1776,7 @@ export default function ScannedBills() {
         <div className="overflow-x-auto">
           {loading ? (
             <div className="py-20 flex flex-col items-center gap-3">
-              <RefreshCw size={28} className="text-emerald-500 animate-spin" />
+              <RefreshCw size={28} className="text-[var(--pro-azure)] animate-spin" />
               <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Loading bills…</p>
             </div>
           ) : bills.length === 0 ? (
@@ -1796,7 +1797,7 @@ export default function ScannedBills() {
                         selected.size === bills.length && bills.length > 0
                       }
                       onChange={toggleAll}
-                      className="rounded border-slate-300 text-emerald-600 focus:ring-teal-400"
+                      className="rounded border-slate-300 text-[var(--pro-azure)] focus:ring-teal-400"
                     />
                   </th>
                   <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
@@ -1826,25 +1827,25 @@ export default function ScannedBills() {
                   return (
                     <tr
                       key={bill.id}
-                      className={`hover:bg-emerald-50/30 dark:hover:bg-emerald-900/10 transition-colors group ${selected.has(bill.id) ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''}`}
+                      className={`hover:bg-[var(--pro-azure-50)]/30 dark:hover:bg-green-900/10 transition-colors group ${selected.has(bill.id) ? 'bg-[var(--pro-azure-50)]/50 dark:bg-green-900/10' : ''}`}
                     >
                       <td className="px-5 py-4">
                         <input
                           type="checkbox"
                           checked={selected.has(bill.id)}
                           onChange={() => toggleSelect(bill.id)}
-                          className="rounded border-slate-300 text-emerald-600 focus:ring-teal-400"
+                          className="rounded border-slate-300 text-[var(--pro-azure)] focus:ring-teal-400"
                         />
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <div
-                            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${bill.billType === 'BANK' ? 'bg-emerald-100 dark:bg-emerald-950/40' : bill.billType === 'TELECOM' ? 'bg-amber-100 dark:bg-amber-950/40' : 'bg-violet-100 dark:bg-violet-950/40'}`}
+                            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${bill.billType === 'BANK' ? 'bg-[var(--pro-azure-100)] dark:bg-green-950/40' : bill.billType === 'TELECOM' ? 'bg-amber-100 dark:bg-amber-950/40' : 'bg-violet-100 dark:bg-violet-950/40'}`}
                           >
                             {bill.billType === 'BANK' ? (
                               <Building2
                                 size={16}
-                                className="text-emerald-600"
+                                className="text-[var(--pro-azure)]"
                               />
                             ) : bill.billType === 'TELECOM' ? (
                               <Smartphone
@@ -1913,7 +1914,7 @@ export default function ScannedBills() {
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => setSelectedBill(bill)}
-                            className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-all"
+                            className="p-2 text-slate-400 hover:text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-900/20 rounded-lg transition-all"
                             title="View details"
                           >
                             <Eye size={15} />
@@ -1923,7 +1924,7 @@ export default function ScannedBills() {
                               onClick={() =>
                                 handleStatusChange(bill.id, 'VERIFIED')
                               }
-                              className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-all"
+                              className="p-2 text-slate-400 hover:text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-900/20 rounded-lg transition-all"
                               title="Verify"
                             >
                               <CheckCircle2 size={15} />

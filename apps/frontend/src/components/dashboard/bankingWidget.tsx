@@ -1,9 +1,11 @@
+import { fmtCompact } from '@ovds/ui';
+import { Landmark, ArrowUpRight } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Landmark, ArrowUpRight } from 'lucide-react';
-import { useApiQuery } from '../../hooks/useApiQuery';
+
 import { useBusiness } from '../../context/businessContext';
-import { fmtCompact } from '@ovds/ui';
+import { useApiQuery } from '../../hooks/useApiQuery';
+
 
 interface Props {
   currency?: string;
@@ -21,22 +23,22 @@ const BankingWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
   const totalBalance = accounts.reduce((sum, a) => sum + (a.balance ?? 0), 0);
 
   const bankColors = [
-    'bg-emerald-500', 'bg-sky-500', 'bg-violet-500', 'bg-amber-500',
+    'bg-[var(--pro-azure-50)]0', 'bg-sky-500', 'bg-violet-500', 'bg-amber-500',
   ];
 
   return (
     <div className="ovds-widget-card">
       <div className="ovds-widget-header">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-xl bg-emerald-50 flex items-center justify-center">
-            <Landmark size={14} className="text-emerald-600" />
+          <div className="w-7 h-7 rounded-xl bg-[var(--pro-azure-50)] flex items-center justify-center">
+            <Landmark size={14} className="text-[var(--pro-azure)]" />
           </div>
           <div>
             <h3 className="ovds-card-title">Bank Accounts</h3>
             <p className="ovds-caption">{accounts.length} account{accounts.length !== 1 ? 's' : ''}</p>
           </div>
         </div>
-        <Link to="/banking/accounts" className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 hover:underline">
+        <Link to="/banking/accounts" className="flex items-center gap-1 text-[11px] font-semibold text-[var(--pro-azure)] hover:underline">
           Manage accounts <ArrowUpRight size={11} />
         </Link>
       </div>
@@ -59,16 +61,16 @@ const BankingWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
         <div className="ovds-empty">
           <Landmark size={28} className="mb-2 text-slate-200" />
           <p className="text-[12px] font-semibold">No bank accounts</p>
-          <Link to="/banking/accounts" className="mt-2 text-[11px] text-emerald-600 font-semibold hover:underline">
+          <Link to="/banking/accounts" className="mt-2 text-[11px] text-[var(--pro-azure)] font-semibold hover:underline">
             Add account →
           </Link>
         </div>
       ) : (
         <>
           {/* Total balance */}
-          <div className="mb-4 p-3.5 rounded-xl bg-emerald-50 border border-emerald-100">
-            <p className="text-[10px] text-emerald-600 uppercase tracking-wider mb-0.5">Total Balance</p>
-            <p className="text-[22px] font-extrabold text-emerald-700 tabular-nums leading-none">
+          <div className="mb-4 p-3.5 rounded-xl bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)]">
+            <p className="text-[10px] text-[var(--pro-azure)] uppercase tracking-wider mb-0.5">Total Balance</p>
+            <p className="text-[22px] font-extrabold text-[var(--pro-azure-dark)] tabular-nums leading-none">
               {fmtCompact(totalBalance, currency)}
             </p>
           </div>

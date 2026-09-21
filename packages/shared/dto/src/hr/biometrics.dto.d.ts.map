@@ -1,0 +1,1 @@
+{"version":3,"file":"biometrics.dto.d.ts","sourceRoot":"","sources":["biometrics.dto.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,aAAa,EAAE,MAAM,oBAAoB,CAAC;AAEnD,qBAAa,oBAAoB;IACP,UAAU,EAAE,MAAM,CAAC;IACN,IAAI,EAAE,aAAa,CAAC;IAC/B,QAAQ,EAAE,MAAM,CAAC;CAC5C;AAED,qBAAa,kBAAkB;IACL,UAAU,EAAE,MAAM,CAAC;IACN,IAAI,EAAE,aAAa,CAAC;IAC/B,QAAQ,EAAE,MAAM,CAAC;CAC5C"}

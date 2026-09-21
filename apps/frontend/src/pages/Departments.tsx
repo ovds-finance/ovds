@@ -2,21 +2,22 @@
  * Departments — ovds-style department management
  * AppPage · AppKpi · AppTable · useApiCrud
  */
-import React, { useState, useMemo, useCallback } from 'react';
 import {
   Building2, Plus, Edit2, Trash2, Download, RefreshCw, Users,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
+
 import {
   AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select, Textarea,
   SearchBar, EmptyState, Pagination,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
 
 interface Department {
   id: string;
@@ -59,7 +60,7 @@ const DeptForm: React.FC<{
         <Textarea value={data.description ?? ''} onChange={e => set('description', e.target.value)} rows={2} placeholder="Department purpose…" />
       </FormField>
       <div className="flex items-center gap-2">
-        <input type="checkbox" id="deptActive" checked={data.isActive !== false} onChange={e => set('isActive', e.target.checked)} className="accent-emerald-600" />
+        <input type="checkbox" id="deptActive" checked={data.isActive !== false} onChange={e => set('isActive', e.target.checked)} className="accent-indigo-600" />
         <label htmlFor="deptActive" className="text-[12px] font-semibold text-slate-700 cursor-pointer">Active</label>
       </div>
     </div>
@@ -86,7 +87,7 @@ const Departments: React.FC = () => {
   }, [rows, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total',    value: rows.length,                                                    color: 'emerald' as const },
+    { label: 'Total',    value: rows.length,                                                    color: 'green' as const },
     { label: 'Active',   value: rows.filter(d => d.isActive !== false).length,                  color: 'sky' as const },
     { label: 'Employees',value: rows.reduce((s, d) => s + (d.employeeCount ?? 0), 0),           color: 'violet' as const },
     { label: 'Top-Level',value: rows.filter(d => !d.parentId).length,                           color: 'amber' as const },
@@ -155,8 +156,8 @@ const Departments: React.FC = () => {
               <AppTr key={d.id}>
                 <AppTd>
                   <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
-                      <Building2 size={12} className="text-emerald-600" />
+                    <div className="w-7 h-7 rounded-lg bg-[var(--pro-azure-50)] flex items-center justify-center shrink-0">
+                      <Building2 size={12} className="text-[var(--pro-azure)]" />
                     </div>
                     <div>
                       <p className="text-[12px] font-semibold text-slate-800">{d.name}</p>
@@ -187,7 +188,7 @@ const Departments: React.FC = () => {
                   <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     {can('departments:write') && (
                       <>
-                        <button onClick={() => setModal({ open: true, data: { ...d } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all"><Edit2 size={11} /></button>
+                        <button onClick={() => setModal({ open: true, data: { ...d } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all"><Edit2 size={11} /></button>
                         <button onClick={async () => { if (await confirm({ title: `Delete "${d.name}"?`, variant: 'danger' })) remove(d.id); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all"><Trash2 size={11} /></button>
                       </>
                     )}

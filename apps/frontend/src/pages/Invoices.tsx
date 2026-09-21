@@ -1,6 +1,5 @@
-﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { DocStackLayout, type DocStackItem } from '@ovds/ui';
+import { eimsApi } from '@ovds/features/eims';
+import { recurringInvoicesApi } from '@ovds/features/invoice';
 import {
   FileText,
   Building2,
@@ -17,13 +16,12 @@ import {
   FileCheck2,
   Download,
   TrendingUp,
+  TrendingDown,
   Calendar,
   Receipt,
   ChevronLeft,
   ChevronRight,
   Wallet,
-  ArrowUpRight,
-  ArrowDownRight,
   ShieldCheck,
   History,
   Repeat2,
@@ -31,47 +29,52 @@ import {
   Upload,
   BarChart2,
   Archive,
+  List,
+  LayoutGrid,
+  Filter,
+  X,
+  Minus,
+  Copy,
+  Eye,
+  AlertTriangle,
+  BellRing,
+  Ban,
 } from 'lucide-react';
-import { Icon } from '../components/ui';
-import {
-  PipelineStageHeader,
-  PipelineViewToggle,
-  PipelineCard,
-  KanbanBoard,
-  PipelineFunnel,
-  type PipelineView,
-  type KanbanColumnDef,
-} from '../components/pipelineComponents';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { Navigate } from 'react-router-dom';
+
+import CustomerRegistryModal from '../components/invoice/customerRegistryModal';
+import EstimateModal from '../components/invoice/estimateModal';
+import InvoiceModuleModal from '../components/invoice/InvoiceModuleModal';
+import {
+  InvoiceModalsProvider,
+  InvoiceModals,
+} from '../components/invoiceModals';
+import { DEFAULT_INVOICE_COLUMN_KEYS } from '../components/invoicesTable';
+import { type PipelineView } from '../components/pipelineComponents';
+import { ActionsRow, ActionsIconBtn } from '../components/ui/ActionsRow';
+import { DataGrid, GridStatusBadge, type GridColumn, type GridRowAction } from '../components/ui/DataGrid';
+import { GridPageLayout, type GridTab } from '../components/ui/GridPageLayout';
+import { MetricsOverviewGrid, type MetricItem } from '../components/ui/MetricsOverviewGrid';
 import { useBusiness } from '../context/businessContext';
-import { useAuth } from '../rbac/AuthContext';
 import {
   useAuditLog,
   useInterval,
   usePageTitle,
   useDebounce,
 } from '../hooks';
-import { useOfflineQueue } from '../hooks/useOfflineQueue';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
+import { useOfflineQueue } from '../hooks/useOfflineQueue';
+import { useAuth } from '../rbac/AuthContext';
 import api from '../services/api';
 import { invoicesApi, estimatesApi } from '../services/ovdsApi';
-import { recurringInvoicesApi } from '@ovds/features/invoice';
-import toast from 'react-hot-toast';
-import { InvoicesTable, DEFAULT_INVOICE_COLUMN_KEYS } from '../components/invoicesTable';
-import { eimsApi } from '@ovds/features/eims';
-import { eimsBadgeLabel, eimsBadgeClass, matchesEimsFilter, type EimsFilter } from '../utils/eimsBadge';
-import { InvoiceAnalytics } from '../components/invoiceAnalytics';
-import {
-  InvoiceModalsProvider,
-  InvoiceModals,
-} from '../components/invoiceModals';
-import EstimateModal from '../components/invoice/estimateModal';
-import CustomerRegistryModal from '../components/invoice/customerRegistryModal';
-import { IngestionHubModal } from '../components/invoice/ingestionHubModal';
-import InvoiceModuleModal from '../components/invoice/InvoiceModuleModal';
 import { confirm, prompt } from '../utils/confirm';
-import { fmtCurrency, fmtDecimal } from '../utils/fmt';
+import { matchesEimsFilter, type EimsFilter } from '../utils/eimsBadge';
 import { calcLineTax } from '../utils/ethiopianTax';
+import { fmtCurrency } from '../utils/fmt';
+// ── Grid-over-Card architecture imports ───────────────────────────────────────
 
 // -- Design tokens -------------------------------------------------------------
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
@@ -79,18 +82,13 @@ const fmt = (n: number) => fmtCurrency(n, 'ETB');
 // -- Named constants (replaces magic numbers) ----------------------------------
 const MS_PER_DAY = 86_400_000;
 const DEFAULT_DUE_DAYS = 30;
-const DEFAULT_INVOICE_PREFIX = 'INV';
 const DEFAULT_VAT_RATE = 15;
-const ECL_HIGH_RISK_RATE = 5;
-const ECL_MEDIUM_RISK_RATE = 2;
-const TOP_CUSTOMERS_LIMIT = 5;
 const MONTHLY_CHART_MONTHS = 6;
 const INTERVAL_DAILY_FACTOR = 30;
 const INTERVAL_WEEKLY_FACTOR = 4.33;
 const INTERVAL_QUARTERLY_FACTOR = 3;
 const INTERVAL_YEARLY_FACTOR = 12;
 const FULL_DATE_OPTS: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short', year: 'numeric' };
-const SHORT_DATE_OPTS: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short' };
 
 // -- Local Invoice type --------------------------------------------------------
 export interface Invoice {
@@ -98,7 +96,7 @@ export interface Invoice {
   invoiceNumber: string;
   customer: string;
   customerEmail?: string | null;
-  status: 'DRAFT' | 'PENDING' | 'PAID' | 'OVERDUE' | 'CANCELLED';
+  status: 'DRAFT' | 'PENDING' | 'PAID' | 'OVERDUE' | 'CANCELLED' | 'SENT';
   date: string;
   dueDate?: string | null;
   paidAt?: string | null;
@@ -158,17 +156,151 @@ type SortField =
   | 'customer'
   | 'invoiceNumber';
 type SortDir = 'asc' | 'desc';
+type InvoiceViewMode = 'list' | 'kanban';
+
+// -- KPI Card (same design as Estimates page) ---------------------------------
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const InvKpiCard: React.FC<{
+  label: string;
+  value: string | number;
+  sub?: string;
+  icon: React.ReactNode;
+  color: string;
+  trend?: { val: string; pos: boolean } | null;
+}> = ({ label, value, sub, icon, color, trend }) => (
+  <div className={`rounded-xl border p-4 flex flex-col gap-2 ${color}`}>
+    <div className="flex items-center justify-between">
+      <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">{label}</span>
+      <span className="opacity-50">{icon}</span>
+    </div>
+    <div className="flex items-end justify-between gap-2">
+      <p className="text-2xl font-black tabular-nums leading-none">{value}</p>
+      {trend && (
+        <span className={`flex items-center gap-0.5 text-[10px] font-bold ${trend.pos ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-rose-500'}`}>
+          {trend.pos ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
+          {trend.val}
+        </span>
+      )}
+    </div>
+    {sub && <p className="text-[10px] opacity-50 font-medium">{sub}</p>}
+  </div>
+);
+
+// -- Status pill (same design as Estimates page) ------------------------------
+const INV_STATUS_META: Record<string, { label: string; cls: string; dot: string }> = {
+  DRAFT:     { label: 'Draft',     cls: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300',          dot: 'bg-slate-400' },
+  PENDING:   { label: 'Sent',      cls: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400',        dot: 'bg-amber-500' },
+  PAID:      { label: 'Paid',      cls: 'bg-[var(--pro-azure-50)] dark:bg-green-900/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]', dot: 'bg-[var(--pro-azure-50)]0' },
+  OVERDUE:   { label: 'Overdue',   cls: 'bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400',            dot: 'bg-rose-500' },
+  CANCELLED: { label: 'Cancelled', cls: 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400',          dot: 'bg-slate-300' },
+};
+const InvStatusPill: React.FC<{ status: string }> = ({ status }) => {
+  const m = INV_STATUS_META[status] ?? { label: status, cls: 'bg-slate-100 text-slate-600', dot: 'bg-slate-400' };
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${m.cls}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${m.dot}`} />
+      {m.label}
+    </span>
+  );
+};
+
+// -- Kanban column (invoice) --------------------------------------------------
+const InvKanbanCol: React.FC<{
+  label: string; count: number; total: number;
+  color: string; headerCls: string; dotCls: string;
+  invoices: Invoice[];
+  onEdit: (inv: Invoice) => void;
+  onSend: (inv: Invoice) => void;
+  onDelete: (inv: Invoice) => void;
+  onRecordPayment: (inv: Invoice) => void;
+  onRowClick: (inv: Invoice) => void;
+}> = ({ label, count, total, color, headerCls, dotCls, invoices: colInvoices, onEdit, onSend, onDelete, onRecordPayment, onRowClick }) => (
+  <div className="flex-1 min-w-[220px] max-w-[320px] flex flex-col gap-2">
+    <div className={`rounded-xl px-4 py-3 ${headerCls} border border-slate-200 dark:border-slate-700`}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className={`w-2 h-2 rounded-full ${dotCls}`} />
+          <span className={`text-xs font-bold ${color}`}>{label}</span>
+        </div>
+        <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">{count}</span>
+      </div>
+      {total > 0 && <p className={`text-sm font-black tabular-nums mt-1 ${color}`}>{fmt(total)}</p>}
+    </div>
+    <div className="space-y-2 overflow-y-auto max-h-[calc(100vh-320px)] pr-1">
+      {colInvoices.map(inv => (
+        <div
+          key={inv.id}
+          onClick={() => onRowClick(inv)}
+          className="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 transition-all hover:shadow-md cursor-default"
+        >
+          <div className="px-3.5 pt-3.5 pb-2.5">
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <span className="font-mono text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                {inv.invoiceNumber || `INV-${inv.id.slice(-6)}`}
+              </span>
+              <InvStatusPill status={inv.status} />
+            </div>
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate mb-1">{inv.customer}</p>
+            <div className="flex items-center justify-between">
+              <span className="text-base font-black tabular-nums text-slate-800 dark:text-slate-100">{fmt(Number(inv.totalAmount))}</span>
+            </div>
+            {inv.dueDate && (
+              <p className="text-[10px] text-slate-400 mt-1.5 flex items-center gap-1">
+                <Calendar size={9} />
+                {new Date(inv.dueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+              </p>
+            )}
+          </div>
+          <div className="border-t border-slate-100 dark:border-slate-800 px-3 py-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {inv.status === 'DRAFT' && (
+              <button onClick={e => { e.stopPropagation(); onSend(inv); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold text-sky-600 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all">
+                <Send size={9} /> Send
+              </button>
+            )}
+            {inv.status === 'PENDING' && (
+              <button onClick={e => { e.stopPropagation(); onRecordPayment(inv); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-900/20 transition-all">
+                <CheckCircle2 size={9} /> Record Payment
+              </button>
+            )}
+            <button onClick={e => { e.stopPropagation(); onEdit(inv); }} className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all ml-auto">
+              <Edit2 size={10} />
+            </button>
+            {inv.status === 'DRAFT' && (
+              <button onClick={e => { e.stopPropagation(); onDelete(inv); }} className="p-1 rounded-md text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all">
+                <Trash2 size={10} />
+              </button>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// -- Tiny action button helper ------------------------------------------------
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const InvActionBtn: React.FC<{
+  onClick: () => void;
+  title: string;
+  hoverCls: string;
+  children: React.ReactNode;
+}> = ({ onClick, title, hoverCls, children }) => (
+  <button
+    onClick={e => { e.stopPropagation(); onClick(); }}
+    title={title}
+    className={`w-6 h-6 rounded-md flex items-center justify-center text-slate-400 transition-all ${hoverCls}`}
+  >
+    {children}
+  </button>
+);
 
 // -- Main Component ----------------------------------------------------------
 const InvoicesInner: React.FC = () => {
   usePageTitle('Invoices & Estimates');
   const { t } = useTranslation();
-  const { selectedCompanyId, companies } = useBusiness();
-  const activeCompanyName = companies.find(
-    (c) => c.id === selectedCompanyId,
-  )?.name;
+  const { selectedCompanyId: rawSelectedCompanyId, companies } = useBusiness();
+  const selectedCompanyId = rawSelectedCompanyId ?? (companies.length > 0 ? companies[0].id : null);
   const { log } = useAuditLog();
-  const navigate = useNavigate();
   const { queueCount, isSyncing, syncNow } = useOfflineQueue();
   const { isOnline } = useNetworkStatus();
 
@@ -255,7 +387,7 @@ const InvoicesInner: React.FC = () => {
   const [showIngestionHub, setShowIngestionHub] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showReceiptViewer, setShowReceiptViewer] = useState(false);
-  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [_showShortcuts, setShowShortcuts] = useState(false);
   const [receiptViewerRef, setReceiptViewerRef] = useState('');
   const [evidenceInvoice, setEvidenceInvoice] = useState<Invoice | null>(null);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
@@ -322,13 +454,16 @@ const InvoicesInner: React.FC = () => {
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [loading, setLoading] = useState(true);
   // -- Pipeline view state ---------------------------------------------------
-  const [pipelineView, setPipelineView] = useState<PipelineView>('list');
+  const [pipelineView] = useState<PipelineView>('list');
+  // -- List/kanban toggle (matches Estimates page) ---------------------------
+  const [invoiceViewMode, setInvoiceViewMode] = useState<InvoiceViewMode>('list');
+  // -- Filter panel toggle (matches Estimates page) -------------------------
+  const [showFilters, setShowFilters] = useState(false);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [totalInvoices, setTotalInvoices] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [totalPages, setTotalPages] = useState(1);
-  const [stats, setStats] = useState<any>(null);
   const [statusCounts, setStatusCounts] = useState<Record<string, number>>({});
   const [settings, setSettings] = useState<any>({});
   const [visibleCols, setVisibleCols] = useState<Set<string>>(new Set());
@@ -405,20 +540,30 @@ const InvoicesInner: React.FC = () => {
   }, [invoices, totalBilled]);
   const dso = useMemo(() => {
     const paid = invoices.filter((i) => i.status === 'PAID');
-    if (!paid.length) return null;
-    const totalDays = paid.reduce((s, i) => {
+    if (paid.length) {
+      const totalDays = paid.reduce((s, i) => {
+        const created = new Date(i.date).getTime();
+        let pAt = i.paidAt ? new Date(i.paidAt as string).getTime() : 0;
+        if (!pAt && i.payments && i.payments.length > 0) {
+          pAt = Math.max(...i.payments.map((p) => new Date(p.paidAt).getTime()));
+        }
+        if (!pAt) return s;
+        return s + Math.max(0, (pAt - created) / MS_PER_DAY);
+      }, 0);
+      const count = paid.filter(
+        (i) => i.paidAt || (i.payments && i.payments.length > 0),
+      ).length;
+      return count > 0 ? Math.round(totalDays / count) : 0;
+    }
+
+    const unpaid = invoices.filter((i) => i.status !== 'PAID' && i.status !== 'CANCELLED');
+    if (!unpaid.length) return 0;
+    const now = Date.now();
+    const totalDays = unpaid.reduce((s, i) => {
       const created = new Date(i.date).getTime();
-      let pAt = i.paidAt ? new Date(i.paidAt as string).getTime() : 0;
-      if (!pAt && i.payments && i.payments.length > 0) {
-        pAt = Math.max(...i.payments.map((p) => new Date(p.paidAt).getTime()));
-      }
-      if (!pAt) return s; // Skip if no payment date found
-      return s + Math.max(0, (pAt - created) / MS_PER_DAY);
+      return s + Math.max(0, (now - created) / MS_PER_DAY);
     }, 0);
-    const count = paid.filter(
-      (i) => i.paidAt || (i.payments && i.payments.length > 0),
-    ).length;
-    return count > 0 ? Math.round(totalDays / count) : null;
+    return Math.round(totalDays / unpaid.length);
   }, [invoices]);
   const monthlyData = useMemo(
     () =>
@@ -443,250 +588,10 @@ const InvoicesInner: React.FC = () => {
       }),
     [invoices, today],
   );
-  const aging = useMemo(() => {
-    const unpaid = invoices.filter(
-      (i) => !['PAID', 'CANCELLED'].includes(i.status),
-    );
-    return [
-      {
-        label: 'Current',
-        min: 0,
-        max: 30,
-        color: 'bg-emerald-500',
-        textColor: 'text-emerald-700',
-        bg: 'bg-emerald-50',
-      },
-      {
-        label: '31–60 days',
-        min: 31,
-        max: 60,
-        color: 'bg-amber-400',
-        textColor: 'text-amber-700',
-        bg: 'bg-amber-50',
-      },
-      {
-        label: '61–90 days',
-        min: 61,
-        max: 90,
-        color: 'bg-orange-500',
-        textColor: 'text-orange-700',
-        bg: 'bg-orange-50',
-      },
-      {
-        label: '90+ days',
-        min: 91,
-        max: Infinity,
-        color: 'bg-rose-500',
-        textColor: 'text-rose-700',
-        bg: 'bg-rose-50',
-      },
-    ].map((b) => {
-      const items = unpaid.filter((i) => {
-        const age = Math.floor(
-          (today.getTime() - new Date(i.date).getTime()) / MS_PER_DAY,
-        );
-        return age >= b.min && age <= b.max;
-      });
-      return {
-        ...b,
-        count: items.length,
-        amount: items.reduce((s, i) => s + Number(i.totalAmount), 0),
-      };
-    });
-  }, [invoices, today]);
-  const topCustomers = useMemo(() => {
-    const map: Record<
-      string,
-      { revenue: number; count: number; paid: number }
-    > = {};
-    invoices.forEach((inv) => {
-      if (!map[inv.customer])
-        map[inv.customer] = { revenue: 0, count: 0, paid: 0 };
-      map[inv.customer].revenue += Number(inv.totalAmount);
-      map[inv.customer].count += 1;
-      if (inv.status === 'PAID')
-        map[inv.customer].paid += Number(inv.totalAmount);
-    });
-    return Object.entries(map)
-      .map(([name, d]) => ({
-        name,
-        ...d,
-        payRate: d.revenue > 0 ? Math.round((d.paid / d.revenue) * 100) : 0,
-      }))
-      .sort((a, b) => b.revenue - a.revenue)
-      .slice(0, TOP_CUSTOMERS_LIMIT);
-  }, [invoices]);
-  const invoiceGaps = useMemo(() => {
-    const prefix = settings.ovds_invoice_prefix || DEFAULT_INVOICE_PREFIX;
-    const nums = invoices
-      .map((i) => {
-        const m = i.invoiceNumber?.match(new RegExp(`^${prefix}-(\\d+)$`));
-        return m ? parseInt(m[1], 10) : null;
-      })
-      .filter((n): n is number => n !== null)
-      .sort((a, b) => a - b);
-    const gaps: number[] = [];
-    for (let i = 1; i < nums.length; i++) {
-      if (nums[i] - nums[i - 1] > 1) gaps.push(nums[i - 1] + 1);
-    }
-    return gaps.slice(0, 3);
-  }, [invoices, settings]);
-  const arHealthScore = useMemo(() => {
-    if (!invoices.length) return null;
-    const activeInvoices = invoices.filter((i) => i.status !== 'CANCELLED');
-    const total = activeInvoices.reduce((s, i) => s + Number(i.totalAmount), 0);
-    if (total === 0) return null;
-    const paidAmt = activeInvoices
-      .filter((i) => i.status === 'PAID')
-      .reduce((s, i) => s + Number(i.totalAmount), 0);
-    const overdueAmt = activeInvoices
-      .filter((i) => i.status === 'OVERDUE')
-      .reduce((s, i) => s + Number(i.totalAmount), 0);
-    const score = Math.round(
-      (paidAmt / total) * 60 + Math.max(0, 1 - overdueAmt / total) * 40,
-    );
-    const grade =
-      score >= 85
-        ? 'A'
-        : score >= 70
-          ? 'B'
-          : score >= 55
-            ? 'C'
-            : score >= 40
-              ? 'D'
-              : 'F';
-    const color =
-      score >= 85
-        ? 'emerald'
-        : score >= 70
-          ? 'blue'
-          : score >= 55
-            ? 'amber'
-            : 'red';
-    return { score, grade, color };
-  }, [invoices]);
-
-  const invoiceMap = useMemo(() => {
-    const map = new Map<string, Invoice>();
-    invoices.forEach((inv) => map.set(inv.id, inv));
-    return map;
-  }, [invoices]);
-
-  const maxMonthly = useMemo(
-    () => Math.max(...monthlyData.map((m) => m.invoiced), 1),
-    [monthlyData],
-  );
-
-  const ifrsAnalytics = useMemo(() => {
-    const withIfrs = invoices.filter(
-      (i: Invoice) =>
-        i.ifrsPerformanceObligation || i.ifrsContractRef || i.ifrsCreditRisk,
-    );
-    const stage3 = invoices.filter(
-      (i: Invoice) => i.ifrsCreditRisk === 'HIGH' && i.status !== 'PAID',
-    );
-    const stage2 = invoices.filter(
-      (i: Invoice) => i.ifrsCreditRisk === 'MEDIUM' && i.status !== 'PAID',
-    );
-    const nonCurrent = invoices.filter(
-      (i: Invoice) =>
-        i.ifrsReceivableClass === 'NON_CURRENT' && i.status !== 'PAID',
-    );
-    const eclExposure =
-      stage3.reduce(
-        (s: number, i: Invoice) =>
-          s + Number(i.totalAmount) * (Number(i.ifrsEclProvision || ECL_HIGH_RISK_RATE) / 100),
-        0,
-      ) +
-      stage2.reduce(
-        (s: number, i: Invoice) =>
-          s + Number(i.totalAmount) * (Number(i.ifrsEclProvision || ECL_MEDIUM_RISK_RATE) / 100),
-        0,
-      );
-    const withWarranty = invoices.filter((i: Invoice) => i.ifrsHasWarranty);
-    const warrantyProvision = withWarranty.reduce(
-      (s: number, i: Invoice) =>
-        s +
-        Number(i.totalAmount) * (Number(i.ifrsWarrantyProvision || 0) / 100),
-      0,
-    );
-    const contractRefs = invoices.filter((i: Invoice) => i.ifrsContractRef).length;
-    return {
-      withIfrs: withIfrs.length,
-      stage3: stage3.length,
-      stage2: stage2.length,
-      nonCurrent: nonCurrent.length,
-      eclExposure,
-      warrantyProvision,
-      contractRefs,
-    };
-  }, [invoices]);
-
   const displayInvoices = useMemo(() => {
     if (eimsFilter === 'ALL' || pipelineView === 'list') return invoices;
     return invoices.filter((inv) => matchesEimsFilter(inv as any, eimsFilter));
   }, [invoices, eimsFilter, pipelineView]);
-
-  const eimsKpi = useMemo(() => ({
-    registered: invoices.filter((i) => !!(i as any).eimsIrn).length,
-    pending: invoices.filter((i) => (i as any).eimsStatus === 'PENDING').length,
-    needs: invoices.filter((i) => matchesEimsFilter(i as any, 'NEEDS_REGISTRATION')).length,
-    failed: invoices.filter((i) => (i as any).eimsStatus === 'FAILED').length,
-  }), [invoices]);
-
-  // -- Kanban columns --------------------------------------------------------
-  const kanbanColumns = useMemo((): KanbanColumnDef<Invoice>[] => {
-    const COLS: Array<{
-      key: Invoice['status'];
-      label: string;
-      color: string;
-      headerBg: string;
-      accentColor: string;
-      dotColor: string;
-    }> = [
-      {
-        key: 'DRAFT',
-        label: 'Draft',
-        color: 'text-slate-500 dark:text-slate-400',
-        headerBg: 'bg-white dark:bg-slate-800',
-        accentColor: '#94a3b8',
-        dotColor: 'bg-slate-400',
-      },
-      {
-        key: 'PENDING',
-        label: 'Sent',
-        color: 'text-amber-600 dark:text-amber-400',
-        headerBg: 'bg-amber-50 dark:bg-amber-950/30',
-        accentColor: '#f59e0b',
-        dotColor: 'bg-amber-400',
-      },
-      {
-        key: 'OVERDUE',
-        label: 'Overdue',
-        color: 'text-rose-600 dark:text-rose-400',
-        headerBg: 'bg-rose-50 dark:bg-rose-950/30',
-        accentColor: '#ef4444',
-        dotColor: 'bg-rose-500',
-      },
-      {
-        key: 'PAID',
-        label: 'Paid',
-        color: 'text-emerald-600 dark:text-emerald-400',
-        headerBg: 'bg-emerald-50 dark:bg-emerald-950/30',
-        accentColor: '#00E784',
-        dotColor: 'bg-emerald-500',
-      },
-    ];
-    return COLS.map((col) => {
-      const items = displayInvoices.filter((i) => i.status === col.key);
-      const total = items.reduce((s, i) => s + Number(i.totalAmount), 0);
-      return {
-        ...col,
-        items,
-        totalAmount: total > 0 ? fmt(total) : undefined,
-      };
-    });
-  }, [displayInvoices]);
 
   // -- Data Fetching ---------------------------------------------------------
   const fetchSettings = useCallback(async () => {
@@ -700,6 +605,7 @@ const InvoicesInner: React.FC = () => {
     } catch {
       toast.error('Failed to load settings');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCompanyId]);
 
   const fetchCustomersAndItems = useCallback(async () => {
@@ -709,7 +615,7 @@ const InvoicesInner: React.FC = () => {
         api.get(`/ovds/customers/registry?companyId=${selectedCompanyId}`),
         api.get(`/ovds/inventory/items?companyId=${selectedCompanyId}&take=200`),
       ]);
-      const custData: unknown = custRes.data.data ?? custRes.data;
+      const custData: unknown = custRes.data?.data?.data ?? custRes.data?.data ?? custRes.data;
       setCustomers(
         Array.isArray(custData)
           ? custData
@@ -773,7 +679,7 @@ const InvoicesInner: React.FC = () => {
         ? `/ovds/customers/registry?companyId=${selectedCompanyId}`
         : `/ovds/customers/registry`;
       const r = await api.get(url, { headers: { 'x-background': '1' } } as any);
-      const raw = r.data?.data ?? r.data ?? [];
+      const raw = r.data?.data?.data ?? r.data?.data ?? r.data ?? [];
       setRegistryCustomers(Array.isArray(raw) ? raw : []);
     } catch {
       toast.error('Failed to load registry customers');
@@ -830,7 +736,6 @@ const InvoicesInner: React.FC = () => {
   const fetchStats = useCallback(async () => {
     try {
       const res = await invoicesApi.stats(selectedCompanyId);
-      setStats(res);
       setStatusCounts({
         DRAFT: res?.draftCount ?? 0,
         PENDING: res?.pendingCount ?? 0,
@@ -884,19 +789,6 @@ const InvoicesInner: React.FC = () => {
       fetchInvoices(1, size); // pass size directly — avoids stale-closure on pageSize state
     },
     [fetchInvoices],
-  );
-  const handleToggleCol = useCallback(
-    (col: string) => {
-      const newCols = new Set(visibleCols);
-      if (visibleCols.has(col)) newCols.delete(col);
-      else newCols.add(col);
-      setVisibleCols(newCols);
-      localStorage.setItem(
-        'col_vis_invoice_columns',
-        JSON.stringify(Array.from(newCols)),
-      );
-    },
-    [visibleCols],
   );
   const handleToggleAll = useCallback(() => {
     if (invoices.length > 0 && invoices.every((i) => selected.has(i.id)))
@@ -994,41 +886,13 @@ const InvoicesInner: React.FC = () => {
     }
   };
 
-  const handleBulkStatusUpdate = async (status: string) => {
-    if (selected.size === 0) return toast.error(t('common.select_items'));
-    if (
-      !(await confirm({
-        title: `Update ${selected.size} invoice(s) to ${status}?`,
-        variant: 'info',
-      }))
-    )
-      return;
-    try {
-      if (status === 'CANCELLED') {
-        await invoicesApi.bulkCancel(Array.from(selected));
-      } else {
-        await Promise.all(
-          Array.from(selected).map((id) =>
-            invoicesApi.update(id, { status }),
-          ),
-        );
-      }
-      toast.success('Bulk update completed');
-      setSelected(new Set());
-      fetchInvoices(currentPage);
-      fetchStats();
-    } catch {
-      toast.error('Bulk status update failed');
-    }
-  };
-
   const handleNewInvoice = useCallback(() => {
     const dueDays = Number(settings?.invoice_due_days) || DEFAULT_DUE_DAYS;
     setNewInvoice(blankInvoice(dueDays));
     setShowAddModal(true);
   }, [blankInvoice, settings]);
 
-  // -- Keyboard shortcuts (Akaunting-style) ------------------------------------
+  // -- Keyboard shortcuts (Ovds SaaS style) ------------------------------------
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName || '');
@@ -1085,7 +949,18 @@ const InvoicesInner: React.FC = () => {
             : Number(settings?.ovds_default_vat_rate || DEFAULT_VAT_RATE);
         totalVat += li.showTax !== false ? calcLineTax(net, vatRate) : 0;
       });
-      const grandTotal = subtotal + totalVat;
+      // GAP-1 FIX: DRRF (1%) must be included in the stored totalAmount so it
+      // matches the live-preview and the backend's calculateInvoiceTotals().
+      // The old formula (subtotal + totalVat) was ~1% lower than displayed.
+      // Ovds SaaS always stores the full amount the customer owes.
+      const invoiceDiscVal   = Number(newInvoice.discountValue || 0);
+      const invoiceDiscType  = (newInvoice.discountType || 'FIXED') as 'PERCENT' | 'FIXED';
+      const invoiceDiscAmt   = invoiceDiscType === 'PERCENT'
+        ? subtotal * (invoiceDiscVal / 100)
+        : invoiceDiscVal;
+      const subtotalAfterDisc = Math.max(0, subtotal - invoiceDiscAmt);
+      const drrfAmount  = Math.round(subtotalAfterDisc * 0.01 * 100) / 100;
+      const grandTotal  = Math.round((subtotalAfterDisc + totalVat + drrfAmount) * 100) / 100;
 
       try {
         const isSend = forcedStatus === 'PENDING';
@@ -1096,6 +971,22 @@ const InvoicesInner: React.FC = () => {
           subtotal,
           vatAmount: totalVat,
           status: isSend ? 'DRAFT' : (forcedStatus || newInvoice.status || 'DRAFT'),
+          // Map frontend field aliases to backend/DTO field names
+          customerName: (newInvoice.customerName || newInvoice.customer || '').trim(),
+          currencyCode: newInvoice.invoiceCurrency || newInvoice.currencyCode || 'ETB',
+          // Strip frontend-only display/UI fields the backend doesn't know about
+          customer: undefined,
+          invoiceCurrency: undefined,
+          companyTitle: undefined,
+          invoiceTemplate: undefined,
+          invoiceColor: undefined,
+          terms: undefined,
+          interactionType: undefined,
+          archType: undefined,
+          processType: undefined,
+          ccEmails: undefined,
+          bccEmails: undefined,
+          _convertedFromEstimate: undefined,
         };
 
         // Build buyerDetails for B2B transactions from structured address fields
@@ -1144,8 +1035,8 @@ const InvoicesInner: React.FC = () => {
         setShowAddModal(false);
         fetchInvoices(currentPage);
         fetchStats();
-      } catch {
-        toast.error('Failed to save invoice');
+      } catch (err) {
+        toast.error(`Failed to save invoice: ${(err as Error)?.message ?? 'Unknown error'}`);
       }
     },
     [newInvoice, selectedCompanyId, currentPage, fetchInvoices, fetchStats, settings],
@@ -1167,6 +1058,7 @@ const InvoicesInner: React.FC = () => {
     [currentPage, fetchInvoices, fetchStats],
   );
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleSend = async (id: string) => {
     try {
       await invoicesApi.send(id);
@@ -1176,16 +1068,10 @@ const InvoicesInner: React.FC = () => {
       toast.error('Send failed');
     }
   };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handlePrint = (id: string) =>
-    window.open(`${(api as any).defaults?.baseURL || '/api'}/ovds/invoices/${id}/pdf`, '_blank');
-  const handleFlagOverdue = async (_id: string) => {
-    try {
-      await invoicesApi.flagOverdue(selectedCompanyId ?? undefined);
-      fetchInvoices(currentPage);
-    } catch {
-      toast.error('Flag overdue failed');
-    }
-  };
+    window.open(`${api.defaults.baseURL || '/api'}/ovds/invoices/${id}/pdf`, '_blank');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleDuplicate = async (id: string) => {
     try {
       await invoicesApi.duplicate(id);
@@ -1260,17 +1146,20 @@ const InvoicesInner: React.FC = () => {
     )
       return;
     try {
-      await Promise.all(
-        Array.from(selected).map((id) => invoicesApi.remove(id)),
-      );
-      toast.success(`${selected.size} invoice(s) deleted`);
-      setSelected(new Set());
-      fetchInvoices(currentPage);
-      fetchStats();
-    } catch {
-      toast.error('Bulk delete failed');
-    }
-  };
+    const results = await Promise.allSettled(
+      Array.from(selected).map((id) => invoicesApi.remove(id)),
+    );
+    const succeeded = results.filter(r => r.status === 'fulfilled').length;
+    const failed    = results.filter(r => r.status === 'rejected').length;
+    if (succeeded > 0) toast.success(`${succeeded} invoice(s) deleted`);
+    if (failed    > 0) toast.error(`${failed} invoice(s) could not be deleted`);
+    setSelected(new Set());
+    fetchInvoices(currentPage);
+    fetchStats();
+  } catch {
+    toast.error('Bulk delete failed');
+  }
+};
 
   const handleBulkArchive = async () => {
     if (selected.size === 0) return toast.error(t('common.select_items'));
@@ -1300,93 +1189,6 @@ const InvoicesInner: React.FC = () => {
   };
 
   // -- Estimates Handlers ---------------------------------------------------
-  const handleNewEstimate = () => {
-    const dueDays = Number(settings?.invoice_due_days) || DEFAULT_DUE_DAYS;
-    setNewEstimate(blankEstimate(dueDays));
-    setShowEstimateModal(true);
-  };
-  const handleEditEstimate = (e: Estimate) => {
-    setEditingEstimate(e);
-    setNewEstimate(e);
-    setShowEstimateModal(true);
-  };
-   const handleDeleteEstimate = async (id: string) => {
-     if (await confirm({ title: 'Delete estimate?', variant: 'danger' })) {
-       try {
-         await estimatesApi.remove(id);
-         setSelectedEstimates(new Set());
-         fetchEstimates(estimatePage);
-       } catch {
-           toast.error('Delete estimate failed');
-         }
-     }
-   };
-   const handleBulkDeleteEstimates = async () => {
-     if (!selectedEstimates.size) return;
-     if (await confirm({
-       title: `Delete ${selectedEstimates.size} estimate${selectedEstimates.size !== 1 ? 's' : ''}?`,
-       message: 'This cannot be undone.',
-       variant: 'danger',
-       confirmLabel: 'Delete',
-     })) {
-       try {
-         await Promise.all(
-           [...selectedEstimates].map(id => estimatesApi.remove(id))
-         );
-         setSelectedEstimates(new Set());
-         fetchEstimates(estimatePage);
-       } catch {
-         toast.error('Bulk delete failed');
-       }
-     }
-   };
-  const handleSendEstimate = async (id: string) => {
-    try {
-      await estimatesApi.send(id);
-      toast.success('Sent');
-      fetchEstimates(estimatePage);
-    } catch {
-      toast.error('Send estimate failed');
-    }
-  };
-  const handleConvertToInvoice = async (e: Estimate) => {
-    if (await confirm({ title: 'Convert to invoice?', variant: 'info' })) {
-      try {
-        const result = await estimatesApi.convertToInvoice(e.id);
-        toast.success('Converted to invoice');
-
-        // Pre-populate the invoice form with the converted data and open it
-        const convertedInvoice = result?.data?.data ?? result?.data ?? null;
-        if (convertedInvoice) {
-          setNewInvoice({
-            ...convertedInvoice,
-            customer: convertedInvoice.customerName ?? convertedInvoice.customer ?? e.customer,
-            customerEmail: convertedInvoice.customerEmail ?? e.customerEmail ?? '',
-            customerPhone: convertedInvoice.customerPhone ?? e.customerPhone ?? '',
-            items: ((convertedInvoice.items as any[]) || e.items || []).map((li: any) => ({
-              ...li,
-              id: li.id || Math.random().toString(36).slice(2, 11),
-              showDiscount: Number(li.discount ?? li.discountValue ?? 0) > 0,
-              discountValue: Number(li.discountValue ?? li.discount ?? 0),
-              discountType: li.discountType || 'FIXED',
-              taxRate: li.taxRate !== undefined ? li.taxRate : null,
-              showTax: true,
-              showTaxPanel: false,
-            })),
-            _convertedFromEstimate: e.estimateNumber,
-          });
-          setShowAddModal(true);
-          setMainTab('INVOICES');
-        } else {
-          // Fallback: just refresh invoices list
-          fetchInvoices(1);
-          setMainTab('INVOICES');
-        }
-      } catch {
-          toast.error('Convert to invoice failed');
-        }
-    }
-  };
   const handleSubmitEstimate = async (e: React.FormEvent, status?: string) => {
     e.preventDefault();
     if (!selectedCompanyId) return toast.error('Select a company first');
@@ -1533,694 +1335,505 @@ const InvoicesInner: React.FC = () => {
     onDebitNote: handleDebitNote,
   };
 
-  const pipelineStages = useMemo(() => [
+  // ── Computed for new layout ───────────────────────────────────────────────
+  const kanbanColDefs = useMemo(() => [
+    { key: 'DRAFT' as const,    label: 'Draft',    color: 'text-slate-600 dark:text-slate-300',      headerCls: 'bg-white dark:bg-slate-800',          dotCls: 'bg-slate-400' },
+    { key: 'PENDING' as const,  label: 'Sent',     color: 'text-amber-700 dark:text-amber-400',      headerCls: 'bg-amber-50 dark:bg-amber-950/30',    dotCls: 'bg-amber-500' },
+    { key: 'OVERDUE' as const,  label: 'Overdue',  color: 'text-rose-700 dark:text-rose-400',        headerCls: 'bg-rose-50 dark:bg-rose-950/30',      dotCls: 'bg-rose-500' },
+    { key: 'PAID' as const,     label: 'Paid',     color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',  headerCls: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30', dotCls: 'bg-[var(--pro-azure-50)]0' },
+  ].map(col => ({
+    ...col,
+    invoices: invoices.filter(i => i.status === col.key),
+    total: invoices.filter(i => i.status === col.key).reduce((s, i) => s + Number(i.totalAmount), 0),
+    count: invoices.filter(i => i.status === col.key).length,
+  })), [invoices]);
+
+  // ── Grid-over-Card: column schema ─────────────────────────────────────────
+  const gridColumns = useMemo((): GridColumn<Invoice>[] => [
     {
-      key: 'DRAFT',
-      label: t('invoices.pipelineDraft', 'Draft'),
-      count: statusCounts.DRAFT ?? 0,
-      color: '#94a3b8',
-      amount: fmt(
-        invoices
-          .filter((i) => i.status === 'DRAFT')
-          .reduce((s, i) => s + Number(i.totalAmount), 0),
+      key: 'invoiceNumber',
+      label: 'Invoice #',
+      required: true,
+      sortable: true,
+      width: 'w-36',
+      render: (_, inv) => (
+        <button
+          type="button"
+          onClick={() => setDrawerInvoice(inv)}
+          className="font-mono text-[11px] font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] hover:underline focus-visible:outline-none"
+        >
+          {inv.invoiceNumber || `INV-${inv.id.slice(-6)}`}
+        </button>
       ),
     },
     {
-      key: 'PENDING',
-      label: t('invoices.pipelineSent', 'Sent'),
-      count: statusCounts.PENDING ?? 0,
-      color: '#f59e0b',
-      active: statusTab === 'PENDING',
-      amount: fmt(
-        invoices
-          .filter((i) => i.status === 'PENDING')
-          .reduce((s, i) => s + Number(i.totalAmount), 0),
+      key: 'customer',
+      label: 'Customer',
+      required: true,
+      sortable: true,
+      render: (_, inv) => (
+        <div className="min-w-0">
+          <p className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate max-w-[200px]">{inv.customer}</p>
+          {inv.customerEmail && (
+            <p className="text-[10px] text-slate-400 truncate max-w-[200px]">{inv.customerEmail}</p>
+          )}
+        </div>
       ),
     },
     {
-      key: 'OVERDUE',
-      label: t('invoices.pipelineOverdue', 'Overdue'),
-      count: statusCounts.OVERDUE ?? 0,
-      color: '#ef4444',
-      active: statusTab === 'OVERDUE',
-      amount: fmt(
-        invoices
-          .filter((i) => i.status === 'OVERDUE')
-          .reduce((s, i) => s + Number(i.totalAmount), 0),
+      key: 'date',
+      label: 'Date',
+      sortable: true,
+      width: 'w-28',
+      render: (v) => (
+        <span className="text-[11px] text-slate-500">
+          {v ? new Date(v as string).toLocaleDateString('en-GB', FULL_DATE_OPTS) : '—'}
+        </span>
       ),
     },
     {
-      key: 'PAID',
-      label: t('invoices.pipelineSettled', 'Settled'),
-      count: statusCounts.PAID ?? 0,
-      color: '#00E784',
-      active: statusTab === 'PAID',
-      amount: fmt(
-        invoices
-          .filter((i) => i.status === 'PAID')
-          .reduce((s, i) => s + Number(i.totalAmount), 0),
+      key: 'dueDate',
+      label: 'Due Date',
+      sortable: true,
+      width: 'w-28',
+      render: (v, inv) => {
+        if (!v) return <span className="text-slate-300 text-[11px]">—</span>;
+        return (
+          <span className={`text-[11px] ${inv.status === 'OVERDUE' ? 'text-rose-600 font-semibold' : 'text-slate-500'}`}>
+            {new Date(v as string).toLocaleDateString('en-GB', FULL_DATE_OPTS)}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'totalAmount',
+      label: 'Amount',
+      sortable: true,
+      align: 'right',
+      width: 'w-32',
+      render: (v, inv) => (
+        <div className="text-right">
+          <span className="text-xs font-bold tabular-nums text-slate-800 dark:text-slate-100">{fmt(Number(v))}</span>
+          {inv.vatAmount ? (
+            <p className="text-[9px] text-slate-400">+{fmt(Number(inv.vatAmount))} VAT</p>
+          ) : null}
+        </div>
       ),
     },
-  ], [invoices, statusCounts, statusTab, fmt, t]);
+    {
+      key: 'status',
+      label: 'Status',
+      width: 'w-28',
+      render: (v) => <GridStatusBadge status={String(v)} />,
+    },
+  ], [setDrawerInvoice]);
+
+  // ── Grid-over-Card: row actions ────────────────────────────────────────────
+  const gridRowActions = useMemo((): GridRowAction<Invoice>[] => [
+    {
+      key: 'view',
+      label: 'View details',
+      icon: <Eye size={13} />,
+      onClick: (inv) => setDrawerInvoice(inv),
+    },
+    {
+      key: 'edit',
+      label: 'Edit',
+      icon: <Edit2 size={13} />,
+      onClick: (inv) => { setEditingInvoice(inv); setShowAddModal(true); },
+    },
+    {
+      key: 'send',
+      label: 'Send to customer',
+      icon: <Send size={13} />,
+      visible: (inv) => inv.status === 'DRAFT',
+      onClick: (inv) => handleSend(inv.id),
+    },
+    {
+      key: 'record-payment',
+      label: 'Record payment',
+      icon: <CheckCircle2 size={13} />,
+      visible: (inv) => inv.status === 'PENDING' || inv.status === 'OVERDUE',
+      onClick: (inv) => setPaymentInvoice(inv),
+    },
+    {
+      key: 'download',
+      label: 'Print / PDF',
+      icon: <Download size={13} />,
+      onClick: (inv) => handlePrint(inv.id),
+    },
+    {
+      key: 'duplicate',
+      label: 'Duplicate',
+      icon: <Copy size={13} />,
+      onClick: (inv) => handleDuplicate(inv.id),
+    },
+    {
+      key: 'send-reminder',
+      label: 'Send payment reminder',
+      icon: <BellRing size={13} />,
+      visible: (inv) => inv.status === 'PENDING' || inv.status === 'OVERDUE',
+      onClick: (inv) => handleSendReminder(inv.id),
+    },
+    {
+      key: 'void',
+      label: 'Void invoice',
+      icon: <Ban size={13} />,
+      visible: (inv) => inv.status === 'PENDING' || inv.status === 'SENT' || inv.status === 'OVERDUE',
+      destructive: true,
+      onClick: (inv) => handleVoidInvoice(inv.id),
+    },
+    {
+      key: 'delete',
+      label: 'Delete',
+      icon: <Trash2 size={13} />,
+      visible: (inv) => inv.status === 'DRAFT',
+      destructive: true,
+      onClick: (inv) => handleDelete(inv.id),
+    },
+  ], [setDrawerInvoice, setEditingInvoice, setShowAddModal, setPaymentInvoice, handleSend, handlePrint, handleDuplicate, handleDelete, handleVoidInvoice, handleSendReminder]);
+
+  // ── Grid-over-Card: metrics strip ─────────────────────────────────────────
+  const metricsItems = useMemo((): MetricItem[] => [
+    {
+      key: 'total-invoiced',
+      label: t('invoices.kpiTotalInvoiced', 'Total Invoiced'),
+      value: fmt(totalBilled),
+      sub: `${totalInvoices} invoice${totalInvoices !== 1 ? 's' : ''}`,
+      icon: <FileText size={16} />,
+      accent: 'slate',
+      loading,
+      trend: billedTrend
+        ? { label: billedTrend.val, direction: billedTrend.pos ? 'positive' : 'negative', period: 'vs last month' }
+        : null,
+    },
+    {
+      key: 'collection-rate',
+      label: t('invoices.kpiCollected', 'Collection Rate'),
+      value: `${collectionRate}%`,
+      sub: 'Paid ÷ Total invoiced',
+      icon: <CheckCircle2 size={16} />,
+      accent: collectionRate >= 80 ? 'indigo' : collectionRate >= 50 ? 'amber' : 'rose',
+      loading,
+    },
+    {
+      key: 'overdue',
+      label: t('invoices.kpiOverdue', 'Overdue'),
+      value: overdueCount,
+      sub: overdueCount > 0 ? 'Action required' : 'All current',
+      icon: <AlertTriangle size={16} />,
+      accent: overdueCount > 0 ? 'rose' : 'indigo',
+      loading,
+    },
+    {
+      key: 'dso',
+      label: t('invoices.kpiDso', 'Days Sales Outstanding'),
+      value: `${dso}d`,
+      sub: dso <= 30 ? 'Excellent' : dso <= 45 ? 'On track' : dso <= 60 ? 'Watch' : 'Critical',
+      icon: <TrendingUp size={16} />,
+      accent: dso <= 30 ? 'slate' : dso <= 45 ? 'sky' : dso <= 60 ? 'amber' : 'rose',
+      loading,
+    },
+  ], [totalBilled, totalInvoices, loading, billedTrend, collectionRate, overdueCount, dso, t]);
+
+  // ── Grid-over-Card: main tab definitions ──────────────────────────────────
+  const mainTabs = useMemo((): GridTab[] => [
+    {
+      key: 'INVOICES',
+      label: t('invoices.title', 'Invoices'),
+      icon: <FileText size={14} />,
+      count: totalInvoices,
+      active: mainTab === 'INVOICES',
+      onClick: () => setMainTab('INVOICES'),
+    },
+    {
+      key: 'ESTIMATES',
+      label: t('invoices.estimates', 'Estimates'),
+      icon: <ClipboardList size={14} />,
+      count: estimateTotalCount,
+      active: mainTab === 'ESTIMATES',
+      onClick: () => setMainTab('ESTIMATES'),
+    },
+    {
+      key: 'RECURRING',
+      label: t('invoices.recurring', 'Recurring'),
+      icon: <Repeat2 size={14} />,
+      active: mainTab === 'RECURRING',
+      onClick: () => setMainTab('RECURRING'),
+    },
+  ], [mainTab, totalInvoices, estimateTotalCount, t]);
 
   return (
     <InvoiceModalsProvider {...modalProps}>
-      <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 space-y-4">
-
-        {/* ── Page Hero (Akaunting-style flat) ───────────────────────────── */}
-        <div className="ovds-page-hero">
-          {/* Breadcrumb */}
-          <nav className="ovds-breadcrumb relative" aria-label="Breadcrumb">
-            <span>{t('nav.sales', 'Sales')}</span>
-            <span className="sep">/</span>
-            <span style={{ color: 'var(--text-2)', fontWeight: 600 }}>
-              {mainTab === 'ESTIMATES' ? 'Estimates' : mainTab === 'RECURRING' ? 'Recurring' : 'Invoices'}
-            </span>
-          </nav>
-
-          {/* Hero body */}
-          <div className="ovds-page-hero-body pt-2 pb-1">
-            <div className="flex items-center gap-3 min-w-0">
-              {/* Module icon */}
-              <div
-                className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                style={{ background: 'var(--aki-blue)', color: '#fff' }}
-                aria-hidden="true"
-              >
-                <FileText size={17} strokeWidth={2} />
-              </div>
-              <div className="min-w-0">
-                <h1 className="ovds-module-title">
-                  {t('invoices.title', 'Invoices & Estimates')}
-                </h1>
-                <p className="ovds-caption mt-0.5 hidden sm:block">
-                  {t('invoices.subtitle', 'Create and send ERCA-compliant invoices, track payments, and manage estimates.')}
-                </p>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="ovds-page-hero-actions flex-wrap gap-2">
-              {/* Offline/queue pill */}
+      <div className="p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto">
+        <GridPageLayout
+          title={t('invoices.title', 'Invoices')}
+          description={t('invoices.subtitle', 'Create and send ERCA-compliant invoices, track payments, and manage estimates.')}
+          tabs={mainTabs}
+          onRefresh={handleRefresh}
+          refreshing={loading}
+          headerActions={
+            <div className="flex items-center gap-2">
               {(!isOnline || queueCount > 0) && (
-                <span className={`ovds-context-pill ${!isOnline ? 'alert' : 'warning'}`}>
-                  <span className="live-dot" />
+                <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold ${!isOnline ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-amber-50 border-amber-200 text-amber-700'}`}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
                   {!isOnline ? 'Offline' : `${queueCount} queued`}
                   {isOnline && queueCount > 0 && (
-                    <button
-                      type="button"
-                      onClick={syncNow}
-                      disabled={isSyncing}
-                      className="ml-1 font-bold underline text-[10px] disabled:opacity-60"
-                    >
+                    <button type="button" onClick={syncNow} disabled={isSyncing} className="ml-1 font-bold underline disabled:opacity-60">
                       {isSyncing ? 'Syncing…' : 'Sync'}
                     </button>
                   )}
                 </span>
               )}
-
-              <button type="button" onClick={() => { fetchRegistryCustomers(); setShowCustomerRegistryStandalone(true); }} className="aki-btn aki-btn-secondary sm">
-                <Building2 size={13} /> Customers
-              </button>
-
-              <button type="button" onClick={handleExportCSV} className="aki-btn aki-btn-secondary sm">
-                <Download size={13} /> Export
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowAnalytics(v => !v)}
-                className={`aki-btn sm ${showAnalytics ? 'aki-btn-soft-blue' : 'aki-btn-secondary'}`}
-              >
-                <BarChart2 size={13} /> Analytics
-              </button>
-
-              <div className="w-px h-5 mx-1 hidden sm:block" style={{ background: 'var(--border)' }} />
-
-              {mainTab === 'ESTIMATES' ? (
-                <button type="button" onClick={handleNewEstimate} className="aki-btn aki-btn-primary sm">
-                  <Plus size={14} /> New Estimate
-                </button>
-              ) : (
-                <button type="button" onClick={handleNewInvoice} className="aki-btn aki-btn-primary sm">
-                  <Plus size={14} /> New Invoice
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-         {/* -- Pipeline Stage Header — clickable to filter ──────────── */}
-         <div className="ovds-widget-card overflow-hidden" onClick={(e) => {
-           const cell = (e.target as HTMLElement).closest('[data-stage]');
-           if (cell) {
-             const key = cell.getAttribute('data-stage');
-             const validKeys: StatusTab[] = ['ALL', 'DRAFT', 'PENDING', 'PAID', 'OVERDUE', 'CANCELLED'];
-             if (key && (validKeys as string[]).includes(key)) {
-               setStatusTab(key as StatusTab);
-               setPipelineView('list');
-             }
-           }
-         }}>
-          <PipelineStageHeader stages={pipelineStages.map(s => ({
-            ...s,
-            active: statusTab === s.key,
-          }))} />
-        </div>
-
-         {/* ── KPI Stats Strip (Akaunting-style compact grid) ───────────── */}
-         <div
-           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"
-           role="list"
-           aria-label="Invoice KPIs"
-         >
-            {/* Total Invoiced */}
-            <div className="aki-kpi-card" role="listitem">
-              <p className="aki-kpi-label">{t('invoices.kpiTotalInvoiced', 'Total Invoiced')}</p>
-              <p className="aki-kpi-value mt-1">{fmt(totalBilled)}</p>
-              <div className="flex items-center gap-1 mt-1.5">
-                {billedTrend.pos
-                  ? <ArrowUpRight size={11} className="aki-kpi-trend-up" />
-                  : <ArrowDownRight size={11} className="aki-kpi-trend-down" />
-                }
-                <span className={`text-[11px] font-bold ${billedTrend.pos ? 'aki-kpi-trend-up' : 'aki-kpi-trend-down'}`}>{billedTrend.val}</span>
-                <span className="aki-caption">vs last month</span>
-              </div>
-            </div>
-
-            {/* Collection Rate */}
-            <div className={`aki-kpi-card ${collectionRate >= 80 ? 'highlight-success' : collectionRate >= 50 ? 'highlight-warning' : 'highlight-danger'}`} role="listitem">
-              <p className="aki-kpi-label">{t('invoices.kpiCollected', 'Collection Rate')}</p>
-              <p className="aki-kpi-value mt-1">{collectionRate}%</p>
-              <div className="aki-progress mt-2">
-                <div className="aki-progress-bar" style={{ width: `${collectionRate}%`, background: collectionRate >= 80 ? '#10B981' : collectionRate >= 50 ? '#F59E0B' : '#F43F5E' }} />
-              </div>
-              <div className="mt-2">
-                <span className={`aki-badge sm ${
-                  collectionRate >= 80 ? 'solid-success' : collectionRate >= 50 ? 'solid-warning' : 'solid-danger'
-                }`}>
-                  {collectionRate >= 80 ? 'On target' : collectionRate >= 50 ? 'At risk' : 'Below target'}
+              {overdueCount > 0 && (
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-[10px] font-bold">
+                  <AlertTriangle size={11} />
+                  {overdueCount} overdue
                 </span>
-              </div>
-            </div>
-
-            {/* Overdue */}
-            <div className="aki-kpi-card highlight-rose" role="listitem">
-              <p className="aki-kpi-label">{t('invoices.kpiOverdue', 'Overdue')}</p>
-              <p className="aki-kpi-value mt-1" style={{ color: overdueCount > 0 ? 'var(--aki-danger-text)' : 'var(--text)' }}>{overdueCount}</p>
-              <div className="mt-1.5">
-                {overdueCount > 0 ? (
-                  <span className="aki-badge sm solid-danger">
-                    <span className="w-1 h-1 rounded-full bg-rose-500 animate-pulse" />
-                    Action required
-                  </span>
-                ) : (
-                  <span className="aki-badge sm solid-success">
-                    <CheckCircle2 size={10} />
-                    All current
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* DSO */}
-            <div className="aki-kpi-card highlight-indigo" role="listitem">
-              <p className="aki-kpi-label">{t('invoices.kpiDso', 'Days Sales Outstanding')}</p>
-              <p className="aki-kpi-value mt-1">{dso != null ? `${dso}d` : '—'}</p>
-              <div className="mt-1.5">
-                {dso == null ? (
-                  <span className="aki-badge sm solid-default">No paid invoices</span>
-                ) : dso <= 30 ? (
-                  <span className="aki-badge sm solid-success">
-                    <ShieldCheck size={10} /> Excellent
-                  </span>
-                ) : dso <= 45 ? (
-                  <span className="aki-badge sm solid-info">On track</span>
-                ) : dso <= 60 ? (
-                  <span className="aki-badge sm solid-warning">
-                    <TrendingUp size={10} /> Watch
-                  </span>
-                ) : (
-                  <span className="aki-badge sm solid-danger">Critical</span>
-                )}
-              </div>
-            </div>
-
-            {/* AR Health Score */}
-            <div className="aki-kpi-card highlight-purple" role="listitem">
-              <p className="aki-kpi-label">{t('invoices.kpiArHealth', 'AR Health Score')}</p>
-              <div className="flex items-center gap-3 mt-1">
-                <div className="relative w-10 h-10 shrink-0">
-                  <svg viewBox="0 0 36 36" className="w-10 h-10 -rotate-90">
-                    <circle cx="18" cy="18" r="14" fill="none" strokeWidth="3.5" stroke="var(--border)" />
-                    <circle cx="18" cy="18" r="14" fill="none" strokeWidth="3.5"
-                      stroke={
-                        (arHealthScore?.score ?? 100) >= 85 ? '#10B981' :
-                        (arHealthScore?.score ?? 100) >= 70 ? '#3B82F6' :
-                        (arHealthScore?.score ?? 100) >= 55 ? '#F59E0B' : '#F43F5E'
-                      }
-                      strokeLinecap="round"
-                      strokeDasharray={`${((arHealthScore?.score ?? 100) / 100) * 87.96} 87.96`}
-                      className="transition-all duration-700 ease-out"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-[11px] font-black" style={{ color: 'var(--text)' }}>
-                      {arHealthScore?.grade ?? 'A'}
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm font-bold leading-none" style={{ color: 'var(--text)' }}>{arHealthScore?.score ?? 100}</p>
-                  <p className="aki-caption mt-0.5">/ 100</p>
-                </div>
-              </div>
-            </div>
-         </div>
-
-        {/* ── Analytics panel (collapsible, slides in) ──────────────── */}
-        {showAnalytics && (
-          <div className="page-transition">
-            <InvoiceAnalytics
-              stats={stats}
-              invoices={invoices as any}
-              statusCounts={statusCounts}
-              monthlyData={monthlyData}
-              aging={aging}
-              ifrsAnalytics={ifrsAnalytics}
-              arHealthScore={arHealthScore?.score ?? null}
-              topCustomers={topCustomers}
-              invoiceGaps={invoiceGaps}
-              collectionRate={collectionRate}
-              overdueCount={overdueCount}
-              dso={dso}
-              currency="ETB"
-              settings={settings}
-              maxMonthly={maxMonthly}
-              showAnalytics={showAnalytics}
-            />
-          </div>
-        )}
-
-         {/* ── Main Content Panel ─────────────────────────────────────── */}
-         <div className="aki-card" style={{ marginTop: showAnalytics ? undefined : '4px' }}>
-
-          {/* ── Tab bar ── */}
-          <div
-            className="flex items-center"
-            style={{
-              background: 'var(--surface)',
-              borderBottom: '1px solid var(--border-alt)',
-              padding: '0 4px',
-            }}
-          >
-            <div className="ovds-tab-nav flex-1 border-b-0">
-              {(
-                [
-                  { id: 'INVOICES',  label: 'Invoices',  count: totalInvoices,                          icon: FileText    },
-                  { id: 'ESTIMATES', label: 'Estimates', count: estimates.length,                       icon: ClipboardList },
-                  { id: 'RECURRING', label: 'Recurring', count: invoices.filter(i => i.isRecurring).length, icon: History },
-                ] as const
-              ).map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setMainTab(tab.id)}
-                  className={`ovds-tab${mainTab === tab.id ? ' active' : ''}`}
-                >
-                  <tab.icon size={13} strokeWidth={2} />
-                  {tab.label}
-                  {tab.count > 0 && (
-                    <span
-                      className={`aki-badge sm pill ${
-                        mainTab === tab.id ? 'solid-info' : 'solid-default'
-                      }`}
-                    >
-                      {tab.count}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-
-            {/* Right controls */}
-            <div className="flex items-center gap-2 pr-3">
-              {mainTab === 'INVOICES' && (
-                <PipelineViewToggle
-                  value={pipelineView}
-                  onChange={setPipelineView}
-                  options={['list', 'stack', 'kanban', 'funnel']}
-                />
               )}
-              {mainTab === 'INVOICES' && pipelineView !== 'list' && (
-                <div className="flex items-center gap-1 flex-wrap">
-                  {([
-                    ['ALL', 'All'],
-                    ['REGISTERED', 'Registered'],
-                    ['NEEDS_REGISTRATION', 'Needs EIMS'],
-                    ['PENDING', 'Pending'],
-                    ['FAILED', 'Failed'],
-                  ] as const).map(([key, label]) => (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() => setEimsFilter(key)}
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${
-                        eimsFilter === key
-                          ? 'bg-teal-600 text-white border-teal-600'
-                          : 'bg-white text-slate-600 border-slate-200 hover:border-teal-300'
-                      }`}
-                    >
-                      {label}
-                      {key === 'REGISTERED' && eimsKpi.registered > 0 && (
-                        <span className="ml-1 opacity-80">({eimsKpi.registered})</span>
-                      )}
-                      {key === 'NEEDS_REGISTRATION' && eimsKpi.needs > 0 && (
-                        <span className="ml-1 opacity-80">({eimsKpi.needs})</span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-              {mainTab === 'ESTIMATES' && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    fetchRegistryCustomers();
-                    setShowCustomerRegistryStandalone(true);
+              <ActionsIconBtn
+                label="Export CSV"
+                icon={<Download size={14} />}
+                onClick={handleExportCSV}
+              />
+              <ActionsIconBtn
+                label="Analytics"
+                icon={<BarChart2 size={14} />}
+                onClick={() => setShowAnalytics(v => !v)}
+                active={showAnalytics}
+              />
+            </div>
+          }
+          actionsRow={
+            mainTab === 'INVOICES' ? (
+              <div className="flex flex-col gap-2.5">
+                <ActionsRow
+                  searchValue={searchTerm}
+                  onSearchChange={(v) => { setSearchTerm(v); setCurrentPage(1); }}
+                  searchPlaceholder="Search invoice # or customer…"
+                  filterOptions={[
+                    { value: 'DRAFT', label: 'Draft' },
+                    { value: 'PENDING', label: 'Sent' },
+                    { value: 'PAID', label: 'Paid' },
+                    { value: 'OVERDUE', label: 'Overdue' },
+                    { value: 'CANCELLED', label: 'Cancelled' },
+                  ]}
+                  filterValue={statusTab}
+                  onFilterChange={(v) => { setStatusTab(v as StatusTab); setCurrentPage(1); fetchInvoices(1); }}
+                  filterLabel="All Statuses"
+                  primaryAction={{
+                    label: 'New Invoice',
+                    icon: <Plus size={14} />,
+                    onClick: handleNewInvoice,
                   }}
-                  className="aki-btn aki-btn-secondary xs"
-                >
-                  <Building2 size={11} />
-                  {t('common.manageCustomers', 'Customers')}
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div className="p-6">
-            {mainTab === 'INVOICES' && (
-              <div className="space-y-5">
-                {/* ── Kanban board view ── */}
-                {pipelineView === 'kanban' && (
-                  <div>
-                    {loading ? (
-                      <div className="flex items-center justify-center h-64 gap-2.5">
-                        <RefreshCw size={18} className="animate-spin" style={{ color: 'var(--aki-blue)' }} />
-                        <span className="ovds-label">
-                          {t('invoices.loadingPipeline', 'Loading pipeline…')}
-                        </span>
-                      </div>
-                    ) : (
-                      <KanbanBoard
-                        columns={kanbanColumns}
-                        emptyLabel={t('invoices.noInvoices', 'No invoices')}
-                        renderCard={(invoice) => (
-                          <PipelineCard
-                            title={
-                              invoice.invoiceNumber ||
-                              `Invoice #${invoice.id.slice(-6)}`
-                            }
-                            subtitle={invoice.customer}
-                            amount={fmt(Number(invoice.totalAmount))}
-                            status={invoice.status}
-                            accentColor={
-                              invoice.status === 'PAID'
-                                ? '#10B981'
-                                : invoice.status === 'OVERDUE'
-                                  ? '#F43F5E'
-                                  : invoice.status === 'PENDING'
-                                    ? '#F59E0B'
-                                    : '#94a3b8'
-                            }
-                            meta={[
-                               {
-                                 icon: <Calendar size={10} />,
-                                 label: invoice.dueDate
-                                   ? new Date(invoice.dueDate).toLocaleDateString('en-ET', SHORT_DATE_OPTS)
-                                   : t('invoices.noDueDate', 'No due date'),
-                               },
-                               ...(eimsBadgeLabel(invoice as any) ? [{
-                                 icon: <ShieldCheck size={10} />,
-                                 label: `EIMS ${eimsBadgeLabel(invoice as any)}`,
-                               }] : []),
-                            ]}
-                            actions={
-                              <div className="flex gap-1 items-center">
-                                {eimsBadgeLabel(invoice as any) && (
-                                  <span className={`text-[8px] px-1.5 py-0.5 rounded-full border font-bold ${eimsBadgeClass(eimsBadgeLabel(invoice as any)!)}`}>
-                                    EIMS
-                                  </span>
-                                )}
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setEditingInvoice(invoice);
-                                    setShowAddModal(true);
-                                  }}
-                                  className="ovds-doc-action-btn"
-                                  aria-label="Edit invoice"
-                                >
-                                  <Edit2 size={12} />
-                                </button>
-                              </div>
-                            }
-                            onClick={() => setDrawerInvoice(invoice)}
-                          />
-                        )}
+                  secondaryActions={
+                    <>
+                      <ActionsIconBtn
+                        label={showFilters ? 'Hide date filters' : 'Date filters'}
+                        icon={<Filter size={14} />}
+                        onClick={() => setShowFilters(f => !f)}
+                        active={showFilters}
                       />
+                      <ActionsIconBtn
+                        label={invoiceViewMode === 'list' ? 'Kanban view' : 'List view'}
+                        icon={invoiceViewMode === 'list' ? <LayoutGrid size={14} /> : <List size={14} />}
+                        onClick={() => setInvoiceViewMode(m => m === 'list' ? 'kanban' : 'list')}
+                      />
+                    </>
+                  }
+                  resultCount={totalInvoices}
+                  loading={loading}
+                />
+
+                {/* Date range + advanced filters — shown when expanded */}
+                {showFilters && (
+                  <div className="flex flex-wrap items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+
+                    {/* Date range */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Date</span>
+                      <input
+                        type="date"
+                        value={dateFrom}
+                        onChange={e => setDateFrom(e.target.value)}
+                        className="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)] transition-all"
+                        aria-label="From date"
+                      />
+                      <span className="text-slate-300 text-sm">—</span>
+                      <input
+                        type="date"
+                        value={dateTo}
+                        onChange={e => setDateTo(e.target.value)}
+                        className="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)] transition-all"
+                        aria-label="To date"
+                      />
+                    </div>
+
+                    {/* Source filter */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Source</span>
+                      <select
+                        value={sourceFilter}
+                        onChange={e => setSourceFilter(e.target.value as typeof sourceFilter)}
+                        className="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)] transition-all cursor-pointer"
+                      >
+                        <option value="ALL">All sources</option>
+                        <option value="MANUAL">Manual entry</option>
+                        <option value="BANK_TRANSFER">Bank transfer</option>
+                        <option value="CASH">Cash</option>
+                        <option value="TELECOM">Telebirr / Telecom</option>
+                        <option value="CHEQUE">Cheque</option>
+                        <option value="MOBILE_BANKING">Mobile banking</option>
+                      </select>
+                    </div>
+
+                    {/* EIMS registration status filter */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">EIMS</span>
+                      <select
+                        value={eimsFilter}
+                        onChange={e => setEimsFilter(e.target.value as typeof eimsFilter)}
+                        className="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)] transition-all cursor-pointer"
+                      >
+                        <option value="ALL">All EIMS statuses</option>
+                        <option value="NEEDS_REGISTRATION">Needs registration</option>
+                        <option value="REGISTERED">Registered ✓</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="FAILED">Failed ✗</option>
+                      </select>
+                    </div>
+
+                    {/* Active filter indicator + clear */}
+                    {(dateFrom || dateTo || sourceFilter !== 'ALL' || eimsFilter !== 'ALL') && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDateFrom('');
+                          setDateTo('');
+                          setSourceFilter('ALL');
+                          setEimsFilter('ALL');
+                        }}
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all border border-rose-200 dark:border-rose-800 ml-auto"
+                      >
+                        <X size={11} /> Clear all filters
+                      </button>
                     )}
                   </div>
                 )}
 
-                {/* -- Funnel view -- */}
-                {pipelineView === 'funnel' && (
-                  <div className="ovds-grid-layout cols-2 gap-lg">
-                    <PipelineFunnel
-                      title={t('invoices.funnelTitle', 'Invoice Pipeline Funnel')}
-                      stages={[
-                        {
-                          label: 'Draft',
-                          count: statusCounts.DRAFT ?? 0,
-                          color: '#94a3b8',
-                          pct: 100,
-                          amount: fmt(
-                            invoices
-                              .filter((i) => i.status === 'DRAFT')
-                              .reduce((s, i) => s + Number(i.totalAmount), 0),
-                          ),
-                        },
-                        {
-                          label: 'Sent',
-                          count: statusCounts.PENDING ?? 0,
-                          color: '#f59e0b',
-                          pct: 80,
-                          amount: fmt(
-                            invoices
-                              .filter((i) => i.status === 'PENDING')
-                              .reduce((s, i) => s + Number(i.totalAmount), 0),
-                          ),
-                        },
-                        {
-                          label: 'Overdue',
-                          count: statusCounts.OVERDUE ?? 0,
-                          color: '#ef4444',
-                          pct: 40,
-                          amount: fmt(
-                            invoices
-                              .filter((i) => i.status === 'OVERDUE')
-                              .reduce((s, i) => s + Number(i.totalAmount), 0),
-                          ),
-                        },
-                        {
-                          label: 'Settled',
-                          count: statusCounts.PAID ?? 0,
-                          color: '#00E784',
-                          pct: 60,
-                          amount: fmt(
-                            invoices
-                              .filter((i) => i.status === 'PAID')
-                              .reduce((s, i) => s + Number(i.totalAmount), 0),
-                          ),
-                        },
-                      ]}
-                    />
-                    {/* Aging breakdown */}
-                    <div className="ovds-widget-card overflow-hidden">
-                        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
-                          <h3 className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.15em]">
-                            {t('invoices.agingBreakdown', 'Aging Breakdown')}
-                          </h3>
-                        </div>
-                      <div className="p-5 space-y-1">
-                        {aging.map((b) => (
-                          <div key={b.label} className="funnel-bar">
-                            <div className="w-24 shrink-0">
-                              <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                {b.label}
-                              </p>
-                              <p className="text-[10px] font-bold text-slate-400 tabular-nums mt-0.5">
-                                {fmt(b.amount)}
-                              </p>
-                            </div>
-                            <div className="funnel-track">
-                              <div
-                                className={`funnel-fill ${b.color}`}
-                                style={{
-                                  width: `${totalBilled > 0 ? Math.round((b.amount / totalBilled) * 100) : 0}%`,
-                                }}
-                              />
-                            </div>
-                            <span className="text-xs font-black text-slate-700 dark:text-slate-200 tabular-nums w-8 text-right">
-                              {b.count}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
+                {/* Bulk action bar */}
+                {selected.size > 0 && (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-[var(--pro-azure-50)] dark:bg-green-950/30 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl flex-wrap">
+
+                    {/* Select-all toggle */}
+                    <button
+                      type="button"
+                      onClick={handleToggleAll}
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] hover:bg-[var(--pro-azure-100)] dark:hover:bg-green-900/40 transition-all"
+                      title={invoices.length > 0 && invoices.every(i => selected.has(i.id)) ? 'Deselect all' : 'Select all on page'}
+                    >
+                      {invoices.length > 0 && invoices.every(i => selected.has(i.id))
+                        ? <><Minus size={11} /> Deselect all</>
+                        : <><CheckCircle2 size={11} /> Select all ({invoices.length})</>}
+                    </button>
+
+                    <span className="text-[var(--pro-azure-100)] dark:text-green-800 select-none">|</span>
+                    <span className="text-xs font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
+                      {selected.size} selected
+                    </span>
+
+                    <div className="flex items-center gap-1.5 ml-1 flex-wrap">
+                      {/* Send */}
+                      <button onClick={handleBulkSend} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400 hover:bg-sky-200 transition-all border border-sky-200 dark:border-sky-800">
+                        <Send size={11} /> Send All
+                      </button>
+                      {/* Duplicate */}
+                      <button onClick={handleBulkDuplicate} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-all border border-slate-200 dark:border-slate-700">
+                        <Copy size={11} /> Duplicate
+                      </button>
+                      {/* EIMS Register */}
+                      <button
+                        onClick={handleBulkEimsRegister}
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 hover:bg-teal-100 transition-all border border-teal-200 dark:border-teal-800"
+                        title="Register selected invoices with MoR EIMS"
+                      >
+                        <ShieldCheck size={11} /> EIMS Register
+                      </button>
+                      {/* Archive */}
+                      <button
+                        onClick={handleBulkArchive}
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 hover:bg-amber-100 transition-all border border-amber-200 dark:border-amber-800"
+                        title="Archive selected invoices (hidden from active view)"
+                      >
+                        <Archive size={11} /> Archive
+                      </button>
+                      {/* Delete */}
+                      <button onClick={handleBulkDelete} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition-all border border-rose-200 dark:border-rose-800">
+                        <Trash2 size={11} /> Delete
+                      </button>
                     </div>
+
+                    <button onClick={() => setSelected(new Set())} className="ml-auto p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all" title="Clear selection">
+                      <X size={14} />
+                    </button>
                   </div>
                 )}
-
-                {/* -- Document Stack view -- */}
-                {pipelineView === 'stack' && (
-                  <DocStackLayout
-                    items={displayInvoices.map((inv): DocStackItem => ({
-                      id: inv.id,
-                      title: inv.invoiceNumber || `Invoice #${inv.id.slice(-6)}`,
-                      subtitle: inv.customer,
-                      amount: fmt(Number(inv.totalAmount)),
-                      status: inv.status?.toLowerCase(),
-                      date: inv.date ?? undefined,
-                      dueDate: inv.dueDate ?? undefined,
-                      badge: eimsBadgeLabel(inv as any)
-                        ? `EIMS ${eimsBadgeLabel(inv as any)}`
-                        : (inv.isRecurring ? 'RECURRING' : undefined),
-                      badgeCls: eimsBadgeLabel(inv as any)
-                        ? eimsBadgeClass(eimsBadgeLabel(inv as any)!)
-                        : 'bg-violet-100 text-violet-700',
-                    }))}
-                    loading={loading}
-                    emptyLabel={t('invoices.noInvoices', 'No invoices')}
-                    emptyDescription={t('invoices.noInvoicesFilter', 'No invoices match the current filter.')}
-                    selected={selected}
-                    onSelect={handleToggleSelect}
-                    showCheckbox
-                    onOpen={(item) => setDrawerInvoice(invoiceMap.get(item.id) ?? null)}
-                    rowIcon={(item) => {
-                      const inv = invoiceMap.get(item.id);
-                      const status = inv?.status;
-                      const iconColor =
-                        status === 'PAID' ? 'text-emerald-500' :
-                        status === 'OVERDUE' ? 'text-rose-500' :
-                        status === 'PENDING' ? 'text-amber-500' : 'text-slate-400';
-                      const iconBg =
-                        status === 'PAID' ? 'bg-emerald-50' :
-                        status === 'OVERDUE' ? 'bg-rose-50' :
-                        status === 'PENDING' ? 'bg-amber-50' : 'bg-white';
-                      return (
-                        <div className={`w-8 h-8 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center`}>
-                          <Receipt size={15} />
-                        </div>
-                      );
-                    }}
-                    renderRowActions={(item) => {
-                      const inv = invoiceMap.get(item.id);
-                      if (!inv) return null;
-                      return (
-                        <>
-                          <button type="button"
-                            onClick={(e) => { e.stopPropagation(); setEditingInvoice(inv); setShowAddModal(true); }}
-                            className="ovds-doc-action-btn" title="Edit" aria-label="Edit">
-                            <Edit2 size={13} />
-                          </button>
-                          <button type="button"
-                            onClick={(e) => { e.stopPropagation(); handleSend(inv.id); }}
-                            className="ovds-doc-action-btn" title="Send" aria-label="Send">
-                            <Send size={13} />
-                          </button>
-                          <button type="button"
-                            onClick={(e) => { e.stopPropagation(); handlePrint(inv.id); }}
-                            className="ovds-doc-action-btn" title="Print / PDF" aria-label="Print or download PDF">
-                            <Download size={13} />
-                          </button>
-                          <button type="button"
-                            onClick={(e) => { e.stopPropagation(); setPaymentInvoice(inv); }}
-                            className="ovds-doc-action-btn success" title="Record Payment" aria-label="Record payment">
-                            <CheckCircle2 size={13} />
-                          </button>
-                          <button type="button"
-                            onClick={(e) => { e.stopPropagation(); handleDelete(inv.id); }}
-                            className="ovds-doc-action-btn danger" title="Delete" aria-label="Delete">
-                            <Trash2 size={13} />
-                          </button>
-                        </>
-                      );
-                    }}
-                  />
-                )}
-
-                {/* -- List view (default) -- */}
-                {pipelineView === 'list' && (
-                  <InvoicesTable
-                    invoices={invoices as any}
-                    stats={stats}
-                    statusCounts={statusCounts}
-                    loading={loading}
-                    totalInvoices={totalInvoices}
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    pageSize={pageSize}
-                    statusTab={statusTab}
-                    sourceFilter={sourceFilter}
-                    eimsFilter={eimsFilter}
-                    searchTerm={searchTerm}
-                    dateFrom={dateFrom}
-                    dateTo={dateTo}
-                    sortField={sortField}
-                    sortDir={sortDir}
-                    visibleCols={visibleCols}
-                    selected={selected}
-                    settings={settings}
-                    currency="ETB"
-                    onStatusTabChange={setStatusTab}
-                    onSourceFilterChange={setSourceFilter}
-                    onEimsFilterChange={setEimsFilter}
-                    onSearchChange={setSearchTerm}
-                    onDateFromChange={setDateFrom}
-                    onDateToChange={setDateTo}
-                    onSortChange={(field) => setSortField(field)}
-                    onPageChange={handlePageChange}
-                    onPageSizeChange={handlePageSizeChange}
-                    onToggleCol={handleToggleCol}
-                    onToggleAll={handleToggleAll}
-                    onToggleSelect={handleToggleSelect}
-                    onDelete={handleDelete}
-                    onSend={handleSend}
-                    onPrint={(inv) => handlePrint(inv.id)}
-                    onBulkSend={handleBulkSend}
-                    onBulkEimsRegister={handleBulkEimsRegister}
-                    onBulkStatusUpdate={handleBulkStatusUpdate}
-                    onBulkDelete={handleBulkDelete}
-                    onBulkDuplicate={handleBulkDuplicate}
-                    onBulkArchive={handleBulkArchive}
-                    onExportCSV={handleExportCSV}
-                    onRefresh={handleRefresh}
-                    onNewInvoice={handleNewInvoice}
-                    onIngestionHub={() => setShowIngestionHub(true)}
-                    onFlagOverdue={() => handleFlagOverdue('')}
-                    onDuplicate={handleDuplicate}
-                    onCreditNote={handleCreditNote}
-                    onVoid={handleVoidInvoice}
-                    onRecordPayment={(inv) => setPaymentInvoice(inv)}
-                    onSendReminder={handleSendReminder}
-                    onRowClick={(inv) => setDrawerInvoice(inv)}
-                  />
-                )}
               </div>
-            )}
-
-            {mainTab === 'ESTIMATES' && (
+            ) : undefined
+          }
+          metricsGrid={
+            mainTab === 'INVOICES' ? (
+              <MetricsOverviewGrid metrics={metricsItems} cols={4} />
+            ) : undefined
+          }
+          dataGrid={
+            mainTab === 'INVOICES' ? (
+              invoiceViewMode === 'kanban' ? (
+                /* ── Kanban view (preserved) ──────────────────────── */
+                <div className="flex gap-4 overflow-x-auto pb-4 -mx-1 px-1">
+                  {kanbanColDefs.map(col => (
+                    <InvKanbanCol
+                      key={col.key}
+                      label={col.label}
+                      count={col.count}
+                      total={col.total}
+                      color={col.color}
+                      headerCls={col.headerCls}
+                      dotCls={col.dotCls}
+                      invoices={col.invoices}
+                      onEdit={inv => { setEditingInvoice(inv); setShowAddModal(true); }}
+                      onSend={inv => handleSend(inv.id)}
+                      onDelete={inv => handleDelete(inv.id)}
+                      onRecordPayment={inv => setPaymentInvoice(inv)}
+                      onRowClick={inv => setDrawerInvoice(inv)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                /* ── Grid-over-Card list view ─────────────────────── */
+                <DataGrid<Invoice>
+                  columns={gridColumns}
+                  rows={invoices}
+                  rowActions={gridRowActions}
+                  onRowClick={(inv) => setDrawerInvoice(inv)}
+                  sortState={{ key: sortField, dir: sortDir }}
+                  onSortChange={(s) => { setSortField(s.key as SortField); setSortDir(s.dir); fetchInvoices(currentPage); }}
+                  loading={loading}
+                  emptyMessage="No invoices found"
+                  emptySubMessage="Create your first invoice or adjust the filters."
+                  emptyAction={
+                    <button
+                      type="button"
+                      onClick={handleNewInvoice}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white transition-all shadow-sm"
+                    >
+                      <Plus size={14} /> New Invoice
+                    </button>
+                  }
+                  highlightRow={(inv) => inv.status === 'OVERDUE' ? 'danger' : false}
+                />
+              )
+            ) : mainTab === 'ESTIMATES' ? (
               <EstimatesPanel
                 estimates={estimates}
                 loading={estimatesLoading}
@@ -2229,40 +1842,51 @@ const InvoicesInner: React.FC = () => {
                 page={estimatePage}
                 totalPages={estimateTotalPages}
                 totalCount={estimateTotalCount}
-                onPageChange={fetchEstimates}
-                onStatusTabChange={setEstimateStatusTab}
-                onSearchChange={setEstimateSearch}
-                onNew={handleNewEstimate}
-                onEdit={handleEditEstimate}
-                onDelete={handleDeleteEstimate}
-                 onSend={handleSendEstimate}
-                 onConvert={handleConvertToInvoice}
-                 onBulkDelete={handleBulkDeleteEstimates}
-                 selectedEstimates={selectedEstimates}
-                 setSelectedEstimates={setSelectedEstimates}
-                 onManageCustomers={() => {
-                  fetchRegistryCustomers();
-                  setShowCustomerRegistryStandalone(true);
+                onPageChange={(p: number) => { setEstimatePage(p); fetchEstimates(p); }}
+                onStatusTabChange={(s: EstimateStatusTab) => { setEstimateStatusTab(s); fetchEstimates(1); }}
+                onSearchChange={(v: string) => setEstimateSearch(v)}
+                onNew={() => { setNewEstimate(blankEstimate()); setShowEstimateModal(true); }}
+                onEdit={(est: Estimate) => { setEditingEstimate(est); setNewEstimate(est); setShowEstimateModal(true); }}
+                onDelete={async (id: string) => {
+                  if (!(await confirm({ title: 'Delete estimate?', variant: 'danger' }))) return;
+                  try { await estimatesApi.delete(id); toast.success('Estimate deleted'); fetchEstimates(estimatePage); } catch { toast.error('Delete failed'); }
                 }}
-                onRefresh={() => fetchEstimates(1)}
+                onSend={async (id: string) => {
+                  try { await estimatesApi.send(id); toast.success('Estimate sent'); fetchEstimates(estimatePage); } catch { toast.error('Send failed'); }
+                }}
+                onConvert={async (id: string) => {
+                  try { await estimatesApi.convert(id); toast.success('Converted to invoice'); fetchInvoices(1); setMainTab('INVOICES'); } catch { toast.error('Convert failed'); }
+                }}
+                selectedEstimates={selectedEstimates}
+                setSelectedEstimates={setSelectedEstimates}
+                onRefresh={() => fetchEstimates(estimatePage)}
               />
-            )}
-
-            {mainTab === 'RECURRING' && (
+            ) : (
+              /* ── Recurring tab ────────────────────────────────────── */
               <RecurringPanel
-                invoices={invoices.filter((i) => i.isRecurring)}
+                companyId={selectedCompanyId ?? undefined}
                 onNewInvoice={handleNewInvoice}
-                onTrigger={(inv) => {
-                  // Manually send the next occurrence of a recurring invoice
-                  handleSend(inv.id);
-                }}
+                invoices={[]}
+                onTrigger={() => {}}
                 fmt={fmt}
-                companyId={selectedCompanyId}
               />
-            )}
-          </div>
-        </div>
+            )
+          }
+          pagination={
+            mainTab === 'INVOICES' && invoiceViewMode === 'list'
+              ? {
+                  page: currentPage,
+                  limit: pageSize,
+                  total: totalInvoices,
+                  totalPages,
+                  onPageChange: handlePageChange,
+                  onLimitChange: handlePageSizeChange,
+                }
+              : undefined
+          }
+        />
 
+        {/* ── Preserved modals ────────────────────────────────────────────── */}
         <InvoiceModals {...modalProps} />
 
         {showEstimateModal && (
@@ -2328,15 +1952,15 @@ const ESTIMATE_STATUS_TABS: {
     id: 'SENT',
     label: 'Sent',
     icon: Send,
-    color: 'text-emerald-600',
-    dot: 'bg-emerald-500',
+    color: 'text-[var(--pro-azure)]',
+    dot: 'bg-[var(--pro-azure-50)]0',
   },
   {
     id: 'ACCEPTED',
     label: 'Accepted',
     icon: CheckCircle2,
-    color: 'text-emerald-600',
-    dot: 'bg-emerald-500',
+    color: 'text-[var(--pro-azure)]',
+    dot: 'bg-[var(--pro-azure-50)]0',
   },
   {
     id: 'DECLINED',
@@ -2353,16 +1977,6 @@ const ESTIMATE_STATUS_TABS: {
     dot: 'bg-teal-500',
   },
 ];
-
-const EST_STATUS_STYLE: Record<string, string> = {
-  DRAFT: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-  SENT: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-  ACCEPTED:
-    'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-  DECLINED: 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
-  CONVERTED:
-    'bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
-};
 
 const EstimatesPanel: React.FC<any> = ({
   estimates,
@@ -2409,7 +2023,7 @@ const EstimatesPanel: React.FC<any> = ({
 
   return (
     <div className="space-y-4">
-      {/* ── Estimate KPI strip (flat Akaunting style) ── */}
+      {/* ── Estimate KPI strip (flat Ovds SaaS style) ── */}
       <div
         className="ovds-stat-row"
         style={{ gridTemplateColumns: 'repeat(3, minmax(0,1fr))' }}

@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import {
   ShieldCheck, AlertTriangle, CheckCircle2, XCircle, Clock, RefreshCw, Globe, Banknote, Shield,
   TrendingUp, ChevronDown, ChevronUp, ExternalLink,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+
 import api from '../../services/api';
 import { fmtCurrency } from '../../utils/fmt';
 
@@ -28,7 +29,7 @@ interface TaxDashboard {
 }
 
 const STATUS_CONFIG = {
-  OK:       { icon: <CheckCircle2 size={12} />, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-800', label: 'OK' },
+  OK:       { icon: <CheckCircle2 size={12} />, color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30', border: 'border-[var(--pro-azure-100)] dark:border-green-800', label: 'OK' },
   WARNING:  { icon: <AlertTriangle size={12} />, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200 dark:border-amber-800', label: 'Warning' },
   CRITICAL: { icon: <XCircle size={12} />, color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-950/30', border: 'border-rose-200 dark:border-rose-800', label: 'Critical' },
   PENDING:  { icon: <Clock size={12} />, color: 'text-slate-500 dark:text-slate-400', bg: 'bg-white dark:bg-slate-800/50', border: 'border-slate-200 dark:border-slate-700', label: 'Pending' },
@@ -99,10 +100,10 @@ const ERCAComplianceDashboard: React.FC = () => {
   const warningCount = checklist.filter(c => c.status === 'WARNING').length;
   const okCount = checklist.filter(c => c.status === 'OK').length;
 
-  const scoreColor = score >= 90 ? 'text-emerald-600 dark:text-emerald-400'
+  const scoreColor = score >= 90 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
     : score >= 70 ? 'text-amber-600 dark:text-amber-400'
     : 'text-rose-600 dark:text-rose-400';
-  const scoreBg = score >= 90 ? 'bg-emerald-500' : score >= 70 ? 'bg-amber-500' : 'bg-rose-500';
+  const scoreBg = score >= 90 ? 'bg-[var(--pro-azure-50)]0' : score >= 70 ? 'bg-amber-500' : 'bg-rose-500';
 
   const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
@@ -143,7 +144,7 @@ const ERCAComplianceDashboard: React.FC = () => {
       <div className="px-5 pt-4 pb-2">
         <div className="flex justify-between text-[10px] font-bold text-slate-400 mb-1.5">
           <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />{okCount} passed
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--pro-azure-50)]0" />{okCount} passed
             {warningCount > 0 && <><span className="w-1.5 h-1.5 rounded-full bg-amber-500 ml-1" />{warningCount} warning</>}
             {criticalCount > 0 && <><span className="w-1.5 h-1.5 rounded-full bg-rose-500 ml-1" />{criticalCount} critical</>}
           </span>
@@ -214,7 +215,7 @@ const ERCAComplianceDashboard: React.FC = () => {
         <div className="px-5 pb-3">
           <button
             onClick={() => setExpanded(v => !v)}
-            className="w-full flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors"
+            className="w-full flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors"
           >
             {expanded ? <><ChevronUp size={12} /> Show less</> : <><ChevronDown size={12} /> Show {checklist.length - 5} more</>}
           </button>
@@ -223,7 +224,7 @@ const ERCAComplianceDashboard: React.FC = () => {
 
       {/* Footer */}
       <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <Link to="/tax/dashboard" className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+        <Link to="/tax/dashboard" className="flex items-center gap-1.5 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
           <TrendingUp size={12} /> Full Tax Dashboard
         </Link>
         <a href="https://etax.erca.gov.et" target="_blank" rel="noopener noreferrer"

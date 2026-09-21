@@ -1,4 +1,4 @@
-# AI Engineering Prompt: Enterprise SaaS Architecture Alignment & Bug Fix
+﻿# AI Engineering Prompt: Enterprise SaaS Architecture Alignment & Bug Fix
 
 ## 🎯 Objective
 Refactor and repair the full-stack SaaS application built on **Nx Monorepo (React Frontend & NestJS Backend with Prisma ORM)**. Transition the system from temporary stubs to production-ready, real-world execution. The system must bridge the **OVDS Enterprise Modules** with the **Ethiopian Ministry of Revenues (MoR/ERCA) Electronic Invoice Information Management System**, fully complying with **IFRS** and **AABE** standards.
@@ -8,7 +8,7 @@ Refactor and repair the full-stack SaaS application built on **Nx Monorepo (Reac
 ## 🏗️ 1. Architecture Blueprint & Domain Separation
 Enforce strict domain separation and advanced architectural layers to handle complex enterprise-to-tax-authority (MoR) interactions.
 * **Remove Stubs:** Wipe out all temporary mock functions, hardcoded variables, and static answers. Implement live production code.
-* **UI/UX Logic:** Align all user interfaces and workflows with **Akaunting** UX/UI design patterns.
+* **UI/UX Logic:** Align all user interfaces and workflows with **Ovds SaaS** UX/UI design patterns.
 * **Data Mapping Registry:** Implement a centralized data registry to map internal enterprise schemas to official MoR/ERCA data models.
 * **Localized Ledger Protocols:** Build a compliance bridging layer specifically designed for Ethiopian tax law requirements.
  

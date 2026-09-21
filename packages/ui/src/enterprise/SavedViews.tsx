@@ -83,7 +83,7 @@ export function SavedViewSelector({
         className={cn(
           'flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[12px] font-semibold transition-all min-w-[140px]',
           activeView
-            ? 'bg-aki-blue-50 dark:bg-aki-blue-950/30 border-aki-blue-200 dark:border-aki-blue-800 text-aki-blue dark:text-blue-400'
+            ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]-950/30 border-[var(--pro-azure)]-200 dark:border-[var(--pro-azure)]-800 text-[var(--pro-azure)] dark:text-blue-400'
             : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800',
         )}
       >
@@ -109,7 +109,7 @@ export function SavedViewSelector({
                 className={cn(
                   'group flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer transition-all',
                   view.id === activeViewId
-                    ? 'bg-aki-blue-50 dark:bg-aki-blue-950/30 text-aki-blue dark:text-blue-400'
+                    ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]-950/30 text-[var(--pro-azure)] dark:text-blue-400'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800',
                 )}
                 onClick={() => {
@@ -185,7 +185,7 @@ export function SavedViewSelector({
             <div className="p-2 border-t border-slate-100 dark:border-slate-800">
               <button
                 onClick={handleCreate}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-semibold text-aki-blue dark:text-blue-400 hover:bg-aki-blue-50 dark:hover:bg-aki-blue-950/20 transition-all"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-semibold text-[var(--pro-azure)] dark:text-blue-400 hover:bg-[var(--pro-azure-50)] dark:hover:bg-[var(--pro-azure)]-950/20 transition-all"
               >
                 <Plus size={12} /> Create new view
               </button>
@@ -243,7 +243,7 @@ export function CreateViewDialog({ open, onClose, onCreate }: CreateViewDialogPr
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., My Overdue Invoices"
-              className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-[13px] text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-aki-blue/20 focus:border-aki-blue"
+              className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-[13px] text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)]"
               autoFocus
             />
           </div>
@@ -256,7 +256,7 @@ export function CreateViewDialog({ open, onClose, onCreate }: CreateViewDialogPr
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Optional description..."
               rows={2}
-              className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-[13px] text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-aki-blue/20 focus:border-aki-blue resize-none"
+              className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-[13px] text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)] resize-none"
             />
           </div>
         </div>
@@ -271,7 +271,7 @@ export function CreateViewDialog({ open, onClose, onCreate }: CreateViewDialogPr
           <button
             onClick={handleCreate}
             disabled={!name.trim()}
-            className="px-4 py-2 bg-aki-blue text-white rounded-xl text-[12px] font-semibold hover:bg-aki-blue-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm shadow-aki-blue/20"
+            className="px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-[12px] font-semibold hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm shadow-[var(--pro-azure)]/20"
           >
             Create View
           </button>

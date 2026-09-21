@@ -1,4 +1,3 @@
-import React, { useState, useCallback, useRef, useMemo } from 'react';
 import {
   Plus, X, ChevronLeft, ChevronRight, GripVertical, LayoutGrid,
   Layers, BarChart3, Wallet, Users, Banknote, TrendingUp, Bell,
@@ -6,8 +5,10 @@ import {
   Star, Zap, Shield, PieChart, Activity, Calendar, Package,
   FileText, CreditCard, Building2, Check, Info, Sparkles,
 } from 'lucide-react';
-import { useLocalStorage } from '../../hooks';
+import React, { useState, useCallback, useRef, useMemo } from 'react';
 import toast from 'react-hot-toast';
+
+import { useLocalStorage } from '../../hooks';
 import KPIWidgetPreview from '../kpiWidgetPreview';
 
 // -- Types ---------------------------------------------------------------------
@@ -66,8 +67,8 @@ const WIDGET_CATALOG: Omit<DashboardWidget, 'visible'>[] = [
 
 // Widget category groupings for the catalog
 const WIDGET_CATEGORIES: { label: string; color: string; ids: string[] }[] = [
-  { label: 'Summary',    color: 'emerald', ids: ['receivables-payables', 'cash-flow-summary', 'account-balance', 'module-quick-access'] },
-  { label: 'ovds',    color: 'emerald', ids: ['cash-flow', 'revenue', 'invoices', 'banking', 'expenses', 'recent-invoices', 'pie-breakdown', 'continuous-close'] },
+  { label: 'Summary',    color: 'green', ids: ['receivables-payables', 'cash-flow-summary', 'account-balance', 'module-quick-access'] },
+  { label: 'ovds',    color: 'green', ids: ['cash-flow', 'revenue', 'invoices', 'banking', 'expenses', 'recent-invoices', 'pie-breakdown', 'continuous-close'] },
   { label: 'HR',         color: 'blue',    ids: ['employees', 'payroll', 'attendance'] },
   { label: 'Compliance', color: 'amber',   ids: ['tax-calendar', 'ifrs-readiness', 'vat-status', 'credibility', 'etax-status'] },
   { label: 'Insights',   color: 'violet',  ids: ['insights', 'alerts', 'financial-health', 'quick-actions'] },
@@ -170,8 +171,8 @@ const DashboardManager: React.FC<DashboardManagerProps> = ({ onClose }) => {
     <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4 animate-aki-fade-in">
       <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 w-full max-w-xl max-h-[88vh] flex flex-col overflow-hidden animate-aki-scale-in">
         <div className="flex items-center gap-2.5 px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/30">
-          <div className="w-7 h-7 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-lg flex items-center justify-center">
-            <LayoutGrid size={14} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="w-7 h-7 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-lg flex items-center justify-center">
+            <LayoutGrid size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div className="flex-1">
             <h2 className="font-semibold text-slate-900 dark:text-white text-[13px] leading-none">Dashboard Manager</h2>
@@ -179,7 +180,7 @@ const DashboardManager: React.FC<DashboardManagerProps> = ({ onClose }) => {
           </div>
           <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 gap-0.5">
             {([{ key: 'dashboards' as const, label: 'Dashboards', icon: <LayoutGrid size={10} /> }, { key: 'widgets' as const, label: 'Arrange', icon: <GripVertical size={10} /> }, { key: 'catalog' as const, label: 'Add Widget', icon: <Plus size={10} /> }]).map(tab => (
-              <button key={tab.key} onClick={() => setView(tab.key)} className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-semibold transition-all ${view === tab.key ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>{tab.icon}{tab.label}</button>
+              <button key={tab.key} onClick={() => setView(tab.key)} className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-semibold transition-all ${view === tab.key ? 'bg-white dark:bg-slate-700 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>{tab.icon}{tab.label}</button>
             ))}
           </div>
           <button onClick={onClose} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors text-slate-400"><X size={14} /></button>
@@ -189,49 +190,49 @@ const DashboardManager: React.FC<DashboardManagerProps> = ({ onClose }) => {
             <div className="p-4 space-y-3">
               <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/60 dark:to-slate-800/30 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><Sparkles size={10} className="text-emerald-600 dark:text-emerald-400" /> Dashboard Slider</p>
+                  <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><Sparkles size={10} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" /> Dashboard Slider</p>
                   <span className="ovds-caption">{activeIdx + 1} / {dashboards.length}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button onClick={() => setActiveIdx(i => Math.max(0, i - 1))} disabled={activeIdx === 0} className="p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm"><ChevronLeft size={13} /></button>
                   <div className="flex-1 flex gap-1.5 overflow-x-auto pb-0.5">
                     {dashboards.map((d, i) => (
-                      <button key={d.id} onClick={() => setActiveIdx(i)} className={`shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all border ${i === activeIdx ? 'bg-emerald-500 text-white border-emerald-600 shadow-sm shadow-emerald-500/20 dark:shadow-emerald-500/10/30' : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-emerald-500/40 dark:border-emerald-700 hover:text-emerald-600 dark:text-emerald-400'}`}>{d.name}</button>
+                      <button key={d.id} onClick={() => setActiveIdx(i)} className={`shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all border ${i === activeIdx ? 'bg-[var(--pro-azure)] text-white border-[var(--pro-azure)] shadow-sm shadow-green-500/20 dark:shadow-green-500/10/30' : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-[var(--pro-azure)]/40 dark:border-green-700 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'}`}>{d.name}</button>
                     ))}
                   </div>
                   <button onClick={() => setActiveIdx(i => Math.min(dashboards.length - 1, i + 1))} disabled={activeIdx === dashboards.length - 1} className="p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm"><ChevronRight size={13} /></button>
                 </div>
                 <div className="flex justify-center gap-1 mt-3">
-                  {dashboards.map((_, i) => (<button key={i} onClick={() => setActiveIdx(i)} className={`rounded-full transition-all ${i === activeIdx ? 'w-4 h-1.5 bg-emerald-500' : 'w-1.5 h-1.5 bg-slate-300 dark:bg-slate-600 hover:bg-emerald-50/50 dark:bg-emerald-950/100'}`} />))}
+                  {dashboards.map((_, i) => (<button key={i} onClick={() => setActiveIdx(i)} className={`rounded-full transition-all ${i === activeIdx ? 'w-4 h-1.5 bg-[var(--pro-azure-50)]0' : 'w-1.5 h-1.5 bg-slate-300 dark:bg-slate-600 hover:bg-[var(--pro-azure-50)]/50 dark:bg-green-950/100'}`} />))}
                 </div>
               </div>
               <div className="space-y-2">
                 <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-1">Your Dashboards</p>
                 {dashboards.map((d, i) => (
-                  <div key={d.id} className={`group flex items-center gap-3 p-3.5 rounded-xl border transition-all ${i === activeIdx ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/50 dark:bg-emerald-950/10 dark:bg-emerald-50 dark:bg-emerald-950/20' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600'}`}>
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-semibold shrink-0 ${i === activeIdx ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/20 dark:shadow-emerald-500/10/30' : 'bg-slate-100 dark:bg-slate-700 text-slate-500'}`}>{i + 1}</div>
+                  <div key={d.id} className={`group flex items-center gap-3 p-3.5 rounded-xl border transition-all ${i === activeIdx ? 'border-[var(--pro-azure-light)] dark:border-green-700 bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 dark:bg-[var(--pro-azure-50)] dark:bg-green-950/20' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600'}`}>
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-semibold shrink-0 ${i === activeIdx ? 'bg-[var(--pro-azure)] text-white shadow-sm shadow-green-500/20 dark:shadow-green-500/10/30' : 'bg-slate-100 dark:bg-slate-700 text-slate-500'}`}>{i + 1}</div>
                     <button onClick={() => setActiveIdx(i)} className="flex-1 text-left min-w-0">
                       {editingId === d.id ? (
-                        <input ref={nameInputRef} value={editName} onChange={e => setEditName(e.target.value)} onBlur={saveEdit} onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditingId(null); }} className="w-full text-sm font-bold bg-transparent border-b-2 border-emerald-600 outline-none text-slate-900 dark:text-white pb-0.5" onClick={e => e.stopPropagation()} />
+                        <input ref={nameInputRef} value={editName} onChange={e => setEditName(e.target.value)} onBlur={saveEdit} onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditingId(null); }} className="w-full text-sm font-bold bg-transparent border-b-2 border-[var(--pro-azure)] outline-none text-slate-900 dark:text-white pb-0.5" onClick={e => e.stopPropagation()} />
                       ) : (
                         <div><p className="text-sm font-bold text-slate-900 dark:text-white truncate">{d.name}</p><p className="ovds-caption">{d.widgets.filter(w => w.visible).length} widgets active</p></div>
                       )}
                     </button>
-                    {i === activeIdx && <span className="text-[10px] font-medium px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-full border border-emerald-200 dark:border-emerald-800 shrink-0">ACTIVE</span>}
+                    {i === activeIdx && <span className="text-[10px] font-medium px-2 py-0.5 bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] rounded-full border border-[var(--pro-azure-100)] dark:border-green-800 shrink-0">ACTIVE</span>}
                     <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => startEdit(d)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-400 hover:text-emerald-600 dark:text-emerald-400"><Edit2 size={12} /></button>
+                      <button onClick={() => startEdit(d)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]"><Edit2 size={12} /></button>
                       <button onClick={() => removeDashboard(d.id)} className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors text-slate-400 hover:text-rose-500"><Trash2 size={12} /></button>
                     </div>
                   </div>
                 ))}
               </div>
-              <button onClick={addDashboard} className="w-full flex items-center justify-center gap-2 py-3.5 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-400 hover:border-emerald-400 dark:hover:border-emerald-600 hover:text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50/50 dark:bg-emerald-950/10 transition-all group">
-                <div className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-emerald-50 dark:bg-emerald-950/20 flex items-center justify-center transition-colors"><Plus size={14} className="group-hover:text-emerald-600 dark:text-emerald-400 transition-colors" /></div>
+              <button onClick={addDashboard} className="w-full flex items-center justify-center gap-2 py-3.5 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-400 hover:border-[var(--pro-azure)] dark:hover:border-[var(--pro-azure-light)] hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 transition-all group">
+                <div className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-[var(--pro-azure-50)] dark:bg-green-950/20 flex items-center justify-center transition-colors"><Plus size={14} className="group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors" /></div>
                 Create New Dashboard
               </button>
-              <div className="flex items-start gap-2.5 p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900 rounded-xl">
-                <Info size={13} className="text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
-                <p className="text-[11px] text-emerald-600 dark:text-emerald-300 leading-relaxed">Use the <strong>slider</strong> to switch between dashboards. Press <kbd className="px-1 py-0.5 bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800 rounded text-[9px] font-mono">D</kbd> anywhere to open this manager.</p>
+              <div className="flex items-start gap-2.5 p-3 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900 rounded-xl">
+                <Info size={13} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] mt-0.5 shrink-0" />
+                <p className="text-[11px] text-[var(--pro-azure)] dark:text-green-300 leading-relaxed">Use the <strong>slider</strong> to switch between dashboards. Press <kbd className="px-1 py-0.5 bg-white dark:bg-slate-800 border border-[var(--pro-azure-100)] dark:border-green-800 rounded text-[9px] font-mono">D</kbd> anywhere to open this manager.</p>
               </div>
             </div>
           )}
@@ -240,16 +241,16 @@ const DashboardManager: React.FC<DashboardManagerProps> = ({ onClose }) => {
               <div className="flex items-center justify-between">
                 <div><p className="text-sm font-semibold text-slate-900 dark:text-white">{activeDash?.name}</p><p className="ovds-caption">Drag to reorder · click eye to show/hide</p></div>
                 <div className="flex items-center gap-1.5">
-                  <button onClick={() => setDashboards(prev => prev.map(d => d.id === activeDash.id ? { ...d, widgets: d.widgets.map(w => ({ ...w, visible: true })) } : d))} className="px-2.5 py-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition-colors">Show All</button>
+                  <button onClick={() => setDashboards(prev => prev.map(d => d.id === activeDash.id ? { ...d, widgets: d.widgets.map(w => ({ ...w, visible: true })) } : d))} className="px-2.5 py-1 text-[10px] font-bold text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-lg hover:bg-[var(--pro-azure-100)] transition-colors">Show All</button>
                   <button onClick={() => setDashboards(prev => prev.map(d => d.id === activeDash.id ? { ...d, widgets: d.widgets.map(w => ({ ...w, visible: false })) } : d))} className="px-2.5 py-1 text-[10px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-200 transition-colors">Hide All</button>
                 </div>
               </div>
               <div className="space-y-1.5">
                 {activeDash?.widgets.map((widget, idx) => (
                   <div key={widget.id} draggable onDragStart={() => setDragId(widget.id)} onDragOver={e => { e.preventDefault(); setDragOverId(widget.id); }} onDragLeave={() => setDragOverId(null)} onDrop={() => handleWidgetDrop(widget.id)} onDragEnd={() => { setDragId(null); setDragOverId(null); }}
-                    className={['flex items-center gap-3 p-3 rounded-xl border transition-all cursor-grab active:cursor-grabbing select-none', dragId === widget.id ? 'opacity-30 scale-95' : '', dragOverId === widget.id && dragId !== widget.id ? 'ring-2 ring-emerald-500/30 border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/10' : widget.visible ? 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600' : 'border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50'].join(' ')}>
+                    className={['flex items-center gap-3 p-3 rounded-xl border transition-all cursor-grab active:cursor-grabbing select-none', dragId === widget.id ? 'opacity-30 scale-95' : '', dragOverId === widget.id && dragId !== widget.id ? 'ring-2 ring-[var(--pro-azure)]/30 border-[var(--pro-azure-100)] dark:border-green-800 bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10' : widget.visible ? 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600' : 'border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50'].join(' ')}>
                     <GripVertical size={14} className="text-slate-300 dark:text-slate-600 shrink-0" />
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${widget.visible ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700 text-slate-400'}`}>{widget.icon}</div>
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${widget.visible ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'bg-slate-100 dark:bg-slate-700 text-slate-400'}`}>{widget.icon}</div>
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm font-bold truncate ${widget.visible ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>{widget.label}</p>
                       <div className="flex items-center gap-2 mt-0.5">
@@ -257,7 +258,7 @@ const DashboardManager: React.FC<DashboardManagerProps> = ({ onClose }) => {
                         <span className="text-[9px] text-slate-300 dark:text-slate-600">#{idx + 1}</span>
                       </div>
                     </div>
-                    <button onClick={() => toggleWidget(widget.id)} className={`p-2 rounded-xl transition-all ${widget.visible ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 dark:bg-emerald-900/30' : 'text-slate-400 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600'}`}>{widget.visible ? <Eye size={14} /> : <EyeOff size={14} />}</button>
+                    <button onClick={() => toggleWidget(widget.id)} className={`p-2 rounded-xl transition-all ${widget.visible ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/20 hover:bg-[var(--pro-azure-100)] dark:bg-green-900/30' : 'text-slate-400 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600'}`}>{widget.visible ? <Eye size={14} /> : <EyeOff size={14} />}</button>
                   </div>
                 ))}
               </div>
@@ -270,11 +271,11 @@ const DashboardManager: React.FC<DashboardManagerProps> = ({ onClose }) => {
                 <input value={widgetSearch} onChange={e => setWidgetSearch(e.target.value)} placeholder="Search widgets..." className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[12px] font-medium dark:text-slate-200 dark:placeholder-slate-500 outline-none focus:ring-2 focus:ring-teal-400/20 focus:border-teal-400 transition-all" />
               </div>
               <div className="flex gap-1.5 flex-wrap">
-                <button onClick={() => setActiveCategory(null)} className={`px-3 py-1 rounded-full text-[10px] font-semibold transition-all border ${!activeCategory ? 'bg-emerald-500 text-white border-emerald-600' : 'bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:border-emerald-300'}`}>All ({WIDGET_CATALOG.length})</button>
+                <button onClick={() => setActiveCategory(null)} className={`px-3 py-1 rounded-full text-[10px] font-semibold transition-all border ${!activeCategory ? 'bg-[var(--pro-azure)] text-white border-[var(--pro-azure)]' : 'bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:border-[var(--pro-azure-light)]'}`}>All ({WIDGET_CATALOG.length})</button>
                 {WIDGET_CATEGORIES.map(cat => {
                   const active = activeCategory === cat.label;
-                  const ca: Record<string,string> = { emerald:'bg-emerald-500 text-white border-emerald-500', blue:'bg-emerald-500 text-white border-emerald-500', amber:'bg-amber-500 text-white border-amber-500', violet:'bg-violet-500 text-white border-violet-500', rose:'bg-rose-500 text-white border-rose-500' };
-                  const ci: Record<string,string> = { emerald:'text-emerald-600 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50', blue:'text-emerald-600 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50', amber:'text-amber-600 border-amber-200 dark:border-amber-800 hover:bg-amber-50', violet:'text-violet-600 border-violet-200 dark:border-violet-800 hover:bg-violet-50', rose:'text-rose-600 border-rose-200 dark:border-rose-800 hover:bg-rose-50' };
+                  const ca: Record<string,string> = { indigo:'bg-[var(--pro-azure)] text-white border-[var(--pro-azure)]', blue:'bg-[var(--pro-azure)] text-white border-[var(--pro-azure)]', amber:'bg-amber-500 text-white border-amber-500', violet:'bg-violet-500 text-white border-violet-500', rose:'bg-rose-500 text-white border-rose-500' };
+                  const ci: Record<string,string> = { indigo:'text-[var(--pro-azure)] border-[var(--pro-azure-100)] dark:border-green-800 hover:bg-[var(--pro-azure-50)]', blue:'text-[var(--pro-azure)] border-[var(--pro-azure-100)] dark:border-green-800 hover:bg-[var(--pro-azure-50)]', amber:'text-amber-600 border-amber-200 dark:border-amber-800 hover:bg-amber-50', violet:'text-violet-600 border-violet-200 dark:border-violet-800 hover:bg-violet-50', rose:'text-rose-600 border-rose-200 dark:border-rose-800 hover:bg-rose-50' };
                   return (<button key={cat.label} onClick={() => setActiveCategory(active ? null : cat.label)} className={`px-3 py-1 rounded-full text-[10px] font-semibold transition-all border ${active ? ca[cat.color] : `bg-white dark:bg-slate-800 ${ci[cat.color]}`}`}>{cat.label} ({cat.ids.length})</button>);
                 })}
               </div>
@@ -289,8 +290,8 @@ const DashboardManager: React.FC<DashboardManagerProps> = ({ onClose }) => {
                       className={[
                         'relative p-3.5 rounded-xl border transition-all cursor-pointer group',
                         isVisible
-                          ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/60 dark:bg-emerald-950/20'
-                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-emerald-200 dark:hover:border-emerald-800',
+                          ? 'border-[var(--pro-azure-light)] dark:border-green-700 bg-[var(--pro-azure-50)]/60 dark:bg-green-950/20'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-[var(--pro-azure-100)] dark:hover:border-green-800',
                       ].join(' ')}
                       onClick={() => {
                         if (!isInDash) {
@@ -303,7 +304,7 @@ const DashboardManager: React.FC<DashboardManagerProps> = ({ onClose }) => {
                     >
                       {/* Active check badge */}
                       {isVisible && (
-                        <div className="absolute top-2 right-2 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center">
+                        <div className="absolute top-2 right-2 w-4 h-4 bg-[var(--pro-azure-50)]0 rounded-full flex items-center justify-center">
                           <Check size={9} className="text-white" />
                         </div>
                       )}
@@ -317,13 +318,13 @@ const DashboardManager: React.FC<DashboardManagerProps> = ({ onClose }) => {
                           />
                         </div>
                       ) : (
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-2.5 ${isVisible ? 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700 text-slate-500'}`}>
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-2.5 ${isVisible ? 'bg-[var(--pro-azure-100)] dark:bg-green-900/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'bg-slate-100 dark:bg-slate-700 text-slate-500'}`}>
                           {widget.icon}
                         </div>
                       )}
                       <p className="ovds-card-title leading-tight truncate">{widget.label}</p>
                       <p className="ovds-caption mt-0.5">{widget.span === 2 ? 'Full width' : 'Half width'}</p>
-                      <div className={`mt-2.5 w-full py-1.5 rounded-lg text-[10px] font-semibold text-center transition-all ${isVisible ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/20 group-hover:text-emerald-600 dark:group-hover:text-emerald-400'}`}>
+                      <div className={`mt-2.5 w-full py-1.5 rounded-lg text-[10px] font-semibold text-center transition-all ${isVisible ? 'bg-[var(--pro-azure-100)] dark:bg-green-900/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 group-hover:bg-[var(--pro-azure-50)] dark:group-hover:bg-green-950/20 group-hover:text-[var(--pro-azure)] dark:group-hover:text-[var(--pro-azure-light)]'}`}>
                         {isVisible ? '✓ Visible' : isInDash ? '+ Show' : '+ Add'}
                       </div>
                     </div>
@@ -341,12 +342,12 @@ const DashboardManager: React.FC<DashboardManagerProps> = ({ onClose }) => {
         </div>
         <div className="px-4 py-2.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
-            <div className="flex gap-0.5">{dashboards.map((_, i) => (<button key={i} onClick={() => setActiveIdx(i)} className={`rounded-full transition-all ${i === activeIdx ? 'w-3 h-1 bg-emerald-500' : 'w-1 h-1 bg-slate-300 dark:bg-slate-600'}`} />))}</div>
+            <div className="flex gap-0.5">{dashboards.map((_, i) => (<button key={i} onClick={() => setActiveIdx(i)} className={`rounded-full transition-all ${i === activeIdx ? 'w-3 h-1 bg-[var(--pro-azure-50)]0' : 'w-1 h-1 bg-slate-300 dark:bg-slate-600'}`} />))}</div>
             <span className="ovds-caption">{activeDash?.name}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="ovds-caption">{activeDash?.widgets.filter(w => w.visible).length ?? 0} widgets</span>
-            <button onClick={onClose} className="px-3 py-1.5 bg-emerald-500 text-white rounded text-[11px] font-semibold hover:bg-emerald-600 transition-all">Done</button>
+            <button onClick={onClose} className="px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded text-[11px] font-semibold hover:bg-[var(--pro-azure-dark)] transition-all">Done</button>
           </div>
         </div>
       </div>

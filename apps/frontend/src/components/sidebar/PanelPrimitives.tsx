@@ -1,41 +1,168 @@
-import React from 'react';
+﻿import React from 'react';
 
-export const PanelShell: React.FC<{ title: string; onClose: () => void; children: React.ReactNode }> = ({ title, onClose, children }) => (
+import { Icon } from '../ui';
+
+import type { PanelRowProps } from './types';
+
+/**
+ * PanelPrimitives — Shared building blocks for sidebar flyover panels
+ * (Profile, Notifications, QuickCreate, Support).
+ *
+ * These panels slide over the content area, so they use a slightly elevated
+ * white surface consistent with the Ovds SaaS white-sidebar design.
+ */
+
+const PANEL_SHELL_STYLE: React.CSSProperties = {
+  position: 'fixed',
+  top: 0, bottom: 0,
+  width: 288,
+  zIndex: 300,
+  display: 'flex',
+  flexDirection: 'column',
+  background: 'var(--surface)',
+  borderRight: '1px solid var(--border)',
+  boxShadow: '8px 0 32px rgba(0,0,0,0.10), 2px 0 8px rgba(0,0,0,0.05)',
+  overflow: 'hidden',
+  animation: 'aki-slide-in-left 220ms cubic-bezier(0.16,1,0.3,1) both',
+};
+
+const PANEL_HEADER_STYLE: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '14px 16px',
+  borderBottom: '1px solid var(--border)',
+  flexShrink: 0,
+  background: 'var(--sys-bg-subtle)',
+};
+
+export const PanelShell: React.FC<{
+  title: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}> = ({ title, onClose, children }) => (
   <>
-    <div className="fixed inset-0 z-[290] bg-black/20 backdrop-blur-[2px] animate-aki-fade-in" onClick={onClose} aria-hidden="true" />
+    {/* Backdrop */}
     <div
-      className="fixed top-0 bottom-0 w-72 z-[300] flex flex-col bg-white border-r border-slate-200/80 shadow-2xl shadow-slate-300/30 overflow-hidden animate-aki-slide-in-left"
-    >
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-white shrink-0">
-        <p className="text-[12px] font-bold text-slate-700">{title}</p>
-        <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
-          <Icon name="CLOSE" size={14} />
+      onClick={onClose}
+      aria-hidden="true"
+      style={{
+        position: 'fixed', inset: 0,
+        zIndex: 290,
+        background: 'rgba(17,24,39,0.30)',
+        backdropFilter: 'blur(2px)',
+        animation: 'aki-fade-in 160ms ease both',
+      }}
+    />
+    <div style={PANEL_SHELL_STYLE}>
+      <div style={PANEL_HEADER_STYLE}>
+        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.01em' }}>
+          {title}
+        </p>
+        <button
+          onClick={onClose}
+          style={{
+            width: 28, height: 28,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            borderRadius: 6,
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--text-4)',
+            cursor: 'pointer',
+            transition: 'background 120ms, color 120ms',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'var(--sys-bg-accent)';
+            (e.currentTarget as HTMLButtonElement).style.color = 'var(--pro-azure)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+            (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-4)';
+          }}
+        >
+          <Icon name="CLOSE" size={13} />
         </button>
       </div>
-      <div className="overflow-y-auto flex-1 min-h-0">{children}</div>
+      <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
+        {children}
+      </div>
     </div>
   </>
 );
 
-import { Icon } from '../ui';
-import type { PanelRowProps } from './types';
-
-export const PanelRow: React.FC<PanelRowProps> = ({ icon, label, sub, badge, badgeCls = 'bg-blue-100 text-blue-700', onClick, danger, right }) => (
+export const PanelRow: React.FC<PanelRowProps> = ({
+  icon, label, sub, badge, badgeCls, onClick, danger, right,
+}) => (
   <button
     onClick={onClick}
-    className={`w-full flex items-center gap-3 px-4 py-2.5 transition-colors group/pr ${danger ? 'text-rose-500 hover:bg-rose-50' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'}`}
+    style={{
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      padding: '10px 16px',
+      background: 'transparent',
+      border: 'none',
+      cursor: 'pointer',
+      transition: 'background 100ms, color 100ms',
+      color: danger ? 'var(--pro-rose)' : 'var(--text-2)',
+      textAlign: 'left',
+    }}
+    onMouseEnter={e => {
+      (e.currentTarget as HTMLButtonElement).style.background = danger
+        ? 'var(--sys-state-critical)'
+        : 'var(--sys-bg-subtle)';
+      (e.currentTarget as HTMLButtonElement).style.color = danger
+        ? 'var(--pro-rose)'
+        : 'var(--text)';
+    }}
+    onMouseLeave={e => {
+      (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+      (e.currentTarget as HTMLButtonElement).style.color = danger
+        ? 'var(--pro-rose)'
+        : 'var(--text-2)';
+    }}
   >
-    <span className={`shrink-0 transition-colors ${danger ? 'text-rose-500' : 'text-slate-400 group-hover/pr:text-slate-600'}`}>{icon}</span>
-    <div className="flex-1 text-left min-w-0">
-      <p className="text-[12px] font-semibold leading-none truncate">{label}</p>
-      {sub && <p className="text-[10px] text-slate-400 mt-0.5 truncate">{sub}</p>}
+    <span style={{ flexShrink: 0, color: 'var(--text-4)' }}>{icon}</span>
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <p style={{ fontSize: 12, fontWeight: 600, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {label}
+      </p>
+      {sub && (
+        <p style={{ fontSize: 10, color: 'var(--text-4)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {sub}
+        </p>
+      )}
     </div>
-    {badge && <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full ${badgeCls}`}>{badge}</span>}
-    {right && <span className="shrink-0 text-slate-300">{right}</span>}
+    {badge && (
+      <span
+        style={{
+          flexShrink: 0, fontSize: 10, fontWeight: 700,
+          padding: '2px 7px', borderRadius: 99,
+          background: 'var(--sidebar-new-badge-bg)',
+          color: 'var(--sidebar-new-badge-fg)',
+        }}
+        className={badgeCls}
+      >
+        {badge}
+      </span>
+    )}
+    {right && <span style={{ flexShrink: 0, color: 'var(--text-4)' }}>{right}</span>}
   </button>
 );
 
-export const PanelDivider: React.FC = () => <div className="h-px bg-slate-100 my-1 mx-4" />;
+export const PanelDivider: React.FC = () => (
+  <div style={{ height: 1, background: 'var(--border)', margin: '4px 16px' }} />
+);
+
 export const PanelSectionLabel: React.FC<{ label: string }> = ({ label }) => (
-  <p className="px-4 pt-3 pb-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</p>
+  <p style={{
+    padding: '12px 16px 6px',
+    fontSize: 9, fontWeight: 800,
+    textTransform: 'uppercase',
+    letterSpacing: '0.12em',
+    color: 'var(--text-4)',
+  }}>
+    {label}
+  </p>
 );

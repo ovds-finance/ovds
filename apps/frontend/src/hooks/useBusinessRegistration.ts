@@ -5,10 +5,6 @@
  * Manages 5-step wizard: NID → TIN → Business License → VAT → Cross-reference
  * Auto-saves draft to localStorage; validates each step before advancing.
  */
-import { useState, useCallback, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import api from '../services/api';
-import toast from 'react-hot-toast';
 import {
   isValidTin,
   isValidFaydaId,
@@ -22,6 +18,11 @@ import type {
   VatRegistrationStatus,
   EcrStatus,
 } from '@ovds/shared';
+import { useState, useCallback, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+
+import api from '../services/api';
 // Local stubs for DTOs not yet exported from @ovds/dto
 type SaveNidDto = Record<string, unknown>;
 type SaveTinDto = Record<string, unknown>;
@@ -39,6 +40,9 @@ export interface NidFormState {
   faydaId: string;
   fullName: string;
   dateOfBirth: string;
+  /** When true the user declares they don't yet have a Fayda ID.
+   *  Validation is relaxed: fullName is still required, faydaId is skipped. */
+  faydaBypass: boolean;
 }
 
 export interface TinFormState {
@@ -82,7 +86,7 @@ export interface WizardDraft {
 }
 
 const INITIAL_DRAFT: WizardDraft = {
-  nid: { faydaId: '', fullName: '', dateOfBirth: '' },
+  nid: { faydaId: '', fullName: '', dateOfBirth: '', faydaBypass: false },
   tin: { tin: '', businessName: '', taxOffice: '', biometricComplete: false },
   license: {
     licenseNumber: '', tradeName: '', activity: '',
@@ -112,8 +116,11 @@ const VALIDATORS_BASE: Record<WizardStepId, (form: WizardDraft) => StepErrors> =
   nid:      (d) => {
     const e: StepErrors = {};
     const f = d.nid;
-    if (!f.faydaId) e.faydaId = 'Fayda ID is required';
-    else if (!isValidFaydaId(f.faydaId)) e.faydaId = 'Must be a 12-digit Fayda Identification Number';
+    // When user declares no Fayda ID yet, skip faydaId validation entirely
+    if (!f.faydaBypass) {
+      if (!f.faydaId) e.faydaId = 'Fayda ID is required';
+      else if (!isValidFaydaId(f.faydaId)) e.faydaId = 'Must be a 12-digit Fayda Identification Number';
+    }
     if (!f.fullName.trim()) e.fullName = 'Full legal name is required';
     return e;
   },
@@ -227,6 +234,7 @@ export function useBusinessRegistration() {
                 faydaId: data.nid.faydaId ?? prev.nid.faydaId,
                 fullName: data.nid.fullName ?? prev.nid.fullName,
                 dateOfBirth: data.nid.dateOfBirth ?? prev.nid.dateOfBirth,
+                faydaBypass: data.nid.faydaBypass ?? prev.nid.faydaBypass ?? false,
               };
             }
             if (data.tin) {
@@ -288,8 +296,8 @@ export function useBusinessRegistration() {
   // Derive live harmonization snapshot from draft
   useEffect(() => {
     const record: Partial<BusinessHarmonization> = {
-      nid: draft.nid.faydaId
-        ? { faydaId: draft.nid.faydaId, fullName: draft.nid.fullName, status: 'PENDING' }
+      nid: (draft.nid.faydaId || draft.nid.faydaBypass)
+        ? { faydaId: draft.nid.faydaBypass ? 'BYPASSED' : draft.nid.faydaId, fullName: draft.nid.fullName, status: 'PENDING' }
         : undefined,
       tin: draft.tin.tin
         ? { tin: draft.tin.tin, businessName: draft.tin.businessName, status: 'PENDING', biometricComplete: draft.tin.biometricComplete }
@@ -370,6 +378,7 @@ export function useBusinessRegistration() {
     } finally {
       setSaving(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep, draft, stepIndex, totalSteps]);
 
   const saveCurrentStep = async () => {
@@ -378,9 +387,10 @@ export function useBusinessRegistration() {
       switch (currentStep) {
         case 'nid': {
           const dto: SaveNidDto = {
-            faydaId: draft.nid.faydaId.replace(/[\s-]/g, ''),
+            faydaId: draft.nid.faydaBypass ? null : draft.nid.faydaId.replace(/[\s-]/g, ''),
             fullName: draft.nid.fullName,
             dateOfBirth: draft.nid.dateOfBirth || undefined,
+            faydaBypass: draft.nid.faydaBypass,
           };
           await api.post('/business-registration/nid', dto);
           break;
@@ -470,6 +480,7 @@ export function useBusinessRegistration() {
     } finally {
       setLoadingRecord(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = useCallback(async () => {
@@ -501,6 +512,7 @@ export function useBusinessRegistration() {
     } finally {
       setSubmitting(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep, draft, invalidateCache]);
 
   const resetWizard = useCallback(() => {

@@ -3,22 +3,23 @@
  * Track equipment distributed to employees (laptops, vehicles, keys, etc.)
  * with deployment logging and signable receipt workflow.
  */
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { hrAssetsApi, employeesApi } from '@ovds/features/hr';
 import {
   Package, Plus, Edit2, Trash2, RefreshCw, User, Laptop,
   Car, Key, Smartphone, Monitor, CheckCircle2, AlertTriangle,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { hrAssetsApi, employeesApi } from '@ovds/features/hr';
-import { confirm } from '../utils/confirm';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select,
   SearchBar, EmptyState, Pagination,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
 
 interface HrAsset {
   id: string;
@@ -49,9 +50,9 @@ const ASSET_TYPES = [
 ] as const;
 
 const ASSET_TYPE_COLORS: Record<string, string> = {
-  LAPTOP: 'bg-blue-50 text-blue-700 border-blue-100',
-  DESKTOP: 'bg-indigo-50 text-indigo-700 border-indigo-100',
-  MOBILE: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+  LAPTOP: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
+  DESKTOP: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
+  MOBILE: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
   VEHICLE: 'bg-amber-50 text-amber-700 border-amber-100',
   KEY: 'bg-slate-50 text-slate-700 border-slate-100',
   ACCESS_CARD: 'bg-violet-50 text-violet-700 border-violet-100',
@@ -145,7 +146,7 @@ const HrAssets: React.FC = () => {
     const assigned = rows.filter(a => a.status === 'ASSIGNED').length;
     const totalVal = rows.length;
     return [
-      { label: 'Total Allocations', value: totalVal, color: 'emerald' as const },
+      { label: 'Total Allocations', value: totalVal, color: 'green' as const },
       { label: 'Assigned', value: assigned, color: 'sky' as const },
       { label: 'Returned', value: rows.filter(a => a.status === 'RETURNED').length, color: 'violet' as const },
       { label: 'Issues', value: rows.filter(a => a.status === 'DAMAGED' || a.status === 'LOST').length, color: 'rose' as const },
@@ -261,10 +262,10 @@ const HrAssets: React.FC = () => {
               <AppTd align="right">
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {can('hr_assets:return') && a.status === 'ASSIGNED' && (
-                    <button onClick={() => setModal({ open: true, data: { ...a, status: 'RETURNED', returnDate: new Date().toISOString().slice(0, 10) } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Return"><CheckCircle2 size={11} /></button>
+                    <button onClick={() => setModal({ open: true, data: { ...a, status: 'RETURNED', returnDate: new Date().toISOString().slice(0, 10) } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Return"><CheckCircle2 size={11} /></button>
                   )}
                   {can('hr_assets:edit') && (
-                    <button onClick={() => setModal({ open: true, data: { ...a } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Edit"><Edit2 size={11} /></button>
+                    <button onClick={() => setModal({ open: true, data: { ...a } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Edit"><Edit2 size={11} /></button>
                   )}
                   {can('hr_assets:edit') && (
                     <button onClick={() => handleDelete(a.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Delete"><Trash2 size={11} /></button>

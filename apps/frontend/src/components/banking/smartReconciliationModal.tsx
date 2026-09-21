@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { X, Camera, QrCode, FileText, Clipboard, Zap, CheckCircle2, AlertTriangle, Loader2, ArrowRight, RefreshCw, Search, Upload, ScanLine, Link2, Info, Eye, Clock, CheckCheck } from 'lucide-react';
-import api from '../../services/api';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import toast from 'react-hot-toast';
+
 import { useBusiness } from '../../context/businessContext';
 import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
+import { normalizeOcrError } from '../../utils';
 
 type Tab = 'CAPTURE' | 'PENDING' | 'REVIEW';
 type CaptureMode = 'SCREENSHOT' | 'CAMERA' | 'QR' | 'PASTE' | 'MANUAL';
@@ -45,10 +47,10 @@ function parseQrString(raw: string): Record<string, string> {
   return { format: 'UNKNOWN', raw: s };
 }
 
-const METHOD_COLORS: Record<string, string> = { EXACT_REF: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400', QR: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400', FUZZY_REF: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400', AMOUNT_DATE: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400', AMOUNT_ONLY: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400', MANUAL: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400' };
+const METHOD_COLORS: Record<string, string> = { EXACT_REF: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/30 dark:text-[var(--pro-azure-light)]', QR: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/30 dark:text-[var(--pro-azure-light)]', FUZZY_REF: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400', AMOUNT_DATE: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400', AMOUNT_ONLY: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400', MANUAL: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400' };
 
 function ScoreBadge({ score, method }: { score: number; method: string }) {
-  const color = score >= 85 ? 'text-emerald-600' : score >= 60 ? 'text-amber-500' : 'text-slate-400';
+  const color = score >= 85 ? 'text-[var(--pro-azure)]' : score >= 60 ? 'text-amber-500' : 'text-slate-400';
   return (
     <div className="flex items-center gap-1.5">
       <div className="relative w-8 h-8">
@@ -155,7 +157,7 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
       if (result.bankName) { updates.bankName = result.bankName; detected.add('bankName'); }
       setCaptureForm(prev => ({ ...prev, ...updates })); setDetectedFields(detected);
       toast.success('Extracted ' + txs.length + ' transaction(s) — review fields below');
-    } catch (e: any) { toast.error(e.response?.data?.message ?? 'OCR failed — check API key'); } finally { setOcrLoading(false); }
+    } catch (e: any) { toast.error(normalizeOcrError(e.response?.data?.message ?? 'OCR failed — check API key')); } finally { setOcrLoading(false); }
   }, []);
 
   const handleFileUpload = useCallback((file: File) => {
@@ -240,7 +242,7 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
     return [tx.description, tx.reference, tx.telecomRef, tx.counterparty].some(f => f?.toLowerCase().includes(search.toLowerCase()));
   }), [pending, search]);
 
-  const fieldCls = (name: string) => 'w-full px-3 py-2.5 rounded-xl text-sm font-medium outline-none transition-all focus:ring-2 focus:ring-teal-400/20 dark:text-white ' + (detectedFields.has(name) ? 'bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-300 dark:border-emerald-500/40' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700');
+  const fieldCls = (name: string) => 'w-full px-3 py-2.5 rounded-xl text-sm font-medium outline-none transition-all focus:ring-2 focus:ring-teal-400/20 dark:text-white ' + (detectedFields.has(name) ? 'bg-[var(--pro-azure-50)] dark:bg-green-900/10 border border-[var(--pro-azure-light)] dark:border-[var(--pro-azure)]/40' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700');
 
   useEffect(() => () => stopCamera(), [stopCamera]);
 
@@ -251,7 +253,7 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
         {/* Header */}
         <div className="flex items-center justify-between px-5 sm:px-8 py-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-emerald-500 rounded-2xl shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30"><Link2 className="text-white" size={20} /></div>
+            <div className="p-2.5 bg-[var(--pro-azure-50)]0 rounded-2xl shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30"><Link2 className="text-white" size={20} /></div>
             <div>
               <h2 className="text-base sm:text-lg font-semibold text-slate-800 dark:text-slate-100">Smart Reconciliation</h2>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider hidden sm:block">Multi-bank · QR · Telebirr · EMV · Reference Matching</p>
@@ -262,7 +264,7 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
               <div className="hidden sm:flex items-center gap-4 mr-2">
                 <div className="text-center"><p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{stats.reconciliationRate}%</p><p className="text-[9px] text-slate-400 uppercase font-bold">Reconciled</p></div>
                 <div className="text-center"><p className="text-sm font-semibold text-amber-500">{stats.pending}</p><p className="text-[9px] text-slate-400 uppercase font-bold">Pending</p></div>
-                <div className="text-center"><p className="text-sm font-semibold text-emerald-500">{stats.withProposedMatch}</p><p className="text-[9px] text-slate-400 uppercase font-bold">Matched</p></div>
+                <div className="text-center"><p className="text-sm font-semibold text-[var(--pro-azure)]">{stats.withProposedMatch}</p><p className="text-[9px] text-slate-400 uppercase font-bold">Matched</p></div>
               </div>
             )}
             <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-400 transition-colors"><X size={20} /></button>
@@ -272,13 +274,13 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
         {/* Tab bar */}
         <div className="flex gap-1 px-5 sm:px-8 py-3 bg-slate-50/50 dark:bg-slate-800/20 border-b border-slate-100 dark:border-slate-800 shrink-0 overflow-x-auto">
           {([{ id: 'CAPTURE', label: 'Capture', icon: <Camera size={14} /> }, { id: 'PENDING', label: 'Pending' + (stats?.pending ? ' (' + stats.pending + ')' : ''), icon: <Clock size={14} /> }, { id: 'REVIEW', label: 'Review', icon: <Eye size={14} /> }] as { id: Tab; label: string; icon: React.ReactNode }[]).map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)} className={'flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ' + (tab === t.id ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200 dark:border-slate-700' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300')}>{t.icon} {t.label}</button>
+            <button key={t.id} onClick={() => setTab(t.id)} className={'flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ' + (tab === t.id ? 'bg-white dark:bg-slate-800 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shadow-sm border border-slate-200 dark:border-slate-700' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300')}>{t.icon} {t.label}</button>
           ))}
           <div className="ml-auto flex items-center gap-2 shrink-0">
             <button onClick={() => handleRunReconciliation(false)} disabled={runLoading} className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400 border border-violet-200 dark:border-violet-500/30 rounded-xl text-xs font-bold hover:bg-violet-100 transition-colors disabled:opacity-50">
               {runLoading ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}<span className="hidden sm:inline">Find Matches</span>
             </button>
-            <button onClick={() => handleRunReconciliation(true)} disabled={runLoading} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-slate-200 rounded-xl text-xs font-bold hover:bg-emerald-100 transition-colors disabled:opacity-50">
+            <button onClick={() => handleRunReconciliation(true)} disabled={runLoading} className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] border border-[var(--pro-azure-100)] dark:border-slate-200 rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-100)] transition-colors disabled:opacity-50">
               {runLoading ? <Loader2 size={12} className="animate-spin" /> : <CheckCheck size={12} />}<span className="hidden sm:inline">Auto-Reconcile</span>
             </button>
           </div>
@@ -299,7 +301,7 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
                   <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Capture Method</p>
                   <div className="grid grid-cols-5 gap-2">
                     {([{ id: 'PASTE', label: 'SMS/Text', icon: <Clipboard size={16} /> }, { id: 'SCREENSHOT', label: 'Screenshot', icon: <Upload size={16} /> }, { id: 'CAMERA', label: 'Camera', icon: <Camera size={16} /> }, { id: 'QR', label: 'QR Code', icon: <QrCode size={16} /> }, { id: 'MANUAL', label: 'Manual', icon: <FileText size={16} /> }] as { id: CaptureMode; label: string; icon: React.ReactNode }[]).map(m => (
-                      <button key={m.id} onClick={() => setCaptureMode(m.id)} className={'flex flex-col items-center gap-1.5 p-2.5 rounded-2xl border-2 text-center transition-all ' + (captureMode === m.id ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'border-slate-100 dark:border-slate-800 text-slate-400 hover:border-emerald-200')}>
+                      <button key={m.id} onClick={() => setCaptureMode(m.id)} className={'flex flex-col items-center gap-1.5 p-2.5 rounded-2xl border-2 text-center transition-all ' + (captureMode === m.id ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-900/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'border-slate-100 dark:border-slate-800 text-slate-400 hover:border-[var(--pro-azure-100)]')}>
                         {m.icon}<span className="text-[10px] font-medium uppercase leading-tight">{m.label}</span>
                       </button>
                     ))}
@@ -309,9 +311,9 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
                 {/* PASTE */}
                 {captureMode === 'PASTE' && (
                   <div className="space-y-3">
-                    <div className="flex items-start gap-2 p-3 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl border border-emerald-100 dark:border-emerald-900/30">
-                      <Info size={14} className="text-emerald-500 shrink-0 mt-0.5" />
-                      <p className="text-xs text-emerald-700 dark:text-emerald-400">Paste any bank SMS, telebirr notification, CBE/Awash/Dashen receipt, or transfer text. Fields are auto-extracted.</p>
+                    <div className="flex items-start gap-2 p-3 bg-[var(--pro-azure-50)] dark:bg-green-900/10 rounded-2xl border border-[var(--pro-azure-100)] dark:border-green-900/30">
+                      <Info size={14} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
+                      <p className="text-xs text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">Paste any bank SMS, telebirr notification, CBE/Awash/Dashen receipt, or transfer text. Fields are auto-extracted.</p>
                     </div>
                     <textarea value={pasteText} onChange={e => setPasteText(e.target.value)} rows={7} autoFocus
                       placeholder={"CBE Transfer Alert\nAmount: ETB 5,000.00\nRef: TXN20240115001\nDate: 2024-01-15\nCredited to your account\n\n— or telebirr —\nYou received ETB 1,200 from +251911234567\nTransaction ID: TB7X9K2M"}
@@ -335,7 +337,7 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
                       <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
                         <img src={capturedImage} alt="Captured" className="w-full max-h-48 object-contain bg-white dark:bg-slate-800" />
                         <button onClick={() => { setCapturedImage(null); setDetectedFields(new Set()); }} className="absolute top-2 right-2 p-1.5 bg-white/90 dark:bg-slate-900/90 rounded-xl text-slate-500 hover:text-rose-500 transition-colors"><X size={14} /></button>
-                        {ocrLoading && (<div className="absolute inset-0 bg-white/70 dark:bg-slate-900/70 flex items-center justify-center gap-2"><Loader2 size={20} className="animate-spin text-emerald-600 dark:text-emerald-400" /><span className="text-sm font-bold text-slate-700 dark:text-slate-200">Extracting with AI...</span></div>)}
+                        {ocrLoading && (<div className="absolute inset-0 bg-white/70 dark:bg-slate-900/70 flex items-center justify-center gap-2"><Loader2 size={20} className="animate-spin text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" /><span className="text-sm font-bold text-slate-700 dark:text-slate-200">Extracting with AI...</span></div>)}
                       </div>
                     )}
                     {capturedImage && !ocrLoading && (
@@ -356,11 +358,11 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
                       {cameraActive && (
                         <div className="absolute inset-0 pointer-events-none">
                           <div className="absolute inset-8 border-2 border-white/30 rounded-2xl" />
-                          <div className="absolute top-8 left-8 w-6 h-6 border-t-2 border-l-2 border-emerald-600 rounded-tl-lg" />
-                          <div className="absolute top-8 right-8 w-6 h-6 border-t-2 border-r-2 border-emerald-600 rounded-tr-lg" />
-                          <div className="absolute bottom-8 left-8 w-6 h-6 border-b-2 border-l-2 border-emerald-600 rounded-bl-lg" />
-                          <div className="absolute bottom-8 right-8 w-6 h-6 border-b-2 border-r-2 border-emerald-600 rounded-br-lg" />
-                          <div className="absolute top-1/2 left-8 right-8 h-0.5 bg-emerald-50/50 dark:bg-emerald-950/100 animate-pulse" />
+                          <div className="absolute top-8 left-8 w-6 h-6 border-t-2 border-l-2 border-[var(--pro-azure)] rounded-tl-lg" />
+                          <div className="absolute top-8 right-8 w-6 h-6 border-t-2 border-r-2 border-[var(--pro-azure)] rounded-tr-lg" />
+                          <div className="absolute bottom-8 left-8 w-6 h-6 border-b-2 border-l-2 border-[var(--pro-azure)] rounded-bl-lg" />
+                          <div className="absolute bottom-8 right-8 w-6 h-6 border-b-2 border-r-2 border-[var(--pro-azure)] rounded-br-lg" />
+                          <div className="absolute top-1/2 left-8 right-8 h-0.5 bg-[var(--pro-azure-50)]/50 dark:bg-green-950/100 animate-pulse" />
                         </div>
                       )}
                     </div>
@@ -378,20 +380,20 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
                 {/* QR */}
                 {captureMode === 'QR' && (
                   <div className="space-y-3">
-                    <div className="flex items-start gap-2 p-3 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl border border-emerald-100 dark:border-emerald-900/30">
-                      <QrCode size={14} className="text-emerald-500 shrink-0 mt-0.5" />
-                      <p className="text-xs text-emerald-700 dark:text-emerald-400">Paste EMV QR, NBE-IQR, telebirr QR, or pipe-delimited bank QR. Supports all Ethiopian bank QR formats per NBE Directive SB/IoT/001/2021.</p>
+                    <div className="flex items-start gap-2 p-3 bg-[var(--pro-azure-50)] dark:bg-green-900/10 rounded-2xl border border-[var(--pro-azure-100)] dark:border-green-900/30">
+                      <QrCode size={14} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
+                      <p className="text-xs text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">Paste EMV QR, NBE-IQR, telebirr QR, or pipe-delimited bank QR. Supports all Ethiopian bank QR formats per NBE Directive SB/IoT/001/2021.</p>
                     </div>
                     <textarea value={qrInput} onChange={e => setQrInput(e.target.value)} rows={5}
                       placeholder={"NBE-IQR|Ovds-01|5000.00|INV-2026-0042|ETB|750.00\n\n— or EMV TLV —\n000201010211...\n\n— or telebirr ref —\nTB7X9K2M"}
                       className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-teal-400/20 resize-none" />
                     <button onClick={handleParseQr} className="flex items-center gap-2 px-5 py-2.5 bg-teal-500 text-white rounded-lg text-sm font-medium hover:bg-teal-500-dark transition-colors"><QrCode size={16} /> Parse QR</button>
                     {parsedQr && (
-                      <div className="p-4 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 space-y-2">
-                        <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Parsed — {parsedQr.format}</p>
+                      <div className="p-4 bg-[var(--pro-azure-50)] dark:bg-green-900/10 rounded-2xl border border-[var(--pro-azure-100)] dark:border-green-900/30 space-y-2">
+                        <p className="text-xs font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] uppercase tracking-wider">Parsed — {parsedQr.format}</p>
                         <div className="grid grid-cols-2 gap-2">
                           {Object.entries(parsedQr).filter(([k]) => k !== 'format').map(([k, v]) => (
-                            <div key={k} className="bg-white dark:bg-slate-900 rounded-xl p-2 border border-emerald-100 dark:border-emerald-900/30">
+                            <div key={k} className="bg-white dark:bg-slate-900 rounded-xl p-2 border border-[var(--pro-azure-100)] dark:border-green-900/30">
                               <p className="text-[10px] font-medium text-slate-400 uppercase">{k}</p>
                               <p className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">{v}</p>
                             </div>
@@ -404,17 +406,17 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
 
                 {/* Detected badge */}
                 {detectedFields.size > 0 && (
-                  <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl border border-emerald-100 dark:border-emerald-900/30">
-                    <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-                    <p className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold">{detectedFields.size} field(s) auto-filled — highlighted in green below</p>
-                    <button onClick={() => setDetectedFields(new Set())} className="ml-auto text-emerald-500 hover:text-emerald-700"><X size={12} /></button>
+                  <div className="flex items-center gap-2 p-3 bg-[var(--pro-azure-50)] dark:bg-green-900/10 rounded-2xl border border-[var(--pro-azure-100)] dark:border-green-900/30">
+                    <CheckCircle2 size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0" />
+                    <p className="text-xs text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] font-semibold">{detectedFields.size} field(s) auto-filled — highlighted in green below</p>
+                    <button onClick={() => setDetectedFields(new Set())} className="ml-auto text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)]"><X size={12} /></button>
                   </div>
                 )}
 
                 {/* Form fields */}
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
-                    <button type="button" onClick={() => setCaptureForm(p => ({ ...p, type: 'CREDIT' }))} className={'py-3 rounded-lg text-sm font-medium transition-all ' + (captureForm.type === 'CREDIT' ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-500')}>+ Credit (In)</button>
+                    <button type="button" onClick={() => setCaptureForm(p => ({ ...p, type: 'CREDIT' }))} className={'py-3 rounded-lg text-sm font-medium transition-all ' + (captureForm.type === 'CREDIT' ? 'bg-[var(--pro-azure)] text-white shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-500')}>+ Credit (In)</button>
                     <button type="button" onClick={() => setCaptureForm(p => ({ ...p, type: 'DEBIT' }))} className={'py-3 rounded-lg text-sm font-medium transition-all ' + (captureForm.type === 'DEBIT' ? 'bg-rose-600 text-white shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-500')}>− Debit (Out)</button>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -443,12 +445,12 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
 
               {/* Right: Info + Save */}
               <div className="lg:col-span-5 space-y-5">
-                <div className="p-5 bg-emerald-50/50 dark:bg-emerald-900/10 rounded-2xl border border-emerald-100 dark:border-emerald-900/30">
-                  <h4 className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-semibold text-xs uppercase tracking-wider mb-4"><Zap size={14} /> Smart Matching</h4>
+                <div className="p-5 bg-[var(--pro-azure-50)]/50 dark:bg-green-900/10 rounded-2xl border border-[var(--pro-azure-100)] dark:border-green-900/30">
+                  <h4 className="flex items-center gap-2 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] font-semibold text-xs uppercase tracking-wider mb-4"><Zap size={14} /> Smart Matching</h4>
                   <ul className="space-y-3">
                     {[['QR Code', 'NBE-IQR, EMV TLV, telebirr QR — highest confidence'], ['Exact Ref', 'Transaction ID, TXN, receipt number — 95%+ match'], ['Telebirr Ref', 'telebirr transaction ID cross-referenced — 97%+ match'], ['Voucher', 'Cheque / bank voucher number — 93%+ match'], ['Amount + Date', 'Amount within 1 ETB + date ±3 days — 65% match']].map(([title, desc]) => (
                       <li key={title} className="flex gap-3 text-xs text-slate-600 dark:text-slate-400 leading-tight">
-                        <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" />
+                        <CheckCircle2 size={14} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
                         <span><strong className="text-slate-700 dark:text-slate-200">{title}:</strong> {desc}</span>
                       </li>
                     ))}
@@ -480,7 +482,7 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
               {/* Stats row */}
               {stats && (
                 <div className="ovds-grid-layout cols-4">
-                  {[{ label: 'Total', val: stats.total, color: 'text-slate-700 dark:text-slate-200' }, { label: 'Reconciled', val: stats.reconciled, color: 'text-emerald-600' }, { label: 'Pending', val: stats.pending, color: 'text-amber-500' }, { label: 'Proposed', val: stats.withProposedMatch, color: 'text-emerald-600' }].map(s => (
+                  {[{ label: 'Total', val: stats.total, color: 'text-slate-700 dark:text-slate-200' }, { label: 'Reconciled', val: stats.reconciled, color: 'text-[var(--pro-azure)]' }, { label: 'Pending', val: stats.pending, color: 'text-amber-500' }, { label: 'Proposed', val: stats.withProposedMatch, color: 'text-[var(--pro-azure)]' }].map(s => (
                     <div key={s.label} className="p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 text-center">
                       <p className={'text-2xl font-semibold font-mono ' + s.color}>{s.val}</p>
                       <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{s.label}</p>
@@ -502,21 +504,21 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
 
               {/* Transaction list */}
               {pendingLoading && pending.length === 0 ? (
-                <div className="flex items-center justify-center py-16 gap-3"><Loader2 size={20} className="animate-spin text-emerald-600 dark:text-emerald-400" /><span className="text-sm text-slate-500">Loading transactions...</span></div>
+                <div className="flex items-center justify-center py-16 gap-3"><Loader2 size={20} className="animate-spin text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" /><span className="text-sm text-slate-500">Loading transactions...</span></div>
               ) : filteredPending.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 gap-3">
-                  <CheckCircle2 size={40} className="text-emerald-400" />
+                  <CheckCircle2 size={40} className="text-[var(--pro-azure-light)]" />
                   <p className="font-bold text-slate-600 dark:text-slate-300">All transactions reconciled</p>
                   <p className="text-xs text-slate-400">No pending transactions found</p>
                 </div>
               ) : (
                 <div className="space-y-2">
                   {filteredPending.map(tx => (
-                    <div key={tx.id} className={'p-4 rounded-2xl border transition-all cursor-pointer hover:shadow-md ' + (tx.hasProposedMatch ? 'bg-emerald-50/50 dark:bg-emerald-900/5 border-emerald-100 dark:border-emerald-900/30' : 'bg-white dark:bg-slate-800/50 border-slate-100 dark:border-slate-800')} onClick={() => openReview(tx.id)}>
+                    <div key={tx.id} className={'p-4 rounded-2xl border transition-all cursor-pointer hover:shadow-md ' + (tx.hasProposedMatch ? 'bg-[var(--pro-azure-50)]/50 dark:bg-green-900/5 border-[var(--pro-azure-100)] dark:border-green-900/30' : 'bg-white dark:bg-slate-800/50 border-slate-100 dark:border-slate-800')} onClick={() => openReview(tx.id)}>
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className={'px-2 py-0.5 rounded-full text-[10px] font-medium uppercase ' + (tx.type === 'CREDIT' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400')}>{tx.type}</span>
+                            <span className={'px-2 py-0.5 rounded-full text-[10px] font-medium uppercase ' + (tx.type === 'CREDIT' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/30 dark:text-[var(--pro-azure-light)]' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400')}>{tx.type}</span>
                             {tx.BankAccount?.bankName && <span className="text-[9px] text-slate-400 font-bold">{tx.BankAccount.bankName}</span>}
                             {tx.telecomRef && <span className="px-1.5 py-0.5 bg-violet-100 dark:bg-violet-900/20 text-violet-700 dark:text-violet-400 rounded-full text-[10px] font-medium">telebirr</span>}
                           </div>
@@ -530,7 +532,7 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
                           <div className="text-right">
-                            <p className={'text-sm font-semibold ' + (tx.type === 'CREDIT' ? 'text-emerald-600' : 'text-rose-600')}>
+                            <p className={'text-sm font-semibold ' + (tx.type === 'CREDIT' ? 'text-[var(--pro-azure)]' : 'text-rose-600')}>
                               {tx.type === 'CREDIT' ? '+' : '−'} ETB {Math.abs(tx.amount).toLocaleString()}
                             </p>
                             {tx.hasProposedMatch && tx.matchScore > 0 && <ScoreBadge score={tx.matchScore} method={tx.matchMethod ?? 'AMOUNT_ONLY'} />}
@@ -562,7 +564,7 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
           {tab === 'REVIEW' && (
             <div className="p-4 sm:p-6 space-y-5">
               {reviewLoading && (
-                <div className="flex items-center justify-center py-20 gap-3"><Loader2 size={24} className="animate-spin text-emerald-600 dark:text-emerald-400" /><span className="text-sm text-slate-500">Loading match proposals...</span></div>
+                <div className="flex items-center justify-center py-20 gap-3"><Loader2 size={24} className="animate-spin text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" /><span className="text-sm text-slate-500">Loading match proposals...</span></div>
               )}
               {!reviewLoading && !reviewTx && (
                 <div className="flex flex-col items-center justify-center py-20 gap-3">
@@ -578,7 +580,7 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className={'px-2 py-0.5 rounded-full text-[10px] font-medium uppercase ' + (reviewTx.transaction.type === 'CREDIT' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700')}>{reviewTx.transaction.type}</span>
+                          <span className={'px-2 py-0.5 rounded-full text-[10px] font-medium uppercase ' + (reviewTx.transaction.type === 'CREDIT' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : 'bg-rose-100 text-rose-700')}>{reviewTx.transaction.type}</span>
                           {reviewTx.transaction.bankName && <span className="text-xs text-slate-400 font-bold">{reviewTx.transaction.bankName}</span>}
                         </div>
                         <p className="font-semibold text-slate-800 dark:text-white text-base">{reviewTx.transaction.description}</p>
@@ -587,11 +589,11 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
                           {reviewTx.transaction.reference && (<div className="flex items-center gap-1.5"><span className="text-[10px] font-medium text-slate-400 uppercase">Ref</span><span className="text-xs font-mono text-slate-600 dark:text-slate-300">{reviewTx.transaction.reference}</span></div>)}
                           {reviewTx.transaction.telecomRef && (<div className="flex items-center gap-1.5"><span className="text-[10px] font-medium text-violet-400 uppercase">Telebirr</span><span className="text-xs font-mono text-violet-600 dark:text-violet-400">{reviewTx.transaction.telecomRef}</span></div>)}
                           {reviewTx.transaction.voucherCode && (<div className="flex items-center gap-1.5"><span className="text-[10px] font-medium text-amber-400 uppercase">Voucher</span><span className="text-xs font-mono text-amber-600 dark:text-amber-400">{reviewTx.transaction.voucherCode}</span></div>)}
-                          {reviewTx.transaction.qrCode && (<div className="flex items-center gap-1.5"><QrCode size={12} className="text-emerald-400" /><span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 truncate max-w-[120px]">{reviewTx.transaction.qrCode.slice(0, 20)}...</span></div>)}
+                          {reviewTx.transaction.qrCode && (<div className="flex items-center gap-1.5"><QrCode size={12} className="text-[var(--pro-azure-light)]" /><span className="text-xs font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] truncate max-w-[120px]">{reviewTx.transaction.qrCode.slice(0, 20)}...</span></div>)}
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className={'text-2xl font-semibold font-mono ' + (reviewTx.transaction.type === 'CREDIT' ? 'text-emerald-600' : 'text-rose-600')}>
+                        <p className={'text-2xl font-semibold font-mono ' + (reviewTx.transaction.type === 'CREDIT' ? 'text-[var(--pro-azure)]' : 'text-rose-600')}>
                           {reviewTx.transaction.type === 'CREDIT' ? '+' : '−'} ETB {Math.abs(reviewTx.transaction.amount).toLocaleString()}
                         </p>
                       </div>
@@ -612,13 +614,13 @@ const SmartReconciliationModal: React.FC<Props> = ({ onClose, onRefresh, bankAcc
                     ) : (
                       <div className="space-y-3">
                         {reviewTx.candidates.map((c, i) => (
-                          <div key={c.id} className={'p-4 rounded-2xl border transition-all ' + (i === 0 && reviewTx.autoReconcile ? 'border-emerald-300 dark:border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-900/10' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50')}>
+                          <div key={c.id} className={'p-4 rounded-2xl border transition-all ' + (i === 0 && reviewTx.autoReconcile ? 'border-[var(--pro-azure-light)] dark:border-[var(--pro-azure)]/40 bg-[var(--pro-azure-50)]/50 dark:bg-green-900/10' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50')}>
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <span className={'px-2 py-0.5 rounded-full text-[10px] font-medium uppercase ' + (c.type === 'INVOICE' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400')}>{c.type}</span>
+                                  <span className={'px-2 py-0.5 rounded-full text-[10px] font-medium uppercase ' + (c.type === 'INVOICE' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/30 dark:text-[var(--pro-azure-light)]' : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400')}>{c.type}</span>
                                   <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-300">{c.number}</span>
-                                  {i === 0 && reviewTx.autoReconcile && <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full text-[10px] font-medium">TOP MATCH</span>}
+                                  {i === 0 && reviewTx.autoReconcile && <span className="px-2 py-0.5 bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/30 dark:text-[var(--pro-azure-light)] rounded-full text-[10px] font-medium">TOP MATCH</span>}
                                 </div>
                                 <p className="text-sm text-slate-600 dark:text-slate-400">{c.counterparty}</p>
                                 <p className="text-xs text-slate-400 mt-0.5">{new Date(c.date).toLocaleDateString()}</p>

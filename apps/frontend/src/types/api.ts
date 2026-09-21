@@ -1,4 +1,20 @@
 import {
+  AppDto,
+  ReviewDto,
+  CreateAuditFirmDto,
+  UpdateAuditFirmDto,
+  CreateEngagementDto,
+  UpdateEngagementDto,
+  CreateCommentDto,
+  CreateFindingDto,
+  UpdateFindingDto,
+  CreateReleaseDto,
+  ApplyReleaseDto,
+  CreateFeatureFlagDto,
+  ToggleFeatureFlagDto,
+  CreateOnboardingDto,
+} from '@ovds/dto';
+import {
   Invoice,
   InvoiceItem,
   InvoiceStatus,
@@ -44,28 +60,11 @@ import {
   HealthScoreComponent,
   NetworkEvent,
 } from '@ovds/shared';
-
 import {
   Integration,
   IntegrationStatus,
   AppSettings,
 } from '@ovds/shared';
-import {
-  AppDto,
-  ReviewDto,
-  CreateAuditFirmDto,
-  UpdateAuditFirmDto,
-  CreateEngagementDto,
-  UpdateEngagementDto,
-  CreateCommentDto,
-  CreateFindingDto,
-  UpdateFindingDto,
-  CreateReleaseDto,
-  ApplyReleaseDto,
-  CreateFeatureFlagDto,
-  ToggleFeatureFlagDto,
-  CreateOnboardingDto,
-} from '@ovds/dto';
 
 /**
  * Shared API response types for the frontend.
@@ -148,14 +147,28 @@ export type {
   PaginatedResult,
 };
 
-// Local type stubs for types not yet in @ovds/shared
-export type TaxRate = { id: string; name: string; rate: number; type: string; isActive: boolean; companyId?: string | null; createdAt: string; updatedAt: string; [k: string]: unknown };
-export type PayrollFilters = { companyId?: string; period?: string; status?: string; employeeId?: string };
-export type LoanStats = { total: number; pending: number; approved: number; rejected: number; totalAmount: number };
-export type ReimbursementStats = { total: number; pending: number; approved: number; rejected: number; totalAmount: number };
+// ── Types now sourced from canonical packages ────────────────────────────────
+
+// ApiResponse — full 9-field envelope (statusCode, message, data, success,
+// error, fields, requestId, timestamp, ms, errors).
+export type { ApiResponse } from '@ovds/shared';
+
+// TaxRate — Zod-inferred from @ovds/contracts/schemas/ovds TaxRateSchema.
+export type { TaxRate } from '@ovds/contracts/schemas';
+
+// KycStatus — @ovds/shared includes EXPIRED which the old local stub missed.
+export type { KycStatus } from '@ovds/shared';
+
+// PartnershipType / PartnershipStatus — proper union literals, not plain string.
+export type { PartnershipType, PartnershipStatus } from '@ovds/shared';
+
+// PayrollFilters, LoanStats, ReimbursementStats — canonical shapes from @ovds/dto.
+// NOTE: field names differ slightly from old stubs (see migration note below).
+//   PayrollFilters: uses year/month (number) instead of period (string)
+//   LoanStats:      totalOutstanding instead of totalAmount
+//   ReimbursementStats: totalApprovedAmount instead of totalAmount
+export type { PayrollFilters, LoanStats, ReimbursementStats } from '@ovds/dto';
+
+// ── Remaining local stubs (no shared equivalent yet) ─────────────────────────
 export type RootovdsSummary = Record<string, unknown>;
 export type SharedTaxpayerStatus = { category: string; isVatRegistered: boolean; tin?: string };
-export type ApiResponse<T = unknown> = { statusCode: number; message: string; data: T; success: boolean };
-export type KycStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
-export type PartnershipType = string;
-export type PartnershipStatus = string;

@@ -1,10 +1,13 @@
 import 'reflect-metadata';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+
 import App from './app';
+
 import './index.css';
 import './i18n';
 import { registerSW } from 'virtual:pwa-register';
+
 import { prefetchRoutes } from './lib/routePreloader';
 import { sanitizeUiState, THEME_KEY } from './utils/storage';
 
@@ -82,7 +85,7 @@ class ErrorBoundary extends React.Component<
                 this.setState({ hasError: false, error: null });
                 window.location.href = '/';
               }}
-              className="px-6 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-all"
+              className="px-6 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
             >
               Reload App
             </button>

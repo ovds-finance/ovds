@@ -2,18 +2,20 @@
  * BankList — Ovds-inspired bank accounts page
  * White cards · teal accents · icon-labeled fields · pill badges
  */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
 import {
   Plus, RefreshCw, Landmark, CheckCircle2, AlertTriangle,
   ArrowLeftRight, Upload, TrendingUp, TrendingDown, BarChart3, Wallet,
   Activity, ShieldCheck, ScanLine, ChevronRight, Link2, Search, Filter,
   ArrowUpDown, Building2, CircleDot, MoreHorizontal,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import toast from 'react-hot-toast';
-import api from '../../services/api';
-import { useAuth } from '../../rbac/AuthContext';
+import { useSearchParams, Link } from 'react-router-dom';
+
 import { usePageTitle } from '../../hooks/usePageTitle';
+import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
+
 import BankAccountCard from './bankAccount';
 import BankModal from './bankModal';
 import BankTransactionModal from './bankTransactionModal';
@@ -95,7 +97,7 @@ const getBankShort = (bankName?: string) => {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  ACTIVE: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
+  ACTIVE: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/40 dark:text-[var(--pro-azure-light)]',
   INACTIVE: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
   ARCHIVED: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400',
 };
@@ -378,8 +380,8 @@ const BankList: React.FC = () => {
               label="Net Change" value={`${netChange >= 0 ? '+' : ''}ETB ${fmt(netChange)}`}
               sub="vs opening balance"
               icon={netChange >= 0 ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
-              accent={netChange >= 0 ? 'bg-emerald-50 dark:bg-emerald-900/20' : 'bg-rose-50 dark:bg-rose-900/20'}
-              textColor={netChange >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}
+              accent={netChange >= 0 ? 'bg-[var(--pro-azure-50)] dark:bg-green-900/20' : 'bg-rose-50 dark:bg-rose-900/20'}
+              textColor={netChange >= 0 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-rose-600 dark:text-rose-400'}
             />
             <KpiCard
               label="Avg Balance" value={`ETB ${fmt(avgBalance)}`}
@@ -391,8 +393,8 @@ const BankList: React.FC = () => {
               label="Unreconciled" value={String(totalUnreconciled)}
               sub="pending transactions"
               icon={<Activity size={18} />}
-              accent={totalUnreconciled > 0 ? 'bg-amber-50 dark:bg-amber-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}
-              textColor={totalUnreconciled > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}
+              accent={totalUnreconciled > 0 ? 'bg-amber-50 dark:bg-amber-900/20' : 'bg-[var(--pro-azure-50)] dark:bg-green-900/20'}
+              textColor={totalUnreconciled > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'}
             />
           </div>
 
@@ -431,9 +433,9 @@ const BankList: React.FC = () => {
           )}
 
           {!loading && totalUnreconciled === 0 && banks.length > 0 && (
-            <div className="flex items-center gap-3 px-5 py-3.5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 rounded-2xl">
-              <CheckCircle2 size={15} className="text-emerald-500 flex-shrink-0" />
-              <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">All transactions reconciled — books are clean</p>
+            <div className="flex items-center gap-3 px-5 py-3.5 bg-[var(--pro-azure-50)] dark:bg-green-900/20 border border-[var(--pro-azure-100)] dark:border-green-700 rounded-2xl">
+              <CheckCircle2 size={15} className="text-[var(--pro-azure)] flex-shrink-0" />
+              <p className="text-sm font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">All transactions reconciled — books are clean</p>
             </div>
           )}
 
@@ -600,7 +602,7 @@ const BankList: React.FC = () => {
               ))}
             </div>
             {filteredBanks.map(b => {
-              const statusColor = STATUS_COLORS[b.status ?? 'ACTIVE'] ?? STATUS_COLORS.ACTIVE;
+              const statusColor = STATUS_COLORS[(b as any).status ?? 'ACTIVE'] ?? STATUS_COLORS.ACTIVE;
               const typeLabel = ACCOUNT_TYPE_LABELS[b.accountType ?? 'BANK'] ?? b.accountType ?? 'Bank Account';
               return (
                 <div key={b.id} className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr] px-6 py-4 border-b border-slate-50 dark:border-slate-700/50 items-center hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors last:border-b-0">
@@ -616,7 +618,7 @@ const BankList: React.FC = () => {
                     {typeLabel}
                   </span>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full w-fit ${statusColor}`}>
-                    {b.status ?? 'ACTIVE'}
+                    {(b as any).status ?? 'ACTIVE'}
                   </span>
                   <p className="text-sm font-semibold text-teal-600 dark:text-teal-400 text-right tabular-nums">
                     {(b.currencyCode ?? 'ETB')} {fmt(b.computedBalance ?? Number(b.balance ?? 0))}

@@ -3,14 +3,15 @@
  *
  * Modes: send | cancel | duplicate | remind
  */
-import React, { useState } from 'react';
 import {
   Send, X, AlertTriangle, CheckCircle2, Loader2,
   XCircle, FileText, ChevronRight, Ban, Copy, Bell,
 } from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+
 import api from '../../services/api';
 import { invoicesApi } from '../../services/ovdsApi';
-import toast from 'react-hot-toast';
 import { fmtCurrencyDecimal } from '../../utils/fmt';
 
 const fmt = (n: number) => fmtCurrencyDecimal(n, 'ETB');
@@ -34,9 +35,9 @@ const MODE_CONFIG = {
   send: {
     label: 'Batch Send Invoices',
     icon: Send,
-    color: 'bg-emerald-100 dark:bg-emerald-950/40',
-    iconColor: 'text-emerald-600 dark:text-emerald-400',
-    btnColor: 'bg-emerald-500 hover:bg-emerald-600',
+    color: 'bg-[var(--pro-azure-100)] dark:bg-green-950/40',
+    iconColor: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+    btnColor: 'bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)]',
     eligibleFilter: (inv: Invoice) => inv.status === 'DRAFT',
     ineligibleReason: 'not DRAFT',
     warning: null,
@@ -54,9 +55,9 @@ const MODE_CONFIG = {
   duplicate: {
     label: 'Batch Duplicate Invoices',
     icon: Copy,
-    color: 'bg-emerald-100 dark:bg-emerald-950/40',
-    iconColor: 'text-emerald-600',
-    btnColor: 'bg-emerald-500 hover:bg-emerald-600',
+    color: 'bg-[var(--pro-azure-100)] dark:bg-green-950/40',
+    iconColor: 'text-[var(--pro-azure)]',
+    btnColor: 'bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)]',
     eligibleFilter: () => true,
     ineligibleReason: '',
     warning: 'Each invoice will be duplicated as a new DRAFT with a new invoice number.',

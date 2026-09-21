@@ -3,10 +3,6 @@
  * Pipeline view · Expiry tracking · Convert-to-invoice · Bulk actions
  * Uses EstimateModal (full-screen form) from the Invoices feature
  */
-import React, {
-  useState, useEffect, useCallback, useMemo, useRef,
-} from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   FileText, Plus, Edit2, Trash2, RefreshCw, CheckCircle2,
   ArrowRight, Search, Send, Copy, TrendingUp, TrendingDown,
@@ -14,17 +10,22 @@ import {
   Download, Filter, X, ChevronDown, Eye, Calendar,
   ArrowUpRight, Minus,
 } from 'lucide-react';
+import React, {
+  useState, useEffect, useCallback, useMemo, useRef,
+} from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useDebounce } from '../hooks';
-import { estimatesApi } from '../services/ovdsApi';
-import api from '../services/api';
-import { confirm } from '../utils/confirm';
-import { fmtCurrency } from '../utils/fmt';
+import { useNavigate } from 'react-router-dom';
+
 import { Can } from '../components/can';
 import EstimateModal from '../components/invoice/estimateModal';
+import { useBusiness } from '../context/businessContext';
+import { useDebounce } from '../hooks';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { estimatesApi } from '../services/ovdsApi';
+import { confirm } from '../utils/confirm';
+import { fmtCurrency } from '../utils/fmt';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -111,11 +112,11 @@ function daysUntilExpiry(e: Estimate): number | null {
 const STATUS_META: Record<string, { label: string; cls: string; dot: string }> = {
   DRAFT:    { label: 'Draft',     cls: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300',         dot: 'bg-slate-400' },
   PENDING:  { label: 'Sent',      cls: 'bg-sky-50 dark:bg-sky-900/20 text-sky-700 dark:text-sky-400',               dot: 'bg-sky-500' },
-  PAID:     { label: 'Accepted',  cls: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400', dot: 'bg-emerald-500' },
+  PAID:     { label: 'Accepted',  cls: 'bg-[var(--pro-azure-50)] dark:bg-green-900/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]', dot: 'bg-[var(--pro-azure-50)]0' },
   REJECTED: { label: 'Rejected',  cls: 'bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400',           dot: 'bg-rose-500' },
   EXPIRED:  { label: 'Expired',   cls: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400',       dot: 'bg-amber-500' },
   SENT:     { label: 'Sent',      cls: 'bg-sky-50 dark:bg-sky-900/20 text-sky-700 dark:text-sky-400',               dot: 'bg-sky-500' },
-  ACCEPTED: { label: 'Accepted',  cls: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400', dot: 'bg-emerald-500' },
+  ACCEPTED: { label: 'Accepted',  cls: 'bg-[var(--pro-azure-50)] dark:bg-green-900/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]', dot: 'bg-[var(--pro-azure-50)]0' },
   CONVERTED:{ label: 'Converted', cls: 'bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-400',   dot: 'bg-violet-500' },
 };
 
@@ -169,7 +170,7 @@ const KpiCard: React.FC<{
     <div className="flex items-end justify-between gap-2">
       <p className="text-2xl font-black tabular-nums leading-none">{value}</p>
       {trend && (
-        <span className={`flex items-center gap-0.5 text-[10px] font-bold ${trend.pos ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
+        <span className={`flex items-center gap-0.5 text-[10px] font-bold ${trend.pos ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-rose-500'}`}>
           {trend.pos ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
           {trend.val}
         </span>
@@ -251,7 +252,7 @@ const KanbanCard: React.FC<{
           </button>
         )}
         {est.status === 'PENDING' && canWrite && (
-          <button onClick={() => onAccept(est)} className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all">
+          <button onClick={() => onAccept(est)} className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-900/20 transition-all">
             <CheckCircle2 size={9} /> Accept
           </button>
         )}
@@ -286,7 +287,7 @@ const Estimates: React.FC = () => {
   // ── Data state ────────────────────────────────────────────────────────────
   const [estimates, setEstimates] = useState<Estimate[]>([]);
   const [loading, setLoading] = useState(false);
-  const [statsLoading, setStatsLoading] = useState(false);
+  const [_statsLoading, setStatsLoading] = useState(false);
   const [stats, setStats] = useState<{ total: number; draft: number; sent: number; accepted: number } | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize] = useState(25);
@@ -393,7 +394,7 @@ const Estimates: React.FC = () => {
         api.get(`/ovds/inventory/items?companyId=${selectedCompanyId}&take=200`),
         api.get('/settings'),
       ]);
-      const custData = custRes.data?.data ?? custRes.data ?? [];
+      const custData = custRes.data?.data?.data ?? custRes.data?.data ?? custRes.data ?? [];
       setCustomers(
         Array.isArray(custData)
           ? custData.map((c: any) => typeof c === 'string' ? c : (c.customerName ?? c.name ?? '')).filter(Boolean)
@@ -443,7 +444,7 @@ const Estimates: React.FC = () => {
   const kanbanCols = useMemo(() => [
     { key: 'DRAFT',    label: 'Draft',    color: 'text-slate-600 dark:text-slate-300',      headerCls: 'bg-white dark:bg-slate-800',          dotCls: 'bg-slate-400' },
     { key: 'PENDING',  label: 'Sent',     color: 'text-sky-700 dark:text-sky-400',          headerCls: 'bg-sky-50 dark:bg-sky-950/30',         dotCls: 'bg-sky-500' },
-    { key: 'PAID',     label: 'Accepted', color: 'text-emerald-700 dark:text-emerald-400',  headerCls: 'bg-emerald-50 dark:bg-emerald-950/30', dotCls: 'bg-emerald-500' },
+    { key: 'PAID',     label: 'Accepted', color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',  headerCls: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30', dotCls: 'bg-[var(--pro-azure-50)]0' },
     { key: 'REJECTED', label: 'Rejected', color: 'text-rose-700 dark:text-rose-400',        headerCls: 'bg-rose-50 dark:bg-rose-950/30',       dotCls: 'bg-rose-500' },
   ].map(col => ({
     ...col,
@@ -702,7 +703,7 @@ const Estimates: React.FC = () => {
           value={fmt(acceptedValue)}
           sub={`${stats?.accepted ?? estimates.filter(e => e.status === 'PAID').length} accepted`}
           icon={<CheckCircle2 size={16} />}
-          color="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-100"
+          color="bg-[var(--pro-azure-50)] dark:bg-green-950/30 border border-[var(--pro-azure-100)] dark:border-green-800 text-[var(--pro-azure-dark)] dark:text-green-100"
           trend={null}
         />
         <KpiCard
@@ -968,7 +969,7 @@ const Estimates: React.FC = () => {
                               )}
                               {/* Accept: PENDING */}
                               {est.status === 'PENDING' && canWrite && (
-                                <ActionBtn onClick={() => handleAccept(est)} title="Mark as accepted" hoverCls="hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400">
+                                <ActionBtn onClick={() => handleAccept(est)} title="Mark as accepted" hoverCls="hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-900/20 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)]">
                                   <CheckCircle2 size={12} />
                                 </ActionBtn>
                               )}

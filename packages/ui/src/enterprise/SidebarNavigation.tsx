@@ -121,7 +121,7 @@ export function SidebarNavigation({
       <div className={cn('flex items-center h-12 px-3 shrink-0', headerBorder, isSidebar ? 'border-b' : 'border-b')}>
         {!collapsed && (
           <div className="flex items-center gap-2.5">
-            <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center text-white shrink-0', isSidebar ? 'bg-[--aki-blue]' : 'bg-aki-blue')}>
+            <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center text-white shrink-0', isSidebar ? 'bg-[--aki-blue]' : 'bg-[var(--pro-azure)]')}>
               <Building2 size={16} />
             </div>
             <div>
@@ -131,7 +131,7 @@ export function SidebarNavigation({
           </div>
         )}
         {collapsed && (
-          <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center text-white mx-auto', isSidebar ? 'bg-[--aki-blue]' : 'bg-aki-blue')}>
+          <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center text-white mx-auto', isSidebar ? 'bg-[--aki-blue]' : 'bg-[var(--pro-azure)]')}>
             <Building2 size={16} />
           </div>
         )}
@@ -157,7 +157,7 @@ export function SidebarNavigation({
               placeholder="Search..."
               className={cn('w-full pl-8 pr-3 py-1.5 rounded-lg text-[12px] outline-none transition-all', isSidebar
                 ? 'bg-white/5 border border-[--sidebar-border] text-[--sidebar-fg] placeholder-[--sidebar-fg-muted] focus:border-[--aki-blue] focus:ring-1 focus:ring-[--aki-blue]/30'
-                : 'bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-aki-blue/20 focus:border-aki-blue')}
+                : 'bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)]')}
             />
           </div>
         </div>
@@ -237,7 +237,7 @@ function NavItemButton({
         ? 'bg-[--sidebar-active-bg] text-[--sidebar-active-fg]'
         : 'text-[--sidebar-fg-muted] hover:bg-white/5 hover:text-[--sidebar-fg-hover]'
       : active
-        ? 'bg-aki-blue-50 dark:bg-aki-blue-950/30 text-aki-blue dark:text-blue-400'
+        ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]-950/30 text-[var(--pro-azure)] dark:text-blue-400'
         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-200',
     item.disabled && 'opacity-50 cursor-not-allowed',
   );
@@ -247,7 +247,7 @@ function NavItemButton({
       ? 'text-[--sidebar-accent]'
       : 'text-[--sidebar-fg-muted] group-hover:text-[--sidebar-fg-hover]'
     : active
-      ? 'text-aki-blue dark:text-blue-400'
+      ? 'text-[var(--pro-azure)] dark:text-blue-400'
       : 'text-slate-500 dark:text-slate-400',
   );
 
@@ -258,7 +258,7 @@ function NavItemButton({
         ? 'bg-[--aki-blue] text-white'
         : 'bg-white/10 text-[--sidebar-fg-muted]'
       : active
-        ? 'bg-aki-blue text-white'
+        ? 'bg-[var(--pro-azure)] text-white'
         : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400',
   );
 

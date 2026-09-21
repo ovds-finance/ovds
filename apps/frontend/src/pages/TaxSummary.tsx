@@ -1,10 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { AppPage, AppKpi, Btn } from '@ovds/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useAuth } from '../rbac/AuthContext';
-import api from '../services/api';
-import toast from 'react-hot-toast';
+import { AppPage, AppStat, Btn } from '@ovds/ui';
 import {
   Receipt,
   Download,
@@ -15,6 +9,14 @@ import {
   ArrowLeftRight,
   Filter,
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+
 
 interface TaxSummaryRow {
   taxRateId: string;
@@ -69,6 +71,7 @@ const TaxSummaryPage: React.FC = () => {
     if (companyId && period) {
       fetchSummary();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyId, period]);
 
   const fetchSummary = async () => {
@@ -105,7 +108,7 @@ const TaxSummaryPage: React.FC = () => {
 
   const netPositionColor = (val: number) => {
     if (val > 0) return 'text-rose-600 dark:text-rose-400';
-    if (val < 0) return 'text-emerald-600 dark:text-emerald-400';
+    if (val < 0) return 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]';
     return 'text-slate-500';
   };
 
@@ -124,12 +127,12 @@ const TaxSummaryPage: React.FC = () => {
               className="bg-transparent border-none outline-none text-sm text-slate-700 dark:text-slate-200"
             />
           </div>
-          <Btn variant="outline" onClick={fetchSummary} loading={loading}>
+          <Btn variant="secondary" onClick={fetchSummary} loading={loading}>
             <RefreshCw size={16} className="mr-2" />
             Refresh
           </Btn>
           {data && (
-            <Btn variant="outline" onClick={handleExport}>
+            <Btn variant="secondary" onClick={handleExport}>
               <Download size={16} className="mr-2" />
               Export CSV
             </Btn>
@@ -155,29 +158,29 @@ const TaxSummaryPage: React.FC = () => {
         <>
           {/* KPI Strip */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <AppKpi
-              title="Output Tax"
+            <AppStat
+              label="Output Tax"
               value={fmtETB(data.summary.totalOutputTax)}
-              icon={<TrendingUp className="text-emerald-500" size={20} />}
-              trend="From invoices"
+              icon={<TrendingUp className="text-[var(--pro-azure)]" size={20} />}
+              color="indigo"
             />
-            <AppKpi
-              title="Input Tax"
+            <AppStat
+              label="Input Tax"
               value={fmtETB(data.summary.totalInputTax)}
-              icon={<TrendingDown className="text-blue-500" size={20} />}
-              trend="From bills"
+              icon={<TrendingDown className="text-[var(--pro-azure)]" size={20} />}
+              color="blue"
             />
-            <AppKpi
-              title="Net Payable"
+            <AppStat
+              label="Net Payable"
               value={fmtETB(data.summary.netPayable)}
               icon={<ArrowLeftRight className="text-violet-500" size={20} />}
-              trend={data.summary.netPayable > 0 ? 'Owe MoR' : 'Credit due'}
+              color="violet"
             />
-            <AppKpi
-              title="Transactions"
+            <AppStat
+              label="Transactions"
               value={String(data.summary.totalTransactions)}
               icon={<Filter className="text-amber-500" size={20} />}
-              trend={`${data.byDocumentType.invoices.count} invoices / ${data.byDocumentType.bills.count} bills`}
+              color="amber"
             />
           </div>
 
@@ -218,10 +221,10 @@ const TaxSummaryPage: React.FC = () => {
                             {row.calculationType}
                           </span>
                         </td>
-                        <td className="px-6 py-3 text-sm text-right font-mono text-emerald-700 dark:text-emerald-400">
+                        <td className="px-6 py-3 text-sm text-right font-mono text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
                           {fmtETB(row.outputTax)}
                         </td>
-                        <td className="px-6 py-3 text-sm text-right font-mono text-blue-700 dark:text-blue-400">
+                        <td className="px-6 py-3 text-sm text-right font-mono text-[var(--pro-azure)]">
                           {fmtETB(row.inputTax)}
                         </td>
                         <td className={`px-6 py-3 text-sm text-right font-mono font-medium ${netPositionColor(row.netPosition)}`}>
@@ -251,7 +254,7 @@ const TaxSummaryPage: React.FC = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-500">Total Output Tax</span>
-                  <span className="font-mono text-emerald-700 dark:text-emerald-400">{fmtETB(data.byDocumentType.invoices.outputTax)}</span>
+                  <span className="font-mono text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">{fmtETB(data.byDocumentType.invoices.outputTax)}</span>
                 </div>
               </div>
             </div>
@@ -266,7 +269,7 @@ const TaxSummaryPage: React.FC = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-500">Total Input Tax</span>
-                  <span className="font-mono text-blue-700 dark:text-blue-400">{fmtETB(data.byDocumentType.bills.inputTax)}</span>
+                  <span className="font-mono text-[var(--pro-azure)]">{fmtETB(data.byDocumentType.bills.inputTax)}</span>
                 </div>
               </div>
             </div>

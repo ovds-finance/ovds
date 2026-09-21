@@ -9,11 +9,11 @@
  *  - action column rendering
  *  - pagination rendering when onPageChange is provided
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { DataTable, DataTableColumn } from '@ovds/ui';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { DataTable, DataTableColumn } from '@ovds/ui';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 const SAMPLE = [
   { id: '1', name: 'Alice', role: 'Admin', age: 34 },
@@ -74,16 +74,15 @@ describe('DataTable', () => {
     );
 
     // Open the column toggle popover
-    await user.click(screen.getByTitle('Toggle columns'));
-    const popover = screen.getByText('Visible Columns').closest('div')?.parentElement;
-    expect(popover).toBeDefined();
+    await user.click(screen.getByTitle('Toggle visible columns'));
+    const popover = screen.getByRole('listbox', { name: 'Toggle columns' });
 
     // Toggle off the "Role" column
     const roleBtn = within(popover!).getByText('Role');
     await user.click(roleBtn);
 
     // Close popover
-    await user.click(screen.getByTitle('Toggle columns'));
+    await user.click(screen.getByTitle('Toggle visible columns'));
 
     // Role header should be gone from the table
     expect(screen.queryByText('Role')).toBeNull();

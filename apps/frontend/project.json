@@ -11,7 +11,7 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run dev",
+        "command": "node ../../scripts/bin-run.mjs vite/bin/vite",
         "cwd": "apps/frontend"
       },
       "cache": false
@@ -19,11 +19,12 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run build",
+        "command": "pnpm run build",
         "cwd": "apps/frontend"
       },
       "dependsOn": [
-        "^build"
+        "contracts:build",
+        "dto:build"
       ],
       "inputs": [
         "production",
@@ -37,7 +38,7 @@
     "preview": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run preview",
+        "command": "node ../../scripts/bin-run.mjs vite/bin/vite preview",
         "cwd": "apps/frontend"
       },
       "cache": false
@@ -45,7 +46,7 @@
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run typecheck",
+        "command": "pnpm run typecheck",
         "cwd": "apps/frontend"
       },
       "inputs": [
@@ -57,7 +58,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run lint",
+        "command": "node ../../scripts/bin-run.mjs eslint/bin/eslint . --fix --report-unused-disable-directives",
         "cwd": "apps/frontend"
       },
       "inputs": [
@@ -68,7 +69,7 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run test",
+        "command": "node ../../scripts/bin-run.mjs vitest/vitest.mjs --run --config vitest.config.ts",
         "cwd": "apps/frontend"
       },
       "inputs": [
@@ -80,7 +81,7 @@
     "test:watch": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run test:watch",
+        "command": "node ../../scripts/bin-run.mjs vitest/vitest.mjs --config vitest.config.ts",
         "cwd": "apps/frontend"
       },
       "cache": false
@@ -88,7 +89,7 @@
     "test:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run test:coverage",
+        "command": "node ../../scripts/bin-run.mjs vitest/vitest.mjs --run --coverage --config vitest.config.ts",
         "cwd": "apps/frontend"
       },
       "inputs": [

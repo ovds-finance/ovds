@@ -1,8 +1,8 @@
-# Authentication, Users & Access Control
+﻿# Authentication, Users & Access Control
 
 Canonical OVDS module (`packages/modules/auth`).
 
-Akaunting-inspired, DDD-aligned module layout:
+Ovds SaaS DDD-aligned module layout:
 
 ```
 modules/auth/

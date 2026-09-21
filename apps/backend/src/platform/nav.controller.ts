@@ -1,9 +1,10 @@
 import { Controller, Get, Query, UseGuards, HttpCode, HttpStatus, Req } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import type { NavGroupDto, NavSectionDto, NavTreeDto, NavItemDto } from '@ovds/contracts/schemas';
+import { Role, allowedSectionsForRole, isSuperUser, STATIC_SECTIONS, NAV_CACHE_TTL_SECONDS } from '@ovds/shared';
+
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { Role, allowedSectionsForRole, isSuperUser, STATIC_SECTIONS, NAV_CACHE_TTL_SECONDS } from '@ovds/shared';
-import type { NavGroupDto, NavSectionDto, NavTreeDto, NavItemDto } from '@ovds/contracts/schemas';
 import { PrismaService } from '../common/prisma.service';
 
 type StaticGroup = {
@@ -314,12 +315,11 @@ const STATIC_GROUPS: StaticGroup[] = [
     items: [
       { to: '/getting-started',       label: 'Setup Wizard',         icon: 'ZAP',          permission: 'settings:read', priority: 10, keywords: ['setup wizard', 'first run', 'company setup', 'wizard'] },
       { to: '/settings',              label: 'Settings',             icon: 'SETTINGS',     permission: 'settings:read', pinnable: true, end: true, priority: 20, keywords: ['company', 'localization', 'invoice', 'currency', 'email', 'smtp', 'tax', 'modules', 'defaults', 'financial', 'fiscal year'] },
-      { to: '/settings?tab=profile',  label: 'Company Profile',      icon: 'BUILDING',     permission: 'settings:write', priority: 30, keywords: ['company name', 'tin', 'vat', 'business type', 'logo'] },
-      { to: '/settings?tab=email',    label: 'Email & SMTP',         icon: 'MAIL',          permission: 'settings:write', priority: 40, keywords: ['smtp', 'email config', 'mail server'] },
-      { to: '/settings?tab=users',    label: 'Users & Access',       icon: 'USERS',         permission: 'users:read',     pinnable: true, priority: 50, keywords: ['users', 'roles', 'access', 'portal', '2fa'] },
-      { to: '/settings?tab=modules',  label: 'Modules',              icon: 'LAYERS',        permission: 'settings:write', priority: 60, keywords: ['enable module', 'disable module', 'extensions'] },
-      { to: '/settings/roles',                    label: 'Roles & Permissions',      icon: 'LOCK',          permission: 'role_permissions:read', priority: 70 },
-      { to: '/settings/advanced-access-controls', label: 'Advanced Access Controls', icon: 'SHIELD',        permission: 'role_permissions:read', priority: 80 },
+      { to: '/settings/company-profile', label: 'Company Profile',  icon: 'BUILDING',     permission: 'settings:write', priority: 30, keywords: ['company name', 'tin', 'vat', 'business type', 'logo'] },
+      { to: '/settings/email',        label: 'Email & SMTP',         icon: 'MAIL',          permission: 'settings:write', priority: 40, keywords: ['smtp', 'email config', 'mail server'] },
+      { to: '/settings/users-access', label: 'Users & Access',       icon: 'USERS',         permission: 'users:read',     pinnable: true, priority: 50, keywords: ['users', 'roles', 'access', 'portal', '2fa'] },
+      { to: '/settings/modules',      label: 'Modules',              icon: 'LAYERS',        permission: 'settings:write', priority: 60, keywords: ['enable module', 'disable module', 'extensions'] },
+      { to: '/settings/roles',  label: 'Roles & Permissions', icon: 'LOCK', permission: 'role_permissions:read', priority: 70 },
       { to: '/settings/eims',     label: 'EIMS / MoR',        icon: 'SEND',         permission: 'eims:compliance', priority: 90, keywords: ['eims', 'mor', 'insa', 'bsp', 'source system'] },
       { to: '/settings/taxes',    label: 'Tax Rate Profiles',  icon: 'RECEIPT',      permission: 'settings:read',  priority: 110, keywords: ['vat rate', 'tot', 'wht', 'bit', 'drrf', 'tax profile'] },
       { to: '/settings/currencies', label: 'Currencies',        icon: 'GLOBE',         permission: 'settings:write', priority: 115, isNew: true },
@@ -416,6 +416,46 @@ const STATIC_GROUPS: StaticGroup[] = [
     items: [
       { to: '/settings/security', label: 'Security Settings', icon: 'LOCK', permission: 'settings:write', priority: 10 },
       { to: '/settings/releases', label: 'System Updates',   icon: 'REFRESH_CW', permission: 'settings:read', priority: 20 },
+    ],
+  },
+  // ── CRM — dedicated group so the sidebar CRM parent resolves correctly ──
+  {
+    key: 'crm',
+    label: 'CRM',
+    i18nKey: 'nav.groups.crm',
+    icon: 'CUSTOMER',
+    sectionKey: '__sec_crm',
+    permission: 'crm:contacts:read',
+    items: [
+      { to: '/crm/dashboard',      label: 'CRM Dashboard',   icon: 'LAYOUT_DASHBOARD', permission: 'crm:contacts:read',   priority: 10 },
+      { to: '/crm/contacts',       label: 'Contacts',         icon: 'CUSTOMER',         permission: 'crm:contacts:read',   pinnable: true, priority: 20 },
+      { to: '/crm/companies',      label: 'Companies',        icon: 'BUILDING',         permission: 'crm:contacts:read',   priority: 30 },
+      { to: '/crm/deals',          label: 'Deals',            icon: 'TREND_UP',         permission: 'crm:deals:read',      priority: 40 },
+      { to: '/crm/pipeline',       label: 'Pipeline',         icon: 'TREND_UP',         permission: 'crm:deals:read',      pinnable: true, priority: 50 },
+      { to: '/crm/activities',     label: 'Activities',       icon: 'CALENDAR',         permission: 'crm:activities:read', priority: 60 },
+      { to: '/crm/interactions',   label: 'Interactions',     icon: 'MESSAGE_SQUARE',   permission: 'crm:activities:read', priority: 70, isNew: true },
+      { to: '/customers',          label: 'All Customers',    icon: 'USERS',            permission: 'crm:contacts:read',   priority: 80 },
+      { to: '/customers/statement', label: 'Customer Statement', icon: 'FILE_TEXT',    permission: 'crm:contacts:read',   priority: 90 },
+      { to: '/customers/growth',   label: 'Customer Growth',  icon: 'TREND_UP',        permission: 'insights:read',        priority: 100, isNew: true },
+      { to: '/customers/portal',   label: 'Client Portal',    icon: 'EXTERNAL_LINK',   permission: 'crm:contacts:read',   priority: 110 },
+      { to: '/helpdesk',           label: 'Helpdesk',         icon: 'INBOX',            permission: 'crm:contacts:read',   priority: 120 },
+    ],
+  },
+  // ── Trade & Customs — dedicated group so the sidebar Trade parent resolves ──
+  {
+    key: 'trade',
+    label: 'Trade & Customs',
+    i18nKey: 'nav.groups.trade',
+    icon: 'GLOBE',
+    sectionKey: '__sec_trade',
+    permission: 'items:read',
+    items: [
+      { to: '/trade',                  label: 'Trade Dashboard',      icon: 'GLOBE',          permission: 'items:read',  pinnable: true, priority: 10 },
+      { to: '/trade/shipments',        label: 'Import / Export',      icon: 'PACKAGE',         permission: 'items:read',  priority: 20 },
+      { to: '/procurement/import-shipments', label: 'Import Shipments', icon: 'ARCHIVE',      permission: 'bills:read',  priority: 30 },
+      { to: '/procurement/letter-of-credit', label: 'Letter of Credit', icon: 'FILE_TEXT',    permission: 'bills:read',  priority: 40 },
+      { to: '/procurement/landed-cost', label: 'Landed Cost',         icon: 'CALCULATOR',     permission: 'bills:read',  priority: 50 },
+      { to: '/trade/portals',          label: 'Portal Integrations',  icon: 'EXTERNAL_LINK',  permission: 'items:read',  priority: 60, isNew: true },
     ],
   },
 ];

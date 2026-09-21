@@ -14,19 +14,20 @@
  * IAS 1.104 — Comparative information requires accurate opening balances.
  * Without correct opening balances, the balance sheet and retained earnings are wrong.
  */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Scale, RefreshCw, Save, CheckCircle, AlertTriangle,
   Info, ChevronDown, ChevronUp, Download,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
+
 import {
   AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, FormField, Input, EmptyState,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
 import api from '../services/api';
 
 // -- Types ---------------------------------------------------------------------
@@ -56,7 +57,7 @@ const ACCOUNT_TYPE_SECTIONS: Array<{
   side: 'debit' | 'credit';
   accentCls: string;
 }> = [
-  { type: 'ASSET',     label: 'Assets',      hint: 'Debit-normal: Cash, Bank, AR, Inventory, Fixed Assets, etc.', side: 'debit',  accentCls: 'bg-emerald-500' },
+  { type: 'ASSET',     label: 'Assets',      hint: 'Debit-normal: Cash, Bank, AR, Inventory, Fixed Assets, etc.', side: 'debit',  accentCls: 'bg-[var(--pro-azure-50)]0' },
   { type: 'LIABILITY', label: 'Liabilities', hint: 'Credit-normal: AP, VAT Payable, Loans, Accruals, etc.',       side: 'credit', accentCls: 'bg-rose-500'    },
   { type: 'EQUITY',    label: 'Equity',      hint: 'Credit-normal: Share Capital, Retained Earnings, etc.',       side: 'credit', accentCls: 'bg-violet-500'  },
 ];
@@ -111,7 +112,7 @@ const AccountSection: React.FC<{
                 const val = balances[a.id] ?? '';
                 const hasValue = val !== '' && parseFloat(val) !== 0;
                 return (
-                  <tr key={a.id} className={`hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${hasValue ? 'bg-emerald-50/30 dark:bg-emerald-950/10' : ''}`}>
+                  <tr key={a.id} className={`hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${hasValue ? 'bg-[var(--pro-azure-50)]/30 dark:bg-green-950/10' : ''}`}>
                     <td className="px-4 py-2 font-mono text-[10px] text-slate-400">{a.code}</td>
                     <td className="px-4 py-2 font-semibold text-slate-700 dark:text-slate-200">{a.name}</td>
                     <td className="px-4 py-2 text-[10px] text-slate-400">{a.category?.replace(/_/g, ' ')}</td>
@@ -125,7 +126,7 @@ const AccountSection: React.FC<{
                         placeholder="0.00"
                         className={`w-full text-right px-2 py-1 border rounded-lg text-[11px] font-semibold tabular-nums outline-none transition-colors bg-white dark:bg-slate-900 ${
                           hasValue
-                            ? 'border-emerald-300 focus:border-teal-400'
+                            ? 'border-[var(--pro-azure-light)] focus:border-teal-400'
                             : 'border-slate-200 dark:border-slate-700 focus:border-teal-400'
                         }`}
                       />
@@ -196,7 +197,7 @@ const OpeningBalances: React.FC = () => {
       if (st?.hasOpeningBalances) {
         toast(`Opening balances already posted as of ${st.openingDate}. You can post again to update.`, { icon: 'ℹ️', duration: 5000 });
       }
-    } catch (err: any) {
+    } catch (_err: any) {
       toast.error('Failed to load accounts');
     } finally {
       setLoading(false);
@@ -227,12 +228,12 @@ const OpeningBalances: React.FC = () => {
   const filledCount      = Object.values(balances).filter(v => v !== '' && parseFloat(v) !== 0).length;
 
   const kpiCells = [
-    { label: 'Total Assets',           value: `ETB ${fmt(totalAssets)}`,      color: 'emerald' as const },
+    { label: 'Total Assets',           value: `ETB ${fmt(totalAssets)}`,      color: 'green' as const },
     { label: 'Total Liabilities',      value: `ETB ${fmt(totalLiabilities)}`, color: 'rose'    as const },
     { label: 'Total Equity',           value: `ETB ${fmt(totalEquity)}`,      color: 'violet'  as const },
-    { label: 'Difference (must = 0)', value: `ETB ${fmt(diff)}`,             color: isBalanced ? 'emerald' as const : 'amber' as const },
+    { label: 'Difference (must = 0)', value: `ETB ${fmt(diff)}`,             color: isBalanced ? 'indigo' as const : 'amber' as const },
     { label: 'Accounts Filled',        value: `${filledCount} / ${accounts.length}`, color: 'sky' as const },
-    { label: 'Status',                 value: status?.hasOpeningBalances ? 'Posted' : 'Pending', color: status?.hasOpeningBalances ? 'emerald' as const : 'amber' as const },
+    { label: 'Status',                 value: status?.hasOpeningBalances ? 'Posted' : 'Pending', color: status?.hasOpeningBalances ? 'indigo' as const : 'amber' as const },
   ];
 
   const handleSave = async () => {
@@ -293,7 +294,7 @@ const OpeningBalances: React.FC = () => {
       title="Opening Balances"
       subtitle="Set opening balances for all accounts to seed the General Ledger correctly · Accounting & ovds Software · Banking & ovds · ERP · Revenue · Market Value"
       icon={<Scale size={18} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       crumbs={[{ label: 'Accounting' }, { label: 'Opening Balances' }]}
       actions={
         <>
@@ -319,17 +320,17 @@ const OpeningBalances: React.FC = () => {
     >
       {/* Status banner */}
       {status?.hasOpeningBalances && (
-        <div className="flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl">
-          <CheckCircle size={15} className="text-emerald-600 shrink-0" />
+        <div className="flex items-center gap-3 p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl">
+          <CheckCircle size={15} className="text-[var(--pro-azure)] shrink-0" />
           <div className="flex-1">
-            <p className="text-[12px] font-bold text-emerald-800 dark:text-emerald-200">
+            <p className="text-[12px] font-bold text-[var(--pro-azure-dark)] dark:text-green-200">
               Opening balances already posted as of <strong>{status.openingDate}</strong>
             </p>
-            <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5">
+            <p className="text-[11px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] mt-0.5">
               {status.accountsWithBalance} accounts · Assets ETB {fmt(status.totalAssets)} · Liabilities ETB {fmt(status.totalLiabilities)} · Equity ETB {fmt(status.totalEquity)}
             </p>
           </div>
-          <span className="text-[10px] text-emerald-500">You can post again to update</span>
+          <span className="text-[10px] text-[var(--pro-azure)]">You can post again to update</span>
         </div>
       )}
 
@@ -365,7 +366,7 @@ const OpeningBalances: React.FC = () => {
         {filledCount > 0 && (
           <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border ${
             isBalanced
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/20 dark:border-emerald-800 dark:text-emerald-400'
+              ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/20 dark:border-green-800 dark:text-[var(--pro-azure-light)]'
               : 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-950/20 dark:border-amber-800 dark:text-amber-400'
           }`}>
             {isBalanced

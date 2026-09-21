@@ -1,14 +1,14 @@
 /**
- * @ovds/modules-items
+ * @ovds/modules/items
  *
  * Canonical DDD module: "Items, Inventory & Manufacturing".
  *
  * Public surface:
- *   import { ... } from '@ovds/modules-items';        // domain types & logic
- *   import { web } from '@ovds/modules-items';        // namespaced UI slice
- *   import ... from '@ovds/modules-items/web';         // UI subpath
- *   import ... from '@ovds/modules-items/domain';      // types subpath
- *   import ... from '@ovds/modules-items/dto';         // contracts subpath
+ *   import { ... } from '@ovds/modules/items';        // domain types & logic
+ *   import { web } from '@ovds/modules/items';        // namespaced UI slice
+ *   import ... from '@ovds/modules/items/web';         // UI subpath
+ *   import ... from '@ovds/modules/items/domain';      // types subpath
+ *   import ... from '@ovds/modules/items/dto';         // contracts subpath
  */
 
 // Domain types & logic (the bounded context's single source of truth).

@@ -91,7 +91,7 @@ const TransactionCategories: React.FC = () => {
   }, [rows, tab, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total',    value: rows.length,                                          color: 'emerald' as const },
+    { label: 'Total',    value: rows.length,                                          color: 'green' as const },
     { label: 'Income',   value: rows.filter(c => c.type === 'INCOME').length,         color: 'sky' as const },
     { label: 'Expense',  value: rows.filter(c => c.type === 'EXPENSE').length,        color: 'rose' as const },
     { label: 'Transfer', value: rows.filter(c => c.type === 'TRANSFER').length,       color: 'amber' as const },
@@ -162,7 +162,7 @@ const TransactionCategories: React.FC = () => {
               </AppTd>
               <AppTd>
                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold border ${
-                  c.type === 'INCOME'   ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                  c.type === 'INCOME'   ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' :
                   c.type === 'EXPENSE'  ? 'bg-rose-50 text-rose-700 border-rose-100' :
                                           'bg-amber-50 text-amber-700 border-amber-100'
                 }`}>{c.type}</span>
@@ -172,7 +172,7 @@ const TransactionCategories: React.FC = () => {
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {can('ovds:write') && (
                     <>
-                      <button onClick={() => setModal({ open: true, data: { ...c } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all"><Edit2 size={11} /></button>
+                      <button onClick={() => setModal({ open: true, data: { ...c } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all"><Edit2 size={11} /></button>
                       <button onClick={async () => { if (await confirm({ title: `Delete "${c.name}"?`, variant: 'danger' })) remove(c.id); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all"><Trash2 size={11} /></button>
                     </>
                   )}

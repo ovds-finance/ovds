@@ -20,24 +20,25 @@
  *   POST   /ovds/currency/fetch-live         — fetch NBE live
  *   GET    /ovds/currency/convert            — convert amount
  */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   RefreshCw, Plus, Edit2, Trash2, Save, Zap,
   TrendingUp, TrendingDown, Globe, ArrowRight,
   Info, CheckCircle, AlertTriangle, Download,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import toast from 'react-hot-toast';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
 } from 'recharts';
-import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
-import { usePageTitle } from '../hooks/usePageTitle';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, Modal, FormField, Input, Select, EmptyState,
   StatusBadge, SearchBar, Amount,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
 import api from '../services/api';
 import { confirm } from '../utils/confirm';
 
@@ -74,12 +75,12 @@ type TabKey = 'rates' | 'currencies' | 'converter' | 'history' | 'revaluation';
 // -- Source badge ---------------------------------------------------------------
 const SourceBadge: React.FC<{ source: string }> = ({ source }) => {
   const cfg = {
-    live:     { label: 'NBE Live',    cls: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800' },
+    live:     { label: 'NBE Live',    cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800' },
     scrape:   { label: 'NBE Scraped', cls: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/30 dark:text-sky-400 dark:border-sky-800' },
     cache:    { label: 'Cached',      cls: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-400 dark:border-violet-800' },
     fallback: { label: 'Fallback',    cls: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800' },
     MANUAL:   { label: 'Manual',      cls: 'bg-white text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700' },
-    NBE_LIVE: { label: 'NBE Live',    cls: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800' },
+    NBE_LIVE: { label: 'NBE Live',    cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800' },
   } as Record<string, { label: string; cls: string }>;
   const m = cfg[source] ?? { label: source, cls: 'bg-white text-slate-500 border-slate-200' };
   return (
@@ -230,9 +231,9 @@ const RateForm: React.FC<{
         </FormField>
       </div>
       {data.fromCurrency && data.toCurrency && Number(data.rate) > 0 && (
-        <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl text-[11px]">
-          <CheckCircle size={12} className="text-emerald-500 shrink-0" />
-          <span className="text-emerald-700 dark:text-emerald-400">
+        <div className="flex items-center gap-2 p-3 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl text-[11px]">
+          <CheckCircle size={12} className="text-[var(--pro-azure)] shrink-0" />
+          <span className="text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
             1 <strong>{data.fromCurrency}</strong> = <strong>ETB {Number(data.rate).toFixed(4)}</strong> (IAS 21 closing rate)
           </span>
         </div>
@@ -328,11 +329,11 @@ const FxRevaluationPanel: React.FC = () => {
           <div className="ovds-stat-row">
             {[
               { label: 'Items Revalued',  value: String(result.itemCount),              accent: 'bg-slate-400' },
-              { label: 'Total FX Gains',  value: fmtETB(result.totalGain),              accent: result.totalGain > 0  ? 'bg-emerald-500' : 'bg-slate-200' },
+              { label: 'Total FX Gains',  value: fmtETB(result.totalGain),              accent: result.totalGain > 0  ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-200' },
               { label: 'Total FX Losses', value: fmtETB(result.totalLoss),              accent: result.totalLoss > 0  ? 'bg-rose-500'    : 'bg-slate-200' },
-              { label: 'Net Position',    value: fmtETB(result.netFxMovement),          accent: result.netFxMovement >= 0 ? 'bg-emerald-500' : 'bg-rose-500' },
+              { label: 'Net Position',    value: fmtETB(result.netFxMovement),          accent: result.netFxMovement >= 0 ? 'bg-[var(--pro-azure-50)]0' : 'bg-rose-500' },
               { label: 'GL Posted',       value: result.journalPosted ? 'Yes' : dryRun ? 'Dry Run' : 'No',
-                accent: result.journalPosted ? 'bg-emerald-500' : 'bg-slate-300' },
+                accent: result.journalPosted ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-300' },
             ].map(k => (
               <div key={k.label} className="ovds-kpi-cell">
                 <div className={`w-1 h-8 rounded-full shrink-0 ${k.accent}`} />
@@ -347,7 +348,7 @@ const FxRevaluationPanel: React.FC = () => {
           {/* Net position banner */}
           <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm ${
             result.netPosition === 'NET_GAIN'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'
               : result.netPosition === 'NET_LOSS'
               ? 'bg-rose-50 border-rose-200 text-rose-800'
               : 'bg-white border-slate-200 text-slate-600'
@@ -388,7 +389,7 @@ const FxRevaluationPanel: React.FC = () => {
                       <tr key={i} className="hover:bg-slate-50 transition-colors">
                         <td className="px-4 py-3">
                           <span className={`px-2 py-0.5 rounded text-[10px] font-semibold border ${
-                            m.type === 'INVOICE' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'
+                            m.type === 'INVOICE' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' : 'bg-rose-50 text-rose-700 border-rose-100'
                           }`}>{m.type}</span>
                         </td>
                         <td className="px-4 py-3 text-xs font-mono text-slate-600">{m.reference}</td>
@@ -399,14 +400,14 @@ const FxRevaluationPanel: React.FC = () => {
                         <td className="px-4 py-3 text-xs tabular-nums text-right">{fmtETB(m.originalETB)}</td>
                         <td className="px-4 py-3 text-xs tabular-nums text-right font-semibold">{fmtETB(m.revaluedETB)}</td>
                         <td className="px-4 py-3 text-xs tabular-nums text-right">
-                          <span className={m.fxDifference >= 0 ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}>
+                          <span className={m.fxDifference >= 0 ? 'text-[var(--pro-azure)] font-bold' : 'text-rose-600 font-bold'}>
                             {m.fxDifference >= 0 ? '+' : ''}{fmtETB(m.fxDifference)}
                           </span>
                         </td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                             m.gainOrLoss === 'GAIN'
-                              ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                              ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] border border-[var(--pro-azure-100)]'
                               : m.gainOrLoss === 'LOSS'
                               ? 'bg-rose-50 text-rose-600 border border-rose-100'
                               : 'bg-slate-100 text-slate-400'
@@ -435,7 +436,7 @@ const FxRevaluationPanel: React.FC = () => {
         {[
           { step: '1', title: 'Transaction Date', desc: 'Record at spot rate on transaction date (IAS 21.21)', color: 'bg-sky-50 border-sky-100 text-sky-700' },
           { step: '2', title: 'Closing Rate',     desc: 'Retranslate monetary items at period-end closing rate (IAS 21.23a)', color: 'bg-amber-50 border-amber-100 text-amber-700' },
-          { step: '3', title: 'P&L Recognition',  desc: 'Recognise FX differences in profit or loss (IAS 21.28)', color: 'bg-emerald-50 border-emerald-100 text-emerald-700' },
+          { step: '3', title: 'P&L Recognition',  desc: 'Recognise FX differences in profit or loss (IAS 21.28)', color: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' },
         ].map(c => (
           <div key={c.step} className={`px-4 py-3 rounded-xl border ${c.color}`}>
             <div className="flex items-center gap-2 mb-1">
@@ -637,9 +638,9 @@ const FxRates: React.FC = () => {
   }, [currencies, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Tracked Currencies', value: currencies.length,         color: 'emerald' as const },
+    { label: 'Tracked Currencies', value: currencies.length,         color: 'green' as const },
     { label: 'Live Rates',         value: nbeRates.filter(r => r.source === 'live' || (r.source as string) === 'NBE_LIVE').length, color: 'sky' as const },
-    { label: 'ETB Base',           value: 'ETB',                     color: 'emerald' as const },
+    { label: 'ETB Base',           value: 'ETB',                     color: 'green' as const },
     { label: 'Last Source',        value: nbeRates[0]?.source ?? '—', color: 'amber' as const },
   ], [currencies, nbeRates]);
 
@@ -647,6 +648,7 @@ const FxRates: React.FC = () => {
   const QUICK_PAIRS = ['USD', 'EUR', 'GBP', 'AED', 'SAR', 'CNY'];
   const quickRates = useMemo(() =>
     QUICK_PAIRS.map(code => nbeRates.find(r => r.currency === code)).filter(Boolean) as NBERate[],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [nbeRates],
   );
 
@@ -720,7 +722,7 @@ const FxRates: React.FC = () => {
                 </p>
                 <p className="text-[9px] text-slate-400 mt-0.5">ETB per 1 {r.currency}</p>
                 {Math.abs(pct) > 0.01 && (
-                  <p className={`text-[9px] font-bold mt-0.5 flex items-center gap-0.5 ${pct >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
+                  <p className={`text-[9px] font-bold mt-0.5 flex items-center gap-0.5 ${pct >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-500'}`}>
                     {pct >= 0 ? <TrendingUp size={8} /> : <TrendingDown size={8} />}
                     {pct >= 0 ? '+' : ''}{pct.toFixed(2)}%
                   </p>
@@ -1010,9 +1012,9 @@ const FxRates: React.FC = () => {
             </Btn>
 
             {convResult && (
-              <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl space-y-2">
+              <div className="p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wider">Result</p>
+                  <p className="text-[11px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold uppercase tracking-wider">Result</p>
                   <SourceBadge source={convResult.source} />
                 </div>
                 <p className="text-2xl font-black tabular-nums text-slate-800 dark:text-slate-100">
@@ -1078,7 +1080,7 @@ const FxRates: React.FC = () => {
             <div className="flex items-center justify-between mb-3">
               <p className="ovds-card-title">{selectedCurrency}/ETB — Last 14 Rates</p>
               {nbeRates.find(r => r.currency === selectedCurrency) && (
-                <p className="text-xl font-black tabular-nums text-emerald-700 dark:text-emerald-400">
+                <p className="text-xl font-black tabular-nums text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
                   ETB {(nbeRates.find(r => r.currency === selectedCurrency)!.buying).toFixed(4)}
                 </p>
               )}
@@ -1120,7 +1122,7 @@ const FxRates: React.FC = () => {
                     <AppTr key={i}>
                       <AppTd><span className="text-[11px] font-mono text-slate-500">{r.date?.slice(0, 10) ?? '—'}</span></AppTd>
                       <AppTd><span className="text-[11px] font-black font-mono text-sky-700 dark:text-sky-400">{r.fromCurrency}</span></AppTd>
-                      <AppTd><span className="text-[11px] font-black font-mono text-emerald-700 dark:text-emerald-400">{r.toCurrency}</span></AppTd>
+                      <AppTd><span className="text-[11px] font-black font-mono text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">{r.toCurrency}</span></AppTd>
                       <AppTd align="right">
                         <span className="text-[12px] font-black tabular-nums font-mono text-slate-800 dark:text-slate-100">
                           {Number(r.rate).toFixed(4)}

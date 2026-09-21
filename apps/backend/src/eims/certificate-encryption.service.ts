@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
+
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CertificateEncryptionService {
@@ -40,7 +41,7 @@ export class CertificateEncryptionService {
     const key = this.getKey();
     const parts = ciphertext.split(':');
     if (parts.length !== 4) {
-      throw new Error('Invalid encrypted private key format');
+      throw new InternalServerErrorException('Invalid encrypted private key format');
     }
     const [saltHex, ivHex, tagHex, encrypted] = parts;
     const salt = Buffer.from(saltHex, 'hex');

@@ -19,7 +19,7 @@ interface ovdsPageHeaderProps {
   title: string;
   subtitle?: string;
   icon: React.ReactNode;
-  iconBg?: string;       // e.g. "bg-emerald-500"
+  iconBg?: string;       // e.g. "bg-[var(--pro-azure)]"
   actions?: React.ReactNode;
   tabs?: ovdsTab[];
   activeTab?: string;
@@ -32,7 +32,7 @@ interface ovdsPageHeaderProps {
 }
 
 export const OvdsPageHeader: React.FC<ovdsPageHeaderProps> = ({
-  title, subtitle, icon, iconBg = 'bg-emerald-500',
+  title, subtitle, icon, iconBg = 'bg-[var(--pro-azure)]',
   actions, tabs, activeTab, onTabChange, onRefresh, loading, badge, extra,
 }) => (
   <div className="bg-white border-b border-slate-100 px-4 sm:px-5 pt-4 pb-0 sticky top-0 z-10">
@@ -85,12 +85,12 @@ export const OvdsPageHeader: React.FC<ovdsPageHeaderProps> = ({
             className={[
               'flex items-center gap-1.5 px-3.5 py-2.5 text-[12px] font-semibold border-b-2 whitespace-nowrap transition-all shrink-0',
               activeTab === tab.id
-                ? 'border-emerald-500 text-emerald-700 bg-emerald-50/40'
+                ? 'border-[var(--pro-azure)] text-[var(--pro-azure-dark)] bg-[var(--pro-azure-50)]/40'
                 : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-200',
             ].join(' ')}
           >
             {tab.icon && (
-              <span className={activeTab === tab.id ? 'text-emerald-600' : 'text-slate-400'}>
+              <span className={activeTab === tab.id ? 'text-[var(--pro-azure-dark)]' : 'text-slate-400'}>
                 {tab.icon}
               </span>
             )}
@@ -98,14 +98,14 @@ export const OvdsPageHeader: React.FC<ovdsPageHeaderProps> = ({
             {tab.count !== undefined && (
               <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold leading-none ${
                 activeTab === tab.id
-                  ? 'bg-emerald-100 text-emerald-700'
+                  ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'
                   : 'bg-slate-100 text-slate-500'
               }`}>
                 {tab.count > 999 ? '999+' : tab.count}
               </span>
             )}
             {tab.badge && (
-              <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wide ${tab.badgeCls ?? 'bg-emerald-100 text-emerald-700'}`}>
+              <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wide ${tab.badgeCls ?? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'}`}>
                 {tab.badge}
               </span>
             )}

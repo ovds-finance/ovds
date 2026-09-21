@@ -2,23 +2,24 @@
  * Partnerships — ovds-style business partnership management
  * AppPage · AppKpi · AppTable · useApiCrud
  */
-import React, { useState, useMemo, useCallback } from 'react';
 import {
   HeartHandshake, Plus, Edit2, Trash2, RefreshCw, Download,
   Calendar,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import { fmtETB } from '../utils/ethiopianTax';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select, Textarea,
   SearchBar, EmptyState, Pagination, Amount,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
+import { fmtETB } from '../utils/ethiopianTax';
 
 interface Partnership {
   id: string;
@@ -114,7 +115,7 @@ const Partnerships: React.FC = () => {
   const kpiCells = useMemo(() => {
     const totalCapital = rows.reduce((s, p) => s + (p.investedCapital ?? 0), 0);
     return [
-      { label: 'Total',    value: rows.length,                                                    color: 'emerald' as const },
+      { label: 'Total',    value: rows.length,                                                    color: 'green' as const },
       { label: 'Active',   value: rows.filter(p => p.status === 'ACTIVE').length,                 color: 'sky' as const },
       { label: 'JV',       value: rows.filter(p => p.type === 'JOINT_VENTURE').length,            color: 'violet' as const },
       { label: 'Capital',  value: fmtETB(totalCapital),                                           color: 'amber' as const },
@@ -196,7 +197,7 @@ const Partnerships: React.FC = () => {
             <AppTr key={p.id}>
               <AppTd>
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center text-[11px] font-bold text-emerald-700 shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--pro-azure-100)] to-teal-100 flex items-center justify-center text-[11px] font-bold text-[var(--pro-azure-dark)] shrink-0">
                     {p.name.slice(0, 2).toUpperCase()}
                   </div>
                   <div>
@@ -218,7 +219,7 @@ const Partnerships: React.FC = () => {
               </AppTd>
               <AppTd align="right">
                 {p.sharePercentage != null
-                  ? <span className="text-[11px] font-bold text-emerald-600">{p.sharePercentage.toFixed(1)}%</span>
+                  ? <span className="text-[11px] font-bold text-[var(--pro-azure)]">{p.sharePercentage.toFixed(1)}%</span>
                   : <span className="text-[10px] text-slate-300">—</span>
                 }
               </AppTd>
@@ -236,7 +237,7 @@ const Partnerships: React.FC = () => {
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {can('partnerships:write') && (
                     <>
-                      <button onClick={() => setModal({ open: true, data: { ...p } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all"><Edit2 size={11} /></button>
+                      <button onClick={() => setModal({ open: true, data: { ...p } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all"><Edit2 size={11} /></button>
                       <button onClick={async () => { if (await confirm({ title: `Delete "${p.name}"?`, variant: 'danger' })) remove(p.id); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all"><Trash2 size={11} /></button>
                     </>
                   )}

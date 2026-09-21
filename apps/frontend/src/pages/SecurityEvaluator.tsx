@@ -2,7 +2,7 @@
  * SecurityEvaluator — AI-powered security posture assessment
  * Three pillars: Automated Assessment · Continuous Monitoring · Manual Reviews
  */
-import React, { useState, useCallback } from 'react';
+import { AppPage, Btn } from '@ovds/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   ShieldAlert, ShieldCheck, ShieldX, Zap, RefreshCw, AlertTriangle,
@@ -10,11 +10,13 @@ import {
   ChevronDown, ChevronUp, Bell, BellOff, PenLine, Trash2,
   TrendingUp, TrendingDown, Minus, Clock, X, Download, History,
 } from 'lucide-react';
-import { AppPage, Btn } from '@ovds/ui';
-import api from '../services/api';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
+import React, { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
+
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+
 
 type Severity    = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'INFO';
 type RiskLevel   = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
@@ -42,7 +44,7 @@ const RISK_LABEL: Record<RiskLevel,string> = { CRITICAL:'CRITICAL RISK', HIGH:'H
 const STATUS_CFG: Record<ReviewStatus,{cls:string;label:string}> = {
   OPEN:          { cls:'bg-rose-50 text-rose-700 border-rose-200',         label:'Open'          },
   IN_PROGRESS:   { cls:'bg-amber-50 text-amber-700 border-amber-200',      label:'In Progress'   },
-  RESOLVED:      { cls:'bg-emerald-50 text-emerald-700 border-emerald-200', label:'Resolved'     },
+  RESOLVED:      { cls:'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]', label:'Resolved'     },
   ACCEPTED_RISK: { cls:'bg-slate-100 text-slate-600 border-slate-200',     label:'Accepted Risk' },
 };
 
@@ -99,7 +101,7 @@ const FindingCard: React.FC<{f:Finding; onReview:(f:Finding)=>void}> = ({f, onRe
         <div className="px-4 pb-4 pt-3 space-y-2 border-t border-current/10 bg-white/60 dark:bg-slate-900/40">
           <p className="text-[11px] leading-relaxed"><span className="font-semibold">Description:</span> {f.description}</p>
           <p className="text-[11px] leading-relaxed"><span className="font-semibold">Evidence:</span> {f.evidence}</p>
-          <p className="text-[11px] leading-relaxed text-emerald-700 dark:text-emerald-400"><span className="font-semibold">Recommendation:</span> {f.recommendation}</p>
+          <p className="text-[11px] leading-relaxed text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]"><span className="font-semibold">Recommendation:</span> {f.recommendation}</p>
           {(f.cve||f.owasp)&&(
             <div className="flex flex-wrap gap-1.5 pt-1">
               {f.cve  && <span className="text-[9px] font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">{f.cve}</span>}
@@ -228,7 +230,7 @@ const SecurityEvaluator: React.FC = () => {
   }, [qs]);
 
   const trendIcon = (t?:Trend) =>
-    t==='IMPROVING' ? <TrendingUp size={12} className="text-emerald-500"/> :
+    t==='IMPROVING' ? <TrendingUp size={12} className="text-[var(--pro-azure)]"/> :
     t==='DEGRADING' ? <TrendingDown size={12} className="text-rose-500"/> :
     <Minus size={12} className="text-slate-400"/>;
 
@@ -365,11 +367,11 @@ const SecurityEvaluator: React.FC = () => {
                 <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                   <ShieldAlert size={14} className="text-rose-400"/> Findings ({report.findings.length})
                 </h3>
-                {report.findings.length===0 && <span className="flex items-center gap-1 text-xs text-emerald-600 font-medium"><CheckCircle2 size={12}/> All clear</span>}
+                {report.findings.length===0 && <span className="flex items-center gap-1 text-xs text-[var(--pro-azure)] font-medium"><CheckCircle2 size={12}/> All clear</span>}
               </div>
               <div className="p-4 space-y-2">
                 {report.findings.length===0
-                  ? <div className="flex flex-col items-center py-8 gap-2 text-emerald-600"><ShieldCheck size={24}/><p className="text-sm font-medium">No issues detected</p></div>
+                  ? <div className="flex flex-col items-center py-8 gap-2 text-[var(--pro-azure)]"><ShieldCheck size={24}/><p className="text-sm font-medium">No issues detected</p></div>
                   : report.findings.map(f=><FindingCard key={f.id} f={f} onReview={fnd=>{setReviewTarget(fnd);setTab('reviews');}}/>)
                 }
               </div>
@@ -422,7 +424,7 @@ const SecurityEvaluator: React.FC = () => {
             </div>
             <div className="divide-y divide-slate-50 dark:divide-slate-800">
               {(mon?.alerts??[]).length===0 ? (
-                <div className="flex flex-col items-center py-12 gap-2 text-emerald-600">
+                <div className="flex flex-col items-center py-12 gap-2 text-[var(--pro-azure)]">
                   <ShieldCheck size={24}/><p className="text-sm font-medium">No active alerts</p>
                   <p className="text-xs text-slate-400">The hourly monitor has not detected any threshold breaches.</p>
                 </div>
@@ -439,12 +441,12 @@ const SecurityEvaluator: React.FC = () => {
                       <p className="text-xs text-slate-700 dark:text-slate-300 mt-1">{alert.message}</p>
                       <p className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1">
                         <Clock size={9}/> {new Date(alert.triggeredAt).toLocaleString('en-ET',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}
-                        {alert.acknowledged && <span className="ml-2 text-emerald-500 font-medium">· Acknowledged</span>}
+                        {alert.acknowledged && <span className="ml-2 text-[var(--pro-azure)] font-medium">· Acknowledged</span>}
                       </p>
                     </div>
                     {!alert.acknowledged && (
                       <button onClick={()=>ackAlert.mutate(alert.id)}
-                        className="shrink-0 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-emerald-500 transition-colors" title="Acknowledge">
+                        className="shrink-0 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-[var(--pro-azure)] transition-colors" title="Acknowledge">
                         <CheckCircle2 size={13}/>
                       </button>
                     )}
@@ -484,7 +486,7 @@ const SecurityEvaluator: React.FC = () => {
             {([
               {label:'Open',          s:'OPEN'          as ReviewStatus, cls:'text-rose-600'},
               {label:'In Progress',   s:'IN_PROGRESS'   as ReviewStatus, cls:'text-amber-600'},
-              {label:'Resolved',      s:'RESOLVED'      as ReviewStatus, cls:'text-emerald-600'},
+              {label:'Resolved',      s:'RESOLVED'      as ReviewStatus, cls:'text-[var(--pro-azure)]'},
               {label:'Accepted Risk', s:'ACCEPTED_RISK' as ReviewStatus, cls:'text-slate-600'},
             ]).map(row=>{
               const count = reviews.filter(r=>r.status===row.s).length;
@@ -544,7 +546,7 @@ const SecurityEvaluator: React.FC = () => {
                         <p className="text-xs font-semibold text-slate-800 dark:text-slate-100">{rev.title}</p>
                         {rev.notes && <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">{rev.notes}</p>}
                         {rev.remediation && (
-                          <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1">
+                          <p className="text-[11px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] mt-1">
                             <span className="font-semibold">Plan:</span> {rev.remediation}
                           </p>
                         )}

@@ -22,7 +22,9 @@
  *   <div ref={sentinelRef} />   ← auto-triggers next page
  */
 import { useState, useCallback, useRef, useEffect } from 'react';
+
 import api from '../services/api';
+
 import { buildApiQueryError, type ApiQueryError } from './useApiQuery';
 
 interface UseInfiniteScrollOptions<T> {
@@ -53,7 +55,7 @@ interface UseInfiniteScrollResult<T> {
   /** Reset and reload from page 1 */
   reset: () => void;
   /** Attach to a sentinel div at the bottom of the list for auto-load */
-  sentinelRef: React.RefObject<HTMLDivElement>;
+  sentinelRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export function useInfiniteScroll<T = any>(

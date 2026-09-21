@@ -16,8 +16,8 @@
  *
  * Type-safe: each entity type has its own isolated key in localStorage.
  */
-import { useState, useCallback } from 'react';
 import { safeJsonParse } from '@ovds/ui';
+import { useState, useCallback } from 'react';
 
 export interface RecentItem {
   id: string;

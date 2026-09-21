@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Pagination, usePagination, MetricCard } from '@ovds/ui';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { Pagination, usePagination } from '@ovds/ui';
+import { calcWHT, evalMath } from '@ovds/ui';
 import {
   Plus, Trash2, Edit2, CheckCircle2, Clock,
   AlertTriangle, Calendar, Download,
@@ -10,30 +9,28 @@ import {
   Search, ChevronRight, FileText, LayoutGrid, List,
   TrendingDown, Landmark, Info, Wallet, ArrowUpRight, AlertCircle,
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
 import { OvdsPageHeader, OvdsStatsStrip, OvdsToolbar, OvdsEmptyState } from '../components/ovds';
-import { Icon } from '../components/ui';
 import {
   PipelineStageHeader,
   PipelineBadge,
 } from '../components/pipelineComponents';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import { confirm } from '../utils/confirm';
-import { useTranslation } from 'react-i18next';
+import { Icon } from '../components/ui';
 import { useBusiness } from '../context/businessContext';
-import { useSearch, useAuditLog, useApiQuery, usePageTitle, invalidateQueryPrefix } from '../hooks';
+import { useSearch, useAuditLog, useApiQuery, usePageTitle } from '../hooks';
 import { useAuth } from '../rbac/AuthContext';
-import { downloadCSV } from '../utils/download';
-import { IconType } from '@ovds/ui';
+import api from '../services/api';
 import { useWarehouses } from '../services/inventoryApi';
 import { useCreateDebitNote } from '../services/missingFeaturesApi';
-import ColumnToggle from '../components/columnToggle';
-import { ContextualInsight } from '@ovds/ui';
-import ApiErrorState from '../components/apiErrorState';
-import InvoiceCaptureModal from '../components/invoice/invoiceCaptureModal';
-import { fmtCurrency, fmtDate } from '../utils/fmt';
-import { calcWHT, evalMath } from '@ovds/ui';
+import { confirm } from '../utils/confirm';
+import { downloadCSV } from '../utils/download';
 import { calcLineTax } from '../utils/ethiopianTax';
+import { fmtCurrency, fmtDate } from '../utils/fmt';
+
 
 const BILL_STATUS_TABS = ['ALL', 'PENDING', 'PAID', 'OVERDUE'] as const;
 type BillStatusTab = typeof BILL_STATUS_TABS[number];
@@ -47,32 +44,32 @@ const CATEGORIES = [
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
-  UTILITIES:              'bg-emerald-100 text-emerald-700',
+  UTILITIES:              'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   RENT:                   'bg-violet-100 text-violet-700',
   SUPPLIES:               'bg-amber-100 text-amber-700',
   MAINTENANCE:            'bg-orange-100 text-orange-700',
   TRANSPORT:              'bg-teal-100 text-teal-700',
-  PROFESSIONAL_FEES:      'bg-indigo-100 text-indigo-700',
-  INSURANCE:              'bg-emerald-100 text-emerald-700',
+  PROFESSIONAL_FEES:      'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
+  INSURANCE:              'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   ADVERTISING:            'bg-pink-100 text-pink-700',
   REPAIRS:                'bg-rose-100 text-rose-700',
   SALARIES:               'bg-cyan-100 text-cyan-700',
   RECRUITMENT_AGENCY_FEE: 'bg-purple-100 text-purple-700',
-  OTHER:                  'bg-emerald-50 text-emerald-600',
+  OTHER:                  'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]',
 };
 
-const STATUS_BADGE: Record<string, string> = {
-  PAID:    'bg-emerald-50 text-emerald-700 border border-emerald-200',
+const _STATUS_BADGE: Record<string, string> = {
+  PAID:    'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)]',
   OVERDUE: 'bg-rose-50 text-rose-700 border border-rose-200',
   PENDING: 'bg-amber-50 text-amber-700 border border-amber-200',
-  DRAFT:   'bg-emerald-50/50 text-emerald-500 border border-emerald-100',
+  DRAFT:   'bg-[var(--pro-azure-50)]/50 text-[var(--pro-azure)] border border-[var(--pro-azure-100)]',
 };
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
 // -- Design tokens -------------------------------------------------------------
-const inp = 'w-full px-3 py-2.5 bg-white border border-emerald-200 rounded-lg text-sm text-emerald-900 outline-none focus:ring-2 focus:ring-teal-400/20 focus:border-teal-400 transition-all placeholder:text-emerald-300';
-const lbl = 'block text-[11px] font-semibold text-emerald-700 uppercase tracking-wide mb-1';
+const inp = 'w-full px-3 py-2.5 bg-white border border-[var(--pro-azure-100)] rounded-lg text-sm text-[var(--pro-azure-dark)] outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)] transition-all placeholder:text-green-300';
+const lbl = 'block text-[11px] font-semibold text-[var(--pro-azure-dark)] uppercase tracking-wide mb-1';
 
 // -- BillFormModal — defined OUTSIDE Bills to avoid React remount on every render --
 interface BillFormModalProps {
@@ -91,21 +88,21 @@ const BillFormModal: React.FC<BillFormModalProps> = ({
   onClose, editingBill, billForm, setBillForm, saving, vendors, warehouses, handleSaveBill, calcTotal,
 }) => (
   <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl border border-emerald-100 overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl border border-[var(--pro-azure-100)] overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-emerald-100">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--pro-azure-100)]">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-violet-50 rounded-xl flex items-center justify-center">
             <Icon name="RECEIPT" size={15} className="text-violet-600" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-emerald-900">
+            <p className="text-sm font-semibold text-[var(--pro-azure-dark)]">
               {editingBill ? 'Edit Bill' : 'New Bill'}
             </p>
-            <p className="text-[10px] text-emerald-500">Accounts Payable · WHT 3% auto-calculated</p>
+            <p className="text-[10px] text-[var(--pro-azure)]">Accounts Payable · WHT 3% auto-calculated</p>
           </div>
         </div>
-        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-500 transition-colors">
+        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[var(--pro-azure-50)] text-[var(--pro-azure)] transition-colors">
           <X size={16} />
         </button>
       </div>
@@ -230,19 +227,19 @@ const BillFormModal: React.FC<BillFormModalProps> = ({
           <div className="flex flex-col justify-end">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={billForm.whtApplicable} onChange={e => setBillForm((p: any) => ({ ...p, whtApplicable: e.target.checked }))}
-                className="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-teal-400" />
-              <span className="text-xs font-semibold text-emerald-700">WHT Applicable (3%)</span>
+                className="w-4 h-4 rounded border-slate-300 text-[var(--pro-azure)] focus:ring-teal-400" />
+              <span className="text-xs font-semibold text-[var(--pro-azure-dark)]">WHT Applicable (3%)</span>
             </label>
-            <p className="text-[10px] text-emerald-500 mt-1">Proclamation No. 1395/2025</p>
+            <p className="text-[10px] text-[var(--pro-azure)] mt-1">Proclamation No. 1395/2025</p>
           </div>
         </div>
 
         {/* Total preview */}
         {billForm.amount && (
-          <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
+          <div className="bg-[var(--pro-azure-50)] rounded-xl p-4 border border-[var(--pro-azure-100)]">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-emerald-600">Subtotal</span>
-              <span className="font-semibold text-emerald-800">ETB {fmt(parseFloat(billForm.amount) || 0)}</span>
+              <span className="text-[var(--pro-azure)]">Subtotal</span>
+              <span className="font-semibold text-[var(--pro-azure-dark)]">ETB {fmt(parseFloat(billForm.amount) || 0)}</span>
             </div>
             <div className="flex items-center justify-between text-xs mt-1">
               <span className="text-violet-600">VAT (15%)</span>
@@ -254,19 +251,19 @@ const BillFormModal: React.FC<BillFormModalProps> = ({
                 <span className="font-semibold text-amber-600 dark:text-amber-400">− ETB {fmt(calcWHT(parseFloat(billForm.amount) || 0, 'GOODS').whtAmount)}</span>
               </div>
             )}
-            <div className="flex items-center justify-between text-sm font-bold mt-2 pt-2 border-t border-emerald-200">
-              <span className="text-emerald-800">Total</span>
-              <span className="text-emerald-900">ETB {calcTotal(billForm)}</span>
+            <div className="flex items-center justify-between text-sm font-bold mt-2 pt-2 border-t border-[var(--pro-azure-100)]">
+              <span className="text-[var(--pro-azure-dark)]">Total</span>
+              <span className="text-[var(--pro-azure-dark)]">ETB {calcTotal(billForm)}</span>
             </div>
           </div>
         )}
 
         {/* Actions */}
         <div className="flex gap-2 pt-2">
-          <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 border border-emerald-200 text-emerald-700 rounded-xl text-sm font-bold hover:bg-emerald-50 transition-colors">
+          <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 border border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-50)] transition-colors">
             Cancel
           </button>
-          <button type="submit" disabled={saving} className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-bold transition-colors disabled:opacity-50">
+          <button type="submit" disabled={saving} className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-xl text-sm font-bold transition-colors disabled:opacity-50">
             {saving ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving…</> : <><Receipt size={14} /> {editingBill ? 'Update Bill' : 'Create Bill'}</>}
           </button>
         </div>
@@ -394,13 +391,13 @@ const Bills: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingBill, setEditingBill] = useState<any>(null);
-  const [settings, setSettings] = useState<any>({});
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [_settings, setSettings] = useState<any>({});
+  const [_selected, _setSelected] = useState<Set<string>>(new Set());
   const [debitNoteBillId, setDebitNoteBillId] = useState<string | null>(null);
   const [debitNoteBill, setDebitNoteBill] = useState<any>(null);
   const { trigger: createDebitNote, loading: creatingDN } = useCreateDebitNote();
   const [vendors, setVendors] = useState<any[]>([]);
-  const [items, setItems] = useState<any[]>([]);
+  const [_items, _setItems] = useState<any[]>([]);
   
   const pagination = usePagination({ initialTake: 15 });
   const { page, take } = pagination;
@@ -419,6 +416,7 @@ const Bills: React.FC = () => {
     suppressToast: true,
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const bills: any[] = billsData?.data ?? [];
   const totalCount = billsData?.pagination?.total ?? bills.length;
 
@@ -624,9 +622,9 @@ const Bills: React.FC = () => {
               value: fmt(stats.paid),
               sub: `${bills.filter((b:any) => b.status === 'PAID').length} bills`,
               icon: <CheckCircle2 size={15} />,
-              iconBg: 'bg-emerald-50',
-              iconColor: 'text-emerald-600',
-              valueColor: 'text-emerald-700',
+              iconBg: 'bg-[var(--pro-azure-50)]',
+              iconColor: 'text-[var(--pro-azure)]',
+              valueColor: 'text-[var(--pro-azure-dark)]',
               onClick: () => setStatusFilter('PAID'),
             },
             {
@@ -664,7 +662,7 @@ const Bills: React.FC = () => {
                   className={[
                     'px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all',
                     categoryFilter === cat
-                      ? 'bg-emerald-500 text-white'
+                      ? 'bg-[var(--pro-azure)] text-white'
                       : 'bg-slate-100 text-slate-500 hover:bg-slate-200',
                   ].join(' ')}
                 >
@@ -678,7 +676,7 @@ const Bills: React.FC = () => {
           <div className="overflow-x-auto min-h-[360px]">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-[360px] gap-3">
-              <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-[var(--pro-azure)] border-t-transparent rounded-full animate-spin" />
               <p className="text-[11px] font-semibold text-slate-400">Loading bills…</p>
             </div>
           ) : bills.length === 0 ? (
@@ -717,7 +715,7 @@ const Bills: React.FC = () => {
                   <tr key={b.id} className="hover:bg-slate-50 transition-colors group">
                     <td className="px-5 py-3.5">
                       <div className="flex flex-col">
-                        <button onClick={() => navigate(`/purchases/bills/${b.id}`)} className="font-mono font-bold text-[12px] text-slate-800 dark:text-slate-100 hover:text-emerald-600 transition-colors text-left">
+                        <button onClick={() => navigate(`/purchases/bills/${b.id}`)} className="font-mono font-bold text-[12px] text-slate-800 dark:text-slate-100 hover:text-[var(--pro-azure)] transition-colors text-left">
                           #{b.billNumber}
                         </button>
                         <span className="ovds-caption mt-0.5 flex items-center gap-1">
@@ -770,7 +768,7 @@ const Bills: React.FC = () => {
                         {b.status !== 'PAID' && (
                           <button
                             onClick={() => handleMarkPaid(b.id)}
-                            className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all border border-transparent hover:border-emerald-100"
+                            className="p-1.5 text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)] rounded-lg transition-all border border-transparent hover:border-[var(--pro-azure-100)]"
                             title="Mark as Paid"
                           >
                             <CheckCircle2 size={14} />

@@ -1,6 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import api from './api';
-import {
+﻿import {
   DEVICE_CONTROL_DEFAULT_SETTINGS,
   type CreateDeviceControlChangeRequestDTO,
   type DeviceControlCategory,
@@ -8,6 +6,9 @@ import {
   type DeviceControlPolicyDTO,
   type ReviewDeviceControlChangeRequestDTO,
 } from '@ovds/shared';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import api from './api';
 
 const BASE = '/device-control';
 

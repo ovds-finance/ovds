@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
 import {
   X, ShieldCheck, Eye, EyeOff, Landmark, ChevronDown, ChevronUp,
   Building2, CreditCard, PiggyBank, Globe, Hash, GitBranch, FileText,
   DollarSign, Lock, CheckCircle2,
 } from 'lucide-react';
-import { useAuth } from '../../rbac/AuthContext';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+
 import { useEscapeKey } from '../../hooks';
+import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
 
 // -- Ethiopian banks with colour accents --------------------------------------
 const ET_BANKS: { name: string; short: string; color: string }[] = [
@@ -33,7 +34,7 @@ const ET_BANKS: { name: string; short: string; color: string }[] = [
 
 // -- Account type definitions --------------------------------------------------
 const ACCOUNT_TYPES = [
-  { value: 'CURRENT',      label: 'Current',       sub: 'Day-to-day ops',     icon: <Building2 size={14} />,  color: 'text-emerald-600 dark:text-emerald-400' },
+  { value: 'CURRENT',      label: 'Current',       sub: 'Day-to-day ops',     icon: <Building2 size={14} />,  color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
   { value: 'SAVINGS',      label: 'Savings',        sub: 'Interest-bearing',   icon: <PiggyBank size={14} />,  color: 'text-sky-600 dark:text-sky-400' },
   { value: 'FIXED_DEPOSIT',label: 'Fixed Deposit',  sub: 'Term deposit',       icon: <Lock size={14} />,       color: 'text-violet-600 dark:text-violet-400' },
   { value: 'FOREIGN',      label: 'Foreign FCY',    sub: 'Multi-currency',     icon: <Globe size={14} />,      color: 'text-amber-600 dark:text-amber-400' },
@@ -142,9 +143,9 @@ const BankModal: React.FC<BankModalProps> = ({ onClose, onSave, editAccount }) =
         {/* -- Header -- */}
         <div className="relative overflow-hidden shrink-0">
           {/* Accent stripe */}
-          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-teal-400 via-teal-500 to-emerald-500" />
+          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-teal-400 via-teal-500 to-indigo-500" />
           <div className="flex items-center gap-3 px-6 py-5">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 ${selectedBank?.color ?? 'bg-emerald-500'}`}>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 ${selectedBank?.color ?? 'bg-[var(--pro-azure-50)]0'}`}>
               {selectedBank ? selectedBank.short : <Landmark size={18} className="text-white" />}
             </div>
             <div className="flex-1 min-w-0">
@@ -183,7 +184,7 @@ const BankModal: React.FC<BankModalProps> = ({ onClose, onSave, editAccount }) =
                       title={b.name}
                       className={`flex flex-col items-center gap-1 px-1 py-2 rounded-xl text-[9px] font-bold transition-all border ${
                         isSelected
-                          ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 shadow-sm'
+                          ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] shadow-sm'
                           : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
@@ -193,7 +194,7 @@ const BankModal: React.FC<BankModalProps> = ({ onClose, onSave, editAccount }) =
                       <span className="truncate w-full text-center leading-tight">
                         {b.short === '···' ? 'Other' : b.short}
                       </span>
-                      {isSelected && <CheckCircle2 size={8} className="text-emerald-500" />}
+                      {isSelected && <CheckCircle2 size={8} className="text-[var(--pro-azure)]" />}
                     </button>
                   );
                 })}
@@ -248,7 +249,7 @@ const BankModal: React.FC<BankModalProps> = ({ onClose, onSave, editAccount }) =
                   </button>
                 </div>
                 <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
-                  <ShieldCheck size={10} className="text-emerald-500" />
+                  <ShieldCheck size={10} className="text-[var(--pro-azure)]" />
                   Stored securely — only last 4 digits shown in the UI
                 </div>
               </div>
@@ -268,7 +269,7 @@ const BankModal: React.FC<BankModalProps> = ({ onClose, onSave, editAccount }) =
                       onClick={() => setForm(f => ({ ...f, accountType: t.value }))}
                       className={`flex items-center gap-2 px-3 py-2 rounded-xl text-left border transition-all ${
                         form.accountType === t.value
-                          ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30'
+                          ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30'
                           : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
@@ -276,7 +277,7 @@ const BankModal: React.FC<BankModalProps> = ({ onClose, onSave, editAccount }) =
                         {t.icon}
                       </span>
                       <div className="min-w-0">
-                        <p className={`text-xs font-semibold leading-tight ${form.accountType === t.value ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                        <p className={`text-xs font-semibold leading-tight ${form.accountType === t.value ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-slate-700 dark:text-slate-300'}`}>
                           {t.label}
                         </p>
                         <p className="text-[9px] text-slate-400 leading-tight">{t.sub}</p>
@@ -299,13 +300,13 @@ const BankModal: React.FC<BankModalProps> = ({ onClose, onSave, editAccount }) =
                         onClick={() => setForm(f => ({ ...f, currencyCode: c.code }))}
                         className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-left border transition-all ${
                           form.currencyCode === c.code
-                            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30'
+                            ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30'
                             : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600'
                         }`}
                       >
                         <span className="text-base leading-none">{c.flag}</span>
                         <div className="min-w-0">
-                          <p className={`text-xs font-semibold leading-tight ${form.currencyCode === c.code ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                          <p className={`text-xs font-semibold leading-tight ${form.currencyCode === c.code ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-slate-700 dark:text-slate-300'}`}>
                             {c.code}
                           </p>
                           <p className="text-[9px] text-slate-400 truncate">{c.label}</p>
@@ -399,7 +400,7 @@ const BankModal: React.FC<BankModalProps> = ({ onClose, onSave, editAccount }) =
             {/* Preview strip */}
             {(form.name || form.bankName) && (
               <div className="flex items-center gap-3 px-3 py-2.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-white text-[9px] font-bold shrink-0 ${selectedBank?.color ?? 'bg-emerald-500'}`}>
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-white text-[9px] font-bold shrink-0 ${selectedBank?.color ?? 'bg-[var(--pro-azure-50)]0'}`}>
                   {selectedBank?.short ?? '—'}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -411,7 +412,7 @@ const BankModal: React.FC<BankModalProps> = ({ onClose, onSave, editAccount }) =
                     {form.currencyCode !== 'ETB' && ` · ${form.currencyCode}`}
                   </p>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 shrink-0">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-[var(--pro-azure-100)] dark:border-green-800 shrink-0">
                   {ACCOUNT_TYPES.find(t => t.value === form.accountType)?.label ?? form.accountType}
                 </span>
               </div>

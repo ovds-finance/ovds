@@ -3,15 +3,13 @@
  * Proclamation No. 1395/2025 — ERCA
  * Covers: GOODS 2%, SERVICES 2%, NON-RESIDENT 15%, RENT 30%, DIVIDEND 15%, INTEREST 10%
  */
+import { AppPage, AppKpi } from '@ovds/ui';
+import { FileCheck, Plus, RefreshCw, Download, Send, XCircle, Zap } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
-import { FileCheck, Plus, RefreshCw, Download, Send, XCircle, Eye, Zap } from 'lucide-react';
-import { AppPage, AppKpi, AppGrid, AppCard } from '@ovds/ui';
-import { Icon } from '../components/ui';
-import { useBusiness } from '../context/businessContext';
-import { useAuth } from '../rbac/AuthContext';
-import api from '../services/api';
-import { fmtCurrency, fmtDate } from '@ovds/ui';
 import toast from 'react-hot-toast';
+
+import { useBusiness } from '../context/businessContext';
+import api from '../services/api';
 
 // -- Types ---------------------------------------------------------------------
 interface WhtCert {
@@ -53,8 +51,8 @@ const WHT_TYPE_LABELS: Record<string, string> = {
 
 const STATUS_COLOR: Record<string, string> = {
   DRAFT:     'bg-slate-100 text-slate-600',
-  ISSUED:    'bg-blue-100 text-blue-700',
-  REMITTED:  'bg-emerald-100 text-emerald-700',
+  ISSUED:    'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
+  REMITTED:  'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
   CANCELLED: 'bg-rose-100 text-rose-600',
 };
 
@@ -132,7 +130,7 @@ const CreateModal: React.FC<{ onClose: () => void; onCreated: () => void; compan
             </div>
             <div>
               <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1 block">WHT Amount (auto)</label>
-              <div className="w-full px-3 py-2 border border-emerald-200 dark:border-emerald-800 rounded-xl text-sm bg-emerald-50 dark:bg-emerald-950/30 font-bold text-emerald-700 dark:text-emerald-400">
+              <div className="w-full px-3 py-2 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl text-sm bg-[var(--pro-azure-50)] dark:bg-green-950/30 font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
                 ETB {whtAmount.toLocaleString('en-ET', { minimumFractionDigits: 2 })}
               </div>
             </div>
@@ -148,7 +146,7 @@ const CreateModal: React.FC<{ onClose: () => void; onCreated: () => void; compan
         </div>
         <div className="flex gap-3 p-5 border-t border-slate-100 dark:border-slate-800">
           <button onClick={onClose} className="flex-1 px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Cancel</button>
-          <button onClick={submit} disabled={saving} className="flex-1 px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 disabled:opacity-50 transition-colors">
+          <button onClick={submit} disabled={saving} className="flex-1 px-4 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 transition-colors">
             {saving ? 'Creating…' : 'Create Certificate'}
           </button>
         </div>
@@ -174,14 +172,14 @@ const RemitModal: React.FC<{ cert: WhtCert; onClose: () => void; onDone: () => v
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
       <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl p-5 space-y-4">
         <h2 className="ovds-module-title">Remit to MoR — {cert.certNo}</h2>
-        <p className="ovds-body">WHT Amount: <strong className="text-emerald-600">ETB {Number(cert.whtAmount).toLocaleString()}</strong></p>
+        <p className="ovds-body">WHT Amount: <strong className="text-[var(--pro-azure)]">ETB {Number(cert.whtAmount).toLocaleString()}</strong></p>
         <div>
           <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1 block">ERCA Reference Number</label>
           <input className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800" placeholder="e.g. ERCA-2025-123456" value={ercaRef} onChange={e => setErcaRef(e.target.value)} />
         </div>
         <div className="flex gap-3">
           <button onClick={onClose} className="flex-1 px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
-          <button onClick={submit} disabled={saving} className="flex-1 px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 disabled:opacity-50 transition-colors">
+          <button onClick={submit} disabled={saving} className="flex-1 px-4 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 transition-colors">
             {saving ? 'Saving…' : 'Confirm Remittance'}
           </button>
         </div>
@@ -248,7 +246,7 @@ const WhtCertificates: React.FC = () => {
     { label: 'Total Certificates', value: summary.totalCertificates.toString(), accentCls: 'bg-violet-500' },
     { label: 'Gross Transactions', value: `ETB ${(summary.totalGrossAmount / 1000).toFixed(0)}K`, accentCls: 'bg-sky-500' },
     { label: 'WHT Deducted', value: `ETB ${(summary.totalWhtDeducted / 1000).toFixed(0)}K`, accentCls: 'bg-amber-500' },
-    { label: 'Remitted to MoR', value: `ETB ${(summary.totalRemitted / 1000).toFixed(0)}K`, accentCls: 'bg-emerald-500' },
+    { label: 'Remitted to MoR', value: `ETB ${(summary.totalRemitted / 1000).toFixed(0)}K`, accentCls: 'bg-[var(--pro-azure)]' },
     { label: 'Unremitted', value: `ETB ${(summary.totalUnremitted / 1000).toFixed(0)}K`, accentCls: 'bg-rose-500' },
   ] : [];
 
@@ -268,7 +266,7 @@ const WhtCertificates: React.FC = () => {
             <option value="">All Status</option>
             {['DRAFT','ISSUED','REMITTED','CANCELLED'].map(s => <option key={s} value={s}>{s}</option>)}
           </select>
-          <button onClick={load} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"><RefreshCw size={16} className={loading ? 'animate-spin text-emerald-500' : 'text-slate-500'} /></button>
+          <button onClick={load} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"><RefreshCw size={16} className={loading ? 'animate-spin text-[var(--pro-azure)]' : 'text-slate-500'} /></button>
           <button onClick={handleAutoGenerate} disabled={autoGenLoading}
             className="flex items-center gap-1.5 px-3 py-2 bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 rounded-xl text-sm font-bold hover:bg-amber-200 transition-colors disabled:opacity-50">
             <Zap size={14} />{autoGenLoading ? 'Generating…' : 'Auto-Generate'}
@@ -285,7 +283,7 @@ const WhtCertificates: React.FC = () => {
       <div className="ovds-widget-card p-4 mb-4">
         <p className="ovds-section-title mb-3">WHT Rates — Proclamation No. 1395/2025</p>
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
-          {Object.entries(WHT_TYPE_LABELS).map(([k, v]) => (
+          {Object.entries(WHT_TYPE_LABELS).map(([k, _v]) => (
             <div key={k} className="bg-white dark:bg-slate-800 rounded-xl p-2.5 text-center">
               <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{k}</div>
               <div className="ovds-value-sm text-amber-600 mt-0.5">
@@ -304,12 +302,12 @@ const WhtCertificates: React.FC = () => {
         </div>
         <div className="ovds-widget-body overflow-x-auto">
           {loading ? (
-            <div className="ovds-empty py-12"><RefreshCw size={20} className="animate-spin text-emerald-500 mb-2" /><span>Loading…</span></div>
+            <div className="ovds-empty py-12"><RefreshCw size={20} className="animate-spin text-[var(--pro-azure)] mb-2" /><span>Loading…</span></div>
           ) : certs.length === 0 ? (
             <div className="ovds-empty py-12">
               <FileCheck size={32} className="text-slate-300 mb-2" />
               <span>No certificates for {period}</span>
-              <button onClick={() => setShowCreate(true)} className="mt-3 text-sm text-emerald-600 hover:underline">Create one</button>
+              <button onClick={() => setShowCreate(true)} className="mt-3 text-sm text-[var(--pro-azure)] hover:underline">Create one</button>
             </div>
           ) : (
             <table className="w-full text-sm">
@@ -337,12 +335,12 @@ const WhtCertificates: React.FC = () => {
                     <td className="py-2.5 px-3">
                       <div className="flex items-center gap-1">
                         {c.status === 'DRAFT' && (
-                          <button onClick={() => handleIssue(c)} title="Issue" className="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg text-blue-600 transition-colors">
+                          <button onClick={() => handleIssue(c)} title="Issue" className="p-1 hover:bg-[var(--pro-azure-50)] dark:hover:bg-[var(--pro-azure-50)]/10 rounded-lg text-[var(--pro-azure)] transition-colors">
                             <Send size={13} />
                           </button>
                         )}
                         {c.status === 'ISSUED' && (
-                          <button onClick={() => setRemitTarget(c)} title="Remit to MoR" className="p-1 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-lg text-emerald-600 transition-colors">
+                          <button onClick={() => setRemitTarget(c)} title="Remit to MoR" className="p-1 hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-900/30 rounded-lg text-[var(--pro-azure)] transition-colors">
                             <Download size={13} />
                           </button>
                         )}

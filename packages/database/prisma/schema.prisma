@@ -25,7 +25,7 @@ generator zod {
 
 // ─────────────────────────────────────────────────────────────────────────────┐
 // FINANCIAL CORE — Normalized Double-Entry Accounting Engine                  │
-// Inspired by Akaunting's ledger architecture. Balanced by design.            │
+// Ovds SaaS double-entry ledger architecture. Balanced by design.            │
 //                                                                              │
 // Core models: Company → Account (Chart of Accounts) → JournalEntry           │
 //              → LedgerEntry (immutable double-entry posts).                   │
@@ -884,6 +884,7 @@ model CollectionCase {
 model Company {
   id                         String                       @id @default(uuid())
   name                       String                       @unique(map: "Company_name_key")
+  subdomain                  String?                      @unique @db.VarChar(100)
   type                       CompanyType
   tin                        String?                      @db.VarChar(15)
   vatNumber                  String?                      @db.VarChar(15)
@@ -898,6 +899,16 @@ model Company {
   teamSize                   String?                      @db.VarChar(50)
   settings                   String?                      @db.LongText
   ifrsConfig                 String?                      @db.LongText
+  /**
+   * securityPolicy — per-tenant ABAC configuration stored as a JSON string.
+   * Parsed shape: CompanySecurityPolicy (see access-policy.service.ts).
+   * Fields:
+   *   ipWhitelist    — CIDR blocks / exact IPs allowed for sensitive operations
+   *   allowedHours   — { start: "09:00", end: "17:00", timezone: "Africa/Addis_Ababa" }
+   *   mfaRequired    — force MFA for write/approve operations
+   *   sensitivePerms — override the default sensitive-permission list
+   */
+  securityPolicy             String?                      @db.LongText
   createdAt                  DateTime                     @default(now())
   autoUpdate                 Boolean                      @default(false)
   currentVersion             String?                      @default("2.0.0")
@@ -985,6 +996,7 @@ model Company {
   modularSettings         Setting[]                 @relation("CompanySettings")
   companyModuleSettings   CompanyModule[]
   appInstallations        AppInstallation[]
+  moduleDownloadJobs      ModuleDownloadJob[]
   customRoles             RoleDefinition[]
   customPermissions       Permission[]
   companySettingValues    SettingValue[]
@@ -1037,9 +1049,10 @@ model Company {
   securityAssessment     SecurityAssessment[]
   cyberAudits            CyberAudit[]
   masterComplianceChecklists MasterComplianceChecklist[]
-  accreditationChecklists    AccreditationChecklist[]
+   accreditationChecklists    AccreditationChecklist[]
+   licenseActivations       LicenseActivation[]
 
-  @@map("company")
+   @@map("company")
 }
 
 model CustomField {
@@ -1799,6 +1812,36 @@ model Invoice {
   @@index([companyId, date(sort: Desc)], map: "Invoice_companyId_date_idx")
   @@unique([invoiceNumber, companyId])
   @@map("invoice")
+}
+
+model Estimate {
+  id                 String    @id @default(uuid())
+  estimateNumber     String    @default(uuid()) @db.VarChar(50)
+  customerName       String    @db.VarChar(255)
+  customerId         String?
+  companyId          String?
+  status             String    @default("DRAFT") @db.VarChar(20)  // DRAFT|SENT|ACCEPTED|DECLINED|CONVERTED
+  date               DateTime  @default(now())
+  dueDate            DateTime?
+  subtotal           Decimal   @default(0)
+  vatAmount          Decimal   @default(0)
+  totalAmount        Decimal   @default(0)
+  notes              String?   @db.Text
+  items              String?   @db.LongText
+  convertedInvoiceId String?   @db.VarChar(36)
+  sentAt             DateTime?
+  customerEmail      String?   @db.VarChar(200)
+  customerPhone      String?   @db.VarChar(50)
+  customerAddress    String?   @db.VarChar(500)
+  customerTin        String?   @db.VarChar(50)
+  paymentTerms       String?   @db.VarChar(20)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @default(now()) @updatedAt
+
+  @@index([companyId])
+  @@index([status])
+  @@index([date])
+  @@map("estimate")
 }
 
 model InvoiceActivity {
@@ -4110,6 +4153,7 @@ model RoleDefinition {
   description String?  @db.Text
   isActive    Boolean  @default(true)
   isSystem    Boolean  @default(false)
+  apiAccess   Boolean  @default(false)
   companyId   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
@@ -8785,6 +8829,53 @@ model AppInstallation {
   @@map("app_installation")
 }
 
+/// Tracks the full lifecycle of a programmatic module download/installation job.
+/// On-premises: job streams the ZIP, extracts to disk, transitions PENDING → DOWNLOADING → EXTRACTING → DONE | FAILED.
+/// SaaS/Cloud:  job skips download; activates tenant permissions in DB,  transitions PENDING → ACTIVATING → DONE | FAILED.
+model ModuleDownloadJob {
+  id          String   @id @default(uuid())
+  companyId   String
+
+  /// App slug / module alias (e.g. "erca-etax", "telebirr-pay")
+  moduleAlias String   @db.VarChar(100)
+
+  /// PENDING | DOWNLOADING | EXTRACTING | ACTIVATING | DONE | FAILED | CANCELLED
+  status      String   @default("PENDING") @db.VarChar(20)
+
+  /// "ON_PREMISE" | "SAAS"
+  deploymentType String @default("SAAS") @db.VarChar(20)
+
+  /// Remote download URL used for ON_PREMISE jobs
+  downloadUrl  String?  @db.VarChar(1000)
+
+  /// Absolute server-side path the ZIP was extracted to (ON_PREMISE only)
+  targetPath   String?  @db.VarChar(500)
+
+  /// 0–100 download progress percentage (ON_PREMISE only)
+  progress     Int      @default(0)
+
+  /// Human-readable status message or error detail
+  message      String?  @db.Text
+
+  /// SHA-256 checksum of the downloaded file (ON_PREMISE only)
+  sha256       String?  @db.VarChar(64)
+
+  /// User who triggered the job
+  triggeredBy  String?  @db.VarChar(100)
+
+  startedAt    DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([companyId, moduleAlias])
+  @@index([status])
+  @@map("module_download_job")
+}
+
 // ── EIMS (Electronic Invoice Management System) — MoR/INSA compliance ────────
 
 /// Registered EIMS source system per company (MoR portal source registration)
@@ -9361,4 +9452,214 @@ model AccreditationItem {
   @@index([sectionKey])
   @@index([status])
   @@map("accreditation_item")
+}
+
+// ── V&V (Validation & Verification / TASS) ────────────────────────────────────
+
+/// V&V compliance declaration submitted to MoR ERCA.
+/// Proclamation No. 1341/2024 — Regulation No. 570/2025.
+model VandvSubmission {
+  id                 String   @id @default(uuid())
+  companyId          String
+  period             String   @db.VarChar(7)   // YYYY-MM
+  confirmationNumber String   @unique @db.VarChar(50)
+  status             String   @default("SUBMITTED") @db.VarChar(20)
+  payload            String?  @db.LongText
+  submittedBy        String?  @db.VarChar(100)
+  submittedAt        DateTime @default(now())
+
+  @@index([companyId, period])
+  @@map("vandv_submission")
+}
+
+/// In-progress V&V draft saved while the user fills the compliance form.
+model VandvDraft {
+  id          String   @id @default(uuid())
+  companyId   String
+  period      String   @db.VarChar(7)
+  values      String?  @db.LongText   // JSON blob
+  status      String   @default("DRAFT") @db.VarChar(20)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+   @@index([companyId, period])
+   @@map("vandv_draft")
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// DUAL-RUNTIME DEPLOYMENT & OFFLINE LICENSING (Hybrid On-Cloud / On-Premise)
+// ──────────────────────────────────────────────────────────────────────────────
+
+/// Deployment topology of the running instance.
+/// Injected via DEPLOYMENT_MODE env var by the NestJS Dual-Runtime Bootstrapper.
+enum DeploymentMode {
+  CLOUD_SAAS
+  ON_PREMISE_SINGLE
+  ON_PREMISE_MULTI
+}
+
+/// Air-gapped license activations stored per company.
+model LicenseActivation {
+  id          String    @id @default(uuid())
+  companyId   String
+  licenseKey  String    @db.VarChar(500)
+  signature   String    @db.LongText
+  expiresAt   DateTime?
+  isValid     Boolean   @default(true)
+  registeredModules String @db.LongText
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, licenseKey])
+  @@index([companyId])
+  @@index([expiresAt])
+  @@map("license_activation")
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────┐
+// MODULAR VAT DECLARATION ENGINE                                               │
+// ─────────────────────────────────────────────────────────────────────────────┘
+// VatModuleManifest — global catalogue of country VAT modules installed on
+// this OVDS instance.  One row per country module package.
+// Populated by the VatDeclarationOrchestrator at bootstrap.
+model VatModuleManifest {
+  id                  String   @id @default(uuid())
+  /// ISO-3166-1 alpha-2, e.g. "ET", "AE", "GB" — unique per instance
+  countryCode         String   @unique @db.VarChar(2)
+  countryName         String   @db.VarChar(100)
+  modulePackageName   String   @db.VarChar(150)
+  moduleVersion       String   @db.VarChar(20)
+  displayName         String   @db.VarChar(200)
+  authorityName       String   @db.VarChar(200)
+  authorityAbbrev     String   @db.VarChar(20)
+  currency            String   @db.VarChar(3)
+  ruleSetVersion      String   @db.VarChar(20)
+  /// JSON array of FilingFrequency values
+  filingFrequencies   String   @db.VarChar(200)
+  /// JSON: VatAuthoritySpec
+  authoritySpec       String   @db.LongText
+  /// JSON: VatReportTemplate[]
+  reportTemplates     String   @db.LongText
+  /// JSON: VatFilingFormSpec[]
+  filingForms         String   @db.LongText
+  isActive            Boolean  @default(true)
+  installedAt         DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  tenantModules       TenantVatModule[]
+
+  @@index([countryCode])
+  @@index([isActive])
+  @@map("vat_module_manifest")
+}
+
+// TenantVatModule — per-tenant activation record for each VAT country module.
+// Many tenants can activate the same country module independently.
+model TenantVatModule {
+  id           String   @id @default(uuid())
+  tenantId     String   @db.VarChar(36)
+  /// FK to VatModuleManifest.countryCode
+  countryCode  String   @db.VarChar(2)
+  isActive     Boolean  @default(true)
+  activatedBy  String?  @db.VarChar(100)
+  activatedAt  DateTime @default(now())
+  deactivatedAt DateTime?
+  /// JSON: tenant-specific settings overrides (e.g. filing frequency, TRN)
+  settingsJson String?  @db.LongText
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  manifest     VatModuleManifest @relation(fields: [countryCode], references: [countryCode])
+
+  @@unique([tenantId, countryCode])
+  @@index([tenantId])
+  @@index([countryCode])
+  @@index([isActive])
+  @@map("tenant_vat_module")
+}
+
+// VatFilingRecord — persisted filing records per tenant/period/country.
+// Immutable once status=SUBMITTED; amendments create a new record.
+model VatFilingRecord {
+  id              String   @id @default(uuid())
+  tenantId        String   @db.VarChar(36)
+  countryCode     String   @db.VarChar(2)
+  periodKey       String   @db.VarChar(20)
+  /// DRAFT | PENDING_REVIEW | SUBMITTED | ACCEPTED | REJECTED | AMENDED
+  status          String   @default("DRAFT") @db.VarChar(30)
+  currency        String   @db.VarChar(3)
+  outputVat       Decimal  @default(0)
+  inputVat        Decimal  @default(0)
+  netVatPayable   Decimal  @default(0)
+  /// JSON: VatReturnDraft (serialised return lines + formData)
+  returnDraftJson String   @db.LongText
+  /// JSON: VatComplianceResult from pre-submission validation
+  complianceJson  String?  @db.LongText
+  submittedAt     DateTime?
+  submittedBy     String?  @db.VarChar(100)
+  /// Authority acknowledgement number / reference
+  ackNumber       String?  @db.VarChar(200)
+  ackReceivedAt   DateTime?
+  /// JSON: raw authority response payload
+  ackPayloadJson  String?  @db.LongText
+  dueDate         DateTime?
+  amendmentOf     String?  @db.VarChar(36)
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([tenantId, countryCode, periodKey, status])
+  @@index([tenantId])
+  @@index([tenantId, countryCode])
+  @@index([tenantId, countryCode, periodKey])
+  @@index([status])
+  @@index([dueDate])
+  @@map("vat_filing_record")
+}
+
+// VatFilingEvent — immutable audit trail for every status change on a filing.
+model VatFilingEvent {
+  id            String   @id @default(uuid())
+  filingId      String   @db.VarChar(36)
+  tenantId      String   @db.VarChar(36)
+  /// CREATED | VALIDATED | SUBMITTED | ACCEPTED | REJECTED | AMENDED | REOPENED
+  eventType     String   @db.VarChar(30)
+  fromStatus    String?  @db.VarChar(30)
+  toStatus      String   @db.VarChar(30)
+  actorId       String?  @db.VarChar(100)
+  /// JSON: any additional event payload
+  payloadJson   String?  @db.LongText
+  occurredAt    DateTime @default(now())
+
+  @@index([filingId])
+  @@index([tenantId])
+  @@index([occurredAt])
+  @@map("vat_filing_event")
+}
+
+// VatReportArtifact — stores rendered report files (PDF/XLSX/XML) links.
+model VatReportArtifact {
+  id          String   @id @default(uuid())
+  tenantId    String   @db.VarChar(36)
+  filingId    String?  @db.VarChar(36)
+  countryCode String   @db.VarChar(2)
+  periodKey   String   @db.VarChar(20)
+  templateId  String   @db.VarChar(100)
+  /// PDF | XLSX | XML | JSON | CSV
+  format      String   @db.VarChar(10)
+  /// Storage URL or relative path
+  storageUrl  String   @db.VarChar(500)
+  fileSizeBytes Int?
+  mimeType    String?  @db.VarChar(100)
+  generatedAt DateTime @default(now())
+  generatedBy String?  @db.VarChar(100)
+  expiresAt   DateTime?
+
+  @@index([tenantId, countryCode, periodKey])
+  @@index([filingId])
+  @@index([expiresAt])
+  @@map("vat_report_artifact")
 }

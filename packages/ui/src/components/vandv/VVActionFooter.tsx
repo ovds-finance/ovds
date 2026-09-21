@@ -93,8 +93,8 @@ export const VVActionFooter: React.FC<VVActionFooterProps> = ({
           disabled={busy}
           className={cn(
             'inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-bold rounded-oki text-white shadow-lg',
-            'bg-aki-blue hover:bg-aki-blue-dark active:scale-[0.99] transition-all',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-aki-blue/40',
+            'bg-[var(--pro-azure)] hover:bg-[var(--pro-azure-dark)] active:scale-[0.99] transition-all',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pro-azure)]/40',
             busy && 'opacity-70 cursor-wait',
           )}
         >
@@ -110,7 +110,7 @@ export const VVActionFooter: React.FC<VVActionFooterProps> = ({
           type="button"
           onClick={onNext}
           disabled={busy}
-          className="inline-flex items-center gap-1.5 px-5 py-2.5 text-[13px] font-bold rounded-oki bg-aki-blue text-white hover:bg-aki-blue-dark active:scale-[0.99] transition-all shadow disabled:opacity-70"
+          className="inline-flex items-center gap-1.5 px-5 py-2.5 text-[13px] font-bold rounded-oki bg-[var(--pro-azure)] text-white hover:bg-[var(--pro-azure-dark)] active:scale-[0.99] transition-all shadow disabled:opacity-70"
         >
           {nextLabel} <ArrowRight size={14} />
         </button>

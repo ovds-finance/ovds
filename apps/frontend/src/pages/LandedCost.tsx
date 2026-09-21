@@ -1,22 +1,21 @@
+import {
+  Calculator, Plus, Edit2, Trash2, Download, RefreshCw,
+  Package,
+ } from 'lucide-react';
 import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import { fmtDate } from '../utils/fmt';
-import { fmtETB } from '../utils/ethiopianTax';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Textarea, Select,
   SearchBar, Amount, Pagination, Icon, EmptyState,
 } from '../components/ui';
-import { OvdsEmptyState } from '../components/ovds';
-import {
-  Calculator, Plus, Edit2, Trash2, Download, RefreshCw,
-  Package,
- } from 'lucide-react';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
+import { fmtETB } from '../utils/ethiopianTax';
 
  const toCsv = (rows: any[], filename: string) => {
    if (!rows.length) { toast.error('No data to export'); return; }
@@ -168,7 +167,7 @@ const LandedCost: React.FC = () => {
   }, [rows, tab, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total Allocations', value: rows.length, color: 'emerald' as const },
+    { label: 'Total Allocations', value: rows.length, color: 'green' as const },
     { label: 'Draft', value: rows.filter(lc => lc.status === 'DRAFT').length, color: 'slate' as const },
     { label: 'Allocated', value: rows.filter(lc => lc.status === 'ALLOCATED').length, color: 'sky' as const },
     { label: 'Total Cost', value: fmtETB(rows.reduce((s, lc) => s + Number(lc.totalLandedCost || 0), 0)), color: 'violet' as const },
@@ -284,8 +283,8 @@ const LandedCost: React.FC = () => {
               <AppTd><span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">{lc.allocationMethod}</span></AppTd>
               <AppTd align="right">
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => handleCalculate(lc.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Calculate"><Calculator size={11} /></button>
-                  <button onClick={() => setModal({ open: true, data: { ...lc } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Edit"><Edit2 size={11} /></button>
+                  <button onClick={() => handleCalculate(lc.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Calculate"><Calculator size={11} /></button>
+                  <button onClick={() => setModal({ open: true, data: { ...lc } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Edit"><Edit2 size={11} /></button>
                   <button onClick={async () => { if (await confirm({ title: `Delete allocation for "${lc.poNumber}"?`, variant: 'danger' })) remove(lc.id); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Delete"><Trash2 size={11} /></button>
                 </div>
               </AppTd>

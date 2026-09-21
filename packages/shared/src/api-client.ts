@@ -5,6 +5,14 @@
  * Eliminates duplication across 50+ feature packages.
  */
 
+// Allow `typeof window` checks to compile when this file is consumed by the
+// Node/ESNext-targeted backend tsconfig (lib: [ESNext], no DOM).
+// The runtime guard `typeof window !== 'undefined'` is always present so this
+// is safe; the declare only satisfies the type checker.
+/* eslint-disable no-var */
+declare var window: any;
+/* eslint-enable no-var */
+
 export interface ApiClientOptions {
   baseUrl?: string;
   getToken?: () => string | null;

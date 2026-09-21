@@ -37,13 +37,13 @@ function getStatus(value: number, goodThreshold: number, badThreshold: number, h
 }
 
 const STATUS_ICON: Record<string, React.ReactNode> = {
-  good:    <CheckCircle2 size={14} className="text-emerald-500" />,
+  good:    <CheckCircle2 size={14} className="text-[var(--pro-azure)]" />,
   warning: <AlertTriangle size={14} className="text-amber-500" />,
   bad:     <XCircle size={14} className="text-rose-500" />,
 };
 
 const STATUS_BAR: Record<string, string> = {
-  good:    'bg-emerald-500',
+  good:    'bg-[var(--pro-azure)]',
   warning: 'bg-amber-500',
   bad:     'bg-rose-500',
 };
@@ -155,7 +155,7 @@ export const ovdsHealthScore: React.FC<ovdsHealthScoreProps> = ({
             {STATUS_ICON[overallStatus]}
           </div>
           <p className={`text-[11px] font-semibold mt-0.5 ${
-            overallStatus === 'good' ? 'text-emerald-600' :
+            overallStatus === 'good' ? 'text-[var(--pro-azure-dark)]' :
             overallStatus === 'warning' ? 'text-amber-600' : 'text-rose-600'
           }`}>
             {STATUS_LABEL[overallStatus]}
@@ -169,7 +169,7 @@ export const ovdsHealthScore: React.FC<ovdsHealthScoreProps> = ({
         {metrics.map((metric, i) => (
           <div key={i} className="flex items-center gap-3">
             <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
-              metric.status === 'good' ? 'bg-emerald-50 text-emerald-600' :
+              metric.status === 'good' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]' :
               metric.status === 'warning' ? 'bg-amber-50 text-amber-600' :
               'bg-rose-50 text-rose-600'
             }`}>

@@ -1,9 +1,10 @@
+import { fmtCurrency, DocStackLayout, type DocStackItem, WidgetCard } from '@ovds/ui';
+import { FileText, ArrowUpRight } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, ArrowUpRight } from 'lucide-react';
-import { useApiQuery } from '../../hooks/useApiQuery';
+
 import { useBusiness } from '../../context/businessContext';
-import { fmtCurrency, DocStackLayout, type DocStackItem, WidgetCard } from '@ovds/ui';
+import { useApiQuery } from '../../hooks/useApiQuery';
 import { Icon } from '../ui';
 
 interface Props {
@@ -46,7 +47,7 @@ const RecentInvoicesWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
           </div>
           <Link
             to="/sales/invoices"
-            className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 hover:underline shrink-0"
+            className="flex items-center gap-1 text-[11px] font-semibold text-[var(--pro-azure)] hover:underline shrink-0"
           >
             All invoices <ArrowUpRight size={11} />
           </Link>

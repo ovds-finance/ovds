@@ -3,12 +3,13 @@
  * Shows Revenue, Expenses, Net Profit, and VAT payable in a single row.
  * Designed to sit at the top of the Accounting Dashboard.
  */
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import {
   TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight,
   Wallet, RefreshCw, Activity, Globe,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+
 import api from '../../services/api';
 import { fmtCompact } from '../../utils/fmt';
 
@@ -64,8 +65,8 @@ const LivePnLBanner: React.FC<LivePnLBannerProps> = ({ currency = 'ETB' }) => {
       label: 'Revenue',
       value: fmt(data?.revenue ?? 0),
       icon: <ArrowDownRight size={13} />,
-      color: 'text-emerald-600 dark:text-emerald-400',
-      bg: 'bg-emerald-50 dark:bg-emerald-950/20',
+      color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+      bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20',
       to: '/sales/invoices',
     },
     {
@@ -88,8 +89,8 @@ const LivePnLBanner: React.FC<LivePnLBannerProps> = ({ currency = 'ETB' }) => {
       label: 'Cash & Bank',
       value: fmt(data?.cash ?? 0),
       icon: <Wallet size={13} />,
-      color: 'text-emerald-600 dark:text-emerald-400 dark:text-emerald-400',
-      bg: 'bg-emerald-50 dark:bg-emerald-950/20',
+      color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+      bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20',
       to: '/banking/accounts',
     },
     {
@@ -117,7 +118,7 @@ const LivePnLBanner: React.FC<LivePnLBannerProps> = ({ currency = 'ETB' }) => {
       {data && !loading && (
         <div className="flex h-1">
           <div
-            className="bg-emerald-500 transition-all duration-700"
+            className="bg-[var(--pro-azure-50)]0 transition-all duration-700"
             style={{ width: `${(data.revenue + data.expenses) > 0 ? Math.round((data.revenue / (data.revenue + data.expenses)) * 100) : 50}%` }}
           />
           <div className="bg-rose-400 flex-1" />
@@ -126,7 +127,7 @@ const LivePnLBanner: React.FC<LivePnLBannerProps> = ({ currency = 'ETB' }) => {
       {/* Header strip */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
         <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+          <span className="w-1.5 h-1.5 bg-[var(--pro-azure-50)]0 rounded-full animate-pulse" />
           <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
             Live P&amp;L · {new Date().toLocaleString('en-ET', { month: 'short', year: 'numeric' })}
           </span>

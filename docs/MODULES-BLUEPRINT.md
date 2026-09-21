@@ -10,7 +10,7 @@
 
 > **Platform:** OVDS — Online VAT Declaration System & Full SaaS
 > **Target:** Ethiopian businesses (Category A, B, C) with IFRS + MoR/ERCA/AABE compliance
-> **Design principle:** Inspired by Akaunting's modular UI/UX logic — a clean dashboard, widgetized layout, and double-entry visual flows, adapted for Ethiopian tax compliance.
+> **Design principle:** Ovds SaaS modular UI/UX logic — a clean dashboard, widgetized layout, and double-entry visual flows, adapted for Ethiopian tax compliance.
 
 This document is the complete functional blueprint of all primary modules within the OVDS ecosystem, organized by business function. Each module maps to a dedicated documentation section, a backend NestJS domain library, a frontend React feature library, a route namespace, an RBAC permission group, and a `ModuleApp` provider in `@ovds/core`.
 
@@ -407,7 +407,7 @@ React client → oRPC / REST API contracts
        ↓
 Core System (@ovds/core): Events • Providers • Settings • Menu
        ↓
-Domain Libraries (@ovds/modules/*, @ovds/domains/*): Services • Entities • DTOs
+Domain Libraries (@ovds/modules/*, @ovds/domains-*): Services • Entities • DTOs
        ↓
 Prisma + MySQL (company-scoped by CompanyGuard)
 ```

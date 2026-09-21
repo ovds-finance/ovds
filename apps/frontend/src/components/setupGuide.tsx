@@ -2,14 +2,15 @@
  * SetupGuide — ovds-style documentation hub for Cloud and On-Premise setup.
  * Sidebar nav + anchored sections + collapsible accordions + copy-able code blocks.
  */
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Check, Copy, CheckCircle2, Terminal, Cloud, Server,
   Key, Globe, AlertTriangle, Info, ChevronDown, ChevronUp,
   ExternalLink, Package, Settings, Database, RefreshCw,
   Bug, ArrowRight, BookOpen, Zap, Shield, Users, Download,
 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+
 import { FRONTEND_URL, API_URL } from '../utils/constants';
 
 interface SetupGuideProps {
@@ -30,7 +31,7 @@ const CodeBlock: React.FC<{ code: string; lang?: string }> = ({ code, lang = 'ba
           onClick={() => { navigator.clipboard.writeText(code); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
           className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 hover:text-white transition-colors"
         >
-          {copied ? <><Check size={10} className="text-emerald-400" /> Copied!</> : <><Copy size={10} /> Copy</>}
+          {copied ? <><Check size={10} className="text-[var(--pro-azure-light)]" /> Copied!</> : <><Copy size={10} /> Copy</>}
         </button>
       </div>
       <pre className="p-4 text-xs font-mono text-slate-200 overflow-x-auto leading-relaxed whitespace-pre">{code}</pre>
@@ -42,9 +43,9 @@ const Callout: React.FC<{ type?: 'info' | 'warning' | 'success' | 'danger'; titl
   type = 'info', title, children,
 }) => {
   const cfg = {
-    info:    { bar: 'bg-emerald-500',   bg: 'bg-emerald-50 dark:bg-emerald-950/20',   border: 'border-emerald-200 dark:border-emerald-800/40',   text: 'text-emerald-800 dark:text-emerald-200',   icon: <Info size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" /> },
+    info:    { bar: 'bg-[var(--pro-azure-50)]0',   bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20',   border: 'border-[var(--pro-azure-100)] dark:border-green-800/40',   text: 'text-[var(--pro-azure-dark)] dark:text-green-200',   icon: <Info size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5" /> },
     warning: { bar: 'bg-amber-400',   bg: 'bg-amber-50 dark:bg-amber-950/20', border: 'border-amber-200 dark:border-amber-800/40', text: 'text-amber-800 dark:text-amber-200', icon: <AlertTriangle size={14} className="text-amber-500 shrink-0 mt-0.5" /> },
-    success: { bar: 'bg-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/20', border: 'border-emerald-200 dark:border-emerald-800/40', text: 'text-emerald-800 dark:text-emerald-200', icon: <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" /> },
+    success: { bar: 'bg-[var(--pro-azure-50)]0', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20', border: 'border-[var(--pro-azure-100)] dark:border-green-800/40', text: 'text-[var(--pro-azure-dark)] dark:text-green-200', icon: <CheckCircle2 size={14} className="text-[var(--pro-azure)] shrink-0 mt-0.5" /> },
     danger:  { bar: 'bg-rose-500',     bg: 'bg-rose-50 dark:bg-rose-950/20',     border: 'border-rose-200 dark:border-rose-800/40',     text: 'text-rose-800 dark:text-rose-200',     icon: <AlertTriangle size={14} className="text-rose-500 shrink-0 mt-0.5" /> },
   }[type];
   return (
@@ -67,7 +68,7 @@ const Badge: React.FC<{ children: React.ReactNode; color?: string }> = ({ childr
 
 const SectionHeading: React.FC<{ id: string; icon: React.ReactNode; title: string; subtitle?: string }> = ({ id, icon, title, subtitle }) => (
   <div id={id} className="flex items-start gap-3 pb-4 border-b border-slate-200 dark:border-slate-700 mb-6 scroll-mt-6">
-    <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center shrink-0 text-emerald-600 dark:text-emerald-400">
+    <div className="w-9 h-9 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 flex items-center justify-center shrink-0 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
       {icon}
     </div>
     <div>
@@ -102,13 +103,13 @@ const RequirementRow: React.FC<{ label: string; value: string; note?: string; me
     <div className="flex items-center gap-2">
       {met !== undefined && (
         met
-          ? <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+          ? <CheckCircle2 size={13} className="text-[var(--pro-azure)] shrink-0" />
           : <div className="w-3 h-3 rounded-full border-2 border-slate-300 dark:border-slate-600 shrink-0" />
       )}
       <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{label}</span>
     </div>
     <div className="text-right">
-      <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 font-mono">{value}</span>
+      <span className="text-xs font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-mono">{value}</span>
       {note && <p className="ovds-caption mt-0.5">{note}</p>}
     </div>
   </div>
@@ -129,8 +130,8 @@ const CloudSetup: React.FC = () => (
           { icon: <RefreshCw size={15} />, label: 'Auto updates', desc: 'Always on the latest version' },
           { icon: <Shield size={15} />, label: 'Managed backups', desc: 'Daily backups, 99.9% uptime SLA' },
         ].map(f => (
-          <div key={f.label} className="flex items-start gap-3 p-4 bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-100 dark:border-emerald-900/20 rounded-xl">
-            <div className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5">{f.icon}</div>
+          <div key={f.label} className="flex items-start gap-3 p-4 bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 border border-[var(--pro-azure-100)] dark:border-green-900/20 rounded-xl">
+            <div className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5">{f.icon}</div>
             <div>
               <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">{f.label}</p>
               <p className="text-[10px] text-slate-500 mt-0.5">{f.desc}</p>
@@ -155,7 +156,7 @@ const CloudSetup: React.FC = () => (
             n: 1, title: 'Create your account',
             content: (
               <>
-                <p>Visit <a href="https://ovds.com.et" target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline inline-flex items-center gap-1">ovds.com.et <ExternalLink size={11} /></a> and click <strong>Get Started</strong> in the top-right corner.</p>
+                <p>Visit <a href="https://ovds.com.et" target="_blank" rel="noopener noreferrer" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold hover:underline inline-flex items-center gap-1">ovds.com.et <ExternalLink size={11} /></a> and click <strong>Get Started</strong> in the top-right corner.</p>
                 <ul className="space-y-1.5 text-xs mt-2">
                   {[
                     'Select Start on the next screen.',
@@ -164,7 +165,7 @@ const CloudSetup: React.FC = () => (
                     'Click Create New Account.',
                     'Check your inbox and click Confirm email address to activate your account.',
                   ].map(i => (
-                    <li key={i} className="flex items-start gap-2"><ArrowRight size={11} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />{i}</li>
+                    <li key={i} className="flex items-start gap-2"><ArrowRight size={11} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5" />{i}</li>
                   ))}
                 </ul>
               </>
@@ -174,16 +175,16 @@ const CloudSetup: React.FC = () => (
             n: 2, title: 'Log in and get your API Key',
             content: (
               <>
-                <p>Go to <a href="https://ovds.com.et/login" target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline inline-flex items-center gap-1">ovds.com.et/login <ExternalLink size={11} /></a> and enter your account details.</p>
+                <p>Go to <a href="https://ovds.com.et/login" target="_blank" rel="noopener noreferrer" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold hover:underline inline-flex items-center gap-1">ovds.com.et/login <ExternalLink size={11} /></a> and enter your account details.</p>
                 <p className="mt-2">Your <strong>API Key</strong> is displayed at the top of the Account Dashboard. Click it to copy.</p>
                 <div className="mt-3 p-3 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
                   <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">API Key on Account Dashboard</p>
                   <div className="flex items-center gap-3 p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 flex items-center justify-center shrink-0">
-                      <Key size={12} className="text-emerald-600 dark:text-emerald-400" />
+                    <div className="w-7 h-7 rounded-lg bg-[var(--pro-azure-50)] dark:bg-green-950/20 flex items-center justify-center shrink-0">
+                      <Key size={12} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                     </div>
                     <code className="text-xs font-mono text-slate-500 blur-[3px] select-none flex-1">ovds_live_xxxxxxxxxxxxxxxxxxxxxxxx</code>
-                    <div className="flex items-center gap-1 px-2 py-1 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded text-[10px] font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
+                    <div className="flex items-center gap-1 px-2 py-1 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0">
                       <Copy size={9} /> Copy
                     </div>
                   </div>
@@ -205,7 +206,7 @@ const CloudSetup: React.FC = () => (
                     { k: 'Fiscal year start', v: 'Month 7 (July) for Ethiopian FY' },
                   ].map(r => (
                     <div key={r.k} className="flex items-start gap-2 p-2.5 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-xs">
-                      <CheckCircle2 size={11} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                      <CheckCircle2 size={11} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5" />
                       <div><span className="font-bold text-slate-700 dark:text-slate-300">{r.k}</span> — <span className="text-slate-500">{r.v}</span></div>
                     </div>
                   ))}
@@ -236,7 +237,7 @@ const CloudSetup: React.FC = () => (
         ].map(({ n, title, badge, content }) => (
           <li key={n} className="flex gap-4">
             <div className="flex flex-col items-center">
-              <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-semibold shrink-0 z-10">{n}</div>
+              <div className="w-8 h-8 rounded-full bg-[var(--pro-azure)] text-white flex items-center justify-center text-xs font-semibold shrink-0 z-10">{n}</div>
               <div className="w-px flex-1 bg-slate-200 dark:bg-slate-700 mt-1" />
             </div>
             <div className="flex-1 pb-8 min-w-0">
@@ -285,7 +286,7 @@ const OnPremiseSetup: React.FC = () => (
           <thead>
             <tr className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
               <th className="px-4 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider text-[9px] w-1/3">Feature</th>
-              <th className="px-4 py-3 text-left font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider text-[9px]">
+              <th className="px-4 py-3 text-left font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] uppercase tracking-wider text-[9px]">
                 <span className="flex items-center gap-1.5"><Cloud size={11} /> Cloud (SaaS)</span>
               </th>
               <th className="px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider text-[9px]">
@@ -358,7 +359,7 @@ const OnPremiseSetup: React.FC = () => (
             ].map(r => (
               <div key={r.port} className="flex items-center justify-between py-2.5">
                 <div className="flex items-center gap-3">
-                  <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400 text-xs w-20">{r.port}</span>
+                  <span className="font-mono font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] text-xs w-20">{r.port}</span>
                   <span className="text-sm text-slate-600 dark:text-slate-400">{r.service}</span>
                 </div>
                 <code className="text-[10px] font-mono text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">{r.fix}</code>
@@ -386,7 +387,7 @@ const OnPremiseSetup: React.FC = () => (
               { name: 'api', desc: 'Nginx on port 80 → backend :3001' },
             ].map(s => (
               <div key={s.name} className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
-                <span className="font-semibold text-emerald-600 dark:text-emerald-400 font-mono">{s.name}</span>
+                <span className="font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-mono">{s.name}</span>
                 <span className="text-slate-500">{s.desc}</span>
               </div>
             ))}
@@ -450,7 +451,7 @@ const OnPremiseSetup: React.FC = () => (
                     { label: 'Prisma Studio', url: 'npm run db:studio → :5555' },
                   ].map(u => (
                     <div key={u.label} className="flex items-center gap-2 p-2.5 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-xs">
-                      <Globe size={11} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <Globe size={11} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0" />
                       <div>
                         <div className="font-bold text-slate-700 dark:text-slate-300">{u.label}</div>
                         <div className="font-mono text-slate-400 text-[10px]">{u.url}</div>
@@ -465,7 +466,7 @@ const OnPremiseSetup: React.FC = () => (
         ].map(({ n, title, badge, content }) => (
           <li key={n} className="flex gap-4">
             <div className="flex flex-col items-center">
-              <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-semibold shrink-0 z-10">{n}</div>
+              <div className="w-8 h-8 rounded-full bg-[var(--pro-azure)] text-white flex items-center justify-center text-xs font-semibold shrink-0 z-10">{n}</div>
               <div className="w-px flex-1 bg-slate-200 dark:bg-slate-700 mt-1" />
             </div>
             <div className="flex-1 pb-8 min-w-0">
@@ -493,12 +494,12 @@ const OnPremiseSetup: React.FC = () => (
         {/* Step group 1 — Sign up */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-1 h-4 rounded-full bg-emerald-500 shrink-0" />
+            <div className="w-1 h-4 rounded-full bg-[var(--pro-azure-50)]0 shrink-0" />
             <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Step 1 — Create your account</p>
           </div>
           <ol className="space-y-2">
             {[
-              { n: 1, text: <>Go to <a href="https://ovds.com.et" target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline inline-flex items-center gap-1">ovds.com.et <ExternalLink size={11} /></a></> },
+              { n: 1, text: <>Go to <a href="https://ovds.com.et" target="_blank" rel="noopener noreferrer" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold hover:underline inline-flex items-center gap-1">ovds.com.et <ExternalLink size={11} /></a></> },
               { n: 2, text: <>Click <strong className="text-slate-700 dark:text-slate-200">Get Started</strong> in the top-right corner of the website.</> },
               { n: 3, text: <>Select <strong className="text-slate-700 dark:text-slate-200">Start</strong> on the next screen.</> },
               { n: 4, text: <>Enter the required fields — <strong className="text-slate-700 dark:text-slate-200">Name</strong>, <strong className="text-slate-700 dark:text-slate-200">Email</strong>, and <strong className="text-slate-700 dark:text-slate-200">Password</strong>.</> },
@@ -507,7 +508,7 @@ const OnPremiseSetup: React.FC = () => (
               { n: 7, text: <>Check your email for a confirmation message and click <strong className="text-slate-700 dark:text-slate-200">Confirm email address</strong> to complete your registration and log in.</> },
             ].map(s => (
               <li key={s.n} className="flex items-start gap-3 p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-sm">
-                <span className="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{s.n}</span>
+                <span className="w-5 h-5 rounded-full bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-[var(--pro-azure-100)] dark:border-green-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{s.n}</span>
                 <span className="text-slate-600 dark:text-slate-400 leading-relaxed">{s.text}</span>
               </li>
             ))}
@@ -517,17 +518,17 @@ const OnPremiseSetup: React.FC = () => (
         {/* Step group 2 — Find the key */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-1 h-4 rounded-full bg-emerald-500 shrink-0" />
+            <div className="w-1 h-4 rounded-full bg-[var(--pro-azure-50)]0 shrink-0" />
             <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Step 2 — Locate your API Key</p>
           </div>
           <ol className="space-y-2">
             {[
-              { n: 1, text: <>Go to <a href="https://ovds.com.et/login" target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline inline-flex items-center gap-1">ovds.com.et/login <ExternalLink size={11} /></a></> },
+              { n: 1, text: <>Go to <a href="https://ovds.com.et/login" target="_blank" rel="noopener noreferrer" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold hover:underline inline-flex items-center gap-1">ovds.com.et/login <ExternalLink size={11} /></a></> },
               { n: 2, text: <>Enter your account details to access the <strong className="text-slate-700 dark:text-slate-200">Account Dashboard</strong>.</> },
               { n: 3, text: <>On your Account Dashboard, the <strong className="text-slate-700 dark:text-slate-200">API Key</strong> is displayed at the top of the page.</> },
             ].map(s => (
               <li key={s.n} className="flex items-start gap-3 p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-sm">
-                <span className="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{s.n}</span>
+                <span className="w-5 h-5 rounded-full bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-[var(--pro-azure-100)] dark:border-green-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{s.n}</span>
                 <span className="text-slate-600 dark:text-slate-400 leading-relaxed">{s.text}</span>
               </li>
             ))}
@@ -537,14 +538,14 @@ const OnPremiseSetup: React.FC = () => (
           <div className="mt-4 p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">API Key on Account Dashboard</p>
             <div className="flex items-center gap-3 p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 flex items-center justify-center shrink-0">
-                <Key size={14} className="text-emerald-600 dark:text-emerald-400" />
+              <div className="w-8 h-8 rounded-lg bg-[var(--pro-azure-50)] dark:bg-green-950/20 flex items-center justify-center shrink-0">
+                <Key size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-0.5">Your API Key</p>
                 <code className="text-xs font-mono text-slate-700 dark:text-slate-300 blur-[3px] select-none">ovds_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</code>
               </div>
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-lg text-[10px] font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-lg text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0">
                 <Copy size={10} /> Click to copy
               </div>
             </div>
@@ -554,7 +555,7 @@ const OnPremiseSetup: React.FC = () => (
         {/* Step group 3 — Use the key */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-1 h-4 rounded-full bg-emerald-500 shrink-0" />
+            <div className="w-1 h-4 rounded-full bg-[var(--pro-azure-50)]0 shrink-0" />
             <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Step 3 — Enter your API Key</p>
           </div>
           <ol className="space-y-2">
@@ -564,7 +565,7 @@ const OnPremiseSetup: React.FC = () => (
               { n: 3, text: <>You also need the API key to access <strong className="text-slate-700 dark:text-slate-200">Apps</strong> on OVDS — paste it in the API Key field when prompted.</> },
             ].map(s => (
               <li key={s.n} className="flex items-start gap-3 p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-sm">
-                <span className="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{s.n}</span>
+                <span className="w-5 h-5 rounded-full bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-[var(--pro-azure-100)] dark:border-green-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{s.n}</span>
                 <span className="text-slate-600 dark:text-slate-400 leading-relaxed">{s.text}</span>
               </li>
             ))}
@@ -577,8 +578,8 @@ const OnPremiseSetup: React.FC = () => (
               <div className="space-y-2">
                 <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full w-3/4" />
                 <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full w-1/2" />
-                <div className="flex items-center gap-2 mt-3 p-2 bg-white dark:bg-slate-900 rounded-lg border border-emerald-300 dark:border-emerald-700">
-                  <Key size={11} className="text-emerald-500 shrink-0" />
+                <div className="flex items-center gap-2 mt-3 p-2 bg-white dark:bg-slate-900 rounded-lg border border-[var(--pro-azure-light)] dark:border-green-700">
+                  <Key size={11} className="text-[var(--pro-azure)] shrink-0" />
                   <code className="text-[10px] font-mono text-slate-400 truncate">Paste API key here…</code>
                 </div>
               </div>
@@ -588,8 +589,8 @@ const OnPremiseSetup: React.FC = () => (
               <div className="space-y-2">
                 <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full w-2/3" />
                 <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full w-1/2" />
-                <div className="flex items-center gap-2 mt-3 p-2 bg-white dark:bg-slate-900 rounded-lg border border-emerald-300 dark:border-emerald-700">
-                  <Key size={11} className="text-emerald-500 shrink-0" />
+                <div className="flex items-center gap-2 mt-3 p-2 bg-white dark:bg-slate-900 rounded-lg border border-[var(--pro-azure-light)] dark:border-green-700">
+                  <Key size={11} className="text-[var(--pro-azure)] shrink-0" />
                   <code className="text-[10px] font-mono text-slate-400 truncate">Paste API key here…</code>
                 </div>
               </div>
@@ -612,7 +613,7 @@ const OnPremiseSetup: React.FC = () => (
           { n: 1,  icon: '🔑', title: 'Log in',                   text: 'Log in as ADMIN or SPURADMIN using the credentials from the seed step.' },
           { n: 2,  icon: '🏢', title: 'Open Company Setup Wizard', text: <>Press <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-[10px] font-mono">W</kbd> on any page, or go to <strong>System Administration → Setup Wizard</strong>.</> },
           { n: 3,  icon: '📋', title: 'Fill in company details',   text: 'Enter company name, legal name, TIN (exactly 15 digits), business type, and fiscal year start (Month 7 = July for Ethiopian FY).' },
-          { n: 4,  icon: '🔑', title: 'Enter your API Key',        text: <>Paste your API key from <a href="https://ovds.com.et/login" target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline inline-flex items-center gap-0.5">ovds.com.et <ExternalLink size={10} /></a> when prompted in the wizard.</> },
+          { n: 4,  icon: '🔑', title: 'Enter your API Key',        text: <>Paste your API key from <a href="https://ovds.com.et/login" target="_blank" rel="noopener noreferrer" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold hover:underline inline-flex items-center gap-0.5">ovds.com.et <ExternalLink size={10} /></a> when prompted in the wizard.</> },
           { n: 5,  icon: '🧾', title: 'Seed Ethiopian tax rates',  text: <>Go to <strong>Settings → Taxes</strong> and click <strong>Seed Ethiopian Defaults</strong>, or call <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono">POST /api/ovds/tax-rates/seed-et</code> (requires ADMIN role).</> },
           { n: 6,  icon: '📒', title: 'Seed chart of accounts',    text: <>Go to <strong>Accounting → Chart of Accounts → Seed Ethiopian Defaults</strong>, or call <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono">POST /api/ovds/accounts/seed</code> (requires ovds role).</> },
           { n: 7,  icon: '🏗️', title: 'Add departments',           text: <>Go to <strong>HR → Departments → Add Department</strong>. Departments are required before adding employees.</> },
@@ -622,7 +623,7 @@ const OnPremiseSetup: React.FC = () => (
           { n: 11, icon: '📧', title: 'Configure notifications',   text: <>Optional: go to <strong>System Administration → Notification Settings</strong> and set SMTP credentials to enable email delivery.</> },
         ].map(s => (
           <div key={s.n} className="flex items-start gap-3 p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-sm">
-            <span className="w-6 h-6 rounded-full bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{s.n}</span>
+            <span className="w-6 h-6 rounded-full bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-[var(--pro-azure-100)] dark:border-green-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{s.n}</span>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-slate-700 dark:text-slate-200 text-xs mb-0.5">{s.icon} {s.title}</p>
               <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">{s.text}</p>
@@ -702,7 +703,7 @@ const OnPremiseSetup: React.FC = () => (
             ].map(r => (
               <div key={r.item} className="flex items-center justify-between py-2.5 gap-4">
                 <div className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
-                  <CheckCircle2 size={13} className="text-emerald-500 shrink-0 mt-0.5" />
+                  <CheckCircle2 size={13} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
                   {r.item}
                 </div>
                 <code className="text-[10px] font-mono text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded shrink-0">{r.env}</code>
@@ -871,7 +872,7 @@ const OnPremiseSetup: React.FC = () => (
                     <>To force a cache bust for all users, increment the cache name in <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono">public/sw.js</code> (currently <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono">ovds-v3</code>).</>,
                   ].map((s, i) => (
                     <div key={i} className="flex items-start gap-2 p-2 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <span className="w-4 h-4 rounded-full bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[9px] font-bold shrink-0 mt-0.5">{i + 1}</span>
+                      <span className="w-4 h-4 rounded-full bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] flex items-center justify-center text-[9px] font-bold shrink-0 mt-0.5">{i + 1}</span>
                       <span className="text-slate-600 dark:text-slate-400">{s}</span>
                     </div>
                   ))}
@@ -938,7 +939,7 @@ const CredentialsTable: React.FC = () => {
               <tbody>
                 {creds.map(c => (
                   <tr key={c.role} className="border-b border-slate-50 dark:border-slate-800/50 last:border-0 hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
-                    <td className="px-4 py-2.5 font-semibold text-emerald-600 dark:text-emerald-400 text-[11px]">{c.role}</td>
+                    <td className="px-4 py-2.5 font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] text-[11px]">{c.role}</td>
                     <td className="px-4 py-2.5 font-mono text-slate-600 dark:text-slate-400">{c.user}</td>
                     <td className="px-4 py-2.5 font-mono text-slate-500 dark:text-slate-500">{c.pass}</td>
                   </tr>
@@ -1115,11 +1116,11 @@ const SetupGuide: React.FC<SetupGuideProps> = ({ defaultMode = 'cloud' }) => {
         {/* Mobile "On this page" button */}
         <button
           onClick={() => setMobileNavOpen(true)}
-          className="lg:hidden flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:border-emerald-500/40 dark:border-emerald-700 transition-all"
+          className="lg:hidden flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:border-[var(--pro-azure)]/40 dark:border-green-700 transition-all"
         >
           <ChevronDown size={13} />
           On this page
-          {activeLabel && <span className="text-emerald-600 dark:text-emerald-400 truncate max-w-[120px]">· {activeLabel}</span>}
+          {activeLabel && <span className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] truncate max-w-[120px]">· {activeLabel}</span>}
         </button>
       </div>
 
@@ -1143,13 +1144,13 @@ const SetupGuide: React.FC<SetupGuideProps> = ({ defaultMode = 'cloud' }) => {
                   onClick={() => scrollTo(item.id)}
                   className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-left transition-all w-full ${
                     activeSection === item.id
-                      ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400'
+                      ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
                       : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
                   <span className="shrink-0">{item.icon}</span>
                   {item.label}
-                  {activeSection === item.id && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500" />}
+                  {activeSection === item.id && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--pro-azure-50)]0" />}
                 </button>
               ))}
             </div>
@@ -1164,7 +1165,7 @@ const SetupGuide: React.FC<SetupGuideProps> = ({ defaultMode = 'cloud' }) => {
                   key={l.to}
                   to={l.to}
                   onClick={() => setMobileNavOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600 dark:text-emerald-400 transition-all"
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-all"
                 >
                   <ExternalLink size={12} className="shrink-0" />
                   {l.label}
@@ -1189,7 +1190,7 @@ const SetupGuide: React.FC<SetupGuideProps> = ({ defaultMode = 'cloud' }) => {
               onClick={() => scrollTo(item.id)}
               className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-left transition-all w-full group ${
                 activeSection === item.id
-                  ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-l-2 border-emerald-600 pl-[10px]'
+                  ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border-l-2 border-[var(--pro-azure)] pl-[10px]'
                   : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300 border-l-2 border-transparent'
               }`}
             >
@@ -1209,7 +1210,7 @@ const SetupGuide: React.FC<SetupGuideProps> = ({ defaultMode = 'cloud' }) => {
               <Link
                 key={l.to}
                 to={l.to}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600 dark:text-emerald-400 transition-all"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-all"
               >
                 <ExternalLink size={11} className="shrink-0 opacity-60" />
                 {l.label}
@@ -1222,13 +1223,13 @@ const SetupGuide: React.FC<SetupGuideProps> = ({ defaultMode = 'cloud' }) => {
             <div className="pt-3 mt-1 px-3">
               <div className="flex items-center justify-between mb-1.5">
                 <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Progress</p>
-                <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                <span className="text-[10px] font-medium text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                   {Math.max(1, navItems.findIndex(n => n.id === activeSection) + 1)}/{navItems.length}
                 </span>
               </div>
               <div className="h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                  className="h-full bg-[var(--pro-azure-50)]0 rounded-full transition-all duration-500"
                   style={{ width: `${(Math.max(1, navItems.findIndex(n => n.id === activeSection) + 1) / navItems.length) * 100}%` }}
                 />
               </div>
@@ -1258,9 +1259,9 @@ const SetupGuide: React.FC<SetupGuideProps> = ({ defaultMode = 'cloud' }) => {
                 <Link
                   key={l.to}
                   to={l.to}
-                  className="flex items-center gap-2 px-3 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:text-emerald-400 hover:border-emerald-500/40 dark:border-emerald-700 transition-all"
+                  className="flex items-center gap-2 px-3 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:border-[var(--pro-azure)]/40 dark:border-green-700 transition-all"
                 >
-                  <span className="text-emerald-600 dark:text-emerald-400">{l.icon}</span>
+                  <span className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{l.icon}</span>
                   {l.label}
                 </Link>
               ))}

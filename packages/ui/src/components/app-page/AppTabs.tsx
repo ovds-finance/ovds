@@ -18,7 +18,7 @@ export interface AppTabsProps {
   accent?: keyof typeof BORDER_COLOR;
 }
 
-export const AppTabs: React.FC<AppTabsProps> = ({ tabs, active, onChange, accent = 'emerald' }) => {
+export const AppTabs: React.FC<AppTabsProps> = ({ tabs, active, onChange, accent = 'indigo' }) => {
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -38,10 +38,10 @@ export const AppTabs: React.FC<AppTabsProps> = ({ tabs, active, onChange, accent
     }
   };
 
-  const accentBorder = BORDER_COLOR[accent] ?? 'border-emerald-500';
-  const accentText = COLOR_VALUE[accent] ?? 'text-emerald-600 dark:text-emerald-400';
-  const accentBg = ACCENT_BG[accent] ?? 'bg-emerald-50/40 dark:bg-emerald-950/20';
-  const accentCountBg = ACCENT_COUNT_BG[accent] ?? 'bg-emerald-100 dark:bg-emerald-900/50';
+  const accentBorder    = BORDER_COLOR[accent] ?? 'border-[var(--pro-azure)]';
+  const accentText      = COLOR_VALUE[accent]  ?? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]';
+  const accentBg        = ACCENT_BG[accent]    ?? 'bg-[var(--pro-azure-50)]/40 dark:bg-[var(--pro-azure-50)]/10';
+  const accentCountBg   = ACCENT_COUNT_BG[accent] ?? 'bg-[var(--pro-azure-100)] dark:bg-[var(--pro-azure-50)]/20';
 
   return (
     <div ref={listRef} className="flex items-center gap-0 overflow-x-auto scrollbar-none" role="tablist">
@@ -60,13 +60,19 @@ export const AppTabs: React.FC<AppTabsProps> = ({ tabs, active, onChange, accent
             className={[
               'flex items-center gap-1.5 px-3.5 py-2.5 text-[12px] font-semibold',
               'border-b-2 whitespace-nowrap transition-all duration-150 shrink-0',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 dark:focus-visible:ring-emerald-500/40 focus-visible:ring-inset',
+              /* Ovds SaaS green focus ring */
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pro-azure)]/30 focus-visible:ring-inset',
               tab.disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer',
-              isActive ? `${accentBorder} ${accentText} ${accentBg}` : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:border-slate-200 dark:hover:border-slate-700',
+              isActive
+                ? `${accentBorder} ${accentText} ${accentBg}`
+                : 'border-transparent hover:border-[var(--border)]',
             ].join(' ')}
+            style={!isActive ? { color: 'var(--text-4)' } : undefined}
+            onMouseEnter={!isActive ? (e) => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-2)'; } : undefined}
+            onMouseLeave={!isActive ? (e) => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-4)'; } : undefined}
           >
             {tab.icon && (
-              <span className={`transition-colors ${isActive ? (COLOR_VALUE[accent] ?? 'text-emerald-600 dark:text-emerald-400') : 'text-slate-400 dark:text-slate-500'}`}>
+              <span className={`transition-colors ${isActive ? (COLOR_VALUE[accent] ?? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]') : 'text-slate-400 dark:text-slate-500'}`}>
                 {tab.icon}
               </span>
             )}
@@ -79,9 +85,10 @@ export const AppTabs: React.FC<AppTabsProps> = ({ tabs, active, onChange, accent
               </span>
             )}
             {tab.badge && (
-              <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wide ${
-                tab.badgeCls ?? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400'
-              }`}>
+              <span
+                className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wide ${tab.badgeCls ?? ''}`}
+                style={!tab.badgeCls ? { background: 'var(--pro-azure-100)', color: 'var(--pro-azure-dark)' } : undefined}
+              >
                 {tab.badge}
               </span>
             )}

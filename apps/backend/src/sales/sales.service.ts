@@ -1,22 +1,29 @@
 import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../common/prisma.service';
-import { CreateInvoiceDto, UpdateInvoiceDto, RecordPaymentDto } from './dto/invoice.dto';
 import { DRRF_RATE, DEFAULT_DUE_DAYS_MS, PAGINATION_DEFAULT_LIMIT, DEFAULT_VAT_RATE, INVOICE_ACTIVITY_LIMIT, ETH_TAX } from '@ovds/shared';
+
+import { PrismaService } from '../common/prisma.service';
+
+import { CreateInvoiceDto, UpdateInvoiceDto, RecordPaymentDto } from './dto/invoice.dto';
+import { InvoiceDomainEventService } from './invoice-domain-event.service';
 
 @Injectable()
 export class SalesService {
   private readonly logger = new Logger(SalesService.name);
 
-  constructor(private readonly prisma: PrismaService, private readonly config: ConfigService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService,
+    private readonly domainEvents: InvoiceDomainEventService,
+  ) {}
 
   private logAudit(action: string, data: Record<string, unknown>) {
     this.logger.log(`[AUDIT] ${action}: ${JSON.stringify(data)}`);
   }
 
   async findAll(query: { page?: number; limit?: number; status?: string; customerId?: string; companyId?: string; search?: string; dateFrom?: string; dateTo?: string; sortBy?: string; sortOrder?: string }) {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? PAGINATION_DEFAULT_LIMIT;
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || PAGINATION_DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
     const sortBy = query.sortBy ?? 'date';
     const sortOrder = query.sortOrder ?? 'desc';
@@ -26,7 +33,10 @@ export class SalesService {
     if (query.status) where.status = query.status;
     if (query.customerId) where.customerId = query.customerId;
     if (query.search) {
-      where.customerName = { contains: query.search };
+      where.OR = [
+        { customerName:  { contains: query.search as string, mode: 'insensitive' } },
+        { invoiceNumber: { contains: query.search as string, mode: 'insensitive' } },
+      ];
     }
     if (query.dateFrom || query.dateTo) {
       where.date = {};
@@ -69,7 +79,42 @@ export class SalesService {
     return Math.round(net * (rate / 100) * 100) / 100;
   }
 
-  private calculateInvoiceTotals(items: any[], vatRate: number) {
+  /**
+   * Strip frontend-only fields that are not part of the Prisma Invoice model.
+   * Prevents "Unknown arg" Prisma errors when the frontend spreads its full
+   * form state (which includes display-only and UI-control fields) into the payload.
+   */
+  private sanitizeInvoicePayload(data: Record<string, any>): Record<string, any> {
+    // Fields the frontend sends that DO NOT exist on the Prisma Invoice model
+    const STRIP_FIELDS = new Set([
+      // frontend display/UI fields
+      'companyTitle', 'invoiceTemplate', 'invoiceColor', 'terms',
+      'interactionType', 'archType', 'processType',
+      // field name aliases handled explicitly
+      'customer',           // → customerName
+      'invoiceCurrency',    // → currencyCode
+      'invoiceDiscount',    // → discountAmount / discountValue
+      // array fields not in schema
+      'ccEmails', 'bccEmails',
+      // frontend-only flags
+      '_convertedFromEstimate',
+      // computed totals — overwritten server-side anyway
+      'totalAmount', 'subtotal', 'vatAmount', 'drrfAmount',
+      // settings object sometimes leaked from frontend state
+      'settings',
+    ]);
+
+    const out: Record<string, any> = {};
+    for (const [k, v] of Object.entries(data)) {
+      if (STRIP_FIELDS.has(k)) continue;
+      // Convert empty strings to null for Decimal/optional fields
+      if (v === '') { out[k] = null; continue; }
+      out[k] = v;
+    }
+    return out;
+  }
+
+  private calculateInvoiceTotals(items: any[], vatRate: number, invoiceDiscountValue = 0, invoiceDiscountType: 'PERCENT' | 'FIXED' = 'FIXED') {
     const subtotal = items.reduce((acc, item) => {
       return acc + this.calcLineTotal(
         Number(item.price || 0),
@@ -79,6 +124,15 @@ export class SalesService {
         item.discountType || 'FIXED'
       );
     }, 0);
+
+    // BUG FIX: apply invoice-level discount before computing DRRF so the base
+    // matches what the frontend shows. Previously DRRF was computed on the raw
+    // subtotal (before discount), causing the stored amount to be higher than
+    // displayed — a systematic overcharge that mismatched the PDF and the DB.
+    const invoiceDisc = invoiceDiscountType === 'PERCENT'
+      ? subtotal * (invoiceDiscountValue / 100)
+      : invoiceDiscountValue;
+    const subtotalAfterDisc = Math.max(0, subtotal - invoiceDisc);
 
     const vatAmount = items.reduce((acc, item) => {
       const net = this.calcLineTotal(
@@ -91,18 +145,23 @@ export class SalesService {
       return acc + (item.showTax !== false ? this.calcLineTax(net, vatRate) : 0);
     }, 0);
 
-    const drrfAmount = Math.round(subtotal * DRRF_RATE * 100) / 100;
-    const grandTotal = Math.round((subtotal + vatAmount + drrfAmount) * 100) / 100;
+    const drrfAmount = Math.round(subtotalAfterDisc * DRRF_RATE * 100) / 100;
+    const grandTotal = Math.round((subtotalAfterDisc + vatAmount + drrfAmount) * 100) / 100;
 
-    return { subtotal, vatAmount, drrfAmount, grandTotal };
+    return { subtotal, subtotalAfterDisc, vatAmount, drrfAmount, grandTotal };
   }
 
   async create(data: CreateInvoiceDto, userId?: string) {
-    const { items, ...rest } = data as any;
+    const { items, ...rawRest } = data as any;
+    const rest = this.sanitizeInvoicePayload(rawRest);
     const itemsData = items || [];
     const vatRate = Number((data as any).vatRate || (data as any).settings?.ovds_default_vat_rate || DEFAULT_VAT_RATE);
-    const totals = this.calculateInvoiceTotals(itemsData, vatRate);
-
+    const totals = this.calculateInvoiceTotals(
+      itemsData,
+      vatRate,
+      Number((data as any).discountValue || 0),
+      ((data as any).discountType || 'FIXED') as 'PERCENT' | 'FIXED',
+    );
     // Serialize buyerDetails for storage if provided
     const buyerDetailsJson = (data as any).buyerDetails
       ? JSON.stringify((data as any).buyerDetails)
@@ -158,14 +217,17 @@ export class SalesService {
     });
 
     this.logAudit('INVOICE_CREATED', { invoiceId: invoice.id, total: totals.grandTotal });
+    // Dispatch domain event — decouples invoice creation from GL and notification side-effects.
+    // LedgerObserver will react to INVOICE_EVENTS.CREATED if the invoice is non-DRAFT.
+    await this.domainEvents.emitCreated(invoice as any, itemsData, userId);
     return invoice;
   }
 
   /**
    * Post the IFRS-compliant double-entry journal for a sales invoice.
    *
-   * DR  Accounts Receivable (asset)     = invoice total
-   * CR  Revenue (income)                = subtotal
+   * DR  Accounts Receivable (asset)     = invoice total (grandTotal)
+   * CR  Revenue (income)                = subtotalAfterDisc (post-discount net)
    * CR  VAT Payable (liability)         = vatAmount  [if VAT > 0]
    * CR  DRRF Payable (liability)        = drrfAmount [if DRRF > 0]
    *
@@ -177,7 +239,7 @@ export class SalesService {
     tx: any,
     invoice: { id: string; invoiceNumber: string; date: Date; companyId?: string | null },
     companyId: string,
-    totals: { subtotal: number; vatAmount: number; drrfAmount: number; grandTotal: number },
+    totals: { subtotal: number; subtotalAfterDisc: number; vatAmount: number; drrfAmount: number; grandTotal: number },
   ): Promise<void> {
     // Resolve accounts by type code — these are the standard Ethiopian chart of accounts codes
     const [arAccount, revenueAccount, vatAccount, drrfAccount] = await Promise.all([
@@ -212,12 +274,12 @@ export class SalesService {
               credit: 0,
               description: `AR – Invoice ${invoice.invoiceNumber}`,
             },
-            // CR Revenue
+            // CR Revenue — credited at post-discount net (what was actually earned)
             {
               accountId: revenueAccount.id,
               companyId,
               debit: 0,
-              credit: totals.subtotal,
+              credit: totals.subtotalAfterDisc,
               description: `Revenue – Invoice ${invoice.invoiceNumber}`,
             },
             // CR VAT Payable (only if VAT collected)
@@ -254,10 +316,16 @@ export class SalesService {
 
 
   async update(id: string, data: UpdateInvoiceDto, userId?: string) {
-    const { items, ...rest } = data as any;
+    const { items, ...rawRest } = data as any;
+    const rest = this.sanitizeInvoicePayload(rawRest);
     const itemsData = items || [];
     const vatRate = Number((data as any).vatRate || DEFAULT_VAT_RATE);
-    const totals = this.calculateInvoiceTotals(itemsData, vatRate);
+    const totals = this.calculateInvoiceTotals(
+      itemsData,
+      vatRate,
+      Number((data as any).discountValue || 0),
+      ((data as any).discountType || 'FIXED') as 'PERCENT' | 'FIXED',
+    );
 
     // Serialize buyerDetails for storage if provided
     const buyerDetailsJson = (data as any).buyerDetails
@@ -298,6 +366,8 @@ export class SalesService {
       });
 
       this.logAudit('INVOICE_UPDATED', { invoiceId: id, total: totals.grandTotal });
+      // Dispatch domain event — observers may re-post adjusting journal entries.
+      await this.domainEvents.emitUpdated(invoice as any, Object.keys(rest), userId);
       return invoice;
   }
 
@@ -315,12 +385,24 @@ export class SalesService {
 
   async send(id: string, userId?: string) {
     const invoice = await this.findOne(id);
+    // Only DRAFT invoices may be sent. Sending a PAID, OVERDUE, CANCELLED, or
+    // already-PENDING invoice would corrupt the status lifecycle.
+    // Ovds SaaS enforces the same constraint — Invoice::send() throws if status
+    // is not 'draft'. We allow OVERDUE re-send so operators can nudge late payers.
+    const sendableStatuses = ['DRAFT', 'OVERDUE'];
+    if (!sendableStatuses.includes(invoice.status)) {
+      throw new BadRequestException(
+        `Cannot send an invoice with status "${invoice.status}". Only DRAFT or OVERDUE invoices may be sent.`,
+      );
+    }
     const updated = await this.prisma.invoice.update({
       where: { id },
       data: { status: 'PENDING', sentAt: new Date() },
       include: { invoiceItem: true, invoicePayment: true },
     });
     this.logAudit('INVOICE_SENT', { invoiceId: id });
+    // Dispatch domain event — LedgerObserver posts AR + Revenue GL entries on SENT.
+    await this.domainEvents.emitSent(updated as any, userId);
     return updated;
   }
 
@@ -335,6 +417,8 @@ export class SalesService {
       include: { invoiceItem: true, invoicePayment: true },
     });
     this.logAudit('INVOICE_CANCELLED', { invoiceId: id, reason });
+    // Dispatch domain event — LedgerObserver posts reversal journal on VOIDED.
+    await this.domainEvents.emitVoided(updated as any, reason, userId);
     return updated;
   }
 
@@ -375,6 +459,23 @@ export class SalesService {
     });
 
     this.logAudit('INVOICE_MARKED_PAID', { invoiceId: id, amount, status: newStatus });
+    // Dispatch domain event — LedgerObserver posts Cash/AR clearing journal.
+    const freshInvoice = await this.prisma.invoice.findUnique({
+      where: { id },
+      include: { invoicePayment: { orderBy: { paidAt: 'desc' }, take: 1 } },
+    });
+    if (freshInvoice) {
+      const lastPayment = (freshInvoice.invoicePayment as any[])[0];
+      if (lastPayment) {
+        await this.domainEvents.emitPaymentReceived(
+          freshInvoice as any,
+          lastPayment,
+          newStatus,
+          Number(totalPaid._sum.amount ?? 0),
+          userId,
+        );
+      }
+    }
     return updated;
   }
 
@@ -395,6 +496,17 @@ export class SalesService {
 
   async duplicate(id: string, userId?: string) {
     const original = await this.findOne(id);
+
+    // Re-parse line items from the stored JSON blob so totals are recalculated
+    // against the current vatRate. Ovds SaaS does the same: the clone re-runs
+    // all calculations rather than copying the persisted totals, which may be
+    // stale if prices or tax rates changed since the original was created.
+    const itemsData: any[] = (() => {
+      try { return JSON.parse(original.items as string ?? '[]'); } catch { return []; }
+    })();
+    const vatRate = Number(original.vatRate ?? DEFAULT_VAT_RATE);
+    const totals = this.calculateInvoiceTotals(itemsData, vatRate);
+
     const duplicated = await this.prisma.invoice.create({
       data: {
         customerName: original.customerName,
@@ -405,7 +517,11 @@ export class SalesService {
         dueDate: new Date(Date.now() + DEFAULT_DUE_DAYS_MS),
         currencyCode: original.currencyCode,
         currencyRate: original.currencyRate,
-        vatRate: original.vatRate,
+        vatRate,
+        subtotal: totals.subtotal,
+        vatAmount: totals.vatAmount,
+        drrfAmount: totals.drrfAmount,
+        totalAmount: totals.grandTotal,
         items: original.items,
         invoiceItem: {
           create: (original.invoiceItem || []).map((item) => ({
@@ -447,18 +563,36 @@ export class SalesService {
 
   async getStats(companyId?: string) {
     const where: Record<string, unknown> = companyId ? { companyId } : {};
-    const [total, paid, pending, overdue] = await Promise.all([
+    // BUG FIX: was counting DRAFT invoices as "pending" — a DRAFT has never been
+    // sent, while PENDING means sent-and-awaiting-payment. Ovds SaaS distinguishes
+    // these two states in all dashboard widgets. PARTIAL is added so the dashboard
+    // can show how many invoices have part-payments outstanding.
+    const [total, paid, draft, pending, partial, overdue] = await Promise.all([
       this.prisma.invoice.count({ where }),
       this.prisma.invoice.count({ where: { ...where, status: 'PAID' } }),
       this.prisma.invoice.count({ where: { ...where, status: 'DRAFT' } }),
+      this.prisma.invoice.count({ where: { ...where, status: 'PENDING' } }),
+      this.prisma.invoice.count({ where: { ...where, status: 'PARTIAL' } }),
       this.prisma.invoice.count({ where: { ...where, status: 'OVERDUE' } }),
     ]);
-    return { total, paid, pending, overdue };
+    return {
+      total,
+      paidCount:    paid,
+      draftCount:   draft,
+      pendingCount: pending,
+      partialCount: partial,
+      overdueCount: overdue,
+    };
   }
 
   async flagOverdue(companyId?: string) {
+    // Only PENDING and PARTIAL invoices can become OVERDUE.
+    // CANCELLED, DRAFT, and already-PAID invoices must never be touched —
+    // overwriting a CANCELLED invoice's status would corrupt the audit trail,
+    // and overwriting PARTIAL would erase the partial-payment indicator.
+    // (Ovds SaaS only flags SENT/VIEWED/PARTIAL → OVERDUE for the same reason.)
     const where: Record<string, unknown> = {
-      status: { not: 'PAID' },
+      status: { in: ['PENDING', 'PARTIAL'] },
       dueDate: { lt: new Date() },
     };
     if (companyId) where.companyId = companyId;
@@ -549,6 +683,21 @@ export class SalesService {
     });
 
     this.logAudit('PAYMENT_RECORDED', { invoiceId, amount: payment.amount });
+    // Dispatch domain event — LedgerObserver posts the Cash / AR clearing entry.
+    const refreshedInvoice = await this.prisma.invoice.findUnique({ where: { id: invoiceId } });
+    if (refreshedInvoice) {
+      const totalPaidAgg = await this.prisma.invoicePayment.aggregate({
+        where: { invoiceId },
+        _sum: { amount: true },
+      });
+      await this.domainEvents.emitPaymentReceived(
+        refreshedInvoice as any,
+        payment as any,
+        refreshedInvoice.status,
+        Number(totalPaidAgg._sum.amount ?? 0),
+        userId,
+      );
+    }
     return payment;
   }
 

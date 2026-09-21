@@ -24,7 +24,7 @@ export function useCreateAgm() {
     finally { setPending(false); }
   }, []);
 
-  return { mutateAsync, isLoading: pending };
+  return { mutateAsync, isLoading: pending, isPending: pending };
 }
 
 export function useDeleteAgm() {
@@ -36,7 +36,7 @@ export function useDeleteAgm() {
     finally { setPending(false); }
   }, []);
 
-  return { mutateAsync, isLoading: pending };
+  return { mutateAsync, isLoading: pending, isPending: pending };
 }
 
 export function useGovernanceList() {
@@ -63,7 +63,7 @@ export function useDeleteGovernance() {
     finally { setPending(false); }
   }, []);
 
-  return { mutateAsync, isLoading: pending };
+  return { mutateAsync, isLoading: pending, isPending: pending };
 }
 
 export function useCreateGovernance() {
@@ -75,5 +75,5 @@ export function useCreateGovernance() {
     finally { setPending(false); }
   }, []);
 
-  return { mutateAsync, isLoading: pending };
+  return { mutateAsync, isLoading: pending, isPending: pending };
 }

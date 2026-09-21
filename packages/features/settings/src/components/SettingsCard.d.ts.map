@@ -1,1 +1,1 @@
-{"version":3,"file":"SettingsCard.d.ts","sourceRoot":"","sources":["SettingsCard.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,YAAY,YAAa,CAAC"}
+{"version":3,"file":"SettingsCard.d.ts","sourceRoot":"","sources":["SettingsCard.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,MAAM,OAAO,CAAC;AAE1B,UAAU,iBAAiB;IACzB,KAAK,EAAE,MAAM,CAAC;IACd,WAAW,CAAC,EAAE,MAAM,CAAC;IACrB,QAAQ,EAAE,KAAK,CAAC,SAAS,CAAC;IAC1B,OAAO,CAAC,EAAE,KAAK,CAAC,SAAS,CAAC;CAC3B;AAED,wBAAgB,YAAY,CAAC,EAAE,KAAK,EAAE,WAAW,EAAE,QAAQ,EAAE,OAAO,EAAE,EAAE,iBAAiB,qBAexF"}

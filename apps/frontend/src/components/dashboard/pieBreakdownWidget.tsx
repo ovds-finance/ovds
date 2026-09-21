@@ -1,9 +1,11 @@
-﻿import React from 'react';
-import { Link } from 'react-router-dom';
-import { PieChart, ArrowUpRight } from 'lucide-react';
-import { useApiQuery } from '../../hooks/useApiQuery';
-import { useBusiness } from '../../context/businessContext';
 import { fmtCompact } from '@ovds/ui';
+import { PieChart, ArrowUpRight } from 'lucide-react';
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+import { useBusiness } from '../../context/businessContext';
+import { useApiQuery } from '../../hooks/useApiQuery';
+
 
 interface Props {
   currency?: string;
@@ -36,7 +38,7 @@ const PieBreakdownWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
             <p className="ovds-caption">By category</p>
           </div>
         </div>
-        <Link to="/purchases/expenses" className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 hover:underline">
+        <Link to="/purchases/expenses" className="flex items-center gap-1 text-[11px] font-semibold text-[var(--pro-azure)] hover:underline">
           All expenses <ArrowUpRight size={11} />
         </Link>
       </div>

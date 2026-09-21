@@ -15,10 +15,10 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
-        '@ovds/ui': path.resolve(__dirname, '../../packages/ui/src/index.ts'),
-        '@ovds/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),
-        '@ovds/core': path.resolve(__dirname, '../../packages/core/src/index.ts'),
-        '@ovds/database': path.resolve(__dirname, '../../packages/database/src/index.ts'),
+        '@ovds/ui': path.resolve(__dirname, '../../packages/ui/src'),
+        '@ovds/shared': path.resolve(__dirname, '../../packages/shared/src'),
+        '@ovds/core': path.resolve(__dirname, '../../packages/core/src'),
+        '@ovds/database': path.resolve(__dirname, '../../packages/database/src'),
       },
       extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     },

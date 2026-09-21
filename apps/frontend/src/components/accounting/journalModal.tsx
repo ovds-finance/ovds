@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
 import { X, Plus } from 'lucide-react';
-import { useAuth } from '../../rbac/AuthContext';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+
 import { useEscapeKey } from '../../hooks';
+import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
 import { fmtDecimal } from '../../utils/fmt';
 
 const fmt = fmtDecimal;
@@ -241,13 +242,13 @@ const JournalModal: React.FC<JournalModalProps> = ({
                   { accountId: '', description: '', debit: '', credit: '' },
                 ])
               }
-              className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 rounded-xl transition-all"
+              className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:bg-[var(--pro-azure-50)] rounded-xl transition-all"
             >
               <Plus size={13} /> Add Line
             </button>
           </div>
           <div
-            className={`flex items-center justify-end gap-6 p-4 rounded-2xl border ${isBalanced ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200'}`}
+            className={`flex items-center justify-end gap-6 p-4 rounded-2xl border ${isBalanced ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' : 'bg-rose-50 border-rose-200'}`}
           >
             <div className="text-right">
               <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
@@ -266,7 +267,7 @@ const JournalModal: React.FC<JournalModalProps> = ({
               </p>
             </div>
             <div
-              className={`text-xs font-semibold px-3 py-1.5 rounded-xl ${isBalanced ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-xl ${isBalanced ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : 'bg-rose-100 text-rose-700'}`}
             >
               {isBalanced ? '✓ Balanced' : '✗ Not Balanced'}
             </div>

@@ -234,3 +234,54 @@ export {
 
 // -- Page pin (star-to-favorites) -------------------------------------------
 export { default as PagePinButton } from './PagePinButton';
+
+// ── Grid-over-Card Layout System ─────────────────────────────────────────────
+// Akaunting-inspired high-density accounting UI components.
+// Architecture: GridPageLayout > ActionsRow + MetricsOverviewGrid + DataGrid
+//
+// Usage:
+//   import { GridPageLayout, DataGrid, MetricsOverviewGrid, ActionsRow,
+//            InlineCreationModal } from '../components/ui';
+
+// DataGrid — hover-to-reveal row actions, dynamic column schema, status badges
+export {
+  DataGrid,
+  GridStatusBadge,
+} from './DataGrid';
+export type {
+  DataGridProps,
+  GridColumn,
+  GridRowAction,
+  GridSortState,
+  ColAlign,
+} from './DataGrid';
+
+// MetricsOverviewGrid — Akaunting-style KPI metric strip
+export { MetricsOverviewGrid } from './MetricsOverviewGrid';
+export type {
+  MetricsOverviewGridProps,
+  MetricItem,
+  MetricTrend,
+} from './MetricsOverviewGrid';
+
+// ActionsRow — search + filter dropdown + primary CTA toolbar
+export { ActionsRow, ActionsIconBtn } from './ActionsRow';
+export type {
+  ActionsRowProps,
+  FilterOption,
+  PrimaryAction,
+} from './ActionsRow';
+
+// GridPageLayout — master page shell (header + tabs + actionsRow + metricsGrid + dataGrid + pagination)
+export { GridPageLayout } from './GridPageLayout';
+export type {
+  GridPageLayoutProps,
+  GridTab,
+  GridPaginationState,
+  GridPaginationCallbacks,
+  BreadcrumbItem,
+} from './GridPageLayout';
+
+// InlineCreationModal — context-aware nested sub-modal with focus trap + portal
+export { InlineCreationModal, useInlineModal } from './InlineCreationModal';
+export type { InlineCreationModalProps } from './InlineCreationModal';

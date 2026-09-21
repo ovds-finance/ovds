@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
 interface Invoice {
@@ -44,7 +44,7 @@ const Invoices: React.FC = () => {
 
   const statusBadge = (status: string) => {
     const cfg: Record<string, { cls: string; label: string }> = {
-      PAID: { cls: 'bg-emerald-100 text-emerald-700', label: 'Paid' },
+      PAID: { cls: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]', label: 'Paid' },
       PENDING: { cls: 'bg-amber-100 text-amber-700', label: 'Pending' },
       OVERDUE: { cls: 'bg-rose-100 text-rose-700', label: 'Overdue' },
       DRAFT: { cls: 'bg-slate-100 text-slate-600', label: 'Draft' },
@@ -66,7 +66,7 @@ const Invoices: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
           <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Paid</p>
-          <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-400 mt-1 tabular-nums">{fmt(totalPaid)}</p>
+          <p className="text-2xl font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] mt-1 tabular-nums">{fmt(totalPaid)}</p>
           <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">{invoices.filter(i => i.status === 'PAID').length} invoices</p>
         </div>
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
@@ -128,3 +128,4 @@ const Invoices: React.FC = () => {
 };
 
 export default Invoices;
+

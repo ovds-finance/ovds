@@ -193,7 +193,7 @@ export const DocStackLayout: React.FC<DocStackLayoutProps> = ({
                     type="checkbox"
                     checked={isSelected}
                     onChange={() => onSelect?.(item.id)}
-                    className="w-3.5 h-3.5 rounded accent-emerald-500 cursor-pointer"
+                    className="w-3.5 h-3.5 rounded accent-green-500 cursor-pointer"
                     aria-label={`Select ${item.title}`}
                   />
                 </label>
@@ -211,7 +211,7 @@ export const DocStackLayout: React.FC<DocStackLayoutProps> = ({
                   {item.badge && (
                     <span className={[
                       'text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide flex-shrink-0',
-                      item.badgeCls ?? 'bg-emerald-100 text-emerald-700',
+                      item.badgeCls ?? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
                     ].join(' ')}>
                       {item.badge}
                     </span>

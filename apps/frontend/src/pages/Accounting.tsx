@@ -141,40 +141,40 @@ const ACCOUNT_TYPES = ['ASSET', 'LIABILITY', 'EQUITY', 'INCOME', 'EXPENSE'];
 const STAT_CARD_COLORS: Record<string, {
   iconBg: string; iconText: string; trendUp: string; trendDown: string;
 }> = {
-  emerald: {
-    iconBg:   'bg-emerald-50 dark:bg-emerald-950/30',
-    iconText: 'text-emerald-600 dark:text-emerald-400',
-    trendUp:   'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400',
+  indigo: {
+    iconBg:   'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
+    iconText: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+    trendUp:   'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
     trendDown: 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400',
   },
   teal: {
     iconBg:   'bg-teal-50 dark:bg-teal-950/30',
     iconText: 'text-teal-600 dark:text-teal-400',
-    trendUp:   'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400',
+    trendUp:   'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
     trendDown: 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400',
   },
   amber: {
     iconBg:   'bg-amber-50 dark:bg-amber-950/30',
     iconText: 'text-amber-600 dark:text-amber-400',
-    trendUp:   'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400',
+    trendUp:   'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
     trendDown: 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400',
   },
   violet: {
     iconBg:   'bg-violet-50 dark:bg-violet-950/30',
     iconText: 'text-violet-600 dark:text-violet-400',
-    trendUp:   'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400',
+    trendUp:   'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
     trendDown: 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400',
   },
   rose: {
     iconBg:   'bg-rose-50 dark:bg-rose-950/30',
     iconText: 'text-rose-600 dark:text-rose-400',
-    trendUp:   'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400',
+    trendUp:   'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
     trendDown: 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400',
   },
   sky: {
     iconBg:   'bg-sky-50 dark:bg-sky-950/30',
     iconText: 'text-sky-600 dark:text-sky-400',
-    trendUp:   'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400',
+    trendUp:   'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
     trendDown: 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400',
   },
 };
@@ -187,11 +187,11 @@ const StatCard = ({ title, value, icon, color, trend, onClick }: {
   trend?: number;
   onClick?: () => void;
 }) => {
-  const c = STAT_CARD_COLORS[color] ?? STAT_CARD_COLORS.emerald;
+  const c = STAT_CARD_COLORS[color] ?? STAT_CARD_COLORS.indigo;
   return (
     <button
       onClick={onClick}
-      className="ovds-widget-card p-5 hover:border-emerald-200 dark:hover:border-emerald-800 hover:-translate-y-0.5 transition-all duration-150 group text-left w-full relative overflow-hidden"
+      className="ovds-widget-card p-5 hover:border-[var(--pro-azure-100)] dark:hover:border-green-800 hover:-translate-y-0.5 transition-all duration-150 group text-left w-full relative overflow-hidden"
     >
       <div className="flex items-center justify-between mb-3">
         <div className={`w-11 h-11 rounded-xl ${c.iconBg} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
@@ -325,10 +325,10 @@ const Accounting: React.FC = () => {
   useInterval(fetchAll, 60_000);
 
   const TYPE_COLORS: Record<string, string> = {
-    ASSET: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10',
+    ASSET: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10',
     LIABILITY: 'text-rose-600 bg-rose-50 dark:bg-rose-500/10',
     EQUITY: 'text-teal-600 bg-teal-50 dark:bg-teal-500/10',
-    INCOME: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10',
+    INCOME: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10',
     EXPENSE: 'text-amber-600 bg-amber-50 dark:bg-amber-500/10',
   };
 
@@ -417,7 +417,7 @@ const Accounting: React.FC = () => {
           <MetricCard
             title="Total Assets"
             amount={
-              accountBalances
+              accountBalances?.totals
                 ? fmt(Math.abs(accountBalances.totals.assets))
                 : '—'
             }
@@ -427,7 +427,7 @@ const Accounting: React.FC = () => {
           <MetricCard
             title="Net Equity"
             amount={
-              accountBalances
+              accountBalances?.totals
                 ? fmt(
                     Math.abs(accountBalances.totals.equity) +
                       (Math.abs(accountBalances.totals.income) -
@@ -450,7 +450,7 @@ const Accounting: React.FC = () => {
             className={[
               'flex items-center gap-2 px-4 py-2 rounded-xl text-[12px] font-semibold transition-all duration-150',
               tab === t.key
-                ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200 dark:border-slate-700'
+                ? 'bg-white dark:bg-slate-900 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shadow-sm border border-slate-200 dark:border-slate-700'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/60 dark:hover:bg-slate-700/50',
             ].join(' ')}
           >
@@ -467,7 +467,7 @@ const Accounting: React.FC = () => {
               <div className="relative group">
                 <Search
                   size={14}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--pro-azure)] transition-colors"
                 />
                 <input
                   value={search}
@@ -493,7 +493,7 @@ const Accounting: React.FC = () => {
                   type="checkbox"
                   checked={showInactive}
                   onChange={(e) => setShowInactive(e.target.checked)}
-                  className="w-4 h-4 rounded-lg border-slate-300 text-emerald-600 focus:ring-teal-400"
+                  className="w-4 h-4 rounded-lg border-slate-300 text-[var(--pro-azure)] focus:ring-teal-400"
                 />
                 <span className="text-[11px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-tight">
                   Show Inactive
@@ -649,13 +649,13 @@ const Accounting: React.FC = () => {
                           return (
                             <tr
                               key={a.id}
-                              className="border-b border-slate-50 dark:border-slate-700/50 hover:bg-emerald-50/30 dark:hover:bg-emerald-900/10 transition-colors group"
+                              className="border-b border-slate-50 dark:border-slate-700/50 hover:bg-[var(--pro-azure-50)]/30 dark:hover:bg-green-900/10 transition-colors group"
                             >
                               <td className="px-6 py-4 text-[12px] font-mono font-bold text-slate-400 dark:text-slate-500">
                                 {a.code}
                               </td>
                               <td className="px-6 py-4">
-                                <p className="text-[13px] font-black text-slate-800 dark:text-white group-hover:text-emerald-600 transition-colors">
+                                <p className="text-[13px] font-black text-slate-800 dark:text-white group-hover:text-[var(--pro-azure)] transition-colors">
                                   {a.name}
                                 </p>
                               </td>
@@ -671,7 +671,7 @@ const Accounting: React.FC = () => {
                               </td>
                               <td className="px-6 py-4 text-center">
                                 <span
-                                  className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${a.isActive ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10' : 'bg-slate-100 text-slate-400 dark:bg-slate-700'}`}
+                                  className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${a.isActive ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:bg-[var(--pro-azure-50)]0/10' : 'bg-slate-100 text-slate-400 dark:bg-slate-700'}`}
                                 >
                                   {a.isActive ? 'Active' : 'Inactive'}
                                 </span>
@@ -689,7 +689,7 @@ const Accounting: React.FC = () => {
                                       setEditingAccount(a);
                                       setShowAccountModal(true);
                                     }}
-                                    className="px-3 py-1.5 text-[11px] font-black text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-all"
+                                    className="px-3 py-1.5 text-[11px] font-black text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-900/20 rounded-lg transition-all"
                                   >
                                     Edit
                                   </button>
@@ -784,12 +784,12 @@ const Accounting: React.FC = () => {
           {/* Golden Rules Reference Panel */}
           {journalView === 'golden-rules' && (
             <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="bg-gradient-to-r from-emerald-600 to-violet-600 rounded-2xl p-6 text-white">
+              <div className="bg-gradient-to-r from-[var(--pro-azure)] to-violet-600 rounded-2xl p-6 text-white">
                 <div className="flex items-center gap-3 mb-2">
                   <BookOpen size={20} />
                   <h2 className="text-lg font-black tracking-tight">Golden Rules of Double-Entry Accounting</h2>
                 </div>
-                <p className="text-sm text-emerald-100/80">Every transaction has two equal and opposite effects. Debits always equal Credits.</p>
+                <p className="text-sm text-green-100/80">Every transaction has two equal and opposite effects. Debits always equal Credits.</p>
               </div>
 
               <div className="ovds-grid-layout cols-3">
@@ -820,7 +820,7 @@ const Accounting: React.FC = () => {
                     subtitle: 'Income & Expenses',
                     debit: 'All EXPENSES & LOSSES',
                     credit: 'All INCOME & GAINS',
-                    color: 'emerald',
+                    color: 'green',
                     examples: ['Salary paid → Debit Salary Expense', 'Revenue earned → Credit Sales Revenue', 'Interest earned → Credit Interest Income'],
                     icon: <BarChart3 size={20} />,
                   },
@@ -839,14 +839,14 @@ const Accounting: React.FC = () => {
                       icon:   'text-amber-600 dark:text-amber-400',
                       label:  'text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest',
                     },
-                    emerald: {
-                      card:   'bg-white dark:bg-slate-900 rounded-2xl border border-emerald-200 dark:border-emerald-800 overflow-hidden shadow-sm',
-                      header: 'bg-emerald-50 dark:bg-emerald-950/30 px-5 py-4 border-b border-emerald-100 dark:border-emerald-900',
-                      icon:   'text-emerald-600 dark:text-emerald-400',
-                      label:  'text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest',
+                    indigo: {
+                      card:   'bg-white dark:bg-slate-900 rounded-2xl border border-[var(--pro-azure-100)] dark:border-green-800 overflow-hidden shadow-sm',
+                      header: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 px-5 py-4 border-b border-[var(--pro-azure-100)] dark:border-green-900',
+                      icon:   'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+                      label:  'text-[10px] font-black text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] uppercase tracking-widest',
                     },
                   };
-                  const rc = ruleColors[r.color] ?? ruleColors.emerald;
+                  const rc = ruleColors[r.color] ?? ruleColors.indigo;
                   return (
                   <div key={r.rule} className={rc.card}>
                     <div className={rc.header}>
@@ -859,8 +859,8 @@ const Accounting: React.FC = () => {
                     </div>
                     <div className="p-5 space-y-4">
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-xl p-3 text-center">
-                          <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-1">DEBIT (Dr)</p>
+                        <div className="bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl p-3 text-center">
+                          <p className="text-[9px] font-black text-[var(--pro-azure)] uppercase tracking-widest mb-1">DEBIT (Dr)</p>
                           <p className="text-xs font-bold text-slate-700 dark:text-slate-200">{r.debit}</p>
                         </div>
                         <div className="bg-rose-50 dark:bg-rose-950/20 rounded-xl p-3 text-center">
@@ -886,7 +886,7 @@ const Accounting: React.FC = () => {
               <div className="ovds-widget-card overflow-hidden">
                 <div className="ovds-widget-header">
                   <div className="flex items-center gap-2">
-                    <BookOpen size={15} className="text-emerald-600 dark:text-emerald-400" />
+                    <BookOpen size={15} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                     <h3 className="ovds-card-title">IFRS Account Types — Normal Balances</h3>
                   </div>
                 </div>
@@ -901,16 +901,16 @@ const Accounting: React.FC = () => {
                     </thead>
                     <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
                       {[
-                        { type: 'Asset', normal: 'Debit', inc: 'Debit', dec: 'Credit', std: 'IAS 1', ex: 'Cash, Receivables, Inventory, PPE', color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30' },
+                        { type: 'Asset', normal: 'Debit', inc: 'Debit', dec: 'Credit', std: 'IAS 1', ex: 'Cash, Receivables, Inventory, PPE', color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30' },
                         { type: 'Liability', normal: 'Credit', inc: 'Credit', dec: 'Debit', std: 'IAS 1', ex: 'Payables, Loans, Deferred Revenue', color: 'text-rose-600 bg-rose-50 dark:bg-rose-950/30' },
                         { type: 'Equity', normal: 'Credit', inc: 'Credit', dec: 'Debit', std: 'IAS 1', ex: 'Share Capital, Retained Earnings', color: 'text-violet-600 bg-violet-50 dark:bg-violet-950/30' },
-                        { type: 'Revenue', normal: 'Credit', inc: 'Credit', dec: 'Debit', std: 'IFRS 15', ex: 'Sales, Service Revenue, Interest Income', color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30' },
+                        { type: 'Revenue', normal: 'Credit', inc: 'Credit', dec: 'Debit', std: 'IFRS 15', ex: 'Sales, Service Revenue, Interest Income', color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30' },
                         { type: 'Expense', normal: 'Debit', inc: 'Debit', dec: 'Credit', std: 'IAS 1', ex: 'COGS, Salaries, Depreciation, Tax', color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/30' },
                       ].map(r => (
                         <tr key={r.type} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                           <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded-lg text-[10px] font-black ${r.color}`}>{r.type}</span></td>
                           <td className="px-4 py-3 text-xs font-bold text-slate-700 dark:text-slate-200">{r.normal}</td>
-                          <td className="px-4 py-3 text-xs text-emerald-600 dark:text-emerald-400 font-bold">{r.inc}</td>
+                          <td className="px-4 py-3 text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold">{r.inc}</td>
                           <td className="px-4 py-3 text-xs text-rose-600 dark:text-rose-400 font-bold">{r.dec}</td>
                           <td className="px-4 py-3 text-xs text-slate-400 font-mono">{r.std}</td>
                           <td className="px-4 py-3 text-xs text-slate-500 dark:text-slate-400">{r.ex}</td>
@@ -957,7 +957,7 @@ const Accounting: React.FC = () => {
                         <p className="ovds-caption mt-0.5">{t.note}</p>
                       </div>
                       <div className="flex items-center gap-3 text-xs shrink-0">
-                        <span className="text-emerald-600 dark:text-emerald-400 font-bold">Dr: {t.dr}</span>
+                        <span className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold">Dr: {t.dr}</span>
                         <span className="text-slate-300 dark:text-slate-600">|</span>
                         <span className="text-rose-600 dark:text-rose-400 font-bold">Cr: {t.cr}</span>
                       </div>
@@ -975,7 +975,7 @@ const Accounting: React.FC = () => {
               <div className="relative group">
                 <Search
                   size={14}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--pro-azure)] transition-colors"
                 />
                 <input
                   value={jSearch}
@@ -1066,7 +1066,7 @@ const Accounting: React.FC = () => {
                 return (
                   <div
                     key={j.id}
-                    className="ovds-doc-shell hover:border-emerald-200 dark:hover:border-emerald-900 transition-all"
+                    className="ovds-doc-shell hover:border-[var(--pro-azure-100)] dark:hover:border-green-900 transition-all"
                   >
                     <button
                       onClick={() =>
@@ -1087,7 +1087,7 @@ const Accounting: React.FC = () => {
                           </p>
                           <div className="flex items-center gap-3 mt-0.5">
                             {j.reference && (
-                              <span className="text-[11px] font-mono font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">
+                              <span className="text-[11px] font-mono font-black text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10 px-2 py-0.5 rounded">
                                 {j.reference}
                               </span>
                             )}
@@ -1103,7 +1103,7 @@ const Accounting: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-4">
                         <span
-                          className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${j.status === 'POSTED' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10' : 'bg-amber-50 text-amber-600 dark:bg-amber-500/10'}`}
+                          className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${j.status === 'POSTED' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:bg-[var(--pro-azure-50)]0/10' : 'bg-amber-50 text-amber-600 dark:bg-amber-500/10'}`}
                         >
                           {j.status}
                         </span>
@@ -1146,7 +1146,7 @@ const Accounting: React.FC = () => {
                                 <td className="py-3 text-[12px] text-slate-500 dark:text-slate-400 italic">
                                   {l.description || '—'}
                                 </td>
-                                <td className="py-3 text-right text-[13px] font-black text-emerald-600">
+                                <td className="py-3 text-right text-[13px] font-black text-[var(--pro-azure)]">
                                   {l.debit > 0 ? fmt(l.debit) : '—'}
                                 </td>
                                 <td className="py-3 text-right text-[13px] font-black text-rose-600">
@@ -1161,7 +1161,7 @@ const Accounting: React.FC = () => {
                               >
                                 Balanced Totals
                               </td>
-                              <td className="py-3 text-right text-[13px] text-emerald-600">
+                              <td className="py-3 text-right text-[13px] text-[var(--pro-azure)]">
                                 {fmt(totalDebit)}
                               </td>
                               <td className="py-3 text-right text-[13px] text-rose-600">
@@ -1205,7 +1205,7 @@ const Accounting: React.FC = () => {
                           >
                             <Trash2 size={14} /> Delete Entry
                           </button>
-                          <button className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-emerald-500 dark:bg-slate-900 text-white rounded-xl text-[12px] font-black transition-all">
+                          <button className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-[var(--pro-azure-dark)] dark:bg-slate-900 text-white rounded-xl text-[12px] font-black transition-all">
                             <Printer size={14} /> Print Voucher
                           </button>
                         </div>
@@ -1240,13 +1240,13 @@ const Accounting: React.FC = () => {
       {tab === 'banks' && (
         <div className="space-y-6">
           {reconcSummary && (reconcSummary.totalPending > 0 || reconcSummary.totalReconciled > 0) && (
-            <div className={`rounded-2xl border px-6 py-5 flex items-center justify-between gap-6 shadow-sm ${reconcSummary.totalPending > 0 ? 'bg-amber-50/50 border-amber-100 dark:bg-amber-500/5 dark:border-amber-900/30' : 'bg-emerald-50/50 border-emerald-100 dark:bg-emerald-500/5 dark:border-emerald-900/30'}`}>
+            <div className={`rounded-2xl border px-6 py-5 flex items-center justify-between gap-6 shadow-sm ${reconcSummary.totalPending > 0 ? 'bg-amber-50/50 border-amber-100 dark:bg-amber-500/5 dark:border-amber-900/30' : 'bg-[var(--pro-azure-50)]/50 border-[var(--pro-azure-100)] dark:bg-[var(--pro-azure-50)]0/5 dark:border-green-900/30'}`}>
               <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${reconcSummary.totalPending > 0 ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
-                  <GitCompare size={24} className={reconcSummary.totalPending > 0 ? 'text-amber-600' : 'text-emerald-600'} />
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${reconcSummary.totalPending > 0 ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-[var(--pro-azure-100)] dark:bg-green-900/30'}`}>
+                  <GitCompare size={24} className={reconcSummary.totalPending > 0 ? 'text-amber-600' : 'text-[var(--pro-azure)]'} />
                 </div>
                 <div>
-                  <h4 className={`text-base font-black ${reconcSummary.totalPending > 0 ? 'text-amber-900 dark:text-amber-200' : 'text-emerald-900 dark:text-emerald-200'}`}>
+                  <h4 className={`text-base font-black ${reconcSummary.totalPending > 0 ? 'text-amber-900 dark:text-amber-200' : 'text-[var(--pro-azure-dark)] dark:text-green-200'}`}>
                     {reconcSummary.totalPending > 0 ? `${reconcSummary.totalPending} Unreconciled Transactions` : 'Full Reconciled Status'}
                   </h4>
                   <p className="text-xs font-bold text-slate-500 mt-0.5">
@@ -1316,7 +1316,7 @@ const Accounting: React.FC = () => {
         <div className="space-y-6">
           <div className="ovds-toolbar rounded-2xl">
             <div className="relative group">
-              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
+              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--pro-azure)] transition-colors" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -1357,7 +1357,7 @@ const Accounting: React.FC = () => {
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
                       <button
                         onClick={() => { setEditingVendor(v); setShowVendorModal(true); }}
-                        className="p-2 bg-white dark:bg-slate-700 rounded-xl text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                        className="p-2 bg-white dark:bg-slate-700 rounded-xl text-slate-400 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors"
                       >
                         <Edit2 size={14} />
                       </button>
@@ -1426,8 +1426,8 @@ const Accounting: React.FC = () => {
                 <div key={t.id} className="ovds-widget-card overflow-hidden hover:shadow-md transition-all">
                   <div className="p-6 border-b border-slate-50 dark:border-slate-700 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center">
-                        <RefreshCw size={24} className="text-emerald-600 dark:text-emerald-400" />
+                      <div className="w-12 h-12 bg-[var(--pro-azure-50)] dark:bg-green-900/30 rounded-2xl flex items-center justify-center">
+                        <RefreshCw size={24} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                       </div>
                       <div>
                         <h4 className="font-black text-slate-800 dark:text-white text-base">{t.description}</h4>
@@ -1475,7 +1475,7 @@ const Accounting: React.FC = () => {
                     {(t.lines || []).map((l: any) => (
                       <div key={l.id} className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
                         <p className="text-[11px] font-black text-slate-800 dark:text-white truncate uppercase tracking-tight">{l.account?.code} {l.account?.name}</p>
-                        <p className={`text-[12px] font-black mt-1 ${l.debit > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        <p className={`text-[12px] font-black mt-1 ${l.debit > 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>
                           {l.debit > 0 ? `DR ${fmt(l.debit)}` : `CR ${fmt(l.credit)}`}
                         </p>
                       </div>

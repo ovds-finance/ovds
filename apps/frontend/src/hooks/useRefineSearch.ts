@@ -11,8 +11,8 @@
  * keystroke, and maps the search term to a Refine CrudFilter array you can
  * merge with your other filters.
  */
-import { useState, useEffect, useRef } from "react";
 import type { CrudFilters } from "@refinedev/core";
+import { useState, useEffect, useRef } from "react";
 
 interface UseRefineSearchOptions {
   /** Query param name the backend expects. Defaults to "search". */

@@ -1,6 +1,6 @@
 /**
  * CrmService — CRM domain logic (contacts, companies, deals, activities, pipelines).
- * Migrated from apps/backend/src/crm/crm.service.ts into @ovds/domains/crm.
+ * Migrated from apps/backend/src/crm/crm.service.ts into @ovds/domains-crm.
  */
 import {
   Injectable,
@@ -13,7 +13,7 @@ import {
   BaseService,
   IAuditLogger,
   IPrismaClient,
-} from '@ovds/domains/infrastructure';
+} from '@ovds/domains-infrastructure';
 
 /** Injected at the app level — avoids direct import of app services in the lib */
 export interface ICrmDeps {

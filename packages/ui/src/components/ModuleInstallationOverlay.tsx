@@ -30,13 +30,13 @@ const StateIcon: React.FC<{ state: ModuleInstallationState }> = ({ state }) => {
       return null;
     case 'PRE_FLIGHT':
       return (
-        <svg className="h-5 w-5 animate-aki-spin text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg className="h-5 w-5 animate-aki-spin text-[var(--pro-azure)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" />
         </svg>
       );
     case 'FETCHING':
       return (
-        <svg className="h-5 w-5 animate-aki-spin text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg className="h-5 w-5 animate-aki-spin text-[var(--pro-azure)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
       );
@@ -49,7 +49,7 @@ const StateIcon: React.FC<{ state: ModuleInstallationState }> = ({ state }) => {
       );
     case 'LIVE':
       return (
-        <svg className="h-5 w-5 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg className="h-5 w-5 text-[var(--pro-azure)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
           <polyline points="22 4 12 14.01 9 11.01" />
         </svg>
@@ -76,10 +76,10 @@ const StateIcon: React.FC<{ state: ModuleInstallationState }> = ({ state }) => {
 
 const STATE_STYLES: Record<ModuleInstallationState, string> = {
   IDLE:             'text-slate-600 dark:text-slate-400',
-  PRE_FLIGHT:       'text-blue-600 dark:text-blue-400',
-  FETCHING:         'text-blue-600 dark:text-blue-400',
+  PRE_FLIGHT:       'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+  FETCHING:         'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
   EXTRACTION:       'text-amber-600 dark:text-amber-400',
-  LIVE:             'text-emerald-600 dark:text-emerald-400',
+  LIVE:             'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
   CRITICAL_ERROR:   'text-rose-600 dark:text-rose-400',
   ROLLBACK:         'text-amber-600 dark:text-amber-400',
 };
@@ -94,9 +94,9 @@ export const ModuleInstallationBadge: React.FC<{ state: ModuleInstallationState;
       className={[
         'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold',
         STATE_STYLES[state],
-        state === 'LIVE' ? 'bg-emerald-50 dark:bg-emerald-950/50 ring-1 ring-inset ring-emerald-600/20' :
+        state === 'LIVE' ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]/10 ring-1 ring-inset ring-[var(--pro-azure)]/20' :
         state === 'CRITICAL_ERROR' ? 'bg-rose-50 dark:bg-rose-950/50 ring-1 ring-inset ring-rose-600/20' :
-        state === 'PRE_FLIGHT' || state === 'FETCHING' ? 'bg-blue-50 dark:bg-blue-950/50 ring-1 ring-inset ring-blue-600/20' :
+        state === 'PRE_FLIGHT' || state === 'FETCHING' ? 'bg-[var(--pro-azure-50)] ring-1 ring-inset ring-[var(--pro-azure)]/20' :
         state === 'EXTRACTION' || state === 'ROLLBACK' ? 'bg-amber-50 dark:bg-amber-950/50 ring-1 ring-inset ring-amber-600/20' :
         'bg-slate-50 dark:bg-slate-800 ring-1 ring-inset ring-slate-600/10',
       ].join(' ')}
@@ -175,9 +175,9 @@ export const ModuleInstallationOverlay: React.FC<ModuleInstallationOverlayProps>
                 <div
                   className={[
                     'h-full rounded-full transition-all duration-300',
-                    state === 'FETCHING' ? 'bg-blue-500' :
+                    state === 'FETCHING'   ? 'bg-[var(--pro-azure)]' :
                     state === 'EXTRACTION' ? 'bg-amber-500' :
-                    'bg-blue-500',
+                    'bg-[var(--pro-azure)]',
                   ].join(' ')}
                   style={{ width: `${progress}%` }}
                 />

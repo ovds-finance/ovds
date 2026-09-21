@@ -50,7 +50,7 @@ export const SecurityPermissionRow: React.FC<SecurityPermission> = ({
           checked={checked}
           disabled={disabled}
           onChange={(e) => onChange?.(e.target.checked)}
-          className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 dark:bg-slate-800 focus:ring-offset-slate-900"
+          className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-[var(--pro-azure)] focus:ring-[var(--pro-azure)] dark:bg-slate-800 focus:ring-offset-white dark:focus:ring-offset-slate-900"
         />
       </div>
       <div className="text-sm">
@@ -106,7 +106,7 @@ export const SecuritySandbox: React.FC<SecuritySandboxProps> = ({
         <button
           type="submit"
           disabled={committing}
-          className="rounded-lg bg-blue-600 dark:bg-blue-500 px-4 py-2 text-sm font-semibold text-white dark:text-slate-950 shadow-sm hover:bg-blue-500 dark:hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          className="rounded-lg bg-[var(--pro-azure)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[var(--pro-azure-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pro-azure)] transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {committing ? 'Committing…' : 'Commit Security Rules'}
         </button>

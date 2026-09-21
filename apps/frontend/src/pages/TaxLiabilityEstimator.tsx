@@ -9,14 +9,16 @@
  *   - VAT: /api/vat/summary
  *   - Tax liability: /api/tax/liability-estimate
  */
-import React, { useState, useCallback, useEffect } from 'react';
-import { Calculator, RefreshCw, TrendingUp, Info, AlertTriangle } from 'lucide-react';
 import { AppPage, Btn } from '@ovds/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { fmtCurrency } from '../utils/fmt';
-import api from '../services/api';
+import { Calculator, RefreshCw, TrendingUp, Info, AlertTriangle } from 'lucide-react';
+import React, { useState, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
+
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { fmtCurrency } from '../utils/fmt';
+
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
@@ -50,7 +52,7 @@ const TaxLiabilityEstimatorPage: React.FC = () => {
     try {
       const res = await api.get(`/tax/liability-estimate?period=${period}`);
       setEstimate(res.data?.data ?? res.data);
-    } catch (err: any) {
+    } catch (_err: any) {
       // Graceful fallback — build from VAT summary if dedicated endpoint not yet available
       try {
         const vat = await api.get('/vat/summary');
@@ -84,7 +86,7 @@ const TaxLiabilityEstimatorPage: React.FC = () => {
   const urgencyColor = (days: number) =>
     days <= 3 ? 'text-rose-600 bg-rose-50 border-rose-200' :
     days <= 7 ? 'text-amber-600 bg-amber-50 border-amber-200' :
-                'text-emerald-600 bg-emerald-50 border-emerald-200';
+                'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]';
 
   return (
     <AppPage
@@ -132,13 +134,13 @@ const TaxLiabilityEstimatorPage: React.FC = () => {
           {/* VAT card */}
           <div className="ovds-widget-card col-span-1">
             <div className="ovds-widget-header">
-              <TrendingUp size={15} className="text-emerald-500" />
+              <TrendingUp size={15} className="text-[var(--pro-azure)]" />
               <h3 className="ovds-card-title">VAT Estimate</h3>
             </div>
             <div className="ovds-widget-body space-y-3">
               {[
                 { label: 'Output VAT (15%)',  value: estimate?.outputVat ?? 0,  cls: 'text-slate-700' },
-                { label: 'Input VAT Credit',  value: -(estimate?.inputVat ?? 0), cls: 'text-emerald-600' },
+                { label: 'Input VAT Credit',  value: -(estimate?.inputVat ?? 0), cls: 'text-[var(--pro-azure)]' },
               ].map(row => (
                 <div key={row.label} className="flex justify-between text-sm">
                   <span className="text-slate-500">{row.label}</span>
@@ -147,7 +149,7 @@ const TaxLiabilityEstimatorPage: React.FC = () => {
               ))}
               <div className="pt-2 border-t border-slate-100 flex justify-between text-sm font-bold">
                 <span className="text-slate-700">Net VAT Payable</span>
-                <span className="text-emerald-600 tabular-nums">{fmt(estimate?.netVat ?? 0)}</span>
+                <span className="text-[var(--pro-azure)] tabular-nums">{fmt(estimate?.netVat ?? 0)}</span>
               </div>
               <p className="text-[10px] text-slate-400">Due 30th of following month · Proc. 1341/2024</p>
             </div>
@@ -214,7 +216,7 @@ const TaxLiabilityEstimatorPage: React.FC = () => {
               </div>
               <div className="flex flex-col items-end gap-2">
                 {[
-                  { label: 'VAT',  value: estimate?.netVat     ?? 0, cls: 'bg-emerald-50 text-emerald-700' },
+                  { label: 'VAT',  value: estimate?.netVat     ?? 0, cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]' },
                   { label: 'TOT',  value: estimate?.netTot     ?? 0, cls: 'bg-sky-50 text-sky-700' },
                   { label: 'WHT',  value: estimate?.whtPayable ?? 0, cls: 'bg-amber-50 text-amber-700' },
                 ].map(r => (

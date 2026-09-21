@@ -42,3 +42,6 @@ export {
 
 // -- Array / API response helpers ---------------------------------------------
 export { toArray, unwrapArray, unwrapNestedArray } from './array';
+
+// -- OCR error normalization --------------------------------------------------
+export { normalizeOcrError } from './ocr';

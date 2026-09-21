@@ -15,13 +15,13 @@ export interface DataRowProps {
 }
 
 const STATUS_CLS: Record<string, string> = {
-  Paid:    'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800',
+  Paid:    'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800',
   Pending: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800',
   Overdue: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-800',
 };
 
 const STATUS_DOT: Record<string, string> = {
-  Paid:    'bg-emerald-500',
+  Paid:    'bg-[var(--pro-azure)]',
   Pending: 'bg-amber-500',
   Overdue: 'bg-rose-500',
 };
@@ -36,7 +36,7 @@ export const DataRow: React.FC<DataRowProps> = ({
 }) => (
   <tr className="border-b border-[var(--border-alt)] hover:bg-[var(--surface-alt)] transition-colors duration-100 group">
     {/* Reference ID */}
-    <td className="py-3 px-4 text-[12px] font-semibold font-mono text-[var(--aki-blue)] hover:underline cursor-pointer"
+    <td className="py-3 px-4 text-[12px] font-semibold font-mono text-[var(--pro-azure)] hover:underline cursor-pointer"
       onClick={onIdClick}>
       {id}
     </td>

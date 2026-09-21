@@ -1,8 +1,9 @@
-import api from './api';
 import type {
   ProjectionJournalRow,
   IfrsReportingBalanceRow,
 } from '@ovds/features/reporting';
+
+import api from './api';
 
 export type { ProjectionJournalRow, IfrsReportingBalanceRow } from '@ovds/features/reporting';
 

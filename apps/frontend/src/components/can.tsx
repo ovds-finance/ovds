@@ -37,6 +37,7 @@
  *   </Can>
  */
 import React from 'react';
+
 import { usePermissionGuard } from '../hooks/usePermissionGuard';
 import type { Permission, AppRole } from '../rbac/rbac';
 

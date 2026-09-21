@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { DoubleEntryService } from '@ovds/domains/double-entry';
+import { DoubleEntryService } from '@ovds/domains-double-entry';
 
 function buildPrismaMock() {
   const accountStore = new Map<string, any>();

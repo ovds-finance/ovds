@@ -1,24 +1,24 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import {
-  AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
-  StatusBadge, Btn, Modal, FormField, Input, Textarea, Select,
-  SearchBar, Amount, Pagination, Icon, EmptyState,
-} from '../components/ui';
-import { OvdsEmptyState } from '../components/ovds';
-import api from '../services/api';
-import { fmtDate } from '../utils/fmt';
-import { fmtETB } from '../utils/ethiopianTax';
-import { confirm } from '../utils/confirm';
-import { downloadCSV } from '../utils/download';
 import {
   ArrowDownToLine, ArrowUpFromLine, BookOpen,
   Download, RefreshCw, Plus, Edit2, Trash2,
   FileText, X,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
+import {
+  AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
+  StatusBadge, Btn, Modal, FormField, Input, Textarea, Select,
+  SearchBar, Amount, Pagination, Icon, EmptyState,
+} from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { confirm } from '../utils/confirm';
+import { downloadCSV } from '../utils/download';
+import { fmtETB } from '../utils/ethiopianTax';
+import { fmtDate } from '../utils/fmt';
 
 type EntryType = 'ALL' | 'BILL' | 'PAYMENT' | 'DEBIT_NOTE' | 'CREDIT_NOTE' | 'WHT' | 'ADJUSTMENT' | 'OPENING_BALANCE';
 
@@ -39,7 +39,7 @@ const ENTRY_TABS: EntryType[] = ['ALL', 'BILL', 'PAYMENT', 'DEBIT_NOTE', 'CREDIT
 
 const ENTRY_COLORS: Record<string, string> = {
   BILL: 'bg-violet-100 text-violet-700',
-  PAYMENT: 'bg-emerald-100 text-emerald-700',
+  PAYMENT: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
   DEBIT_NOTE: 'bg-rose-100 text-rose-700',
   CREDIT_NOTE: 'bg-sky-100 text-sky-700',
   WHT: 'bg-amber-100 text-amber-700',
@@ -181,7 +181,7 @@ const VendorLedger: React.FC = () => {
 
   const kpiCells = useMemo(() => [
     { label: 'Total Debits', value: fmtETB(summary.totalDebits), color: 'violet' as const, icon: <ArrowDownToLine size={15} /> },
-    { label: 'Total Credits', value: fmtETB(summary.totalCredits), color: 'emerald' as const, icon: <ArrowUpFromLine size={15} /> },
+    { label: 'Total Credits', value: fmtETB(summary.totalCredits), color: 'green' as const, icon: <ArrowUpFromLine size={15} /> },
     { label: 'Net Balance', value: fmtETB(summary.netBalance), color: summary.netBalance > 0 ? 'rose' as const : 'sky' as const },
     { label: 'Entries', value: String(summary.entryCount), color: 'slate' as const },
   ], [summary]);
@@ -292,12 +292,12 @@ const VendorLedger: React.FC = () => {
               <AppTd><span className="text-[12px] text-slate-600 truncate max-w-[200px] block">{e.description ?? '—'}</span></AppTd>
               <AppTd align="right"><Amount value={Number(e.debit)} size="sm" /></AppTd>
               <AppTd align="right"><Amount value={Number(e.credit)} size="sm" /></AppTd>
-              <AppTd align="right"><span className={`text-[12px] font-bold font-mono ${e.computedBalance >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}>{fmtETB(e.computedBalance)}</span></AppTd>
+              <AppTd align="right"><span className={`text-[12px] font-bold font-mono ${e.computedBalance >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-600'}`}>{fmtETB(e.computedBalance)}</span></AppTd>
               <AppTd align="right">
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {can('bills:write') && (
                     <>
-                      <button onClick={() => setModal({ open: true, data: { ...e } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Edit"><Edit2 size={11} /></button>
+                      <button onClick={() => setModal({ open: true, data: { ...e } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Edit"><Edit2 size={11} /></button>
                       <button onClick={() => handleDelete(e.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Delete"><Trash2 size={11} /></button>
                     </>
                   )}

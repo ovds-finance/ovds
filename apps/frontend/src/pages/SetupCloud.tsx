@@ -1,11 +1,12 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { usePageTitle } from '../hooks/usePageTitle';
 import {
   Cloud, ArrowLeft, ArrowRight, Server,
   CheckCircle2, Zap, RefreshCw, Shield,
   Sparkles,
 } from 'lucide-react';
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const SetupCloud: React.FC = () => {
   usePageTitle('Setting Up OVDS Cloud');
@@ -15,7 +16,7 @@ const SetupCloud: React.FC = () => {
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-slate-400">
-        <Link to="/start" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+        <Link to="/start" className="hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors flex items-center gap-1.5">
           <ArrowLeft size={12} /> Get Started
         </Link>
         <span className="text-slate-300">/</span>
@@ -23,19 +24,19 @@ const SetupCloud: React.FC = () => {
       </nav>
 
       {/* Hero section with ovds flavor */}
-      <div className="relative overflow-hidden rounded-2xl bg-slate-900 px-7 py-10 text-white shadow-2xl shadow-emerald-900/20">
+      <div className="relative overflow-hidden rounded-2xl bg-slate-900 px-7 py-10 text-white shadow-2xl shadow-green-900/20">
         <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-100 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-[var(--pro-azure-100)] rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-teal-600/10 rounded-full blur-[80px] pointer-events-none" />
         
         <div className="relative flex flex-col lg:flex-row items-center gap-10">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shrink-0 shadow-xl shadow-emerald-500/20">
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shrink-0 shadow-xl shadow-green-500/20">
             <Cloud size={40} className="text-white" />
           </div>
           <div className="flex-1 text-center lg:text-left space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-              <Sparkles size={12} className="text-emerald-400" />
-              <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Small Business Solution · SaaS-Based · Cloud Deployment</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[var(--pro-azure-50)]0/10 border border-[var(--pro-azure)]/20 rounded-full">
+              <Sparkles size={12} className="text-[var(--pro-azure-light)]" />
+              <span className="text-[10px] font-bold text-[var(--pro-azure-light)] uppercase tracking-widest">Small Business Solution · SaaS-Based · Cloud Deployment</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">Setting Up OVDS Cloud</h1>
             <p className="text-slate-400 text-sm max-w-2xl mx-auto lg:mx-0 leading-relaxed">
@@ -86,7 +87,7 @@ const SetupCloud: React.FC = () => {
               'Official business location',
             ],
             note: 'The wizard allows adding TIN, logo, and financial start dates later.',
-            color: 'indigo'
+            color: 'green'
           },
           {
             step: 3,
@@ -112,16 +113,16 @@ const SetupCloud: React.FC = () => {
               'Email with secure QR payment code',
             ],
             cta: { label: 'Go to Invoices', to: '/sales/invoices' },
-            color: 'emerald'
+            color: 'green'
           },
         ].map(s => (
-          <div key={s.step} className="group relative ovds-widget-card p-8 hover:border-emerald-500 dark:hover:border-emerald-500 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300">
-            <div className="absolute top-0 right-0 p-8 text-6xl font-black text-slate-100 dark:text-slate-800/50 group-hover:text-emerald-600/10 transition-colors pointer-events-none">
+          <div key={s.step} className="group relative ovds-widget-card p-8 hover:border-[var(--pro-azure)] dark:hover:border-[var(--pro-azure)] hover:shadow-2xl hover:shadow-green-500/10 transition-all duration-300">
+            <div className="absolute top-0 right-0 p-8 text-6xl font-black text-slate-100 dark:text-slate-800/50 group-hover:text-[var(--pro-azure)]/10 transition-colors pointer-events-none">
               0{s.step}
             </div>
             <div className="relative space-y-6">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl font-black text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300 shadow-inner">
+                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl font-black text-slate-400 group-hover:bg-[var(--pro-azure-dark)] group-hover:text-white transition-all duration-300 shadow-inner">
                   {s.step}
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">{s.title}</h3>
@@ -132,14 +133,14 @@ const SetupCloud: React.FC = () => {
               <ul className="space-y-3">
                 {s.items.map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-xs font-medium text-slate-600 dark:text-slate-300">
-                    <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+                    <CheckCircle2 size={16} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
                     {item}
                   </li>
                 ))}
               </ul>
 
               {s.note && (
-                <div className="p-4 bg-white dark:bg-slate-800/50 rounded-2xl border-l-4 border-emerald-500">
+                <div className="p-4 bg-white dark:bg-slate-800/50 rounded-2xl border-l-4 border-[var(--pro-azure)]">
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 italic leading-relaxed">{s.note}</p>
                 </div>
               )}
@@ -147,7 +148,7 @@ const SetupCloud: React.FC = () => {
               {s.cta && (
                 <Link
                   to={s.cta.to}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 text-white rounded-2xl text-xs font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--pro-azure)] text-white rounded-2xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all shadow-lg shadow-green-500/20"
                 >
                   {s.cta.label} <ArrowRight size={14} />
                 </Link>
@@ -160,21 +161,21 @@ const SetupCloud: React.FC = () => {
       {/* Deployment Switcher - ovds style premium toggle */}
       <div className="ovds-widget-card p-2 shadow-sm max-w-2xl mx-auto overflow-hidden">
         <div className="grid grid-cols-2 gap-2">
-          <div className="flex items-center justify-center gap-3 p-6 bg-emerald-500 text-white rounded-xl shadow-xl shadow-emerald-500/20 transition-all">
+          <div className="flex items-center justify-center gap-3 p-6 bg-[var(--pro-azure)] text-white rounded-xl shadow-xl shadow-green-500/20 transition-all">
             <Cloud size={24} className="shrink-0" />
             <div className="text-left">
               <p className="text-sm font-black uppercase tracking-widest">OVDS Cloud</p>
-              <p className="text-[10px] text-emerald-100 font-bold opacity-80">Managed Hosting</p>
+              <p className="text-[10px] text-green-100 font-bold opacity-80">Managed Hosting</p>
             </div>
           </div>
           <Link
             to="/getting-started/on-premise"
             className="flex items-center justify-center gap-3 p-6 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group"
           >
-            <Server size={24} className="text-slate-400 shrink-0 group-hover:text-emerald-600 transition-colors" />
+            <Server size={24} className="text-slate-400 shrink-0 group-hover:text-[var(--pro-azure)] transition-colors" />
             <div className="text-left">
               <p className="text-sm font-black uppercase tracking-widest text-slate-400 group-hover:text-slate-800 dark:group-hover:text-white transition-colors">On-Premise</p>
-              <p className="text-[10px] text-slate-300 font-bold group-hover:text-emerald-500 transition-colors">Self-Hosted</p>
+              <p className="text-[10px] text-slate-300 font-bold group-hover:text-[var(--pro-azure)] transition-colors">Self-Hosted</p>
             </div>
           </Link>
         </div>
@@ -186,7 +187,7 @@ const SetupCloud: React.FC = () => {
           <ArrowLeft size={16} /> Back to Start
         </Link>
         <div className="flex items-center gap-4">
-          <Link to="/getting-started/on-premise" className="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">
+          <Link to="/getting-started/on-premise" className="text-sm font-bold text-slate-500 hover:text-[var(--pro-azure)] transition-colors">
             On-Premise Setup
           </Link>
           <Link to="/plans" className="flex items-center gap-2 px-8 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl text-sm font-bold hover:bg-slate-800 dark:hover:bg-slate-700 transition-all shadow-xl">

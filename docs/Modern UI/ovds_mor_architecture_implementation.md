@@ -1,4 +1,4 @@
-# Part 1: Unified Architectural Blueprint
+﻿# Part 1: Unified Architectural Blueprint
 
 ## 1. Domain Separation & Monorepo Structure (Nx Workspace)
 
@@ -6,7 +6,7 @@ To enforce clean architectural boundaries between the multi-tenant SaaS Layer (O
  
 ```
 apps/
-├── ovds-frontend/             # React application (Akaunting-inspired UI/UX)
+├── ovds-frontend/             # React application (Ovds SaaS UI/UX)
 └── ovds-backend/              # NestJS core application
 libs/
 ├── shared/
@@ -456,7 +456,7 @@ export const sidebarNavigationConfig: SidebarItem[] = [
 
 ---
 
-## 2. Modern Akaunting-Style UI/UX Reporting Lifecycle Grid
+## 2. Modern Ovds SaaS-Style UI/UX Reporting Lifecycle Grid
 
 React functional component utilizing modern hooks to stream data, dispatch actions, and handle UI updates efficiently.
 
@@ -618,7 +618,7 @@ do This document contains the complete, production-ready, enterprise-grade archi
 * Compliance Mapping Registry: Converts internal platform objects to strict data shapes required by the Ethiopian Ministry of Revenues (MoR/ERCA).
 * Production Gateway Controller: Maps explicit REST endpoints (Post), resolves server-side routing, hooks permissions rules, and maps the exact transmission status codes.
 * Live Core Bridge Service: Replaces temporary fake stubs with active live pipelines using dynamic configurations (process.env), atomic transactions ($transaction), and remote api validations.
-* Akaunting-Style UX Core Components: Fixes the missing layout links by introducing structural menu configurations mapped to security clearances alongside reactive frontend data loops.
+* Ovds SaaS-Style UX Core Components: Fixes the missing layout links by introducing structural menu configurations mapped to security clearances alongside reactive frontend data loops.
 * 
 
 Let me know if you would like me to draft matching unit tests using Jest to mock and test the MoR submission responses or build the container deployment configurations (Dockerfile).

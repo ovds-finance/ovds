@@ -1,4 +1,8 @@
-export const QR_CODE_SERVICE_URL = import.meta.env.VITE_QR_CODE_SERVICE_URL || 'https://api.qrserver.com/v1/create-qr-code/';
+// QR code generation — routes through the first-party backend endpoint at
+// /api/utils/qr so invoice data (amounts, TINs, reference numbers) never
+// leaks to the third-party api.qrserver.com service.
+// Override with VITE_QR_CODE_SERVICE_URL if you run a dedicated QR micro-service.
+export const QR_CODE_SERVICE_URL = import.meta.env.VITE_QR_CODE_SERVICE_URL || '/api/utils/qr';
 export const TELECOM_RECEIPT_BASE_URL = import.meta.env.VITE_TELECOM_RECEIPT_BASE_URL || 'https://transactioninfo.ethiotelecom.et/';
 export const DEFAULT_MAIL_FROM = import.meta.env.VITE_DEFAULT_MAIL_FROM || 'noreply@ovds.com.et';
 export const BEARER_PREFIX = 'Bearer ';

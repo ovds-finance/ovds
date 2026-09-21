@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
+    "paths": {
+      "@ovds/shared":                       ["../../packages/shared/dist/index.d.ts"],
+      "@ovds/shared/*":                     ["../../packages/shared/dist/*"],
+      "@ovds/core":                         ["../../packages/core/dist/index.d.ts"],
+      "@ovds/core/vat":                     ["../../packages/core/dist/vat/index.d.ts"],
+      "@ovds/core/vat/report":              ["../../packages/core/dist/vat/report/index.d.ts"],
+      "@ovds/database":                     ["../../packages/database/dist/index.d.ts"],
+      "@ovds/dto":                          ["../../packages/shared/dto/dist/index.d.ts"],
+      "@ovds/contracts":                    ["../../packages/contracts/dist/index.d.ts"],
+      "@ovds/contracts/schemas":            ["../../packages/contracts/dist/schemas/index.d.ts"],
+      "@ovds/contracts/schemas/*":          ["../../packages/contracts/dist/schemas/*.d.ts"],
+      "@ovds/domains-tax":                  ["../../packages/domains/tax/dist/index.d.ts"]
+    }
+  }
+}

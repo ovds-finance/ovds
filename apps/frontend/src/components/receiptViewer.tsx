@@ -1,5 +1,4 @@
-import React from 'react';
-
+﻿
 export interface ReceiptEvidence {
   receiptId: string;
   irn?: string;
@@ -20,7 +19,20 @@ export interface ReceiptEvidence {
   interactionType?: string;
   archType?: string;
   processType?: string;
+  // ERCA / MCC fields
+  mcc?: string;
+  mccDescription?: string;
+  qrType?: string;
+  tinValidated?: boolean;
+  isDuplicate?: boolean;
+  orderNo?: string;
+  orderType?: string;
 }
 
-const ReceiptViewer = () => null;
+const ReceiptViewer: React.FC<{
+  onClose?: () => void;
+  onApply?: (evidence: ReceiptEvidence) => void;
+  initialRef?: string;
+  invoiceId?: string | number;
+}> = () => null;
 export default ReceiptViewer;

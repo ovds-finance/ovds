@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import {
-  Bell, CheckCircle2, Zap, CalendarDays, ArrowRight,
-  UserCheck, AlertCircle, Palmtree, ChevronRight,
-} from 'lucide-react';
-import api from '../../services/api';
 import {
   Skeleton, StatusBadge, GridStatBar, GridSection,
   WidgetCard, DocStackLayout, type DocStackItem,
 } from '@ovds/ui';
-import { usePageTitle } from '../../hooks/usePageTitle';
+import {
+  Bell, CheckCircle2, Zap, CalendarDays, ArrowRight,
+  UserCheck, AlertCircle, Palmtree, ChevronRight,
+} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
 import { useRelativeTime } from '../../hooks';
+import { usePageTitle } from '../../hooks/usePageTitle';
+import api from '../../services/api';
+
+
 
 interface EmployeeDashboardProps {
   user: { username?: string; employeeId?: string };
@@ -92,7 +95,7 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
   return (
     <div className="space-y-5 animate-in fade-in duration-500">
       {/* Hero banner */}
-      <div className="relative bg-gradient-to-br from-emerald-600 via-emerald-600 to-teal-700 rounded-xl p-5 text-white overflow-hidden">
+      <div className="relative bg-gradient-to-br from-[var(--pro-azure)] via-[var(--pro-azure)] to-[var(--pro-azure-dark)] rounded-xl p-5 text-white overflow-hidden">
         <div className="absolute -top-8 -right-8 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 w-32 h-32 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex items-start justify-between gap-4 flex-wrap">
@@ -112,14 +115,14 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
                 attendance
                   ? attendance.checkOut
                     ? 'bg-slate-500/20 border-slate-400/30 text-slate-200'
-                    : 'bg-emerald-500/20 border-emerald-400/30 text-emerald-200'
+                    : 'bg-[var(--pro-azure-50)]0/20 border-[var(--pro-azure)]/30 text-green-200'
                   : 'bg-amber-500/20 border-amber-400/30 text-amber-200'
               }`}>
                 {attendance ? (
                   attendance.checkOut ? (
                     <><UserCheck size={13} /> Checked out</>
                   ) : (
-                    <><span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" /> Checked in</>
+                    <><span className="w-1.5 h-1.5 bg-[var(--pro-azure-light)] rounded-full animate-pulse" /> Checked in</>
                   )
                 ) : (
                   <><AlertCircle size={13} /> Not checked in</>
@@ -153,7 +156,7 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
             label: 'Leave Balance',
             value: loading ? '…' : (balance ? `${balance.remaining}d` : 'N/A'),
             sub: balance ? `of ${balance.entitlement}d entitlement` : 'No data',
-            accentCls: leaveUsedPct > 80 ? 'bg-rose-500' : 'bg-emerald-500',
+            accentCls: leaveUsedPct > 80 ? 'bg-rose-500' : 'bg-[var(--pro-azure-50)]0',
             onClick: () => window.location.assign('/hr/leaves'),
           },
           {
@@ -189,20 +192,20 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
           >
             <div className="space-y-2">
               {[
-                { label: 'Request Leave',       to: '/hr/leaves',        icon: <Palmtree size={15} />,    color: 'bg-emerald-500' },
+                { label: 'Request Leave',       to: '/hr/leaves',        icon: <Palmtree size={15} />,    color: 'bg-[var(--pro-azure-50)]0' },
                 { label: 'View Notifications',  to: '/notifications', icon: <Bell size={15} />,        color: 'bg-violet-600' },
-                { label: 'Public Holidays',     to: '/hr/holidays',      icon: <CalendarDays size={15} />, color: 'bg-emerald-500' },
+                { label: 'Public Holidays',     to: '/hr/holidays',      icon: <CalendarDays size={15} />, color: 'bg-[var(--pro-azure-50)]0' },
               ].map((a) => (
                 <Link
                   key={a.to}
                   to={a.to}
-                  className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group"
+                  className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-[var(--pro-azure-100)] dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group"
                 >
                   <div className={`w-8 h-8 ${a.color} text-white rounded-lg flex items-center justify-center shrink-0`}>
                     {a.icon}
                   </div>
                   <span className="text-[12px] font-bold text-slate-700 dark:text-slate-300 flex-1">{a.label}</span>
-                  <ChevronRight size={13} className="text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all" />
+                  <ChevronRight size={13} className="text-slate-300 dark:text-slate-600 group-hover:text-[var(--pro-azure)] group-hover:translate-x-0.5 transition-all" />
                 </Link>
               ))}
             </div>
@@ -230,7 +233,7 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
                   </div>
                   <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-700 ${leaveUsedPct > 80 ? 'bg-rose-500' : leaveUsedPct > 50 ? 'bg-amber-500' : 'bg-gradient-to-r from-emerald-500 to-teal-500'}`}
+                      className={`h-full rounded-full transition-all duration-700 ${leaveUsedPct > 80 ? 'bg-rose-500' : leaveUsedPct > 50 ? 'bg-amber-500' : 'bg-gradient-to-r from-green-500 to-green-600'}`}
                       style={{ width: `${leaveUsedPct}%` }}
                     />
                   </div>
@@ -249,10 +252,10 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
             header={
               <div className="flex items-center gap-2 w-full">
                 <span className="flex items-center gap-2 ovds-card-title flex-1">
-                  <Bell size={14} className="text-emerald-600" /> Recent Notifications
+                  <Bell size={14} className="text-[var(--pro-azure)]" /> Recent Notifications
                 </span>
                 {unread > 0 && (
-                  <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold rounded-full">
+                  <span className="px-2 py-0.5 bg-[var(--pro-azure-100)] dark:bg-green-900/40 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] text-[10px] font-bold rounded-full">
                     {unread} new
                   </span>
                 )}
@@ -273,7 +276,7 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
                     key={n.id}
                     className={`flex items-start gap-3 py-3 border-b border-slate-50 dark:border-slate-800 last:border-0 ${!n.isRead ? '' : 'opacity-60'}`}
                   >
-                    <div className={`w-1.5 h-1.5 rounded-full mt-2 shrink-0 ${!n.isRead ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                    <div className={`w-1.5 h-1.5 rounded-full mt-2 shrink-0 ${!n.isRead ? 'bg-[var(--pro-azure-50)]0 animate-pulse' : 'bg-slate-300 dark:bg-slate-600'}`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-[12px] font-bold text-slate-800 dark:text-slate-200 truncate leading-snug">{n.title}</p>
                       {n.message && <p className="ovds-caption mt-0.5 line-clamp-1">{n.message}</p>}
@@ -282,7 +285,7 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
                   </div>
                 ))}
                 {notifications.length > 5 && (
-                  <Link to="/notifications" className="flex items-center gap-1 mt-2 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                  <Link to="/notifications" className="flex items-center gap-1 mt-2 text-[11px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
                     View all {notifications.length} <ArrowRight size={11} />
                   </Link>
                 )}
@@ -296,9 +299,9 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
       {myLeaves.length > 0 && (
         <GridSection
           title="My Leave Requests"
-          icon={<CalendarDays size={14} className="text-emerald-600" />}
+          icon={<CalendarDays size={14} className="text-[var(--pro-azure)]" />}
           action={
-            <Link to="/hr/leaves" className="text-[11px] font-bold text-emerald-600 hover:underline flex items-center gap-1">
+            <Link to="/hr/leaves" className="text-[11px] font-bold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
               View all <ArrowRight size={11} />
             </Link>
           }
@@ -312,7 +315,7 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
               status: (l.status ?? 'pending').toLowerCase(),
               badge: l.status,
               badgeCls: l.status === 'APPROVED'
-                ? 'bg-emerald-100 text-emerald-700'
+                ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'
                 : l.status === 'REJECTED'
                   ? 'bg-rose-100 text-rose-700'
                   : 'bg-amber-100 text-amber-700',
@@ -325,7 +328,7 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
       {/* Recent payslips + expense claims */}
       <GridSection
         title="Payslips & Expenses"
-        icon={<CheckCircle2 size={14} className="text-emerald-500" />}
+        icon={<CheckCircle2 size={14} className="text-[var(--pro-azure)]" />}
         spacing="sm"
       >
         <div className="ovds-grid-layout cols-2">
@@ -334,9 +337,9 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
             header={
               <div className="flex items-center justify-between w-full">
                 <span className="flex items-center gap-2 ovds-card-title">
-                  <CheckCircle2 size={14} className="text-emerald-500" /> Recent Payslips
+                  <CheckCircle2 size={14} className="text-[var(--pro-azure)]" /> Recent Payslips
                 </span>
-                <Link to="/hr/payroll" className="text-[11px] font-bold text-emerald-600 hover:underline flex items-center gap-1">
+                <Link to="/hr/payroll" className="text-[11px] font-bold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
                   View all <ArrowRight size={11} />
                 </Link>
               </div>
@@ -356,7 +359,7 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
                       </p>
                       <p className="ovds-caption mt-0.5">{p.status ?? 'Generated'}</p>
                     </div>
-                    <p className="text-[12px] font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                    <p className="text-[12px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] tabular-nums">
                       ETB {Number(p.netPay ?? p.calculatedSalary ?? 0).toLocaleString()}
                     </p>
                   </div>
@@ -372,7 +375,7 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
                 <span className="flex items-center gap-2 ovds-card-title">
                   <AlertCircle size={14} className="text-amber-500" /> Expense Claims
                 </span>
-                <Link to="/purchases/expenses?action=new" className="text-[11px] font-bold text-emerald-600 hover:underline flex items-center gap-1">
+                <Link to="/purchases/expenses?action=new" className="text-[11px] font-bold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
                   New claim <ArrowRight size={11} />
                 </Link>
               </div>

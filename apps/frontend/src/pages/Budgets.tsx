@@ -18,7 +18,7 @@
  *   POST /ovds/reports/budget  { year, budget }
  *   GET  /ovds/accounting/accounts?companyId=X
  */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { evalMath } from '@ovds/ui';
 import {
   BarChart3,
   Save,
@@ -34,10 +34,9 @@ import {
   Target,
   Zap,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
+
 import {
   AppPage,
   AppKpi,
@@ -50,7 +49,9 @@ import {
   SearchBar,
   Amount,
 } from '../components/ui';
-import { evalMath } from '@ovds/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
 import api from '../services/api';
 
 // -- Types ---------------------------------------------------------------------
@@ -104,7 +105,7 @@ const VarianceBadge: React.FC<{ row: BudgetRow }> = ({ row }) => {
     <span
       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold border ${
         isFav
-          ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800'
+          ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800'
           : 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-800'
       }`}
     >
@@ -124,7 +125,7 @@ const BudgetBar: React.FC<{ row: BudgetRow }> = ({ row }) => {
     <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-1">
       <div
         className={`h-full rounded-full transition-all duration-500 ${
-          overBudget ? 'bg-rose-500' : 'bg-emerald-500'
+          overBudget ? 'bg-rose-500' : 'bg-[var(--pro-azure)]'
         }`}
         style={{ width: `${pct}%` }}
       />
@@ -172,7 +173,7 @@ const SectionRow: React.FC<{
       </td>
       <td className="px-4 py-2.5 text-right">
         <span
-          className={`text-[11px] font-black tabular-nums ${isFav ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}
+          className={`text-[11px] font-black tabular-nums ${isFav ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-600 dark:text-rose-400'}`}
         >
           {variance >= 0 ? '+' : ''}
           {fmtNum(variance)}
@@ -181,7 +182,7 @@ const SectionRow: React.FC<{
       <td className="px-4 py-2.5 text-right">
         {totalBudget > 0 && (
           <span
-            className={`text-[10px] font-bold ${isFav ? 'text-emerald-600' : 'text-rose-600'}`}
+            className={`text-[10px] font-bold ${isFav ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}
           >
             {Math.round((totalActual / totalBudget) * 100)}%
           </span>
@@ -257,7 +258,7 @@ const Budgets: React.FC = () => {
 
       setBudgetMap(newBudgetMap);
       setActuals(newActuals);
-    } catch (err: any) {
+    } catch (_err: any) {
       toast.error('Failed to load budget data');
     } finally {
       setLoading(false);
@@ -332,7 +333,7 @@ const Budgets: React.FC = () => {
       {
         label: 'Budget Revenue',
         value: `ETB ${fmtNum(totalBudgetRevenue)}`,
-        color: 'emerald' as const,
+        color: 'green' as const,
       },
       {
         label: 'Actual Revenue',
@@ -347,17 +348,17 @@ const Budgets: React.FC = () => {
       {
         label: 'Actual Expenses',
         value: `ETB ${fmtNum(totalActualExpenses)}`,
-        color: actualNetProfit >= 0 ? ('emerald' as const) : ('rose' as const),
+        color: actualNetProfit >= 0 ? ('green' as const) : ('rose' as const),
       },
       {
         label: 'Budget Net Profit',
         value: `ETB ${fmtNum(budgetNetProfit)}`,
-        color: budgetNetProfit >= 0 ? ('emerald' as const) : ('rose' as const),
+        color: budgetNetProfit >= 0 ? ('green' as const) : ('rose' as const),
       },
       {
         label: 'Actual Net Profit',
         value: `ETB ${fmtNum(actualNetProfit)}`,
-        color: actualNetProfit >= 0 ? ('emerald' as const) : ('rose' as const),
+        color: actualNetProfit >= 0 ? ('green' as const) : ('rose' as const),
       },
     ],
     [
@@ -541,7 +542,7 @@ const Budgets: React.FC = () => {
                           ? row.variance >= 0
                           : row.variance <= 0
                       )
-                        ? 'text-emerald-700 dark:text-emerald-400'
+                        ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                         : 'text-rose-600 dark:text-rose-400'
                     }`}
                   >
@@ -585,7 +586,7 @@ const Budgets: React.FC = () => {
                       ? totalActual >= totalBudget
                       : totalActual <= totalBudget
                   )
-                    ? 'text-emerald-700 dark:text-emerald-400'
+                    ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                     : 'text-rose-600 dark:text-rose-400'
                 }`}
               >
@@ -709,7 +710,7 @@ const Budgets: React.FC = () => {
               size="sm"
               icon={<Zap size={10} />}
               onClick={() => fillFromActuals('INCOME')}
-              className="text-emerald-600 hover:bg-emerald-50"
+              className="text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)]"
             >
               Fill Revenue from Actuals
             </Btn>
@@ -788,14 +789,14 @@ const Budgets: React.FC = () => {
               </td>
               <td className="px-4 py-3 text-right">
                 <span
-                  className={`text-[11px] font-black tabular-nums ${actualNetProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}
+                  className={`text-[11px] font-black tabular-nums ${actualNetProfit >= 0 ? 'text-[var(--pro-azure-light)]' : 'text-rose-400'}`}
                 >
                   {fmtNum(actualNetProfit)}
                 </span>
               </td>
               <td className="px-4 py-3 text-right">
                 <span
-                  className={`text-[11px] font-black tabular-nums ${actualNetProfit - budgetNetProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}
+                  className={`text-[11px] font-black tabular-nums ${actualNetProfit - budgetNetProfit >= 0 ? 'text-[var(--pro-azure-light)]' : 'text-rose-400'}`}
                 >
                   {actualNetProfit - budgetNetProfit >= 0 ? '+' : ''}
                   {fmtNum(actualNetProfit - budgetNetProfit)}
@@ -804,7 +805,7 @@ const Budgets: React.FC = () => {
               <td className="px-4 py-3 text-right">
                 {budgetNetProfit !== 0 && (
                   <span
-                    className={`text-[10px] font-black ${actualNetProfit >= budgetNetProfit ? 'text-emerald-400' : 'text-rose-400'}`}
+                    className={`text-[10px] font-black ${actualNetProfit >= budgetNetProfit ? 'text-[var(--pro-azure-light)]' : 'text-rose-400'}`}
                   >
                     {Math.round(
                       (actualNetProfit / Math.abs(budgetNetProfit)) * 100,

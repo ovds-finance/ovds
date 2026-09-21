@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../../rbac/AuthContext';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
+import { Skeleton } from '@ovds/ui';
+import { Button } from '@ovds/ui';
 import {
   Search,
   Filter,
@@ -12,8 +10,12 @@ import {
   Repeat,
   Plus,
 } from 'lucide-react';
-import { Skeleton } from '@ovds/ui';
-import { Button } from '@ovds/ui';
+import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
+import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
+
 import JournalEntryForm from './journalEntryForm';
 
 interface JournalEntry {
@@ -199,7 +201,7 @@ const JournalEntriesTable: React.FC = () => {
                       {entry.description || '—'}
                     </div>
                   </td>
-                  <td className="px-8 py-4 text-right text-sm font-semibold text-emerald-700">
+                  <td className="px-8 py-4 text-right text-sm font-semibold text-[var(--pro-azure-dark)]">
                     {entry.totalDebit.toLocaleString()}
                   </td>
                   <td className="px-8 py-4 text-right text-sm font-semibold text-sky-700">
@@ -207,14 +209,14 @@ const JournalEntriesTable: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 text-center">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      entry.status === 'POSTED' ? 'bg-emerald-100 text-emerald-700' :
+                      entry.status === 'POSTED' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' :
                       entry.status === 'DRAFT' ? 'bg-amber-100 text-amber-700' :
                       'bg-slate-100 text-slate-700'
                     }`}>
                       {entry.status}
                     </span>
                     {entry.isRecurring && (
-                      <Repeat size={12} className="ml-1 text-emerald-600 dark:text-emerald-400 inline" aria-label="Recurring template" />
+                      <Repeat size={12} className="ml-1 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] inline" aria-label="Recurring template" />
                     )}
                   </td>
                   <td className="px-4 py-4 text-right">
@@ -226,7 +228,7 @@ const JournalEntriesTable: React.FC = () => {
                         <>
                           <button 
                             onClick={() => setEditingEntry(entry)}
-                            className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 rounded-lg transition-all"
+                            className="p-1.5 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:bg-[var(--pro-azure-100)] rounded-lg transition-all"
                           >
                             <Edit3 size={14} />
                           </button>

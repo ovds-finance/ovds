@@ -1,8 +1,9 @@
-﻿import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
 import { FileText, ChevronDown } from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
+
+import api from '../../services/api';
 import { fmtDecimal } from '../../utils/fmt';
 
 const fmt = fmtDecimal;
@@ -79,7 +80,7 @@ const VendorBillSummary: React.FC<VendorBillSummaryProps> = ({ vendorId }) => {
                     {fmt(Number(b.total))}
                   </p>
                   <span
-                    className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${b.status === 'PAID' ? 'bg-emerald-100 text-emerald-700' : b.status === 'OVERDUE' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}
+                    className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${b.status === 'PAID' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : b.status === 'OVERDUE' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}
                   >
                     {b.status}
                   </span>
@@ -97,7 +98,7 @@ const VendorBillSummary: React.FC<VendorBillSummaryProps> = ({ vendorId }) => {
           {!loading && data?.summary?.count > 5 && (
             <Link
               to="/purchases/bills"
-              className="block text-center text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline pt-1"
+              className="block text-center text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline pt-1"
             >
               View all {data.summary.count} bills →
             </Link>

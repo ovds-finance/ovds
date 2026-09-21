@@ -14,17 +14,18 @@
  *   VAT Proclamation No. 1341/2024 Art. 50–52
  *   ERCA Regulation No. 410/2017
  */
-import React, { useState, useMemo, useCallback } from 'react';
 import {
   AlertTriangle, Calculator, RefreshCw, Download, Info,
   CheckCircle, FileText, Shield, Server,
 } from 'lucide-react';
-import { usePageTitle } from '../hooks/usePageTitle';
+import React, { useState, useMemo, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
 import {
   AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr, Btn,
   FormField, Input, Select,
 } from '../components/ui';
-import toast from 'react-hot-toast';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { calculatePenaltyApi, type PenaltyCalcResult } from '../services/newTaxApi';
 
 // -- Tax type config ------------------------------------------------------------
@@ -224,17 +225,18 @@ const ErcaPenaltyCalculator: React.FC = () => {
     } else {
       toast.error(`Penalty: ETB ${fmt(result.totalPenalty)} on top of ETB ${fmt(result.taxDue)}`);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [taxType, taxDue, dueDateStr, payDateStr]);
 
   const latest = results[0] ?? null;
 
   const kpiCells = useMemo(() => latest ? [
     { label: 'Tax Due',        value: `ETB ${fmt(latest.taxDue)}`,       color: 'slate'   as const },
-    { label: 'Flat Penalty',   value: `ETB ${fmt(latest.flatPenalty)}`,   color: latest.flatPenalty > 0 ? 'rose' as const : 'emerald' as const },
-    { label: 'Monthly Interest', value: `ETB ${fmt(latest.interestAmount)}`, color: latest.interestAmount > 0 ? 'amber' as const : 'emerald' as const },
-    { label: 'Total Penalty',  value: `ETB ${fmt(latest.totalPenalty)}`,  color: latest.totalPenalty > 0 ? 'rose' as const : 'emerald' as const },
+    { label: 'Flat Penalty',   value: `ETB ${fmt(latest.flatPenalty)}`,   color: latest.flatPenalty > 0 ? 'rose' as const : 'indigo' as const },
+    { label: 'Monthly Interest', value: `ETB ${fmt(latest.interestAmount)}`, color: latest.interestAmount > 0 ? 'amber' as const : 'indigo' as const },
+    { label: 'Total Penalty',  value: `ETB ${fmt(latest.totalPenalty)}`,  color: latest.totalPenalty > 0 ? 'rose' as const : 'indigo' as const },
     { label: 'Total Owed',     value: `ETB ${fmt(latest.totalOwed)}`,     color: 'sky'     as const },
-    { label: 'Days Late',      value: String(latest.daysLate),            color: latest.daysLate > 0 ? 'rose' as const : 'emerald' as const },
+    { label: 'Days Late',      value: String(latest.daysLate),            color: latest.daysLate > 0 ? 'rose' as const : 'indigo' as const },
   ] : [], [latest]);
 
   const exportCsv = () => {
@@ -349,12 +351,12 @@ const ErcaPenaltyCalculator: React.FC = () => {
 
           {/* Latest result detail */}
           {latest && (
-            <div className={`p-4 rounded-xl border space-y-3 ${latest.isOverdue ? 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800' : 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800'}`}>
+            <div className={`p-4 rounded-xl border space-y-3 ${latest.isOverdue ? 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800' : 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-[var(--pro-azure-100)] dark:border-green-800'}`}>
               <div className="flex items-center gap-2">
                 {latest.isOverdue
                   ? <AlertTriangle size={14} className="text-rose-600 shrink-0" />
-                  : <CheckCircle  size={14} className="text-emerald-600 shrink-0" />}
-                <p className={`text-[12px] font-bold ${latest.isOverdue ? 'text-rose-800 dark:text-rose-200' : 'text-emerald-800 dark:text-emerald-200'}`}>
+                  : <CheckCircle  size={14} className="text-[var(--pro-azure)] shrink-0" />}
+                <p className={`text-[12px] font-bold ${latest.isOverdue ? 'text-rose-800 dark:text-rose-200' : 'text-[var(--pro-azure-dark)] dark:text-green-200'}`}>
                   {latest.isOverdue
                     ? `${latest.daysLate} days late · ${latest.monthsLate} month${latest.monthsLate !== 1 ? 's' : ''} charged`
                     : 'Payment is on time — no penalty applicable'}
@@ -407,12 +409,12 @@ const ErcaPenaltyCalculator: React.FC = () => {
                       <AppTd><span className="text-[11px] text-slate-500">{r.dueDate}</span></AppTd>
                       <AppTd><span className="text-[11px] text-slate-500">{r.paymentDate}</span></AppTd>
                       <AppTd align="right">
-                        <span className={`text-[11px] font-bold tabular-nums ${r.daysLate > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                        <span className={`text-[11px] font-bold tabular-nums ${r.daysLate > 0 ? 'text-rose-600' : 'text-[var(--pro-azure)]'}`}>
                           {r.daysLate}
                         </span>
                       </AppTd>
                       <AppTd align="right">
-                        <span className={`text-[11px] font-bold tabular-nums ${r.totalPenalty > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                        <span className={`text-[11px] font-bold tabular-nums ${r.totalPenalty > 0 ? 'text-rose-600' : 'text-[var(--pro-azure)]'}`}>
                           ETB {fmt(r.totalPenalty)}
                         </span>
                       </AppTd>

@@ -7,7 +7,7 @@
 >
 > **Navigate to:** **Sales → Customers** (`/crm/contacts`) · **Purchases → Vendors** (`/purchases/vendors`)
 
-Customers and vendors are the two master data registries that power every invoice and bill in OVDS. Keeping them accurate — especially TINs, payment currencies, and bank details — ensures correct VAT treatment, WHT auto-calculation, and smooth payment processing.
+Customers and vendors are the two master data registries that power every invoice and bill in Ovds. Keeping them accurate — especially TINs, payment currencies, and bank details — ensures correct VAT treatment, WHT auto-calculation, and smooth payment processing.
 
 ---
 
@@ -102,8 +102,6 @@ WHT is calculated automatically on bills when:
 If the vendor is marked **WHT Exempt**, no WHT is applied regardless of amount.
 
 > Foreign vendors (Business Type = Foreign) trigger **15% Non-Resident WHT** automatically. See [Tax & Compliance → WHT & Other Taxes](../06-tax-compliance/wht-and-other-taxes.md#non-resident-wht-foreign-services).
-
-### Vendor Ledger
 
 Click any vendor name to see their full transaction history:
 

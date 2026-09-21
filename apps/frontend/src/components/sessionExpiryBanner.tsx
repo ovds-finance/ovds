@@ -5,7 +5,6 @@
  * the warning first appears. A "Refresh" button lets the user retry manually.
  * If the Auth0 session has also expired, the banner falls back to "Sign out".
  */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AlertTriangle,
   X,
@@ -14,10 +13,12 @@ import {
   ShieldCheck,
   ShieldAlert,
 } from 'lucide-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { getAuth0Token } from '../rbac/auth0Client';
 import { useAuth } from '../rbac/AuthContext';
 import type { AuthUser } from '../rbac/AuthContext';
-import { getAuth0Token } from '../rbac/auth0Client';
 import { BEARER_PREFIX } from '../utils/constants';
 
 const AUTH0_ENABLED = import.meta.env.VITE_AUTH0_ENABLED === 'true';
@@ -114,33 +115,65 @@ const SessionExpiryBanner: React.FC = () => {
   const mfaBadge =
     isAuth0User && AUTH0_ENABLED ? (
       stepUp === 'full' ? (
-        <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">
+        <span
+          className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full"
+          style={{
+            background: 'var(--sys-state-success)',
+            color: 'var(--sys-state-success-text)',
+            border: '1px solid var(--sys-state-success-border, #A7F3D0)',
+          }}
+        >
           <ShieldCheck size={10} /> {t('session.mfa_full')}
         </span>
       ) : mfaEnrolled ? (
-        <span className="flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">
+        <span
+          className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full"
+          style={{
+            background: 'var(--sys-state-alert)',
+            color: 'var(--sys-state-alert-text)',
+            border: '1px solid var(--sys-state-alert-border, #FDE68A)',
+          }}
+        >
           <ShieldAlert size={10} /> {t('session.mfa_password')}
         </span>
       ) : null
     ) : null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[999] w-full max-w-lg px-4 animate-aki-slide-in-right">
-      <div className="bg-amber-50 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-700 rounded-2xl shadow-xl shadow-amber-100 dark:shadow-amber-950/50 px-5 py-4 flex items-center gap-4 transition-colors">
-        <div className="w-9 h-9 bg-amber-100 dark:bg-amber-900/50 rounded-xl flex items-center justify-center shrink-0">
-          <AlertTriangle
-            size={18}
-            className="text-amber-600 dark:text-amber-400"
-          />
+    <div
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[999] w-full max-w-lg px-4 animate-aki-slide-up"
+    >
+      <div
+        className="flex items-center gap-4 px-5 py-4 rounded-2xl"
+        style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--pro-amber-dim, rgba(217,119,6,0.25))',
+          boxShadow: '0 20px 48px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06)',
+        }}
+      >
+        {/* Icon */}
+        <div
+          className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+          style={{ background: 'rgba(217,119,6,0.10)', color: 'var(--pro-amber)' }}
+        >
+          <AlertTriangle size={18} />
         </div>
+
+        {/* Text */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-sm font-bold text-amber-900 dark:text-amber-200">
+            <p
+              className="text-[13px] font-bold"
+              style={{ color: 'var(--text)' }}
+            >
               {t('session.expiring_soon')}
             </p>
             {mfaBadge}
           </div>
-          <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+          <p
+            className="text-[11px] mt-0.5"
+            style={{ color: 'var(--text-3)' }}
+          >
             {showRefresh
               ? t('session.click_refresh', { time: timeLabel })
               : refreshFailed
@@ -148,25 +181,38 @@ const SessionExpiryBanner: React.FC = () => {
                 : t('session.save_work', { time: timeLabel })}
           </p>
         </div>
+
+        {/* Actions */}
         <div className="flex items-center gap-2 shrink-0">
           {showRefresh ? (
             <button
               onClick={handleManualRefresh}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 text-white rounded-lg text-xs font-bold hover:bg-amber-700 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold transition-all hover:opacity-90 active:scale-97"
+              style={{ background: 'var(--pro-amber)', color: '#fff', boxShadow: '0 2px 8px rgba(217,119,6,0.30)' }}
             >
               <RefreshCw size={13} /> {t('session.refresh_btn')}
             </button>
           ) : (
             <button
               onClick={() => logout()}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 text-white rounded-lg text-xs font-bold hover:bg-amber-700 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold transition-all hover:opacity-90 active:scale-97"
+              style={{ background: 'var(--pro-amber)', color: '#fff', boxShadow: '0 2px 8px rgba(217,119,6,0.30)' }}
             >
               <LogOut size={13} /> {t('a11y.sign_out')}
             </button>
           )}
           <button
             onClick={() => dismissExpiryWarning()}
-            className="p-1.5 rounded-lg text-amber-500 hover:bg-amber-100 transition-colors"
+            className="p-1.5 rounded-lg transition-colors"
+            style={{ color: 'var(--text-4)' }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-alt)';
+              (e.currentTarget as HTMLButtonElement).style.color = 'var(--text)';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+              (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-4)';
+            }}
             aria-label={t('a11y.dismiss')}
           >
             <X size={15} />

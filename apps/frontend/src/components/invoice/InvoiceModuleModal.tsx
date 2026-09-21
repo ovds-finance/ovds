@@ -7,13 +7,14 @@
  * Shows: download links (live manifest), 4-step hybrid setup guide,
  * offline/online sync overview, and plan comparison table.
  */
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import {
   X, Download, Cloud, Server, RefreshCw, Shield, Wifi, WifiOff,
   Copy, Check, AlertTriangle, Lock, Zap, Info, Key, Globe,
   CheckCircle2, ExternalLink, Loader2, ArrowRight,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+
 import {
   getInvoiceModuleManifest,
   getInvoiceModuleDownloadUrl,
@@ -55,7 +56,7 @@ const HashBlock: React.FC<{ filename: string; sha256: string }> = ({ filename, s
       </code>
       <button onClick={copy} aria-label="Copy SHA-256"
         className="flex items-center gap-1 px-2 py-1.5 bg-slate-900 dark:bg-slate-700 text-white
-          rounded-lg text-[10px] font-bold hover:bg-emerald-600 transition-colors shrink-0">
+          rounded-lg text-[10px] font-bold hover:bg-[var(--pro-azure-dark)] transition-colors shrink-0">
         {copied ? <><Check size={9} /> Copied!</> : <><Copy size={9} /> Copy</>}
       </button>
     </div>
@@ -106,7 +107,7 @@ const DownloadRow: React.FC<{
           <button onClick={() => setShowHash(v => !v)}
             className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-colors ${
               showHash
-                ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400'
+                ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-light)] dark:border-green-700 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                 : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
             }`}>
             <Shield size={9} /> {showHash ? 'Hide' : 'Verify'}
@@ -116,8 +117,8 @@ const DownloadRow: React.FC<{
             disabled={downloading}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all disabled:opacity-60 ${
               done
-                ? 'bg-emerald-600 text-white'
-                : 'bg-slate-900 dark:bg-slate-700 text-white hover:bg-emerald-600'
+                ? 'bg-[var(--pro-azure)] text-white'
+                : 'bg-slate-900 dark:bg-slate-700 text-white hover:bg-[var(--pro-azure-dark)]'
             }`}
           >
             {downloading
@@ -132,7 +133,7 @@ const DownloadRow: React.FC<{
       {showHash && (
         <div className="border-t border-slate-100 dark:border-slate-800 px-3 py-3 bg-white dark:bg-slate-800/50 space-y-2">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-            <Shield size={9} className="text-emerald-500" /> SHA-256 Checksum
+            <Shield size={9} className="text-[var(--pro-azure)]" /> SHA-256 Checksum
           </p>
           <HashBlock filename={platform.filename} sha256={platform.sha256} />
           <p className="text-[10px] text-slate-400">
@@ -156,7 +157,7 @@ const StepItem: React.FC<{
 }> = ({ n, title, badge, last, children }) => (
   <li className="flex gap-4">
     <div className="flex flex-col items-center">
-      <div className="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center
+      <div className="w-7 h-7 rounded-full bg-[var(--pro-azure)] text-white flex items-center justify-center
         text-xs font-semibold shrink-0 z-10">{n}</div>
       {!last && <div className="w-px flex-1 bg-slate-200 dark:bg-slate-700 mt-1" />}
     </div>
@@ -181,18 +182,18 @@ const Callout: React.FC<{
   children: React.ReactNode;
 }> = ({ type = 'info', title, children }) => {
   const cfg = {
-    info:    { bar: 'bg-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/20',
-                border: 'border-emerald-200 dark:border-emerald-800/40',
-                text: 'text-emerald-800 dark:text-emerald-200',
-                icon: <Info size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" /> },
+    info:    { bar: 'bg-[var(--pro-azure-50)]0', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20',
+                border: 'border-[var(--pro-azure-100)] dark:border-green-800/40',
+                text: 'text-[var(--pro-azure-dark)] dark:text-green-200',
+                icon: <Info size={13} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5" /> },
     warning: { bar: 'bg-amber-400',  bg: 'bg-amber-50 dark:bg-amber-950/20',
                 border: 'border-amber-200 dark:border-amber-800/40',
                 text: 'text-amber-800 dark:text-amber-200',
                 icon: <AlertTriangle size={13} className="text-amber-500 shrink-0 mt-0.5" /> },
-    success: { bar: 'bg-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/20',
-                border: 'border-emerald-200 dark:border-emerald-800/40',
-                text: 'text-emerald-800 dark:text-emerald-200',
-                icon: <CheckCircle2 size={13} className="text-emerald-500 shrink-0 mt-0.5" /> },
+    success: { bar: 'bg-[var(--pro-azure-50)]0', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20',
+                border: 'border-[var(--pro-azure-100)] dark:border-green-800/40',
+                text: 'text-[var(--pro-azure-dark)] dark:text-green-200',
+                icon: <CheckCircle2 size={13} className="text-[var(--pro-azure)] shrink-0 mt-0.5" /> },
   }[type];
   return (
     <div className={`flex gap-3 p-3 rounded-xl border ${cfg.bg} ${cfg.border}`}>
@@ -223,7 +224,7 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const token =
+  const _token =
     localStorage.getItem('ovds_token') ??
     localStorage.getItem('auth0_token') ??
     localStorage.getItem('token') ?? '';
@@ -272,8 +273,8 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
         {/* Header */}
         <div className="flex items-center gap-4 px-6 py-4 border-b border-slate-200 dark:border-slate-800
           bg-slate-900 text-white rounded-t-2xl shrink-0">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-slate-600 flex items-center
-            justify-center shrink-0 shadow-lg shadow-emerald-500/20">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--pro-azure)] to-slate-600 flex items-center
+            justify-center shrink-0 shadow-lg shadow-green-500/20">
             <Download size={17} className="text-white" />
           </div>
           <div className="flex-1 min-w-0">
@@ -283,8 +284,8 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border
-              border-emerald-500/20 rounded-full text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
+            <span className="flex items-center gap-1.5 px-2.5 py-1 bg-[var(--pro-azure-50)]0/10 border
+              border-[var(--pro-azure)]/20 rounded-full text-[10px] font-bold text-[var(--pro-azure-light)] uppercase tracking-wider">
               <Zap size={9} /> All plans
             </span>
             <button onClick={onClose} aria-label="Close"
@@ -301,7 +302,7 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                 tab === t.id
-                  ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200 dark:border-slate-600'
+                  ? 'bg-white dark:bg-slate-700 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shadow-sm border border-slate-200 dark:border-slate-600'
                   : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
               }`}>
               {t.label}
@@ -317,7 +318,7 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-3 text-center">
                 {[
-                  { icon: <Cloud size={18} className="text-emerald-500" />, title: 'Cloud Account',
+                  { icon: <Cloud size={18} className="text-[var(--pro-azure)]" />, title: 'Cloud Account',
                     desc: 'Holds templates, VAT rules & ERCA keys' },
                   { icon: <RefreshCw size={18} className="text-amber-500" />, title: '↔ Auto Sync',
                     desc: 'Bidirectional sync over HTTPS when online' },
@@ -380,14 +381,14 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
                       </div>
                     </div>
                   ))}
-                  <div className="flex items-center justify-between gap-4 p-3 bg-emerald-50 dark:bg-emerald-950/20
-                    border border-emerald-200 dark:border-emerald-800/40 rounded-xl">
-                    <p className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold">
+                  <div className="flex items-center justify-between gap-4 p-3 bg-[var(--pro-azure-50)] dark:bg-green-950/20
+                    border border-[var(--pro-azure-100)] dark:border-green-800/40 rounded-xl">
+                    <p className="text-xs text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] font-semibold">
                       Sign in to access live download links with SHA-256 checksums.
                     </p>
                     <Link to="/login" onClick={onClose}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white
-                        rounded-xl text-[10px] font-bold hover:bg-emerald-600 transition-colors shrink-0">
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white
+                        rounded-xl text-[10px] font-bold hover:bg-[var(--pro-azure-dark)] transition-colors shrink-0">
                       Sign in <ArrowRight size={10} />
                     </Link>
                   </div>
@@ -401,7 +402,7 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
 
               <div className="flex items-center justify-end pt-2">
                 <Link to="/getting-started/invoice-module" onClick={onClose}
-                  className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                  className="flex items-center gap-1.5 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
                   Full setup guide <ExternalLink size={11} />
                 </Link>
               </div>
@@ -415,14 +416,14 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
                 <p>
                   Log in to your cloud dashboard at{' '}
                   <a href="https://ovds.com.et" target="_blank" rel="noopener noreferrer"
-                    className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline inline-flex items-center gap-0.5">
+                    className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold hover:underline inline-flex items-center gap-0.5">
                     ovds.com.et <ExternalLink size={10} />
                   </a>.
                   Navigate to <strong>Settings → Downloads &amp; Apps</strong>.
                   Download the standalone <strong>Invoice Module installer</strong> for your OS.
                 </p>
                 <button onClick={() => setTab('download')}
-                  className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">
+                  className="flex items-center gap-1.5 text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold hover:underline">
                   <Download size={11} /> Go to downloads →
                 </button>
               </StepItem>
@@ -442,7 +443,7 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
                   ].map(r => (
                     <div key={r.label} className="flex items-start gap-2 p-2 bg-white dark:bg-slate-800
                       rounded-lg border border-slate-200 dark:border-slate-700 text-xs">
-                      <CheckCircle2 size={10} className="text-emerald-600 shrink-0 mt-0.5" />
+                      <CheckCircle2 size={10} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
                       <span><strong className="text-slate-700 dark:text-slate-300">{r.label}</strong> — {r.value}</span>
                     </div>
                   ))}
@@ -454,10 +455,10 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
                   Run the installer. When prompted, link to your subscription using <strong>one of two methods</strong>:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200
-                    dark:border-emerald-800/40 rounded-xl space-y-2">
+                  <div className="p-3 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)]
+                    dark:border-green-800/40 rounded-xl space-y-2">
                     <div className="flex items-center gap-2">
-                      <Key size={13} className="text-emerald-600 shrink-0" />
+                      <Key size={13} className="text-[var(--pro-azure)] shrink-0" />
                       <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Option A — API Key</p>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -489,7 +490,7 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
                   When connected, it syncs automatically.
                 </p>
                 <button onClick={() => setTab('sync')}
-                  className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">
+                  className="flex items-center gap-1.5 text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold hover:underline">
                   <RefreshCw size={11} /> View sync details →
                 </button>
               </StepItem>
@@ -515,15 +516,15 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
                       'Store all documents in local SQLite / MySQL',
                     ].map(i => (
                       <li key={i} className="flex items-start gap-2">
-                        <CheckCircle2 size={10} className="text-emerald-500 shrink-0 mt-0.5" /> {i}
+                        <CheckCircle2 size={10} className="text-[var(--pro-azure)] shrink-0 mt-0.5" /> {i}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200
-                  dark:border-emerald-800/40 rounded-xl space-y-2">
+                <div className="p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)]
+                  dark:border-green-800/40 rounded-xl space-y-2">
                   <div className="flex items-center gap-2">
-                    <Wifi size={13} className="text-emerald-600 shrink-0" />
+                    <Wifi size={13} className="text-[var(--pro-azure)] shrink-0" />
                     <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Online — syncs automatically</p>
                   </div>
                   <ul className="space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
@@ -535,7 +536,7 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
                       'Push audit trail entries to cloud ledger',
                     ].map(i => (
                       <li key={i} className="flex items-start gap-2">
-                        <CheckCircle2 size={10} className="text-emerald-500 shrink-0 mt-0.5" /> {i}
+                        <CheckCircle2 size={10} className="text-[var(--pro-azure)] shrink-0 mt-0.5" /> {i}
                       </li>
                     ))}
                   </ul>
@@ -547,7 +548,7 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
                 <strong> Invoice Module → Settings → Sync &amp; Connectivity</strong>.
                 Force a sync anytime via the toolbar <strong>Sync Now</strong> button.
                 Air-gapped use: set{' '}
-                <code className="font-mono text-[11px] bg-emerald-100 dark:bg-emerald-950/40 px-1 rounded">
+                <code className="font-mono text-[11px] bg-[var(--pro-azure-100)] dark:bg-green-950/40 px-1 rounded">
                   SYNC_INTERVAL_SECONDS=0
                 </code>{' '}
                 — licensing is cached for 30 days.
@@ -620,7 +621,7 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
                         <td className="px-3 py-2 font-medium text-slate-700 dark:text-slate-300">{feat}</td>
                         {vals.map((v, i) => (
                           <td key={i} className={`px-3 py-2 text-center text-sm ${
-                            v === '✅' ? 'text-emerald-500 font-black' : 'text-slate-300 dark:text-slate-700'
+                            v === '✅' ? 'text-[var(--pro-azure)] font-black' : 'text-slate-300 dark:text-slate-700'
                           }`}>{v}</td>
                         ))}
                       </tr>
@@ -629,8 +630,8 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
                 </table>
               </div>
               <Link to="/plans" onClick={onClose}
-                className="flex items-center justify-center gap-2 w-full py-3 bg-emerald-500 text-white
-                  rounded-xl text-sm font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20">
+                className="flex items-center justify-center gap-2 w-full py-3 bg-[var(--pro-azure)] text-white
+                  rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-all shadow-lg shadow-green-500/20">
                 View all plans & upgrade <ArrowRight size={16} />
               </Link>
             </div>
@@ -642,8 +643,8 @@ const InvoiceModuleModal: React.FC<InvoiceModuleModalProps> = ({ show, onClose }
         <div className="flex items-center justify-between gap-4 px-5 py-3 border-t border-slate-100
           dark:border-slate-800 bg-white dark:bg-slate-800/50 shrink-0 rounded-b-2xl">
           <Link to="/getting-started/invoice-module" onClick={onClose}
-            className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-emerald-600
-              dark:hover:text-emerald-400 transition-colors">
+            className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-[var(--pro-azure)]
+              dark:hover:text-[var(--pro-azure-light)] transition-colors">
             <ExternalLink size={12} /> Full documentation
           </Link>
           <button onClick={onClose}

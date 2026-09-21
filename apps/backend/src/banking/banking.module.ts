@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { BankingController } from './banking.controller';
+
+import { PrismaModule } from '../common/prisma.module';
+
 import { BankAccountsController } from './bank-accounts.controller';
 import { BankTransactionsController } from './bank-transactions.controller';
-import { ReconciliationController } from './reconciliation.controller';
+import { BankingController } from './banking.controller';
 import { BankingService } from './banking.service';
-import { PrismaModule } from '../common/prisma.module';
+import { ReconciliationController } from './reconciliation.controller';
 
 @Module({
   imports: [PrismaModule],

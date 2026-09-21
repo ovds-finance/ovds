@@ -1,14 +1,17 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../../common/prisma.service';
+﻿import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PAGINATION_DEFAULT_LIMIT } from '@ovds/shared';
+
+import { PrismaService } from '../../common/prisma.service';
 
 @Injectable()
 export class AttendanceService {
+  private readonly logger = new Logger(AttendanceService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(query: { page?: number; limit?: number; employeeId?: string; companyId?: string; date?: string; status?: string }) {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? PAGINATION_DEFAULT_LIMIT;
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || PAGINATION_DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
@@ -113,7 +116,7 @@ export class AttendanceService {
         data: { verified: true },
       });
     } catch (e) {
-      console.error(`[ATTENDANCE] Failed to verify record ${id}:`, e);
+      this.logger.warn(`Failed to verify attendance record ${id}: ${e instanceof Error ? e.message : String(e)}`);
       throw new NotFoundException('Attendance record not found');
     }
   }
@@ -122,7 +125,7 @@ export class AttendanceService {
     try {
       return await this.prisma.attendance.delete({ where: { id } });
     } catch (e) {
-      console.error(`[ATTENDANCE] Failed to delete record ${id}:`, e);
+      this.logger.warn(`Failed to delete attendance record ${id}: ${e instanceof Error ? e.message : String(e)}`);
       throw new NotFoundException('Attendance record not found');
     }
   }

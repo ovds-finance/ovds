@@ -1,15 +1,11 @@
 /**
- * CompanyProfile — /settings/company-profile
+ * CompanyProfile — /settings/company-profile (legacy alias kept for back-compat)
  *
- * Focused entry point for company identity and TIN settings.
- * Renders the Settings page with the 'profile' tab pre-selected via URL state,
- * keeping all company profile logic in the single Settings component.
+ * The route now maps directly to CompanyProfilePage.  This file is no longer
+ * used as a redirect; it stays here only so any old bookmarks or external
+ * links to /settings/company-profile continue to work — app.tsx maps that
+ * path straight to CompanyProfilePage.
+ *
+ * @deprecated Import CompanyProfilePage directly instead.
  */
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-
-const CompanyProfile: React.FC = () => (
-  <Navigate to="/settings?tab=profile" replace />
-);
-
-export default CompanyProfile;
+export { default } from './settings/CompanyProfilePage';

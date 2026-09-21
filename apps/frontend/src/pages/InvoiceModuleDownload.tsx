@@ -7,9 +7,6 @@
  *
  * Route: /getting-started/invoice-module  (public — no auth required)
  */
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { usePageTitle } from '../hooks/usePageTitle';
 import {
   ArrowLeft, ArrowRight, Download, Cloud, Server, Key,
   CheckCircle2, RefreshCw, Shield, Wifi, WifiOff, Copy,
@@ -17,6 +14,10 @@ import {
   ChevronDown, ChevronUp, ExternalLink, FileText,
   Loader2,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+
+import { usePageTitle } from '../hooks/usePageTitle';
 import {
   getInvoiceModuleManifest,
   getInvoiceModuleDownloadUrl,
@@ -37,7 +38,7 @@ const CodeBlock: React.FC<{ code: string; lang?: string }> = ({ code, lang = 'ba
           onClick={() => { navigator.clipboard.writeText(code); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
           className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 hover:text-white transition-colors"
         >
-          {copied ? <><Check size={10} className="text-emerald-400" /> Copied!</> : <><Copy size={10} /> Copy</>}
+          {copied ? <><Check size={10} className="text-[var(--pro-azure-light)]" /> Copied!</> : <><Copy size={10} /> Copy</>}
         </button>
       </div>
       <pre className="p-4 text-xs font-mono text-slate-200 overflow-x-auto leading-relaxed whitespace-pre">{code}</pre>
@@ -51,9 +52,9 @@ const Callout: React.FC<{
   children: React.ReactNode;
 }> = ({ type = 'info', title, children }) => {
   const cfg = {
-    info:    { bar: 'bg-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/20', border: 'border-emerald-200 dark:border-emerald-800/40', text: 'text-emerald-800 dark:text-emerald-200', icon: <Info size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" /> },
+    info:    { bar: 'bg-[var(--pro-azure-50)]0', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20', border: 'border-[var(--pro-azure-100)] dark:border-green-800/40', text: 'text-[var(--pro-azure-dark)] dark:text-green-200', icon: <Info size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5" /> },
     warning: { bar: 'bg-amber-400',  bg: 'bg-amber-50 dark:bg-amber-950/20',    border: 'border-amber-200 dark:border-amber-800/40',    text: 'text-amber-800 dark:text-amber-200',    icon: <AlertTriangle size={14} className="text-amber-500 shrink-0 mt-0.5" /> },
-    success: { bar: 'bg-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/20', border: 'border-emerald-200 dark:border-emerald-800/40', text: 'text-emerald-800 dark:text-emerald-200', icon: <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" /> },
+    success: { bar: 'bg-[var(--pro-azure-50)]0', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20', border: 'border-[var(--pro-azure-100)] dark:border-green-800/40', text: 'text-[var(--pro-azure-dark)] dark:text-green-200', icon: <CheckCircle2 size={14} className="text-[var(--pro-azure)] shrink-0 mt-0.5" /> },
     danger:  { bar: 'bg-rose-500',   bg: 'bg-rose-50 dark:bg-rose-950/20',      border: 'border-rose-200 dark:border-rose-900/40',      text: 'text-rose-800 dark:text-rose-200',      icon: <AlertTriangle size={14} className="text-rose-500 shrink-0 mt-0.5" /> },
   }[type];
   return (
@@ -73,7 +74,7 @@ const StepItem: React.FC<{
 }> = ({ n, title, badge, last, children }) => (
   <li className="flex gap-4">
     <div className="flex flex-col items-center">
-      <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-semibold shrink-0 z-10">{n}</div>
+      <div className="w-8 h-8 rounded-full bg-[var(--pro-azure)] text-white flex items-center justify-center text-xs font-semibold shrink-0 z-10">{n}</div>
       {!last && <div className="w-px flex-1 bg-slate-200 dark:bg-slate-700 mt-1" />}
     </div>
     <div className={`flex-1 min-w-0 ${last ? 'pb-0' : 'pb-8'}`}>
@@ -153,7 +154,7 @@ const DownloadCard: React.FC<{
             onClick={() => setShowHash(v => !v)}
             className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-colors ${
               showHash
-                ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400'
+                ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-light)] dark:border-green-700 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                 : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
             }`}
           >
@@ -162,7 +163,7 @@ const DownloadCard: React.FC<{
           <a
             href={downloadHref}
             download
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 dark:bg-slate-700 text-white rounded-lg text-[10px] font-bold hover:bg-emerald-600 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 dark:bg-slate-700 text-white rounded-lg text-[10px] font-bold hover:bg-[var(--pro-azure-dark)] transition-colors"
           >
             <Download size={10} /> Download
           </a>
@@ -171,14 +172,14 @@ const DownloadCard: React.FC<{
       {showHash && (
         <div className="border-t border-slate-100 dark:border-slate-800 px-3 py-3 bg-white dark:bg-slate-800/50 space-y-2.5">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-            <Shield size={9} className="text-emerald-500" /> SHA-256 Checksum
+            <Shield size={9} className="text-[var(--pro-azure)]" /> SHA-256 Checksum
           </p>
           {isPending ? (
             <p className="text-[10px] text-slate-400 italic">Checksum published when the build pipeline runs. Download only from your authenticated dashboard.</p>
           ) : (
             <div className="flex items-center gap-2">
               <code className="flex-1 font-mono text-[10px] text-slate-600 dark:text-slate-300 break-all bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-2.5 py-2 rounded-lg leading-relaxed">{sha256}</code>
-              <button onClick={copyHash} className="flex items-center gap-1 px-2.5 py-2 bg-slate-900 dark:bg-slate-700 text-white rounded-lg text-[10px] font-bold hover:bg-emerald-600 transition-colors shrink-0">
+              <button onClick={copyHash} className="flex items-center gap-1 px-2.5 py-2 bg-slate-900 dark:bg-slate-700 text-white rounded-lg text-[10px] font-bold hover:bg-[var(--pro-azure-dark)] transition-colors shrink-0">
                 {hashCopied ? <><Check size={9} /> Copied!</> : <><Copy size={9} /> Copy</>}
               </button>
             </div>
@@ -219,7 +220,7 @@ const InvoiceModuleDownload: React.FC = () => {
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-slate-400">
-        <Link to="/sales/invoices" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+        <Link to="/sales/invoices" className="hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors flex items-center gap-1.5">
           <ArrowLeft size={12} /> Invoices
         </Link>
         <span className="text-slate-300">/</span>
@@ -227,18 +228,18 @@ const InvoiceModuleDownload: React.FC = () => {
       </nav>
 
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-2xl bg-slate-900 px-7 py-10 text-white shadow-2xl shadow-emerald-900/20">
+      <div className="relative overflow-hidden rounded-2xl bg-slate-900 px-7 py-10 text-white shadow-2xl shadow-green-900/20">
         <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-400/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-400/5 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-[var(--pro-azure-light)]/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-[var(--pro-azure-light)]/5 rounded-full blur-[80px] pointer-events-none" />
         <div className="relative flex flex-col lg:flex-row items-center gap-10">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-500 to-slate-700 flex items-center justify-center shrink-0 shadow-xl shadow-emerald-500/20">
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[var(--pro-azure)] to-slate-700 flex items-center justify-center shrink-0 shadow-xl shadow-green-500/20">
             <FileText size={38} className="text-white" />
           </div>
           <div className="flex-1 text-center lg:text-left space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-              <Zap size={12} className="text-emerald-400" />
-              <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Hybrid Cloud + On-Premise · Invoice Module</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[var(--pro-azure-50)]0/10 border border-[var(--pro-azure)]/20 rounded-full">
+              <Zap size={12} className="text-[var(--pro-azure-light)]" />
+              <span className="text-[10px] font-bold text-[var(--pro-azure-light)] uppercase tracking-widest">Hybrid Cloud + On-Premise · Invoice Module</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">OVDS Invoice Module</h1>
             <p className="text-slate-400 text-sm max-w-2xl mx-auto lg:mx-0 leading-relaxed">
@@ -266,7 +267,7 @@ const InvoiceModuleDownload: React.FC = () => {
         <h2 className="text-base font-semibold text-slate-900 dark:text-white">How hybrid invoice works</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
           {[
-            { icon: <Cloud size={22} className="text-emerald-500" />, title: 'Cloud Account', desc: 'Active subscription — holds templates, VAT/TOT rules, ERCA keys, and MoR credentials.', color: 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/40' },
+            { icon: <Cloud size={22} className="text-[var(--pro-azure)]" />, title: 'Cloud Account', desc: 'Active subscription — holds templates, VAT/TOT rules, ERCA keys, and MoR credentials.', color: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-[var(--pro-azure-100)] dark:border-green-800/40' },
             { icon: <RefreshCw size={22} className="text-amber-500" />, title: '↔ Auto Sync', desc: 'Invoice data, templates, and compliance updates flow bidirectionally over HTTPS when online.', color: 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/40' },
             { icon: <Server size={22} className="text-slate-500 dark:text-slate-300" />, title: 'Invoice Module', desc: 'Local installer on your workstation. Full invoice with ERCA QR codes — no internet needed.', color: 'bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700' },
           ].map(c => (
@@ -287,7 +288,7 @@ const InvoiceModuleDownload: React.FC = () => {
       {/* Step-by-step hybrid invoice setup */}
       <div className="ovds-widget-card p-8 shadow-sm">
         <div className="flex items-start gap-3 pb-6 border-b border-slate-200 dark:border-slate-700 mb-8">
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center shrink-0 text-emerald-600 dark:text-emerald-400">
+          <div className="w-9 h-9 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 flex items-center justify-center shrink-0 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
             <Zap size={16} />
           </div>
           <div>
@@ -302,7 +303,7 @@ const InvoiceModuleDownload: React.FC = () => {
             <p>
               Log in to your primary OVDS cloud accounting dashboard at{' '}
               <a href="https://ovds.com.et" target="_blank" rel="noopener noreferrer"
-                className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline inline-flex items-center gap-0.5">
+                className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold hover:underline inline-flex items-center gap-0.5">
                 ovds.com.et <ExternalLink size={10} />
               </a>.
               Navigate to <strong>Settings → Downloads &amp; Apps</strong> or the <strong>Integrations &amp; API</strong> sidebar section.
@@ -362,11 +363,11 @@ const InvoiceModuleDownload: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                <div className="flex items-center justify-between gap-4 p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 rounded-2xl">
-                  <p className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold">
+                <div className="flex items-center justify-between gap-4 p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800/40 rounded-2xl">
+                  <p className="text-xs text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] font-semibold">
                     Log in to your dashboard to access live download links with SHA-256 checksums.
                   </p>
-                  <Link to="/login" className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 text-white rounded-xl text-[10px] font-bold hover:bg-emerald-600 transition-colors shrink-0 shadow-lg shadow-emerald-500/20">
+                  <Link to="/login" className="flex items-center gap-1.5 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-[10px] font-bold hover:bg-[var(--pro-azure-dark)] transition-colors shrink-0 shadow-lg shadow-green-500/20">
                     Sign in <ArrowRight size={10} />
                   </Link>
                 </div>
@@ -397,7 +398,7 @@ const InvoiceModuleDownload: React.FC = () => {
                 { label: 'Revocation',  value: 'Remove the node from cloud settings at any time to cut access instantly' },
               ].map(r => (
                 <div key={r.label} className="flex items-start gap-2 p-2.5 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-xs">
-                  <CheckCircle2 size={11} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <CheckCircle2 size={11} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5" />
                   <span><strong className="text-slate-700 dark:text-slate-300">{r.label}</strong> — {r.value}</span>
                 </div>
               ))}
@@ -411,9 +412,9 @@ const InvoiceModuleDownload: React.FC = () => {
               link the Invoice Module to your active subscription using <strong>one of the two methods</strong>:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 rounded-xl space-y-2">
+              <div className="p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800/40 rounded-xl space-y-2">
                 <div className="flex items-center gap-2">
-                  <Key size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <Key size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0" />
                   <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Option A — API Key</p>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -462,14 +463,14 @@ const InvoiceModuleDownload: React.FC = () => {
                     'Store all documents in local SQLite / MySQL',
                   ].map(i => (
                     <li key={i} className="flex items-start gap-2">
-                      <CheckCircle2 size={10} className="text-emerald-500 shrink-0 mt-0.5" /> {i}
+                      <CheckCircle2 size={10} className="text-[var(--pro-azure)] shrink-0 mt-0.5" /> {i}
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 rounded-xl space-y-2">
+              <div className="p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800/40 rounded-xl space-y-2">
                 <div className="flex items-center gap-2">
-                  <Wifi size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <Wifi size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0" />
                   <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Online — syncs automatically</p>
                 </div>
                 <ul className="space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
@@ -481,7 +482,7 @@ const InvoiceModuleDownload: React.FC = () => {
                     'Push audit trail entries to cloud ledger',
                   ].map(i => (
                     <li key={i} className="flex items-start gap-2">
-                      <CheckCircle2 size={10} className="text-emerald-500 shrink-0 mt-0.5" /> {i}
+                      <CheckCircle2 size={10} className="text-[var(--pro-azure)] shrink-0 mt-0.5" /> {i}
                     </li>
                   ))}
                 </ul>
@@ -491,7 +492,7 @@ const InvoiceModuleDownload: React.FC = () => {
               The module syncs every <strong>5 minutes</strong> when online. Configure the interval in
               <strong> Invoice Module → Settings → Sync &amp; Connectivity</strong>.
               Force a sync anytime via the toolbar <strong>Sync Now</strong> button.
-              Air-gapped use: set <code className="font-mono text-[11px] bg-emerald-100 dark:bg-emerald-950/40 px-1 rounded">SYNC_INTERVAL_SECONDS=0</code> — licensing is cached for 30 days.
+              Air-gapped use: set <code className="font-mono text-[11px] bg-[var(--pro-azure-100)] dark:bg-green-950/40 px-1 rounded">SYNC_INTERVAL_SECONDS=0</code> — licensing is cached for 30 days.
             </Callout>
           </StepItem>
         </ol>
@@ -559,7 +560,7 @@ const InvoiceModuleDownload: React.FC = () => {
                 <tr key={feat} className="border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/30">
                   <td className="px-4 py-2.5 font-medium text-slate-700 dark:text-slate-300">{feat}</td>
                   {vals.map((v, i) => (
-                    <td key={i} className={`px-4 py-2.5 text-center ${v === '✅' ? 'text-emerald-500 font-black' : 'text-slate-300 dark:text-slate-700'}`}>{v}</td>
+                    <td key={i} className={`px-4 py-2.5 text-center ${v === '✅' ? 'text-[var(--pro-azure)] font-black' : 'text-slate-300 dark:text-slate-700'}`}>{v}</td>
                   ))}
                 </tr>
               ))}
@@ -609,12 +610,12 @@ const InvoiceModuleDownload: React.FC = () => {
           <ArrowLeft size={16} /> Back to Invoices
         </Link>
         <div className="flex items-center gap-4">
-          <Link to="/getting-started/client" className="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">
+          <Link to="/getting-started/client" className="text-sm font-bold text-slate-500 hover:text-[var(--pro-azure)] transition-colors">
             Full Enterprise Client Guide
           </Link>
           <Link
             to="/plans"
-            className="flex items-center gap-2 px-8 py-4 bg-emerald-500 text-white rounded-2xl text-sm font-bold hover:bg-emerald-600 transition-all shadow-xl shadow-emerald-500/20"
+            className="flex items-center gap-2 px-8 py-4 bg-[var(--pro-azure)] text-white rounded-2xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-all shadow-xl shadow-green-500/20"
           >
             View Plans <ArrowRight size={18} />
           </Link>

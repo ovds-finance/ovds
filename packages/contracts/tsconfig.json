@@ -6,16 +6,24 @@
     "declarationMap": true,
     "rootDir": "./src",
     "outDir": "./dist",
-    "baseUrl": "./",
     "moduleResolution": "bundler",
     "incremental": true,
-    "tsBuildInfoFile": "./dist/.tsbuildinfo"
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "paths": {
+      "@ovds/contracts/prisma-zod": ["./src/prisma-zod/index.ts"],
+      "@ovds/dto": ["packages/shared/dto/dist/index.d.ts"],
+      "@ovds/shared": ["packages/shared/dist/index.d.ts"],
+      "@ovds/core": ["packages/core/dist/index.d.ts"],
+      "@ovds/database": ["packages/database/dist/index.d.ts"]
+    }
   },
   "include": [
     "src/index.ts",
     "src/router/**/*",
     "src/schemas/**/*",
-    "src/prisma-zod/**/*"
+    "src/pipes/**/*",
+    "src/filters/**/*",
+    "src/interceptors/**/*"
   ],
   "exclude": [
     "node_modules",

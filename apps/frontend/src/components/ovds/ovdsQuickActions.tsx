@@ -3,12 +3,13 @@
  * Large, icon-forward tiles that non-accountants can understand at a glance
  * Each tile has a plain-language description of what it does
  */
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   FileText, Receipt, CreditCard, Users, Building2,
   ArrowLeftRight, BarChart3, Package, ShieldCheck,
 } from 'lucide-react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { useAuth } from '../../rbac/AuthContext';
 import type { Permission } from '../../rbac/rbac';
 
@@ -29,7 +30,7 @@ const ACTIONS: QuickAction[] = [
     description: 'Bill a customer',
     icon: <FileText size={20} />,
     to: '/sales/invoices',
-    color: 'bg-emerald-500',
+    color: 'bg-[var(--pro-azure-50)]0',
     textColor: 'text-white',
     permission: 'invoices:write',
   },
@@ -74,7 +75,7 @@ const ACTIONS: QuickAction[] = [
     description: 'Move between accounts',
     icon: <ArrowLeftRight size={20} />,
     to: '/banking/transfers',
-    color: 'bg-indigo-500',
+    color: 'bg-[var(--pro-azure-50)]0',
     textColor: 'text-white',
     permission: 'fund_transfers:write',
   },
@@ -112,7 +113,9 @@ interface ovdsQuickActionsProps {
 }
 
 export const ovdsQuickActions: React.FC<ovdsQuickActionsProps> = ({ compact }) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const navigate = useNavigate();
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { can } = useAuth();
 
   const visible = ACTIONS.filter(a => !a.permission || can(a.permission));
@@ -128,7 +131,7 @@ export const ovdsQuickActions: React.FC<ovdsQuickActionsProps> = ({ compact }) =
                         text-[12px] font-semibold transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]
                         shadow-sm`}
           >
-            {React.cloneElement(action.icon as React.ReactElement, { size: 14 })}
+            {React.cloneElement(action.icon as React.ReactElement<any>, { size: 14 })}
             {action.label}
           </button>
         ))}
@@ -143,13 +146,13 @@ export const ovdsQuickActions: React.FC<ovdsQuickActionsProps> = ({ compact }) =
           key={action.to}
           onClick={() => navigate(action.to)}
           className="group relative flex flex-col items-center gap-2.5 p-4 ovds-widget-card
-                     hover:border-emerald-200 dark:hover:border-emerald-800
+                     hover:border-[var(--pro-azure-100)] dark:hover:border-green-800
                      hover:-translate-y-0.5 transition-all duration-150
                      text-center focus:outline-none focus:ring-2 focus:ring-teal-400/30"
         >
           {action.isNew && (
             <span className="absolute top-2 right-2 text-[8px] font-bold px-1.5 py-0.5 rounded-full
-                             bg-emerald-100 text-emerald-700 uppercase tracking-wide">
+                             bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] uppercase tracking-wide">
               New
             </span>
           )}

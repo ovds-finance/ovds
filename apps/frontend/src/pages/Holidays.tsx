@@ -3,19 +3,20 @@
  * AppPage · AppKpi · AppTable · useApiCrud
  * Ethiopian public holidays + custom company holidays
  */
-import React, { useState, useMemo, useCallback } from 'react';
 import { Star, Plus, Edit2, Trash2, RefreshCw, Calendar } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select,
   SearchBar, EmptyState, Pagination,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
 
 interface Holiday {
   id: string;
@@ -50,15 +51,15 @@ const HolidayForm: React.FC<{ data: Partial<Holiday>; onChange: (d: Partial<Holi
   return (
     <div className="space-y-3">
       {/* Ethiopian presets */}
-      <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-        <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider mb-2">Ethiopian Public Holidays</p>
+      <div className="p-3 bg-[var(--pro-azure-50)] rounded-xl border border-[var(--pro-azure-100)]">
+        <p className="text-[10px] font-bold text-[var(--pro-azure-dark)] uppercase tracking-wider mb-2">Ethiopian Public Holidays</p>
         <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto">
           {ETH_HOLIDAYS.map(h => (
             <button
               key={h.name}
               type="button"
               onClick={() => onChange({ ...data, name: h.name, date: h.date, type: h.type, isRecurring: true })}
-              className="px-2 py-1 bg-white border border-emerald-200 rounded text-[9px] font-semibold text-emerald-700 hover:bg-emerald-100 transition-all"
+              className="px-2 py-1 bg-white border border-[var(--pro-azure-100)] rounded text-[9px] font-semibold text-[var(--pro-azure-dark)] hover:bg-[var(--pro-azure-100)] transition-all"
             >
               {h.name}
             </button>
@@ -81,7 +82,7 @@ const HolidayForm: React.FC<{ data: Partial<Holiday>; onChange: (d: Partial<Holi
         </FormField>
       </div>
       <div className="flex items-center gap-2">
-        <input type="checkbox" id="isRecurring" checked={data.isRecurring ?? false} onChange={e => set('isRecurring', e.target.checked)} className="accent-emerald-600" />
+        <input type="checkbox" id="isRecurring" checked={data.isRecurring ?? false} onChange={e => set('isRecurring', e.target.checked)} className="accent-indigo-600" />
         <label htmlFor="isRecurring" className="text-[12px] font-semibold text-slate-700 cursor-pointer">Recurring annually</label>
       </div>
     </div>
@@ -113,7 +114,7 @@ const Holidays: React.FC = () => {
   }, [rows, tab, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total',     value: rows.length,                                          color: 'emerald' as const },
+    { label: 'Total',     value: rows.length,                                          color: 'green' as const },
     { label: 'Public',    value: rows.filter(h => h.type === 'PUBLIC').length,         color: 'sky' as const },
     { label: 'Religious', value: rows.filter(h => h.type === 'RELIGIOUS').length,      color: 'violet' as const },
     { label: 'Company',   value: rows.filter(h => h.type === 'COMPANY').length,        color: 'amber' as const },
@@ -126,7 +127,7 @@ const Holidays: React.FC = () => {
   }, [modal.data, save]);
 
   const TYPE_CLS: Record<string, string> = {
-    PUBLIC:    'bg-emerald-50 text-emerald-700 border-emerald-100',
+    PUBLIC:    'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
     RELIGIOUS: 'bg-violet-50 text-violet-700 border-violet-100',
     COMPANY:   'bg-amber-50 text-amber-700 border-amber-100',
   };
@@ -205,7 +206,7 @@ const Holidays: React.FC = () => {
               </AppTd>
               <AppTd>
                 {h.isRecurring
-                  ? <span className="text-[10px] font-semibold text-emerald-600">Annual</span>
+                  ? <span className="text-[10px] font-semibold text-[var(--pro-azure)]">Annual</span>
                   : <span className="ovds-caption">Once</span>
                 }
               </AppTd>
@@ -216,7 +217,7 @@ const Holidays: React.FC = () => {
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {can('holidays:write') && (
                     <>
-                      <button onClick={() => setModal({ open: true, data: { ...h } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all"><Edit2 size={11} /></button>
+                      <button onClick={() => setModal({ open: true, data: { ...h } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all"><Edit2 size={11} /></button>
                       <button onClick={async () => { if (await confirm({ title: `Delete "${h.name}"?`, variant: 'danger' })) remove(h.id); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all"><Trash2 size={11} /></button>
                     </>
                   )}

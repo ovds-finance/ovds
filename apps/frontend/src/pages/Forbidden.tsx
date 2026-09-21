@@ -1,14 +1,15 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import {
   ShieldOff, ArrowLeft, Home, ShieldCheck,
   CheckCircle2, ExternalLink, Lock, Zap,
 } from 'lucide-react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
-import { rbac, ROLE_METADATA } from '../rbac/rbac';
+import { Link, useNavigate } from 'react-router-dom';
+
 import RoleBadge from '../components/roleBadge';
+import { useBusiness } from '../context/businessContext';
+import { useAuth } from '../rbac/AuthContext';
+import { rbac, ROLE_METADATA } from '../rbac/rbac';
 
 const Forbidden: React.FC = () => {
   const navigate = useNavigate();
@@ -30,14 +31,14 @@ const Forbidden: React.FC = () => {
 
   const levelColor: Record<string, string> = {
     admin: 'text-red-500',
-    write: 'text-emerald-600',
-    read:  'text-blue-500',
+    write: 'text-[var(--pro-azure)]',
+    read:  'text-[var(--pro-azure)]',
     none:  'text-gray-300',
   };
   const levelBg: Record<string, string> = {
     admin: 'bg-red-50 border-red-100',
-    write: 'bg-emerald-50 border-emerald-100',
-    read:  'bg-blue-50 border-blue-100',
+    write: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]',
+    read:  'bg-[var(--pro-azure-50)] border-[var(--pro-azure-50)]',
     none:  'bg-white border-gray-100',
   };
 
@@ -85,7 +86,7 @@ const Forbidden: React.FC = () => {
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <RoleBadge role={role} size="sm"/>
                     {isAuth0User && (
-                      <span className="text-[10px] font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-semibold text-[var(--pro-azure)] bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] px-2 py-0.5 rounded-full">
                         {stepUp === 'full' ? 'SSO · MFA ✓' : 'SSO'}
                       </span>
                     )}
@@ -115,11 +116,11 @@ const Forbidden: React.FC = () => {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                <Lock size={10} className="text-emerald-400"/>
+                <Lock size={10} className="text-[var(--pro-azure-light)]"/>
                 {t('forbidden.what_you_can_access', { role })}
               </p>
               <Link to="/settings/roles"
-                className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+                className="flex items-center gap-1 text-[11px] font-semibold text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] transition-colors">
                 <ExternalLink size={10}/> {t('forbidden.view_permissions')}
               </Link>
             </div>
@@ -140,7 +141,7 @@ const Forbidden: React.FC = () => {
 
         {/* Footer */}
         <p className="text-center text-[11px] text-gray-400 flex items-center justify-center gap-1.5">
-          <Zap size={10} className="text-emerald-400"/> OVDS AI ERP · Ethiopia 🇪🇹
+          <Zap size={10} className="text-[var(--pro-azure-light)]"/> OVDS AI ERP · Ethiopia 🇪🇹
         </p>
       </div>
     </div>

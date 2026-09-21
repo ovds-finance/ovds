@@ -3,9 +3,10 @@
  * Covers PIT, VAT, WHT, BIT, DRRF, and IFRS 18 classification utilities.
  */
 import { describe, it, expect } from 'vitest';
+
 import {
   ETH_TAX,
-  PIT_BRACKETS,
+
   calculatePIT,
   calcVAT,
   calcWHT,

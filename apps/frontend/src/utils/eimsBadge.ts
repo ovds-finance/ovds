@@ -1,6 +1,6 @@
 /** EIMS registration status badge classes and labels for invoice UI */
 export const EIMS_STATUS_CLS: Record<string, string> = {
-  REGISTERED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  REGISTERED: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
   PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
   FAILED: 'bg-rose-50 text-rose-700 border-rose-200',
   CANCELLED: 'bg-slate-100 text-slate-600 border-slate-200',

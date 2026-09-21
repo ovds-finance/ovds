@@ -3,7 +3,9 @@
  * Handles integration config, templates, and campaigns.
  */
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+
 import { PrismaService } from '../common/prisma.service';
+
 import { NotificationDispatchService } from './notification-dispatch.service';
 
 @Injectable()

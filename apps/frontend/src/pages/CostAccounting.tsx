@@ -11,23 +11,24 @@
  *
  * Uses existing /inventory items as cost objects, actual costs from bills/expenses.
  */
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  ResponsiveContainer, Cell,
-} from 'recharts';
 import {
   Calculator, TrendingUp, TrendingDown, RefreshCw,
   Download, Plus, Edit2, Save, Info, AlertTriangle,
 } from 'lucide-react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  ResponsiveContainer, Cell,
+} from 'recharts';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, FormField, Input, Select,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
 import api from '../services/api';
 
 // -- Types ---------------------------------------------------------------------
@@ -129,7 +130,7 @@ const StandardCostsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
   const handleSave = async (itemId: string) => {
     setSaving(true);
     try {
-      const totalCost = (parseFloat(editForm.material) || 0) + (parseFloat(editForm.labour) || 0) + (parseFloat(editForm.overhead) || 0);
+      const _totalCost = (parseFloat(editForm.material) || 0) + (parseFloat(editForm.labour) || 0) + (parseFloat(editForm.overhead) || 0);
       await api.patch(`/ovds/inventory/items/${itemId}`, {
         costPrice:    parseFloat(editForm.material) || 0,
         labourCost:   parseFloat(editForm.labour)   || 0,
@@ -167,7 +168,7 @@ const StandardCostsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
       <div className="ovds-grid-layout cols-4 gap-sm">
         {[
           { label: 'Products', value: items.length, accent: 'bg-slate-500' },
-          { label: 'Avg Gross Margin', value: `${avgMargin.toFixed(1)}%`, accent: avgMargin > 30 ? 'bg-emerald-500' : avgMargin > 15 ? 'bg-amber-500' : 'bg-rose-500' },
+          { label: 'Avg Gross Margin', value: `${avgMargin.toFixed(1)}%`, accent: avgMargin > 30 ? 'bg-[var(--pro-azure-50)]0' : avgMargin > 15 ? 'bg-amber-500' : 'bg-rose-500' },
           { label: 'Total Std Cost', value: fmtK(totalStdCost), accent: 'bg-violet-500' },
           { label: 'Low Margin Items', value: items.filter(i => (i.grossMarginPct ?? 0) < 10 && i.salePrice > 0).length, accent: 'bg-rose-500' },
         ].map(k => (
@@ -243,7 +244,7 @@ const StandardCostsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
 
               <AppTd align="right"><span className="tabular-nums text-[11px] font-semibold text-slate-700 dark:text-slate-200">{fmt(item.salePrice)}</span></AppTd>
               <AppTd align="right">
-                <span className={`tabular-nums text-[11px] font-bold ${(item.grossMarginPct ?? 0) > 30 ? 'text-emerald-700' : (item.grossMarginPct ?? 0) > 10 ? 'text-amber-600' : 'text-rose-600'}`}>
+                <span className={`tabular-nums text-[11px] font-bold ${(item.grossMarginPct ?? 0) > 30 ? 'text-[var(--pro-azure-dark)]' : (item.grossMarginPct ?? 0) > 10 ? 'text-amber-600' : 'text-rose-600'}`}>
                   {(item.grossMarginPct ?? 0).toFixed(1)}%
                 </span>
               </AppTd>
@@ -288,7 +289,7 @@ const VariancesTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
     try {
       // Derive variances from actual costs (bills) vs standard costs (inventory items)
       // Use /ovds/reports/expense-summary for actuals and /inventory/items for standards
-      const [stdRes, actualRes] = await Promise.all([
+      const [stdRes, _actualRes] = await Promise.all([
         api.get(`/ovds/inventory/items?${companyId ? `companyId=${companyId}&` : ''}limit=500`),
         api.get(`/ovds/reports/expense-summary?${companyId ? `companyId=${companyId}&` : ''}startDate=${period}-01&endDate=${period}-31`).catch(() => ({ data: null })),
       ]);
@@ -341,7 +342,7 @@ const VariancesTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
 
       <div className="ovds-grid-layout cols-3 gap-sm">
         {[
-          { label: 'Favourable Variances', value: fmtK(totalFav),   accent: 'bg-emerald-500' },
+          { label: 'Favourable Variances', value: fmtK(totalFav),   accent: 'bg-[var(--pro-azure-50)]0' },
           { label: 'Adverse Variances',    value: fmtK(totalAdv),   accent: 'bg-rose-500'    },
           { label: 'Items Analysed',       value: variances.length, accent: 'bg-slate-500'   },
         ].map(k => (
@@ -394,23 +395,23 @@ const VariancesTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
               <AppTd align="right"><span className="tabular-nums text-[11px] text-slate-500">{fmt(v.standardCost)}</span></AppTd>
               <AppTd align="right"><span className="tabular-nums text-[11px] text-slate-600">{fmt(v.actualCost)}</span></AppTd>
               <AppTd align="right">
-                <span className={`tabular-nums text-[11px] font-semibold ${v.priceVariance > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                <span className={`tabular-nums text-[11px] font-semibold ${v.priceVariance > 0 ? 'text-rose-600' : 'text-[var(--pro-azure)]'}`}>
                   {v.priceVariance >= 0 ? '+' : ''}{fmt(v.priceVariance)}
                 </span>
               </AppTd>
               <AppTd align="right">
-                <span className={`tabular-nums text-[11px] font-bold ${v.totalVariance > 0 ? 'text-rose-600' : 'text-emerald-700'}`}>
+                <span className={`tabular-nums text-[11px] font-bold ${v.totalVariance > 0 ? 'text-rose-600' : 'text-[var(--pro-azure-dark)]'}`}>
                   {v.totalVariance >= 0 ? '+' : ''}{fmt(v.totalVariance)}
                 </span>
               </AppTd>
               <AppTd align="right">
-                <span className={`tabular-nums text-[10px] font-bold ${v.variancePct > 0 ? 'text-rose-500' : 'text-emerald-600'}`}>
+                <span className={`tabular-nums text-[10px] font-bold ${v.variancePct > 0 ? 'text-rose-500' : 'text-[var(--pro-azure)]'}`}>
                   {v.variancePct >= 0 ? '+' : ''}{v.variancePct.toFixed(1)}%
                 </span>
               </AppTd>
               <AppTd>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                  v.status === 'FAVOURABLE' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                  v.status === 'FAVOURABLE' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' :
                   v.status === 'ADVERSE'    ? 'bg-rose-50 text-rose-700 border-rose-200' :
                                               'bg-white text-slate-500 border-slate-200'
                 }`}>
@@ -437,7 +438,7 @@ const JobCostingTab: React.FC = () => {
   const [jobs, setJobs]   = useState<Job[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm]   = useState({ jobNumber: '', description: '', customer: '', contractValue: '', materialCost: '', labourCost: '', overheadCost: '', status: 'OPEN' as Job['status'], startDate: new Date().toISOString().slice(0, 10) });
-  const [saving, setSaving] = useState(false);
+  const [_saving, _setSaving] = useState(false);
 
   // Use localStorage for job costing (client-side demo — extend with backend endpoint)
   const STORE_KEY = 'ovds_job_costs';
@@ -488,7 +489,7 @@ const JobCostingTab: React.FC = () => {
   const STATUS_CLS: Record<string, string> = {
     OPEN:        'bg-sky-50 text-sky-700 border-sky-200',
     IN_PROGRESS: 'bg-amber-50 text-amber-700 border-amber-200',
-    COMPLETE:    'bg-emerald-50 text-emerald-700 border-emerald-200',
+    COMPLETE:    'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
     INVOICED:    'bg-violet-50 text-violet-700 border-violet-200',
   };
 
@@ -528,7 +529,7 @@ const JobCostingTab: React.FC = () => {
           {form.contractValue && (
             <div className="p-3 bg-violet-50 dark:bg-violet-950/20 border border-violet-200 dark:border-violet-700 rounded-xl text-[11px] grid grid-cols-3 gap-3">
               <div><p className="text-slate-400">Total Cost</p><p className="font-black text-violet-700">ETB {fmt((parseFloat(form.materialCost)||0)+(parseFloat(form.labourCost)||0)+(parseFloat(form.overheadCost)||0))}</p></div>
-              <div><p className="text-slate-400">Gross Profit</p><p className={`font-black ${((parseFloat(form.contractValue)||0) - (parseFloat(form.materialCost)||0) - (parseFloat(form.labourCost)||0) - (parseFloat(form.overheadCost)||0)) >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}>ETB {fmt((parseFloat(form.contractValue)||0) - (parseFloat(form.materialCost)||0) - (parseFloat(form.labourCost)||0) - (parseFloat(form.overheadCost)||0))}</p></div>
+              <div><p className="text-slate-400">Gross Profit</p><p className={`font-black ${((parseFloat(form.contractValue)||0) - (parseFloat(form.materialCost)||0) - (parseFloat(form.labourCost)||0) - (parseFloat(form.overheadCost)||0)) >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-600'}`}>ETB {fmt((parseFloat(form.contractValue)||0) - (parseFloat(form.materialCost)||0) - (parseFloat(form.labourCost)||0) - (parseFloat(form.overheadCost)||0))}</p></div>
               <div><p className="text-slate-400">Gross Margin</p><p className="font-black text-violet-700">{(parseFloat(form.contractValue)||0) > 0 ? (((parseFloat(form.contractValue)||0) - (parseFloat(form.materialCost)||0) - (parseFloat(form.labourCost)||0) - (parseFloat(form.overheadCost)||0)) / (parseFloat(form.contractValue)||0) * 100).toFixed(1) : 0}%</p></div>
             </div>
           )}
@@ -541,7 +542,7 @@ const JobCostingTab: React.FC = () => {
         {[
           { label: 'Active Jobs', value: jobs.filter(j => ['OPEN','IN_PROGRESS'].includes(j.status)).length, accent: 'bg-sky-500' },
           { label: 'Total Contract Value', value: fmtK(totalContractValue), accent: 'bg-violet-500' },
-          { label: 'Total Gross Profit', value: fmtK(totalGrossProfit), accent: totalGrossProfit >= 0 ? 'bg-emerald-500' : 'bg-rose-500' },
+          { label: 'Total Gross Profit', value: fmtK(totalGrossProfit), accent: totalGrossProfit >= 0 ? 'bg-[var(--pro-azure-50)]0' : 'bg-rose-500' },
         ].map(k => (
           <div key={k.label} className="ovds-widget-card p-4">
             <div className={`w-1 h-6 rounded-full ${k.accent} mb-2`} />
@@ -584,12 +585,12 @@ const JobCostingTab: React.FC = () => {
                 <AppTd align="right"><span className="tabular-nums text-[11px] text-slate-500">{fmt(j.overheadCost)}</span></AppTd>
                 <AppTd align="right"><span className="tabular-nums text-[11px] font-bold text-violet-700">{fmt(j.totalCost)}</span></AppTd>
                 <AppTd align="right">
-                  <span className={`tabular-nums text-[11px] font-bold ${j.grossProfit >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}>
+                  <span className={`tabular-nums text-[11px] font-bold ${j.grossProfit >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-600'}`}>
                     {j.grossProfit >= 0 ? '' : '('}{fmt(j.grossProfit)}{j.grossProfit < 0 ? ')' : ''}
                   </span>
                 </AppTd>
                 <AppTd align="right">
-                  <span className={`tabular-nums text-[11px] font-bold ${j.grossMarginPct > 20 ? 'text-emerald-700' : j.grossMarginPct > 0 ? 'text-amber-600' : 'text-rose-600'}`}>
+                  <span className={`tabular-nums text-[11px] font-bold ${j.grossMarginPct > 20 ? 'text-[var(--pro-azure-dark)]' : j.grossMarginPct > 0 ? 'text-amber-600' : 'text-rose-600'}`}>
                     {j.grossMarginPct.toFixed(1)}%
                   </span>
                 </AppTd>

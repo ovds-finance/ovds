@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+
 import { getOfflineCapabilities, getOfflineSLAReport } from '../services/api';
 
 export interface OfflineCapabilities {
@@ -72,6 +73,7 @@ export function useOfflineResilience(companyId?: string | null) {
     // Refresh SLA every 15 minutes
     const interval = setInterval(fetchSLAReport, 15 * 60 * 1000);
     return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyId]);
 
   return {

@@ -7,3 +7,11 @@ export type {
   TaxRatePrisma,
   TaxRateAuditLogger,
 } from "./tax-rate.service";
+
+// Ledger Observer — Ovds SaaS domain event → GL posting bridge
+export { LedgerObserver } from "./ledger-observer";
+export type {
+  LedgerPersistence,
+  JournalEntryInput,
+  JournalLineInput,
+} from "./ledger-observer";

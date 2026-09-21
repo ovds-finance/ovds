@@ -43,7 +43,7 @@ export const LoadMoreButton: React.FC<LoadMoreButtonProps> = ({
       {total > 0 && (
         <div className="w-48 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
           <div
-            className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+            className="h-full bg-[var(--pro-azure)] rounded-full transition-all duration-500"
             style={{ width: `${pct}%` }}
           />
         </div>

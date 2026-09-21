@@ -63,7 +63,7 @@ export interface SettingOption {
   value: string;
 }
 
-export type SetupCategory = 'company' | 'financial' | 'modules' | 'tax' | 'compliance' | 'users' | 'localization' | 'deployment' | 'system';
+export type SetupCategory = 'company' | 'financial' | 'modules' | 'tax' | 'compliance' | 'users' | 'localization' | 'deployment' | 'system' | 'security';
 export type SetupScope = 'company' | 'financial' | 'modules' | 'users' | 'system' | 'compliance' | 'deployment';
 export type SetupStatus = 'pending' | 'in_progress' | 'completed' | 'skipped';
 

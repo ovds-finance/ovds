@@ -2,9 +2,10 @@
  * ovdsRecentActivity — ovds-style recent transactions feed
  * Shows invoices and bills in a unified timeline with plain-language status labels
  */
+import { FileText, Receipt, ArrowRight, Clock, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Receipt, ArrowRight, Clock, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
+
 import { fmtRelative, fmtCompact } from '../../utils/fmt';
 
 function fmtAmt(n: number, currency = 'ETB'): string {
@@ -32,7 +33,7 @@ interface ovdsRecentActivityProps {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; icon: React.ReactNode; cls: string }> = {
-  PAID:      { label: 'Paid',      icon: <CheckCircle2 size={11} />, cls: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
+  PAID:      { label: 'Paid',      icon: <CheckCircle2 size={11} />, cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' },
   PENDING:   { label: 'Pending',   icon: <Clock size={11} />,        cls: 'bg-amber-50 text-amber-700 border-amber-100' },
   OVERDUE:   { label: 'Overdue',   icon: <AlertTriangle size={11} />,cls: 'bg-rose-50 text-rose-700 border-rose-100' },
   DRAFT:     { label: 'Draft',     icon: <FileText size={11} />,     cls: 'bg-slate-100 text-slate-500 border-slate-200' },
@@ -43,6 +44,7 @@ const STATUS_CONFIG: Record<string, { label: string; icon: React.ReactNode; cls:
 export const ovdsRecentActivity: React.FC<ovdsRecentActivityProps> = ({
   invoices = [], bills = [], loading, currency = 'ETB',
 }) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const navigate = useNavigate();
 
   // Merge and sort by date
@@ -77,14 +79,14 @@ export const ovdsRecentActivity: React.FC<ovdsRecentActivityProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate('/sales/invoices')}
-            className="text-[10px] text-emerald-600 hover:underline font-semibold flex items-center gap-0.5"
+            className="text-[10px] text-[var(--pro-azure)] hover:underline font-semibold flex items-center gap-0.5"
           >
             Invoices <ArrowRight size={9} />
           </button>
           <span className="text-slate-200 dark:text-slate-700">·</span>
           <button
             onClick={() => navigate('/purchases/bills')}
-            className="text-[10px] text-emerald-600 hover:underline font-semibold flex items-center gap-0.5"
+            className="text-[10px] text-[var(--pro-azure)] hover:underline font-semibold flex items-center gap-0.5"
           >
             Bills <ArrowRight size={9} />
           </button>
@@ -124,7 +126,7 @@ export const ovdsRecentActivity: React.FC<ovdsRecentActivityProps> = ({
               >
                 {/* Type icon */}
                 <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                  isInvoice ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
+                  isInvoice ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' : 'bg-amber-50 text-amber-600'
                 }`}>
                   {isInvoice ? <FileText size={14} /> : <Receipt size={14} />}
                 </div>
@@ -144,7 +146,7 @@ export const ovdsRecentActivity: React.FC<ovdsRecentActivityProps> = ({
                 {/* Amount + date */}
                 <div className="text-right shrink-0">
                   <p className={`text-[12px] font-bold tabular-nums ${
-                    isInvoice ? 'text-emerald-600' : 'text-rose-500'
+                    isInvoice ? 'text-[var(--pro-azure)]' : 'text-rose-500'
                   }`}>
                     {isInvoice ? '+' : '-'}{fmtAmt(item.amount, item.currency)}
                   </p>

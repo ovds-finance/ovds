@@ -12,14 +12,16 @@
  * Not subject to IAS 12 (Income Taxes).
  * Generates POESSA-format schedule for ERCA submission.
  */
-import React, { useState, useCallback, useEffect } from 'react';
-import { Shield, RefreshCw, Download, Send, Info, CheckCircle2 } from 'lucide-react';
 import { AppPage, Btn } from '@ovds/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { fmtCurrency } from '../utils/fmt';
-import api from '../services/api';
+import { Shield, RefreshCw, Send, Info, CheckCircle2 } from 'lucide-react';
+import React, { useState, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
+
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { fmtCurrency } from '../utils/fmt';
+
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
@@ -50,7 +52,7 @@ interface PensionEmployee {
 const STATUS_CFG = {
   DRAFT:     { label: 'Draft',     cls: 'bg-slate-100 text-slate-600 border border-slate-200' },
   SUBMITTED: { label: 'Submitted', cls: 'bg-amber-50 text-amber-700 border border-amber-200' },
-  PAID:      { label: 'Paid',      cls: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
+  PAID:      { label: 'Paid',      cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)]' },
 };
 
 const PensionSubmissionPage: React.FC = () => {
@@ -154,7 +156,7 @@ const PensionSubmissionPage: React.FC = () => {
       title="Pension Submissions"
       subtitle="Format and submit to MoR · Proclamation No. 1395/2025"
       icon={<Shield size={18} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       crumbs={[{ label: '4 · Submit to PFSA' }, { label: 'Pension Submissions' }]}
       actions={
         <div className="flex items-center gap-2">
@@ -162,7 +164,7 @@ const PensionSubmissionPage: React.FC = () => {
             type="month"
             value={period}
             onChange={e => setPeriod(e.target.value)}
-            className="px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+            className="px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)]"
           />
           <Btn variant="secondary" size="sm"
             icon={loading ? <RefreshCw size={14} className="animate-spin" /> : <RefreshCw size={14} />}
@@ -179,7 +181,7 @@ const PensionSubmissionPage: React.FC = () => {
           {[
             { label: `Employee Pension (${(pensionEmpRate * 100).toFixed(0)}%)`,  value: fmt(totalEmployee), accent: 'bg-sky-500' },
             { label: `Employer Pension (${(pensionEmpRRate * 100).toFixed(0)}%)`, value: fmt(totalEmployer), accent: 'bg-violet-500' },
-            { label: 'Total Remittance',       value: fmt(totalRemit),    accent: 'bg-emerald-500' },
+            { label: 'Total Remittance',       value: fmt(totalRemit),    accent: 'bg-[var(--pro-azure-50)]0' },
             { label: 'Employees',              value: String(employees.length), accent: 'bg-slate-400' },
           ].map(kpi => (
             <div key={kpi.label} className="ovds-kpi-cell">
@@ -213,7 +215,7 @@ const PensionSubmissionPage: React.FC = () => {
         <div className="ovds-widget-card overflow-hidden">
           <div className="ovds-widget-header flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Shield size={15} className="text-emerald-500" />
+              <Shield size={15} className="text-[var(--pro-azure)]" />
               <h3 className="ovds-card-title">Pension Schedule — {period}</h3>
             </div>
             <Btn
@@ -280,7 +282,7 @@ const PensionSubmissionPage: React.FC = () => {
         {submissions.length > 0 && (
           <div className="ovds-widget-card overflow-hidden">
             <div className="ovds-widget-header">
-              <CheckCircle2 size={15} className="text-emerald-500" />
+              <CheckCircle2 size={15} className="text-[var(--pro-azure)]" />
               <h3 className="ovds-card-title">Submission History</h3>
             </div>
             <div className="overflow-x-auto">

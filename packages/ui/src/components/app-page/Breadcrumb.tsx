@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 
@@ -11,9 +11,13 @@ export interface BreadcrumbProps {
   items: BreadcrumbItem[];
 }
 
+/**
+ * Breadcrumb — Ovds SaaS style: small, muted grey text, green hover on links.
+ */
 export const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => (
   <nav
-    className="flex items-center gap-1 text-[10px] text-slate-400 dark:text-slate-500 mb-2.5"
+    className="flex items-center gap-1 mb-2.5"
+    style={{ fontSize: 10, color: 'var(--text-4)' }}
     aria-label="Breadcrumb"
   >
     {items.map((item, i) => (
@@ -21,19 +25,26 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => (
         {i > 0 && (
           <ChevronRight
             size={9}
-            className="text-slate-300 dark:text-slate-600 shrink-0"
+            style={{ color: 'var(--text-5)', flexShrink: 0 }}
           />
         )}
         {item.to ? (
           <Link
             to={item.to}
-            className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors font-medium truncate max-w-[120px]"
+            className="font-medium truncate max-w-[120px] transition-colors"
+            style={{ color: 'var(--text-4)', textDecoration: 'none' }}
+            onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = 'var(--pro-azure)')}
+            onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-4)')}
           >
             {item.label}
           </Link>
         ) : (
           <span
-            className={`truncate max-w-[160px] ${i === items.length - 1 ? 'text-slate-600 dark:text-slate-300 font-semibold' : ''}`}
+            className="truncate max-w-[160px]"
+            style={{
+              color: i === items.length - 1 ? 'var(--text-2)' : 'var(--text-4)',
+              fontWeight: i === items.length - 1 ? 600 : 500,
+            }}
           >
             {item.label}
           </span>

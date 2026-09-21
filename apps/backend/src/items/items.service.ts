@@ -1,18 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../common/prisma.service';
 import { PAGINATION_DEFAULT_LIMIT } from '@ovds/shared';
+
+import { PrismaService } from '../common/prisma.service';
 
 @Injectable()
 export class ItemsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findItems(query: { page?: number; limit?: number; type?: string }) {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? PAGINATION_DEFAULT_LIMIT;
+  async findItems(query: { page?: number; limit?: number; type?: string; status?: string; search?: string; companies?: string[]; companiesIn?: string[] }) {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || PAGINATION_DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
     if (query.type) where.type = query.type;
+    if (query.status) where.status = query.status;
+    if (query.search) {
+      where.OR = [
+        { name: { contains: query.search, mode: 'insensitive' } },
+        { code: { contains: query.search, mode: 'insensitive' } },
+      ];
+    }
+    if (query.companies) where.companyId = { in: query.companies };
+    if (query.companiesIn) where.companyId = { in: query.companiesIn };
 
     const [data, total] = await Promise.all([
       this.prisma.item.findMany({ where, skip, take: limit, orderBy: { name: 'asc' } }),

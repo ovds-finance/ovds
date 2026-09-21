@@ -43,6 +43,16 @@ export interface UseSavedViewsOptions {
   defaultColumns: SavedViewColumnConfig[];
   userId: string;
   serverViews?: SavedView[];
+  /**
+   * Optional async callback invoked whenever a non-local view is mutated.
+   * Callers should wire this to a TanStack Query `mutateAsync` (or equivalent
+   * oRPC mutation) so server-owned views are persisted via the backend API.
+   *
+   * @example
+   * const { mutateAsync } = useMutation({ mutationFn: updateSavedView });
+   * useSavedViews({ ..., onServerUpdate: (id, updates) => mutateAsync({ id, updates }) });
+   */
+  onServerUpdate?: (id: string, updates: Partial<SavedView>) => Promise<void> | void;
 }
 
 export interface UseSavedViewsResult {
@@ -61,10 +71,15 @@ export function useSavedViews({
   defaultColumns,
   userId,
   serverViews = [],
+  onServerUpdate,
 }: UseSavedViewsOptions): UseSavedViewsResult {
   const storageKey = `${STORAGE_PREFIX}${tableKey}_${userId}`;
   const [localViews, setLocalViews] = useLocalStorage<SavedView[]>(storageKey, []);
   const [activeViewId, setActiveViewId] = useLocalStorage<string | null>(`${storageKey}_active`, null);
+
+  // Keep a stable ref to onServerUpdate so useCallback deps stay minimal.
+  const onServerUpdateRef = useRef(onServerUpdate);
+  useEffect(() => { onServerUpdateRef.current = onServerUpdate; }, [onServerUpdate]);
 
   const views = useMemo(() => {
     const allViews = [...serverViews, ...localViews];
@@ -111,12 +126,17 @@ export function useSavedViews({
 
   const updateView = useCallback(
     (id: string, updates: Partial<SavedView>) => {
+      // 1. Optimistically update local storage so the UI reflects the change immediately.
       setLocalViews((prev) =>
         prev.map((v) =>
           v.id === id ? { ...v, ...updates, updatedAt: new Date().toISOString() } : v,
         ),
       );
-      setServerView?.(id, updates);
+      // 2. Propagate to the server only for non-local views (local views live in
+      //    localStorage only; their IDs start with "local_").
+      if (!id.startsWith('local_') && onServerUpdateRef.current) {
+        void onServerUpdateRef.current(id, updates);
+      }
     },
     [setLocalViews],
   );
@@ -159,12 +179,6 @@ export function useSavedViews({
     },
     [views, setLocalViews],
   );
-
-  // serverViews is a prop, not state — we need a setter for updates
-  // In a real app, this would be a server mutation
-  const setServerView = (_id: string, _updates: Partial<SavedView>) => {
-    // Server mutation placeholder
-  };
 
   return {
     views,

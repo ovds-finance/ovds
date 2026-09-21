@@ -1,4 +1,4 @@
-import { useCallback, useReducer, useRef } from 'react';
+﻿import { useCallback, useReducer, useRef } from 'react';
 
 // ── State machine ────────────────────────────────────────────────────────────
 
@@ -66,7 +66,7 @@ export interface UseBladeStateResult<T> {
 /**
  * useBladeState — predictable async state machine for UI blades.
  *
- * Akaunting design principle: every blade has a deterministic state that
+ * Ovds SaaS design principle: every blade has a deterministic state that
  * the UI can render without ambiguity. No "sometimes loading, sometimes not"
  * edge cases.
  *

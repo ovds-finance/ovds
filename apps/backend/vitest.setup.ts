@@ -1,5 +1,8 @@
 // Backend Vitest global setup — runs in every test worker before each test file.
 
+// ── reflect-metadata (required by NestJS + class-transformer decorators) ──────
+import 'reflect-metadata';
+
 // ── Environment variables ─────────────────────────────────────────────────────
 // PrismaService constructor requires PRISMA_DATABASE_URL.
 // Set a fallback so the constructor doesn't throw during test module compilation.
@@ -57,7 +60,7 @@ vi.mock('@prisma/client', () => {
 // ── Mock @prisma/adapter-mariadb to avoid real driver loading ─────────────────
 vi.mock('@prisma/adapter-mariadb', () => ({
   PrismaMariaDb: class MockAdapter {
-    constructor(_opts: any) {}
+constructor() {}
   },
 }));
 

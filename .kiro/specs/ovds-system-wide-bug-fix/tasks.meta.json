@@ -1,0 +1,192 @@
+{
+  "pbtResults": {
+    "1. Write bug condition exploration tests (all 5 bugs, BEFORE any fix)": {
+      "status": "passed",
+      "failingExample": "Bug 1 (50 packages): accounting, appstore, audit-outsourcing, auth, banking, contracts, cost-centers, crm, currency, custom-fields, customers, dashboard, device-control, disaster-fund, double-entry, eims (./src/index.js), expense-claims, expenses, fiscal, general-ledger-compliance, helpdesk, hr, ifrs, inventory, invoice, iot, items, loyalty, manufacturing, monetization, notifications, offline-sync, onboarding, payroll, procurement, purchases, receipts, release, reporting, sales, security (./src/index.js), security-assessment, security-evaluator, settings, sub-ledger, tax, trade, treasury, vendors, workflow — all have main pointing to non-existent .js files.\n\nBug 2: auth.service.ts const payload = { companyId: resolvedCompanyId } — no explicit string|null annotation on the companyId key in the JWT payload object.\n\nBug 3: ALREADY RESOLVED — @prisma/client/runtime/library import not present in current trade.service.ts.\n\nBug 4: this.prisma.tradeLicense.count(companyId ? { where: { companyId } } : undefined) — explicit undefined passed to count() at line 96 of trade.service.ts.\n\nBug 5a: import * as crypto from 'crypto' (static top-level) in packages/shared/src/license-crypto.native.ts — confirmed by build_errors.txt: \"Module 'crypto' has been externalized for browser compatibility\".\nBug 5b: require('crypto') in packages/shared/src/utils.ts randomBytes() — confirmed by build_errors.txt: \"Module 'crypto' has been externalized for browser compatibility, imported by utils.ts\".",
+      "lastRunTimestamp": 1788958326761
+    },
+    "2. Write preservation property tests (BEFORE implementing any fix)": {
+      "status": "passed",
+      "lastRunTimestamp": 1788959676259
+    }
+  },
+  "executionHistory": {
+    "1. Write bug condition exploration tests (all 5 bugs, BEFORE any fix)": [
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788955743361
+      },
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788955760116
+      },
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788958368324
+      }
+    ],
+    "2. Write preservation property tests (BEFORE implementing any fix)": [
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788955745466
+      },
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788958373397
+      },
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788959701739
+      }
+    ],
+    "3.1 Fix Bug 1 — Correct `package.json` `main` and `types` fields for all affected feature packages": [
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788955746046
+      },
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788959711043
+      },
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788960641068
+      }
+    ],
+    "3.2 Fix Bug 2 — Widen `companyId` type in JWT payload and return objects in `auth.service.ts`": [
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788955747243
+      },
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788960646428
+      },
+      {
+        "executionId": "b33c453b-dda5-4a2e-a848-502e8ab82982",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788962206655
+      }
+    ],
+    "3.3 Fix Bug 3 — Remove obsolete `@prisma/client/runtime/library` import from `trade.service.ts`": [
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788955747566
+      },
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788960647288
+      },
+      {
+        "executionId": "b33c453b-dda5-4a2e-a848-502e8ab82982",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788962207222
+      }
+    ],
+    "3.4 Fix Bug 4 — Rewrite `tradeLicense.count()` conditional pattern in `trade.service.ts`": [
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788955748682
+      },
+      {
+        "executionId": "b33c453b-dda5-4a2e-a848-502e8ab82982",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788962215482
+      },
+      {
+        "executionId": "b33c453b-dda5-4a2e-a848-502e8ab82982",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788962220589
+      }
+    ],
+    "3.5 Fix Bug 5 — Guard Node.js `crypto` usage in `license-crypto.native.ts` and `utils.ts`": [
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788955751297
+      },
+      {
+        "executionId": "b33c453b-dda5-4a2e-a848-502e8ab82982",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788962226943
+      },
+      {
+        "executionId": "b33c453b-dda5-4a2e-a848-502e8ab82982",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788962719621
+      }
+    ],
+    "3.6 Verify bug condition exploration test now passes (after all fixes applied)": [
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788955751548
+      },
+      {
+        "executionId": "b33c453b-dda5-4a2e-a848-502e8ab82982",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788962727812
+      },
+      {
+        "executionId": "b33c453b-dda5-4a2e-a848-502e8ab82982",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788963251664
+      }
+    ],
+    "3.7 Verify preservation tests still pass (after all fixes applied)": [
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788955751867
+      },
+      {
+        "executionId": "b33c453b-dda5-4a2e-a848-502e8ab82982",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788963258235
+      },
+      {
+        "executionId": "b33c453b-dda5-4a2e-a848-502e8ab82982",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788963312718
+      }
+    ],
+    "4. Checkpoint — Ensure all tests pass": [
+      {
+        "executionId": "a37d8586-3f84-4b05-babf-ce569f31d7a5",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788955752278
+      },
+      {
+        "executionId": "b33c453b-dda5-4a2e-a848-502e8ab82982",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788963323068
+      },
+      {
+        "executionId": "b33c453b-dda5-4a2e-a848-502e8ab82982",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788963537517
+      }
+    ],
+    "3. Fix all five OVDS bugs": [
+      {
+        "executionId": "b33c453b-dda5-4a2e-a848-502e8ab82982",
+        "chatSessionId": "sess_cc76522a-ae4f-459e-a454-b008e724dcc4",
+        "timestamp": 1788963313135
+      }
+    ]
+  }
+}

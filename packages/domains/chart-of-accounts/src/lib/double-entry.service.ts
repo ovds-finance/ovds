@@ -2,7 +2,7 @@
  * DoubleEntryService — domain lib
  *
  * Migrated from apps/backend/src/double-entry/double-entry.service.ts into
- * the @ovds/domains/double-entry library following the thin-apps-thick-libs pattern.
+ * the @ovds/domains-double-entry library following the thin-apps-thick-libs pattern.
  *
  * Handles:
  *   - Chart of Accounts CRUD with IFRS/GAAP parent-child guardrails
@@ -22,7 +22,7 @@ import {
   BaseService,
   IAuditLogger,
   IPrismaClient,
-} from '@ovds/domains/infrastructure';
+} from '@ovds/domains-infrastructure';
 
 // ── IFRS/GAAP parent-child CoA guardrails ─────────────────────────────────────
 // Top-level account groups. A code NOT in this set is a sub-account and MUST

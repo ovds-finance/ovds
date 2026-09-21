@@ -1,4 +1,5 @@
 ﻿import { describe, it, expect } from 'vitest';
+
 import { rbac, ROLE_HIERARCHY } from '../rbac/rbac';
 import type { AppRole } from '../rbac/rbac';
 
@@ -7,7 +8,7 @@ const r = (s: string) => s as AppRole;
 // -- Role hierarchy ------------------------------------------------------------
 describe('ROLE_HIERARCHY', () => {
   it('SPURADMIN has the highest weight', () => {
-    const max = Math.max(...Object.values(ROLE_HIERARCHY));
+    const max = Math.max(...Object.values(ROLE_HIERARCHY) as number[]);
     expect(ROLE_HIERARCHY.SPURADMIN).toBe(max);
   });
 
@@ -20,7 +21,7 @@ describe('ROLE_HIERARCHY', () => {
   });
 
   it('CLIENT has the lowest weight', () => {
-    const min = Math.min(...Object.values(ROLE_HIERARCHY));
+    const min = Math.min(...Object.values(ROLE_HIERARCHY) as number[]);
     expect(ROLE_HIERARCHY.CLIENT).toBe(min);
   });
 });
@@ -38,12 +39,12 @@ describe('rbac.can()', () => {
 
   it('ovds can approve payroll if payroll module is enabled for business type', () => {
     // Assuming 'LARGE_ENTERPRISE' has payroll enabled
-    expect(rbac.can(r('ovds'), 'payroll:approve', undefined, 'LARGE_ENTERPRISE')).toBe(true);
+    expect(rbac.can(r('OVDS'), 'payroll:approve', undefined, 'LARGE_ENTERPRISE')).toBe(true);
   });
 
   it('ovds cannot approve payroll if business type gates the payroll module', () => {
     // Assuming 'SMALL_BUSINESS' has payroll disabled/hidden
-    expect(rbac.can(r('ovds'), 'payroll:approve', undefined, 'SMALL_BUSINESS')).toBe(false);
+    expect(rbac.can(r('OVDS'), 'payroll:approve', undefined, 'SMALL_BUSINESS')).toBe(false);
   });
 
   it('HR can generate payroll but not approve it', () => {
@@ -74,19 +75,19 @@ describe('rbac.canAccessRoute()', () => {
 // -- rbac.vatLevel() -----------------------------------------------------------
 describe('rbac.vatLevel()', () => {
   it('ovds has admin VAT level in LARGE_ENTERPRISE', () => {
-    expect(rbac.vatLevel(r('ovds'), 'LARGE_ENTERPRISE')).toBe('admin');
+    expect(rbac.vatLevel(r('OVDS'), 'LARGE_ENTERPRISE')).toBe('admin');
   });
 
   it('ovds has none VAT level if tax module is gated', () => {
     // If we ever gate tax module for a specific business type
-    expect(rbac.vatLevel(r('ovds'), 'NON_PROFIT')).toBe('none');
+    expect(rbac.vatLevel(r('OVDS'), 'NON_PROFIT')).toBe('none');
   });
 });
 
 // -- rbac.groupOf() ------------------------------------------------------------
 describe('rbac.groupOf()', () => {
   it('ovds is in the ovds group', () => {
-    expect(rbac.groupOf(r('ovds'))).toBe('ovds');
+    expect(rbac.groupOf(r('OVDS'))).toBe('OVDS');
   });
 
   it('SPURADMIN is in the system group', () => {

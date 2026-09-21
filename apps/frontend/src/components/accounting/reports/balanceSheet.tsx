@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../../rbac/AuthContext';
-import api from '../../../services/api';
-import toast from 'react-hot-toast';
+import { Button } from '@ovds/ui';
+import { Badge } from '@ovds/ui';
+import { format, addMonths } from 'date-fns';
 import {
   Download,
   Printer,
@@ -12,9 +11,11 @@ import {
   TrendingDown,
   Shield,
 } from 'lucide-react';
-import { format, addMonths } from 'date-fns';
-import { Button } from '@ovds/ui';
-import { Badge } from '@ovds/ui';
+import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+
+import { useAuth } from '../../../rbac/AuthContext';
+import api from '../../../services/api';
 import { fmtCurrencyDecimal } from '../../../utils/fmt';
 
 const fmt = (n: number) => fmtCurrencyDecimal(Math.abs(n), 'ETB');
@@ -136,7 +137,7 @@ const BalanceSheetReport: React.FC = () => {
           <div className="p-8 sm:p-12 print:p-6">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 print:flex-col print:gap-4">
               <div>
-                <h1 className="text-4xl lg:text-5xl font-semibold bg-gradient-to-r from-emerald-700 via-emerald-600 to-emerald-800 dark:from-slate-100 dark:via-emerald-300 dark:to-emerald-400 bg-clip-text text-transparent mb-2">
+                <h1 className="text-4xl lg:text-5xl font-semibold bg-gradient-to-r from-[var(--pro-azure-dark)] via-[var(--pro-azure)] to-[var(--pro-azure-dark)] dark:from-slate-100 dark:via-green-300 dark:to-[var(--pro-azure-light)] bg-clip-text text-transparent mb-2">
                   Balance Sheet
                 </h1>
                 <p className="text-2xl font-bold text-slate-700">
@@ -186,10 +187,10 @@ const BalanceSheetReport: React.FC = () => {
           {/* Assets */}
           <div className="bg-white rounded-xl shadow-xl border border-slate-200 p-8 print:p-6 print:shadow-none print:border-0">
             <div className="flex items-center gap-3 mb-8 print:mb-6">
-              <Shield size={32} className="text-emerald-600 bg-emerald-100 p-2 rounded-2xl" />
+              <Shield size={32} className="text-[var(--pro-azure)] bg-[var(--pro-azure-100)] p-2 rounded-2xl" />
               <div>
                 <h2 className="text-2xl font-semibold text-slate-800 dark:text-slate-100">Assets</h2>
-                <div className="flex items-baseline gap-2 text-4xl font-semibold text-emerald-700 mt-1">
+                <div className="flex items-baseline gap-2 text-4xl font-semibold text-[var(--pro-azure-dark)] mt-1">
                   {fmt(data.totalAssets)}
                   <span className="text-xl text-slate-500">ETB</span>
                 </div>
@@ -248,19 +249,19 @@ const BalanceSheetReport: React.FC = () => {
         </div>
 
         {/* Footer Verification */}
-        <div className="mt-12 bg-gradient-to-r from-emerald-50 to-sky-50 rounded-2xl p-8 border border-emerald-200/50 print:hidden">
+        <div className="mt-12 bg-gradient-to-r from-[var(--pro-azure-50)] to-[var(--pro-azure-50)] rounded-2xl p-8 border border-[var(--pro-azure-100)]/50 print:hidden">
           <div className="max-w-4xl mx-auto text-center">
             <div className="flex flex-col lg:flex-row items-end justify-center gap-8 text-2xl lg:text-3xl font-semibold mb-4">
               <div>
-                <span className="text-emerald-700">{fmt(data.totalAssets)}</span>
-                <span className="text-sm text-emerald-500 block lg:inline ml-0 lg:ml-2">=</span>
+                <span className="text-[var(--pro-azure-dark)]">{fmt(data.totalAssets)}</span>
+                <span className="text-sm text-[var(--pro-azure)] block lg:inline ml-0 lg:ml-2">=</span>
               </div>
               <div className="text-sky-700">
                 {fmt(data.totalLiabilities + data.totalEquity)}
               </div>
             </div>
             <div className="bg-white px-8 py-4 rounded-2xl shadow-lg inline-block">
-              <Badge variant="emerald" className="!text-lg !px-4 !py-2 font-semibold">
+              <Badge variant="indigo" className="!text-lg !px-4 !py-2 font-semibold">
                 ✅ Balance Sheet Balances
               </Badge>
             </div>
@@ -301,18 +302,18 @@ const Section: React.FC<SectionProps> = ({
   expanded, 
   onToggle 
 }) => {
-  const color = type === 'asset' ? 'emerald' : type === 'liability' ? 'sky' : 'purple';
+  const color = type === 'asset' ? 'indigo' : type === 'liability' ? 'sky' : 'purple';
 
   return (
-    <div className="group border-l-4 border-emerald-500 bg-slate-50/50 rounded-r-2xl p-6 hover:shadow-md transition-all">
+    <div className="group border-l-4 border-[var(--pro-azure)] bg-slate-50/50 rounded-r-2xl p-6 hover:shadow-md transition-all">
       <button 
         className="w-full flex items-center justify-between text-left" 
         onClick={onToggle}
       >
         <div className="flex items-baseline gap-4">
-          <div className="w-2 h-2 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full shadow-lg"></div>
+          <div className="w-2 h-2 bg-gradient-to-r from-green-500 to-green-600 rounded-full shadow-lg"></div>
           <h4 className="text-xl font-bold text-slate-900">{title}</h4>
-          <div className="text-2xl font-semibold text-emerald-700">{fmt(subtotal)}</div>
+          <div className="text-2xl font-semibold text-[var(--pro-azure-dark)]">{fmt(subtotal)}</div>
           <span className="text-sm text-slate-500">{pct(subtotal, total)}</span>
         </div>
         <ChevronRight 
@@ -334,7 +335,7 @@ const Section: React.FC<SectionProps> = ({
                   </Badge>
                 </div>
               </div>
-              <div className="text-right font-mono text-sm font-bold text-emerald-700 min-w-[120px]">
+              <div className="text-right font-mono text-sm font-bold text-[var(--pro-azure-dark)] min-w-[120px]">
                 {fmt(item.balance)}
               </div>
             </div>

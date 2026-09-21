@@ -1,14 +1,14 @@
-# Tax, VAT, WHT & Declarations
+﻿# Tax, VAT, WHT & Declarations
 
 Canonical OVDS module (`packages/modules/tax`).
 
-Akaunting-inspired, DDD-aligned module layout:
+Ovds SaaS DDD-aligned module layout:
 
 ```
 modules/tax/
   src/
     index.ts        # public barrel (domain types + namespaced web)
-    domain/         # centralized domain types & rules  (@ovds/domains/tax)
+    domain/         # centralized domain types & rules  (@ovds/domains-tax)
     dto/            # zod / class-validator contracts
     web/            # React pages & components           (@ovds/features/tax)
 ```

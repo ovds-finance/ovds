@@ -6,10 +6,12 @@
  * resolves to null via @Optional(). In that case dispatch() logs a warning
  * and returns early so the rest of the application continues to function.
  */
-import { Injectable, Logger, Optional, Inject } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
+import { Injectable, Logger, Optional, Inject } from '@nestjs/common';
 import { Queue } from 'bullmq';
+
 import { PrismaService } from '../common/prisma.service';
+
 import {
   NOTIFICATION_QUEUE,
   NOTIFICATION_JOB,

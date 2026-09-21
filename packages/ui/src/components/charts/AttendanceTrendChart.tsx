@@ -34,7 +34,7 @@ export const AttendanceTrendChart: React.FC<AttendanceTrendProps> = ({
       </div>
       <div className="flex items-center gap-3 text-[10px] font-bold">
         <span className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+          <span className="w-2 h-2 rounded-full bg-[var(--pro-azure)] inline-block" />
           Present
         </span>
         <span className="flex items-center gap-1">

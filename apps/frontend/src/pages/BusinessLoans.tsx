@@ -1,14 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../rbac/AuthContext';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useDebounce } from '../hooks';
-import { StatsCard, AppPage, Btn, EmptyState, Skeleton } from '@ovds/ui';
+import { AppPage, EmptyState, Skeleton } from '@ovds/ui';
 import { ContextualInsight } from '@ovds/ui';
-import { PipelineStageHeader } from '../components/pipelineComponents';
 import {
   ArrowRight,
   Banknote,
@@ -25,17 +16,28 @@ import {
   TrendingDown,
   X,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+import { PipelineStageHeader } from '../components/pipelineComponents';
+import { useDebounce } from '../hooks';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+
 const fmt = (n: number) =>
   new Intl.NumberFormat('en-ET', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(n);
 const STATUS_COLORS: Record<string, string> = {
-  APPLIED: 'bg-emerald-100 text-emerald-600 dark:text-emerald-400',
+  APPLIED: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
   UNDER_REVIEW: 'bg-amber-100 text-amber-700',
-  APPROVED: 'bg-emerald-100 text-emerald-700',
+  APPROVED: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   DISBURSED: 'bg-teal-100 text-teal-700',
-  ACTIVE: 'bg-emerald-100 text-emerald-700',
+  ACTIVE: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   CLOSED: 'bg-slate-100 text-slate-500',
   REJECTED: 'bg-rose-100 text-rose-6',
 };
@@ -43,7 +45,7 @@ const STATUSES = Object.keys(STATUS_COLORS);
 const ScoreBar: React.FC<{ label: string; value: number; color?: string }> = ({
   label,
   value,
-  color = 'bg-emerald-500',
+  color = 'bg-[var(--pro-azure-50)]0',
 }) => (
   <div>
     {' '}
@@ -168,7 +170,7 @@ const RepaymentModal: React.FC<{
             <button
               type="submit"
               disabled={saving || !form.amount}
-              className="flex-1 bg-emerald-500 text-white py-3 px-6 rounded-2xl font-semibold text-sm uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed hover:bg-emerald-500 transition-all flex items-center justify-center gap-2"
+              className="flex-1 bg-[var(--pro-azure)] text-white py-3 px-6 rounded-2xl font-semibold text-sm uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[var(--pro-azure-dark)] transition-all flex items-center justify-center gap-2"
             >
               {' '}
               {saving ? (
@@ -260,24 +262,24 @@ const LoanDetailDrawer: React.FC<{
               {
                 label: 'Applied',
                 value: `ETB ${fmt(Number(loan.appliedAmount))}`,
-                color: 'text-emerald-600 dark:text-emerald-400',
+                color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
               },
               {
                 label: 'Outstanding',
                 value: `ETB ${fmt(outstanding)}`,
-                color: outstanding > 0 ? 'text-amber-600' : 'text-emerald-600',
+                color: outstanding > 0 ? 'text-amber-600' : 'text-[var(--pro-azure)]',
               },
               {
                 label: 'Total Repaid',
                 value: `ETB ${fmt(totalRepaid)}`,
-                color: 'text-emerald-600',
+                color: 'text-[var(--pro-azure)]',
               },
               {
                 label: 'Credit Score',
                 value: `${loan.overallCreditScore ?? 0}/100`,
                 color:
                   (loan.overallCreditScore ?? 0) >= 70
-                    ? 'text-emerald-600'
+                    ? 'text-[var(--pro-azure)]'
                     : 'text-amber-600',
               },
             ].map(({ label, value, color }) => (
@@ -310,7 +312,7 @@ const LoanDetailDrawer: React.FC<{
             <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
               {' '}
               <div
-                className={`h-full rounded-full transition-all ${progress >= 100 ? 'bg-emerald-500' : progress >= 50 ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                className={`h-full rounded-full transition-all ${progress >= 100 ? 'bg-[var(--pro-azure-50)]0' : progress >= 50 ? 'bg-[var(--pro-azure-50)]0' : 'bg-amber-500'}`}
                 style={{ width: `${Math.min(progress, 100)}%` }}
               />{' '}
             </div>{' '}
@@ -346,10 +348,10 @@ const LoanDetailDrawer: React.FC<{
                     {' '}
                     <div className="flex items-center gap-2.5">
                       {' '}
-                      <div className="w-7 h-7 bg-emerald-100 dark:bg-emerald-950/30 rounded-lg flex items-center justify-center">
+                      <div className="w-7 h-7 bg-[var(--pro-azure-100)] dark:bg-green-950/30 rounded-lg flex items-center justify-center">
                         <Banknote
                           size={12}
-                          className="text-emerald-600 dark:text-emerald-400"
+                          className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]"
                         />{' '}
                       </div>{' '}
                       <div>
@@ -428,7 +430,7 @@ const LoanDetailDrawer: React.FC<{
           {' '}
           <button
             onClick={() => onRecordRepayment(loan)}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-emerald-500 text-white rounded-2xl font-semibold text-sm hover:bg-emerald-500 transition-all"
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[var(--pro-azure)] text-white rounded-2xl font-semibold text-sm hover:bg-[var(--pro-azure-dark)] transition-all"
           >
             <TrendingDown size={15} /> Record Repayment{' '}
           </button>{' '}
@@ -592,7 +594,7 @@ const NewLoanModal: React.FC<{
             <button
               type="submit"
               disabled={saving || !form.bankName || !form.appliedAmount}
-              className="flex-1 bg-emerald-500 text-white py-3 px-6 rounded-2xl font-semibold text-sm uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed hover:bg-emerald-600 transition-all flex items-center justify-center gap-2"
+              className="flex-1 bg-[var(--pro-azure)] text-white py-3 px-6 rounded-2xl font-semibold text-sm uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[var(--pro-azure-dark)] transition-all flex items-center justify-center gap-2"
             >
               {saving ? <RefreshCw className="animate-spin" size={16} /> : <CheckCircle2 size={16} />}
               {saving ? 'Submitting...' : 'Submit Application'}
@@ -673,10 +675,10 @@ const BusinessLoans: React.FC = () => {
       title="Business Loans & Financing"
       subtitle="Manage loans, track repayments, monitor credit health"
       icon={<Landmark size={18} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       crumbs={[{ label: 'ovds' }, { label: 'Business Loans' }]}
       actions={can('business_loans:write') ? (
-        <button onClick={() => setShowNewLoanModal(true)} className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
+        <button onClick={() => setShowNewLoanModal(true)} className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
           <Plus size={15} /> New Loan Application
         </button>
       ) : undefined}
@@ -693,9 +695,9 @@ const BusinessLoans: React.FC = () => {
       {/* Stats */}{' '}
       <div className="ovds-grid-layout cols-4 gap-sm">
           {[
-            { label: 'Total Applied',   value: `ETB ${fmt(totalApplied)}`,  color: 'text-emerald-600 dark:text-emerald-400',          bg: 'bg-emerald-50 dark:bg-emerald-950/30',    sub: `${loans.length} applications` },
-            { label: 'Avg Credit Score',value: `${avgScore}/100`,           color: avgScore >= 70 ? 'text-emerald-600 dark:text-emerald-400' : avgScore >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400', bg: 'bg-white dark:bg-slate-800', sub: 'Bank eligibility' },
-            { label: 'Active Loans',    value: loans.filter(l => l.status === 'ACTIVE').length, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30', sub: 'Currently active' },
+            { label: 'Total Applied',   value: `ETB ${fmt(totalApplied)}`,  color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',          bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',    sub: `${loans.length} applications` },
+            { label: 'Avg Credit Score',value: `${avgScore}/100`,           color: avgScore >= 70 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : avgScore >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400', bg: 'bg-white dark:bg-slate-800', sub: 'Bank eligibility' },
+            { label: 'Active Loans',    value: loans.filter(l => l.status === 'ACTIVE').length, color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30', sub: 'Currently active' },
             { label: 'Outstanding',     value: `ETB ${fmt(loans.reduce((s, l) => s + Number(l.outstandingBalance || 0), 0))}`, color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-950/30', sub: 'Balance remaining' },
           ].map(s => (
             <div key={s.label} className={`${s.bg} rounded-xl p-4`}>
@@ -757,7 +759,7 @@ const BusinessLoans: React.FC = () => {
         </select>{' '}
         <button
           onClick={fetchAll}
-          className="px-6 py-3 bg-emerald-500 text-white rounded-2xl font-semibold uppercase tracking-wider hover:bg-emerald-500 transition-all whitespace-nowrap"
+          className="px-6 py-3 bg-[var(--pro-azure)] text-white rounded-2xl font-semibold uppercase tracking-wider hover:bg-[var(--pro-azure-dark)] transition-all whitespace-nowrap"
         >
           <RefreshCw className="inline w-4 h-4 mr-1 animate-spin" />{' '}
           Refresh{' '}
@@ -779,13 +781,13 @@ const BusinessLoans: React.FC = () => {
           ) : (
             <div className="space-y-3">
               {' '}
-              {filtered.map((loan, i) => (
+              {filtered.map((loan, _i) => (
                 <div
                   key={loan.id}
                   className="group bg-white dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 transition-all hover:shadow-md hover:-translate-y-1 flex items-start gap-4"
                 >
                   {' '}
-                  <div className="w-2 h-2 mt-2 bg-gradient-to-b from-emerald-600 to-emerald-600 rounded-full shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />{' '}
+                  <div className="w-2 h-2 mt-2 bg-gradient-to-b from-[var(--pro-azure)] to-indigo-600 rounded-full shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />{' '}
                   <div className="flex-1 min-w-0">
                     {' '}
                     <div className="flex items-start justify-between mb-2">
@@ -818,7 +820,7 @@ const BusinessLoans: React.FC = () => {
                         )}{' '}
                         <button
                           onClick={() => handleRecordRepayment(loan)}
-                          className="px-4 py-1.5 bg-emerald-500 text-white text-xs font-semibold rounded-xl hover:bg-emerald-500 transition-all whitespace-nowrap"
+                          className="px-4 py-1.5 bg-[var(--pro-azure)] text-white text-xs font-semibold rounded-xl hover:bg-[var(--pro-azure-dark)] transition-all whitespace-nowrap"
                         >
                           {' '}
                           Record Payment{' '}
@@ -855,7 +857,7 @@ const BusinessLoans: React.FC = () => {
                         <span className="text-slate-500 font-bold text-xs uppercase tracking-wider block mb-1">
                           Applied
                         </span>{' '}
-                        <div className="text-lg font-semibold text-emerald-600 dark:text-emerald-400">
+                        <div className="text-lg font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                           ETB {fmt(Number(loan.appliedAmount))}
                         </div>{' '}
                       </div>{' '}
@@ -864,7 +866,7 @@ const BusinessLoans: React.FC = () => {
                         <span className="text-slate-500 font-bold text-xs uppercase tracking-wider block mb-1">
                           Outstanding
                         </span>{' '}
-                        <div className="text-lg font-semibold text-emerald-600">
+                        <div className="text-lg font-semibold text-[var(--pro-azure)]">
                           ETB {fmt(Number(loan.outstandingBalance))}
                         </div>{' '}
                       </div>{' '}
@@ -875,7 +877,7 @@ const BusinessLoans: React.FC = () => {
                         value={loan.overallCreditScore || 0}
                         color="bg-green-500"
                       />{' '}
-                      <button className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1">
+                      <button className="text-xs font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline flex items-center gap-1">
                         {' '}
                         View Details <ArrowRight size={12} />{' '}
                       </button>{' '}

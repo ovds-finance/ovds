@@ -17,3 +17,9 @@ export * from './router/index';
 
 // ── Hand-crafted Zod schemas ──────────────────────────────────────────────────
 export * from './schemas/index';
+
+// ── NestJS Zod validation pipe ────────────────────────────────────────────────
+export * from './pipes/zod-validation.pipe';
+
+// ── Global HTTP exception filter (standard ApiResponse envelope) ─────────────
+export * from './filters/http-exception.filter';

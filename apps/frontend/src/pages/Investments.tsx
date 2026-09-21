@@ -3,23 +3,24 @@
  * AppPage · AppKpi · AppTable · useApiCrud
  * IFRS 9 financial instruments · Ethiopian capital markets
  */
-import React, { useState, useMemo, useCallback } from 'react';
 import {
   TrendingUp, Plus, Edit2, Trash2, RefreshCw, Download,
   Calendar,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import { fmtETB } from '../utils/ethiopianTax';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select, Textarea,
   SearchBar, EmptyState, Pagination, Amount, IFRSBadge,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
+import { fmtETB } from '../utils/ethiopianTax';
 
 interface Investment {
   id: string;
@@ -74,12 +75,12 @@ const InvestmentForm: React.FC<{ data: Partial<Investment>; onChange: (d: Partia
         </FormField>
       </div>
       {gain !== null && (
-        <div className={`flex items-center justify-between p-3 rounded-xl border text-[11px] ${gain >= 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>
-          <span className={`font-semibold ${gain >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+        <div className={`flex items-center justify-between p-3 rounded-xl border text-[11px] ${gain >= 0 ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' : 'bg-rose-50 border-rose-100'}`}>
+          <span className={`font-semibold ${gain >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-700'}`}>
             {gain >= 0 ? 'Gain' : 'Loss'}: {fmtETB(Math.abs(gain))}
           </span>
           {gainPct !== null && (
-            <span className={`font-bold ${gain >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+            <span className={`font-bold ${gain >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-700'}`}>
               {gain >= 0 ? '+' : ''}{gainPct.toFixed(2)}%
             </span>
           )}
@@ -132,10 +133,10 @@ const Investments: React.FC = () => {
     const totalCurrent  = rows.reduce((s, i) => s + Number(i.currentValue ?? i.investedAmount ?? 0), 0);
     const totalGain     = totalCurrent - totalInvested;
     return [
-      { label: 'Investments',  value: rows.length,                                                    color: 'emerald' as const },
+      { label: 'Investments',  value: rows.length,                                                    color: 'green' as const },
       { label: 'Invested',     value: fmtETB(totalInvested),                                          color: 'sky' as const },
       { label: 'Current Value',value: fmtETB(totalCurrent),                                           color: 'violet' as const },
-      { label: totalGain >= 0 ? 'Total Gain' : 'Total Loss', value: fmtETB(Math.abs(totalGain)), color: totalGain >= 0 ? 'emerald' as const : 'rose' as const },
+      { label: totalGain >= 0 ? 'Total Gain' : 'Total Loss', value: fmtETB(Math.abs(totalGain)), color: totalGain >= 0 ? 'indigo' as const : 'rose' as const },
     ];
   }, [rows]);
 
@@ -237,7 +238,7 @@ const Investments: React.FC = () => {
                   </div>
                 </AppTd>
                 <AppTd>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold border ${inv.type === 'EQUITY' ? 'bg-violet-50 text-violet-700 border-violet-100' : inv.type === 'TREASURY_BILL' ? 'bg-sky-50 text-sky-700 border-sky-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100'}`}>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold border ${inv.type === 'EQUITY' ? 'bg-violet-50 text-violet-700 border-violet-100' : inv.type === 'TREASURY_BILL' ? 'bg-sky-50 text-sky-700 border-sky-100' : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]'}`}>
                     {inv.type.replace(/_/g, ' ')}
                   </span>
                 </AppTd>
@@ -245,10 +246,10 @@ const Investments: React.FC = () => {
                 <AppTd align="right"><Amount value={current} size="sm" /></AppTd>
                 <AppTd align="right">
                   <div className="text-right">
-                    <p className={`text-[11px] font-bold tabular-nums ${gain >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    <p className={`text-[11px] font-bold tabular-nums ${gain >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>
                       {gain >= 0 ? '+' : ''}{fmtETB(gain)}
                     </p>
-                    <p className={`text-[9px] ${gain >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                    <p className={`text-[9px] ${gain >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-500'}`}>
                       {gain >= 0 ? '+' : ''}{gainPct.toFixed(1)}%
                     </p>
                   </div>
@@ -264,7 +265,7 @@ const Investments: React.FC = () => {
                   <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     {can('investments:write') && (
                       <>
-                        <button onClick={() => setModal({ open: true, data: { ...inv } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all"><Edit2 size={11} /></button>
+                        <button onClick={() => setModal({ open: true, data: { ...inv } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all"><Edit2 size={11} /></button>
                         <button onClick={async () => { if (await confirm({ title: `Delete "${inv.name}"?`, variant: 'danger' })) remove(inv.id); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all"><Trash2 size={11} /></button>
                       </>
                     )}

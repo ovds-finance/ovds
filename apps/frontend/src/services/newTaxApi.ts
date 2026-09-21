@@ -1,4 +1,4 @@
-/**
+﻿/**
  * API hooks for new tax/ovds modules:
  *   - Property Tax
  *   - Excise Tax
@@ -8,32 +8,30 @@
  *   - Sub-Ledger (AR/AP/GL)
  *   - Cost Centers
  */
-import { useState, useEffect, useCallback } from 'react';
-import api from './api';
-import toast from 'react-hot-toast';
+import { useFetchQuery } from '../hooks/useFetchQuery';
 
-// -- Generic fetcher helper -----------------------------------------------------
+import api, { bgConfig } from './api';
+
+// -- Generic fetcher helper (delegates to useFetchQuery) -----------------------
+//
+// Thin compatibility shim so every existing useFetch<T>(url, fallback, [deps])
+// call site stays unchanged while gaining caching, deduplication, and retry.
+// The `fallback` value is used as the `select` transform's null-guard result.
 function useFetch<T>(
   url: string | null,
   fallback: T,
-  deps: any[] = [],
+  deps: unknown[] = [],
 ): { data: T; loading: boolean; refetch: () => void } {
-  const [data, setData]       = useState<T>(fallback);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    if (!url) { setLoading(false); return; }
-    setLoading(true);
-    try {
-      const res = await api.get(url, { headers: { 'x-background': '1' } } as any).catch(() => ({ data: null }));
-      const d = res.data?.data ?? res.data;
-      setData(d ?? fallback);
-    } finally { setLoading(false); }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url, ...deps]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, refetch: fetch };
+  const query = useFetchQuery<T>(url ?? '', {
+    enabled: !!url,
+    deps,
+    select: (d) => (d ?? fallback) as T,
+  });
+  return {
+    data:    query.data ?? fallback,
+    loading: query.loading,
+    refetch: query.refetch,
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -177,14 +175,14 @@ export function useApSummary(asOf: string, companyId?: string) {
 export async function fetchGlEntries(accountId: string, startDate: string, endDate: string, companyId?: string) {
   const q = new URLSearchParams({ accountId, startDate, endDate });
   if (companyId) q.set('companyId', companyId);
-  const res = await api.get(`/ovds/sub-ledger/gl?${q}`, { headers: { 'x-background': '1' } } as any).catch(() => ({ data: [] }));
+  const res = await api.get(`/ovds/sub-ledger/gl?${q}`, bgConfig()).catch(() => ({ data: [] }));
   return res.data?.data ?? res.data ?? [];
 }
 
 export async function fetchArTransactions(customerId: string, asOf: string, companyId?: string) {
   const q = new URLSearchParams({ customerId, asOf });
   if (companyId) q.set('companyId', companyId);
-  const res = await api.get(`/ovds/sub-ledger/ar/transactions?${q}`, { headers: { 'x-background': '1' } } as any).catch(() => ({ data: [] }));
+  const res = await api.get(`/ovds/sub-ledger/ar/transactions?${q}`, bgConfig()).catch(() => ({ data: [] }));
   return res.data?.data ?? res.data ?? [];
 }
 
@@ -246,7 +244,7 @@ export async function buildMonthlyDeclaration(params: {
     auditLogRef:  params.auditLogRef,
   }, {
     headers: params.companyId ? { 'x-company-id': params.companyId } : {},
-  } as any);
+  });
   return res.data?.data ?? res.data;
 }
 
@@ -267,7 +265,7 @@ export async function buildAnnualBitDeclaration(params: {
     auditLogRef:  params.auditLogRef,
   }, {
     headers: params.companyId ? { 'x-company-id': params.companyId } : {},
-  } as any);
+  });
   return res.data?.data ?? res.data;
 }
 

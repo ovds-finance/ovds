@@ -3,12 +3,13 @@
  * Deferred expenses (prepayments) and accrued liabilities (accruals)
  * with monthly straight-line amortisation scheduling.
  */
-import React, { useState, useEffect, useCallback } from 'react';
-import { CalendarClock, Plus, RefreshCw, XCircle, Play, ChevronDown, ChevronUp } from 'lucide-react';
 import { AppPage, AppKpi } from '@ovds/ui';
+import { CalendarClock, Plus, RefreshCw, XCircle, Play, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
 import { useBusiness } from '../context/businessContext';
 import api from '../services/api';
-import toast from 'react-hot-toast';
 
 // -- Types ---------------------------------------------------------------------
 interface AccrualItem {
@@ -28,7 +29,7 @@ interface AccrualItem {
 
 const STATUS_COLOR: Record<string, string> = {
   ACTIVE:           'bg-sky-100 text-sky-700',
-  FULLY_AMORTISED:  'bg-emerald-100 text-emerald-700',
+  FULLY_AMORTISED:  'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
   CANCELLED:        'bg-rose-100 text-rose-600',
 };
 const TYPE_COLOR: Record<string, string> = {
@@ -79,7 +80,7 @@ const CreateModal: React.FC<{ onClose: () => void; onCreated: () => void; compan
             <div className="flex gap-2">
               {(['ACCRUAL','PREPAYMENT'] as const).map(t => (
                 <button key={t} onClick={() => setForm(f => ({ ...f, type: t }))}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-bold border transition-colors ${form.type === t ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-bold border transition-colors ${form.type === t ? 'bg-[var(--pro-azure)] border-[var(--pro-azure)] text-white' : 'border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
                   {t}
                 </button>
               ))}
@@ -107,9 +108,9 @@ const CreateModal: React.FC<{ onClose: () => void; onCreated: () => void; compan
             </div>
           </div>
           {months > 0 && (
-            <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-3 text-sm">
+            <div className="bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl p-3 text-sm">
               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Monthly amortisation: </span>
-              <span className="font-bold text-emerald-700 dark:text-emerald-400">ETB {fmt(monthly)}</span>
+              <span className="font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">ETB {fmt(monthly)}</span>
               <span className="ovds-caption ml-2">× {months} months</span>
             </div>
           )}
@@ -120,7 +121,7 @@ const CreateModal: React.FC<{ onClose: () => void; onCreated: () => void; compan
         </div>
         <div className="flex gap-3 p-5 border-t border-slate-100 dark:border-slate-800">
           <button onClick={onClose} className="flex-1 px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
-          <button onClick={submit} disabled={saving} className="flex-1 px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 disabled:opacity-50 transition-colors">
+          <button onClick={submit} disabled={saving} className="flex-1 px-4 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 transition-colors">
             {saving ? 'Creating…' : 'Create'}
           </button>
         </div>
@@ -187,7 +188,7 @@ const AccrualsPrepayments: React.FC = () => {
     { label: 'Total Accruals', value: summary.totalAccruals?.toString() ?? '0',   accentCls: 'bg-amber-500' },
     { label: 'Prepayments',   value: summary.totalPrepayments?.toString() ?? '0', accentCls: 'bg-violet-500' },
     { label: 'Remaining',     value: `ETB ${((summary.totalRemaining ?? 0) / 1000).toFixed(0)}K`, accentCls: 'bg-rose-500' },
-    { label: 'Amortised',     value: `ETB ${((summary.totalAmortised ?? 0) / 1000).toFixed(0)}K`, accentCls: 'bg-emerald-500' },
+    { label: 'Amortised',     value: `ETB ${((summary.totalAmortised ?? 0) / 1000).toFixed(0)}K`, accentCls: 'bg-[var(--pro-azure)]' },
   ] : [];
 
   return (
@@ -210,7 +211,7 @@ const AccrualsPrepayments: React.FC = () => {
             <option value="FULLY_AMORTISED">Fully Amortised</option>
             <option value="CANCELLED">Cancelled</option>
           </select>
-          <button onClick={load} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"><RefreshCw size={16} className={loading ? 'animate-spin text-emerald-500' : 'text-slate-500'} /></button>
+          <button onClick={load} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"><RefreshCw size={16} className={loading ? 'animate-spin text-[var(--pro-azure)]' : 'text-slate-500'} /></button>
           <button onClick={() => setShowCreate(true)} className="ovds-btn-primary flex items-center gap-1.5"><Plus size={14} /> New</button>
         </div>
       }
@@ -242,12 +243,12 @@ const AccrualsPrepayments: React.FC = () => {
         </div>
         <div className="ovds-widget-body">
           {loading ? (
-            <div className="ovds-empty py-12"><RefreshCw size={20} className="animate-spin text-emerald-500 mb-2" /><span>Loading…</span></div>
+            <div className="ovds-empty py-12"><RefreshCw size={20} className="animate-spin text-[var(--pro-azure)] mb-2" /><span>Loading…</span></div>
           ) : items.length === 0 ? (
             <div className="ovds-empty py-12">
               <CalendarClock size={32} className="text-slate-300 mb-2" />
               <span>No accruals or prepayments found</span>
-              <button onClick={() => setShowCreate(true)} className="mt-3 text-sm text-emerald-600 hover:underline">Create one</button>
+              <button onClick={() => setShowCreate(true)} className="mt-3 text-sm text-[var(--pro-azure)] hover:underline">Create one</button>
             </div>
           ) : (
             <div className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -268,13 +269,13 @@ const AccrualsPrepayments: React.FC = () => {
                         </p>
                         {/* Progress bar */}
                         <div className="mt-2 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden w-48">
-                          <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${Math.min(pct, 100)}%` }} />
+                          <div className="h-full bg-[var(--pro-azure)] rounded-full transition-all" style={{ width: `${Math.min(pct, 100)}%` }} />
                         </div>
                         <p className="ovds-caption mt-0.5">{item.amortisedMonths}/{item.totalMonths} months — {pct.toFixed(0)}% amortised</p>
                       </div>
                       <div className="text-right shrink-0">
                         <p className="ovds-number text-slate-800 dark:text-slate-100">ETB {fmt(Number(item.amount))}</p>
-                        <p className="ovds-caption text-emerald-600 mt-0.5">ETB {fmt(Number(item.monthlyAmount))}/mo</p>
+                        <p className="ovds-caption text-[var(--pro-azure)] mt-0.5">ETB {fmt(Number(item.monthlyAmount))}/mo</p>
                         <p className="ovds-caption text-rose-500 mt-0.5">ETB {fmt(Number(item.remainingAmount))} remaining</p>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
@@ -295,7 +296,7 @@ const AccrualsPrepayments: React.FC = () => {
                           {item.postings.map(p => (
                             <div key={p.id} className="bg-white dark:bg-slate-800 rounded-lg p-2 text-center">
                               <div className="font-bold text-slate-700 dark:text-slate-200">{p.period}</div>
-                              <div className="text-emerald-600 font-mono">ETB {fmt(Number(p.amount))}</div>
+                              <div className="text-[var(--pro-azure)] font-mono">ETB {fmt(Number(p.amount))}</div>
                             </div>
                           ))}
                         </div>

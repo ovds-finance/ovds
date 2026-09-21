@@ -16,11 +16,11 @@ export const OfflineStatus: React.FC<OfflineStatusProps> = ({ className, mode = 
 
   if (!hasActivity) {
     if (mode === 'dot') {
-      return <span className={`w-2 h-2 rounded-full bg-emerald-500 shrink-0 ${className ?? ''}`} aria-label="Online" />;
+      return <span className={`w-2 h-2 rounded-full bg-[var(--pro-azure)] shrink-0 ${className ?? ''}`} aria-label="Online" />;
     }
     if (mode === 'badge') {
       return (
-        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 ${className ?? ''}`}>
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--pro-azure-50)] dark:bg-green-950/40 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] ${className ?? ''}`}>
           <Database size={10} /> Synced
         </span>
       );
@@ -44,7 +44,7 @@ export const OfflineStatus: React.FC<OfflineStatusProps> = ({ className, mode = 
   }
 
   return (
-    <div className={`flex items-center gap-3 px-4 py-2.5 rounded-ovds border ${
+    <div className={`flex items-center gap-3 px-4 py-2.5 rounded-lg border ${
       isOnline
         ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300'
         : 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300'

@@ -1,5 +1,5 @@
 {
-  "name": "@ovds/domains/manufacturing",
+  "name": "@ovds/domains-manufacturing",
   "version": "0.0.1",
   "private": true,
   "main": "./dist/index.js",
@@ -10,12 +10,13 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@ovds/core": "*",
-    "@ovds/shared": "*",
-    "@ovds/database": "*",
-    "@ovds/domains/projects": "*"
+    "@ovds/core": "workspace:*",
+    "@ovds/shared": "workspace:*",
+    "@ovds/database": "workspace:*",
+    "@ovds/domains-projects": "workspace:*"
   },
   "devDependencies": {
     "@nestjs/common": "*"
   }
 }
+

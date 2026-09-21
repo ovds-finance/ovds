@@ -1,9 +1,11 @@
-﻿import React from 'react';
-import { Link } from 'react-router-dom';
+import { fmtCompact } from '@ovds/ui';
 import { CreditCard, ArrowUpRight, TrendingDown } from 'lucide-react';
-import { useApiQuery } from '../../hooks/useApiQuery';
+import React from 'react';
+import { Link } from 'react-router-dom';
+
 import { useBusiness } from '../../context/businessContext';
-import { fmtCompact, fmtCurrency } from '@ovds/ui';
+import { useApiQuery } from '../../hooks/useApiQuery';
+
 
 interface Props {
   currency?: string;
@@ -34,7 +36,7 @@ const ExpensesWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
             <p className="ovds-caption">This period</p>
           </div>
         </div>
-        <Link to="/purchases/bills" className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 hover:underline">
+        <Link to="/purchases/bills" className="flex items-center gap-1 text-[11px] font-semibold text-[var(--pro-azure)] hover:underline">
           View bills <ArrowUpRight size={11} />
         </Link>
       </div>

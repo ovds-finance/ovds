@@ -14,10 +14,6 @@
  *  - Print layout CSS injected via style tag
  */
 import DOMPurify from 'dompurify';
-import React, {
-  useState, useRef, useCallback, useEffect, useLayoutEffect,
-} from 'react';
-import { Link } from 'react-router-dom';
 import {
   FileText, CheckCircle, AlertTriangle, Activity, ShieldCheck,
   Building2, Landmark, Layers, ArrowRight, ExternalLink,
@@ -26,6 +22,10 @@ import {
   Banknote, Factory, Home, Award, BookOpen, Plus, Trash2,
   Calculator, ClipboardCheck, RefreshCw,
 } from 'lucide-react';
+import React, {
+  useState, useRef, useCallback, useEffect, useLayoutEffect,
+} from 'react';
+import { Link } from 'react-router-dom';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared micro-components
@@ -37,7 +37,7 @@ const RefTag: React.FC<{ code: string }> = ({ code }) => (
   </span>
 );
 
-const StdBadge: React.FC<{ code: string; color?: string }> = ({ code, color = 'emerald' }) => (
+const StdBadge: React.FC<{ code: string; color?: string }> = ({ code, color = 'indigo' }) => (
   <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border shrink-0
     bg-${color}-50 text-${color}-700 border-${color}-200
     dark:bg-${color}-950/30 dark:text-${color}-300 dark:border-${color}-800`}>
@@ -190,23 +190,23 @@ const ComponentisationCalc: React.FC = () => {
                   <td className="px-3 py-2">
                     <input value={c.name} onChange={e => update(c.id, 'name', e.target.value)}
                       placeholder="Component name"
-                      className="w-32 bg-transparent border-b border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 outline-none focus:border-emerald-500 pb-0.5" />
+                      className="w-32 bg-transparent border-b border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 outline-none focus:border-[var(--pro-azure)] pb-0.5" />
                   </td>
                   <td className="px-3 py-2">
                     <input type="number" value={c.cost || ''} onChange={e => update(c.id, 'cost', e.target.value)}
-                      className="w-28 bg-transparent border-b border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 outline-none focus:border-emerald-500 pb-0.5 text-right" />
+                      className="w-28 bg-transparent border-b border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 outline-none focus:border-[var(--pro-azure)] pb-0.5 text-right" />
                   </td>
                   <td className="px-3 py-2">
                     <input type="number" value={c.life || ''} onChange={e => update(c.id, 'life', e.target.value)}
-                      className="w-16 bg-transparent border-b border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 outline-none focus:border-emerald-500 pb-0.5 text-center" />
+                      className="w-16 bg-transparent border-b border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 outline-none focus:border-[var(--pro-azure)] pb-0.5 text-center" />
                   </td>
-                  <td className="px-3 py-2 font-mono text-emerald-700 dark:text-emerald-400 text-right">
+                  <td className="px-3 py-2 font-mono text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] text-right">
                     {annualDep.toLocaleString('en-ET', { maximumFractionDigits: 0 })}
                   </td>
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                        <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
+                        <div className="h-full bg-[var(--pro-azure-50)]0 rounded-full" style={{ width: `${pct}%` }} />
                       </div>
                       <span className="text-[9px] text-slate-500">{pct.toFixed(1)}%</span>
                     </div>
@@ -221,14 +221,14 @@ const ComponentisationCalc: React.FC = () => {
               );
             })}
           </tbody>
-          <tfoot className="bg-emerald-50/60 dark:bg-emerald-950/20 border-t-2 border-emerald-200 dark:border-emerald-800">
+          <tfoot className="bg-[var(--pro-azure-50)]/60 dark:bg-green-950/20 border-t-2 border-[var(--pro-azure-100)] dark:border-green-800">
             <tr>
               <td className="px-3 py-2 text-xs font-black text-slate-700 dark:text-slate-200">Total Asset Cost</td>
-              <td className="px-3 py-2 font-black font-mono text-emerald-700 dark:text-emerald-400 text-right">
+              <td className="px-3 py-2 font-black font-mono text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] text-right">
                 {totalCost.toLocaleString('en-ET')}
               </td>
               <td />
-              <td className="px-3 py-2 font-black font-mono text-emerald-700 dark:text-emerald-400 text-right">
+              <td className="px-3 py-2 font-black font-mono text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] text-right">
                 {components.reduce((s, c) => s + (c.life > 0 ? c.cost / c.life : 0), 0)
                   .toLocaleString('en-ET', { maximumFractionDigits: 0 })}
               </td>
@@ -238,7 +238,7 @@ const ComponentisationCalc: React.FC = () => {
         </table>
       </div>
       <button onClick={addRow}
-        className="mt-2 flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+        className="mt-2 flex items-center gap-1.5 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
         <Plus size={11} /> Add Component
       </button>
       <p className="text-[9px] text-slate-400 mt-1">
@@ -323,7 +323,7 @@ const DeferredTaxBuilder: React.FC = () => {
                         className="w-28 bg-transparent border-b border-slate-200 dark:border-slate-700 text-xs text-right text-slate-700 dark:text-slate-300 outline-none focus:border-violet-500 pb-0.5" />
                     </td>
                   ))}
-                  <td className={`px-3 py-2 font-mono font-bold text-right text-xs ${diff > 0 ? 'text-rose-600 dark:text-rose-400' : diff < 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}>
+                  <td className={`px-3 py-2 font-mono font-bold text-right text-xs ${diff > 0 ? 'text-rose-600 dark:text-rose-400' : diff < 0 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-slate-400'}`}>
                     {diff >= 0 ? '+' : ''}{diff.toLocaleString('en-ET')}
                   </td>
                   <td className="px-3 py-2 font-mono font-bold text-right text-xs text-violet-700 dark:text-violet-400">
@@ -333,7 +333,7 @@ const DeferredTaxBuilder: React.FC = () => {
                     <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
                       isDTL
                         ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-800'
-                        : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800'
+                        : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800'
                     }`}>
                       {isDTL ? 'DTL' : diff < 0 ? 'DTA' : '—'}
                     </span>
@@ -356,7 +356,7 @@ const DeferredTaxBuilder: React.FC = () => {
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: 'Total DTL', value: totalDTL, cls: 'border-rose-200 bg-rose-50/50 dark:bg-rose-950/10 dark:border-rose-800', valCls: 'text-rose-700 dark:text-rose-400' },
-          { label: 'Total DTA', value: totalDTA, cls: 'border-emerald-200 bg-emerald-50/50 dark:bg-emerald-950/10 dark:border-emerald-800', valCls: 'text-emerald-700 dark:text-emerald-400' },
+          { label: 'Total DTA', value: totalDTA, cls: 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 dark:border-green-800', valCls: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' },
           { label: 'Net Balance', value: Math.abs(net), cls: 'border-violet-200 bg-violet-50/50 dark:bg-violet-950/10 dark:border-violet-800', valCls: 'text-violet-700 dark:text-violet-400' },
         ].map(c => (
           <div key={c.label} className={`rounded-xl border p-3 ${c.cls}`}>
@@ -441,7 +441,7 @@ const DisclosureTracker: React.FC = () => {
           <p className="text-[10px] text-slate-400">Progress is saved automatically in your browser</p>
         </div>
         <div className="flex items-center gap-2">
-          <span className={`text-sm font-black ${pct >= 80 ? 'text-emerald-600' : pct >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>
+          <span className={`text-sm font-black ${pct >= 80 ? 'text-[var(--pro-azure)]' : pct >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>
             {pct}%
           </span>
           <button onClick={reset} className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-rose-500 transition-colors">
@@ -454,7 +454,7 @@ const DisclosureTracker: React.FC = () => {
       <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-4">
         <div
           className={`h-full rounded-full transition-all duration-500 ${
-            pct >= 80 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-400' : 'bg-rose-400'
+            pct >= 80 ? 'bg-[var(--pro-azure-50)]0' : pct >= 50 ? 'bg-amber-400' : 'bg-rose-400'
           }`}
           style={{ width: `${pct}%` }}
         />
@@ -469,13 +469,13 @@ const DisclosureTracker: React.FC = () => {
             <div key={area} className="rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
               <div className="flex items-center justify-between px-4 py-2 bg-white dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <StdBadge code={area} color={doneCount === items.length ? 'emerald' : 'slate'} />
+                  <StdBadge code={area} color={doneCount === items.length ? 'indigo' : 'slate'} />
                   <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400">
                     {doneCount}/{items.length}
                   </span>
                 </div>
                 <div className="w-20 h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                  <div className="h-full bg-emerald-500 rounded-full transition-all"
+                  <div className="h-full bg-[var(--pro-azure-50)]0 rounded-full transition-all"
                     style={{ width: `${(doneCount / items.length) * 100}%` }} />
                 </div>
               </div>
@@ -485,8 +485,8 @@ const DisclosureTracker: React.FC = () => {
                     className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors text-left group">
                     <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-all ${
                       checked.has(item.id)
-                        ? 'bg-emerald-500 border-emerald-500'
-                        : 'border-slate-300 dark:border-slate-600 group-hover:border-emerald-400'
+                        ? 'bg-[var(--pro-azure-50)]0 border-[var(--pro-azure)]'
+                        : 'border-slate-300 dark:border-slate-600 group-hover:border-[var(--pro-azure)]'
                     }`}>
                       {checked.has(item.id) && <CheckCircle size={10} className="text-white" />}
                     </div>
@@ -547,14 +547,14 @@ const SidebarTOC: React.FC<{
             }}
             className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left transition-all ${
               isActive
-                ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
+                ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                 : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-700 dark:hover:text-slate-200'
             }`}>
-            <span className={`text-[8px] font-black w-5 shrink-0 ${isActive ? 'text-emerald-500' : 'text-slate-300 dark:text-slate-700'}`}>
+            <span className={`text-[8px] font-black w-5 shrink-0 ${isActive ? 'text-[var(--pro-azure)]' : 'text-slate-300 dark:text-slate-700'}`}>
               {item.num}
             </span>
             <span className="text-[10px] font-semibold truncate">{item.label}</span>
-            {isActive && <div className="ml-auto w-1 h-1 rounded-full bg-emerald-500 shrink-0" />}
+            {isActive && <div className="ml-auto w-1 h-1 rounded-full bg-[var(--pro-azure-50)]0 shrink-0" />}
           </button>
         );
       })}
@@ -633,7 +633,7 @@ export const IFRSComplianceReport: React.FC = () => {
         <div className="flex-1 min-w-0 space-y-4 pb-10">
 
           {/* ── Hero ───────────────────────────────────────────────────────── */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-700 via-emerald-600 to-violet-700 p-6 text-white shadow-lg no-print">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--pro-azure-dark)] via-[var(--pro-azure)] to-violet-700 p-6 text-white shadow-lg no-print">
             <div className="pointer-events-none absolute -top-10 -right-10 w-48 h-48 rounded-full bg-white/5" />
             <div className="pointer-events-none absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/5" />
             <div className="relative">
@@ -643,7 +643,7 @@ export const IFRSComplianceReport: React.FC = () => {
                     <span className="text-[9px] font-bold uppercase tracking-widest bg-white/15 border border-white/25 px-2 py-0.5 rounded-full">
                       Federal Democratic Republic of Ethiopia
                     </span>
-                    <span className="text-[9px] font-bold uppercase tracking-widest bg-emerald-400/30 border border-emerald-300/40 px-2 py-0.5 rounded-full">
+                    <span className="text-[9px] font-bold uppercase tracking-widest bg-[var(--pro-azure-light)]/30 border border-[var(--pro-azure-light)]/40 px-2 py-0.5 rounded-full">
                       AABE Mandatory
                     </span>
                   </div>
@@ -706,7 +706,7 @@ export const IFRSComplianceReport: React.FC = () => {
           {/* ── §1 Executive Summary ───────────────────────────────────────── */}
           <Accordion id="s1" num="01" title="Executive Summary"
             subtitle="Transition from tax-driven cash accounting to global accrual-based fair value standards"
-            icon={<FileText size={15} />} accentCls="border-emerald-300 dark:border-emerald-700"
+            icon={<FileText size={15} />} accentCls="border-[var(--pro-azure-light)] dark:border-green-700"
             openSections={openSections} toggle={toggle}>
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
               Following the mandate by the Accounting and Audit Board of Ethiopia (AABE), all public interest
@@ -717,7 +717,7 @@ export const IFRSComplianceReport: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
               {[
                 { label: 'Tier 1 — Full IFRS',     since: '7 Jul 2023', criteria: 'Turnover > ETB 300M · Assets > ETB 200M · 2 of 4 criteria', dot: 'bg-violet-500', cls: 'border-violet-200 bg-violet-50/60 dark:bg-violet-950/20 dark:border-violet-800' },
-                { label: 'Tier 2 — IFRS for SMEs', since: '7 Jul 2024', criteria: 'Turnover > ETB 20M · Assets > ETB 20M · 2 of 4 criteria',  dot: 'bg-emerald-500', cls: 'border-emerald-200 bg-emerald-50/60 dark:bg-emerald-950/20 dark:border-emerald-800' },
+                { label: 'Tier 2 — IFRS for SMEs', since: '7 Jul 2024', criteria: 'Turnover > ETB 20M · Assets > ETB 20M · 2 of 4 criteria',  dot: 'bg-[var(--pro-azure-50)]0', cls: 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/60 dark:bg-green-950/20 dark:border-green-800' },
                 { label: 'Tier 3 — Micro-entity',  since: 'N/A',        criteria: 'Below Tier 2 on all 4 criteria — no IFRS obligation',       dot: 'bg-amber-400',  cls: 'border-amber-200 bg-amber-50/60 dark:bg-amber-950/20 dark:border-amber-800' },
               ].map(t => (
                 <div key={t.label} className={`rounded-xl border p-3 ${t.cls}`}>
@@ -741,7 +741,7 @@ export const IFRSComplianceReport: React.FC = () => {
           {/* ── §2 Financial Statement Checklist ───────────────────────────── */}
           <Accordion id="s2" num="02" title="Core IFRS Financial Statement Checklist"
             subtitle="Five mandatory components for AABE-compliant status — IAS 1 / IFRS 18 (2027)"
-            icon={<ListChecks size={15} />} accentCls="border-emerald-300 dark:border-emerald-700"
+            icon={<ListChecks size={15} />} accentCls="border-[var(--pro-azure-light)] dark:border-green-700"
             openSections={openSections} toggle={toggle}>
             <div className="space-y-2">
               {FS_CHECKLIST.map((item, i) => (
@@ -752,14 +752,14 @@ export const IFRSComplianceReport: React.FC = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center flex-wrap gap-2 mb-0.5">
-                      <p className="text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <p className="text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-[var(--pro-azure)] dark:group-hover:text-[var(--pro-azure-light)] transition-colors">
                         {item.title}
                       </p>
                       <RefTag code={item.ref} />
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
                   </div>
-                  <ArrowRight size={13} className="text-slate-300 group-hover:text-emerald-500 transition-colors shrink-0 mt-1" />
+                  <ArrowRight size={13} className="text-slate-300 group-hover:text-[var(--pro-azure)] transition-colors shrink-0 mt-1" />
                 </Link>
               ))}
             </div>
@@ -796,10 +796,10 @@ export const IFRSComplianceReport: React.FC = () => {
               ))}
             </div>
             {/* IAS 16 Calculator */}
-            <div className="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-950/10 p-4 mt-2">
+            <div className="rounded-xl border border-[var(--pro-azure-100)] dark:border-green-800 bg-[var(--pro-azure-50)]/30 dark:bg-green-950/10 p-4 mt-2">
               <div className="flex items-center gap-2 mb-3">
-                <Calculator size={14} className="text-emerald-600 dark:text-emerald-400" />
-                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                <Calculator size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
+                <p className="text-xs font-bold text-[var(--pro-azure-dark)] dark:text-green-300">
                   IAS 16 Componentisation Calculator
                 </p>
               </div>
@@ -824,7 +824,7 @@ export const IFRSComplianceReport: React.FC = () => {
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-2">{p.desc}</p>
                     {p.tasks.map(t => (
                       <div key={t} className="flex items-start gap-1.5 mt-1">
-                        <CheckCircle size={10} className="text-emerald-500 shrink-0 mt-0.5" />
+                        <CheckCircle size={10} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
                         <span className="text-[10px] text-slate-500 dark:text-slate-400">{t}</span>
                       </div>
                     ))}
@@ -837,9 +837,9 @@ export const IFRSComplianceReport: React.FC = () => {
                 </React.Fragment>
               ))}
             </div>
-            <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 flex items-start gap-2">
-              <ShieldCheck size={12} className="text-emerald-500 shrink-0 mt-0.5" />
-              <p className="text-[11px] text-emerald-700 dark:text-emerald-300 leading-relaxed">
+            <div className="p-3 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 flex items-start gap-2">
+              <ShieldCheck size={12} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
+              <p className="text-[11px] text-[var(--pro-azure-dark)] dark:text-green-300 leading-relaxed">
                 <strong>Phase 4 requirement:</strong> The external auditor must hold an active AABE practice licence.
                 Verify licence numbers at{' '}
                 <a href="https://aabe.gov.et" target="_blank" rel="noopener noreferrer" className="underline font-bold">aabe.gov.et</a>.
@@ -854,7 +854,7 @@ export const IFRSComplianceReport: React.FC = () => {
             openSections={openSections} toggle={toggle}>
             <div className="relative rounded-xl bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 p-4 mb-3">
               <button onClick={copyNote}
-                className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-[10px] font-bold text-slate-500 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors shadow-sm">
+                className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-[10px] font-bold text-slate-500 dark:text-slate-300 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors shadow-sm">
                 <Copy size={10} />{copied ? '✓ Copied!' : 'Copy'}
               </button>
               <p className="text-[11px] font-mono text-slate-600 dark:text-slate-300 leading-loose pr-20 italic whitespace-pre-line">
@@ -975,7 +975,7 @@ export const IFRSComplianceReport: React.FC = () => {
           {/* ── §9 CFO Checklist ───────────────────────────────────────────── */}
           <Accordion id="s9" num="09" title="Actionable Compliance Checklist for CFOs"
             subtitle="Five priority actions for audit readiness — verify · upgrade · document · compute · review"
-            icon={<ShieldCheck size={15} />} accentCls="border-emerald-300 dark:border-emerald-700"
+            icon={<ShieldCheck size={15} />} accentCls="border-[var(--pro-azure-light)] dark:border-green-700"
             openSections={openSections} toggle={toggle}>
             <div className="space-y-3">
               {CFO_CHECKLIST.map(item => (
@@ -989,12 +989,12 @@ export const IFRSComplianceReport: React.FC = () => {
                     <div className="flex flex-wrap gap-3">
                       {item.links.map(l => l.external ? (
                         <a key={l.label} href={l.url} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                          className="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
                           {l.label} <ExternalLink size={9} />
                         </a>
                       ) : (
                         <Link key={l.label} to={l.url}
-                          className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                          className="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
                           {l.label} <ArrowRight size={9} />
                         </Link>
                       ))}
@@ -1033,7 +1033,7 @@ export const IFRSComplianceReport: React.FC = () => {
                       <td className="px-4 py-3">
                         <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
                           row.dtl === 'DTL' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-800'
-                          : row.dtl === 'DTA' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800'
+                          : row.dtl === 'DTA' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800'
                           : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
                         }`}>{row.dtl}</span>
                       </td>
@@ -1044,7 +1044,7 @@ export const IFRSComplianceReport: React.FC = () => {
             </div>
             <div className="flex flex-wrap gap-3 text-[10px] text-slate-500 mb-4">
               <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block" /> DTL — Deferred Tax Liability (IFRS book &gt; tax base)</span>
-              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" /> DTA — Deferred Tax Asset (IFRS book &lt; tax base)</span>
+              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-[var(--pro-azure-50)]0 inline-block" /> DTA — Deferred Tax Asset (IFRS book &lt; tax base)</span>
               <span className="ml-auto text-slate-400">BIT: 30% flat · Proclamation No. 979/2016</span>
             </div>
             {/* Deferred Tax Builder */}
@@ -1097,7 +1097,7 @@ export const IFRSComplianceReport: React.FC = () => {
           {/* ── §12 Disclosure Gap Tracker ─────────────────────────────────── */}
           <Accordion id="s12" num="12" title="Disclosure Gap Tracker"
             subtitle="20-item checklist grouped by IAS/IFRS standard — progress saved to browser storage"
-            icon={<ClipboardCheck size={15} />} accentCls="border-emerald-300 dark:border-emerald-700"
+            icon={<ClipboardCheck size={15} />} accentCls="border-[var(--pro-azure-light)] dark:border-green-700"
             openSections={openSections} toggle={toggle}>
             <DisclosureTracker />
           </Accordion>
@@ -1135,7 +1135,7 @@ export const IFRSComplianceReport: React.FC = () => {
                 <div className="flex flex-wrap gap-3">
                   {REFS.map(r => (
                     <a key={r.url} href={r.url} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                      className="flex items-center gap-1 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
                       {r.label} <ExternalLink size={9} />
                     </a>
                   ))}
@@ -1172,20 +1172,20 @@ const BASIS_NOTE =
 
 const TIER_PILLS = [
   { label: 'Tier 1 — Full IFRS',     since: '7 Jul 2023', dot: 'bg-violet-400' },
-  { label: 'Tier 2 — IFRS for SMEs', since: '7 Jul 2024', dot: 'bg-emerald-400' },
+  { label: 'Tier 2 — IFRS for SMEs', since: '7 Jul 2024', dot: 'bg-[var(--pro-azure-light)]' },
   { label: 'Tier 3 — Micro-entity',  since: 'N/A',        dot: 'bg-amber-400'  },
 ];
 
 const SCORE_CARDS = [
   { label: 'AABE Mandate',  value: 'Tier 1',  sub: 'Since 7 Jul 2023',     bg: 'bg-violet-50 dark:bg-violet-950/20 border-violet-200 dark:border-violet-800',   icon: <Award size={20} className="text-violet-500" /> },
-  { label: 'Key Standards', value: '11+',      sub: 'IAS + IFRS in scope',  bg: 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800', icon: <BookOpen size={20} className="text-emerald-500" /> },
+  { label: 'Key Standards', value: '11+',      sub: 'IAS + IFRS in scope',  bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-[var(--pro-azure-100)] dark:border-green-800', icon: <BookOpen size={20} className="text-[var(--pro-azure)]" /> },
   { label: 'BIT Rate',      value: '30%',      sub: 'Flat · Proc. 979/2016',bg: 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800',        icon: <Banknote size={20} className="text-amber-500" /> },
   { label: 'Legal Reserve', value: '5%→10%',   sub: 'Commercial Code 2021', bg: 'bg-sky-50 dark:bg-sky-950/20 border-sky-200 dark:border-sky-800',                icon: <Scale size={20} className="text-sky-500" /> },
 ];
 
 const FS_CHECKLIST = [
-  { title: 'Statement of Financial Position',      ref: 'IAS 1.54–76', route: '/reports?type=bs',    desc: 'Assets, liabilities, and equity — current/non-current split. Minimum line items per IAS 1.54.', color: 'border-emerald-200 bg-emerald-50/50 dark:bg-emerald-950/10 dark:border-emerald-800', numCls: 'bg-emerald-500' },
-  { title: 'Statement of Profit or Loss & OCI',   ref: 'IAS 1.81A',   route: '/reports?type=pl',    desc: 'Performance statement. OCI isolates items not reclassified to P&L — e.g. PPE revaluation surpluses, actuarial remeasurements.', color: 'border-emerald-200 bg-emerald-50/50 dark:bg-emerald-950/10 dark:border-emerald-800', numCls: 'bg-emerald-600' },
+  { title: 'Statement of Financial Position',      ref: 'IAS 1.54–76', route: '/reports?type=bs',    desc: 'Assets, liabilities, and equity — current/non-current split. Minimum line items per IAS 1.54.', color: 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 dark:border-green-800', numCls: 'bg-[var(--pro-azure-50)]0' },
+  { title: 'Statement of Profit or Loss & OCI',   ref: 'IAS 1.81A',   route: '/reports?type=pl',    desc: 'Performance statement. OCI isolates items not reclassified to P&L — e.g. PPE revaluation surpluses, actuarial remeasurements.', color: 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 dark:border-green-800', numCls: 'bg-[var(--pro-azure)]' },
   { title: 'Statement of Changes in Equity',      ref: 'IAS 1.106',   route: '/reports?type=equity', desc: 'Movements in share capital, legal reserves (5% of net profit until 10% of capital — Comm. Code 2021), and retained earnings.', color: 'border-violet-200 bg-violet-50/50 dark:bg-violet-950/10 dark:border-violet-800', numCls: 'bg-violet-500' },
   { title: 'Statement of Cash Flows',             ref: 'IAS 7',       route: '/reports?type=cf',     desc: 'Operating, investing, and financing activities. Indirect method (IAS 7.18) most common; direct method (IAS 7.19) encouraged by IASB.', color: 'border-amber-200 bg-amber-50/50 dark:bg-amber-950/10 dark:border-amber-800', numCls: 'bg-amber-500' },
   { title: 'Notes to the Financial Statements',   ref: 'IAS 1.112',   route: '/reports?type=notes',  desc: 'Accounting policies, judgments, estimates, and detailed schedules. Must cross-reference all statement line items.', color: 'border-slate-200 bg-slate-50/50 dark:bg-slate-800/20 dark:border-slate-700', numCls: 'bg-slate-500' },
@@ -1193,13 +1193,13 @@ const FS_CHECKLIST = [
 
 const FOCUS_AREAS = [
   {
-    code: 'IAS 16', title: 'Property, Plant & Equipment — Deemed Cost', badgeColor: 'emerald',
-    cls: 'border-emerald-200 bg-emerald-50/40 dark:bg-emerald-950/10 dark:border-emerald-800',
-    linkCls: 'text-emerald-600 dark:text-emerald-400',
+    code: 'IAS 16', title: 'Property, Plant & Equipment — Deemed Cost', badgeColor: 'indigo',
+    cls: 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/40 dark:bg-green-950/10 dark:border-green-800',
+    linkCls: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
     link: { label: 'Fixed Assets Register', to: '/accounting/fixed-assets' },
     rules: [
       { label: 'Historical Records Gap',      icon: <AlertTriangle size={11} className="text-amber-500" />, body: 'Many Ethiopian businesses lack historical cost registries for old assets, making transition-date measurement difficult.' },
-      { label: 'IFRS 1 Deemed Cost Solution', icon: <CheckCircle size={11} className="text-emerald-500" />, body: 'Companies can use a professional, certified valuation to establish "deemed cost" on the IFRS transition date — replacing missing historical cost.' },
+      { label: 'IFRS 1 Deemed Cost Solution', icon: <CheckCircle size={11} className="text-[var(--pro-azure)]" />, body: 'Companies can use a professional, certified valuation to establish "deemed cost" on the IFRS transition date — replacing missing historical cost.' },
       { label: 'Componentisation Required',   icon: <Layers size={11} className="text-violet-500" />,       body: 'Major assets must be broken into parts and depreciated over their unique useful lifespans (IAS 16.43–47). See calculator below.' },
     ],
   },
@@ -1210,7 +1210,7 @@ const FOCUS_AREAS = [
     rules: [
       { label: 'Post-Floatation Risk',      icon: <AlertTriangle size={11} className="text-rose-500" />, body: 'Following the NBE currency floatation reform, ETB/USD volatility has sharply increased. All importing entities face significant translation risk.' },
       { label: 'Monetary Item Revaluation', icon: <Banknote size={11} className="text-amber-500" />,     body: 'FCY bank accounts, import LCs, and foreign trade payables must be revalued at the official CBE closing rate on the balance sheet date.' },
-      { label: 'P&L Presentation',          icon: <TrendingUp size={11} className="text-emerald-500" />, body: 'Realised and unrealised FX gains/losses must be disclosed separately under ovds Costs — not netted against revenue.' },
+      { label: 'P&L Presentation',          icon: <TrendingUp size={11} className="text-[var(--pro-azure)]" />, body: 'Realised and unrealised FX gains/losses must be disclosed separately under ovds Costs — not netted against revenue.' },
     ],
   },
   {
@@ -1231,7 +1231,7 @@ const FOCUS_AREAS = [
     rules: [
       { label: 'Large Advance Payments', icon: <Banknote size={11} className="text-sky-500" />,       body: 'Ethiopian businesses frequently receive large upfront cash in real estate, construction, and commodity trading.' },
       { label: 'Revenue ≠ Cash',         icon: <AlertTriangle size={11} className="text-amber-500" />, body: 'Receipt of cash does NOT equal revenue recognition under IFRS 15. Revenue is recognised only when performance obligations are satisfied.' },
-      { label: 'Contract Liability',     icon: <CheckCircle size={11} className="text-emerald-500" />, body: 'All cash received before performance obligations are met must be recorded as a Contract Liability on the balance sheet.' },
+      { label: 'Contract Liability',     icon: <CheckCircle size={11} className="text-[var(--pro-azure)]" />, body: 'All cash received before performance obligations are met must be recorded as a Contract Liability on the balance sheet.' },
     ],
   },
 ];
@@ -1239,7 +1239,7 @@ const FOCUS_AREAS = [
 const PHASES = [
   { num: '01', phase: 'Phase 1', title: 'Diagnostic Assessment',    cls: 'border-violet-200 bg-violet-50/50 dark:bg-violet-950/10 dark:border-violet-800', desc: 'Map all policy gaps between current tax-basis accounting and IFRS.',          tasks: ['Identify temporary differences for IAS 12', 'Review asset registry completeness', 'Assess revenue recognition policies'] },
   { num: '02', phase: 'Phase 2', title: 'Data & Ledger Cleansing',  cls: 'border-amber-200 bg-amber-50/50 dark:bg-amber-950/10 dark:border-amber-800',   desc: 'Fix asset registries, inventory records, and historical ledger backlogs.',  tasks: ['Physical asset inventory + componentisation', 'Deemed cost valuations (IFRS 1)', 'Establish Opening Balance Sheet'] },
-  { num: '03', phase: 'Phase 3', title: 'Parallel Ledger Reporting', cls: 'border-emerald-200 bg-emerald-50/50 dark:bg-emerald-950/10 dark:border-emerald-800', desc: 'Run tax books alongside IFRS ledger simultaneously for the transition year.', tasks: ['Configure dual-book accounting system', 'Reconcile tax vs IFRS profit monthly', 'Prepare first IFRS trial balance'] },
+  { num: '03', phase: 'Phase 3', title: 'Parallel Ledger Reporting', cls: 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 dark:border-green-800', desc: 'Run tax books alongside IFRS ledger simultaneously for the transition year.', tasks: ['Configure dual-book accounting system', 'Reconcile tax vs IFRS profit monthly', 'Prepare first IFRS trial balance'] },
   { num: '04', phase: 'Phase 4', title: 'AABE Statutory Audit',     cls: 'border-sky-200 bg-sky-50/50 dark:bg-sky-950/10 dark:border-sky-800',             desc: 'Appoint AABE-licenced external auditor to review and sign final statements.', tasks: ['Verify auditor AABE licence at aabe.gov.et', 'Submit complete 5-statement set', 'File within statutory deadline'] },
 ];
 
@@ -1277,11 +1277,11 @@ const INDUSTRIES = [
     ],
   },
   {
-    sector: 'Real Estate & Construction', badgeColor: 'emerald',
-    icon: <Home size={14} />, iconCls: 'bg-emerald-100 dark:bg-emerald-950/30 text-emerald-600',
-    titleCls: 'text-emerald-700 dark:text-emerald-300',
-    cls: 'border-emerald-200 bg-emerald-50/40 dark:bg-emerald-950/10 dark:border-emerald-800',
-    linkCls: 'text-emerald-600 dark:text-emerald-400', link: null,
+    sector: 'Real Estate & Construction', badgeColor: 'indigo',
+    icon: <Home size={14} />, iconCls: 'bg-[var(--pro-azure-100)] dark:bg-green-950/30 text-[var(--pro-azure)]',
+    titleCls: 'text-[var(--pro-azure-dark)] dark:text-green-300',
+    cls: 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/40 dark:bg-green-950/10 dark:border-green-800',
+    linkCls: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', link: null,
     items: [
       { std: 'IFRS 15', body: '<strong>Advance Receipts:</strong> Addis Ababa developers frequently collect 20%–100% of purchase price before construction begins. Cash collected ≠ revenue.' },
       { std: 'IFRS 15', body: '<strong>Contract Liability:</strong> If the contract doesn\'t meet IFRS 15 over-time recognition thresholds, all collected cash sits as a <strong>Contract Liability</strong> until legal title is transferred to the buyer.' },
@@ -1297,21 +1297,21 @@ const DEFICIENCIES = [
 ];
 
 const COLUMNS = [
-  { label: 'Asset Section',     titleCls: 'text-emerald-700 dark:text-emerald-300', cls: 'border-emerald-200 bg-emerald-50/50 dark:bg-emerald-950/10 dark:border-emerald-800', dot: 'bg-emerald-500', items: [{ name: 'PPE', ref: 'IAS 16', note: 'Cost or revaluation; component basis' }, { name: 'Inventory', ref: 'IAS 2', note: 'Lower of cost and NRV' }, { name: 'Trade Receivables', ref: 'IFRS 9', note: 'Net of ECL provision' }, { name: 'Prepayments', ref: 'IAS 1', note: 'Current asset' }, { name: 'Cash & Equivalents', ref: 'IAS 7', note: 'CBE closing rate for FCY' }, { name: 'ROU Assets', ref: 'IFRS 16', note: 'Leases > 12 months' }] },
+  { label: 'Asset Section',     titleCls: 'text-[var(--pro-azure-dark)] dark:text-green-300', cls: 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 dark:border-green-800', dot: 'bg-[var(--pro-azure-50)]0', items: [{ name: 'PPE', ref: 'IAS 16', note: 'Cost or revaluation; component basis' }, { name: 'Inventory', ref: 'IAS 2', note: 'Lower of cost and NRV' }, { name: 'Trade Receivables', ref: 'IFRS 9', note: 'Net of ECL provision' }, { name: 'Prepayments', ref: 'IAS 1', note: 'Current asset' }, { name: 'Cash & Equivalents', ref: 'IAS 7', note: 'CBE closing rate for FCY' }, { name: 'ROU Assets', ref: 'IFRS 16', note: 'Leases > 12 months' }] },
   { label: 'Liability / Equity', titleCls: 'text-violet-700 dark:text-violet-300', cls: 'border-violet-200 bg-violet-50/50 dark:bg-violet-950/10 dark:border-violet-800', dot: 'bg-violet-500', items: [{ name: 'Share Capital', ref: 'IAS 1', note: '' }, { name: 'Legal Reserve', ref: 'Comm. Code', note: '5% net profit → 10% cap' }, { name: 'Retained Earnings', ref: 'IAS 1', note: 'After legal reserve transfer' }, { name: 'Deferred Tax Liability', ref: 'IAS 12', note: '30% BIT rate' }, { name: 'Contract Liabilities', ref: 'IFRS 15', note: 'Advance payments received' }, { name: 'Lease Liability', ref: 'IFRS 16', note: 'PV of future lease payments' }] },
   { label: 'Profit or Loss',     titleCls: 'text-sky-700 dark:text-sky-300',       cls: 'border-sky-200 bg-sky-50/50 dark:bg-sky-950/10 dark:border-sky-800',             dot: 'bg-sky-500',     items: [{ name: 'Revenue', ref: 'IFRS 15', note: 'Performance obligation met' }, { name: 'FX Gains / Losses', ref: 'IAS 21', note: 'Realised + unrealised' }, { name: 'ECL Impairment', ref: 'IFRS 9', note: 'Expected credit losses' }, { name: 'Depreciation', ref: 'IAS 16', note: 'Component basis' }, { name: 'Admin & Operating', ref: 'IAS 1', note: 'By nature or function' }, { name: 'Income Tax Expense', ref: 'IAS 12', note: 'Current + deferred' }] },
 ];
 
 const CFO_CHECKLIST = [
   { num: '1', title: 'Verify Auditor Credentials',                cls: 'border-violet-200 bg-violet-50/40 dark:bg-violet-950/10 dark:border-violet-800', numCls: 'bg-violet-500', desc: 'Confirm the external auditor\'s licence number on the AABE portal before signing the engagement letter. Unlicensed auditors cannot certify AABE-compliant statements.', links: [{ label: 'AABE Registry', url: 'https://aabe.gov.et', external: true }, { label: 'Audit Outsourcing', url: '/compliance/audit-outsourcing', external: false }] },
-  { num: '2', title: 'Update IT Accounting Infrastructure',       cls: 'border-emerald-200 bg-emerald-50/40 dark:bg-emerald-950/10 dark:border-emerald-800', numCls: 'bg-emerald-500', desc: 'Ensure your ERP supports parallel ledgers — one for tax reporting (Proc. 979/2016) and one for IFRS entries. Single-book systems cannot produce compliant statements.', links: [{ label: 'IFRS Settings', url: '/settings?tab=ifrs-standards', external: false }, { label: 'Chart of Accounts', url: '/accounting/chart-of-accounts', external: false }] },
+  { num: '2', title: 'Update IT Accounting Infrastructure',       cls: 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/40 dark:bg-green-950/10 dark:border-green-800', numCls: 'bg-[var(--pro-azure-50)]0', desc: 'Ensure your ERP supports parallel ledgers — one for tax reporting (Proc. 979/2016) and one for IFRS entries. Single-book systems cannot produce compliant statements.', links: [{ label: 'IFRS Settings', url: '/settings?tab=ifrs-standards', external: false }, { label: 'Chart of Accounts', url: '/accounting/chart-of-accounts', external: false }] },
   { num: '3', title: 'Build the Fair Value Documentation Trail', cls: 'border-amber-200 bg-amber-50/40 dark:bg-amber-950/10 dark:border-amber-800', numCls: 'bg-amber-500', desc: 'Retain all independent valuation reports for land, buildings, and investment properties. Document FX revaluation workings at each balance sheet date. Auditors require a complete evidence trail.', links: [{ label: 'Fixed Assets', url: '/accounting/fixed-assets', external: false }, { label: 'Audit Logs', url: '/settings/audit-logs', external: false }] },
   { num: '4', title: 'Run the Deferred Tax Computation',          cls: 'border-sky-200 bg-sky-50/40 dark:bg-sky-950/10 dark:border-sky-800', numCls: 'bg-sky-500', desc: 'Before year-end, reconcile IFRS carrying values vs tax bases for all assets and liabilities. A deferred tax schedule is mandatory for Tier 1 and Tier 2 entities.', links: [{ label: 'Deferred Tax', url: '/ifrs/deferred-tax', external: false }, { label: 'Tax Dashboard', url: '/tax/dashboard', external: false }] },
   { num: '5', title: 'Review Revenue Contracts for IFRS 15',     cls: 'border-rose-200 bg-rose-50/40 dark:bg-rose-950/10 dark:border-rose-800', numCls: 'bg-rose-500', desc: 'Review all advance-payment contracts. Identify which performance obligations are over-time vs point-in-time. Reclassify advance receipts to Contract Liabilities where required.', links: [{ label: 'Revenue Module', url: '/sales/invoices', external: false }, { label: 'Financial Statements', url: '/reports/financial-statements', external: false }] },
 ];
 
 const TAX_DIVERGENCE = [
-  { area: 'Asset Depreciation',      std: 'IAS 16',  color: 'emerald', ifrs: 'Straight-line over useful life; component-by-component',   eth: 'Pool rates Art. 25: Buildings 5%, Machinery 20%, Vehicles 25%', dtl: 'DTL' },
+  { area: 'Asset Depreciation',      std: 'IAS 16',  color: 'green', ifrs: 'Straight-line over useful life; component-by-component',   eth: 'Pool rates Art. 25: Buildings 5%, Machinery 20%, Vehicles 25%', dtl: 'DTL' },
   { area: 'Bad Debt Provision',      std: 'IFRS 9',  color: 'sky',     ifrs: 'ECL model — lifetime losses from day 1 of recognition',     eth: 'Only specific provisions allowed when debt is actually written off', dtl: 'DTA' },
   { area: 'Entertainment Expenses',  std: 'IAS 1',   color: 'slate',   ifrs: 'Deductible if incurred for genuine business purpose',        eth: 'Capped at 1% of net business income; excess disallowed',       dtl: 'DTA' },
   { area: 'Borrowing Costs',         std: 'IAS 23',  color: 'violet',  ifrs: 'Capitalised for qualifying assets under construction',       eth: 'Interest expense fully deductible when paid',                  dtl: 'DTL' },
@@ -1323,7 +1323,7 @@ const TAX_DIVERGENCE = [
 
 const IFRS15_STEPS = [
   { step: 1, label: 'Identify Contract',       dotCls: 'bg-violet-500', cls: 'border-violet-200 bg-violet-50/50 dark:bg-violet-950/10 dark:border-violet-800', title: 'Identify the Contract',               desc: 'Contract approved, commercial substance, payment terms identified.', eth: 'Oral contracts common — written form needed for IFRS 15 recognition.' },
-  { step: 2, label: 'Identify Obligations',    dotCls: 'bg-emerald-500',cls: 'border-emerald-200 bg-emerald-50/50 dark:bg-emerald-950/10 dark:border-emerald-800', title: 'Identify Performance Obligations', desc: 'Each distinct good or service promised in the contract.',             eth: 'Real estate: land, construction, and finishing are often separate obligations.' },
+  { step: 2, label: 'Identify Obligations',    dotCls: 'bg-[var(--pro-azure-50)]0',cls: 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 dark:border-green-800', title: 'Identify Performance Obligations', desc: 'Each distinct good or service promised in the contract.',             eth: 'Real estate: land, construction, and finishing are often separate obligations.' },
   { step: 3, label: 'Determine Price',         dotCls: 'bg-amber-500',  cls: 'border-amber-200 bg-amber-50/50 dark:bg-amber-950/10 dark:border-amber-800', title: 'Determine Transaction Price',         desc: 'Variable consideration, financing components, non-cash consideration.', eth: 'Long-term advance payments may contain a significant financing component.' },
   { step: 4, label: 'Allocate Price',          dotCls: 'bg-sky-500',    cls: 'border-sky-200 bg-sky-50/50 dark:bg-sky-950/10 dark:border-sky-800', title: 'Allocate to Obligations',             desc: 'Allocate based on standalone selling price of each obligation.',      eth: 'Bundled construction + maintenance must be split at relative standalone prices.' },
   { step: 5, label: 'Recognise Revenue',       dotCls: 'bg-rose-500',   cls: 'border-rose-200 bg-rose-50/50 dark:bg-rose-950/10 dark:border-rose-800', title: 'Recognise Revenue',                   desc: 'Recognise when (or as) each obligation is satisfied — over time or at a point in time.', eth: 'Cash before Step 5 = Contract Liability. Revenue ≠ Cash received.' },
@@ -1337,14 +1337,14 @@ const READINESS_SCORES = [
 ];
 
 const READINESS_ITEMS = [
-  { area: 'PP&E / IAS 16',        pct: 82, barCls: 'bg-emerald-500', status: 'On Track',    statusCls: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800' },
+  { area: 'PP&E / IAS 16',        pct: 82, barCls: 'bg-[var(--pro-azure-50)]0', status: 'On Track',    statusCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800' },
   { area: 'Revenue / IFRS 15',    pct: 61, barCls: 'bg-sky-500',     status: 'In Progress', statusCls: 'bg-sky-50 text-sky-600 border-sky-200 dark:bg-sky-950/30 dark:text-sky-400 dark:border-sky-800' },
   { area: 'Deferred Tax / IAS 12',pct: 52, barCls: 'bg-violet-500',  status: 'In Progress', statusCls: 'bg-violet-50 text-violet-600 border-violet-200 dark:bg-violet-950/30 dark:text-violet-400 dark:border-violet-800' },
   { area: 'ECL / IFRS 9',         pct: 44, barCls: 'bg-amber-500',   status: 'Gap',         statusCls: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800' },
-  { area: 'Leases / IFRS 16',     pct: 70, barCls: 'bg-emerald-400', status: 'On Track',    statusCls: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800' },
+  { area: 'Leases / IFRS 16',     pct: 70, barCls: 'bg-[var(--pro-azure-light)]', status: 'On Track',    statusCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800' },
   { area: 'FX / IAS 21',          pct: 55, barCls: 'bg-sky-400',     status: 'In Progress', statusCls: 'bg-sky-50 text-sky-600 border-sky-200 dark:bg-sky-950/30 dark:text-sky-400 dark:border-sky-800' },
   { area: 'Disclosures / IAS 1',  pct: 67, barCls: 'bg-slate-400',   status: 'In Progress', statusCls: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700' },
-  { area: 'Legal Reserve',        pct: 90, barCls: 'bg-emerald-600', status: 'On Track',    statusCls: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800' },
+  { area: 'Legal Reserve',        pct: 90, barCls: 'bg-[var(--pro-azure)]', status: 'On Track',    statusCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800' },
 ];
 
 const REFS = [

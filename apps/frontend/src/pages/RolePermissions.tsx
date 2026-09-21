@@ -1,8 +1,6 @@
-import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { advancedAccessApi, sodRulesApi, auditEventCatalogApi, permissionsApi, type RolePermissionOverrideDTO } from '@ovds/features/settings';
+import { permissionCatalog } from '@ovds/shared';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { usePageTitle } from "../hooks/usePageTitle";
-import { useRbac } from "../hooks/useRbac";
-import { useTranslation } from "react-i18next";
 import {
   AlertCircle, AlertTriangle, ArrowRight, BarChart3, BookOpen,
   Check, CheckCircle2, ChevronDown,
@@ -11,20 +9,29 @@ import {
   ShieldCheck, Star, TrendingUp,
   User, Users, X, Zap, BarChart2, Grid3x3,
   GitCompare, Activity, Layers, AlertOctagon, Fingerprint,
-  Scale, Gauge, Play,
+  Scale, Gauge, Play, Clock,
   CheckSquare, XSquare, HelpCircle, Crosshair, FlaskConical,
   Download, Copy, CheckCheck, Keyboard, History, Bell,
   Lightbulb, Package, RefreshCw,
   Plus, Edit, Trash2, ToggleLeft, ToggleRight, Save,
+  Building2, SortAsc, SortDesc, Trash,
 } from "lucide-react";
+import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+
+import { usePageTitle } from "../hooks/usePageTitle";
+import { useRbac } from "../hooks/useRbac";
+import { orpc } from "../lib/orpc";
 import {
   rbac, ROLE_METADATA, ROLE_HIERARCHY, ROLE_GROUPS,
   ROUTE_PERMISSIONS, RESOURCE_DOMAINS_FLAT, PERMISSION_GROUPS, SENSITIVE_ROUTES,
   type AppRole, type Permission,
 } from "../rbac";
-import { orpc } from "../lib/orpc";
+import { useAuth } from "../rbac/AuthContext";
 import api from "../services/api";
-import toast from "react-hot-toast";
+import { fmtDateTime } from "../utils/fmt";
+
 
 // -- Derived constants used throughout the page --------------------------------
 // ROUTE_PERMISSIONS is the alias for ROUTE_POLICY in this codebase
@@ -42,12 +49,28 @@ const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = Object.fromEntries(
 type ViewMode =
   | 'by-role' | 'matrix' | 'diff' | 'groups' | 'coverage'
   | 'routes' | 'ifrs' | 'OVDS' | 'risk' | 'sod' | 'simulate' | 'audit' | 'policy' | 'smart-rules' | 'app-access'
-  | 'custom-roles' | 'permissions';
+  | 'overrides'
+  | 'custom-roles' | 'permissions' | 'security-policy';
 
 const ALL_ROLES = Object.keys(ROLE_HIERARCHY) as AppRole[];
 
-const CRITICAL_PERMISSIONS: Permission[] = [
-  'fund_transfers:approve', 'payroll:approve', 'users:delete',
+const ROLE_TEMPLATES: { label: string; role: AppRole; icon: string }[] = [
+  { label: 'Accounting / Accountant', role: 'ACCOUNTING', icon: 'ACCOUNTING' },
+  { label: 'Manager', role: 'ADMIN', icon: 'ADMIN' },
+  { label: 'Employee', role: 'EMPLOYEE', icon: 'EMPLOYEE' },
+  { label: 'Customer / Client', role: 'CLIENT', icon: 'CLIENT' },
+];
+
+const allPerms: { name: string; id: string }[] = Object.values(PERMISSION_GROUPS).flatMap(g => g.permissions.map(p => ({ name: p, id: p })));
+
+function applyTemplate(templateRole: AppRole): Set<string> {
+  const permNames = ROLE_PERMISSIONS[templateRole] ?? [];
+  const nameToId = new Map<string, string>();
+  for (const p of allPerms) nameToId.set(p.name, p.id);
+  return new Set(permNames.map(p => p).filter(n => nameToId.has(n)).map(n => nameToId.get(n)!));
+}
+
+const CRITICAL_PERMISSIONS_FALLBACK: Permission[] = [
   'vat:file', 'companies:delete', 'role_permissions:write',
   'system:deploy', 'banking:kyc:approve', 'banking:aml:flag',
   'payroll:admin', 'ovds:delete', 'audit_logs:write',
@@ -58,7 +81,7 @@ const CRITICAL_PERMISSIONS: Permission[] = [
 function calcRiskScore(role: AppRole): number {
   if (role === 'SPURADMIN' || role === 'SUPERADMIN') return 100;
   const perms = new Set(rbac.permissionsFor(role));
-  const criticalHits = CRITICAL_PERMISSIONS.filter(p => perms.has(p)).length;
+  const criticalHits = CRITICAL_PERMISSIONS_FALLBACK.filter(p => perms.has(p)).length;
   const adminPerms = rbac.permissionsFor(role).filter(p =>
     p.includes(':delete') || p.includes(':approve') || p.includes(':admin') ||
     p.includes(':deploy') || p.includes(':certify')
@@ -73,13 +96,13 @@ function calcRiskScore(role: AppRole): number {
 function riskColor(score: number): string {
   if (score >= 61) return 'text-rose-400';
   if (score >= 31) return 'text-amber-400';
-  return 'text-emerald-400';
+  return 'text-[var(--pro-azure-light)]';
 }
 
 function riskBg(score: number): string {
   if (score >= 61) return 'bg-rose-500/10 border-rose-500/30';
   if (score >= 31) return 'bg-amber-500/10 border-amber-500/30';
-  return 'bg-emerald-500/10 border-slate-200';
+  return 'bg-[var(--pro-azure-50)]0/10 border-slate-200';
 }
 
 function riskLabel(score: number): string {
@@ -97,23 +120,23 @@ function permRiskColor(perm: Permission): string {
       perm.includes(':calculate') || perm.includes(':submit')) {
     return 'bg-amber-500/15 text-amber-300 border border-amber-500/30';
   }
-  return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20';
+  return 'bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure)] dark:text-green-300 border border-[var(--pro-azure)]/20';
 }
 
 function isSensitivePerm(perm: Permission): boolean {
-  return CRITICAL_PERMISSIONS.includes(perm);
+  return CRITICAL_PERMISSIONS_FALLBACK.includes(perm);
 }
 
 interface SodRule {
   id: string;
   name: string;
-  risk: 'critical' | 'high' | 'medium';
+  risk: 'critical' | 'high' | 'medium' | 'low';
   perm1: Permission;
   perm2: Permission;
   description: string;
 }
 
-const SOD_RULES: SodRule[] = [
+const SOD_RULES_FALLBACK: SodRule[] = [
   { id: 'SOD-001', name: 'Payroll Preparer vs Approver', risk: 'critical',
     perm1: 'payroll:generate', perm2: 'payroll:approve',
     description: 'Same role should not generate AND approve payroll' },
@@ -169,7 +192,7 @@ function exportCSV(filename: string, rows: string[][]) {
 // SoD Remediation suggestions
 // -----------------------------------------------------------------------------
 
-const SOD_REMEDIATION: Record<string, string[]> = {
+const SOD_REMEDIATION_FALLBACK: Record<string, string[]> = {
   'SOD-001': [
     'Split payroll generation (HR role) from payroll approval (ovds role)',
     'Require a second approver from a different role group for payroll runs',
@@ -224,7 +247,7 @@ interface AuditEvent {
   retentionYears: number;
 }
 
-const AUDIT_EVENTS: AuditEvent[] = [
+const AUDIT_EVENTS_FALLBACK: AuditEvent[] = [
   { permission: 'users:delete',              event: 'User account permanently deleted',         severity: 'critical', regulation: 'ISO 27001 A.9.2.6',    retentionYears: 7 },
   { permission: 'users:write',               event: 'User account created or modified',         severity: 'high',     regulation: 'ISO 27001 A.9.2.2',    retentionYears: 5 },
   { permission: 'role_permissions:write',    event: 'Role permission set modified',             severity: 'critical', regulation: 'ISO 27001 A.9.2.3',    retentionYears: 7 },
@@ -253,6 +276,89 @@ const AUDIT_EVENTS: AuditEvent[] = [
 ];
 
 // -----------------------------------------------------------------------------
+// Shared dynamic RBAC data hook
+// Fetches SoD rules, audit event catalog, and critical permissions from the API.
+// Falls back to static constants when the API is unavailable.
+// -----------------------------------------------------------------------------
+
+function useRbacStaticData(companyId?: string | null) {
+  const { data: sodRulesRaw } = useQuery({
+    queryKey: ['rbac', 'sod-rules', companyId ?? ''],
+    queryFn: () => sodRulesApi.list(companyId),
+    staleTime: 5 * 60_000,
+    retry: 1,
+  });
+
+  const { data: auditEventsRaw } = useQuery({
+    queryKey: ['rbac', 'audit-events', companyId ?? ''],
+    queryFn: () => auditEventCatalogApi.list(companyId),
+    staleTime: 5 * 60_000,
+    retry: 1,
+  });
+
+  const { data: permissionsRaw } = useQuery({
+    queryKey: ['rbac', 'permissions', companyId ?? ''],
+    queryFn: () => permissionsApi.list({ companyId }),
+    staleTime: 5 * 60_000,
+    retry: 1,
+  });
+
+  // Map API SodRuleDTO → local SodRule shape
+  const sodRules: SodRule[] = useMemo(() => {
+    if (sodRulesRaw && sodRulesRaw.length > 0) {
+      return sodRulesRaw.map(r => ({
+        id: r.id,
+        name: r.name,
+        risk: r.risk as SodRule['risk'],
+        perm1: r.perm1 as Permission,
+        perm2: r.perm2 as Permission,
+        description: r.description,
+      }));
+    }
+    return SOD_RULES_FALLBACK;
+  }, [sodRulesRaw]);
+
+  // Build remediation map from API (DTO carries remediation[]) or fall back
+  const sodRemediation: Record<string, string[]> = useMemo(() => {
+    if (sodRulesRaw && sodRulesRaw.length > 0) {
+      return Object.fromEntries(
+        sodRulesRaw
+          .filter(r => r.remediation && r.remediation.length > 0)
+          .map(r => [r.id, r.remediation!])
+      );
+    }
+    return SOD_REMEDIATION_FALLBACK;
+  }, [sodRulesRaw]);
+
+  // Map API AuditEventCatalogDTO → local AuditEvent shape
+  const auditEvents: AuditEvent[] = useMemo(() => {
+    if (auditEventsRaw && auditEventsRaw.length > 0) {
+      return auditEventsRaw.map(e => ({
+        permission: e.permission as Permission,
+        event: e.event,
+        severity: e.severity as AuditEvent['severity'],
+        regulation: e.regulation,
+        retentionYears: e.retentionYears,
+      }));
+    }
+    return AUDIT_EVENTS_FALLBACK;
+  }, [auditEventsRaw]);
+
+  // Build critical permissions list from API (isCritical flag) or fall back
+  const criticalPermissions: Permission[] = useMemo(() => {
+    if (permissionsRaw && permissionsRaw.length > 0) {
+      const crit = permissionsRaw
+        .filter(p => p.isCritical)
+        .map(p => p.key as Permission);
+      return crit.length > 0 ? crit : CRITICAL_PERMISSIONS_FALLBACK;
+    }
+    return CRITICAL_PERMISSIONS_FALLBACK;
+  }, [permissionsRaw]);
+
+  return { sodRules, sodRemediation, auditEvents, criticalPermissions };
+}
+
+// -----------------------------------------------------------------------------
 // Shared UI helpers
 // -----------------------------------------------------------------------------
 
@@ -276,7 +382,7 @@ function RiskBadge({ score }: { score: number }) {
 
 function MfaBadge() {
   return (
-    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-slate-200">
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium bg-[var(--pro-azure-50)]0/15 text-[var(--pro-azure)] dark:text-green-300 border border-slate-200">
       <Fingerprint className="w-3 h-3" />
       MFA
     </span>
@@ -385,7 +491,7 @@ function ByRoleView() {
           <select
             value={groupFilter}
             onChange={e => setGroupFilter(e.target.value)}
-            className="w-full text-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-700 dark:text-slate-300 focus:outline-none focus:border-emerald-400"
+            className="w-full text-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-700 dark:text-slate-300 focus:outline-none focus:border-[var(--pro-azure)]"
           >
             <option value="all">All Groups</option>
             {Object.entries(ROLE_GROUPS).map(([k, g]) => (
@@ -405,7 +511,7 @@ function ByRoleView() {
                 onClick={() => { setSelectedRole(role); setSearch(''); }}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-all ${
                   selectedRole === role
-                    ? 'bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-300'
+                    ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10 border border-[var(--pro-azure-100)] dark:border-[var(--pro-azure)]/30 text-[var(--pro-azure-dark)] dark:text-green-300'
                     : 'hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
               >
@@ -443,11 +549,11 @@ function ByRoleView() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-0.5">
                           <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate capitalize">{d.label}</span>
-                          <span className={`text-[9px] font-bold ml-1 shrink-0 ${d.hasAdmin ? 'text-rose-500' : d.hasWrite ? 'text-amber-500' : 'text-emerald-500'}`}>{d.pct}%</span>
+                          <span className={`text-[9px] font-bold ml-1 shrink-0 ${d.hasAdmin ? 'text-rose-500' : d.hasWrite ? 'text-amber-500' : 'text-[var(--pro-azure)]'}`}>{d.pct}%</span>
                         </div>
                         <div className="h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                           <div
-                            className={`h-1 rounded-full ${d.hasAdmin ? 'bg-rose-500' : d.hasWrite ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                            className={`h-1 rounded-full ${d.hasAdmin ? 'bg-rose-500' : d.hasWrite ? 'bg-amber-500' : 'bg-[var(--pro-azure-50)]0'}`}
                             style={{ width: `${d.pct}%` }}
                           />
                         </div>
@@ -466,7 +572,7 @@ function ByRoleView() {
               <div className="flex items-center gap-1.5">
                 <button onClick={handleCopy} title="Copy permissions list"
                   className="flex items-center gap-1 px-2 py-1 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 text-xs rounded-lg transition-colors">
-                  {copied ? <CheckCheck className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                  {copied ? <CheckCheck className="w-3 h-3 text-[var(--pro-azure)]" /> : <Copy className="w-3 h-3" />}
                   {copied ? 'Copied' : 'Copy'}
                 </button>
                 <button onClick={handleExport} title="Export as CSV"
@@ -486,7 +592,7 @@ function ByRoleView() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Filter permissions…"
-            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:border-emerald-400 dark:focus:border-emerald-500"
+            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:border-[var(--pro-azure)] dark:focus:border-[var(--pro-azure)]"
           />
           {search && (
             <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
@@ -516,7 +622,7 @@ function ByRoleView() {
                     {/* coverage mini bar */}
                     <div className="flex items-center gap-1.5 hidden sm:flex">
                       <div className="w-16 h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                        <div className="h-1 rounded-full bg-emerald-500" style={{ width: `${coveragePct}%` }} />
+                        <div className="h-1 rounded-full bg-[var(--pro-azure-50)]0" style={{ width: `${coveragePct}%` }} />
                       </div>
                       <span className="text-[10px] text-slate-400 dark:text-slate-500">{coveragePct}%</span>
                     </div>
@@ -546,7 +652,7 @@ function ByRoleView() {
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-700">
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-rose-500/20 border border-rose-500/30 inline-block" /> Admin/Delete/Approve</span>
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-amber-500/20 border border-amber-500/30 inline-block" /> Write/Generate/File</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-500/10 border border-emerald-500/20 inline-block" /> Read</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-[var(--pro-azure-50)]0/10 border border-[var(--pro-azure)]/20 inline-block" /> Read</span>
           <span className="flex items-center gap-1"><Star className="w-3 h-3 text-yellow-400" /> Critical</span>
           <MfaBadge /> Requires MFA
         </div>
@@ -588,7 +694,7 @@ function MatrixView() {
         perm.includes(':calculate') || perm.includes(':submit')) {
       return 'bg-amber-500/15 text-amber-300';
     }
-    return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300';
+    return 'bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure)] dark:text-green-300';
   }
 
   return (
@@ -609,7 +715,7 @@ function MatrixView() {
             type="checkbox"
             checked={sensitiveOnly}
             onChange={e => setSensitiveOnly(e.target.checked)}
-            className="rounded border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-emerald-500"
+            className="rounded border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-[var(--pro-azure)]"
           />
           <Star className="w-3 h-3 text-yellow-400" />
           Sensitive permissions only
@@ -617,7 +723,7 @@ function MatrixView() {
         <div className="flex items-center gap-3 ml-auto text-xs text-slate-500">
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-rose-500/20 inline-block" /> Admin</span>
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-amber-500/15 inline-block" /> Write</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-500/10 inline-block" /> Read</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-[var(--pro-azure-50)]0/10 inline-block" /> Read</span>
           <button
             onClick={() => {
               const header = ['Permission', 'Critical', ...roles.map(r => ROLE_METADATA[r].label)];
@@ -742,7 +848,7 @@ function DiffView() {
       {/* Stats summary */}
       <div className="ovds-grid-layout cols-3 gap-sm">
         {[
-          { label: `Added in ${ROLE_METADATA[targetRole].label}`, count: added.length, color: 'text-emerald-400', bg: 'bg-emerald-500/5 border-emerald-500/20' },
+          { label: `Added in ${ROLE_METADATA[targetRole].label}`, count: added.length, color: 'text-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)]0/5 border-[var(--pro-azure)]/20' },
           { label: 'Shared', count: shared.length, color: 'text-slate-500 dark:text-slate-400', bg: 'bg-slate-100/50 dark:bg-slate-800/50 border-slate-200/80 dark:border-slate-700/50' },
           { label: `Removed from ${ROLE_METADATA[targetRole].label}`, count: removed.length, color: 'text-rose-400', bg: 'bg-rose-500/5 border-rose-500/20' },
         ].map(s => (
@@ -754,11 +860,11 @@ function DiffView() {
       </div>
 
       <div className="ovds-grid-layout cols-3">
-        <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
+        <div className="bg-[var(--pro-azure-50)]0/5 border border-[var(--pro-azure)]/20 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-3">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-            <h3 className="text-sm font-semibold text-emerald-400">Added in {ROLE_METADATA[targetRole].label}</h3>
-            <span className="ml-auto text-xs text-emerald-500">{added.length}</span>
+            <CheckCircle2 className="w-4 h-4 text-[var(--pro-azure-light)]" />
+            <h3 className="text-sm font-semibold text-[var(--pro-azure-light)]">Added in {ROLE_METADATA[targetRole].label}</h3>
+            <span className="ml-auto text-xs text-[var(--pro-azure)]">{added.length}</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {added.map(p => <PermChip key={p} perm={p} />)}
@@ -812,7 +918,7 @@ function GroupView() {
       {/* Hierarchy Ladder */}
       <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-700/50 p-4">
         <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-          <Layers className="w-3.5 h-3.5 text-emerald-400" />
+          <Layers className="w-3.5 h-3.5 text-[var(--pro-azure-light)]" />
           Role Hierarchy Ladder — click any row to inspect
         </h3>
         <div className="space-y-1.5">
@@ -821,14 +927,14 @@ function GroupView() {
             const weight = ROLE_HIERARCHY[role];
             const pct = Math.round((weight / maxWeight) * 100);
             const score = calcRiskScore(role);
-            const barColor = weight >= 150 ? 'bg-rose-500' : weight >= 80 ? 'bg-teal-500' : weight >= 50 ? 'bg-emerald-500' : weight >= 25 ? 'bg-amber-500' : 'bg-slate-500';
+            const barColor = weight >= 150 ? 'bg-rose-500' : weight >= 80 ? 'bg-teal-500' : weight >= 50 ? 'bg-[var(--pro-azure-50)]0' : weight >= 25 ? 'bg-amber-500' : 'bg-slate-500';
             const isOpen = expandedRole === role;
             return (
               <React.Fragment key={role}>
                 <button
                   onClick={() => setExpandedRole(isOpen ? null : role)}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all group ${
-                    isOpen ? 'bg-emerald-100 border border-slate-200' : 'hover:bg-slate-100 dark:hover:bg-slate-700/40 border border-transparent'
+                    isOpen ? 'bg-[var(--pro-azure-100)] border border-slate-200' : 'hover:bg-slate-100 dark:hover:bg-slate-700/40 border border-transparent'
                   }`}
                 >
                   <span className={`w-2 h-2 rounded-full shrink-0 ${meta.color.dot}`} />
@@ -838,7 +944,7 @@ function GroupView() {
                   </div>
                   <span className="text-[10px] font-mono text-slate-500 w-8 text-right shrink-0">{weight}</span>
                   <RiskBadge score={score} />
-                  <ChevronRight className={`w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform ${isOpen ? 'rotate-90 text-emerald-400' : 'group-hover:text-slate-500'}`} />
+                  <ChevronRight className={`w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform ${isOpen ? 'rotate-90 text-[var(--pro-azure-light)]' : 'group-hover:text-slate-500'}`} />
                 </button>
 
                 {isOpen && (() => {
@@ -873,9 +979,9 @@ function GroupView() {
                           </div>
                         </div>
                         <div>
-                          <div className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-1.5">Read ({readD.length})</div>
+                          <div className="text-[10px] font-bold text-[var(--pro-azure-light)] uppercase tracking-wider mb-1.5">Read ({readD.length})</div>
                           <div className="flex flex-wrap gap-1">
-                            {readD.slice(0,8).map(d => <span key={d} className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/15 text-[10px] capitalize">{d.replace(/_/g,' ')}</span>)}
+                            {readD.slice(0,8).map(d => <span key={d} className="px-1.5 py-0.5 rounded bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure)] dark:text-green-300 border border-[var(--pro-azure)]/15 text-[10px] capitalize">{d.replace(/_/g,' ')}</span>)}
                             {readD.length > 8 && <span className="text-slate-500 text-[10px]">+{readD.length - 8} more</span>}
                           </div>
                         </div>
@@ -911,7 +1017,7 @@ function GroupView() {
                     onClick={() => setExpandedRole(expandedRole === role ? null : role)}
                     className={`w-full flex items-center gap-3 p-2.5 rounded-lg text-left transition-all ${
                       expandedRole === role
-                        ? 'bg-emerald-100 border border-slate-200'
+                        ? 'bg-[var(--pro-azure-100)] border border-slate-200'
                         : 'hover:bg-slate-100 dark:hover:bg-slate-700/40 border border-transparent'
                     }`}
                   >
@@ -982,8 +1088,8 @@ function CoverageView() {
           </div>
           <div className="ovds-caption">Highly Restricted (&le;20%)</div>
         </div>
-        <div className="bg-emerald-500/5 rounded-xl border border-emerald-500/20 p-4 text-center">
-          <div className="text-2xl font-bold text-emerald-400">
+        <div className="bg-[var(--pro-azure-50)]0/5 rounded-xl border border-[var(--pro-azure)]/20 p-4 text-center">
+          <div className="text-2xl font-bold text-[var(--pro-azure-light)]">
             {coverage.filter(c => c.coveragePct >= 80).length}
           </div>
           <div className="ovds-caption">Widely Granted (&ge;80%)</div>
@@ -1015,7 +1121,7 @@ function CoverageView() {
             { key: 'critical',      label: '★ First' },
           ] as const).map(s => (
             <button key={s.key} onClick={() => setSortMode(s.key)}
-              className={`px-2.5 py-1 rounded text-[10px] font-bold transition-all ${sortMode === s.key ? 'bg-emerald-500 text-white' : 'text-slate-500 hover:text-slate-600 dark:text-slate-300'}`}>
+              className={`px-2.5 py-1 rounded text-[10px] font-bold transition-all ${sortMode === s.key ? 'bg-[var(--pro-azure)] text-white' : 'text-slate-500 hover:text-slate-600 dark:text-slate-300'}`}>
               {s.label}
             </button>
           ))}
@@ -1044,7 +1150,7 @@ function CoverageView() {
                   <div className="flex items-center gap-2">
                     <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 min-w-[60px]">
                       <div
-                        className={`h-1.5 rounded-full ${c.coveragePct >= 80 ? 'bg-emerald-500' : c.coveragePct >= 40 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                        className={`h-1.5 rounded-full ${c.coveragePct >= 80 ? 'bg-[var(--pro-azure-50)]0' : c.coveragePct >= 40 ? 'bg-amber-500' : 'bg-rose-500'}`}
                         style={{ width: `${c.coveragePct}%` }}
                       />
                     </div>
@@ -1225,7 +1331,7 @@ function IFRSView() {
                     </div>
                   </td>
                   {ifrsRoles.map(role => (
-                    <td key={role} className={`text-center py-1.5 ${rbac.can(role, perm) ? 'text-emerald-400' : 'text-slate-700'}`}>
+                    <td key={role} className={`text-center py-1.5 ${rbac.can(role, perm) ? 'text-[var(--pro-azure-light)]' : 'text-slate-700'}`}>
                       {rbac.can(role, perm) ? <Check className="w-3 h-3 mx-auto" /> : <span>—</span>}
                     </td>
                   ))}
@@ -1265,13 +1371,13 @@ function OvdsView() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-emerald-500/5 rounded-xl border border-emerald-500/20 p-5 mb-4">
+      <div className="bg-[var(--pro-azure-50)]0/5 rounded-xl border border-[var(--pro-azure)]/20 p-5 mb-4">
         <div className="flex items-center gap-3 mb-2">
-          <BookOpen className="w-5 h-5 text-emerald-400" />
+          <BookOpen className="w-5 h-5 text-[var(--pro-azure-light)]" />
           <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Role & Access Guide</h2>
         </div>
         <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-          The enterprise authorization framework follows a strict <span className="text-emerald-600 dark:text-emerald-400 font-semibold">deny-by-default</span> principle. 
+          The enterprise authorization framework follows a strict <span className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold">deny-by-default</span> principle. 
           Use this guide to understand the functional scope and privilege level of each system role.
         </p>
       </div>
@@ -1286,7 +1392,7 @@ function OvdsView() {
           return (
             <div key={role} className={`group rounded-xl border transition-all duration-200 ${
               isExpanded 
-                ? 'bg-white dark:bg-slate-900 border-emerald-500/40 shadow-lg shadow-emerald-500/10' 
+                ? 'bg-white dark:bg-slate-900 border-[var(--pro-azure)]/40 shadow-lg shadow-green-500/10' 
                 : 'bg-slate-50/80 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 hover:border-slate-200 hover:bg-slate-100/40 dark:bg-slate-800/40'
             }`}>
               <button
@@ -1294,9 +1400,9 @@ function OvdsView() {
                 className="w-full flex items-center gap-4 px-5 py-4 text-left"
               >
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
-                  isExpanded ? 'bg-emerald-500/20 border-slate-200' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 group-hover:border-slate-200'
+                  isExpanded ? 'bg-[var(--pro-azure-50)]0/20 border-slate-200' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 group-hover:border-slate-200'
                 }`}>
-                  <User className={`w-5 h-5 ${isExpanded ? 'text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`} />
+                  <User className={`w-5 h-5 ${isExpanded ? 'text-[var(--pro-azure-light)]' : 'text-slate-500 dark:text-slate-400'}`} />
                 </div>
                 
                 <div className="flex-1 min-w-0">
@@ -1311,23 +1417,23 @@ function OvdsView() {
                 <div className="flex items-center gap-6 shrink-0 ml-4">
                   <div className="hidden md:block text-right">
                     <div className="text-[10px] text-slate-500 uppercase tracking-tighter font-bold">Permissions</div>
-                    <div className="text-xs font-mono text-emerald-400">{rbac.permissionsFor(role).length}</div>
+                    <div className="text-xs font-mono text-[var(--pro-azure-light)]">{rbac.permissionsFor(role).length}</div>
                   </div>
                   <div className="hidden md:block text-right">
                     <div className="text-[10px] text-slate-500 uppercase tracking-tighter font-bold">Hierarchy</div>
                     <div className="text-xs font-mono text-slate-600 dark:text-slate-300">{ROLE_HIERARCHY[role]}</div>
                   </div>
                   {isExpanded ? (
-                    <ChevronDown className="w-5 h-5 text-emerald-400" />
+                    <ChevronDown className="w-5 h-5 text-[var(--pro-azure-light)]" />
                   ) : (
-                    <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-emerald-400/50" />
+                    <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-[var(--pro-azure-light)]/50" />
                   )}
                 </div>
               </button>
 
               {isExpanded && (
                 <div className="px-5 pb-5 pt-1 space-y-6 animate-fade-in">
-                  <div className="h-px bg-gradient-to-r from-emerald-500/30 to-transparent mb-4" />
+                  <div className="h-px bg-gradient-to-r from-[var(--pro-azure)]/30 to-transparent mb-4" />
                   
                   <div className="ovds-grid-layout cols-4">
                     {domainSummary.filter(d => d.level !== 'none').map(d => (
@@ -1336,7 +1442,7 @@ function OvdsView() {
                           <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{d.domain}</span>
                           <div className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
                             d.level === 'admin' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 
-                            d.level === 'write' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 
+                            d.level === 'write' ? 'bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure-light)] border border-[var(--pro-azure)]/20' : 
                             'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                           }`}>
                             {d.level.toUpperCase()}
@@ -1344,7 +1450,7 @@ function OvdsView() {
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-1 overflow-hidden">
-                            <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${d.pct}%` }} />
+                            <div className="bg-[var(--pro-azure-50)]0 h-full rounded-full" style={{ width: `${d.pct}%` }} />
                           </div>
                           <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">{d.pct}%</span>
                         </div>
@@ -1355,7 +1461,7 @@ function OvdsView() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                        <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                        <ShieldCheck className="w-3 h-3 text-[var(--pro-azure)]" />
                         Explicitly Granted Capabilities
                       </h4>
                       <span className="text-[10px] text-slate-600 font-mono">Total: {rbac.permissionsFor(role).length}</span>
@@ -1390,9 +1496,9 @@ function OvdsView() {
 function SmartRulesView() {
   return (
     <div className="space-y-6">
-      <div className="bg-emerald-500/5 rounded-xl border border-emerald-500/20 p-5">
+      <div className="bg-[var(--pro-azure-50)]0/5 rounded-xl border border-[var(--pro-azure)]/20 p-5">
         <div className="flex items-center gap-3 mb-2">
-          <Zap className="w-5 h-5 text-emerald-400 animate-pulse" />
+          <Zap className="w-5 h-5 text-[var(--pro-azure-light)] animate-pulse" />
           <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Smart Contextual Rules</h2>
         </div>
         <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl">
@@ -1404,15 +1510,15 @@ function SmartRulesView() {
       <div className="ovds-grid-layout cols-2">
         <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
           <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2">
-            <Kanban className="w-4 h-4 text-emerald-400" />
+            <Kanban className="w-4 h-4 text-[var(--pro-azure-light)]" />
             Active Smart Constraints
           </h3>
           <div className="space-y-4">
             {Object.entries(rbac.rules ?? {}).map(([perm]) => (
               <div key={perm} className="group bg-slate-100/30 dark:bg-slate-800/30 border border-slate-200/80 dark:border-slate-700/50 rounded-xl p-4 hover:border-slate-200 transition-all">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-mono text-emerald-600 dark:text-emerald-300">{perm}</span>
-                  <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-bold border border-emerald-500/20 uppercase">Active</span>
+                  <span className="text-xs font-mono text-[var(--pro-azure)] dark:text-green-300">{perm}</span>
+                  <span className="px-1.5 py-0.5 rounded bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure-light)] text-[10px] font-bold border border-[var(--pro-azure)]/20 uppercase">Active</span>
                 </div>
                 <div className="ovds-body mb-3">
                   {perm === 'payroll:approve' && "ovds can approve any amount; ACCOUNTING is capped at 500,000 ETB per run."}
@@ -1437,15 +1543,15 @@ function SmartRulesView() {
         <div className="space-y-4">
           <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
             <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2">
-              <Activity className="w-4 h-4 text-emerald-400" />
+              <Activity className="w-4 h-4 text-[var(--pro-azure-light)]" />
               Runtime Evaluation
             </h3>
             <div className="bg-white dark:bg-slate-950 rounded-xl p-4 border border-slate-200 dark:border-slate-800 font-mono text-[11px] leading-relaxed">
               <div className="text-slate-500 mb-2">// Example Smart Check</div>
               <div className="flex gap-2">
-                <span className="text-emerald-400">const</span>
+                <span className="text-[var(--pro-azure-light)]">const</span>
                 <span className="text-slate-700 dark:text-slate-200">canApprove</span>
-                <span className="text-emerald-400">=</span>
+                <span className="text-[var(--pro-azure-light)]">=</span>
                 <span className="text-slate-700 dark:text-slate-200">rbac.can(</span>
               </div>
               <div className="pl-4">
@@ -1453,7 +1559,7 @@ function SmartRulesView() {
                 <br />
                 <span className="text-amber-300">'payroll:approve'</span>,
                 <br />
-                {"{"} <span className="text-emerald-600 dark:text-emerald-300">amount:</span> <span className="text-orange-300">750000</span> {"}"}
+                {"{"} <span className="text-[var(--pro-azure)] dark:text-green-300">amount:</span> <span className="text-orange-300">750000</span> {"}"}
               </div>
               <div className="text-slate-700 dark:text-slate-200">);</div>
               <div className="mt-2 text-slate-500 flex items-center gap-2">
@@ -1463,26 +1569,26 @@ function SmartRulesView() {
             </div>
           </div>
 
-          <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-6">
-            <h3 className="text-sm font-bold text-emerald-400 mb-3 flex items-center gap-2">
+          <div className="bg-[var(--pro-azure-50)]0/5 border border-[var(--pro-azure)]/20 rounded-2xl p-6">
+            <h3 className="text-sm font-bold text-[var(--pro-azure-light)] mb-3 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4" />
               Compliance Impact
             </h3>
             <ul className="space-y-3">
               <li className="flex gap-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-1.5" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--pro-azure-50)]0 shrink-0 mt-1.5" />
                 <div className="text-xs text-slate-600 dark:text-slate-300">
                   <span className="font-bold">Fraud Prevention:</span> Limits risk of unauthorized large disbursements by junior staff.
                 </div>
               </li>
               <li className="flex gap-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-1.5" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--pro-azure-50)]0 shrink-0 mt-1.5" />
                 <div className="text-xs text-slate-600 dark:text-slate-300">
                   <span className="font-bold">Audit Accuracy:</span> Ensures historical data cannot be modified after finalization.
                 </div>
               </li>
               <li className="flex gap-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-1.5" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--pro-azure-50)]0 shrink-0 mt-1.5" />
                 <div className="text-xs text-slate-600 dark:text-slate-300">
                   <span className="font-bold">Data Privacy:</span> Automates tenant isolation for external consultants and auditors.
                 </div>
@@ -1500,7 +1606,7 @@ function SmartRulesView() {
 // Risk Scoring View
 // -----------------------------------------------------------------------------
 
-function RiskView({ complianceScore }: { complianceScore: number }) {
+function RiskView({ complianceScore, criticalPermissions, sodRules }: { complianceScore: number; criticalPermissions: Permission[]; sodRules: SodRule[] }) {
   const roleScores = useMemo(() =>
     ALL_ROLES.map(role => ({ role, score: calcRiskScore(role) }))
       .sort((a, b) => b.score - a.score)
@@ -1509,11 +1615,11 @@ function RiskView({ complianceScore }: { complianceScore: number }) {
   const maxScore = useMemo(() => Math.max(...roleScores.map(r => r.score)), [roleScores]);
 
   const criticalPermsData = useMemo(() =>
-    CRITICAL_PERMISSIONS.map(perm => ({
+    criticalPermissions.map(perm => ({
       perm,
       roles: rbac.rolesWithPermission(perm),
     })).sort((a, b) => a.roles.length - b.roles.length)
-  , []);
+  , [criticalPermissions]);
 
   const privilegeCreep = useMemo(() => {
     return ALL_ROLES.filter(role => {
@@ -1524,11 +1630,17 @@ function RiskView({ complianceScore }: { complianceScore: number }) {
     });
   }, []);
 
+  const sodConflicts = useMemo(() =>
+    sodRules.filter(rule =>
+      ALL_ROLES.some(role => rbac.can(role, rule.perm1) && rbac.can(role, rule.perm2))
+    ).length
+  , [sodRules]);
+
   return (
     <div className="space-y-6">
       {/* Compliance score banner */}
       <div className={`rounded-xl border p-4 flex items-center gap-4 ${
-        complianceScore >= 80 ? 'bg-emerald-500/5 border-emerald-500/20' :
+        complianceScore >= 80 ? 'bg-[var(--pro-azure-50)]0/5 border-[var(--pro-azure)]/20' :
         complianceScore >= 50 ? 'bg-amber-500/5 border-amber-500/20' :
         'bg-rose-500/5 border-rose-500/20'
       }`}>
@@ -1538,12 +1650,12 @@ function RiskView({ complianceScore }: { complianceScore: number }) {
             <circle cx="18" cy="18" r="15.9" fill="none" strokeWidth="2.5"
               strokeDasharray={`${complianceScore} ${100 - complianceScore}`}
               strokeLinecap="round"
-              className={complianceScore >= 80 ? 'text-emerald-400' : complianceScore >= 50 ? 'text-amber-400' : 'text-rose-400'}
+              className={complianceScore >= 80 ? 'text-[var(--pro-azure-light)]' : complianceScore >= 50 ? 'text-amber-400' : 'text-rose-400'}
               stroke="currentColor"
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className={`text-sm font-bold ${complianceScore >= 80 ? 'text-emerald-400' : complianceScore >= 50 ? 'text-amber-400' : 'text-rose-400'}`}>
+            <span className={`text-sm font-bold ${complianceScore >= 80 ? 'text-[var(--pro-azure-light)]' : complianceScore >= 50 ? 'text-amber-400' : 'text-rose-400'}`}>
               {complianceScore}
             </span>
           </div>
@@ -1552,7 +1664,7 @@ function RiskView({ complianceScore }: { complianceScore: number }) {
           <div className="flex items-center gap-2 mb-1">
             <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">Overall Compliance Score</h3>
             <span className={`px-2 py-0.5 rounded-full text-xs font-bold border ${
-              complianceScore >= 80 ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border-slate-200' :
+              complianceScore >= 80 ? 'bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure)] dark:text-green-300 border-slate-200' :
               complianceScore >= 50 ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' :
               'bg-rose-500/20 text-rose-300 border-rose-500/30'
             }`}>
@@ -1564,7 +1676,7 @@ function RiskView({ complianceScore }: { complianceScore: number }) {
             {complianceScore < 80 && ' Resolve SoD conflicts and review high-risk role assignments to improve.'}
           </p>
           <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
-            <span>SoD penalty: <span className="text-rose-400 font-mono">−{SOD_RULES.filter(r => ALL_ROLES.some(role => rbac.can(role, r.perm1) && rbac.can(role, r.perm2))).length * 8}</span></span>
+            <span>SoD penalty: <span className="text-rose-400 font-mono">−{sodConflicts * 8}</span></span>
             <span>High-risk penalty: <span className="text-amber-400 font-mono">−{ALL_ROLES.filter(r => calcRiskScore(r) >= 61).length * 4}</span></span>
           </div>
         </div>
@@ -1586,8 +1698,8 @@ function RiskView({ complianceScore }: { complianceScore: number }) {
           <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">Medium Risk Roles</div>
           <div className="ovds-caption">Score 31-60</div>
         </div>
-        <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4 text-center">
-          <div className="text-2xl font-bold text-emerald-400">
+        <div className="bg-[var(--pro-azure-50)]0/5 border border-[var(--pro-azure)]/20 rounded-xl p-4 text-center">
+          <div className="text-2xl font-bold text-[var(--pro-azure-light)]">
             {roleScores.filter(r => r.score < 31).length}
           </div>
           <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">Low Risk Roles</div>
@@ -1599,7 +1711,7 @@ function RiskView({ complianceScore }: { complianceScore: number }) {
       <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-700/50 p-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-            <BarChart2 className="w-4 h-4 text-emerald-400" />
+            <BarChart2 className="w-4 h-4 text-[var(--pro-azure-light)]" />
             Risk Score Distribution
           </h3>
           <button
@@ -1628,7 +1740,7 @@ function RiskView({ complianceScore }: { complianceScore: number }) {
                 </div>
                 <div className="flex-1 bg-slate-200/50 dark:bg-slate-700/50 rounded-full h-4 relative overflow-hidden">
                   <div
-                    className={`h-4 rounded-full transition-all ${score >= 61 ? 'bg-rose-500/70' : score >= 31 ? 'bg-amber-500/70' : 'bg-emerald-500/70'}`}
+                    className={`h-4 rounded-full transition-all ${score >= 61 ? 'bg-rose-500/70' : score >= 31 ? 'bg-amber-500/70' : 'bg-[var(--pro-azure-50)]0/70'}`}
                     style={{ width: `${barWidth}%` }}
                   />
                 </div>
@@ -1682,7 +1794,7 @@ function RiskView({ complianceScore }: { complianceScore: number }) {
             Privilege Creep Detector
           </h3>
           {privilegeCreep.length === 0 ? (
-            <div className="flex items-center gap-2 text-emerald-400 text-sm py-4">
+            <div className="flex items-center gap-2 text-[var(--pro-azure-light)] text-sm py-4">
               <CheckCircle2 className="w-4 h-4" />
               No privilege creep detected
             </div>
@@ -1714,7 +1826,7 @@ function RiskView({ complianceScore }: { complianceScore: number }) {
       {/* Domain Permission Heatmap */}
       <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-700/50 overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-200/80 dark:border-slate-700/50 bg-slate-100/80 dark:bg-slate-800/80 flex items-center gap-2">
-          <BarChart3 className="w-4 h-4 text-emerald-400" />
+          <BarChart3 className="w-4 h-4 text-[var(--pro-azure-light)]" />
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Domain Access Heatmap</h3>
           <span className="text-xs text-slate-500 ml-auto">admin = red · write = amber · read = green · none = dark</span>
         </div>
@@ -1747,7 +1859,7 @@ function RiskView({ complianceScore }: { complianceScore: number }) {
                   const cellColor = granted.length === 0 ? 'bg-slate-100/60 dark:bg-slate-800/60'
                     : hasAdmin ? 'bg-rose-500/40 hover:bg-rose-500/60'
                     : hasWrite ? 'bg-amber-500/35 hover:bg-amber-500/55'
-                    : hasRead  ? 'bg-emerald-500/30 hover:bg-emerald-600/50'
+                    : hasRead  ? 'bg-[var(--pro-azure-50)]0/30 hover:bg-[var(--pro-azure-dark)]/50'
                     : 'bg-slate-600/40';
                   return (
                     <div
@@ -1771,9 +1883,9 @@ function RiskView({ complianceScore }: { complianceScore: number }) {
 // Segregation of Duties (SoD) View
 // -----------------------------------------------------------------------------
 
-function SodView() {
+function SodView({ sodRules, sodRemediation }: { sodRules: SodRule[]; sodRemediation: Record<string, string[]> }) {
   const results = useMemo(() => {
-    return SOD_RULES.map(rule => {
+    return sodRules.map(rule => {
       const conflictingRoles = ALL_ROLES.filter(role =>
         rbac.can(role, rule.perm1) && rbac.can(role, rule.perm2)
       );
@@ -1792,8 +1904,8 @@ function SodView() {
     <div className="space-y-6">
       {/* Summary */}
       <div className="ovds-grid-layout cols-4">
-        <div className={`rounded-xl border p-4 text-center ${totalConflicts > 0 ? 'bg-rose-500/5 border-rose-500/20' : 'bg-emerald-500/5 border-emerald-500/20'}`}>
-          <div className={`text-2xl font-bold ${totalConflicts > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+        <div className={`rounded-xl border p-4 text-center ${totalConflicts > 0 ? 'bg-rose-500/5 border-rose-500/20' : 'bg-[var(--pro-azure-50)]0/5 border-[var(--pro-azure)]/20'}`}>
+          <div className={`text-2xl font-bold ${totalConflicts > 0 ? 'text-rose-400' : 'text-[var(--pro-azure-light)]'}`}>
             {totalConflicts}
           </div>
           <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">SoD Conflicts</div>
@@ -1806,8 +1918,8 @@ function SodView() {
           <div className="text-2xl font-bold text-amber-400">{highFails}</div>
           <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">High Risk Violations</div>
         </div>
-        <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4 text-center">
-          <div className="text-2xl font-bold text-emerald-400">{affectedRoles.size}</div>
+        <div className="bg-[var(--pro-azure-50)]0/5 border border-[var(--pro-azure)]/20 rounded-xl p-4 text-center">
+          <div className="text-2xl font-bold text-[var(--pro-azure-light)]">{affectedRoles.size}</div>
           <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">Affected Roles</div>
         </div>
       </div>
@@ -1815,7 +1927,7 @@ function SodView() {
       {/* SoD Rules Table */}
       <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-700/50 overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-200/80 dark:border-slate-700/50 bg-slate-100/80 dark:bg-slate-800/80 flex items-center gap-2">
-          <Scale className="w-4 h-4 text-emerald-400" />
+          <Scale className="w-4 h-4 text-[var(--pro-azure-light)]" />
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Segregation of Duties Rules</h3>
           <button
             onClick={() => {
@@ -1831,13 +1943,13 @@ function SodView() {
         </div>
         <div className="divide-y divide-slate-700/30">
           {results.map(rule => {
-            const remediation = SOD_REMEDIATION[rule.id] ?? [];
+            const remediation = sodRemediation[rule.id] ?? [];
             return (
               <div key={rule.id} className={`p-4 ${!rule.pass ? 'bg-rose-950/10' : ''}`}>
                 <div className="flex items-start gap-4">
                   <div className="shrink-0 mt-0.5">
                     {rule.pass ? (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                      <CheckCircle2 className="w-5 h-5 text-[var(--pro-azure-light)]" />
                     ) : (
                       <AlertOctagon className="w-5 h-5 text-rose-400" />
                     )}
@@ -1849,7 +1961,7 @@ function SodView() {
                       <span className={`px-2 py-0.5 rounded-full text-xs font-bold border ${sodRiskBadge(rule.risk)}`}>
                         {rule.risk.toUpperCase()}
                       </span>
-                      <span className={`ml-auto px-2 py-0.5 rounded-full text-xs font-bold ${rule.pass ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-slate-200' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}`}>
+                      <span className={`ml-auto px-2 py-0.5 rounded-full text-xs font-bold ${rule.pass ? 'bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure)] dark:text-green-300 border border-slate-200' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}`}>
                         {rule.pass ? '✓ PASS' : '✗ FAIL'}
                       </span>
                     </div>
@@ -1898,8 +2010,8 @@ function SodView() {
       </div>
 
       {/* Compliant Roles */}
-      <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
-        <h3 className="text-sm font-semibold text-emerald-600 dark:text-emerald-300 mb-3 flex items-center gap-2">
+      <div className="bg-[var(--pro-azure-50)]0/5 border border-[var(--pro-azure)]/20 rounded-xl p-4">
+        <h3 className="text-sm font-semibold text-[var(--pro-azure)] dark:text-green-300 mb-3 flex items-center gap-2">
           <ShieldCheck className="w-4 h-4" />
           Compliant Roles (Zero SoD Conflicts)
         </h3>
@@ -2010,7 +2122,7 @@ function SimulateView() {
       <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-700/50 p-4">
         <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">
-            <User className="w-4 h-4 text-emerald-400" />
+            <User className="w-4 h-4 text-[var(--pro-azure-light)]" />
             <label className="text-sm font-medium text-slate-600 dark:text-slate-300">Simulate Role:</label>
             <select
               value={selectedRole}
@@ -2080,7 +2192,7 @@ function SimulateView() {
                         <span className={`px-2 py-0.5 rounded text-xs font-bold ${
                           d.level === 'admin' ? 'bg-rose-500/20 text-rose-300' :
                           d.level === 'write' ? 'bg-amber-500/20 text-amber-300' :
-                          d.level === 'read' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300' :
+                          d.level === 'read' ? 'bg-[var(--pro-azure-50)]0/15 text-[var(--pro-azure)] dark:text-green-300' :
                           'bg-slate-200 dark:bg-slate-700 text-slate-500'
                         }`}>
                           {d.level.toUpperCase()}
@@ -2091,7 +2203,7 @@ function SimulateView() {
                         return (
                           <td key={action} className="px-3 py-2 text-center">
                             {can ? (
-                              <CheckSquare className="w-3.5 h-3.5 text-emerald-400 mx-auto" />
+                              <CheckSquare className="w-3.5 h-3.5 text-[var(--pro-azure-light)] mx-auto" />
                             ) : (
                               <XSquare className="w-3.5 h-3.5 text-slate-700 mx-auto" />
                             )}
@@ -2123,7 +2235,7 @@ function SimulateView() {
         {/* Try a Permission */}
         <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-700/50 p-4">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-2">
-            <Crosshair className="w-4 h-4 text-emerald-400" />
+            <Crosshair className="w-4 h-4 text-[var(--pro-azure-light)]" />
             Try a Permission
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Type a permission string to see which roles have it.</p>
@@ -2210,14 +2322,14 @@ function SimulateView() {
             </div>
             <button
               onClick={runScenario}
-              className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+              className="w-full py-2 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
             >
               <Play className="w-3.5 h-3.5" />
               Test Scenario
             </button>
           </div>
           {scenarioResult && (
-            <div className={`rounded-lg p-3 text-xs ${scenarioResult.allowed ? 'bg-emerald-500/10 border border-slate-200 text-emerald-600 dark:text-emerald-300' : 'bg-rose-500/10 border border-rose-500/30 text-rose-300'}`}>
+            <div className={`rounded-lg p-3 text-xs ${scenarioResult.allowed ? 'bg-[var(--pro-azure-50)]0/10 border border-slate-200 text-[var(--pro-azure)] dark:text-green-300' : 'bg-rose-500/10 border border-rose-500/30 text-rose-300'}`}>
               <div className="flex items-start gap-2">
                 {scenarioResult.allowed ? (
                   <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
@@ -2239,12 +2351,41 @@ function SimulateView() {
 // Audit Intelligence View
 // -----------------------------------------------------------------------------
 
-function AuditView() {
+function AuditView({ auditEvents }: { auditEvents: AuditEvent[] }) {
+  const companyId = useCompanyId();
   const [search, setSearch] = useState('');
   const [severityFilter, setSeverityFilter] = useState<'all' | 'critical' | 'high' | 'medium' | 'low'>('all');
+  const [liveTab, setLiveTab] = useState<'live' | 'intelligence'>('live');
+
+  // ── Live ACCESS_DENIED feed ───────────────────────────────────────────────
+  const { data: denialData, isLoading: denialLoading, refetch: refetchDenials } = useQuery({
+    queryKey: ['access-denials', companyId],
+    queryFn: async () => {
+      const res = await api.get('/security/access-denials', {
+        params: { ...(companyId ? { companyId } : {}), take: 50 },
+      });
+      return res.data?.data as {
+        data: Array<{
+          id: string;
+          userId: string | null;
+          username: string | null;
+          email: string | null;
+          role: string | null;
+          companyId: string | null;
+          reason: string | null;
+          permissions: string[];
+          createdAt: string;
+        }>;
+        pagination: { total: number; pages: number };
+        summary: { total: number; last24h: number };
+      };
+    },
+    refetchInterval: 30_000, // poll every 30 s
+    staleTime: 20_000,
+  });
 
   const filtered = useMemo(() => {
-    let events = AUDIT_EVENTS;
+    let events = auditEvents;
     if (search) events = events.filter(e => e.permission.toLowerCase().includes(search.toLowerCase()) || e.event.toLowerCase().includes(search.toLowerCase()));
     if (severityFilter !== 'all') events = events.filter(e => e.severity === severityFilter);
     return events.sort((a, b) => {
@@ -2254,11 +2395,11 @@ function AuditView() {
   }, [search, severityFilter]);
 
   const stats = useMemo(() => ({
-    critical: AUDIT_EVENTS.filter(e => e.severity === 'critical').length,
-    high: AUDIT_EVENTS.filter(e => e.severity === 'high').length,
-    medium: AUDIT_EVENTS.filter(e => e.severity === 'medium').length,
-    low: AUDIT_EVENTS.filter(e => e.severity === 'low').length,
-  }), []);
+    critical: auditEvents.filter(e => e.severity === 'critical').length,
+    high: auditEvents.filter(e => e.severity === 'high').length,
+    medium: auditEvents.filter(e => e.severity === 'medium').length,
+    low: auditEvents.filter(e => e.severity === 'low').length,
+  }), [auditEvents]);
 
   function severityBadge(severity: AuditEvent['severity']): string {
     if (severity === 'critical') return 'bg-rose-500/20 text-rose-300 border border-rose-500/40';
@@ -2278,6 +2419,127 @@ function AuditView() {
 
   return (
     <div className="space-y-6">
+
+      {/* ── Tab switcher: Live Feed vs Intelligence ── */}
+      <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 w-fit">
+        {(['live', 'intelligence'] as const).map(tab => (
+          <button
+            key={tab}
+            onClick={() => setLiveTab(tab)}
+            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              liveTab === tab
+                ? 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+            }`}
+          >
+            {tab === 'live' ? (
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                Live Denials
+                {denialData?.summary?.last24h != null && denialData.summary.last24h > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-500 text-[9px] font-extrabold">
+                    {denialData.summary.last24h}
+                  </span>
+                )}
+              </span>
+            ) : 'Event Intelligence'}
+          </button>
+        ))}
+      </div>
+
+      {liveTab === 'live' ? (
+        <div className="space-y-4">
+          {/* Live summary row */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="p-3.5 rounded-xl border border-rose-500/20 bg-rose-500/5">
+              <p className="text-xl font-bold text-rose-400 tabular-nums">
+                {denialData?.summary?.total ?? '—'}
+              </p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 font-semibold uppercase tracking-wider">Total Denials</p>
+            </div>
+            <div className="p-3.5 rounded-xl border border-amber-500/20 bg-amber-500/5">
+              <p className="text-xl font-bold text-amber-400 tabular-nums">
+                {denialData?.summary?.last24h ?? '—'}
+              </p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 font-semibold uppercase tracking-wider">Last 24 h</p>
+            </div>
+            <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+              <p className="text-xl font-bold text-slate-600 dark:text-slate-300 tabular-nums">
+                {denialData?.pagination?.total ?? '—'}
+              </p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 font-semibold uppercase tracking-wider">In View</p>
+            </div>
+          </div>
+
+          {/* Denial feed */}
+          <div className="ovds-widget-card overflow-hidden">
+            <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <AlertOctagon className="w-4 h-4 text-rose-500" />
+                <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Access Denied Events</span>
+                <span className="text-[10px] text-slate-400 font-mono">action = ACCESS_DENIED</span>
+              </div>
+              <button
+                onClick={() => refetchDenials()}
+                className="flex items-center gap-1 text-[11px] text-slate-500 hover:text-[var(--pro-azure)] transition-colors"
+              >
+                <RefreshCw className="w-3 h-3" /> Refresh
+              </button>
+            </div>
+
+            {denialLoading ? (
+              <div className="p-6 space-y-2">
+                {[1,2,3].map(i => <div key={i} className="h-12 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse" />)}
+              </div>
+            ) : !denialData?.data?.length ? (
+              <div className="p-8 text-center">
+                <CheckCircle2 className="w-8 h-8 text-[var(--pro-azure)] mx-auto mb-2" />
+                <p className="text-sm text-slate-500">No access denials recorded. Your ABAC policies are clean.</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {denialData.data.map(denial => (
+                  <div key={denial.id} className="px-4 py-3 hover:bg-rose-500/5 transition-colors">
+                    <div className="flex items-start gap-3">
+                      <div className="w-7 h-7 rounded-lg bg-rose-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                        <AlertOctagon className="w-3.5 h-3.5 text-rose-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                            {denial.username ?? denial.email ?? denial.userId ?? 'unknown'}
+                          </span>
+                          {denial.role && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
+                              {denial.role}
+                            </span>
+                          )}
+                          <span className="text-[10px] text-slate-400 ml-auto">
+                            {new Date(denial.createdAt).toLocaleString()}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-rose-600 dark:text-rose-400 mt-0.5 leading-relaxed">
+                          {denial.reason ?? 'No reason recorded'}
+                        </p>
+                        {denial.permissions.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1.5">
+                            {denial.permissions.map(p => (
+                              <code key={p} className="text-[9px] px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 font-mono">
+                                {p}
+                              </code>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+      <div className="space-y-6">
       {/* Summary cards */}
       <div className="ovds-grid-layout cols-4">
         <div className="bg-rose-500/5 border border-rose-500/20 rounded-xl p-4 text-center">
@@ -2315,7 +2577,7 @@ function AuditView() {
           <option value="low">Low</option>
         </select>
         <button onClick={handleExport}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium rounded-lg transition-colors">
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-xs font-medium rounded-lg transition-colors">
           <Download className="w-3.5 h-3.5" />
           Export CSV
         </button>
@@ -2325,7 +2587,7 @@ function AuditView() {
       {/* Audit events table */}
       <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-700/50 overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-200/80 dark:border-slate-700/50 bg-slate-100/80 dark:bg-slate-800/80 flex items-center gap-2">
-          <History className="w-4 h-4 text-emerald-400" />
+          <History className="w-4 h-4 text-[var(--pro-azure-light)]" />
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Audit Intelligence Matrix</h3>
           <span className="text-xs text-slate-500 ml-auto">Regulatory compliance & retention requirements</span>
         </div>
@@ -2379,17 +2641,19 @@ function AuditView() {
       </div>
 
       {/* Compliance note */}
-      <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
+      <div className="bg-[var(--pro-azure-50)]0/5 border border-[var(--pro-azure)]/20 rounded-xl p-4">
         <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+          <Info className="w-5 h-5 text-[var(--pro-azure-light)] shrink-0 mt-0.5" />
           <div>
-            <h4 className="text-sm font-semibold text-emerald-600 dark:text-emerald-300 mb-1">Audit Log Retention Policy</h4>
+            <h4 className="text-sm font-semibold text-[var(--pro-azure)] dark:text-green-300 mb-1">Audit Log Retention Policy</h4>
             <p className="ovds-body">
               All audit events are automatically logged with immutable timestamps. Retention periods are based on Ethiopian regulatory requirements (Commercial Code 2021, VAT Proclamation 1341/2024, Income Tax 979/2016, NBE Directives) and international standards (ISO 27001, IFRS, FATF). Critical events (payroll approval, fund transfers, VAT filing, KYC approval, AML flags) are retained for 10 years minimum.
             </p>
           </div>
         </div>
       </div>
+    </div>
+      )} {/* end intelligence tab */}
     </div>
   );
 }
@@ -2452,7 +2716,7 @@ function PermissionLookupModal({ onClose }: { onClose: () => void }) {
               <div className="flex items-center justify-center gap-2 flex-wrap mt-4">
                 {['payroll:approve', 'vat:file', 'users:delete', 'fund_transfers:approve'].map(ex => (
                   <button key={ex} onClick={() => setQuery(ex)}
-                    className="text-xs font-mono bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-400 px-2 py-1 rounded transition-colors">
+                    className="text-xs font-mono bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] dark:hover:text-[var(--pro-azure-light)] px-2 py-1 rounded transition-colors">
                     {ex}
                   </button>
                 ))}
@@ -2469,7 +2733,7 @@ function PermissionLookupModal({ onClose }: { onClose: () => void }) {
                   <div className="flex items-center gap-2 mb-2.5">
                     <span className="font-mono text-sm font-semibold text-slate-800 dark:text-slate-100">{permission}</span>
                     {isSensitivePerm(permission) && <Star className="w-3.5 h-3.5 text-yellow-400 shrink-0" />}
-                    <span className="ml-auto text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/20 shrink-0">
+                    <span className="ml-auto text-xs font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10 px-2 py-0.5 rounded-full border border-[var(--pro-azure-100)] dark:border-[var(--pro-azure)]/20 shrink-0">
                       {roles.length} / {ALL_ROLES.length} roles
                     </span>
                   </div>
@@ -2542,7 +2806,7 @@ function PolicyView() {
   function levelBadge(level: string) {
     if (level === 'admin') return 'bg-rose-500/20 text-rose-300 border-rose-500/30';
     if (level === 'write') return 'bg-amber-500/20 text-amber-300 border-amber-500/30';
-    if (level === 'read')  return 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/20';
+    if (level === 'read')  return 'bg-[var(--pro-azure-50)]0/15 text-[var(--pro-azure)] dark:text-green-300 border-[var(--pro-azure)]/20';
     return 'bg-slate-200/50 dark:bg-slate-700/50 text-slate-500 border-slate-600/30';
   }
 
@@ -2626,7 +2890,7 @@ function PolicyView() {
       <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-700/50 overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-200/80 dark:border-slate-700/50 bg-slate-100/80 dark:bg-slate-800/80">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-            <Download className="w-4 h-4 text-emerald-400" />
+            <Download className="w-4 h-4 text-[var(--pro-azure-light)]" />
             Policy Export
           </h3>
           <p className="text-xs text-slate-500 mt-0.5">Export the full RBAC policy as JSON or CSV for documentation, audits, or CI/CD pipelines.</p>
@@ -2637,7 +2901,7 @@ function PolicyView() {
             <div className="flex gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-0.5">
               {(['csv', 'json'] as const).map(f => (
                 <button key={f} onClick={() => setExportFormat(f)}
-                  className={`px-3 py-1.5 rounded text-xs font-bold transition-all ${exportFormat === f ? 'bg-emerald-500 text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200'}`}>
+                  className={`px-3 py-1.5 rounded text-xs font-bold transition-all ${exportFormat === f ? 'bg-[var(--pro-azure)] text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200'}`}>
                   {f.toUpperCase()}
                 </button>
               ))}
@@ -2656,8 +2920,8 @@ function PolicyView() {
           <button onClick={handleExport}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
               justExported
-                ? 'bg-emerald-500 text-white'
-                : 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                ? 'bg-[var(--pro-azure)] text-white'
+                : 'bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white'
             }`}>
             {justExported ? <CheckCheck className="w-4 h-4" /> : <Download className="w-4 h-4" />}
             {justExported ? 'Exported!' : `Export ${exportFormat.toUpperCase()}`}
@@ -2758,7 +3022,7 @@ function PolicyView() {
                       </span>
                     </td>
                     <td className="px-4 py-2 text-center">
-                      {diff > 0 && <span className="text-emerald-600 dark:text-emerald-400 font-bold text-xs">▲ {compareB.split('_')[0]}</span>}
+                      {diff > 0 && <span className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold text-xs">▲ {compareB.split('_')[0]}</span>}
                       {diff < 0 && <span className="text-rose-400 font-bold text-xs">▼ {compareA.split('_')[0]}</span>}
                       {diff === 0 && <span className="text-slate-600 text-xs">—</span>}
                     </td>
@@ -2778,7 +3042,7 @@ function PolicyView() {
             Sensitive Route Guard Analysis
           </h3>
           <p className="text-xs text-slate-500 mt-0.5">
-            Routes in <code className="text-emerald-400 bg-emerald-500/10 px-1 rounded">SENSITIVE_ROUTES</code> require MFA step-up. Shows which roles can access each and the required permission.
+            Routes in <code className="text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)]0/10 px-1 rounded">SENSITIVE_ROUTES</code> require MFA step-up. Shows which roles can access each and the required permission.
           </p>
         </div>
         <div className="overflow-auto">
@@ -2817,7 +3081,7 @@ function PolicyView() {
                     </div>
                   </td>
                   <td className="px-4 py-2.5 text-center">
-                    <span className={`text-xs font-bold ${accessibleRoles.length <= 3 ? 'text-emerald-400' : accessibleRoles.length <= 7 ? 'text-amber-400' : 'text-rose-400'}`}>
+                    <span className={`text-xs font-bold ${accessibleRoles.length <= 3 ? 'text-[var(--pro-azure-light)]' : accessibleRoles.length <= 7 ? 'text-amber-400' : 'text-rose-400'}`}>
                       {accessibleRoles.length}
                     </span>
                   </td>
@@ -2859,7 +3123,7 @@ function ShortcutsModal({ onClose }: { onClose: () => void }) {
       <div className="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
           <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <Keyboard className="w-4 h-4 text-emerald-500" />
+            <Keyboard className="w-4 h-4 text-[var(--pro-azure)]" />
             Keyboard Shortcuts
           </h3>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
@@ -2886,7 +3150,7 @@ function ShortcutsModal({ onClose }: { onClose: () => void }) {
               {tabShortcuts.map(s => (
                 <div key={s.key} className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 rounded-lg px-2.5 py-1.5">
                   <span className="text-xs text-slate-600 dark:text-slate-300">{s.desc}</span>
-                  <kbd className="text-[10px] font-mono font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-1.5 py-0.5 rounded">{s.key}</kbd>
+                  <kbd className="text-[10px] font-mono font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10 border border-[var(--pro-azure-100)] dark:border-[var(--pro-azure)]/20 px-1.5 py-0.5 rounded">{s.key}</kbd>
                 </div>
               ))}
             </div>
@@ -2925,13 +3189,15 @@ const TABS: TabConfig[] = [
    { id: 'OVDS', label: 'Role Guide', icon: <BookOpen className="w-3.5 h-3.5" />,     description: 'Comprehensive role reference guide' },
   { id: 'risk',      label: 'Risk',      icon: <Gauge className="w-3.5 h-3.5" />,         description: 'Enterprise risk scoring dashboard', badge: 'NEW', badgeColor: 'bg-rose-500/20 text-rose-300' },
   { id: 'sod',       label: 'SoD',       icon: <Scale className="w-3.5 h-3.5" />,         description: 'Segregation of Duties conflict detector', badge: 'NEW', badgeColor: 'bg-amber-500/20 text-amber-300' },
-  { id: 'simulate',  label: 'Simulate',  icon: <FlaskConical className="w-3.5 h-3.5" />,  description: 'Role simulation explorer', badge: 'NEW', badgeColor: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300' },
-  { id: 'audit',     label: 'Audit',     icon: <History className="w-3.5 h-3.5" />,       description: 'Audit intelligence — events, regulations, retention', badge: 'NEW', badgeColor: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300' },
-  { id: 'policy',    label: 'Policy',    icon: <FileText className="w-3.5 h-3.5" />,      description: 'Policy export, deep role comparison, sensitive route analysis', badge: 'NEW', badgeColor: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300' },
-  { id: 'smart-rules', label: 'Smart Rules', icon: <Zap className="w-3.5 h-3.5" />,      description: 'Context-aware RBAC: amount limits, status checks, and multi-tenant isolation', badge: 'SMART', badgeColor: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300' },
+  { id: 'simulate',  label: 'Simulate',  icon: <FlaskConical className="w-3.5 h-3.5" />,  description: 'Role simulation explorer', badge: 'NEW', badgeColor: 'bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure)] dark:text-green-300' },
+  { id: 'audit',     label: 'Audit',     icon: <History className="w-3.5 h-3.5" />,       description: 'Audit intelligence — events, regulations, retention', badge: 'NEW', badgeColor: 'bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure)] dark:text-green-300' },
+  { id: 'policy',    label: 'Policy',    icon: <FileText className="w-3.5 h-3.5" />,      description: 'Policy export, deep role comparison, sensitive route analysis', badge: 'NEW', badgeColor: 'bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure)] dark:text-green-300' },
+  { id: 'smart-rules', label: 'Smart Rules', icon: <Zap className="w-3.5 h-3.5" />,      description: 'Context-aware RBAC: amount limits, status checks, and multi-tenant isolation', badge: 'SMART', badgeColor: 'bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure)] dark:text-green-300' },
   { id: 'app-access', label: 'App Access', icon: <Package className="w-3.5 h-3.5" />,   description: 'App access control per role', badge: 'NEW', badgeColor: 'bg-violet-500/20 text-violet-300' },
-  { id: 'custom-roles', label: 'Custom Roles', icon: <Users className="w-3.5 h-3.5" />,   description: 'CRUD for company-specific database-backed roles', badge: 'CRUD', badgeColor: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300' },
-  { id: 'permissions',  label: 'Permissions',  icon: <Lock className="w-3.5 h-3.5" />,     description: 'CRUD for granular permissions and categories', badge: 'CRUD', badgeColor: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300' },
+  { id: 'overrides',  label: 'Overrides',  icon: <Shield className="w-3.5 h-3.5" />,    description: 'Per-company role permission overrides (GRANT / DENY)', badge: 'LIVE', badgeColor: 'bg-amber-500/20 text-amber-600 dark:text-amber-300' },
+  { id: 'custom-roles', label: 'Custom Roles', icon: <Users className="w-3.5 h-3.5" />,   description: 'CRUD for company-specific database-backed roles', badge: 'CRUD', badgeColor: 'bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure)] dark:text-green-300' },
+  { id: 'permissions',  label: 'Permissions',  icon: <Lock className="w-3.5 h-3.5" />,     description: 'CRUD for granular permissions and categories', badge: 'CRUD', badgeColor: 'bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure)] dark:text-green-300' },
+  { id: 'security-policy', label: 'Security Policy', icon: <ShieldCheck className="w-3.5 h-3.5" />, description: 'Per-tenant ABAC policy: IP whitelist, time-window, MFA enforcement', badge: 'ABAC', badgeColor: 'bg-rose-500/20 text-rose-600 dark:text-rose-300' },
 ];
 
 // -----------------------------------------------------------------------------
@@ -2967,7 +3233,7 @@ function AppAccessView() {
 
   const ACCESS_LEVELS = [
     { value: 'NONE', label: 'None', color: 'bg-slate-100 text-slate-500' },
-    { value: 'READ', label: 'Read', color: 'bg-emerald-50 text-emerald-700' },
+    { value: 'READ', label: 'Read', color: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]' },
     { value: 'WRITE', label: 'Write', color: 'bg-amber-50 text-amber-700' },
     { value: 'ADMIN', label: 'Admin', color: 'bg-rose-50 text-rose-700' },
   ];
@@ -2987,8 +3253,8 @@ function AppAccessView() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-emerald-50 dark:bg-emerald-500/5 rounded-xl border border-emerald-200 dark:border-emerald-500/20 p-4">
-        <h3 className="text-sm font-semibold text-emerald-700 dark:text-emerald-400 mb-1 flex items-center gap-2">
+      <div className="bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/5 rounded-xl border border-[var(--pro-azure-100)] dark:border-[var(--pro-azure)]/20 p-4">
+        <h3 className="text-sm font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] mb-1 flex items-center gap-2">
           <Package className="w-4 h-4" />
           Role → App Access Matrix
         </h3>
@@ -3057,6 +3323,280 @@ function AppAccessView() {
 }
 
 // -----------------------------------------------------------------------------
+// Overrides View — per-company role permission override matrix
+// (migrated from the former /settings/advanced-access-controls page)
+// -----------------------------------------------------------------------------
+
+const OVERRIDE_ACCESS_OPTIONS: { value: 'GRANT' | 'DENY'; label: string }[] = [
+  { value: 'GRANT', label: 'Grant' },
+  { value: 'DENY',  label: 'Deny'  },
+];
+
+function OverridesView() {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const companyId = useCompanyId();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [expandedDomain, setExpandedDomain] = useState<string | null>(null);
+
+  const catalog = useMemo(() => permissionCatalog(), []);
+
+  const filteredCatalog = useMemo(() => {
+    if (!searchTerm.trim()) return catalog;
+    const term = searchTerm.toLowerCase();
+    return catalog.filter((domain) => {
+      if (domain.key.toLowerCase().includes(term)) return true;
+      return [
+        ...domain.permissions.view,
+        ...domain.permissions.create,
+        ...domain.permissions.edit,
+        ...domain.permissions.delete,
+        ...domain.permissions.approve,
+      ].some((p) => p.toLowerCase().includes(term));
+    });
+  }, [catalog, searchTerm]);
+
+  useEffect(() => {
+    if (expandedDomain === null && filteredCatalog.length > 0) {
+      setExpandedDomain(filteredCatalog[0].key);
+    }
+  }, [expandedDomain, filteredCatalog]);
+
+  const {
+    data: overrides,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ['app-access', 'overrides', companyId],
+    queryFn: () => advancedAccessApi.getOverrides(companyId || undefined),
+    enabled: !!companyId,
+    staleTime: 30_000,
+  });
+
+  const resetMutation = useMutation({
+    mutationFn: () => advancedAccessApi.saveOverrides([], companyId || undefined),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['app-access', 'overrides', companyId] });
+      toast.success(t('advancedAccess.resetComplete', 'All overrides cleared'));
+    },
+    onError: (err: any) => {
+      toast.error(err?.message ?? t('advancedAccess.errors.resetFailed', 'Reset failed'));
+    },
+  });
+
+  const safeOverrides: RolePermissionOverrideDTO[] = (Array.isArray(overrides) ? overrides : []).filter(
+    (o): o is RolePermissionOverrideDTO =>
+      o !== null &&
+      typeof o === 'object' &&
+      typeof o.role === 'string' &&
+      typeof o.permission === 'string' &&
+      (o.access === 'GRANT' || o.access === 'DENY'),
+  );
+
+  const overrideMap = useMemo(() => {
+    const map = new Map<string, 'GRANT' | 'DENY'>();
+    for (const o of safeOverrides) map.set(`${o.role}:${o.permission}`, o.access);
+    return map;
+  }, [safeOverrides]);
+
+  const getOverride = (role: string, permission: string) =>
+    overrideMap.get(`${role}:${permission}`) ?? null;
+
+  const setOverride = async (role: string, permission: string, access: 'GRANT' | 'DENY') => {
+    const newAccess = getOverride(role, permission) === access ? null : access;
+    const current = [...safeOverrides];
+    const idx = current.findIndex((o) => o.role === role && o.permission === permission);
+    if (newAccess === null) {
+      if (idx >= 0) current.splice(idx, 1);
+    } else {
+      if (idx >= 0) current[idx].access = newAccess;
+      else current.push({ role, permission, access: newAccess });
+    }
+    try {
+      await advancedAccessApi.saveOverrides(current, companyId || undefined);
+      queryClient.setQueryData(['app-access', 'overrides', companyId], current);
+      toast.success(t('advancedAccess.overrideSaved', 'Override saved'));
+    } catch (err: any) {
+      toast.error(err?.message ?? t('advancedAccess.errors.saveFailed', 'Save failed'));
+    }
+  };
+
+  const handleReset = () => {
+    if (!confirm(t('advancedAccess.resetConfirm', 'Clear all overrides? This cannot be undone.'))) return;
+    resetMutation.mutate();
+  };
+
+  if (!companyId) {
+    return (
+      <div className="flex items-center justify-center py-12 text-sm text-slate-500 gap-2">
+        <AlertCircle className="h-5 w-5 text-amber-500" />
+        No company selected. Select a company to manage overrides.
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12 gap-2 text-sm text-slate-500">
+        <RefreshCw className="h-4 w-4 animate-spin" /> Loading overrides…
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center py-12 gap-2 text-sm text-rose-500">
+        <AlertCircle className="h-5 w-5" /> Failed to load overrides.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+            <Shield className="w-4 h-4 text-amber-500" />
+            Role Permission Overrides
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            GRANT or DENY specific permissions per role for this company. Overrides layer on top of base role permissions.
+            SPURADMIN / SUPERADMIN are never restricted by DENY overrides.
+          </p>
+        </div>
+        <div className="flex gap-2 shrink-0">
+          <button
+            onClick={() => refetch()}
+            disabled={isLoading}
+            className="px-3 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5 text-slate-600 dark:text-slate-300"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+          <button
+            onClick={handleReset}
+            disabled={safeOverrides.length === 0 || resetMutation.isPending}
+            className="px-3 py-1.5 text-xs border border-rose-300 dark:border-rose-800 text-rose-600 dark:text-rose-400 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 flex items-center gap-1.5 disabled:opacity-40"
+          >
+            <X className="h-3.5 w-3.5" />
+            Reset All
+          </button>
+        </div>
+      </div>
+
+      {/* Active override count */}
+      <div className="text-xs text-slate-500 dark:text-slate-400">
+        {safeOverrides.length} active override{safeOverrides.length !== 1 ? 's' : ''}
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Search domains or permissions…"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-9 pr-4 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded-lg w-full bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/30"
+        />
+      </div>
+
+      {/* Domain accordion */}
+      <div className="space-y-2">
+        {filteredCatalog.map((domain) => (
+          <div key={domain.key} className="border border-slate-200/80 dark:border-slate-700/50 rounded-xl overflow-hidden">
+            <button
+              onClick={() => setExpandedDomain(expandedDomain === domain.key ? null : domain.key)}
+              className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-slate-800/50 text-sm font-medium text-slate-700 dark:text-slate-200"
+            >
+              <span>{domain.key}</span>
+              {expandedDomain === domain.key
+                ? <ChevronDown className="h-4 w-4 text-slate-400" />
+                : <ChevronRight className="h-4 w-4 text-slate-400" />}
+            </button>
+
+            {expandedDomain === domain.key && (
+              <div className="border-t border-slate-200/80 dark:border-slate-700/50 overflow-x-auto">
+                <table className="text-xs w-full border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50/80 dark:bg-slate-800/50">
+                      <th className="text-left px-4 py-2 text-slate-500 dark:text-slate-400 font-medium min-w-[200px]">Permission</th>
+                      {ALL_ROLES.map((role) => (
+                        <th key={role} className="text-center px-2 py-2 text-slate-500 dark:text-slate-400 font-medium min-w-[80px]">
+                          {ROLE_METADATA[role]?.label ?? role}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Array.from(new Set([
+                      ...domain.permissions.view,
+                      ...domain.permissions.create,
+                      ...domain.permissions.edit,
+                      ...domain.permissions.delete,
+                      ...domain.permissions.approve,
+                    ])).map((perm, pi) => (
+                      <tr key={perm} className={pi % 2 === 0 ? 'bg-white dark:bg-slate-900/20' : 'bg-slate-50/60 dark:bg-slate-800/20'}>
+                        <td className="px-4 py-1.5 font-mono text-slate-600 dark:text-slate-300 border-r border-slate-100 dark:border-slate-700/50">{perm}</td>
+                        {ALL_ROLES.map((role) => {
+                          const current = getOverride(role, perm);
+                          return (
+                            <td key={role} className="text-center py-1.5 px-1">
+                              {current ? (
+                                <button
+                                  onClick={() => setOverride(role, perm, current)}
+                                  title={`Clear ${current} override`}
+                                  className={`inline-flex items-center justify-center w-6 h-6 rounded ${
+                                    current === 'GRANT'
+                                      ? 'bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure)] hover:bg-[var(--pro-azure-dark)]/20'
+                                      : 'bg-rose-500/10 text-rose-500 hover:bg-rose-500/20'
+                                  }`}
+                                >
+                                  {current === 'GRANT' ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                                </button>
+                              ) : (
+                                <div className="inline-flex gap-0.5">
+                                  {OVERRIDE_ACCESS_OPTIONS.map((opt) => (
+                                    <button
+                                      key={opt.value}
+                                      onClick={() => setOverride(role, perm, opt.value)}
+                                      title={`${opt.label} ${perm} for ${role}`}
+                                      className={`inline-flex items-center justify-center w-5 h-5 rounded opacity-30 hover:opacity-100 transition-opacity ${
+                                        opt.value === 'GRANT'
+                                          ? 'text-[var(--pro-azure)] hover:bg-[var(--pro-azure-dark)]/10'
+                                          : 'text-rose-500 hover:bg-rose-500/10'
+                                      }`}
+                                    >
+                                      {opt.value === 'GRANT' ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        ))}
+
+        {filteredCatalog.length === 0 && (
+          <div className="text-center py-10 text-sm text-slate-400">
+            No domains match "{searchTerm}".
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// -----------------------------------------------------------------------------
 // Database-backed RBAC CRUD Views
 // -----------------------------------------------------------------------------
 
@@ -3077,10 +3617,12 @@ type DbRole = {
   description?: string | null;
   isActive: boolean;
   isSystem: boolean;
+  apiAccess: boolean;
   companyId?: string | null;
   createdAt?: string;
   updatedAt?: string;
   permissions: DbPermission[];
+  customUsersCount?: number;
 };
 
 function useCompanyId(): string | undefined {
@@ -3095,24 +3637,1763 @@ const PERMISSION_CATEGORIES = [
   'ifrs', 'inventory', 'crm', 'invoice', 'compliance', 'other',
 ];
 
+// ---------------------------------------------------------------------------
+// SecurityPolicyPanel — per-tenant ABAC configuration
+// ---------------------------------------------------------------------------
+
+const COMMON_TIMEZONES = [
+  'Africa/Addis_Ababa', 'Africa/Nairobi', 'Africa/Cairo',
+  'Europe/London', 'Europe/Paris', 'Asia/Dubai',
+  'America/New_York', 'America/Los_Angeles', 'UTC',
+];
+
+/** The default sensitive permissions mirrored from access-policy.service.ts */
+const DEFAULT_SENSITIVE_PERMS = [
+  'fund_transfers:approve',
+  'payroll:approve',
+  'payroll:admin',
+  'users:delete',
+  'vat:file',
+  'companies:delete',
+  'role_permissions:write',
+  'system:deploy',
+  'banking:kyc:approve',
+  'banking:aml:flag',
+  'period_close:write',
+  'audit_logs:write',
+  'external_audit:certify',
+  'ifrs10:consolidation:approve',
+];
+
+/** Validate an IPv4, IPv4 CIDR, or simple IPv6 address string. Returns an error message or null. */
+function validateIpOrCidr(value: string): string | null {
+  const v = value.trim();
+  if (!v) return 'Enter an IP or CIDR block.';
+  // CIDR
+  if (v.includes('/')) {
+    const [ip, bits] = v.split('/');
+    const prefixLen = parseInt(bits ?? '', 10);
+    if (isNaN(prefixLen) || prefixLen < 0 || prefixLen > 32) return 'CIDR prefix must be 0–32.';
+    const octets = (ip ?? '').split('.');
+    if (octets.length !== 4 || octets.some(o => isNaN(+o) || +o < 0 || +o > 255))
+      return 'Invalid IPv4 address in CIDR.';
+    return null;
+  }
+  // IPv4
+  const octets = v.split('.');
+  if (octets.length === 4 && octets.every(o => !isNaN(+o) && +o >= 0 && +o <= 255)) return null;
+  // Allow basic IPv6 (contains colon)
+  if (v.includes(':')) return null;
+  return 'Not a valid IP address or CIDR block.';
+}
+
+/** Pill toggle switch */
+function Toggle({ checked, onChange, disabled, colorClass = 'bg-[var(--pro-azure-50)]0' }: {
+  checked: boolean; onChange: (v: boolean) => void; disabled?: boolean; colorClass?: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      disabled={disabled}
+      onClick={() => !disabled && onChange(!checked)}
+      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent
+        transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pro-azure)]
+        disabled:opacity-40 disabled:cursor-not-allowed
+        ${checked ? colorClass : 'bg-slate-300 dark:bg-slate-600'}`}
+    >
+      <span
+        className={`pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow-sm
+          transform transition-transform duration-200
+          ${checked ? 'translate-x-4' : 'translate-x-0'}`}
+      />
+    </button>
+  );
+}
+
+/** Compute a 0–100 policy strength score based on active controls */
+function calcPolicyScore(ipList: string[], hoursOn: boolean, mfaOn: boolean, extraPerms: string[]): number {
+  let score = 0;
+  if (ipList.length > 0)   score += 35; // IP restriction: biggest impact
+  if (hoursOn)             score += 25; // time-window
+  if (mfaOn)               score += 30; // MFA
+  if (extraPerms.length > 0) score += 10; // extended sensitive perms coverage
+  return Math.min(100, score);
+}
+
+function SecurityPolicyPanel() {
+  const companyId  = useCompanyId();
+  const qc         = useQueryClient();
+  const { can }    = useRbac();
+  const canWrite   = can('role_permissions:write') || can('settings:write');
+
+  const { data: loaded, isLoading } = useQuery({
+    queryKey: ['security-policy', companyId],
+    queryFn: async () => {
+      const res = await api.get('/settings/security-policy', {
+        params: { ...(companyId ? { companyId } : {}) },
+      });
+      return (res.data?.data ?? null) as {
+        companyId: string; companyName: string;
+        policy: {
+          ipWhitelist?: string[];
+          allowedHours?: { start: string; end: string; timezone: string } | null;
+          mfaRequired?: boolean;
+          sensitivePerms?: string[];
+        } | null;
+      } | null;
+    },
+  });
+
+  const policy = loaded?.policy ?? {};
+
+  // ── form state ────────────────────────────────────────────────────────────
+  const [ipInput,     setIpInput]     = useState('');
+  const [ipError,     setIpError]     = useState<string | null>(null);
+  const [ipList,      setIpList]      = useState<string[]>([]);
+  const [hoursOn,     setHoursOn]     = useState(false);
+  const [start,       setStart]       = useState('09:00');
+  const [end,         setEnd]         = useState('17:00');
+  const [tz,          setTz]          = useState('Africa/Addis_Ababa');
+  const [mfaOn,       setMfaOn]       = useState(false);
+  const [extraPerms,  setExtraPerms]  = useState<string[]>([]);
+  const [permInput,   setPermInput]   = useState('');
+  const [saving,      setSaving]      = useState(false);
+  const [previewCopied, setPreviewCopied] = useState(false);
+
+  // ── load from server ─────────────────────────────────────────────────────
+  const loadState = useCallback(() => {
+    if (!loaded) return;
+    const p = loaded.policy ?? {};
+    setIpList(p.ipWhitelist ?? []);
+    setHoursOn(!!p.allowedHours);
+    setStart(p.allowedHours?.start ?? '09:00');
+    setEnd(p.allowedHours?.end ?? '17:00');
+    setTz(p.allowedHours?.timezone ?? 'Africa/Addis_Ababa');
+    setMfaOn(p.mfaRequired ?? false);
+    setExtraPerms(p.sensitivePerms ?? []);
+  }, [loaded]);  
+
+  useEffect(() => { loadState(); }, [loadState]);
+
+  // ── dirty check ──────────────────────────────────────────────────────────
+  const savedIpList     = policy.ipWhitelist     ?? [];
+  const savedHoursOn    = !!policy.allowedHours;
+  const savedStart      = policy.allowedHours?.start    ?? '09:00';
+  const savedEnd        = policy.allowedHours?.end      ?? '17:00';
+  const savedTz         = policy.allowedHours?.timezone ?? 'Africa/Addis_Ababa';
+  const savedMfaOn      = policy.mfaRequired ?? false;
+  const savedExtraPerms = policy.sensitivePerms ?? [];
+
+  const isDirty = useMemo(() => {
+    if (!loaded) return false;
+    const ipChanged   = JSON.stringify([...ipList].sort()) !== JSON.stringify([...savedIpList].sort());
+    const hoursChanged = hoursOn !== savedHoursOn || start !== savedStart || end !== savedEnd || tz !== savedTz;
+    const mfaChanged   = mfaOn !== savedMfaOn;
+    const permsChanged = JSON.stringify([...extraPerms].sort()) !== JSON.stringify([...savedExtraPerms].sort());
+    return ipChanged || hoursChanged || mfaChanged || permsChanged;
+  }, [ipList, hoursOn, start, end, tz, mfaOn, extraPerms, loaded,
+      savedIpList, savedHoursOn, savedStart, savedEnd, savedTz, savedMfaOn, savedExtraPerms]);
+
+  // ── score ─────────────────────────────────────────────────────────────────
+  const score = useMemo(() => calcPolicyScore(ipList, hoursOn, mfaOn, extraPerms), [ipList, hoursOn, mfaOn, extraPerms]);
+  const scoreColor = score >= 70 ? 'text-[var(--pro-azure)]' : score >= 40 ? 'text-amber-500' : 'text-rose-500';
+  const scoreBarColor = score >= 70 ? 'bg-[var(--pro-azure-50)]0' : score >= 40 ? 'bg-amber-500' : 'bg-rose-500';
+  const scoreLabel = score >= 70 ? 'Strong' : score >= 40 ? 'Moderate' : 'Weak';
+
+  // ── IP helpers ────────────────────────────────────────────────────────────
+  const addIp = () => {
+    const t = ipInput.trim();
+    const err = validateIpOrCidr(t);
+    if (err) { setIpError(err); return; }
+    if (ipList.includes(t)) { setIpError('Already in the list.'); return; }
+    setIpList(l => [...l, t]);
+    setIpInput('');
+    setIpError(null);
+  };
+  const removeIp = (ip: string) => setIpList(l => l.filter(x => x !== ip));
+
+  // ── extra perm helpers ────────────────────────────────────────────────────
+  const addPerm = () => {
+    const t = permInput.trim();
+    if (!t) return;
+    if (DEFAULT_SENSITIVE_PERMS.includes(t)) { toast.error('Already in the default set.'); return; }
+    if (extraPerms.includes(t)) { toast.error('Already added.'); return; }
+    setExtraPerms(p => [...p, t]);
+    setPermInput('');
+  };
+  const removePerm = (p: string) => setExtraPerms(list => list.filter(x => x !== p));
+
+  // ── save ──────────────────────────────────────────────────────────────────
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.patch('/settings/security-policy', {
+        ...(companyId ? { companyId } : {}),
+        ipWhitelist:   ipList,
+        allowedHours:  hoursOn ? { start, end, timezone: tz } : null,
+        mfaRequired:   mfaOn,
+        sensitivePerms: extraPerms.length > 0 ? extraPerms : undefined,
+      });
+      qc.invalidateQueries({ queryKey: ['security-policy', companyId] });
+      qc.invalidateQueries({ queryKey: ['security-policy-history', companyId] });
+      toast.success('Security policy saved');
+    } catch (e: any) {
+      // Surface DTO validation errors from the backend (class-validator returns
+      // an array under response.data.message when ValidationPipe fires)
+      const msg = e?.response?.data?.message;
+      if (Array.isArray(msg)) {
+        toast.error(msg[0] ?? 'Validation error');
+      } else {
+        toast.error(msg ?? e?.message ?? 'Failed to save policy');
+      }
+    }
+    finally { setSaving(false); }
+  };
+
+  const handleReset = async () => {
+    if (!confirm('Reset the entire security policy? This clears all restrictions and cannot be undone.')) return;
+    setSaving(true);
+    try {
+      await api.delete('/settings/security-policy', {
+        params: { ...(companyId ? { companyId } : {}) },
+      });
+      qc.invalidateQueries({ queryKey: ['security-policy', companyId] });
+      qc.invalidateQueries({ queryKey: ['security-policy-history', companyId] });
+      toast.success('Security policy reset');
+    } catch (e: any) {
+      toast.error(e?.response?.data?.message ?? e?.message ?? 'Reset failed');
+    } finally { setSaving(false); }
+  };
+
+  // ── preview JSON ──────────────────────────────────────────────────────────
+  const previewObj = {
+    ipWhitelist:    ipList.length > 0 ? ipList : '(unrestricted)',
+    allowedHours:   hoursOn ? { start, end, timezone: tz } : '(unrestricted)',
+    mfaRequired:    mfaOn,
+    sensitivePerms: extraPerms.length > 0
+      ? { defaults: DEFAULT_SENSITIVE_PERMS, extras: extraPerms }
+      : '(defaults only)',
+  };
+  const previewJson = JSON.stringify(previewObj, null, 2);
+
+  const copyPreview = () => {
+    navigator.clipboard.writeText(previewJson).then(() => {
+      setPreviewCopied(true);
+      setTimeout(() => setPreviewCopied(false), 2000);
+    });
+  };
+
+  if (isLoading) return (
+    <div className="space-y-3">
+      {[1,2,3,4].map(i => <div key={i} className="h-16 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />)}
+    </div>
+  );
+
+  return (
+    <div className="space-y-5 max-w-2xl">
+
+      {/* ── Header ─────────────────────────────────────────────────────── */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Tenant Security Policy</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            ABAC rules enforced on every sensitive write for{' '}
+            <span className="font-semibold">{loaded?.companyName ?? 'this company'}</span>.{' '}
+            Stored in <code className="text-[10px] bg-slate-100 dark:bg-slate-800 px-1 rounded">company.securityPolicy</code>.
+          </p>
+        </div>
+        <button onClick={handleSave} disabled={!canWrite || saving}
+          className="ovds-btn-primary flex items-center gap-1.5 text-xs shrink-0 disabled:opacity-50">
+          {saving ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+          {saving ? 'Saving…' : 'Save Policy'}
+        </button>
+        {canWrite && (
+          <button onClick={handleReset} disabled={saving}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg border border-rose-200 dark:border-rose-500/30 transition-colors disabled:opacity-40"
+            title="Reset entire policy to defaults">
+            <Trash className="w-3 h-3" /> Reset
+          </button>
+        )}
+      </div>
+
+      {/* ── Policy Strength Score ─────────────────────────────────────── */}
+      <div className="ovds-widget-card p-4">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Policy Strength</span>
+          </div>
+          <span className={`text-sm font-bold tabular-nums ${scoreColor}`}>
+            {score}/100 — {scoreLabel}
+          </span>
+        </div>
+        <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+          <div
+            className={`h-2 rounded-full transition-all duration-500 ${scoreBarColor}`}
+            style={{ width: `${score}%` }}
+          />
+        </div>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {[
+            { label: 'IP Restriction',   active: ipList.length > 0, points: 35 },
+            { label: 'Time Window',       active: hoursOn,           points: 25 },
+            { label: 'MFA Required',      active: mfaOn,             points: 30 },
+            { label: 'Extra Perms',       active: extraPerms.length > 0, points: 10 },
+          ].map(({ label, active, points }) => (
+            <span key={label}
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border transition-colors
+                ${active
+                  ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10 border-[var(--pro-azure-100)] dark:border-[var(--pro-azure)]/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
+                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400'}`}>
+              {active
+                ? <Check className="w-2.5 h-2.5" />
+                : <span className="w-2.5 h-2.5 inline-block rounded-full border border-current opacity-40" />}
+              {label} <span className="opacity-60">+{points}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Unsaved changes banner ────────────────────────────────────── */}
+      {isDirty && (
+        <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30">
+          <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400">
+            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+            <span className="font-medium">You have unsaved changes.</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={loadState}
+              className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:underline">
+              Reset
+            </button>
+            <button onClick={handleSave} disabled={!canWrite || saving}
+              className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-xs font-bold rounded-lg transition-colors">
+              {saving ? 'Saving…' : 'Save now'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── IP Whitelist ──────────────────────────────────────────────── */}
+      <div className="ovds-widget-card">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-2">
+            <Shield className="w-4 h-4 text-[var(--pro-azure)]" />
+            <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">IP Whitelist</span>
+            {ipList.length > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full bg-[var(--pro-azure-100)] dark:bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] text-[10px] font-bold">
+                {ipList.length}
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Restrict sensitive operations (fund transfers, payroll approvals, role changes) to specific IPs or CIDR blocks.
+            Empty = all IPs allowed.
+          </p>
+        </div>
+        <div className="p-4 space-y-3">
+          {ipList.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {ipList.map(ip => (
+                <span key={ip}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono text-slate-700 dark:text-slate-300">
+                  {ip}
+                  {canWrite && (
+                    <button onClick={() => removeIp(ip)} aria-label={`Remove ${ip}`}
+                      className="text-slate-400 hover:text-rose-500 transition-colors">
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-slate-400 italic">No IP restrictions — all addresses permitted.</p>
+          )}
+          {canWrite && (
+            <div className="space-y-1">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={ipInput}
+                  onChange={e => { setIpInput(e.target.value); setIpError(null); }}
+                  onKeyDown={e => e.key === 'Enter' && addIp()}
+                  placeholder="196.188.0.0/16 or 10.0.0.1"
+                  className={`flex-1 px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border rounded-lg
+                    focus:outline-none font-mono text-slate-700 dark:text-slate-300 transition-colors
+                    ${ipError
+                      ? 'border-rose-400 focus:border-rose-500'
+                      : 'border-slate-200 dark:border-slate-700 focus:border-[var(--pro-azure)]'}`}
+                />
+                <button onClick={addIp} disabled={!ipInput.trim()}
+                  className="px-3 py-1.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] disabled:opacity-40 text-white text-xs font-bold rounded-lg transition-colors">
+                  Add
+                </button>
+              </div>
+              {ipError && (
+                <p className="flex items-center gap-1 text-[10px] text-rose-500">
+                  <AlertTriangle className="w-3 h-3 shrink-0" />{ipError}
+                </p>
+              )}
+            </div>
+          )}
+          <p className="text-[10px] text-slate-400">
+            Supports exact IPs and CIDR notation.
+            IPv6-mapped IPv4 (<code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">::ffff:</code>) normalised automatically.
+          </p>
+        </div>
+      </div>
+
+      {/* ── Allowed Hours ─────────────────────────────────────────────── */}
+      <div className="ovds-widget-card">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-500" />
+              <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Allowed Hours</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`text-xs font-medium ${hoursOn ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}`}>
+                {hoursOn ? 'Enabled' : 'Disabled'}
+              </span>
+              <Toggle checked={hoursOn} onChange={setHoursOn} disabled={!canWrite} colorClass="bg-amber-500" />
+            </div>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Restrict sensitive ops to a business-hours window in the tenant's timezone.
+          </p>
+        </div>
+        <div className={`p-4 space-y-3 transition-opacity duration-200 ${hoursOn ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
+          <div className="grid grid-cols-3 gap-3">
+            {([['Start', start, setStart], ['End', end, setEnd]] as const).map(([label, val, setter]) => (
+              <div key={label as string}>
+                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  {label as string}
+                </label>
+                <input type="time" value={val as string}
+                  onChange={e => (setter as React.Dispatch<React.SetStateAction<string>>)(e.target.value)}
+                  className="w-full mt-1 px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-[var(--pro-azure)] text-slate-700 dark:text-slate-300" />
+              </div>
+            ))}
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Timezone</label>
+              <select value={tz} onChange={e => setTz(e.target.value)}
+                className="w-full mt-1 px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-[var(--pro-azure)] text-slate-700 dark:text-slate-300">
+                {COMMON_TIMEZONES.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+          </div>
+          {hoursOn && start >= end && (
+            <p className="flex items-center gap-1 text-[10px] text-amber-600 dark:text-amber-400">
+              <AlertTriangle className="w-3 h-3 shrink-0" />
+              Start time is not before end time — the window may not match your intent.
+            </p>
+          )}
+          <p className="text-[10px] text-slate-400">Requests outside the window receive a 403 for sensitive permissions.</p>
+        </div>
+      </div>
+
+      {/* ── Require MFA ──────────────────────────────────────────────── */}
+      <div className="ovds-widget-card p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Fingerprint className="w-4 h-4 text-violet-500" />
+            <div>
+              <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Require MFA</span>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Sensitive write/approve operations require a verified MFA session (<code className="text-[10px] bg-slate-100 dark:bg-slate-800 px-1 rounded">mfaVerified</code> JWT claim).
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className={`text-xs font-medium ${mfaOn ? 'text-violet-600 dark:text-violet-400' : 'text-slate-400'}`}>
+              {mfaOn ? 'Enabled' : 'Disabled'}
+            </span>
+            <Toggle checked={mfaOn} onChange={setMfaOn} disabled={!canWrite} colorClass="bg-violet-500" />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Sensitive Permissions ─────────────────────────────────────── */}
+      <div className="ovds-widget-card">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-2">
+            <Lock className="w-4 h-4 text-rose-500" />
+            <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Sensitive Permissions</span>
+            {extraPerms.length > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 text-[10px] font-bold">
+                +{extraPerms.length}
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Permissions that trigger IP whitelist and time-window enforcement.
+            The defaults below always apply; add extras to extend coverage.
+          </p>
+        </div>
+        <div className="p-4 space-y-4">
+          {/* Default set — read-only chips */}
+          <div>
+            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+              Default set (always active)
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {DEFAULT_SENSITIVE_PERMS.map(p => (
+                <span key={p}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 text-[10px] font-mono text-rose-700 dark:text-rose-400">
+                  <Lock className="w-2.5 h-2.5 opacity-60" />{p}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Extra perms */}
+          <div>
+            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+              Extra permissions (this tenant)
+            </p>
+            {extraPerms.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {extraPerms.map(p => (
+                  <span key={p}
+                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-[10px] font-mono text-amber-700 dark:text-amber-400">
+                    {p}
+                    {canWrite && (
+                      <button onClick={() => removePerm(p)} aria-label={`Remove ${p}`}
+                        className="text-amber-400 hover:text-rose-500 transition-colors">
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-400 italic mb-3">No extras — only the defaults apply.</p>
+            )}
+            {canWrite && (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={permInput}
+                  onChange={e => setPermInput(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && addPerm()}
+                  placeholder="e.g. custom_module:approve"
+                  className="flex-1 px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-rose-400 font-mono text-slate-700 dark:text-slate-300"
+                />
+                <button onClick={addPerm} disabled={!permInput.trim()}
+                  className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 disabled:opacity-40 text-white text-xs font-bold rounded-lg transition-colors">
+                  Add
+                </button>
+              </div>
+            )}
+            <p className="text-[10px] text-slate-400 mt-1">
+              Extras <strong>extend</strong> the default set — they do not replace it.
+              Use <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">module:action</code> format.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Effective Policy Preview ──────────────────────────────────── */}
+      <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-200 dark:border-slate-700">
+          <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            Effective Policy Preview
+          </p>
+          <button onClick={copyPreview}
+            className="flex items-center gap-1 text-[10px] font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors">
+            {previewCopied ? <CheckCheck className="w-3 h-3 text-[var(--pro-azure)]" /> : <Copy className="w-3 h-3" />}
+            {previewCopied ? 'Copied!' : 'Copy JSON'}
+          </button>
+        </div>
+        <pre className="p-4 text-[10px] font-mono text-slate-600 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
+          {previewJson}
+        </pre>
+      </div>
+
+      {/* ── Bottom panels: Simulate + History + All Companies ─────── */}
+      <PolicySimulatePanel companyId={companyId} />
+      <PolicyHistoryPanel  companyId={companyId} />
+      <AllCompaniesPanel />
+      <RoleHierarchyPanel  companyId={companyId} />
+      <PolicyRoleCheckPanel companyId={companyId} />
+
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// PolicySimulatePanel — test an IP / time / MFA combo against the saved policy
+// ---------------------------------------------------------------------------
+const SIMULATE_PRESETS = [
+  { label: 'Fund Transfer',  perms: 'fund_transfers:approve' },
+  { label: 'Payroll',        perms: 'payroll:approve' },
+  { label: 'Role Change',    perms: 'role_permissions:write' },
+  { label: 'Deploy',         perms: 'system:deploy' },
+  { label: 'VAT Filing',     perms: 'vat:file' },
+];
+
+function PolicySimulatePanel({ companyId }: { companyId?: string }) {
+  const [ip,       setIp]       = useState('');
+  const [timeStr,  setTimeStr]  = useState('');
+  const [mfa,      setMfa]      = useState(false);
+  const [permsRaw, setPermsRaw] = useState('fund_transfers:approve');
+  const [result,   setResult]   = useState<null | {
+    allowed: boolean;
+    checks: Array<{ check: string; result: 'pass' | 'fail' | 'skipped'; reason: string }>;
+    policy: Record<string, unknown>;
+  }>(null);
+  const [running, setRunning] = useState(false);
+  const [open,    setOpen]    = useState(false);
+
+  // Pre-fill "now" when panel first opens
+  const prevOpen = useRef(false);
+  useEffect(() => {
+    if (open && !prevOpen.current) {
+      // datetime-local format: yyyy-MM-ddTHH:mm
+      const now = new Date();
+      const pad = (n: number) => String(n).padStart(2, '0');
+      setTimeStr(
+        `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`
+      );
+    }
+    prevOpen.current = open;
+  }, [open]);
+
+  const runTest = async () => {
+    setRunning(true);
+    setResult(null);
+    try {
+      const body: Record<string, unknown> = {
+        ...(companyId ? { companyId } : {}),
+        permissions: permsRaw.split(',').map(s => s.trim()).filter(Boolean),
+        mfaVerified: mfa,
+      };
+      if (ip.trim())      body.ipAddress   = ip.trim();
+      if (timeStr.trim()) body.requestTime = new Date(timeStr).toISOString();
+      const res = await api.post('/settings/security-policy/test', body);
+      setResult(res.data?.data ?? null);
+    } catch (e: any) {
+      const msg = e?.response?.data?.message;
+      toast.error(Array.isArray(msg) ? msg[0] : (msg ?? e?.message ?? 'Simulation failed'));
+    } finally { setRunning(false); }
+  };
+
+  const checkIcon = (r: 'pass' | 'fail' | 'skipped') => {
+    if (r === 'pass') return <CheckCircle2 className="w-3.5 h-3.5 text-[var(--pro-azure)] shrink-0" />;
+    if (r === 'fail') return <XSquare      className="w-3.5 h-3.5 text-rose-500 shrink-0" />;
+    return <span className="w-3.5 h-3.5 shrink-0 inline-block rounded-full border border-slate-400 opacity-40" />;
+  };
+
+  return (
+    <div className="ovds-widget-card overflow-hidden">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <FlaskConical className="w-4 h-4 text-violet-500" />
+          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Policy Simulator</span>
+          <span className="px-1.5 py-0.5 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 text-[10px] font-bold">TEST</span>
+        </div>
+        {open ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
+      </button>
+
+      {open && (
+        <div className="border-t border-slate-100 dark:border-slate-800 p-4 space-y-4">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Test how the <em>saved</em> policy responds to a given IP, time, and MFA state — without making a real write.
+          </p>
+
+          {/* Quick presets */}
+          <div>
+            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Quick presets</p>
+            <div className="flex flex-wrap gap-1.5">
+              {SIMULATE_PRESETS.map(p => (
+                <button
+                  key={p.label}
+                  onClick={() => setPermsRaw(p.perms)}
+                  className={`px-2 py-0.5 text-[10px] font-medium rounded-full border transition-colors
+                    ${permsRaw === p.perms
+                      ? 'bg-violet-100 dark:bg-violet-500/20 border-violet-300 dark:border-violet-500/40 text-violet-700 dark:text-violet-300'
+                      : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 hover:border-violet-300'}`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Inputs */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Source IP</label>
+              <input
+                type="text" value={ip} onChange={e => setIp(e.target.value)}
+                placeholder="blank = 127.0.0.1"
+                className="w-full mt-1 px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-violet-500 font-mono text-slate-700 dark:text-slate-300"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Request Time</label>
+              <input
+                type="datetime-local" value={timeStr} onChange={e => setTimeStr(e.target.value)}
+                className="w-full mt-1 px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-violet-500 text-slate-700 dark:text-slate-300"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Permissions (comma-separated)</label>
+            <input
+              type="text" value={permsRaw} onChange={e => setPermsRaw(e.target.value)}
+              placeholder="fund_transfers:approve, payroll:approve"
+              className="w-full mt-1 px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-violet-500 font-mono text-slate-700 dark:text-slate-300"
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Toggle checked={mfa} onChange={setMfa} colorClass="bg-violet-500" />
+              <span className={`text-xs font-medium ${mfa ? 'text-violet-600 dark:text-violet-400' : 'text-slate-400'}`}>MFA verified</span>
+            </div>
+            <button
+              onClick={runTest} disabled={running}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-500 hover:bg-violet-600 disabled:opacity-50 text-white text-xs font-bold rounded-lg transition-colors"
+            >
+              {running ? <><RefreshCw className="w-3 h-3 animate-spin" />Running…</> : <><Play className="w-3 h-3" />Run</>}
+            </button>
+          </div>
+
+          {/* Result */}
+          {result && (
+            <div className={`rounded-xl border p-4 space-y-3 ${
+              result.allowed
+                ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10 border-[var(--pro-azure-100)] dark:border-[var(--pro-azure)]/30'
+                : 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/30'
+            }`}>
+              <div className="flex items-center gap-2">
+                {result.allowed
+                  ? <CheckCircle2 className="w-4 h-4 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
+                  : <XSquare      className="w-4 h-4 text-rose-600 dark:text-rose-400" />}
+                <span className={`text-sm font-bold ${result.allowed ? 'text-[var(--pro-azure-dark)] dark:text-green-300' : 'text-rose-700 dark:text-rose-300'}`}>
+                  {result.allowed ? 'Request ALLOWED' : 'Request DENIED'}
+                </span>
+              </div>
+              <div className="space-y-1.5">
+                {result.checks.map((c, i) => (
+                  <div key={i} className="flex items-start gap-2 text-xs">
+                    {checkIcon(c.result)}
+                    <div className="flex-1 min-w-0">
+                      <span className="font-mono font-semibold text-slate-700 dark:text-slate-300">{c.check}</span>
+                      <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full font-bold
+                        ${c.result === 'pass'    ? 'bg-[var(--pro-azure-100)] dark:bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
+                        : c.result === 'fail'    ? 'bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400'
+                        :                          'bg-slate-100 dark:bg-slate-700 text-slate-500'}`}>
+                        {c.result.toUpperCase()}
+                      </span>
+                      <p className="mt-0.5 text-slate-500 dark:text-slate-400 break-words">{c.reason}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// PolicyHistoryPanel — timeline with filter tabs + "by you" highlight
+// ---------------------------------------------------------------------------
+type HistoryFilter = 'all' | 'updates' | 'denials';
+
+function PolicyHistoryPanel({ companyId }: { companyId?: string }) {
+  const { user: authUser } = useAuth();
+  const currentUserId = authUser?.id ?? null;
+
+  const [open,   setOpen]   = useState(false);
+  const [filter, setFilter] = useState<HistoryFilter>('all');
+
+  const { data = [], isLoading, refetch, isFetching } = useQuery({
+    queryKey: ['security-policy-history', companyId],
+    queryFn: async () => {
+      const res = await api.get('/settings/security-policy/history', {
+        params: { limit: 50, ...(companyId ? { companyId } : {}) },
+      });
+      return (res.data?.data ?? []) as Array<{
+        id: string;
+        action: 'SECURITY_POLICY_UPDATED' | 'ACCESS_DENIED';
+        userId: string | null;
+        userName: string | null;
+        companyId: string | null;
+        details: Record<string, unknown>;
+        createdAt: string;
+      }>;
+    },
+    enabled: open,
+    staleTime: 30_000,
+  });
+
+  const filtered = useMemo(() => {
+    if (filter === 'updates') return data.filter(e => e.action === 'SECURITY_POLICY_UPDATED');
+    if (filter === 'denials') return data.filter(e => e.action === 'ACCESS_DENIED');
+    return data;
+  }, [data, filter]);
+
+  const updateCount = data.filter(e => e.action === 'SECURITY_POLICY_UPDATED').length;
+  const denialCount = data.filter(e => e.action === 'ACCESS_DENIED').length;
+
+  const actionMeta = (action: string) => {
+    if (action === 'SECURITY_POLICY_UPDATED')
+      return { label: 'Policy updated', color: 'bg-[var(--pro-azure-100)] dark:bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]', dot: 'bg-[var(--pro-azure-50)]0' };
+    if (action === 'ACCESS_DENIED')
+      return { label: 'Access denied', color: 'bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400', dot: 'bg-rose-500' };
+    return { label: action, color: 'bg-slate-100 dark:bg-slate-700 text-slate-500', dot: 'bg-slate-400' };
+  };
+
+  const FILTER_TABS: Array<{ id: HistoryFilter; label: string; count: number }> = [
+    { id: 'all',     label: 'All',     count: data.length    },
+    { id: 'updates', label: 'Updates', count: updateCount    },
+    { id: 'denials', label: 'Denials', count: denialCount    },
+  ];
+
+  return (
+    <div className="ovds-widget-card overflow-hidden">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <History className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Policy History</span>
+          <span className="px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 text-[10px] font-bold">AUDIT</span>
+          {denialCount > 0 && (
+            <span className="px-1.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-[10px] font-bold">
+              {denialCount} denied
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {open && (
+            <button
+              onClick={e => { e.stopPropagation(); refetch(); }}
+              className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded"
+              aria-label="Refresh"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
+            </button>
+          )}
+          {open ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
+        </div>
+      </button>
+
+      {open && (
+        <div className="border-t border-slate-100 dark:border-slate-800">
+          {/* Filter tabs */}
+          <div className="flex gap-1 p-3 border-b border-slate-100 dark:border-slate-800">
+            {FILTER_TABS.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setFilter(tab.id)}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors
+                  ${filter === tab.id
+                    ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900'
+                    : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+              >
+                {tab.label}
+                {tab.count > 0 && (
+                  <span className={`text-[10px] px-1 rounded-full font-bold
+                    ${filter === tab.id ? 'bg-white/20 dark:bg-slate-900/20' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {isLoading ? (
+            <div className="p-4 space-y-2">
+              {[1,2,3].map(i => <div key={i} className="h-12 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse" />)}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="p-8 text-center">
+              <History className="w-8 h-8 text-slate-200 dark:text-slate-700 mx-auto mb-2" />
+              <p className="text-xs text-slate-400">
+                {filter === 'all' ? 'No policy events recorded yet.' : `No ${filter} events yet.`}
+              </p>
+            </div>
+          ) : (
+            <div className="relative">
+              <div className="absolute left-[27px] top-4 bottom-4 w-px bg-slate-200 dark:bg-slate-700" />
+              {filtered.map((ev, idx) => {
+                const meta         = actionMeta(ev.action);
+                const isOwnChange  = !!currentUserId && ev.userId === currentUserId;
+                const diff         = ev.action === 'SECURITY_POLICY_UPDATED'
+                  ? (ev.details as any)?.diff as Record<string, { from: unknown; to: unknown }> | undefined
+                  : undefined;
+                const denialReason = ev.action === 'ACCESS_DENIED'
+                  ? (ev.details as any)?.reason as string | undefined
+                  : undefined;
+                const denialPerms  = ev.action === 'ACCESS_DENIED'
+                  ? ((ev.details as any)?.permissions as string[] | undefined)
+                  : undefined;
+
+                return (
+                  <div
+                    key={ev.id}
+                    className={`flex gap-3 px-4 py-3 transition-colors
+                      ${idx < filtered.length - 1 ? 'border-b border-slate-100 dark:border-slate-800/60' : ''}
+                      ${isOwnChange ? 'bg-[var(--pro-azure-50)]/40 dark:bg-[var(--pro-azure-50)]0/5' : ''}`}
+                  >
+                    {/* dot */}
+                    <div className="relative z-10 mt-0.5 shrink-0">
+                      <div className={`w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 ${meta.dot}`} />
+                    </div>
+                    {/* content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${meta.color}`}>
+                          {meta.label}
+                        </span>
+                        {ev.userName && (
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                            by{' '}
+                            <span className={`font-semibold ${isOwnChange ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-slate-700 dark:text-slate-300'}`}>
+                              {ev.userName}{isOwnChange ? ' (you)' : ''}
+                            </span>
+                          </span>
+                        )}
+                        <span className="text-[10px] text-slate-400 ml-auto shrink-0">
+                          {fmtDateTime(new Date(ev.createdAt))}
+                        </span>
+                      </div>
+
+                      {/* policy diff */}
+                      {diff && Object.keys(diff).length > 0 && (
+                        <div className="mt-1.5 space-y-1">
+                          {Object.entries(diff).map(([field, { from, to }]) => (
+                            <div key={field} className="text-[10px] text-slate-600 dark:text-slate-400">
+                              <span className="font-mono font-semibold text-slate-700 dark:text-slate-300">{field}</span>
+                              {': '}
+                              <span className="line-through text-rose-400">{JSON.stringify(from)}</span>
+                              {' → '}
+                              <span className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{JSON.stringify(to)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* denial detail */}
+                      {denialReason && (
+                        <p className="mt-1 text-[10px] text-rose-600 dark:text-rose-400 break-words">{denialReason}</p>
+                      )}
+                      {denialPerms && denialPerms.length > 0 && (
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {denialPerms.map(p => (
+                            <span key={p} className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500">{p}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// AllCompaniesPanel — super-admin: policy health across all tenants
+// ---------------------------------------------------------------------------
+type AllSortKey = 'name' | 'score' | 'denials';
+
+function AllCompaniesPanel() {
+  const { role } = useRbac();
+  const isSuperAdmin = role === 'SPURADMIN' || role === 'SUPERADMIN';
+  const [open,    setOpen]    = useState(false);
+  const [sortKey, setSortKey] = useState<AllSortKey>('score');
+  const [sortAsc, setSortAsc] = useState(true);
+
+  const { data = [], isLoading, refetch, isFetching } = useQuery({
+    queryKey: ['security-policy-all'],
+    queryFn: async () => {
+      const res = await api.get('/settings/security-policy/all');
+      return (res.data?.data ?? []) as Array<{
+        companyId: string;
+        companyName: string;
+        score: number;
+        scoreLabel: 'Strong' | 'Moderate' | 'Weak';
+        denialCount: number;
+        policy: Record<string, unknown> | null;
+        createdAt: string;
+      }>;
+    },
+    enabled: open && isSuperAdmin,
+    staleTime: 60_000,
+  });
+
+  if (!isSuperAdmin) return null;
+
+  const sorted = useMemo(() => {
+    return [...data].sort((a, b) => {
+      let diff = 0;
+      if (sortKey === 'name')    diff = a.companyName.localeCompare(b.companyName);
+      if (sortKey === 'score')   diff = a.score - b.score;
+      if (sortKey === 'denials') diff = a.denialCount - b.denialCount;
+      return sortAsc ? diff : -diff;
+    });
+  }, [data, sortKey, sortAsc]);
+
+  const toggleSort = (key: AllSortKey) => {
+    if (sortKey === key) setSortAsc(a => !a);
+    else { setSortKey(key); setSortAsc(false); }
+  };
+
+  const SortIcon = ({ k }: { k: AllSortKey }) =>
+    sortKey === k
+      ? (sortAsc ? <SortAsc className="w-3 h-3" /> : <SortDesc className="w-3 h-3" />)
+      : <SortAsc className="w-3 h-3 opacity-30" />;
+
+  const scoreColor = (s: number) =>
+    s >= 70 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : s >= 40 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400';
+  const scoreBar = (s: number) =>
+    s >= 70 ? 'bg-[var(--pro-azure-50)]0' : s >= 40 ? 'bg-amber-500' : 'bg-rose-500';
+
+  return (
+    <div className="ovds-widget-card overflow-hidden">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <Building2 className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">All Companies</span>
+          <span className="px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 text-[10px] font-bold">SUPER-ADMIN</span>
+          {data.length > 0 && (
+            <span className="text-[10px] text-slate-400">{data.length} tenants</span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {open && (
+            <button onClick={e => { e.stopPropagation(); refetch(); }}
+              className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded" aria-label="Refresh">
+              <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
+            </button>
+          )}
+          {open ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
+        </div>
+      </button>
+
+      {open && (
+        <div className="border-t border-slate-100 dark:border-slate-800">
+          {isLoading ? (
+            <div className="p-4 space-y-2">
+              {[1,2,3,4].map(i => <div key={i} className="h-10 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse" />)}
+            </div>
+          ) : data.length === 0 ? (
+            <div className="p-8 text-center">
+              <Building2 className="w-8 h-8 text-slate-200 dark:text-slate-700 mx-auto mb-2" />
+              <p className="text-xs text-slate-400">No companies found.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                    <th className="text-left px-4 py-2 font-semibold text-slate-500 dark:text-slate-400">
+                      <button onClick={() => toggleSort('name')} className="flex items-center gap-1 hover:text-slate-700 dark:hover:text-slate-200">
+                        Company <SortIcon k="name" />
+                      </button>
+                    </th>
+                    <th className="text-left px-4 py-2 font-semibold text-slate-500 dark:text-slate-400">
+                      <button onClick={() => toggleSort('score')} className="flex items-center gap-1 hover:text-slate-700 dark:hover:text-slate-200">
+                        Strength <SortIcon k="score" />
+                      </button>
+                    </th>
+                    <th className="text-left px-4 py-2 font-semibold text-slate-500 dark:text-slate-400 hidden sm:table-cell">Controls</th>
+                    <th className="text-left px-4 py-2 font-semibold text-slate-500 dark:text-slate-400">
+                      <button onClick={() => toggleSort('denials')} className="flex items-center gap-1 hover:text-slate-700 dark:hover:text-slate-200">
+                        Denials <SortIcon k="denials" />
+                      </button>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sorted.map(c => (
+                    <tr key={c.companyId} className="border-b border-slate-100 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                      <td className="px-4 py-2.5">
+                        <span className="font-medium text-slate-800 dark:text-slate-200 truncate block max-w-[160px]" title={c.companyName}>
+                          {c.companyName}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <div className="flex items-center gap-2">
+                          <div className="w-16 h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                            <div className={`h-1.5 rounded-full ${scoreBar(c.score)}`} style={{ width: `${c.score}%` }} />
+                          </div>
+                          <span className={`font-bold tabular-nums ${scoreColor(c.score)}`}>{c.score}</span>
+                          <span className={`text-[10px] font-medium ${scoreColor(c.score)}`}>{c.scoreLabel}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-2.5 hidden sm:table-cell">
+                        <div className="flex gap-1">
+                          {[
+                            { flag: Array.isArray(c.policy?.['ipWhitelist']) && (c.policy!['ipWhitelist'] as string[]).length > 0, title: 'IP Whitelist', short: 'IP' },
+                            { flag: !!c.policy?.['allowedHours'],  title: 'Time Window',  short: 'TW' },
+                            { flag: !!c.policy?.['mfaRequired'],   title: 'MFA',          short: 'MFA' },
+                          ].map(({ flag, title, short }) => (
+                            <span key={short} title={title}
+                              className={`text-[9px] font-bold px-1.5 py-0.5 rounded
+                                ${flag
+                                  ? 'bg-[var(--pro-azure-100)] dark:bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
+                                  : 'bg-slate-100 dark:bg-slate-700 text-slate-400 line-through opacity-50'}`}>
+                              {short}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        {c.denialCount > 0 ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-600 dark:text-rose-400">
+                            <AlertTriangle className="w-3 h-3" />{c.denialCount}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-slate-400">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// RoleHierarchyPanel — live role tree with ABAC enforcement status per role
+// ---------------------------------------------------------------------------
+
+type HierarchyRole = {
+  role: string;
+  label: string;
+  description: string;
+  weight: number;
+  group: string;
+  permissionCount: number;
+  sensitiveCount: number;
+  parentRole: string | null;
+  childRoles: string[];
+  isSuperBypass: boolean;
+  isDevBypass: boolean;
+  abac: { exempt: boolean; ipCheck: boolean; timeCheck: boolean; mfaCheck: boolean; crossTenantExempt: boolean };
+  permissions?: string[];
+};
+
+type HierarchyData = {
+  roles: HierarchyRole[];
+  groups: Record<string, { label: string; roles: string[]; avgScore: number }>;
+  policy: { ipActive: boolean; timeActive: boolean; mfaActive: boolean; extraPerms: string[] };
+};
+
+const GROUP_CONFIG: Record<string, { label: string; color: string }> = {
+  system:      { label: 'System & Security',  color: 'text-rose-500'   },
+  operations:  { label: 'Operations & HR',    color: 'text-slate-500'  },
+  finance:     { label: 'Finance & Treasury', color: 'text-[var(--pro-azure)]' },
+  sales:       { label: 'Sales',              color: 'text-sky-500'    },
+  purchases:   { label: 'Purchases',          color: 'text-amber-500'  },
+  audit:       { label: 'Audit & Compliance', color: 'text-amber-600'  },
+  crm:         { label: 'CRM & External',     color: 'text-rose-400'   },
+  operational: { label: 'Operational',        color: 'text-lime-600'   },
+  other:       { label: 'Other',              color: 'text-slate-400'  },
+};
+
+const WEIGHT_COLOR = (w: number) =>
+  w >= 150 ? 'text-rose-500'   :
+  w >= 80  ? 'text-amber-500'  :
+  w >= 40  ? 'text-[var(--pro-azure)]':
+             'text-slate-400';
+
+const WEIGHT_BAR = (w: number) =>
+  w >= 150 ? 'bg-rose-500'    :
+  w >= 80  ? 'bg-amber-500'   :
+  w >= 40  ? 'bg-[var(--pro-azure-50)]0' :
+             'bg-slate-400';
+
+function AbacBadge({ active, label, color }: { active: boolean; label: string; color: string }) {
+  return (
+    <span className={`inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full border transition-colors
+      ${active
+        ? `${color} border-current bg-current/10`
+        : 'text-slate-300 dark:text-slate-600 border-slate-200 dark:border-slate-700 bg-transparent'}`}>
+      {active ? <Check className="w-2 h-2" /> : <span className="w-2 h-2 inline-block rounded-full border border-current opacity-40" />}
+      {label}
+    </span>
+  );
+}
+
+function RoleHierarchyPanel({ companyId }: { companyId?: string }) {
+  const [open,        setOpen]        = useState(false);
+  const [expanded,    setExpanded]    = useState<Set<string>>(new Set());
+  const [filterGroup, setFilterGroup] = useState<string>('all');
+  const [showPerms,   setShowPerms]   = useState<string | null>(null);
+
+  const { data, isLoading, refetch, isFetching } = useQuery({
+    queryKey: ['rbac-hierarchy', companyId],
+    queryFn: async () => {
+      const res = await api.get('/settings/rbac/hierarchy', {
+        params: { ...(companyId ? { companyId } : {}) },
+      });
+      return res.data?.data as HierarchyData | null;
+    },
+    enabled: open,
+    staleTime: 60_000,
+  });
+
+  const toggleExpand = (role: string) =>
+    setExpanded(prev => {
+      const next = new Set(prev);
+      if (next.has(role)) {
+        next.delete(role);
+      } else {
+        next.add(role);
+      }
+      return next;
+    });
+
+  const allGroups = useMemo(() => {
+    if (!data) return [];
+    return Array.from(new Set(data.roles.map(r => r.group)));
+  }, [data]);
+
+  const filtered = useMemo(() => {
+    if (!data) return [];
+    return filterGroup === 'all' ? data.roles : data.roles.filter(r => r.group === filterGroup);
+  }, [data, filterGroup]);
+
+  const maxWeight = 200;
+
+  return (
+    <div className="ovds-widget-card overflow-hidden">
+      {/* header */}
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <Layers className="w-4 h-4 text-[var(--pro-azure)]" />
+          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Role Hierarchy</span>
+          <span className="px-1.5 py-0.5 rounded-full bg-[var(--pro-azure-100)] dark:bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure-dark)] dark:text-green-300 text-[10px] font-bold">
+            {data ? `${data.roles.length} roles` : 'LOADER'}
+          </span>
+          {data && (data.policy.ipActive || data.policy.timeActive || data.policy.mfaActive) && (
+            <span className="px-1.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-[10px] font-bold">
+              ABAC active
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {open && (
+            <button onClick={e => { e.stopPropagation(); refetch(); }}
+              className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded" aria-label="Refresh">
+              <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
+            </button>
+          )}
+          {open ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
+        </div>
+      </button>
+
+      {open && (
+        <div className="border-t border-slate-100 dark:border-slate-800">
+          {/* policy status bar */}
+          {data && (
+            <div className="flex flex-wrap items-center gap-3 px-4 py-2.5 bg-slate-50 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Active ABAC:</span>
+              <AbacBadge active={data.policy.ipActive}   label="IP Whitelist" color="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
+              <AbacBadge active={data.policy.timeActive} label="Time Window"  color="text-amber-600 dark:text-amber-400"   />
+              <AbacBadge active={data.policy.mfaActive}  label="MFA Required" color="text-violet-600 dark:text-violet-400" />
+              {!data.policy.ipActive && !data.policy.timeActive && !data.policy.mfaActive && (
+                <span className="text-[10px] text-slate-400 italic">No ABAC restrictions configured — all roles unrestricted.</span>
+              )}
+            </div>
+          )}
+
+          {/* group filter tabs */}
+          {data && (
+            <div className="flex flex-wrap gap-1 px-3 py-2 border-b border-slate-100 dark:border-slate-800">
+              <button onClick={() => setFilterGroup('all')}
+                className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium transition-colors
+                  ${filterGroup === 'all' ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                All {data.roles.length}
+              </button>
+              {allGroups.map(g => (
+                <button key={g} onClick={() => setFilterGroup(g)}
+                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium transition-colors
+                    ${filterGroup === g ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                  {GROUP_CONFIG[g]?.label ?? g}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {isLoading ? (
+            <div className="p-4 space-y-2">
+              {[1,2,3,4,5].map(i => <div key={i} className="h-10 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse" />)}
+            </div>
+          ) : !data ? (
+            <div className="p-8 text-center text-xs text-slate-400">Failed to load hierarchy.</div>
+          ) : filtered.length === 0 ? (
+            <div className="p-8 text-center text-xs text-slate-400">No roles in this group.</div>
+          ) : (
+            <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
+              {filtered.map(node => {
+                const isExpandedNode = expanded.has(node.role);
+                const groupCfg       = GROUP_CONFIG[node.group] ?? GROUP_CONFIG.other;
+                const meta           = ROLE_METADATA[node.role as AppRole];
+                const dotCls         = meta?.color?.dot ?? 'bg-slate-400';
+                const anyAbac        = node.abac.ipCheck || node.abac.timeCheck || node.abac.mfaCheck;
+                const barPct         = Math.round((node.weight / maxWeight) * 100);
+
+                return (
+                  <div key={node.role}>
+                    {/* row */}
+                    <div
+                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/30 cursor-pointer transition-colors"
+                      onClick={() => toggleExpand(node.role)}
+                    >
+                      {/* expand chevron */}
+                      <span className="shrink-0 w-4 text-slate-400">
+                        {node.childRoles.length > 0
+                          ? (isExpandedNode ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />)
+                          : <span className="w-3.5 h-3.5 inline-block" />}
+                      </span>
+
+                      {/* role dot */}
+                      <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${dotCls}`} />
+
+                      {/* name + description */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs font-semibold text-slate-800 dark:text-slate-100">{node.label}</span>
+                          <span className={`text-[9px] font-mono font-bold ${groupCfg.color} opacity-70`}>{node.role}</span>
+                          {node.isSuperBypass && (
+                            <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400">BYPASS</span>
+                          )}
+                          {node.isDevBypass && (
+                            <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400">DEV</span>
+                          )}
+                          {anyAbac && (
+                            <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400">ABAC</span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-slate-400 truncate mt-0.5">{node.description}</p>
+                      </div>
+
+                      {/* weight bar */}
+                      <div className="hidden sm:flex items-center gap-2 shrink-0">
+                        <div className="w-20 h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                          <div className={`h-1.5 rounded-full ${WEIGHT_BAR(node.weight)}`} style={{ width: `${barPct}%` }} />
+                        </div>
+                        <span className={`text-[10px] font-bold tabular-nums w-8 text-right ${WEIGHT_COLOR(node.weight)}`}>{node.weight}</span>
+                      </div>
+
+                      {/* perm count */}
+                      <span className="text-[10px] text-slate-400 shrink-0 w-12 text-right tabular-nums">
+                        {node.permissionCount}p
+                      </span>
+                    </div>
+
+                    {/* expanded detail */}
+                    {isExpandedNode && (
+                      <div className="px-10 py-3 bg-slate-50/60 dark:bg-slate-800/20 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                        {/* ABAC enforcement per layer */}
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Security policy enforcement</p>
+                          <div className="flex flex-wrap gap-2">
+                            {node.isSuperBypass ? (
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 font-semibold">
+                                ⚡ Bypasses ALL ABAC checks (super-admin)
+                              </span>
+                            ) : (
+                              <>
+                                <AbacBadge active={node.abac.ipCheck}   label="IP check"   color="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
+                                <AbacBadge active={node.abac.timeCheck} label="Time check" color="text-amber-600 dark:text-amber-400"   />
+                                <AbacBadge active={node.abac.mfaCheck}  label="MFA check"  color="text-violet-600 dark:text-violet-400" />
+                                {node.abac.crossTenantExempt && (
+                                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-semibold">
+                                    cross-tenant exempt
+                                  </span>
+                                )}
+                                {!node.abac.ipCheck && !node.abac.timeCheck && !node.abac.mfaCheck && (
+                                  <span className="text-[10px] text-slate-400 italic">
+                                    {node.sensitiveCount === 0
+                                      ? 'No sensitive permissions — ABAC checks never triggered.'
+                                      : 'Has sensitive perms but no active policy restrictions.'}
+                                  </span>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* parent / children */}
+                        <div className="flex flex-wrap gap-4">
+                          {node.parentRole && (
+                            <div>
+                              <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Reports to</p>
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono">
+                                {ROLE_METADATA[node.parentRole as AppRole]?.label ?? node.parentRole}
+                              </span>
+                            </div>
+                          )}
+                          {node.childRoles.length > 0 && (
+                            <div>
+                              <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Direct subordinates</p>
+                              <div className="flex flex-wrap gap-1">
+                                {node.childRoles.map(cr => (
+                                  <span key={cr} className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono">
+                                    {ROLE_METADATA[cr as AppRole]?.label ?? cr}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* sensitive perm count + toggle */}
+                        <div className="flex items-center gap-3">
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                            <span className="font-semibold text-slate-700 dark:text-slate-300">{node.sensitiveCount}</span> sensitive /{' '}
+                            <span className="font-semibold text-slate-700 dark:text-slate-300">{node.permissionCount}</span> total permissions
+                          </span>
+                          <button
+                            onClick={e => { e.stopPropagation(); setShowPerms(showPerms === node.role ? null : node.role); }}
+                            className="text-[10px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline font-medium"
+                          >
+                            {showPerms === node.role ? 'Hide permissions ▲' : 'Show permissions ▼'}
+                          </button>
+                        </div>
+
+                        {/* permission list */}
+                        {showPerms === node.role && (
+                          <div className="flex flex-wrap gap-1 max-h-40 overflow-y-auto pr-1">
+                            {node.isSuperBypass ? (
+                              <span className="text-[10px] text-slate-400 italic">All permissions (super-admin bypass).</span>
+                            ) : (
+                              (data?.roles.find(r => r.role === node.role)?.permissions ?? []).map((p: string) => (
+                                <span key={p}
+                                  className={`text-[9px] font-mono px-1.5 py-0.5 rounded border
+                                    ${DEFAULT_SENSITIVE_PERMS.includes(p)
+                                      ? 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-400'
+                                      : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'}`}>
+                                  {p}
+                                </span>
+                              ))
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// PolicyRoleCheckPanel — full ABAC decision chain for any (role, permissions) pair
+// ---------------------------------------------------------------------------
+
+const ALL_ROLE_OPTIONS: Array<{ value: string; label: string }> = Object.entries(ROLE_METADATA)
+  .map(([role, meta]) => ({ value: role, label: `${meta.label} (${role})` }))
+  .sort((a, b) => {
+    const wa = (ROLE_HIERARCHY as Record<string, number>)[a.value] ?? 0;
+    const wb = (ROLE_HIERARCHY as Record<string, number>)[b.value] ?? 0;
+    return wb - wa;
+  });
+
+const CHECK_PRESETS = [
+  { label: 'Fund transfer (OVDS)',       role: 'OVDS',         perms: 'fund_transfers:approve' },
+  { label: 'Payroll approve (HR)',       role: 'HR',           perms: 'payroll:approve'        },
+  { label: 'Role write (ADMIN)',         role: 'ADMIN',        perms: 'role_permissions:write' },
+  { label: 'System deploy (DEVELOPER)', role: 'DEVELOPER',    perms: 'system:deploy'          },
+  { label: 'VAT file (FINANCE)',         role: 'FINANCE',      perms: 'vat:file'               },
+  { label: 'Invoice read (EMPLOYEE)',    role: 'EMPLOYEE',     perms: 'invoices:read'          },
+  { label: 'Audit certify (EXTERNAL)',   role: 'EXTERNAL_AUDITOR', perms: 'external_audit:certify' },
+];
+
+type LayerResult = { layer: string; result: 'pass' | 'fail' | 'bypass' | 'skipped'; reason: string };
+type CheckData = { role: string; allowed: boolean; layers: LayerResult[]; policy: object | null };
+
+const LAYER_META: Record<string, { icon: React.ReactNode; label: string }> = {
+  'super-bypass':        { icon: <ShieldCheck className="w-3.5 h-3.5" />, label: 'Super-user bypass' },
+  'cross-tenant':        { icon: <Building2   className="w-3.5 h-3.5" />, label: 'Cross-tenant isolation' },
+  'sensitive-perm-gate': { icon: <Lock        className="w-3.5 h-3.5" />, label: 'Sensitive permission gate' },
+  'ip-whitelist':        { icon: <Shield      className="w-3.5 h-3.5" />, label: 'IP whitelist' },
+  'time-window':         { icon: <Clock       className="w-3.5 h-3.5" />, label: 'Time window' },
+  'mfa':                 { icon: <Fingerprint className="w-3.5 h-3.5" />, label: 'MFA requirement' },
+  'ownership':           { icon: <User        className="w-3.5 h-3.5" />, label: 'Data ownership' },
+};
+
+function PolicyRoleCheckPanel({ companyId }: { companyId?: string }) {
+  const [open,       setOpen]       = useState(false);
+  const [role,       setRole]       = useState('ADMIN');
+  const [permsRaw,   setPermsRaw]   = useState('role_permissions:write');
+  const [ip,         setIp]         = useState('');
+  const [timeStr,    setTimeStr]    = useState('');
+  const [mfaOn,      setMfaOn]      = useState(false);
+  const [ownerId,    setOwnerId]    = useState('');
+  const [requestorId,setRequestorId]= useState('');
+  const [result,     setResult]     = useState<CheckData | null>(null);
+  const [running,    setRunning]    = useState(false);
+
+  // Auto-fill "now" when panel opens
+  const prevOpen = useRef(false);
+  useEffect(() => {
+    if (open && !prevOpen.current) {
+      const now = new Date();
+      const pad = (n: number) => String(n).padStart(2, '0');
+      setTimeStr(`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`);
+    }
+    prevOpen.current = open;
+  }, [open]);
+
+  const applyPreset = (p: typeof CHECK_PRESETS[0]) => {
+    setRole(p.role);
+    setPermsRaw(p.perms);
+    setResult(null);
+  };
+
+  const runCheck = async () => {
+    setRunning(true);
+    setResult(null);
+    try {
+      const body: Record<string, unknown> = {
+        role,
+        permissions: permsRaw.split(',').map(s => s.trim()).filter(Boolean),
+        mfaVerified: mfaOn,
+        mfaEnrolled: mfaOn,
+        ...(companyId  ? { companyId }     : {}),
+        ...(ip.trim()  ? { ipAddress: ip.trim() } : {}),
+        ...(timeStr    ? { requestTime: new Date(timeStr).toISOString() } : {}),
+        ...(ownerId    ? { resourceOwnerId: ownerId.trim() }    : {}),
+        ...(requestorId? { requestorUserId: requestorId.trim() }: {}),
+      };
+      const res = await api.post('/settings/security-policy/check-role', body);
+      setResult(res.data?.data ?? null);
+    } catch (e: any) {
+      const msg = e?.response?.data?.message;
+      toast.error(Array.isArray(msg) ? msg[0] : (msg ?? e?.message ?? 'Check failed'));
+    } finally { setRunning(false); }
+  };
+
+  const resultIcon = (r: LayerResult['result']) => {
+    if (r === 'pass')   return <CheckCircle2 className="w-3.5 h-3.5 text-[var(--pro-azure)] shrink-0" />;
+    if (r === 'fail')   return <XSquare      className="w-3.5 h-3.5 text-rose-500 shrink-0" />;
+    if (r === 'bypass') return <ShieldCheck  className="w-3.5 h-3.5 text-blue-500 shrink-0" />;
+    return <span className="w-3.5 h-3.5 shrink-0 inline-block rounded-full border border-slate-400 opacity-30" />;
+  };
+
+  const resultBadge = (r: LayerResult['result']) => {
+    const base = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full ml-1.5';
+    if (r === 'pass')   return `${base} bg-[var(--pro-azure-100)] dark:bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]`;
+    if (r === 'fail')   return `${base} bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400`;
+    if (r === 'bypass') return `${base} bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400`;
+    return `${base} bg-slate-100 dark:bg-slate-700 text-slate-500`;
+  };
+
+  return (
+    <div className="ovds-widget-card overflow-hidden">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <Crosshair className="w-4 h-4 text-rose-500" />
+          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Role Access Check</span>
+          <span className="px-1.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 text-[10px] font-bold">LIVE</span>
+        </div>
+        {open ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
+      </button>
+
+      {open && (
+        <div className="border-t border-slate-100 dark:border-slate-800 p-4 space-y-4">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Run a complete ABAC enforcement decision chain for any role and permission — see exactly which layers pass, fail, are bypassed, or are skipped.
+          </p>
+
+          {/* Quick presets */}
+          <div>
+            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Quick presets</p>
+            <div className="flex flex-wrap gap-1.5">
+              {CHECK_PRESETS.map(p => (
+                <button key={p.label} onClick={() => applyPreset(p)}
+                  className={`px-2 py-0.5 text-[10px] font-medium rounded-full border transition-colors
+                    ${role === p.role && permsRaw === p.perms
+                      ? 'bg-rose-100 dark:bg-rose-500/20 border-rose-300 dark:border-rose-500/40 text-rose-700 dark:text-rose-300'
+                      : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 hover:border-rose-300'}`}>
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Role + permissions */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Role</label>
+              <select value={role} onChange={e => { setRole(e.target.value); setResult(null); }}
+                className="w-full mt-1 px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-rose-500 text-slate-700 dark:text-slate-300">
+                {ALL_ROLE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Permissions (comma-separated)</label>
+              <input type="text" value={permsRaw} onChange={e => { setPermsRaw(e.target.value); setResult(null); }}
+                placeholder="fund_transfers:approve"
+                className="w-full mt-1 px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-rose-500 font-mono text-slate-700 dark:text-slate-300" />
+            </div>
+          </div>
+
+          {/* Context: IP, time, MFA */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Source IP</label>
+              <input type="text" value={ip} onChange={e => setIp(e.target.value)}
+                placeholder="blank = 127.0.0.1"
+                className="w-full mt-1 px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-rose-500 font-mono text-slate-700 dark:text-slate-300" />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Request Time</label>
+              <input type="datetime-local" value={timeStr} onChange={e => setTimeStr(e.target.value)}
+                className="w-full mt-1 px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-rose-500 text-slate-700 dark:text-slate-300" />
+            </div>
+          </div>
+
+          {/* Ownership context (optional) */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Resource owner ID <span className="font-normal opacity-60">(optional)</span></label>
+              <input type="text" value={ownerId} onChange={e => setOwnerId(e.target.value)}
+                placeholder="user UUID of resource owner"
+                className="w-full mt-1 px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-rose-500 font-mono text-slate-700 dark:text-slate-300" />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Requestor user ID <span className="font-normal opacity-60">(optional)</span></label>
+              <input type="text" value={requestorId} onChange={e => setRequestorId(e.target.value)}
+                placeholder="user UUID making the request"
+                className="w-full mt-1 px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-rose-500 font-mono text-slate-700 dark:text-slate-300" />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Toggle checked={mfaOn} onChange={setMfaOn} colorClass="bg-violet-500" />
+              <span className={`text-xs font-medium ${mfaOn ? 'text-violet-600 dark:text-violet-400' : 'text-slate-400'}`}>MFA verified</span>
+            </div>
+            <button onClick={runCheck} disabled={running || !role || !permsRaw.trim()}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white text-xs font-bold rounded-lg transition-colors">
+              {running ? <><RefreshCw className="w-3 h-3 animate-spin" />Checking…</> : <><Play className="w-3 h-3" />Check Access</>}
+            </button>
+          </div>
+
+          {/* Result */}
+          {result && (
+            <div className={`rounded-xl border p-4 space-y-3 ${
+              result.allowed
+                ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10 border-[var(--pro-azure-100)] dark:border-[var(--pro-azure)]/30'
+                : 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/30'
+            }`}>
+              {/* verdict */}
+              <div className="flex items-center gap-2">
+                {result.allowed
+                  ? <CheckCircle2 className="w-4 h-4 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
+                  : <XSquare      className="w-4 h-4 text-rose-600 dark:text-rose-400" />}
+                <span className={`text-sm font-bold ${result.allowed ? 'text-[var(--pro-azure-dark)] dark:text-green-300' : 'text-rose-700 dark:text-rose-300'}`}>
+                  {result.allowed ? `${result.role} — Access GRANTED` : `${result.role} — Access DENIED`}
+                </span>
+              </div>
+
+              {/* layer breakdown */}
+              <div className="space-y-2">
+                {result.layers.map((layer, i) => {
+                  const meta = LAYER_META[layer.layer] ?? { icon: <Info className="w-3.5 h-3.5" />, label: layer.layer };
+                  return (
+                    <div key={i} className="flex items-start gap-2 text-xs">
+                      <div className={`mt-0.5 shrink-0
+                        ${layer.result === 'pass'   ? 'text-[var(--pro-azure)]'
+                        : layer.result === 'fail'   ? 'text-rose-500'
+                        : layer.result === 'bypass' ? 'text-blue-500'
+                        :                             'text-slate-400'}`}>
+                        {resultIcon(layer.result)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center flex-wrap gap-1">
+                          <span className="text-slate-500 dark:text-slate-400 shrink-0">{meta.icon}</span>
+                          <span className="font-semibold text-slate-700 dark:text-slate-300">{meta.label}</span>
+                          <span className={resultBadge(layer.result)}>{layer.result.toUpperCase()}</span>
+                        </div>
+                        <p className="mt-0.5 text-slate-500 dark:text-slate-400 break-words">{layer.reason}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 function PermissionsCrudView() {
   const companyId = useCompanyId();
-  const qc = useQueryClient();
-  const { can } = useRbac();
-  const canWrite = can('role_permissions:write') || can('settings:write');
+  const qc        = useQueryClient();
+  const { can }   = useRbac();
+  const canWrite  = can('role_permissions:write') || can('settings:write');
 
-  const { data: perms, isLoading, isError, refetch } = useQuery({
+  const { data: perms, isLoading, isError } = useQuery({
     queryKey: ['permissions', companyId],
-    queryFn: () => orpc.settings.roles.permissions.list({ companyId, isActive: undefined }),
+    queryFn: async () => {
+      const res = await api.get('/settings/rbac/permissions', {
+        params: { ...(companyId ? { companyId } : {}) },
+      });
+      return (res.data?.data ?? res.data ?? []) as DbPermission[];
+    },
     placeholderData: [],
   });
 
   const mutation = useMutation({
-    mutationFn: ({ action, id, data }: { action: string; id?: string; data?: any }) => {
-      if (action === 'create') return orpc.settings.roles.permissions.create(data);
-      if (action === 'update') return orpc.settings.roles.permissions.update({ id: id!, data });
-      if (action === 'toggle') return orpc.settings.roles.permissions.toggle(data);
-      if (action === 'delete') return orpc.settings.roles.permissions.remove({ id: id! });
+    mutationFn: async ({ action, id, data }: { action: string; id?: string; data?: any }) => {
+      if (action === 'create')
+        return api.post('/settings/rbac/permissions', data).then(r => r.data?.data ?? r.data);
+      if (action === 'update')
+        return api.patch(`/settings/rbac/permissions/${id}`, data).then(r => r.data?.data ?? r.data);
+      if (action === 'toggle')
+        return api.patch(`/settings/rbac/permissions/${data.permissionId}/toggle`, { isActive: data.isActive }).then(r => r.data?.data ?? r.data);
+      if (action === 'delete')
+        return api.delete(`/settings/rbac/permissions/${id}`).then(r => r.data?.data ?? r.data);
+      if (action === 'seed')
+        return api.post('/settings/rbac/permissions/seed', { companyId: data?.companyId }).then(r => r.data?.data ?? r.data);
       return Promise.resolve();
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['permissions', companyId] }); },
@@ -3188,15 +5469,18 @@ function PermissionsCrudView() {
             <input
               type="text"
               placeholder="Search permissions…"
-              className="pl-9 pr-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:border-emerald-500"
+              className="pl-9 pr-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:border-[var(--pro-azure)]"
             />
           </div>
           <span className="text-xs text-slate-500 dark:text-slate-400">{perms?.length ?? 0} permissions</span>
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => mutation.mutateAsync({ action: 'seed', data: { companyId } }).then(() => qc.invalidateQueries({ queryKey: ['permissions', companyId] })).then(() => toast.success('Seeded default permissions'))}
-            disabled={!canWrite}
+            onClick={() => mutation.mutateAsync({ action: 'seed', data: { companyId } })
+              .then(() => qc.invalidateQueries({ queryKey: ['permissions', companyId] }))
+              .then(() => toast.success('Seeded default permissions'))
+              .catch((e: any) => toast.error(e?.message ?? 'Seed failed'))}
+            disabled={!canWrite || mutation.isPending}
             className="ovds-btn-secondary flex items-center gap-1.5 text-xs"
           >
             <RefreshCw className="w-3 h-3" /> Seed Defaults
@@ -3243,7 +5527,7 @@ function PermissionsCrudView() {
                         )}
                       </div>
 
-                      <div className={`p-1 rounded ${perm.isActive ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-300 text-slate-500'}`}>
+                      <div className={`p-1 rounded ${perm.isActive ? 'bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure)]' : 'bg-slate-300 text-slate-500'}`}>
                         {perm.isActive ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
                       </div>
                     </div>
@@ -3254,7 +5538,7 @@ function PermissionsCrudView() {
                         disabled={!canWrite}
                         className={`text-xs px-2 py-1 rounded transition-colors ${perm.isActive
                           ? 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:bg-amber-500/10'
-                          : 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:bg-emerald-500/10'}`}
+                          : 'text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] hover:bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10'}`}
                       >
                         {perm.isActive ? 'Disable' : 'Enable'}
                       </button>
@@ -3287,8 +5571,11 @@ function PermissionsCrudView() {
               <Lock className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
               <p className="text-sm text-slate-500">No permissions defined yet.</p>
               <button
-                onClick={() => mutation.mutateAsync({ action: 'seed', data: { companyId } }).then(() => qc.invalidateQueries({ queryKey: ['permissions', companyId] })).then(() => toast.success('Seeded default permissions'))}
-                className="mt-2 text-xs text-emerald-600 hover:text-emerald-700 font-medium"
+                onClick={() => mutation.mutateAsync({ action: 'seed', data: { companyId } })
+                  .then(() => qc.invalidateQueries({ queryKey: ['permissions', companyId] }))
+                  .then(() => toast.success('Seeded default permissions'))
+                  .catch((e: any) => toast.error(e?.message ?? 'Seed failed'))}
+                className="mt-2 text-xs text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] font-medium"
               >
                 Seed default permissions →
               </button>
@@ -3309,7 +5596,7 @@ function PermissionsCrudView() {
                   value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })}
                   placeholder="e.g. invoices:approve"
-                  className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:border-emerald-500"
+                  className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:border-[var(--pro-azure)]"
                 />
               </div>
               <div>
@@ -3319,7 +5606,7 @@ function PermissionsCrudView() {
                   onChange={e => setForm({ ...form, description: e.target.value })}
                   placeholder="What does this permission allow?"
                   rows={3}
-                  className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:border-emerald-500 resize-none"
+                  className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:border-[var(--pro-azure)] resize-none"
                 />
               </div>
               <div>
@@ -3327,7 +5614,7 @@ function PermissionsCrudView() {
                 <select
                   value={form.category}
                   onChange={e => setForm({ ...form, category: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:border-emerald-500"
+                  className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:border-[var(--pro-azure)]"
                 >
                   {PERMISSION_CATEGORIES.map(cat => (
                     <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
@@ -3345,7 +5632,7 @@ function PermissionsCrudView() {
               <button
                 onClick={editing ? handleUpdate : handleCreate}
                 disabled={mutation.isPending || !form.name}
-                className="flex-1 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
+                className="flex-1 px-3 py-2 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 text-white rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
               >
                 {mutation.isPending ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
                 {editing ? 'Update' : 'Create'}
@@ -3366,23 +5653,40 @@ function CustomRolesCrudView() {
 
   const { data: roles, isLoading, isError } = useQuery({
     queryKey: ['custom-roles', companyId],
-    queryFn: () => orpc.settings.roles.roles.list({ companyId }),
+    queryFn: async () => {
+      const res = await api.get('/settings/rbac/roles', {
+        params: { ...(companyId ? { companyId } : {}) },
+      });
+      return (res.data?.data ?? res.data ?? []) as DbRole[];
+    },
     placeholderData: [],
   });
 
   const { data: allPerms } = useQuery({
     queryKey: ['permissions', companyId, 'all'],
-    queryFn: () => orpc.settings.roles.permissions.list({ companyId }),
+    queryFn: async () => {
+      const res = await api.get('/settings/rbac/permissions', {
+        params: { ...(companyId ? { companyId } : {}) },
+      });
+      return (res.data?.data ?? res.data ?? []) as DbPermission[];
+    },
     placeholderData: [],
   });
 
   const mutation = useMutation({
-    mutationFn: ({ action, id, data }: { action: string; id?: string; data?: any }) => {
-      if (action === 'create') return orpc.settings.roles.roles.create(data);
-      if (action === 'update') return orpc.settings.roles.roles.update({ id: id!, data });
-      if (action === 'toggle') return orpc.settings.roles.roles.toggle(data);
-      if (action === 'delete') return orpc.settings.roles.roles.remove({ id: id! });
-      if (action === 'assign') return orpc.settings.roles.roles.assignPermissions({ id: id!, permissionIds: data });
+    mutationFn: async ({ action, id, data }: { action: string; id?: string; data?: any }) => {
+      if (action === 'create')
+        return api.post('/settings/rbac/roles', data).then(r => r.data?.data ?? r.data);
+      if (action === 'update')
+        return api.patch(`/settings/rbac/roles/${id}`, data).then(r => r.data?.data ?? r.data);
+      if (action === 'toggle')
+        return api.patch(`/settings/rbac/roles/${data.roleId}/toggle`, { isActive: data.isActive }).then(r => r.data?.data ?? r.data);
+      if (action === 'delete')
+        return api.delete(`/settings/rbac/roles/${id}`).then(r => r.data?.data ?? r.data);
+      if (action === 'assign')
+        return api.put(`/settings/rbac/roles/${id}/permissions`, { permissionIds: data }).then(r => r.data?.data ?? r.data);
+      if (action === 'seed')
+        return api.post('/settings/rbac/roles/seed', { companyId: data?.companyId }).then(r => r.data?.data ?? r.data);
       return Promise.resolve();
     },
     onSuccess: () => {
@@ -3393,8 +5697,9 @@ function CustomRolesCrudView() {
 
   const [editing, setEditing] = useState<DbRole | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form, setForm] = useState({ name: '', description: '', isActive: true });
+  const [form, setForm] = useState({ name: '', description: '', isActive: true, apiAccess: false });
   const [selectedPerms, setSelectedPerms] = useState<Set<string>>(new Set());
+  const [permSearch, setPermSearch] = useState('');
 
   const activeRoles = useMemo(() => (roles ?? []).filter(r => r.isActive), [roles]);
   const inactiveRoles = useMemo(() => (roles ?? []).filter(r => !r.isActive), [roles]);
@@ -3404,7 +5709,7 @@ function CustomRolesCrudView() {
       await mutation.mutateAsync({ action: 'create', data: form });
       toast.success('Role created');
       setIsModalOpen(false);
-      setForm({ name: '', description: '', isActive: true });
+      setForm({ name: '', description: '', isActive: true, apiAccess: false });
       if (selectedPerms.size > 0) {
         const roleId = (roles ?? []).find(r => r.name === form.name)?.id;
         if (roleId) await mutation.mutateAsync({ action: 'assign', id: roleId, data: Array.from(selectedPerms) });
@@ -3443,17 +5748,43 @@ function CustomRolesCrudView() {
     } catch (e: any) { toast.error(e?.message ?? 'Failed to delete role'); }
   };
 
+  const handleClone = async (role: DbRole) => {
+    try {
+      const cloned = await mutation.mutateAsync({
+        action: 'create',
+        data: {
+          name: `${role.name} (Copy)`,
+          description: role.description ?? '',
+          isActive: true,
+          apiAccess: role.apiAccess,
+          companyId: role.companyId ?? undefined,
+        },
+      });
+      const newRoleId = cloned?.id ?? (roles ?? []).find(r => r.name === `${role.name} (Copy)`)?.id;
+      if (newRoleId && role.permissions?.length) {
+        await mutation.mutateAsync({
+          action: 'assign',
+          id: newRoleId,
+          data: role.permissions.map(p => p.id),
+        });
+      }
+      toast.success('Role cloned');
+    } catch (e: any) { toast.error(e?.message ?? 'Failed to clone role'); }
+  };
+
   const openCreate = () => {
     setEditing(null);
-    setForm({ name: '', description: '', isActive: true });
+    setForm({ name: '', description: '', isActive: true, apiAccess: false });
     setSelectedPerms(new Set());
+    setPermSearch('');
     setIsModalOpen(true);
   };
 
   const openEdit = (role: DbRole) => {
     setEditing({ ...role });
-    setForm({ name: role.name, description: role.description ?? '', isActive: role.isActive });
+    setForm({ name: role.name, description: role.description ?? '', isActive: role.isActive, apiAccess: role.apiAccess });
     setSelectedPerms(new Set(role.permissions?.map(p => p.id) ?? []));
+    setPermSearch('');
     setIsModalOpen(true);
   };
 
@@ -3478,7 +5809,7 @@ function CustomRolesCrudView() {
             <div className="flex items-center gap-2">
               <span className="font-medium text-slate-900 dark:text-slate-100 text-sm">{role.name}</span>
               {role.isSystem && (
-                <span className="px-1.5 py-0.5 text-[8px] font-bold bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded uppercase">
+                <span className="px-1.5 py-0.5 text-[8px] font-bold bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] rounded uppercase">
                   SYSTEM
                 </span>
               )}
@@ -3487,13 +5818,19 @@ function CustomRolesCrudView() {
                   DISABLED
                 </span>
               )}
+              {role.apiAccess && (
+                <span className="px-1.5 py-0.5 text-[8px] font-bold bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-300 rounded">
+                  API
+                </span>
+              )}
             </div>
             {role.description && (
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{role.description}</p>
             )}
+            <p className="text-[10px] text-slate-400 mt-1">{role.customUsersCount ?? 0} users assigned</p>
           </div>
 
-          <div className={`p-1 rounded ${role.isActive ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-300 text-slate-500'}`}>
+          <div className={`p-1 rounded ${role.isActive ? 'bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure)]' : 'bg-slate-300 text-slate-500'}`}>
             {role.isActive ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
           </div>
         </div>
@@ -3528,7 +5865,7 @@ function CustomRolesCrudView() {
               disabled={!canWrite || role.isSystem}
               className={`text-xs px-2 py-1 rounded transition-colors ${role.isActive
                 ? 'text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:bg-amber-500/10'
-                : 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:bg-emerald-500/10'}`}
+                : 'text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] hover:bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10'}`}
               title={role.isSystem ? 'Cannot toggle system role' : ''}
             >
               {role.isActive ? 'Disable' : 'Enable'}
@@ -3540,6 +5877,14 @@ function CustomRolesCrudView() {
               title="Edit"
             >
               <Edit className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => handleClone(role)}
+              disabled={!canWrite}
+              className="p-1 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 rounded"
+              title="Clone role"
+            >
+              <Copy className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => handleDelete(role)}
@@ -3566,8 +5911,11 @@ function CustomRolesCrudView() {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => mutation.mutateAsync({ action: 'seed', data: { companyId } }).then(() => qc.invalidateQueries({ queryKey: ['custom-roles', companyId] })).then(() => toast.success('Seeded default roles'))}
-            disabled={!canWrite}
+            onClick={() => mutation.mutateAsync({ action: 'seed', data: { companyId } })
+              .then(() => qc.invalidateQueries({ queryKey: ['custom-roles', companyId] }))
+              .then(() => toast.success('Seeded default roles'))
+              .catch((e: any) => toast.error(e?.message ?? 'Seed failed'))}
+            disabled={!canWrite || mutation.isPending}
             className="ovds-btn-secondary flex items-center gap-1.5 text-xs"
           >
             <RefreshCw className="w-3 h-3" /> Seed Defaults
@@ -3611,8 +5959,11 @@ function CustomRolesCrudView() {
               <Users className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
               <p className="text-sm text-slate-500">No custom roles defined yet.</p>
               <button
-                onClick={() => mutation.mutateAsync({ action: 'seed', data: { companyId } }).then(() => qc.invalidateQueries({ queryKey: ['custom-roles', companyId] })).then(() => toast.success('Seeded default roles'))}
-                className="mt-2 text-xs text-emerald-600 hover:text-emerald-700 font-medium"
+                onClick={() => mutation.mutateAsync({ action: 'seed', data: { companyId } })
+                  .then(() => qc.invalidateQueries({ queryKey: ['custom-roles', companyId] }))
+                  .then(() => toast.success('Seeded default roles'))
+                  .catch((e: any) => toast.error(e?.message ?? 'Seed failed'))}
+                className="mt-2 text-xs text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] font-medium"
               >
                 Seed default roles →
               </button>
@@ -3624,16 +5975,42 @@ function CustomRolesCrudView() {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50" onClick={e => e.target === e.currentTarget && (setIsModalOpen(false), setEditing(null))}>
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 w-full max-w-2xl mx-4 p-6" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">{editing ? 'Edit' : 'Create'} Role</h3>
-            <div className="space-y-3">
-              <div>
-                <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Role Name</label>
+             <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">{editing ? 'Edit' : 'Create'} Role</h3>
+             <div className="space-y-3">
+               <div>
+                 <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Role Template</label>
+                 <div className="mt-1 flex flex-wrap gap-2">
+                   {ROLE_TEMPLATES.map(t => (
+                     <button
+                       key={t.role}
+                       type="button"
+                       onClick={() => {
+                         const tpl = applyTemplate(t.role);
+                         setSelectedPerms(tpl);
+                         if (!editing) {
+                           setForm(f => ({
+                             ...f,
+                             name: t.label,
+                             description: ROLE_METADATA[t.role]?.description ?? f.description,
+                           }));
+                         }
+                         toast.success(`Applied ${t.label} template`);
+                       }}
+                       className="text-[11px] px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] transition-all"
+                     >
+                       {t.label}
+                     </button>
+                   ))}
+                 </div>
+               </div>
+               <div>
+                 <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Role Name</label>
                 <input
                   type="text"
                   value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })}
                   placeholder="e.g. Finance Manager"
-                  className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:border-emerald-500"
+                  className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:border-[var(--pro-azure)]"
                 />
               </div>
               <div>
@@ -3643,17 +6020,56 @@ function CustomRolesCrudView() {
                   onChange={e => setForm({ ...form, description: e.target.value })}
                   placeholder="What can this role do?"
                   rows={2}
-                  className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:border-emerald-500 resize-none"
+                  className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:border-[var(--pro-azure)] resize-none"
                 />
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.apiAccess}
+                    onChange={e => setForm({ ...form, apiAccess: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[var(--pro-azure)]/20 dark:peer-focus:ring-[var(--pro-azure-light)]/20 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-[var(--pro-azure)]"></div>
+                </label>
+                <span className="text-xs font-medium text-slate-700 dark:text-slate-300">API Access</span>
+                <span className="text-[10px] text-slate-400">Allow programmatic token / basic auth</span>
               </div>
 
               <div>
                 <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   Permissions ({selectedPerms.size} selected)
                 </label>
+                <div className="mt-1 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPerms(new Set(allPerms?.map(p => p.id) ?? []))}
+                    className="text-[10px] text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] font-medium"
+                  >
+                    Select All
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPerms(new Set())}
+                    className="text-[10px] text-slate-500 hover:text-slate-700 font-medium"
+                  >
+                    Deselect All
+                  </button>
+                </div>
+                <div className="mt-1 relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                  <input
+                    type="text"
+                    value={permSearch}
+                    onChange={e => setPermSearch(e.target.value)}
+                    placeholder="Filter permissions…"
+                    className="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:border-[var(--pro-azure)]"
+                  />
+                </div>
                 {allPerms && allPerms.length > 0 ? (
-                  <div className="mt-1 max-h-48 overflow-y-auto border border-slate-200 dark:border-slate-700 rounded-lg p-2 space-y-1">
-                    {allPerms.map(perm => {
+                  <div className="mt-1.5 max-h-48 overflow-y-auto border border-slate-200 dark:border-slate-700 rounded-lg p-2 space-y-1">
+                    {allPerms.filter(p => p.name.toLowerCase().includes(permSearch.toLowerCase()) || (p.category ?? '').toLowerCase().includes(permSearch.toLowerCase())).map(perm => {
                       const isSelected = selectedPerms.has(perm.id);
                       const isDisabled = selectedPerms.size >= 0 ? false : !isSelected;
                       return (
@@ -3663,7 +6079,7 @@ function CustomRolesCrudView() {
                             checked={isSelected}
                             disabled={isDisabled || !perm.isActive}
                             onChange={() => togglePermSelection(perm.id)}
-                            className="rounded border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-emerald-500"
+                            className="rounded border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-[var(--pro-azure)]"
                           />
                           <code className="text-xs font-mono text-slate-600 dark:text-slate-300">{perm.name}</code>
                           {perm.category && (
@@ -3690,7 +6106,7 @@ function CustomRolesCrudView() {
               <button
                 onClick={editing ? handleUpdate : handleCreate}
                 disabled={mutation.isPending || !form.name}
-                className="flex-1 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
+                className="flex-1 px-3 py-2 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 text-white rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
               >
                 {mutation.isPending ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
                 {editing ? 'Update' : 'Create'}
@@ -3709,12 +6125,16 @@ function CustomRolesCrudView() {
 
 export default function RolePermissions() {
   usePageTitle('Role Permissions');
-  const { t: _t } = useTranslation();
+  const { t: t } = useTranslation();
   const { role: currentUserRole } = useRbac();
+  const companyId = useCompanyId();
   const [activeTab, setActiveTab] = useState<ViewMode>('by-role');
   const [showLookup, setShowLookup] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // -- Dynamic RBAC data (SoD rules, audit events, critical permissions) ---
+  const { sodRules, sodRemediation, auditEvents, criticalPermissions } = useRbacStaticData(companyId);
 
   const activeTabConfig = TABS.find(t => t.id === activeTab)!;
 
@@ -3722,7 +6142,7 @@ export default function RolePermissions() {
   useEffect(() => {
     const TAB_KEYS: ViewMode[] = [
       'by-role','matrix','diff','groups','coverage',
-      'routes','ifrs','OVDS','risk','sod','simulate','audit','policy','smart-rules','app-access','custom-roles','permissions',
+      'routes','ifrs','OVDS','risk','sod','simulate','audit','policy','smart-rules','app-access','overrides','custom-roles','permissions','security-policy',
     ];
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
@@ -3744,9 +6164,9 @@ export default function RolePermissions() {
     return acc;
   }, new Set<Permission>()).size, []);
 
-  const sodConflicts = useMemo(() => SOD_RULES.filter(rule =>
+  const sodConflicts = useMemo(() => sodRules.filter(rule =>
     ALL_ROLES.some(role => rbac.can(role, rule.perm1) && rbac.can(role, rule.perm2))
-  ).length, []);
+  ).length, [sodRules]);
 
   const highRiskRoles = useMemo(() =>
     ALL_ROLES.filter(r => calcRiskScore(r) >= 61).length, []);
@@ -3759,8 +6179,8 @@ export default function RolePermissions() {
     return score;
   }, [sodConflicts, highRiskRoles]);
 
-  const complianceColor = complianceScore >= 80 ? 'text-emerald-400' : complianceScore >= 50 ? 'text-amber-400' : 'text-rose-400';
-  const _complianceBorder = complianceScore >= 80 ? 'bg-emerald-500/5 border-emerald-500/20' : complianceScore >= 50 ? 'bg-amber-500/5 border-amber-500/20' : 'bg-rose-500/5 border-rose-500/20';
+  const complianceColor = complianceScore >= 80 ? 'text-[var(--pro-azure-light)]' : complianceScore >= 50 ? 'text-amber-400' : 'text-rose-400';
+  const _complianceBorder = complianceScore >= 80 ? 'bg-[var(--pro-azure-50)]0/5 border-[var(--pro-azure)]/20' : complianceScore >= 50 ? 'bg-amber-500/5 border-amber-500/20' : 'bg-rose-500/5 border-rose-500/20';
 
   const handleCopyStats = useCallback(() => {
     const lines = [
@@ -3784,17 +6204,17 @@ export default function RolePermissions() {
         {/* -- Page Header ----------------------------------------------- */}
         <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-5 shadow-sm">
           {/* Subtle left accent stripe */}
-          <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-l-2xl" />
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-[var(--pro-azure-50)]0 rounded-l-2xl" />
 
           <div className="relative pl-4 flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-4 min-w-0">
-              <div className="p-2.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-100 dark:border-emerald-500/20 shrink-0">
-                <Shield className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              <div className="p-2.5 bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10 rounded-xl border border-[var(--pro-azure-100)] dark:border-[var(--pro-azure)]/20 shrink-0">
+                <Shield className="w-6 h-6 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight leading-none">Role & Permissions</h1>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30 uppercase tracking-wider shrink-0">RBAC v2</span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[var(--pro-azure-100)] dark:bg-[var(--pro-azure-50)]0/20 text-[var(--pro-azure-dark)] dark:text-green-300 border border-[var(--pro-azure-100)] dark:border-[var(--pro-azure)]/30 uppercase tracking-wider shrink-0">RBAC v2</span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Deny-by-default · explicit grant model · {totalRoles} roles · {totalPerms} unique permissions
@@ -3815,7 +6235,7 @@ export default function RolePermissions() {
               {/* Search lookup */}
               <button
                 onClick={() => setShowLookup(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-lg transition-colors shadow-sm"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] hover:bg-[var(--pro-azure-dark)] text-white text-xs font-medium rounded-lg transition-colors shadow-sm"
               >
                 <Search className="w-3.5 h-3.5" />
                 Permission Lookup
@@ -3836,9 +6256,9 @@ export default function RolePermissions() {
               <button
                 onClick={handleCopyStats}
                 title="Copy system summary"
-                className="p-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                className="p-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 dark:text-slate-400 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
               >
-                {copied ? <CheckCheck className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                {copied ? <CheckCheck className="w-4 h-4 text-[var(--pro-azure)]" /> : <Copy className="w-4 h-4" />}
               </button>
             </div>
           </div>
@@ -3847,9 +6267,9 @@ export default function RolePermissions() {
         {/* -- Stats bar ------------------------------------------------- */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {/* Roles */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3.5 flex items-center gap-3 shadow-sm hover:border-emerald-300 dark:hover:border-emerald-500/40 transition-colors group">
-            <div className="p-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg group-hover:bg-emerald-100 dark:group-hover:bg-emerald-500/20 transition-colors">
-              <Users className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3.5 flex items-center gap-3 shadow-sm hover:border-[var(--pro-azure-light)] dark:hover:border-[var(--pro-azure)]/40 transition-colors group">
+            <div className="p-2 bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10 rounded-lg group-hover:bg-[var(--pro-azure-100)] dark:group-hover:bg-[var(--pro-azure-dark)]/20 transition-colors">
+              <Users className="w-4 h-4 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
             </div>
             <div>
               <div className="text-xl font-bold text-slate-900 dark:text-slate-100 leading-none tabular-nums">{totalRoles}</div>
@@ -3858,9 +6278,9 @@ export default function RolePermissions() {
           </div>
 
           {/* Permissions */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3.5 flex items-center gap-3 shadow-sm hover:border-emerald-300 dark:hover:border-emerald-500/40 transition-colors group">
-            <div className="p-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg group-hover:bg-emerald-100 dark:group-hover:bg-emerald-500/20 transition-colors">
-              <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3.5 flex items-center gap-3 shadow-sm hover:border-[var(--pro-azure-light)] dark:hover:border-[var(--pro-azure)]/40 transition-colors group">
+            <div className="p-2 bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10 rounded-lg group-hover:bg-[var(--pro-azure-100)] dark:group-hover:bg-[var(--pro-azure-dark)]/20 transition-colors">
+              <Lock className="w-4 h-4 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
             </div>
             <div>
               <div className="text-xl font-bold text-slate-900 dark:text-slate-100 leading-none tabular-nums">{totalPerms}</div>
@@ -3874,11 +6294,11 @@ export default function RolePermissions() {
             className={`rounded-xl px-4 py-3.5 flex items-center gap-3 border shadow-sm transition-all text-left hover:scale-[1.01] active:scale-100 ${
               sodConflicts > 0
                 ? 'bg-rose-50 dark:bg-rose-500/5 border-rose-200 dark:border-rose-500/30 hover:border-rose-300 dark:hover:border-rose-500/50'
-                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-500/40'
+                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-[var(--pro-azure-light)] dark:hover:border-[var(--pro-azure)]/40'
             }`}
           >
-            <div className={`p-2 rounded-lg ${sodConflicts > 0 ? 'bg-rose-100 dark:bg-rose-500/10' : 'bg-emerald-50 dark:bg-emerald-500/10'}`}>
-              <Scale className={`w-4 h-4 ${sodConflicts > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`} />
+            <div className={`p-2 rounded-lg ${sodConflicts > 0 ? 'bg-rose-100 dark:bg-rose-500/10' : 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10'}`}>
+              <Scale className={`w-4 h-4 ${sodConflicts > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'}`} />
             </div>
             <div>
               <div className={`text-xl font-bold leading-none tabular-nums ${sodConflicts > 0 ? 'text-rose-700 dark:text-rose-300' : 'text-slate-900 dark:text-slate-100'}`}>{sodConflicts}</div>
@@ -3892,11 +6312,11 @@ export default function RolePermissions() {
             className={`rounded-xl px-4 py-3.5 flex items-center gap-3 border shadow-sm transition-all text-left hover:scale-[1.01] active:scale-100 ${
               highRiskRoles > 0
                 ? 'bg-amber-50 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/30 hover:border-amber-300 dark:hover:border-amber-500/50'
-                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-500/40'
+                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-[var(--pro-azure-light)] dark:hover:border-[var(--pro-azure)]/40'
             }`}
           >
-            <div className={`p-2 rounded-lg ${highRiskRoles > 0 ? 'bg-amber-100 dark:bg-amber-500/10' : 'bg-emerald-50 dark:bg-emerald-500/10'}`}>
-              <Gauge className={`w-4 h-4 ${highRiskRoles > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`} />
+            <div className={`p-2 rounded-lg ${highRiskRoles > 0 ? 'bg-amber-100 dark:bg-amber-500/10' : 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10'}`}>
+              <Gauge className={`w-4 h-4 ${highRiskRoles > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'}`} />
             </div>
             <div>
               <div className={`text-xl font-bold leading-none tabular-nums ${highRiskRoles > 0 ? 'text-amber-700 dark:text-amber-300' : 'text-slate-900 dark:text-slate-100'}`}>{highRiskRoles}</div>
@@ -3919,7 +6339,7 @@ export default function RolePermissions() {
                 <circle cx="18" cy="18" r="14" fill="none" strokeWidth="3"
                   strokeDasharray={`${(complianceScore / 100) * 88} 88`}
                   strokeLinecap="round"
-                  className={complianceScore >= 80 ? 'text-emerald-500' : complianceScore >= 50 ? 'text-amber-500' : 'text-rose-500'}
+                  className={complianceScore >= 80 ? 'text-[var(--pro-azure)]' : complianceScore >= 50 ? 'text-amber-500' : 'text-rose-500'}
                   stroke="currentColor"
                 />
               </svg>
@@ -3949,11 +6369,11 @@ export default function RolePermissions() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`group relative flex items-center gap-1.5 px-3.5 py-3 text-xs font-medium whitespace-nowrap transition-all border-b-2 focus:outline-none ${
                   activeTab === tab.id
-                    ? 'border-emerald-500 text-emerald-700 dark:text-emerald-400 bg-white dark:bg-slate-900'
+                    ? 'border-[var(--pro-azure)] text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] bg-white dark:bg-slate-900'
                     : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-800/60'
                 }`}
               >
-                <span className={`transition-colors ${activeTab === tab.id ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-500 dark:group-hover:text-slate-300'}`}>{tab.icon}</span>
+                <span className={`transition-colors ${activeTab === tab.id ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-500 dark:group-hover:text-slate-300'}`}>{tab.icon}</span>
                 <span>{tab.label}</span>
                 {tab.badge && (
                   <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${tab.badgeColor}`}>
@@ -3961,7 +6381,7 @@ export default function RolePermissions() {
                   </span>
                 )}
                 {/* Keyboard shortcut hint */}
-                <span className={`absolute -top-0 right-1 text-[9px] font-mono transition-opacity opacity-0 group-hover:opacity-100 ${activeTab === tab.id ? 'text-emerald-400/60 opacity-100' : 'text-slate-400 dark:text-slate-600'}`}>
+                <span className={`absolute -top-0 right-1 text-[9px] font-mono transition-opacity opacity-0 group-hover:opacity-100 ${activeTab === tab.id ? 'text-[var(--pro-azure-light)]/60 opacity-100' : 'text-slate-400 dark:text-slate-600'}`}>
                   {idx + 1}
                 </span>
               </button>
@@ -3991,22 +6411,24 @@ export default function RolePermissions() {
             {activeTab === 'routes'    && <RoutesView />}
             {activeTab === 'ifrs'      && <IFRSView />}
             {activeTab === 'OVDS' && <OvdsView />}
-            {activeTab === 'risk'      && <RiskView complianceScore={complianceScore} />}
-            {activeTab === 'sod'       && <SodView />}
+            {activeTab === 'risk'      && <RiskView complianceScore={complianceScore} criticalPermissions={criticalPermissions} sodRules={sodRules} />}
+            {activeTab === 'sod'       && <SodView sodRules={sodRules} sodRemediation={sodRemediation} />}
             {activeTab === 'simulate'  && <SimulateView />}
-            {activeTab === 'audit'     && <AuditView />}
+            {activeTab === 'audit'     && <AuditView auditEvents={auditEvents} />}
             {activeTab === 'policy'    && <PolicyView />}
             {activeTab === 'smart-rules' && <SmartRulesView />}
             {activeTab === 'app-access' && <AppAccessView />}
+            {activeTab === 'overrides' && <OverridesView />}
             {activeTab === 'custom-roles' && <CustomRolesCrudView />}
             {activeTab === 'permissions'  && <PermissionsCrudView />}
+            {activeTab === 'security-policy' && <SecurityPolicyPanel />}
           </div>
         </div>{/* end tab container */}
 
         {/* -- Footer ---------------------------------------------------- */}
         <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-600 pt-1 pb-2 border-t border-slate-200 dark:border-slate-800">
           <span className="flex items-center gap-1.5">
-            <Shield className="w-3 h-3 text-emerald-500/70" />
+            <Shield className="w-3 h-3 text-[var(--pro-azure)]/70" />
             RBAC Engine v2 — deny-by-default · explicit grant model
           </span>
           <span className="hidden sm:block">SPURADMIN &amp; SUPERADMIN bypass all permission checks</span>

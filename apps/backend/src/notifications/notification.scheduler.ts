@@ -6,11 +6,13 @@
  * When Redis is disabled the queue injection resolves to null via @Optional()
  * and all cron jobs that would enqueue BullMQ work are skipped gracefully.
  */
+import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+
 import { PrismaService } from '../common/prisma.service';
+
 import { NotificationDispatchService } from './notification-dispatch.service';
 import {
   NOTIFICATION_QUEUE,

@@ -3,8 +3,9 @@
  * Computes PIT, pension (7%/11%), and net pay from gross salary.
  * Can be embedded in Payroll page or used as a standalone modal.
  */
-import React, { useState, useMemo } from 'react';
 import { Calculator, ChevronDown, ChevronUp, Info, PiggyBank, Banknote, Wallet } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+
 import { calculatePIT as _calculatePIT } from '../utils/ethiopianTax';
 const calculatePIT = (gross: number, er?: number, eer?: number) =>
   _calculatePIT(gross, (er ?? 0.07) as Parameters<typeof _calculatePIT>[1], (eer ?? 0.11) as Parameters<typeof _calculatePIT>[2]);
@@ -13,8 +14,8 @@ import { fmtDecimal } from '../utils/fmt';
 const fmt = fmtDecimal;
 
 const PIT_BRACKETS_INFO = [
-  { range: '0 – 2,000', rate: '0%', deduction: 0, color: 'text-emerald-600 dark:text-emerald-400' },
-  { range: '2,001 – 4,000', rate: '15%', deduction: 300, color: 'text-emerald-600 dark:text-emerald-400' },
+  { range: '0 – 2,000', rate: '0%', deduction: 0, color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
+  { range: '2,001 – 4,000', rate: '15%', deduction: 300, color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
   { range: '4,001 – 7,000', rate: '20%', deduction: 500, color: 'text-teal-600 dark:text-teal-400' },
   { range: '7,001 – 10,000', rate: '25%', deduction: 850, color: 'text-violet-600 dark:text-violet-400' },
   { range: '10,001 – 14,000', rate: '30%', deduction: 1350, color: 'text-amber-600 dark:text-amber-400' },
@@ -69,7 +70,7 @@ const PITCalculator: React.FC<PITCalculatorProps> = ({
       label: 'Net Pay',
       value: result.netPay,
       pct: grossNum > 0 ? (result.netPay / grossNum) * 100 : 0,
-      color: 'bg-emerald-500',
+      color: 'bg-[var(--pro-azure-50)]0',
     },
     {
       label: 'Income Tax',
@@ -96,8 +97,8 @@ const PITCalculator: React.FC<PITCalculatorProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl flex items-center justify-center">
-            <Calculator size={15} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="w-8 h-8 bg-[var(--pro-azure-50)] dark:bg-green-950/30 rounded-xl flex items-center justify-center">
+            <Calculator size={15} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div>
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">PIT Calculator</p>
@@ -190,9 +191,9 @@ const PITCalculator: React.FC<PITCalculatorProps> = ({
                 { label: `Employee Pension (${(pensionRate * 100).toFixed(0)}%)`, value: result.employeePension, color: 'text-amber-600 dark:text-amber-400', icon: <PiggyBank size={12} />, negative: true },
                 { label: 'DRRF (1%)', value: result.drrf, color: 'text-orange-600 dark:text-orange-400', icon: <Info size={12} />, negative: true },
                 { label: `Employer Pension (${(employerPensionRate * 100).toFixed(0)}%)`, value: result.employerPension, color: 'text-orange-600 dark:text-orange-400', icon: <PiggyBank size={12} />, note: 'employer cost' },
-                { label: 'Net Pay', value: result.netPay, color: 'text-emerald-600 dark:text-emerald-400', icon: <Wallet size={12} />, bold: true },
+                { label: 'Net Pay', value: result.netPay, color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', icon: <Wallet size={12} />, bold: true },
               ].map(item => (
-                <div key={item.label} className={`flex items-center justify-between px-3 py-2 rounded-xl ${item.bold ? 'bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40' : 'bg-white dark:bg-slate-800/50'}`}>
+                <div key={item.label} className={`flex items-center justify-between px-3 py-2 rounded-xl ${item.bold ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900/40' : 'bg-white dark:bg-slate-800/50'}`}>
                   <div className="flex items-center gap-2">
                     <span className={item.color}>{item.icon}</span>
                     <span className={`text-xs ${item.bold ? 'font-semibold' : 'font-semibold'} text-slate-600 dark:text-slate-300`}>

@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
 import { AppPage, Btn } from '@ovds/ui';
 import { FileText, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+
 import { useBusiness } from '../../../context/businessContext';
 import { ALL_TEMPLATES, STANDARD_REPORTS, MODULAR_REPORTS } from '../reportRegistry';
-import type { ReportConfig, ReportTemplate, AccountingBasis, ExportFormat, ReportPeriod } from '../types';
 import { defaultPeriod } from '../services/reportsService';
+import type { ReportConfig, ReportTemplate, AccountingBasis, ExportFormat, ReportPeriod } from '../types';
 
 interface Props {
   onBack: () => void;
@@ -89,7 +90,7 @@ export default function ReportBuilder({ onBack, onComplete }: Props) {
       title="New Report"
       subtitle="Build a custom report from a template — choose basis, timeline and grouping."
       icon={<FileText size={16} className="text-white" />}
-      iconBg="bg-indigo-600"
+      iconBg="bg-[var(--pro-azure)]"
       crumbs={[{ label: 'Reports', to: '/reports-dashboard' }, { label: 'New Report' }]}
       actions={
         <>
@@ -108,9 +109,9 @@ export default function ReportBuilder({ onBack, onComplete }: Props) {
                 <div
                   className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold ${
                     active
-                      ? 'bg-indigo-600 text-white'
+                      ? 'bg-[var(--pro-azure)] text-white'
                       : done
-                        ? 'bg-emerald-500 text-white'
+                        ? 'bg-[var(--pro-azure-light)] text-white'
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
                   }`}
                 >
@@ -143,7 +144,7 @@ export default function ReportBuilder({ onBack, onComplete }: Props) {
                         key={t.id}
                         className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
                           templateId === t.id
-                            ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/20'
+                            ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/20'
                             : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
                         }`}
                       >

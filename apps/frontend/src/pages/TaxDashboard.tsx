@@ -1,25 +1,26 @@
-import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { useTaxDashboard, useVatReconciliation, useIncomeTax } from '../services/taxApi';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useAuth } from '../rbac/AuthContext';
-import { useApiQuery } from '../hooks/useApiQuery';
-import { fmtCompact } from '../utils/fmt';
-import { PIT_BRACKETS as SHARED_PIT } from '../utils/ethiopianTax';
-import AccountingChainWidget from '../components/dashboard/accountingChainWidget';
-import { TaxAutomationWidget } from '../components/dashboard/taxAutomationWidget';
-import { PipelineStageHeader } from '../components/pipelineComponents';
-import EthiopianComplianceGuide from '../components/ethiopianComplianceGuide';
-import IASBUpdateBanner from '../components/iasbUpdateBanner';
-import WHTCertificateModal from '../components/whtCertificateModal';
-import { useBusiness } from '../context/businessContext';
 import {
   efyPeriodLabel, efyTaxDeadlines, gregorianToEFY,
   bitFilingDeadline, vatFilingDeadline, drrfQuarterDeadline,
 } from '@ovds/ui';
+import React, { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+
+import AccountingChainWidget from '../components/dashboard/accountingChainWidget';
+import { TaxAutomationWidget } from '../components/dashboard/taxAutomationWidget';
+import EthiopianComplianceGuide from '../components/ethiopianComplianceGuide';
+import IASBUpdateBanner from '../components/iasbUpdateBanner';
+import { PipelineStageHeader } from '../components/pipelineComponents';
 import {
   AppPage, AppKpi, Btn, Icon,
 } from '../components/ui';
+import WHTCertificateModal from '../components/whtCertificateModal';
+import { useBusiness } from '../context/businessContext';
+import { useApiQuery } from '../hooks/useApiQuery';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { useTaxDashboard, useVatReconciliation, useIncomeTax } from '../services/taxApi';
+import { PIT_BRACKETS as SHARED_PIT } from '../utils/ethiopianTax';
+import { fmtCompact } from '../utils/fmt';
 
 const fmtK = (n: number) => fmtCompact(n, 'ETB');
 
@@ -34,26 +35,26 @@ interface TaxDeadline {
   penalty?: string;
 }
 
-const DEADLINE_COLORS: Record<DeadlineType, string> = {
-  VAT:     'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800',
+const _DEADLINE_COLORS: Record<DeadlineType, string> = {
+  VAT:     'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-300 dark:border-green-800',
   DRRF:    'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-950/30 dark:text-orange-300 dark:border-orange-800',
   BIT:     'bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800',
-  PAYROLL: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800',
+  PAYROLL: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-300 dark:border-green-800',
   PENSION: 'bg-teal-100 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-300 dark:border-teal-800',
 };
 
 const DEADLINE_DOT: Record<DeadlineType, string> = {
-  VAT:     'bg-emerald-500',
+  VAT:     'bg-[var(--pro-azure-50)]0',
   DRRF:    'bg-amber-500',
   BIT:     'bg-teal-500',
-  PAYROLL: 'bg-emerald-500',
+  PAYROLL: 'bg-[var(--pro-azure-50)]0',
   PENSION: 'bg-teal-500',
 };
 
 // PIT display table derived from shared PIT_BRACKETS (single source of truth)
 const PIT_BRACKETS = [
-  { range: '0 – 2,000',        rate: '0%',  tax: '0',                                     color: 'text-emerald-600 dark:text-emerald-400' },
-  { range: '2,001 – 4,000',    rate: '15%', tax: '(taxable − 2,000) × 15%',               color: 'text-emerald-600 dark:text-emerald-400' },
+  { range: '0 – 2,000',        rate: '0%',  tax: '0',                                     color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
+  { range: '2,001 – 4,000',    rate: '15%', tax: '(taxable − 2,000) × 15%',               color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
   { range: '4,001 – 7,000',    rate: '20%', tax: '300 + (taxable − 4,000) × 20%',         color: 'text-teal-600 dark:text-teal-400' },
   { range: '7,001 – 10,000',   rate: '25%', tax: '900 + (taxable − 7,000) × 25%',         color: 'text-violet-600 dark:text-violet-400' },
   { range: '10,001 – 14,000',  rate: '30%', tax: '1,650 + (taxable − 10,000) × 30%',      color: 'text-orange-600 dark:text-orange-400' },
@@ -64,9 +65,9 @@ const DRRF_CATEGORIES = [
   { category: 'Annual Sales Revenue', rate: '5%', color: 'text-orange-600' },
   { category: 'Telecom / Digital', rate: '5%', color: 'text-orange-600' },
   { category: 'Service Fees (Bank)', rate: '5%', color: 'text-orange-600' },
-  { category: 'Loan Value', rate: '1%', color: 'text-emerald-600' },
-  { category: 'Insurance Premium', rate: '1%', color: 'text-emerald-600' },
-  { category: 'Salary Contribution', rate: '1%', color: 'text-emerald-600' },
+  { category: 'Loan Value', rate: '1%', color: 'text-[var(--pro-azure)]' },
+  { category: 'Insurance Premium', rate: '1%', color: 'text-[var(--pro-azure)]' },
+  { category: 'Salary Contribution', rate: '1%', color: 'text-[var(--pro-azure)]' },
 ];
 
 function buildDeadlines(year: number, month: number): TaxDeadline[] {
@@ -147,11 +148,12 @@ const ComplianceRing: React.FC<{ score: number; label: string; color: string }> 
   );
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const KPIBlock: React.FC<{ label: string; value: string; sub: string; to?: string; icon: React.ReactNode }> = ({ label, value, sub, to, icon }) => {
   const content = (
     <div className="dash-stat-cell h-full flex flex-col justify-between">
       <div>
-        <div className="p-2 bg-white dark:bg-slate-800 rounded-lg text-emerald-600 dark:text-emerald-400 w-fit mb-3">
+        <div className="p-2 bg-white dark:bg-slate-800 rounded-lg text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] w-fit mb-3">
           {icon}
         </div>
         <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">{label}</p>
@@ -166,7 +168,7 @@ const KPIBlock: React.FC<{ label: string; value: string; sub: string; to?: strin
 const TaxFilingCalendar: React.FC = () => {
   const now = new Date();
   const [viewMonth, setViewMonth] = useState(now.getMonth());
-  const [viewYear, setViewYear] = useState(now.getFullYear());
+  const [viewYear, _setViewYear] = useState(now.getFullYear());
   const deadlines = useMemo(() => buildDeadlines(viewYear, viewMonth), [viewYear, viewMonth]);
   const upcoming = deadlines.filter(d => {
     const diff = (d.date.getTime() - now.getTime()) / 86_400_000;
@@ -177,7 +179,7 @@ const TaxFilingCalendar: React.FC = () => {
     <div className="ovds-widget-card overflow-hidden h-full">
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">
-          <Icon name="CALENDAR" size={16} className="text-emerald-600 dark:text-emerald-400" />
+          <Icon name="CALENDAR" size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           <p className="text-xs font-semibold text-slate-800 dark:text-slate-100">Filing Calendar</p>
         </div>
         <div className="flex items-center gap-1">
@@ -186,7 +188,7 @@ const TaxFilingCalendar: React.FC = () => {
           </button>
           <span className="text-[10px] font-semibold text-slate-500 min-w-[70px] text-center">
             {new Date(viewYear, viewMonth).toLocaleString('en-ET', { month: 'short' })}
-            <span className="block text-[9px] text-emerald-500 font-medium">
+            <span className="block text-[9px] text-[var(--pro-azure)] font-medium">
               {efyPeriodLabel(`${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`)}
             </span>
           </span>
@@ -259,7 +261,7 @@ const OverduePenaltySummary: React.FC<{ companyId?: string }> = ({ companyId }) 
           <div key={i} className="flex items-center gap-4 px-5 py-3">
             <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
               item.type === 'VAT'
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800'
+                ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/20 dark:text-[var(--pro-azure-light)] dark:border-green-800'
                 : 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/20 dark:text-violet-400 dark:border-violet-800'
             }`}>
               {item.type}
@@ -396,7 +398,7 @@ const QuarterlyTaxSummary: React.FC<{ companyId?: string }> = ({ companyId }) =>
               {r ? (
                 <div className="space-y-1.5">
                   {[
-                    { label: 'VAT',  value: Number(r.vatNetPayable  ?? 0), color: 'text-emerald-600 dark:text-emerald-400' },
+                    { label: 'VAT',  value: Number(r.vatNetPayable  ?? 0), color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
                     { label: 'WHT',  value: Number(r.whtTotalToRemit ?? 0), color: 'text-amber-600 dark:text-amber-400'   },
                     { label: 'PAYE', value: Number(r.payeNetPayableErca ?? 0), color: 'text-sky-600 dark:text-sky-400'    },
                     { label: 'DRRF', value: Number(r.drrfLevyDue    ?? 0), color: 'text-orange-600 dark:text-orange-400' },
@@ -417,7 +419,7 @@ const QuarterlyTaxSummary: React.FC<{ companyId?: string }> = ({ companyId }) =>
                   <div className="flex items-center gap-1 mt-1">
                     <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
                       r.status === 'SUBMITTED_TO_MOR'
-                        ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400'
+                        ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)]'
                         : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
                     }`}>
                       {r.status === 'SUBMITTED_TO_MOR' ? '✓ Submitted' : r.status ?? 'DRAFT'}
@@ -511,7 +513,7 @@ const AnnualBitBreakdown: React.FC<{ incomeTax: any; year: number }> = ({ income
             { label: 'Effective Tax Rate',    value: `${((incomeTax.effectiveRate ?? 0) * 100).toFixed(1)}%`,  color: 'text-slate-700 dark:text-slate-200', bg: 'bg-slate-50 dark:bg-slate-800' },
             { label: 'Non-Deductible Total',  value: `ETB ${fmt(incomeTax.permanentAddBacks ?? 0)}`,           color: 'text-amber-700 dark:text-amber-300',  bg: 'bg-amber-50 dark:bg-amber-950/20' },
             { label: 'BIT Due (Nov 7)',        value: `ETB ${fmt(incomeTax.taxPayable ?? 0)}`,                  color: 'text-rose-700 dark:text-rose-300',    bg: 'bg-rose-50 dark:bg-rose-950/20'   },
-            { label: 'MAT Comparison (2.5%)', value: incomeTax.matApplies ? '⚠ MAT > CIT — MAT applies' : '✓ CIT > MAT — standard rate', color: incomeTax.matApplies ? 'text-amber-700 dark:text-amber-300' : 'text-emerald-700 dark:text-emerald-300', bg: incomeTax.matApplies ? 'bg-amber-50 dark:bg-amber-950/20' : 'bg-emerald-50 dark:bg-emerald-950/20' },
+            { label: 'MAT Comparison (2.5%)', value: incomeTax.matApplies ? '⚠ MAT > CIT — MAT applies' : '✓ CIT > MAT — standard rate', color: incomeTax.matApplies ? 'text-amber-700 dark:text-amber-300' : 'text-[var(--pro-azure-dark)] dark:text-green-300', bg: incomeTax.matApplies ? 'bg-amber-50 dark:bg-amber-950/20' : 'bg-[var(--pro-azure-50)] dark:bg-green-950/20' },
           ].map(card => (
             <div key={card.label} className={`flex items-center justify-between px-3 py-2.5 ${card.bg} rounded-xl`}>
               <span className="text-[10px] text-slate-500 dark:text-slate-400">{card.label}</span>
@@ -527,7 +529,7 @@ const AnnualBitBreakdown: React.FC<{ incomeTax: any; year: number }> = ({ income
             </div>
             <div className="flex items-center justify-between text-[10px]">
               <span className="text-slate-400">Cr Tax Payable</span>
-              <span className="font-mono text-emerald-600 dark:text-emerald-400">2150</span>
+              <span className="font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">2150</span>
             </div>
           </div>
         </div>
@@ -554,17 +556,17 @@ const TaxDashboard: React.FC = () => {
   const [showWHT, setShowWHT] = useState(false);
 
   const now = new Date();
-  const vatDaysLeft = Math.ceil((new Date(now.getFullYear(), now.getMonth() + 1, 30).getTime() - now.getTime()) / 86_400_000);
+  const _vatDaysLeft = Math.ceil((new Date(now.getFullYear(), now.getMonth() + 1, 30).getTime() - now.getTime()) / 86_400_000);
   const score = dashboard?.complianceScore ?? 0;
 
   const { data: taxpayer } = useApiQuery<any>(`/ovds/taxpayer/status${selectedCompanyId ? `?companyId=${selectedCompanyId}` : ''}`, { deps: [selectedCompanyId], suppressToast: true });
   const { data: whtSummary } = useApiQuery<any>(`/ovds/wht/summary${selectedCompanyId ? `?companyId=${selectedCompanyId}` : ''}`, { deps: [selectedCompanyId], suppressToast: true });
 
   // Taxpayer category from dashboard data
-  const taxpayerCategory = dashboard?.taxpayerCategory ?? taxpayer?.category ?? 'A';
-  const annualRevenue = dashboard?.annualRevenue ?? 0;
+  const _taxpayerCategory = dashboard?.taxpayerCategory ?? taxpayer?.category ?? 'A';
+  const _annualRevenue = dashboard?.annualRevenue ?? 0;
   const matApplies = dashboard?.matApplies ?? false;
-  const matPayable = dashboard?.matPayable ?? 0;
+  const _matPayable = dashboard?.matPayable ?? 0;
 
   return (
     <AppPage
@@ -592,17 +594,17 @@ const TaxDashboard: React.FC = () => {
 
         <AppKpi
           cells={[
-            { label: 'VAT Net',      value: fmtK(recon?.netPayable ?? 0),  sub: 'Due end of month', icon: <Icon name="RECEIPT" size={14} />, color: 'emerald' },
+            { label: 'VAT Net',      value: fmtK(recon?.netPayable ?? 0),  sub: 'Due end of month', icon: <Icon name="RECEIPT" size={14} />, color: "indigo" },
             { label: 'Income Tax',   value: fmtK(incomeTax?.taxPayable ?? 0), sub: matApplies ? 'MAT applies (2.5%)' : 'Next filing: Nov 7', icon: <Icon name="BANKNOTE" size={14} />, color: 'violet' },
             { label: 'DRRF Levy',    value: fmtK(dashboard?.drrfPending ?? 0), sub: 'Regulation 570/2025', icon: <Icon name="SHIELD" size={14} />, color: 'amber' },
-            { label: 'Compliance',   value: `${score}%`, sub: 'Overall Rating', icon: <Icon name="SHIELD_CHECK" size={14} />, color: score >= 90 ? 'emerald' : 'amber' },
+            { label: 'Compliance',   value: `${score}%`, sub: 'Overall Rating', icon: <Icon name="SHIELD_CHECK" size={14} />, color: score >= 90 ? 'indigo' : 'amber' },
           ]}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div className="lg:col-span-8 space-y-5">
             <div className="ovds-widget-card p-6 shadow-sm flex flex-col md:flex-row items-center gap-10">
-              <ComplianceRing score={score} label="Compliance Rating" color={score >= 90 ? 'text-emerald-500' : 'text-amber-500'} />
+              <ComplianceRing score={score} label="Compliance Rating" color={score >= 90 ? 'text-[var(--pro-azure)]' : 'text-amber-500'} />
               <div className="flex-1 ovds-grid-layout cols-2 w-full">
                 <div>
                   <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">VAT Threshold</p>
@@ -611,7 +613,7 @@ const TaxDashboard: React.FC = () => {
                     <span className="ovds-caption">ETB 2M</span>
                   </div>
                   <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${taxpayer?.vatThresholdPct ?? 0}%` }} />
+                    <div className="h-full bg-[var(--pro-azure-50)]0 rounded-full transition-all" style={{ width: `${taxpayer?.vatThresholdPct ?? 0}%` }} />
                   </div>
                 </div>
                 <div>
@@ -621,7 +623,7 @@ const TaxDashboard: React.FC = () => {
                     <span className="ovds-caption">Ends July 7</span>
                   </div>
                   <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${(new Date().getMonth() + 1) / 12 * 100}%` }} />
+                    <div className="h-full bg-[var(--pro-azure-50)]0 rounded-full transition-all" style={{ width: `${(new Date().getMonth() + 1) / 12 * 100}%` }} />
                   </div>
                 </div>
               </div>
@@ -641,8 +643,8 @@ const TaxDashboard: React.FC = () => {
                     <p className="text-xl font-semibold text-slate-800 dark:text-slate-100">ETB {fmtCompact(whtSummary?.totalWht ?? whtSummary?.totalWithholding ?? whtSummary?.withholdingTax3pct ?? 0)}</p>
                   </div>
                   <div className="flex flex-col items-end gap-1">
-                    <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded-full">3% SVC ≥ ETB 3K</span>
-                    <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded-full">3% GOODS ≥ ETB 10K</span>
+                    <span className="text-[10px] font-medium text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 px-2 py-0.5 rounded-full">3% SVC ≥ ETB 3K</span>
+                    <span className="text-[10px] font-medium text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 px-2 py-0.5 rounded-full">3% GOODS ≥ ETB 10K</span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-[10px] font-medium text-slate-500">
@@ -658,7 +660,7 @@ const TaxDashboard: React.FC = () => {
           <div className="ovds-widget-card overflow-hidden">
             <button onClick={() => setShowPIT(!showPIT)} className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
               <div className="flex items-center gap-2">
-                <Icon name="USERS" size={14} className="text-emerald-600 dark:text-emerald-400" />
+                <Icon name="USERS" size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                 <p className="text-sm font-semibold">PIT Brackets (2026)</p>
               </div>
               <Icon name={showPIT ? 'CHEVRON_UP' : 'CHEVRON_DOWN'} size={14} />
@@ -752,7 +754,7 @@ const TaxDashboard: React.FC = () => {
           <div className="p-5">
             <div className="ovds-grid-layout cols-4 gap-sm">
               {[
-                { label: 'Dividend',          rate: '15%', ref: 'Art. 52', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+                { label: 'Dividend',          rate: '15%', ref: 'Art. 52', color: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' },
                 { label: 'Interest (std)',     rate: '10%', ref: 'Art. 53', color: 'bg-sky-50 text-sky-700 border-sky-200' },
                 { label: 'Interest (FI)',      rate: '30%', ref: 'Art. 53', color: 'bg-sky-50 text-sky-700 border-sky-200' },
                 { label: 'Capital Gains',      rate: '15%', ref: 'Art. 59', color: 'bg-violet-50 text-violet-700 border-violet-200' },

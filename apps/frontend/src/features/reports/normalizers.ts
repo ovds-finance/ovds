@@ -46,9 +46,9 @@ export function normalizeReport(reportId: string, raw: unknown): RenderedReport 
       const gross = (Number(income.total) || 0) - (Number(expenses.total) || 0);
       const net = r.grossProfit != null ? Number(r.grossProfit) : gross;
       const kpis: KpiCell[] = [
-        { label: 'Income', value: fmtMoney(Number(income.total) || 0), color: 'emerald' },
+        { label: 'Income', value: fmtMoney(Number(income.total) || 0), color: "green" },
         { label: 'Expenses', value: fmtMoney(Number(expenses.total) || 0), color: 'rose' },
-        { label: 'Net Profit', value: fmtMoney(net), color: net >= 0 ? 'emerald' : 'rose' },
+        { label: 'Net Profit', value: fmtMoney(net), color: net >= 0 ? 'green' : 'rose' },
       ];
       const columns: ReportColumn[] = [
         { key: 'code', label: 'Code' },
@@ -63,7 +63,7 @@ export function normalizeReport(reportId: string, raw: unknown): RenderedReport 
       const other = Number(r.totalOtherIncome) || 0;
       const byCat = (r.byCategory as ReportRow[]) ?? [];
       const kpis: KpiCell[] = [
-        { label: 'Total Income', value: fmtMoney(total), color: 'emerald' },
+        { label: 'Total Income', value: fmtMoney(total), color: "green" },
         { label: 'Other Income', value: fmtMoney(other), color: 'sky' },
       ];
       const columns: ReportColumn[] = [
@@ -98,9 +98,9 @@ export function normalizeReport(reportId: string, raw: unknown): RenderedReport 
       const net = income - expenses;
       const byMonth = (r.byMonth as ReportRow[]) ?? [];
       const kpis: KpiCell[] = [
-        { label: 'Income', value: fmtMoney(income), color: 'emerald' },
+        { label: 'Income', value: fmtMoney(income), color: "green" },
         { label: 'Expenses', value: fmtMoney(expenses), color: 'rose' },
-        { label: 'Net', value: fmtMoney(net), color: net >= 0 ? 'emerald' : 'rose' },
+        { label: 'Net', value: fmtMoney(net), color: net >= 0 ? 'green' : 'rose' },
       ];
       const columns: ReportColumn[] = [
         { key: 'period', label: 'Period' },
@@ -118,7 +118,7 @@ export function normalizeReport(reportId: string, raw: unknown): RenderedReport 
       const summary = (r.summary as Record<string, unknown>) ?? {};
       const byTax = (r.byTaxRate as ReportRow[]) ?? [];
       const kpis: KpiCell[] = [
-        { label: 'Output Tax', value: fmtMoney(Number(summary.totalOutputTax) || 0), color: 'emerald' },
+        { label: 'Output Tax', value: fmtMoney(Number(summary.totalOutputTax) || 0), color: "green" },
         { label: 'Input Tax', value: fmtMoney(Number(summary.totalInputTax) || 0), color: 'sky' },
         { label: 'Net Payable', value: fmtMoney(Number(summary.netPayable) || 0), color: 'violet' },
         { label: 'Transactions', value: fmtNumber(Number(summary.totalTransactions) || 0), color: 'amber' },
@@ -138,7 +138,7 @@ export function normalizeReport(reportId: string, raw: unknown): RenderedReport 
       const totals = (r.totals as Record<string, unknown>) ?? {};
       const accounts = (r.accounts as ReportRow[]) ?? [];
       const kpis: KpiCell[] = [
-        { label: 'Total Debits', value: fmtMoney(Number(totals.debits) || 0), color: 'emerald' },
+        { label: 'Total Debits', value: fmtMoney(Number(totals.debits) || 0), color: "green" },
         { label: 'Total Credits', value: fmtMoney(Number(totals.credits) || 0), color: 'rose' },
         { label: 'Accounts', value: fmtNumber(accounts.length), color: 'slate' },
       ];
@@ -156,7 +156,7 @@ export function normalizeReport(reportId: string, raw: unknown): RenderedReport 
       const total = Number(r.totalValue) || 0;
       const items = (r.items as ReportRow[]) ?? (r.byWarehouse as ReportRow[]) ?? [];
       const kpis: KpiCell[] = [
-        { label: 'Total Valuation', value: fmtMoney(total), color: 'emerald' },
+        { label: 'Total Valuation', value: fmtMoney(total), color: "green" },
         { label: 'Lines', value: fmtNumber(items.length), color: 'slate' },
       ];
       const columns: ReportColumn[] = [
@@ -173,7 +173,7 @@ export function normalizeReport(reportId: string, raw: unknown): RenderedReport 
       const headcount = Number(r.headcount) || 0;
       const byDept = (r.byDepartment as ReportRow[]) ?? [];
       const kpis: KpiCell[] = [
-        { label: 'Total Payroll', value: fmtMoney(total), color: 'emerald' },
+        { label: 'Total Payroll', value: fmtMoney(total), color: "green" },
         { label: 'Headcount', value: fmtNumber(headcount), color: 'slate' },
       ];
       const columns: ReportColumn[] = [
@@ -191,7 +191,7 @@ export function normalizeReport(reportId: string, raw: unknown): RenderedReport 
       const paid = Number(r.paid) || 0;
       const byCust = (r.byCustomer as ReportRow[]) ?? [];
       const kpis: KpiCell[] = [
-        { label: 'Revenue', value: fmtMoney(revenue), color: 'emerald' },
+        { label: 'Revenue', value: fmtMoney(revenue), color: "green" },
         { label: 'Invoiced', value: fmtMoney(invoiced), color: 'sky' },
         { label: 'Collected', value: fmtMoney(paid), color: 'teal' },
       ];

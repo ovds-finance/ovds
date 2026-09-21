@@ -22,10 +22,10 @@ Multi-company ERP platform built with React 19 (Vite + SWC), NestJS 11, and Pris
 
 ```bash
 pnpm install
-npm run dev:all        # start all apps
-npm run build:apps     # production build
-npm run test           # run all tests
-npm run lint:all       # lint everything
+pnpm run dev:all        # start all apps
+pnpm run build:apps     # production build
+pnpm run test           # run all tests
+pnpm run lint:all       # lint everything
 ```
 
 ## Optimization & Bundle Health
@@ -35,10 +35,10 @@ The monorepo ships a permanent automated pipeline that tracks bundle size, audit
 | Quick command | What it does |
 |---------------|-------------|
 | `pwsh -File scripts/optimize.ps1 -SkipBuild -SkipKnip` | Fast local check (uses cached build) |
-| `npm run optimize:bundle` | Analyze Vite output chunks |
-| `npm run optimize:deps` | Dep hygiene (dedupe, ranges, circular deps) |
-| `npm run optimize:size-check` | Bundle size regression vs baseline |
-| `npm run optimize:size-baseline` | Advance baseline after intentional size change |
+| `pnpm run optimize:bundle` | Analyze Vite output chunks |
+| `pnpm run optimize:deps` | Dep hygiene (dedupe, ranges, circular deps) |
+| `pnpm run optimize:size-check` | Bundle size regression vs baseline |
+| `pnpm run optimize:size-baseline` | Advance baseline after intentional size change |
 
 CI runs this pipeline automatically — see `.github/workflows/dep-optimization.yml` and `scripts/README.md#dependency-optimization-pipeline` for full documentation.
 

@@ -38,7 +38,7 @@ export const RevenueExpenseChart: React.FC<RevenueExpenseProps> = ({
         </div>
         <div className="flex items-center gap-3 text-[10px] font-bold">
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-[var(--pro-azure)] inline-block" />
             Revenue
           </span>
           <span className="flex items-center gap-1">
@@ -46,7 +46,7 @@ export const RevenueExpenseChart: React.FC<RevenueExpenseProps> = ({
             Expenses
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-[var(--pro-azure)] inline-block" />
             Profit
           </span>
         </div>

@@ -3,18 +3,19 @@
  * Wired to the real backend: reads entitlement status, starts trials,
  * and shows the correct CTA based on the company's current plan.
  */
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useEntitlement } from '../context/entitlementContext';
-import { startTrial, listProducts } from '../services/monetizationApi';
 import type { MonetizationProduct } from '@ovds/ui';
-import { toast } from 'react-hot-toast';
 import {
   Check, Zap, ArrowRight, ChevronDown,
   Lock, Sparkles, HelpCircle, Crown, Minus, Clock,
   CheckCircle2, Rocket, Loader2, Store, Layers, Download, FileText,
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+
+import { useEntitlement } from '../context/entitlementContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { startTrial, listProducts } from '../services/monetizationApi';
 
 interface PlanFeature {
   label: string;
@@ -171,7 +172,7 @@ const Plans: React.FC = () => {
 
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
-  const [products, setProducts] = useState<MonetizationProduct[]>([]);
+  const [products, _setProducts] = useState<MonetizationProduct[]>([]);
   const [trialLoading, setTrialLoading] = useState<string | null>(null);
 
   // Highlight the required feature if navigated here from a gate
@@ -275,8 +276,8 @@ const Plans: React.FC = () => {
       price: billing === 'monthly' ? 7500 : 75000,
       period: billing === 'monthly' ? '/month' : '/year',
       saving: billing === 'annual' ? 'Save ETB 15,000' : null,
-      color: 'border-emerald-600 shadow-2xl shadow-emerald-500/10 scale-105 z-10',
-      headerBg: 'bg-emerald-500',
+      color: 'border-[var(--pro-azure)] shadow-2xl shadow-green-500/10 scale-105 z-10',
+      headerBg: 'bg-[var(--pro-azure-50)]0',
       badge: 'Best Value',
       highlights: [
         '25 users included',
@@ -289,7 +290,7 @@ const Plans: React.FC = () => {
         'CRM, projects & BI analytics',
         'Priority support',
       ],
-      ctaStyle: 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/20',
+      ctaStyle: 'bg-[var(--pro-azure)] text-white hover:bg-[var(--pro-azure-dark)] shadow-lg shadow-green-500/20',
     },
     {
       name: 'Enterprise',
@@ -318,7 +319,7 @@ const Plans: React.FC = () => {
   ];
 
   const renderCell = (val: boolean | string) => {
-    if (val === true) return <CheckCircle2 size={16} className="text-emerald-500 mx-auto" />;
+    if (val === true) return <CheckCircle2 size={16} className="text-[var(--pro-azure)] mx-auto" />;
     if (val === false) return <Minus size={14} className="text-slate-200 dark:text-slate-800 mx-auto" />;
     return <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-tighter">{val}</span>;
   };
@@ -341,7 +342,7 @@ const Plans: React.FC = () => {
         <div className="mx-4 mt-4 flex items-center gap-3 px-5 py-3 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl">
           <Lock size={15} className="text-slate-400 shrink-0" />
           <p className="text-sm font-bold text-slate-600 dark:text-slate-300">
-            <span className="font-black text-emerald-500">{requiredFeature}</span> requires an upgrade.
+            <span className="font-black text-[var(--pro-azure)]">{requiredFeature}</span> requires an upgrade.
             Choose a plan below to unlock it.
           </p>
         </div>
@@ -350,16 +351,16 @@ const Plans: React.FC = () => {
       {/* Hero */}
       <div className="relative bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-800 shadow-2xl mb-20 mt-4 mx-4">
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }} />
-        <div className="absolute -top-32 -right-32 w-80 h-80 bg-emerald-100 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute -top-32 -right-32 w-80 h-80 bg-[var(--pro-azure-100)] rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-teal-600/10 rounded-full blur-[100px] pointer-events-none" />
         <div className="relative max-w-4xl mx-auto px-6 py-20 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full mb-6">
-            <Sparkles size={14} className="text-emerald-400" />
-            <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Smart Pricing</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[var(--pro-azure-50)]0/10 border border-[var(--pro-azure)]/20 rounded-full mb-6">
+            <Sparkles size={14} className="text-[var(--pro-azure-light)]" />
+            <span className="text-[10px] font-black text-[var(--pro-azure-light)] uppercase tracking-widest">Smart Pricing</span>
           </div>
           <h1 className="text-4xl sm:text-6xl font-black text-white leading-tight tracking-tighter">
             Accounting that submits{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">itself to MoR.</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--pro-azure-light)] to-teal-300">itself to MoR.</span>
           </h1>
           <p className="mt-6 text-lg text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
             Online or on-premise. For freelancers, small, medium and large businesses. All tax types consolidated and submitted immediately to MoR/ERCA — VAT, TOT, WHT, PAYE, BIT, Excise, Stamp Duty, Schedule D, DRRF and more. Start your 14-day free trial — no credit card required.
@@ -379,7 +380,7 @@ const Plans: React.FC = () => {
             </button>
             <Link
               to="/sample-invoice"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold hover:bg-emerald-500/30 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--pro-azure-50)]0/20 border border-[var(--pro-azure)]/30 text-green-300 text-xs font-bold hover:bg-[var(--pro-azure-dark)]/30 transition-all"
             >
               <FileText size={13} /> Sample Invoice
             </Link>
@@ -396,11 +397,11 @@ const Plans: React.FC = () => {
               onClick={() => setBilling(b => b === 'monthly' ? 'annual' : 'monthly')}
               className="relative w-14 h-7 bg-slate-800 rounded-full border border-slate-700 transition-all p-1"
             >
-              <div className={`w-5 h-5 bg-emerald-500 rounded-full shadow-lg transition-transform duration-300 ${billing === 'annual' ? 'translate-x-7' : 'translate-x-0'}`} />
+              <div className={`w-5 h-5 bg-[var(--pro-azure-50)]0 rounded-full shadow-lg transition-transform duration-300 ${billing === 'annual' ? 'translate-x-7' : 'translate-x-0'}`} />
             </button>
             <div className="flex items-center gap-2">
               <span className={`text-xs font-bold uppercase tracking-widest ${billing === 'annual' ? 'text-white' : 'text-slate-500'}`}>Yearly</span>
-              <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black rounded-lg">SAVE 17%</span>
+              <span className="px-2 py-0.5 bg-[var(--pro-azure-50)]0/10 border border-[var(--pro-azure)]/20 text-[var(--pro-azure-light)] text-[10px] font-black rounded-lg">SAVE 17%</span>
             </div>
           </div>
         </div>
@@ -417,13 +418,13 @@ const Plans: React.FC = () => {
             return (
               <div key={plan.name} className={`relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border ${plan.color} overflow-hidden`}>
                 {plan.badge && (
-                  <div className="absolute top-4 right-6 px-3 py-1 bg-white text-emerald-600 text-[10px] font-black rounded-full uppercase tracking-widest shadow-xl">
+                  <div className="absolute top-4 right-6 px-3 py-1 bg-white text-[var(--pro-azure)] text-[10px] font-black rounded-full uppercase tracking-widest shadow-xl">
                     {plan.badge}
                   </div>
                 )}
                 {isCurrent && (
-                  <div className="absolute top-4 left-6 flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-                    <CheckCircle2 size={10} className="text-emerald-500" />
+                  <div className="absolute top-4 left-6 flex items-center gap-1.5 px-3 py-1 bg-[var(--pro-azure-50)]0/10 border border-[var(--pro-azure)]/20 rounded-full">
+                    <CheckCircle2 size={10} className="text-[var(--pro-azure)]" />
                     <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                       {isOnTrial ? 'Trial' : 'Active'}
                     </span>
@@ -432,7 +433,7 @@ const Plans: React.FC = () => {
 
                 <div className={`p-8 ${plan.headerBg}`}>
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-lg ${
-                    plan.name === 'Business' ? 'bg-white/20 text-white' : 'bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-white'
+                    plan.name === 'Business' ? 'bg-white/20 text-white' : 'bg-[var(--pro-azure-50)] dark:bg-slate-800 text-[var(--pro-azure)] dark:text-white'
                   }`}>
                     {plan.icon}
                   </div>
@@ -469,7 +470,7 @@ const Plans: React.FC = () => {
                     {plan.highlights.map((h, i) => (
                       <li key={i} className="flex items-center gap-3 text-sm font-bold text-slate-600 dark:text-slate-400">
                         <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                          plan.name === 'Business' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                          plan.name === 'Business' ? 'bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure)]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
                         }`}>
                           <Check size={12} strokeWidth={4} />
                         </div>
@@ -512,7 +513,7 @@ const Plans: React.FC = () => {
             <div className="grid grid-cols-4 bg-white dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
               <div className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-widest">Feature</div>
               <div className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Starter</div>
-              <div className="p-6 text-[10px] font-black text-emerald-500 uppercase tracking-widest text-center bg-emerald-500/5">Business</div>
+              <div className="p-6 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-widest text-center bg-[var(--pro-azure-50)]0/5">Business</div>
               <div className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Enterprise</div>
             </div>
             {FEATURE_GROUPS.map(group => (
@@ -524,7 +525,7 @@ const Plans: React.FC = () => {
                   <div key={f.label} className="grid grid-cols-4 border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                     <div className="p-6 text-sm font-bold text-slate-700 dark:text-slate-300">{f.label}</div>
                     <div className="p-6 border-l border-slate-100 dark:border-slate-800 flex items-center justify-center">{renderCell(f.starter)}</div>
-                    <div className="p-6 border-l border-slate-100 dark:border-slate-800 flex items-center justify-center bg-emerald-500/[0.02]">{renderCell(f.business)}</div>
+                    <div className="p-6 border-l border-slate-100 dark:border-slate-800 flex items-center justify-center bg-[var(--pro-azure-50)]0/[0.02]">{renderCell(f.business)}</div>
                     <div className="p-6 border-l border-slate-100 dark:border-slate-800 flex items-center justify-center">{renderCell(f.enterprise)}</div>
                   </div>
                 ))}
@@ -620,7 +621,7 @@ const Plans: React.FC = () => {
             {FAQS.map((faq, i) => (
               <div
                 key={i}
-                className="ovds-panel p-5 cursor-pointer hover:border-emerald-200 dark:hover:border-emerald-900 transition-all"
+                className="ovds-panel p-5 cursor-pointer hover:border-[var(--pro-azure-100)] dark:hover:border-green-900 transition-all"
                 onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
               >
                 <div className="flex items-center justify-between gap-4">
@@ -641,7 +642,7 @@ const Plans: React.FC = () => {
         <div className="ovds-panel mb-20 overflow-hidden">
           <div className="ovds-panel-header">
             <div className="flex items-center gap-2">
-              <Rocket size={15} className="text-emerald-600" />
+              <Rocket size={15} className="text-[var(--pro-azure)]" />
               <span className="text-[12px] font-bold text-slate-700 dark:text-slate-200">Open Source & Customization</span>
             </div>
             <button
@@ -655,7 +656,7 @@ const Plans: React.FC = () => {
             <div className="ovds-grid-layout cols-3">
               {[
                 {
-                  icon: <Sparkles size={16} className="text-emerald-600" />,
+                  icon: <Sparkles size={16} className="text-[var(--pro-azure)]" />,
                   title: 'Open Source Core',
                   desc: 'Every component in @ovds/ui and @ovds/shared is open source. Fork, extend, or replace anything to match your brand.',
                 },

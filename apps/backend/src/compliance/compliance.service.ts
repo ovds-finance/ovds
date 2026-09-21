@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../common/prisma.service';
 import { PAGINATION_DEFAULT_LIMIT } from '@ovds/shared';
+
+import { PrismaService } from '../common/prisma.service';
 
 @Injectable()
 export class ComplianceService {
@@ -67,8 +68,8 @@ export class ComplianceService {
   }
 
   async findRegistrations(query: { page?: number; limit?: number; invoiceId?: string }) {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? PAGINATION_DEFAULT_LIMIT;
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || PAGINATION_DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
@@ -106,8 +107,8 @@ export class ComplianceService {
   }
 
   async findReceipts(query: { page?: number; limit?: number; type?: string }) {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? PAGINATION_DEFAULT_LIMIT;
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || PAGINATION_DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
@@ -126,8 +127,8 @@ export class ComplianceService {
   }
 
   async findBulkJobs(query: { page?: number; limit?: number; type?: string; status?: string }) {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? PAGINATION_DEFAULT_LIMIT;
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || PAGINATION_DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};

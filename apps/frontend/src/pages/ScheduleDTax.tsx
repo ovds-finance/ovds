@@ -9,12 +9,8 @@
  * Rental Income (individual progressive / corporate 30%),
  * Customs Duty (0–35% on CIF).
  */
-import React, { useState, useEffect } from 'react';
+import type { ScheduleDTaxRecord } from '@ovds/shared';
 import { AppPage, AppTabs } from '@ovds/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import api from '../services/api';
-import toast from 'react-hot-toast';
 import {
   SCHEDULE_D_RATES,
   calculateScheduleD,
@@ -29,8 +25,15 @@ import {
   type ScheduleDTaxType,
   type CapitalGainsAssetType,
 } from '@ovds/ui';
-import type { ScheduleDTaxRecord } from '@ovds/shared';
+import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+
 import { Icon } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+
+
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('en-ET', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
@@ -49,7 +52,7 @@ const SCHEDULE_D_DISPLAY: Array<{
   withheld: boolean;
   color: string;
 }> = [
-  { key: 'DIVIDEND',                    label: 'Dividend Income',           rate: '15%',  schedule: 'D', source: 'Art. 52', withheld: true,  color: 'bg-emerald-50 border-emerald-200 text-emerald-800' },
+  { key: 'DIVIDEND',                    label: 'Dividend Income',           rate: '15%',  schedule: 'D', source: 'Art. 52', withheld: true,  color: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' },
   { key: 'INTEREST_STANDARD',           label: 'Interest (standard)',       rate: '10%',  schedule: 'D', source: 'Art. 53', withheld: true,  color: 'bg-sky-50 border-sky-200 text-sky-800' },
   { key: 'INTEREST_FINANCIAL_INSTITUTION', label: 'Interest (FI / credit sales)', rate: '30%', schedule: 'D', source: 'Art. 53', withheld: false, color: 'bg-sky-50 border-sky-200 text-sky-800' },
   { key: 'CAPITAL_GAINS',               label: 'Capital Gains (disposal)',  rate: '15%',  schedule: 'D', source: 'Art. 59', withheld: false, color: 'bg-violet-50 border-violet-200 text-violet-800' },
@@ -79,7 +82,7 @@ const ScheduleDCalculator: React.FC = () => {
           <select
             value={taxType}
             onChange={e => setTaxType(e.target.value as ScheduleDTaxType)}
-            className="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400/20"
+            className="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20"
           >
             {SCHEDULE_D_DISPLAY.map(d => (
               <option key={d.key} value={d.key}>{d.label} ({d.rate})</option>
@@ -93,7 +96,7 @@ const ScheduleDCalculator: React.FC = () => {
             value={amount}
             onChange={e => setAmount(e.target.value)}
             placeholder="0.00"
-            className="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400/20"
+            className="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20"
           />
         </div>
       </div>
@@ -109,7 +112,7 @@ const ScheduleDCalculator: React.FC = () => {
           {[
             { label: 'Gross Amount',  value: result.grossAmount, color: 'text-slate-800' },
             { label: 'Tax Amount',    value: result.taxAmount,   color: 'text-rose-700' },
-            { label: 'Net Amount',    value: result.netAmount,   color: 'text-emerald-700' },
+            { label: 'Net Amount',    value: result.netAmount,   color: 'text-[var(--pro-azure-dark)]' },
           ].map(c => (
             <div key={c.label} className="bg-white border border-slate-200 rounded-xl p-4 text-center">
               <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">{c.label}</p>
@@ -161,7 +164,7 @@ const CapitalGainsCalc: React.FC = () => {
       {result && (
         <div className="space-y-3">
           {!result.applicable && (
-            <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-700">
+            <div className="px-4 py-3 bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-xl text-sm text-[var(--pro-azure-dark)]">
               ✅ No capital gain — disposal proceeds do not exceed acquisition cost.
             </div>
           )}
@@ -170,7 +173,7 @@ const CapitalGainsCalc: React.FC = () => {
               { label: 'Capital Gain',    value: result.capitalGain,   color: result.capitalGain > 0 ? 'text-amber-700' : 'text-slate-400' },
               { label: 'CGT Rate',        value: NaN,                  color: 'text-violet-700',  display: '15%' },
               { label: 'CGT Amount',      value: result.taxAmount,     color: 'text-rose-700' },
-              { label: 'Net Proceeds',    value: result.netProceeds,   color: 'text-emerald-700' },
+              { label: 'Net Proceeds',    value: result.netProceeds,   color: 'text-[var(--pro-azure-dark)]' },
             ].map(c => (
               <div key={c.label} className="bg-white border border-slate-200 rounded-xl p-4 text-center">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">{c.label}</p>
@@ -213,7 +216,7 @@ const RentalTaxCalc: React.FC = () => {
           { type: 'CORPORATE'  as const, label: 'Company / Body',       sub: 'Flat 30%' },
         ]).map(opt => (
           <button key={opt.type} onClick={() => setTaxpayerType(opt.type)}
-            className={`text-left p-4 rounded-xl border-2 transition-all ${taxpayerType === opt.type ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 dark:border-emerald-600' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-slate-300'}`}>
+            className={`text-left p-4 rounded-xl border-2 transition-all ${taxpayerType === opt.type ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/20 dark:border-[var(--pro-azure-light)]' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-slate-300'}`}>
             <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{opt.label}</p>
             <p className="ovds-caption">{opt.sub}</p>
           </button>
@@ -225,20 +228,20 @@ const RentalTaxCalc: React.FC = () => {
           <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5 block">Annual Gross Rental Income (ETB)</label>
           <input type="number" min="0" step="0.01" value={grossRent} onChange={e => setGrossRent(e.target.value)}
             placeholder="0.00"
-            className="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400/20" />
+            className="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20" />
         </div>
         {useActual && (
           <div>
             <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5 block">Actual Allowable Expenses (ETB)</label>
             <input type="number" min="0" step="0.01" value={actualExp} onChange={e => setActualExp(e.target.value)}
               placeholder="0.00"
-              className="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400/20" />
+              className="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20" />
           </div>
         )}
       </div>
 
       <label className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400 cursor-pointer">
-        <input type="checkbox" checked={useActual} onChange={e => setUseActual(e.target.checked)} className="rounded accent-emerald-500" />
+        <input type="checkbox" checked={useActual} onChange={e => setUseActual(e.target.checked)} className="rounded accent-indigo-500" />
         Use actual documented expenses instead of 40% standard deduction
       </label>
 
@@ -300,7 +303,7 @@ const RentalTaxCalc: React.FC = () => {
                   <td className="px-4 py-2.5 font-mono text-slate-600">
                     {fmt(b.min)} – {b.max === Infinity ? '∞' : fmt(b.max)}
                   </td>
-                  <td className="px-4 py-2.5 font-bold text-emerald-700">{(b.rate * 100).toFixed(0)}%</td>
+                  <td className="px-4 py-2.5 font-bold text-[var(--pro-azure-dark)]">{(b.rate * 100).toFixed(0)}%</td>
                   <td className="px-4 py-2.5 font-mono text-slate-500">{fmt(b.deduction)}</td>
                   <td className="px-4 py-2.5 text-slate-400">
                     {b.rate === 0 ? 'Nil' : `Income × ${(b.rate * 100).toFixed(0)}% − ${fmt(b.deduction)}`}
@@ -378,7 +381,7 @@ const CustomsDutyCalc: React.FC = () => {
           </div>
           <div className="flex items-center justify-between px-5 py-4 bg-slate-800 dark:bg-slate-700 rounded-xl">
             <span className="text-sm font-bold text-white">Total Tax Burden on Import</span>
-            <span className="text-2xl font-black text-emerald-400 tabular-nums">ETB {fmt(totalBurden)}</span>
+            <span className="text-2xl font-black text-[var(--pro-azure-light)] tabular-nums">ETB {fmt(totalBurden)}</span>
           </div>
           <p className="text-[11px] text-slate-400">
             Formula: Customs (CIF × rate) + Excise + Surtax 10% (CIF + Customs + Excise) + VAT 15% (all above)
@@ -452,7 +455,7 @@ const RateReferenceTab: React.FC = () => (
         {[
           { label: 'Customs Duty',       rate: '0–35%',  note: 'On CIF value, HS code dependent',       color: 'bg-amber-50 border-amber-200 text-amber-800' },
           { label: 'Import Surtax',      rate: '10%',    note: 'On CIF + Customs Duty + Excise',         color: 'bg-orange-50 border-orange-200 text-orange-800' },
-          { label: 'VAT on Import',      rate: '15%',    note: 'On CIF + Customs + Excise + Surtax',     color: 'bg-emerald-50 border-emerald-200 text-emerald-800' },
+          { label: 'VAT on Import',      rate: '15%',    note: 'On CIF + Customs + Excise + Surtax',     color: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' },
         ].map(t => (
           <div key={t.label} className={`p-4 rounded-xl border ${t.color}`}>
             <p className="text-[10px] font-bold uppercase tracking-wide opacity-70">Import</p>
@@ -491,6 +494,7 @@ const RecordsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
       .finally(() => setLoading(false));
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [companyId]);
 
   const handleSave = async (e: React.FormEvent) => {
@@ -559,8 +563,8 @@ const RecordsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
 
   const STATUS_CLS: Record<string, string> = {
     DRAFT:  'bg-slate-100 text-slate-600 border-slate-200',
-    FILED:  'bg-emerald-50 text-emerald-700 border-emerald-200',
-    PAID:   'bg-emerald-50 text-emerald-700 border-emerald-200',
+    FILED:  'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
+    PAID:   'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
     EXEMPT: 'bg-amber-50 text-amber-700 border-amber-200',
   };
 
@@ -623,7 +627,7 @@ const RecordsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
                 <div className="flex items-center gap-6 px-4 py-3 bg-violet-50 dark:bg-violet-950/20 border border-violet-200 dark:border-violet-800 rounded-xl text-xs">
                   <span className="text-slate-500">Rate: <strong className="text-violet-700">{(result.taxRate * 100).toFixed(0)}%</strong></span>
                   <span className="text-slate-500">Tax: <strong className="text-rose-700">ETB {fmt(result.taxAmount)}</strong></span>
-                  <span className="text-slate-500">Net: <strong className="text-emerald-700">ETB {fmt(result.netAmount)}</strong></span>
+                  <span className="text-slate-500">Net: <strong className="text-[var(--pro-azure-dark)]">ETB {fmt(result.netAmount)}</strong></span>
                   <span className="text-[10px] text-slate-400">{SCHEDULE_D_RATES[form.taxType].withheldAtSource ? '🏦 WHT at source' : '📋 Self-declare'}</span>
                 </div>
               );
@@ -674,9 +678,9 @@ const RecordsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
                       </td>
                       <td className="px-4 py-3 font-mono text-slate-700 dark:text-slate-200 text-right">ETB {fmt(r.grossAmount)}</td>
                       <td className="px-4 py-3 font-mono text-rose-600 dark:text-rose-400 text-right">ETB {fmt(r.taxAmount)}</td>
-                      <td className="px-4 py-3 font-mono text-emerald-700 dark:text-emerald-400 text-right">ETB {fmt(r.netAmount)}</td>
+                      <td className="px-4 py-3 font-mono text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] text-right">ETB {fmt(r.netAmount)}</td>
                       <td className="px-4 py-3 text-slate-500 max-w-[120px] truncate">{r.payerName ?? '—'}</td>
-                      <td className="px-4 py-3 text-center">{r.withheldAtSource ? <span className="text-emerald-600">✓</span> : <span className="text-slate-300">—</span>}</td>
+                      <td className="px-4 py-3 text-center">{r.withheldAtSource ? <span className="text-[var(--pro-azure)]">✓</span> : <span className="text-slate-300">—</span>}</td>
                        <td className="px-4 py-3">
                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${STATUS_CLS[r.status] ?? STATUS_CLS.DRAFT}`}>
                            {r.status}
@@ -688,7 +692,7 @@ const RecordsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
                              <button
                                onClick={() => void handlePay(r)}
                                disabled={busyId === r.id}
-                               className="text-[10px] font-bold px-2 py-1 rounded border border-emerald-200 text-emerald-700 hover:bg-emerald-50 disabled:opacity-50 transition-colors"
+                               className="text-[10px] font-bold px-2 py-1 rounded border border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] hover:bg-[var(--pro-azure-50)] disabled:opacity-50 transition-colors"
                              >
                                File / Pay
                              </button>
@@ -717,7 +721,7 @@ const RecordsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
                   <td className="px-4 py-3 font-mono font-bold text-rose-600 dark:text-rose-400 text-right">
                     ETB {fmtK(records.reduce((s, r) => s + r.taxAmount, 0))}
                   </td>
-                  <td className="px-4 py-3 font-mono font-bold text-emerald-700 dark:text-emerald-400 text-right">
+                  <td className="px-4 py-3 font-mono font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] text-right">
                     ETB {fmtK(records.reduce((s, r) => s + r.netAmount, 0))}
                   </td>
                   <td colSpan={4} />

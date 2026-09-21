@@ -1,11 +1,14 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, Request, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
-import { PurchasesService } from './purchases.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { PermissionsGuard } from '../auth/guards/permissions.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
+
 import { Permissions } from '../auth/decorators/permissions.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../auth/guards/permissions.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+
+import { PurchasesService } from './purchases.service';
+
 
 @ApiTags('purchases')
 @Controller('purchases')
@@ -17,8 +20,8 @@ export class PurchasesController {
   @Permissions('bills:read')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'List bills' })
-  listBills(@Query() query: Record<string, unknown>) {
-    return this.purchasesService.findBills(query);
+  listBills(@Query() query: Record<string, unknown>, @Request() req: any) {
+    return this.purchasesService.findBills({ ...query, companyId: req.user?.companyId });
   }
 
   @Get('bills/:id')
@@ -57,8 +60,8 @@ export class PurchasesController {
   @Permissions('purchase_orders:read')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'List purchase orders' })
-  listOrders(@Query() query: Record<string, unknown>) {
-    return this.purchasesService.findPurchaseOrders(query);
+  listOrders(@Query() query: Record<string, unknown>, @Request() req: any) {
+    return this.purchasesService.findPurchaseOrders({ ...query, companyId: req.user?.companyId });
   }
 
   @Get('orders/:id')
@@ -97,8 +100,8 @@ export class PurchasesController {
   @Roles('ADMIN', 'PURCHASES', 'FINANCE')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'List goods received notes' })
-  listGrns(@Query() query: Record<string, unknown>) {
-    return this.purchasesService.findGrns(query);
+  listGrns(@Query() query: Record<string, unknown>, @Request() req: any) {
+    return this.purchasesService.findGrns({ ...query, companyId: req.user?.companyId });
   }
 
   @Post('grn')
@@ -113,8 +116,8 @@ export class PurchasesController {
   @Roles('ADMIN', 'PURCHASES', 'FINANCE')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'List vendor payments' })
-  listPayments(@Query() query: Record<string, unknown>) {
-    return this.purchasesService.findVendorPayments(query);
+  listPayments(@Query() query: Record<string, unknown>, @Request() req: any) {
+    return this.purchasesService.findVendorPayments({ ...query, companyId: req.user?.companyId });
   }
 
   @Post('payments')

@@ -197,7 +197,7 @@ export function generateCsrConfig(config: {
     'default_bits        = 2048',
     'prompt              = no',
     'string_mask         = utf8only',
-    'default_md          = sha512',
+    'default_md          = sha256',
     'distinguished_name  = req_distinguished_name',
     'req_extensions      = req_ext',
     '',

@@ -1,16 +1,19 @@
-﻿/**
+/**
  * CashFlowSummaryWidget
  * Compact Ovds-style Cash Flow + Profit card.
  * Shows: Incoming / Outgoing / Profit in a single card with "View Report" links.
  * Also renders an Expenses By Category breakdown below.
  */
-import React, { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowDownLeft, ArrowUpRight, TrendingUp, TrendingDown, ExternalLink, PieChart } from 'lucide-react';
-import api from '../../services/api';
-import { useState } from 'react';
 import { fmtCompact } from '@ovds/ui';
+import { ArrowDownLeft, ArrowUpRight, TrendingUp, TrendingDown, ExternalLink, PieChart } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+
 import { useBusiness } from '../../context/businessContext';
+import api from '../../services/api';
+
+
 
 interface Props {
   currency?: string;
@@ -83,7 +86,7 @@ const CashFlowSummaryWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
             </div>
             <Link
               to="/reports?type=cf"
-              className="flex items-center gap-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline shrink-0"
+              className="flex items-center gap-0.5 text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline shrink-0"
             >
               View Report <ExternalLink size={9} />
             </Link>
@@ -91,13 +94,13 @@ const CashFlowSummaryWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
 
           <div className="grid grid-cols-3 gap-3">
             {/* Incoming */}
-            <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-xl p-3 border border-emerald-100 dark:border-emerald-900">
+            <div className="bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl p-3 border border-[var(--pro-azure-100)] dark:border-green-900">
               <div className="flex items-center gap-1 mb-1">
-                <ArrowDownLeft size={10} className="text-emerald-500" />
-                <p className="text-[9px] text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wider">Incoming</p>
+                <ArrowDownLeft size={10} className="text-[var(--pro-azure)]" />
+                <p className="text-[9px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold uppercase tracking-wider">Incoming</p>
               </div>
               {loading ? shimmer('w-20') : (
-                <p className="text-[15px] font-extrabold text-emerald-700 dark:text-emerald-300 tabular-nums leading-none">
+                <p className="text-[15px] font-extrabold text-[var(--pro-azure-dark)] dark:text-green-300 tabular-nums leading-none">
                   {fmtCompact(incoming, currency)}
                 </p>
               )}
@@ -135,7 +138,7 @@ const CashFlowSummaryWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
           {/* P&L link */}
           <Link
             to="/reports?type=pl"
-            className="mt-3 flex items-center gap-1 text-[10px] font-semibold text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+            className="mt-3 flex items-center gap-1 text-[10px] font-semibold text-slate-500 dark:text-slate-400 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors"
           >
             Profit &amp; Loss Report <ExternalLink size={9} />
           </Link>
@@ -158,7 +161,7 @@ const CashFlowSummaryWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
             </div>
             <Link
               to="/reports?type=expense-summary"
-              className="flex items-center gap-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline shrink-0"
+              className="flex items-center gap-0.5 text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline shrink-0"
             >
               View Report <ExternalLink size={9} />
             </Link>
@@ -204,7 +207,7 @@ const CashFlowSummaryWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
                 );
               })}
               {categories.length > 5 && (
-                <Link to="/purchases/expenses" className="text-[10px] text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                <Link to="/purchases/expenses" className="text-[10px] text-slate-400 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors">
                   +{categories.length - 5} more categories →
                 </Link>
               )}

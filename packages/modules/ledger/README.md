@@ -1,14 +1,14 @@
-# General Ledger, Chart of Accounts & Double-Entry
+﻿# General Ledger, Chart of Accounts & Double-Entry
 
 Canonical OVDS module (`packages/modules/ledger`).
 
-Akaunting-inspired, DDD-aligned module layout:
+Ovds SaaS DDD-aligned module layout:
 
 ```
 modules/ledger/
   src/
     index.ts        # public barrel (domain types + namespaced web)
-    domain/         # centralized domain types & rules  (@ovds/domains/accounting)
+    domain/         # centralized domain types & rules  (@ovds/domains-accounting)
     dto/            # zod / class-validator contracts
     web/            # React pages & components           (@ovds/features/accounting)
 ```

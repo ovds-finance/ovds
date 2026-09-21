@@ -64,7 +64,7 @@ const Profile: React.FC = () => {
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
         <div className="p-6">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-2xl font-bold shadow-sm">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--pro-azure)] to-teal-600 flex items-center justify-center text-white text-2xl font-bold shadow-sm">
               {profile.name?.[0]?.toUpperCase() ?? '?'}
             </div>
             <div>
@@ -106,3 +106,4 @@ const Profile: React.FC = () => {
 };
 
 export default Profile;
+

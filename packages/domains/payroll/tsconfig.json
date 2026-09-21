@@ -22,7 +22,7 @@
     "incremental": true,
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "paths": {
-      "@ovds/domains/hr": [
+      "@ovds/domains-hr": [
         "packages/domains/hr/dist/index.d.ts"
       ]
     }

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { FiscalYearService } from '@ovds/domains/double-entry';
+import { FiscalYearService } from '@ovds/domains-double-entry';
 
 function buildPrismaMock() {
   return {

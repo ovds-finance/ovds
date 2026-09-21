@@ -2,15 +2,16 @@
  * ActivityFeedDrawer — global slide-over showing recent audit/activity events.
  * Enhanced with real-time polling, action type filters, and live indicator.
  */
-import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   X, Activity, RefreshCw, ShieldCheck, User, FileText,
   Banknote, Settings, Trash2, Edit3, Plus, LogIn, LogOut,
   AlertTriangle, Clock, ChevronRight, Filter, Circle,
 } from 'lucide-react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../rbac/AuthContext';
+
 import { useInterval } from '../hooks';
+import { useAuth } from '../rbac/AuthContext';
 import api from '../services/api';
 
 interface AuditEntry {
@@ -34,23 +35,23 @@ interface Props {
 function actionMeta(action: string): { icon: React.ReactNode; color: string } {
   const a = action.toLowerCase();
   if (a.includes('login') || a.includes('signin'))
-    return { icon: <LogIn size={13} />, color: 'text-slate-800 bg-emerald-200/10' };
+    return { icon: <LogIn size={13} />, color: 'text-slate-800 bg-[var(--pro-azure-200)]/10' };
   if (a.includes('logout') || a.includes('signout'))
     return { icon: <LogOut size={13} />, color: 'text-slate-500 bg-slate-100 dark:bg-slate-800' };
   if (a.includes('delete') || a.includes('remove'))
     return { icon: <Trash2 size={13} />, color: 'text-rose-600 bg-rose-50' };
   if (a.includes('create') || a.includes('add') || a.includes('register'))
-    return { icon: <Plus size={13} />, color: 'text-slate-800 bg-emerald-200/10' };
+    return { icon: <Plus size={13} />, color: 'text-slate-800 bg-[var(--pro-azure-200)]/10' };
   if (a.includes('update') || a.includes('edit') || a.includes('patch'))
     return { icon: <Edit3 size={13} />, color: 'text-amber-600 bg-amber-50' };
   if (a.includes('payroll') || a.includes('salary'))
-    return { icon: <Banknote size={13} />, color: 'text-indigo-500 bg-indigo-50 dark:bg-indigo-950/40' };
+    return { icon: <Banknote size={13} />, color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/40' };
   if (a.includes('invoice') || a.includes('bill'))
     return { icon: <FileText size={13} />, color: 'text-sky-600 bg-sky-50' };
   if (a.includes('setting') || a.includes('config'))
     return { icon: <Settings size={13} />, color: 'text-slate-500 bg-slate-100 dark:bg-slate-800' };
   if (a.includes('role') || a.includes('permission') || a.includes('access'))
-    return { icon: <ShieldCheck size={13} />, color: 'text-indigo-500 bg-indigo-50 dark:bg-indigo-950/40' };
+    return { icon: <ShieldCheck size={13} />, color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/40' };
   if (a.includes('fail') || a.includes('error') || a.includes('denied'))
     return { icon: <AlertTriangle size={13} />, color: 'text-rose-600 bg-rose-50' };
   return { icon: <Activity size={13} />, color: 'text-slate-400 bg-slate-100 dark:bg-slate-800' };
@@ -204,10 +205,10 @@ const ActivityFeedDrawer: React.FC<Props> = ({ open, onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="p-1.5 bg-emerald-200/10 rounded-lg relative">
+            <div className="p-1.5 bg-[var(--pro-azure-200)]/10 rounded-lg relative">
               <Activity size={15} className="text-slate-800" />
               {isLive && (
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full border border-white dark:border-slate-900 animate-pulse" />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[var(--pro-azure)] rounded-full border border-white dark:border-slate-900 animate-pulse" />
               )}
             </div>
             <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">Activity Feed</span>
@@ -217,7 +218,7 @@ const ActivityFeedDrawer: React.FC<Props> = ({ open, onClose }) => {
               </span>
             )}
             {newCount > 0 && (
-              <span className="text-[10px] font-medium text-slate-800 bg-emerald-200/10 px-1.5 py-0.5 rounded-full animate-bounce">
+              <span className="text-[10px] font-medium text-slate-800 bg-[var(--pro-azure-200)]/10 px-1.5 py-0.5 rounded-full animate-bounce">
                 +{newCount} new
               </span>
             )}
@@ -226,10 +227,10 @@ const ActivityFeedDrawer: React.FC<Props> = ({ open, onClose }) => {
             {/* Live toggle */}
             <button
               onClick={() => setIsLive(v => !v)}
-              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-semibold transition-all ${isLive ? 'bg-emerald-200/10 text-slate-800' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}
+              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-semibold transition-all ${isLive ? 'bg-[var(--pro-azure-200)]/10 text-slate-800' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}
               title={isLive ? 'Live updates on — click to pause' : 'Live updates paused'}
             >
-              <Circle size={7} className={isLive ? 'fill-emerald-500 text-emerald-600' : 'text-slate-400'} />
+              <Circle size={7} className={isLive ? 'fill-[var(--pro-azure)] text-[var(--pro-azure)]' : 'text-slate-400'} />
               {isLive ? 'Live' : 'Paused'}
             </button>
             <button
@@ -258,7 +259,7 @@ const ActivityFeedDrawer: React.FC<Props> = ({ open, onClose }) => {
               <button
                 key={f.key}
                 onClick={() => setActionFilter(f.key)}
-                className={`shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${actionFilter === f.key ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                className={`shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${actionFilter === f.key ? 'bg-[var(--pro-azure)] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
               >
                 {f.label}
               </button>

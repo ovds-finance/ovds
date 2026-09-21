@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
-import { X, Printer, RefreshCw, Download, Search } from 'lucide-react';
 import { Skeleton } from '@ovds/ui';
-import { downloadCSV } from '../../utils/download';
+import { X, Printer, RefreshCw, Download, Search } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
 import { useEscapeKey } from '../../hooks';
+import api from '../../services/api';
+import { downloadCSV } from '../../utils/download';
 import { fmtDecimal } from '../../utils/fmt';
 
 const fmt = fmtDecimal;
@@ -226,7 +227,7 @@ const LedgerModal: React.FC<LedgerModalProps> = ({ account, onClose }) => {
                     <td className="px-4 py-2.5 text-xs text-slate-700 max-w-xs truncate">
                       {e.description}
                     </td>
-                    <td className="px-4 py-2.5 text-xs font-bold text-right text-emerald-600 dark:text-emerald-400">
+                    <td className="px-4 py-2.5 text-xs font-bold text-right text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                       {e.debit > 0 ? fmt(e.debit) : '—'}
                     </td>
                     <td className="px-4 py-2.5 text-xs font-bold text-right text-rose-700">

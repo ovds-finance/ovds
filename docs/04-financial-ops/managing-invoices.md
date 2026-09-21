@@ -6,7 +6,7 @@
 >
 > **Requires:** Login · `invoices:read` · `invoices:write` permissions
 
-Once an invoice is created, OVDS gives you full control over its lifecycle — sending it to customers, recording payments, issuing refunds, setting up recurring billing, and archiving completed records.
+Once an invoice is created, Ovds gives you full control over its lifecycle — sending it to customers, recording payments, issuing refunds, setting up recurring billing, and archiving completed records.
 
 ---
 
@@ -23,16 +23,16 @@ After saving a draft invoice, you can deliver it to your customer in several way
 > Sending requires SMTP to be configured in **Settings → Email / SMTP**.
 
 ### Share Link (No Login Required)
-1. Open the invoice → click **Share**.
+1. Open the invoice and click **Share**.
 2. Copy the generated public URL.
 3. Send it via SMS, WhatsApp, or any channel — the customer can view, download, and pay without creating an account.
 
 ### QR Code
-1. Open the invoice → click **Share → QR Code**.
+1. Open the invoice and click **Share → QR Code**.
 2. The customer scans the QR code with their phone to open the invoice and pay online.
 
 ### Download PDF / Print
-1. Open the invoice → click **More Actions**.
+1. Open the invoice and click **More Actions**.
 2. Select **Download PDF** to save a local copy, or **Print** for a physical copy.
 
 > Every invoice PDF automatically includes the **NBE-IQR QR code** for ERCA digital verification.
@@ -58,7 +58,7 @@ Status updates automatically as payments are recorded. You do not need to change
 ## Recording a Payment
 
 ### Full Payment
-1. Open the invoice → click **Add Payment**.
+1. Open the invoice and click **Add Payment**.
 2. Select:
    - **Date** — date the payment was received
    - **Account** — e.g. Business Bank Account, Cash
@@ -67,7 +67,7 @@ Status updates automatically as payments are recorded. You do not need to change
 4. Click **Save** — invoice status changes to **Paid** and the receipt is posted to the GL.
 
 ### Partial Payment
-1. Open the invoice → click **Add Payment**.
+1. Open the invoice and click **Add Payment**.
 2. Enter an amount less than the balance due.
 3. Click **Save** — status changes to **Partial** and the remaining balance is tracked.
 4. Repeat until the full amount is paid.
@@ -115,15 +115,15 @@ Invoices in **Draft** status can be freely edited.
 3. Make the necessary changes.
 4. Click **Save**.
 
-> Invoices with status **Sent**, **Partial**, or **Paid** are locked for editing to preserve audit integrity. To correct an already-sent invoice, issue a **Credit Note** and create a new invoice with the correct details.
-
 ---
+
+> Invoices with status **Sent**, **Partial**, or **Paid** are locked for editing to preserve audit integrity. To correct an already-sent invoice, issue a **Credit Note** and create a new invoice with the correct details.
 
 ## Duplicating an Invoice
 
 Use Duplicate to quickly create a new invoice pre-filled with the same customer, items, and pricing.
 
-1. Open the invoice → click **More Actions (⋯)**.
+1. Open the invoice and click **More Actions (⋯)**.
 2. Select **Duplicate**.
 3. The system creates a new Draft invoice with today's date — update any fields as needed.
 4. Click **Save** or **Send**.
@@ -133,15 +133,15 @@ Use Duplicate to quickly create a new invoice pre-filled with the same customer,
 ## Handle Refunds and Credit Notes
 
 ### Issue a Full Refund
-1. Open the paid invoice → click **More Actions → Issue Refund** (or navigate to **Sales → Refunds** `/refunds`).
+1. Open the paid invoice and click **More Actions → Issue Refund** (or navigate to **Sales → Refunds** `/refunds`).
 2. Select the refund method (can differ from the original payment method).
-3. Click **Confirm** — OVDS:
+3. Click **Confirm** — Ovds:
    - Creates a **Credit Note** linked to the original invoice
    - Reverses the GL entries automatically
    - Updates the invoice status to reflect the refund
 
 ### Issue a Partial Refund
-1. Open the paid invoice → click **More Actions → Issue Refund**.
+1. Open the paid invoice and click **More Actions → Issue Refund**.
 2. Enter the partial amount to refund.
 3. A Credit Note is created for that amount; the original invoice retains the remaining paid balance.
 
@@ -163,7 +163,7 @@ Use Duplicate to quickly create a new invoice pre-filled with the same customer,
 
 Use recurring invoices to automatically generate and send invoices on a set schedule — ideal for subscriptions, retainers, and monthly service fees.
 
-1. Open any saved invoice → click **Make Recurring**.
+1. Open any saved invoice and click **Make Recurring**.
    *(Alternatively, navigate to **Sales → Recurring Invoices** if the extension is installed.)*
 2. Set the **billing frequency**: Weekly, Monthly, Quarterly, or Annually.
 3. Set the **start date**.
@@ -171,7 +171,7 @@ Use recurring invoices to automatically generate and send invoices on a set sche
    - After a fixed number of cycles (e.g., after 12 months)
    - On a specific end date
    - Never (runs indefinitely until manually stopped)
-5. Click **Save** — OVDS automatically generates and emails the invoice on each scheduled date.
+5. Click **Save** — Ovds automatically generates and emails the invoice on each scheduled date.
 
 > Recurring invoices appear in **Sales → Invoices** with a recurring icon. You can pause, edit, or cancel the schedule at any time without affecting previously issued invoices.
 
@@ -185,7 +185,7 @@ Use recurring invoices to automatically generate and send invoices on a set sche
 3. Click **Export** — download as CSV or PDF.
 
 ### Download Individual Invoice PDF
-1. Open the invoice → click **More Actions → Download PDF**.
+1. Open the invoice and click **More Actions → Download PDF**.
 
 ### Year-End Archiving
 1. Go to **Sales → Invoices**.

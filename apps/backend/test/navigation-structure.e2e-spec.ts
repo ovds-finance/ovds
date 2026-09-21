@@ -1,7 +1,7 @@
 /**
  * E2E Navigation Structure Test
  *
- * Validates that the sidebar renders all 9 Akaunting-inspired
+ * Validates that the sidebar renders all 9 Ovds SaaS
  * navigation groups and that key routes are reachable.
  */
 import { test, expect } from '@playwright/test';

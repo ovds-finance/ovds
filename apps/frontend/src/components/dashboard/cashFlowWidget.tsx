@@ -1,6 +1,7 @@
+import { TrendingUp, TrendingDown, Activity, ArrowUpRight, ArrowDownRight, Banknote, Landmark } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, TrendingDown, Activity, ArrowUpRight, ArrowDownRight, Banknote, Landmark } from 'lucide-react';
+
 import api from '../../services/api';
 import { fmtCurrency } from '../../utils/fmt';
 
@@ -30,7 +31,7 @@ const AnimBar: React.FC<{ pct: number; isHighlight: boolean; label: string; tool
       <div className="w-full flex flex-col justify-end" style={{ height: 48 }}>
         <div
           ref={barRef}
-          className={`w-full rounded-t-md ${isHighlight ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'} group-hover:opacity-80 transition-opacity`}
+          className={`w-full rounded-t-md ${isHighlight ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-200 dark:bg-slate-700'} group-hover:opacity-80 transition-opacity`}
           style={{ height: 4 }}
         />
       </div>
@@ -77,7 +78,7 @@ const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({ currency }) => {
   const maxRevenue = Math.max(...revenueTrend.map(d => d.revenue || 0), 1);
 
   const breakdown = [
-    { label: 'Operating', value: operating, icon: <Activity size={12} />, color: 'text-emerald-600 dark:text-emerald-400 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30' },
+    { label: 'Operating', value: operating, icon: <Activity size={12} />, color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30' },
     { label: 'Investing', value: investing, icon: <TrendingUp size={12} />, color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-950/30' },
     { label: 'Financing', value: financing, icon: <Landmark size={12} />, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/30' },
   ];
@@ -88,36 +89,36 @@ const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({ currency }) => {
       {cashFlow && !loading && (
         <div className="flex h-1.5">
           <div
-            className={`transition-all duration-700 ${operating >= 0 ? 'bg-emerald-500' : 'bg-rose-400'}`}
+            className={`transition-all duration-700 ${operating >= 0 ? 'bg-[var(--pro-azure-50)]0' : 'bg-rose-400'}`}
             style={{ width: `${Math.abs(operating) / (Math.abs(operating) + Math.abs(investing) + Math.abs(financing) + 1) * 100}%` }}
           />
           <div
             className={`transition-all duration-700 ${investing >= 0 ? 'bg-violet-400' : 'bg-amber-400'}`}
             style={{ width: `${Math.abs(investing) / (Math.abs(operating) + Math.abs(investing) + Math.abs(financing) + 1) * 100}%` }}
           />
-          <div className={`flex-1 ${financing >= 0 ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+          <div className={`flex-1 ${financing >= 0 ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-300 dark:bg-slate-600'}`} />
         </div>
       )}
       <div className="p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-950/50 rounded-xl flex items-center justify-center">
-            <Activity size={14} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="w-8 h-8 bg-[var(--pro-azure-100)] dark:bg-green-950/50 rounded-xl flex items-center justify-center">
+            <Activity size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-none">Cash Flow</h3>
             <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Operating · Investing · Financing</p>
           </div>
         </div>
-        <Link to="/ovds" className="flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">
+        <Link to="/ovds" className="flex items-center gap-1 text-xs font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
           ovds Hub <ArrowUpRight size={11} />
         </Link>
       </div>
 
       {/* Net cash flow banner */}
       <div className={`rounded-xl p-4 mb-4 flex items-center justify-between ${
-        net >= 0 ? 'bg-emerald-50 dark:bg-emerald-950/25' : 'bg-rose-50 dark:bg-rose-950/25'
+        net >= 0 ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/25' : 'bg-rose-50 dark:bg-rose-950/25'
       }`}>
         <div>
           <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Net Cash Flow</p>
@@ -125,17 +126,17 @@ const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({ currency }) => {
             <div className="h-7 w-28 ovds-shimmer rounded mt-1" />
           ) : (
             <p className={`text-2xl font-semibold mt-0.5 tabular-nums ${
-              net >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'
+              net >= 0 ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-700 dark:text-rose-400'
             }`}>
               {net >= 0 ? '+' : ''}{fmt(net)}
             </p>
           )}
         </div>
         <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${
-          net >= 0 ? 'bg-emerald-100 dark:bg-emerald-900/50' : 'bg-rose-100 dark:bg-rose-900/50'
+          net >= 0 ? 'bg-[var(--pro-azure-100)] dark:bg-green-900/50' : 'bg-rose-100 dark:bg-rose-900/50'
         }`}>
           {net >= 0
-            ? <TrendingUp size={18} className="text-emerald-600 dark:text-emerald-400" />
+            ? <TrendingUp size={18} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
             : <TrendingDown size={18} className="text-rose-600 dark:text-rose-400" />
           }
         </div>
@@ -192,12 +193,12 @@ const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({ currency }) => {
             Payments · 6 months
           </p>
           <div className="grid grid-cols-2 gap-2">
-            <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-xl p-2.5">
-              <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 mb-0.5">
+            <div className="bg-[var(--pro-azure-50)] dark:bg-green-950/30 rounded-xl p-2.5">
+              <div className="flex items-center gap-1.5 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] mb-0.5">
                 <ArrowDownRight size={10} />
                 <span className="text-[10px] font-medium uppercase tracking-wider">Received</span>
               </div>
-              <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums">{fmt(paymentSummary.totalInflow ?? 0)}</p>
+              <p className="text-xs font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] tabular-nums">{fmt(paymentSummary.totalInflow ?? 0)}</p>
             </div>
             <div className="bg-rose-50 dark:bg-rose-950/30 rounded-xl p-2.5">
               <div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 mb-0.5">
@@ -213,9 +214,9 @@ const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({ currency }) => {
       {/* Quick links */}
       <div className="grid grid-cols-2 gap-2">
         {[
-          { label: 'Invoices', to: '/sales/invoices', icon: <ArrowDownRight size={10} />, color: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 dark:text-emerald-400' },
+          { label: 'Invoices', to: '/sales/invoices', icon: <ArrowDownRight size={10} />, color: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
           { label: 'Bills', to: '/purchases/bills', icon: <ArrowUpRight size={10} />, color: 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400' },
-          { label: 'Payments', to: '/customers/payment-tracker', icon: <Banknote size={10} />, color: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400' },
+          { label: 'Payments', to: '/customers/payment-tracker', icon: <Banknote size={10} />, color: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
           { label: 'Categories', to: '/accounting/categories', icon: <Activity size={10} />, color: 'bg-violet-50 dark:bg-violet-950/30 text-violet-600 dark:text-violet-400' },
         ].map(item => (
           <Link key={item.label} to={item.to}

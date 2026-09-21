@@ -82,6 +82,16 @@ export class EventDispatcher implements EventBusInterface {
     return this.listeners.get(eventName) ?? [];
   }
 
+  getAllListeners(): Array<EventListener & { eventName: string }> {
+    const all: Array<EventListener & { eventName: string }> = [];
+    for (const [eventName, handlers] of this.listeners) {
+      for (const h of handlers) {
+        all.push({ ...h, eventName });
+      }
+    }
+    return all;
+  }
+
   getHistory(eventName?: string): Event[] {
     if (!eventName) return this.history.slice();
     return this.history.filter((e) => e.name === eventName);

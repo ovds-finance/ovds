@@ -11,7 +11,7 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run dev",
+        "command": "node ../../scripts/bin-run.mjs vite/bin/vite",
         "cwd": "apps/portal"
       },
       "cache": false
@@ -19,7 +19,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run build",
+        "command": "pnpm run build",
         "cwd": "apps/portal"
       },
       "cache": true
@@ -27,7 +27,7 @@
     "preview": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run preview",
+        "command": "node ../../scripts/bin-run.mjs vite/bin/vite preview",
         "cwd": "apps/portal"
       },
       "cache": false
@@ -35,7 +35,7 @@
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx tsc --noEmit",
+        "command": "node ../../scripts/bin-run.mjs typescript/bin/tsc --noEmit",
         "cwd": "apps/portal"
       },
       "cache": true
@@ -43,7 +43,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx eslint . --fix",
+        "command": "node ../../scripts/bin-run.mjs eslint/bin/eslint . --fix --no-warn-ignored",
         "cwd": "apps/portal"
       },
       "cache": true
@@ -51,10 +51,11 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx vitest --run",
+        "command": "node ../../node_modules/vitest/vitest.mjs run --passWithNoTests",
         "cwd": "apps/portal"
       },
       "cache": true
     }
   }
 }
+

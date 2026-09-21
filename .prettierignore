@@ -1,0 +1,12 @@
+node_modules
+dist
+dist-cjs
+build
+coverage
+.nx
+.reports
+.tmp
+.vite
+public
+*.min.js
+*.min.css

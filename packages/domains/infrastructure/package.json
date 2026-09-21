@@ -1,5 +1,5 @@
 {
-  "name": "@ovds/domains/infrastructure",
+  "name": "@ovds/domains-infrastructure",
   "version": "0.0.1",
   "private": true,
   "main": "./dist/index.js",
@@ -10,10 +10,11 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@ovds/shared": "*",
-    "@ovds/dto": "*",
-    "@ovds/database": "*",
+    "@ovds/shared": "workspace:*",
+    "@ovds/dto": "workspace:*",
+    "@ovds/database": "workspace:*",
     "@nestjs/common": "11.2.3"
   },
   "devDependencies": {}
 }
+

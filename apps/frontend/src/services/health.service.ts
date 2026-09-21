@@ -1,6 +1,7 @@
+﻿import { HealthStatus, NetworkEvent } from '@ovds/ui';
 import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
+
 import { apiGetBackground, apiPost } from './api';
-import { HealthStatus, NetworkEvent } from '@ovds/ui';
 
 // -- Connection Status Types --------------------------------------------------
 interface HealthContextType {
@@ -35,7 +36,7 @@ export const useHealthCheck = () => {
     isCheckingRef.current = true;
     setIsChecking(true);
     try {
-      const data = await apiGetBackground<any>('/health/ready');
+      const _data = await apiGetBackground<any>('/health/ready');
       setHealth({
         status: 'healthy',
         lastCheck: new Date(),

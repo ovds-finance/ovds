@@ -1,20 +1,13 @@
 /**
- * AlertBox — compact inline alert/notice bar.
+ * AlertBox — Ovds SaaS inline alert/notice strip.
  *
- * Used for page-level warnings, info notices, and success confirmations
- * that don't require a full toast or modal.
- *
- * NOTE: NotificationBanner.tsx exports a simpler `InlineAlert`. This component
- * (AlertBox) provides a richer API with dismiss, action slot, and compact mode.
- *
- * Usage:
- *   <AlertBox variant="warning" title="VAT Threshold Approaching">
- *     Annual revenue is at 78% of the ETB 2M VAT registration threshold.
- *   </AlertBox>
- *
- *   <AlertBox variant="error" dismissible onDismiss={() => setErr(null)}>
- *     Failed to save changes. Please try again.
- *   </AlertBox>
+ * Design:
+ *  - 4 variants: info | success | warning | error
+ *  - Uses CSS status tokens (--status-*) for colours
+ *  - Left: coloured icon, title, body text, optional action slot
+ *  - Right: optional dismiss × button
+ *  - Compact mode: tighter padding, smaller icons/text
+ *  - Accessible: role="alert", dismiss button aria-label
  */
 import React from 'react';
 import { AlertTriangle, CheckCircle2, Info, XCircle, X } from 'lucide-react';
@@ -32,35 +25,46 @@ export interface AlertBoxProps {
   compact?:     boolean;
 }
 
-const VARIANT_CONFIG: Record<AlertBoxVariant, {
-  icon:     React.FC<{ size: number; className: string }>;
-  outer:    string;
-  iconCls:  string;
-  titleCls: string;
+/* ── Variant config using CSS status tokens ─────────────────────── */
+const VARIANT_CFG: Record<AlertBoxVariant, {
+  Icon:     React.FC<{ size: number }>;
+  bg:       string;
+  border:   string;
+  iconColor:string;
+  titleColor:string;
+  bodyColor: string;
 }> = {
   info: {
-    icon:     (p) => <Info {...p} />,
-    outer:    'bg-sky-50 dark:bg-sky-950/30 border-sky-200 dark:border-sky-800',
-    iconCls:  'text-sky-500',
-    titleCls: 'text-sky-800 dark:text-sky-300',
+    Icon:       ({ size }) => <Info size={size} />,
+    bg:         'var(--status-info-bg)',
+    border:     'var(--status-info-border)',
+    iconColor:  'var(--status-info-dot)',
+    titleColor: 'var(--status-info-text)',
+    bodyColor:  'var(--text-3)',
   },
   success: {
-    icon:     (p) => <CheckCircle2 {...p} />,
-    outer:    'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800',
-    iconCls:  'text-emerald-500',
-    titleCls: 'text-emerald-800 dark:text-emerald-300',
+    Icon:       ({ size }) => <CheckCircle2 size={size} />,
+    bg:         'var(--status-success-bg)',
+    border:     'var(--status-success-border)',
+    iconColor:  'var(--status-success-dot)',
+    titleColor: 'var(--status-success-text)',
+    bodyColor:  'var(--text-3)',
   },
   warning: {
-    icon:     (p) => <AlertTriangle {...p} />,
-    outer:    'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800',
-    iconCls:  'text-amber-500',
-    titleCls: 'text-amber-800 dark:text-amber-300',
+    Icon:       ({ size }) => <AlertTriangle size={size} />,
+    bg:         'var(--status-warning-bg)',
+    border:     'var(--status-warning-border)',
+    iconColor:  'var(--status-warning-dot)',
+    titleColor: 'var(--status-warning-text)',
+    bodyColor:  'var(--text-3)',
   },
   error: {
-    icon:     (p) => <XCircle {...p} />,
-    outer:    'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800',
-    iconCls:  'text-rose-500',
-    titleCls: 'text-rose-800 dark:text-rose-300',
+    Icon:       ({ size }) => <XCircle size={size} />,
+    bg:         'var(--status-danger-bg)',
+    border:     'var(--status-danger-border)',
+    iconColor:  'var(--status-danger-dot)',
+    titleColor: 'var(--status-danger-text)',
+    bodyColor:  'var(--text-3)',
   },
 };
 
@@ -74,39 +78,144 @@ export const AlertBox: React.FC<AlertBoxProps> = ({
   className = '',
   compact = false,
 }) => {
-  const cfg      = VARIANT_CONFIG[variant];
-  const Icon     = cfg.icon;
-  const pad      = compact ? 'p-2.5 gap-2' : 'p-3.5 gap-3';
-  const iconSize = compact ? 13 : 16;
+  const cfg      = VARIANT_CFG[variant];
+  const { Icon } = cfg;
+  const iconSize = compact ? 13 : 15;
+  const pad      = compact ? '10px 12px' : '12px 14px';
+  const gap      = compact ? 8 : 10;
+  const titleSz  = compact ? 11 : 12;
+  const bodySz   = compact ? 11 : 12;
 
   return (
     <div
       role="alert"
-      className={`flex items-start rounded-xl border ${cfg.outer} ${pad} ${className}`}
+      className={className}
+      style={{
+        display:      'flex',
+        alignItems:   'flex-start',
+        gap,
+        padding:      pad,
+        borderRadius: 8,
+        background:   cfg.bg,
+        border:       `1px solid ${cfg.border}`,
+      }}
     >
-      <Icon size={iconSize} className={`${cfg.iconCls} shrink-0 mt-0.5`} />
-      <div className="flex-1 min-w-0">
+      {/* Icon */}
+      <span style={{ color: cfg.iconColor, flexShrink: 0, marginTop: 1 }}>
+        <Icon size={iconSize} />
+      </span>
+
+      {/* Content */}
+      <div style={{ flex: 1, minWidth: 0 }}>
         {title && (
-          <p className={`${compact ? 'text-[11px]' : 'text-[12px]'} font-bold ${cfg.titleCls} leading-snug`}>
+          <p
+            style={{
+              fontSize: titleSz, fontWeight: 700,
+              color:    cfg.titleColor,
+              lineHeight: 1.4,
+            }}
+          >
             {title}
           </p>
         )}
         {children && (
-          <div className={`${compact ? 'text-[11px]' : 'text-[12px]'} text-slate-600 dark:text-slate-400 font-medium leading-relaxed ${title ? 'mt-0.5' : ''}`}>
+          <div
+            style={{
+              fontSize:   bodySz,
+              fontWeight: 500,
+              color:      cfg.bodyColor,
+              lineHeight: 1.55,
+              marginTop:  title ? 3 : 0,
+            }}
+          >
             {children}
           </div>
         )}
-        {action && <div className="mt-2">{action}</div>}
+        {action && (
+          <div style={{ marginTop: 8 }}>
+            {action}
+          </div>
+        )}
       </div>
+
+      {/* Dismiss */}
       {dismissible && onDismiss && (
         <button
           onClick={onDismiss}
-          className="shrink-0 w-6 h-6 rounded flex items-center justify-center text-slate-400 dark:text-slate-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-slate-600 dark:hover:text-slate-300 transition-all"
           aria-label="Dismiss alert"
+          style={{
+            flexShrink: 0,
+            width: 22, height: 22,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            borderRadius: 6, background: 'transparent',
+            border: 'none', cursor: 'pointer',
+            color: 'var(--text-4)',
+            transition: 'background 120ms, color 120ms',
+            outline: 'none',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,0,0,0.06)';
+            (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-2)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+            (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-4)';
+          }}
+          onFocus={e => (e.currentTarget as HTMLButtonElement).style.outline = '2px solid var(--pro-azure)'}
+          onBlur={e => (e.currentTarget as HTMLButtonElement).style.outline = 'none'}
         >
-          <X size={12} />
+          <X size={11} />
         </button>
       )}
     </div>
+  );
+};
+
+/* ── NotificationBanner — simple horizontal strip ──────────────── */
+export type AlertBannerVariant = AlertBoxVariant;
+
+export interface AlertBannerProps {
+  variant?: AlertBannerVariant;
+  children: React.ReactNode;
+  onDismiss?: () => void;
+  action?: React.ReactNode;
+  className?: string;
+}
+
+export const AlertNotificationBanner: React.FC<AlertBannerProps> = ({
+  variant = 'info', children, onDismiss, action, className = '',
+}) => (
+  <AlertBox
+    variant={variant}
+    dismissible={!!onDismiss}
+    onDismiss={onDismiss}
+    action={action}
+    compact
+    className={className}
+  >
+    {children}
+  </AlertBox>
+);
+
+/* ── InlineAlert — ultra-minimal text+icon ──────────────────────── */
+export interface AlertInlineProps {
+  variant?: AlertBoxVariant;
+  children: React.ReactNode;
+  className?: string;
+}
+
+export const AlertInline: React.FC<AlertInlineProps> = ({
+  variant = 'info', children, className = '',
+}) => {
+  const cfg = VARIANT_CFG[variant];
+  const { Icon } = cfg;
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 text-[11px] font-medium ${className}`}
+      style={{ color: cfg.titleColor }}
+    >
+      <Icon size={11} />
+      {children}
+    </span>
   );
 };

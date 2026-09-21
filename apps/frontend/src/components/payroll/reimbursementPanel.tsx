@@ -2,13 +2,14 @@
  * ReimbursementPanel — Field reimbursement claims management
  * Used inside PayrollAdministration ?tab=reimbursement
  */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { RefreshCw, Plus, CheckCircle2, XCircle, Banknote, Trash2 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
+
 import { useAuth } from '../../rbac/AuthContext';
-import { confirm } from '../../utils/confirm';
 import api from '../../services/api';
+import { confirm } from '../../utils/confirm';
 import {
   AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select, Textarea,
@@ -41,7 +42,7 @@ const TIER_LABELS: Record<number, string> = { 1: 'Tier 1 — Addis Ababa', 2: 'T
 const TIER_CLS: Record<number, string> = {
   1: 'bg-rose-50 text-rose-700 border-rose-100',
   2: 'bg-amber-50 text-amber-700 border-amber-100',
-  3: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+  3: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
 };
 
 const PAGE_SIZE = 25;
@@ -116,7 +117,7 @@ const ReimbursementPanel: React.FC<Props> = ({ companyId }) => {
   }, [claims, search]);
 
   const kpiCells = [
-    { label: 'Total',    value: stats.total    ?? 0, color: 'emerald' as const },
+    { label: 'Total',    value: stats.total    ?? 0, color: 'green' as const },
     { label: 'Pending',  value: stats.pending  ?? 0, color: 'amber'   as const },
     { label: 'Approved', value: stats.approved ?? 0, color: 'sky'     as const },
     { label: 'Rejected', value: stats.rejected ?? 0, color: 'rose'    as const },
@@ -289,7 +290,7 @@ const ReimbursementPanel: React.FC<Props> = ({ companyId }) => {
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {c.status === 'PENDING' && canApprove && (
                     <>
-                      <button onClick={() => handleStatus(c.id, 'APPROVED')} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Approve">
+                      <button onClick={() => handleStatus(c.id, 'APPROVED')} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Approve">
                         <CheckCircle2 size={11} />
                       </button>
                       <button onClick={() => handleStatus(c.id, 'REJECTED')} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Reject">

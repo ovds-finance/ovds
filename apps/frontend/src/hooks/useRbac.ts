@@ -20,12 +20,15 @@
  *   // Inline guard with reason
  *   const { allowed, reason } = guard({ permission: 'payroll:approve', requireMfa: true });
  */
-import { useCallback } from 'react';
-import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
-import { type PermissionGuardOptions, type PermissionGuardResult } from './usePermissionGuard';
-import { rbac, type AppRole, type Permission, type PermissionContext, type DomainSummary } from '../rbac/rbac';
 import { Role } from '@ovds/ui';
+import { useCallback } from 'react';
+
+import { useBusiness } from '../context/businessContext';
+import { useAuth } from '../rbac/AuthContext';
+import { rbac, type AppRole, type Permission, type PermissionContext, type DomainSummary } from '../rbac/rbac';
+
+import { type PermissionGuardOptions, type PermissionGuardResult } from './usePermissionGuard';
+
 
 export interface UseRbacReturn {
   /** True if the current user has the given permission */

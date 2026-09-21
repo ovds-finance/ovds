@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Banking Verification & Validation (V&V) — Ovds-style process screen
  *
  * A guided, minimalistic V&V flow for bank transactions:
@@ -9,8 +9,6 @@
  * Best practices implemented: progressive disclosure (Advanced Options), auto-save
  * indicator, and credit/debit contrast tints.
  */
-import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   Landmark, ShieldCheck, FileCheck2, ClipboardCheck, ArrowRightLeft,
@@ -19,13 +17,16 @@ import {
   Eye, Info, Hash, CalendarDays, Building2,
   Banknote, CircleDollarSign, Layers,
 } from 'lucide-react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
-import api from '../services/api';
-import { useBusiness } from '../context/businessContext';
-import { fmtETB } from '../utils/ethiopianTax';
+import { useNavigate } from 'react-router-dom';
+
 import {
   AppPage, Btn, Card, Modal, Select, Textarea, AppKpi,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import api from '../services/api';
+import { fmtETB } from '../utils/ethiopianTax';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -78,7 +79,7 @@ const AKA_GREEN_DK = '#3db77a';
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 const inputCls =
-  'w-full px-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-[13px] font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/40 focus:border-emerald-400 dark:focus:border-emerald-500 transition-all';
+  'w-full px-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-[13px] font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure-100)] dark:focus:ring-green-900/40 focus:border-[var(--pro-azure)] dark:focus:border-[var(--pro-azure)] transition-all';
 const labelCls = 'block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5';
 const errorCls = 'text-[11px] text-rose-500 dark:text-rose-400 mt-1.5 flex items-center gap-1.5 font-semibold';
 const hintCls = 'text-[10px] text-slate-400 dark:text-slate-500 mt-1';
@@ -171,7 +172,7 @@ const WizardHeader: React.FC<{ step: number; onJump: (i: number) => void; lastSa
                 Step {step + 1} of {STEPS.length} · {STEPS[step].desc}
                 {/* Auto-save indicator */}
                 {lastSaved && (
-                  <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
+                  <span className="inline-flex items-center gap-1 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold">
                     <Save size={9} /> Saved {fmtTime(lastSaved)}
                   </span>
                 )}
@@ -181,7 +182,7 @@ const WizardHeader: React.FC<{ step: number; onJump: (i: number) => void; lastSa
 
           {/* Auto-save status pill (top-right) */}
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shrink-0">
-            <span className={`w-1.5 h-1.5 rounded-full ${lastSaved ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'} ${lastSaved ? 'animate-pulse' : ''}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${lastSaved ? 'bg-[var(--pro-azure)]' : 'bg-slate-300 dark:bg-slate-600'} ${lastSaved ? 'animate-pulse' : ''}`} />
             <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
               {lastSaved ? `Auto-saved ${fmtTime(lastSaved)}` : 'Draft not saved yet'}
             </span>
@@ -300,13 +301,13 @@ const DetailsStep: React.FC<{
               <div className="grid grid-cols-2 gap-2">
                 <button type="button" onClick={() => onChange({ type: 'CREDIT' })}
                   className={`flex items-center gap-2 p-3 rounded-xl border-2 text-left transition-all ${
-                    isCredit ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30' : 'border-slate-200 dark:border-slate-700 hover:border-emerald-300'
+                    isCredit ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30' : 'border-slate-200 dark:border-slate-700 hover:border-[var(--pro-azure-light)]'
                   }`}>
-                  <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${isCredit ? 'bg-emerald-500 text-white' : 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600'}`}>
+                  <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${isCredit ? 'bg-[var(--pro-azure)] text-white' : 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure)]'}`}>
                     <ArrowDownRight size={13} />
                   </span>
                   <div>
-                    <p className={`text-[12px] font-bold ${isCredit ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-200'}`}>Credit (Inflow)</p>
+                    <p className={`text-[12px] font-bold ${isCredit ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-slate-700 dark:text-slate-200'}`}>Credit (Inflow)</p>
                     <p className="text-[10px] text-slate-400">Money received</p>
                   </div>
                 </button>
@@ -359,13 +360,13 @@ const DetailsStep: React.FC<{
           <span className="flex items-center gap-2 text-[12px] font-bold text-slate-600 dark:text-slate-300">
             <SlidersHorizontal size={13} /> Advanced Options
           </span>
-          <span className={`flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 transition-transform ${showAdvanced ? 'rotate-180' : ''}`}>
+          <span className={`flex items-center gap-1 text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-transform ${showAdvanced ? 'rotate-180' : ''}`}>
             {showAdvanced ? 'Hide' : 'Show'} <ChevronRight size={12} className="rotate-90" />
           </span>
         </button>
 
         {showAdvanced && (
-          <Card className="p-4 border-emerald-100 dark:border-emerald-900/40">
+          <Card className="p-4 border-[var(--pro-azure-100)] dark:border-green-900/40">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className={labelCls}>Value Date</label>
@@ -398,16 +399,16 @@ const DetailsStep: React.FC<{
       {/* Live double-entry side panel */}
       <div className="space-y-3">
         <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Entry Preview</p>
-        <div className={`rounded-2xl border p-4 ${isCredit ? 'border-emerald-200 bg-emerald-50/60 dark:border-emerald-900/50 dark:bg-emerald-950/20' : 'border-rose-200 bg-rose-50/60 dark:border-rose-900/50 dark:bg-rose-950/20'}`}>
+        <div className={`rounded-2xl border p-4 ${isCredit ? 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/60 dark:border-green-900/50 dark:bg-green-950/20' : 'border-rose-200 bg-rose-50/60 dark:border-rose-900/50 dark:bg-rose-950/20'}`}>
           <div className="flex items-center gap-2 mb-3">
-            <span className={`w-7 h-7 rounded-lg flex items-center justify-center ${isCredit ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
+            <span className={`w-7 h-7 rounded-lg flex items-center justify-center ${isCredit ? 'bg-[var(--pro-azure)] text-white' : 'bg-rose-500 text-white'}`}>
               {isCredit ? <ArrowDownRight size={13} /> : <ArrowUpRight size={13} />}
             </span>
-            <span className={`text-[12px] font-bold ${isCredit ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>
+            <span className={`text-[12px] font-bold ${isCredit ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-700 dark:text-rose-400'}`}>
               {isCredit ? 'Inflow' : 'Outflow'} · {form.currencyCode}
             </span>
           </div>
-          <p className={`text-[22px] font-bold tabular-nums ${isCredit ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>
+          <p className={`text-[22px] font-bold tabular-nums ${isCredit ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-700 dark:text-rose-400'}`}>
             {isCredit ? '+' : '-'}{form.amount === '' ? fmtETB(0) : fmtETB(Number(form.amount))}
           </p>
           <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 truncate">{form.counterparty || 'No counterparty'}</p>
@@ -464,18 +465,18 @@ const ValidateStep: React.FC<{
   const ccy = account?.currencyCode ?? form.currencyCode;
 
   const cards = [
-    { label: 'Gross Amount', value: fmtETB(form.amount === '' ? 0 : Number(form.amount)), color: t.isCredit ? 'emerald' : 'rose',
+    { label: 'Gross Amount', value: fmtETB(form.amount === '' ? 0 : Number(form.amount)), color: t.isCredit ? 'green' : 'rose',
       icon: <CircleDollarSign size={12} />, sub: form.currencyCode },
     { label: 'VAT', value: fmtETB(t.vat), color: 'amber' as const, icon: <Layers size={12} />,
       sub: `${Number(form.vatRate) || 0}% applied` },
     { label: 'Bank Charges', value: fmtETB(t.charges), color: 'slate' as const, icon: <SlidersHorizontal size={12} />,
       sub: 'Deducted' },
-    { label: 'Net Booked', value: fmtETB(t.net), color: t.isCredit ? 'emerald' : 'rose', icon: <Banknote size={12} />,
+    { label: 'Net Booked', value: fmtETB(t.net), color: t.isCredit ? 'green' : 'rose', icon: <Banknote size={12} />,
       sub: 'After VAT & charges' },
     { label: 'Running Balance', value: fmtETB(t.running), color: t.running >= 0 ? 'sky' : 'rose', icon: <Landmark size={12} />,
       sub: account ? account.name : 'No account' },
     { label: 'V&V Status', value: errorCount ? `${errorCount} error${errorCount > 1 ? 's' : ''}` : warnCount ? `${warnCount} review` : 'Passed',
-      color: errorCount ? 'rose' : warnCount ? 'amber' : 'emerald', icon: errorCount ? <AlertCircle size={12} /> : <CheckCircle2 size={12} />,
+      color: errorCount ? 'rose' : warnCount ? 'amber' : 'green', icon: errorCount ? <AlertCircle size={12} /> : <CheckCircle2 size={12} />,
       sub: errorCount ? 'Fix before submit' : 'Ready' },
   ];
 
@@ -486,9 +487,9 @@ const ValidateStep: React.FC<{
 
       {/* Double-entry view */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="p-4 rounded-2xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/60 dark:bg-emerald-950/20">
-          <div className="flex items-center gap-1.5 mb-2"><ArrowDownRight size={12} className="text-emerald-600" /><span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Credits (Inflow)</span></div>
-          <p className="text-[18px] font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">{t.isCredit ? fmtETB(t.net) : fmtETB(0)}</p>
+        <div className="p-4 rounded-2xl border border-[var(--pro-azure-100)] dark:border-green-900/50 bg-[var(--pro-azure-50)]/60 dark:bg-green-950/20">
+          <div className="flex items-center gap-1.5 mb-2"><ArrowDownRight size={12} className="text-[var(--pro-azure)]" /><span className="text-[10px] font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] uppercase tracking-widest">Credits (Inflow)</span></div>
+          <p className="text-[18px] font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] tabular-nums">{t.isCredit ? fmtETB(t.net) : fmtETB(0)}</p>
         </div>
         <div className="p-4 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50/60 dark:bg-rose-950/20">
           <div className="flex items-center gap-1.5 mb-2"><ArrowUpRight size={12} className="text-rose-600" /><span className="text-[10px] font-bold text-rose-700 dark:text-rose-400 uppercase tracking-widest">Debits (Outflow)</span></div>
@@ -496,7 +497,7 @@ const ValidateStep: React.FC<{
         </div>
         <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950">
           <div className="flex items-center gap-1.5 mb-2"><ArrowRightLeft size={12} className="text-slate-500" /><span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Net Change</span></div>
-          <p className={`text-[18px] font-bold tabular-nums ${t.net >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>{t.net >= 0 ? '+' : ''}{fmtETB(t.net)}</p>
+          <p className={`text-[18px] font-bold tabular-nums ${t.net >= 0 ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-700 dark:text-rose-400'}`}>{t.net >= 0 ? '+' : ''}{fmtETB(t.net)}</p>
           {!t.sameCcy && <p className="text-[10px] text-slate-400 mt-1">FX @ {Number(form.fxRate) || 1} → {ccy}</p>}
         </div>
       </div>
@@ -505,9 +506,9 @@ const ValidateStep: React.FC<{
       <Card className="p-4">
         <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">Validation Checks</p>
         {issues.length === 0 ? (
-          <div className="flex items-center gap-3 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50">
-            <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
-            <p className="text-[12px] font-semibold text-emerald-700 dark:text-emerald-400">All checks passed — data is clear and ready to confirm.</p>
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900/50">
+            <CheckCircle2 size={18} className="text-[var(--pro-azure)] shrink-0" />
+            <p className="text-[12px] font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">All checks passed — data is clear and ready to confirm.</p>
           </div>
         ) : (
           <div className="space-y-1.5">
@@ -523,7 +524,7 @@ const ValidateStep: React.FC<{
                 ? <AlertCircle size={13} className="text-amber-500 shrink-0" />
                 : <Info size={13} className="text-sky-500 shrink-0" />;
               return (
-                <button key={iss.id} onClick={() => iss.field && onJumpIssue()}
+                <button key={iss.id} onClick={() => iss.field && onJumpIssue(iss)}
                   className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-left transition-all ${color} ${iss.field ? 'hover:shadow-sm cursor-pointer' : 'cursor-default'}`}>
                   {ic}
                   <span className="text-[12px] font-medium text-slate-700 dark:text-slate-200 flex-1">{iss.message}</span>
@@ -543,10 +544,10 @@ const ValidateStep: React.FC<{
 type DiffKind = 'same' | 'edit' | 'add';
 
 function DiffRow({ label, before, after, kind }: { label: string; before: string; after: string; kind: DiffKind }) {
-  const bg = kind === 'add' ? 'bg-emerald-50 dark:bg-emerald-950/20'
+  const bg = kind === 'add' ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20'
     : kind === 'edit' ? 'bg-amber-50 dark:bg-amber-950/20'
     : 'bg-white dark:bg-slate-950';
-  const tag = kind === 'add' ? <span className="px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-[8px] font-bold uppercase">+ Added</span>
+  const tag = kind === 'add' ? <span className="px-1.5 py-0.5 rounded-full bg-[var(--pro-azure-100)] dark:bg-green-900/50 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] text-[8px] font-bold uppercase">+ Added</span>
     : kind === 'edit' ? <span className="px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 text-[8px] font-bold uppercase">~ Edited</span>
     : null;
   return (
@@ -594,7 +595,7 @@ const SplitViewCompare: React.FC<{
         <DiffRow label="Running Bal." before={account ? fmtETB(account.computedBalance ?? 0) : '—'} after={fmtETB(t.running)} kind="add" />
       </div>
       <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-3 flex items-center gap-1.5">
-        <ShieldCheck size={11} className="text-emerald-500" /> Validated values are auto-derived for audit accuracy. Review before submission.
+        <ShieldCheck size={11} className="text-[var(--pro-azure)]" /> Validated values are auto-derived for audit accuracy. Review before submission.
       </p>
     </Modal>
   );
@@ -729,10 +730,10 @@ const BankingVerification: React.FC = () => {
   if (submitted) {
     const t = computeTotals(form, account);
     return (
-      <AppPage title="Verification & Validation" icon={<ShieldCheck size={18} />} iconBg="bg-emerald-500"
+      <AppPage title="Verification & Validation" icon={<ShieldCheck size={18} />} iconBg="bg-[var(--pro-azure-50)]0"
         crumbs={[{ label: 'Banking', to: '/banking' }, { label: 'V&V' }]}>
         <div className="max-w-xl mx-auto py-10 text-center">
-          <div className="w-16 h-16 rounded-3xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 flex items-center justify-center text-emerald-500 mx-auto mb-5 shadow-sm">
+          <div className="w-16 h-16 rounded-3xl bg-[var(--pro-azure-50)] dark:bg-green-950/30 border border-[var(--pro-azure-100)] dark:border-green-900/50 flex items-center justify-center text-[var(--pro-azure)] mx-auto mb-5 shadow-sm">
             <CheckCircle2 size={30} />
           </div>
           <h2 className="text-[18px] font-extrabold text-slate-900 dark:text-slate-50 tracking-tight">Verified &amp; Submitted</h2>
@@ -753,7 +754,7 @@ const BankingVerification: React.FC = () => {
       title="Banking V&V"
       subtitle="Guided Verification & Validation of bank transactions"
       icon={<ArrowRightLeft size={18} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure)]"
       crumbs={[{ label: 'Banking', to: '/banking' }, { label: 'Verify & Validate' }]}
       actions={<Btn variant="ghost" size="sm" icon={<X size={12} />} onClick={() => navigate('/banking')}>Close</Btn>}
     >
@@ -778,7 +779,7 @@ const BankingVerification: React.FC = () => {
               errorCount
                 ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-800'
                 : step === 2
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800'
+                ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800'
                 : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800'
             }`}>
               {errorCount ? `${errorCount} error${errorCount > 1 ? 's' : ''}` : step === 2 ? 'Ready to submit' : 'Draft'}
@@ -848,9 +849,9 @@ const ConfirmStep: React.FC<{
           </p>
         </div>
       ) : (
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50">
-          <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
-          <p className="text-[12px] font-semibold text-emerald-700 dark:text-emerald-400">
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900/50">
+          <CheckCircle2 size={18} className="text-[var(--pro-azure)] shrink-0" />
+          <p className="text-[12px] font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
             Data is clear and validated. Submit to post this entry to the ledger.
           </p>
         </div>

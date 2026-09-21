@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
+
+import { PrismaModule } from '../common/prisma.module';
+
+import { ExpenseClaimsController } from './expense-claims.controller';
+import { ProcurementController } from './procurement.controller';
 import { PurchasesController } from './purchases.controller';
 import { PurchasesService } from './purchases.service';
-import { ProcurementController } from './procurement.controller';
-import { ExpenseClaimsController } from './expense-claims.controller';
-import { PrismaModule } from '../common/prisma.module';
+
 
 @Module({
   imports: [PrismaModule],

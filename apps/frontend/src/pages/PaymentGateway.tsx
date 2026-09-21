@@ -11,24 +11,26 @@
  *  - QR code preview
  *  - Reconciliation summary
  */
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import {
-  CreditCard, RefreshCw, CheckCircle, XCircle, AlertTriangle,
-  Download, Plus, Settings, QrCode, BarChart3, Zap,
-} from 'lucide-react';
-import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
-import {
-  AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
-  Btn, StatusBadge, FormField, Input, Select, Modal,
-} from '../components/ui';
-import api from '../services/api';
 import {
   GATEWAY_LABELS, GATEWAY_FEES, calcGatewayFee,
   type PaymentGateway, type PaymentGatewayTransaction,
 } from '@ovds/ui';
+import {
+  CreditCard, RefreshCw, CheckCircle, XCircle, AlertTriangle,
+  Download, Plus, Settings, QrCode, BarChart3, Zap,
+} from 'lucide-react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import toast from 'react-hot-toast';
+
+import {
+  AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
+  Btn, StatusBadge, FormField, Input, Select, Modal,
+} from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+
 
 // -- Types ---------------------------------------------------------------------
 
@@ -49,9 +51,9 @@ const GATEWAY_ICONS: Record<string, string> = {
 const GATEWAY_COLORS: Record<string, string> = {
   TELEBIRR:   'bg-violet-50 border-violet-200 text-violet-700',
   CBEBIRR:    'bg-sky-50 border-sky-200 text-sky-700',
-  HELLOCASH:  'bg-emerald-50 border-emerald-200 text-emerald-700',
+  HELLOCASH:  'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   MPESA_ET:   'bg-green-50 border-green-200 text-green-700',
-  AMOLE:      'bg-blue-50 border-blue-200 text-blue-700',
+  AMOLE:      'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   AWASH_PAY:  'bg-orange-50 border-orange-200 text-orange-700',
   DASHEN_PAY: 'bg-rose-50 border-rose-200 text-rose-700',
   BANK_EFT:   'bg-white border-slate-200 text-slate-700',
@@ -59,11 +61,11 @@ const GATEWAY_COLORS: Record<string, string> = {
 };
 
 const STATUS_CLS: Record<string, string> = {
-  SUCCESS:   'bg-emerald-50 text-emerald-700 border-emerald-200',
+  SUCCESS:   'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
   PENDING:   'bg-amber-50 text-amber-700 border-amber-200',
   FAILED:    'bg-rose-50 text-rose-700 border-rose-200',
   REVERSED:  'bg-white text-slate-700 border-slate-200',
-  INITIATED: 'bg-blue-50 text-blue-700 border-blue-200',
+  INITIATED: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
   EXPIRED:   'bg-white text-slate-500 border-slate-200',
   CANCELLED: 'bg-white text-slate-500 border-slate-200',
 };
@@ -99,7 +101,7 @@ const GatewayCard: React.FC<{
         {/* Toggle */}
         <button
           onClick={() => onToggle(gateway, !enabled)}
-          className={`w-11 h-6 rounded-full transition-all relative ${enabled ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}
+          className={`w-11 h-6 rounded-full transition-all relative ${enabled ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-200 dark:bg-slate-700'}`}
         >
           <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${enabled ? 'left-5' : 'left-0.5'}`} />
         </button>
@@ -123,7 +125,7 @@ const GatewayCard: React.FC<{
             </div>
             <div className="flex justify-between">
               <span>Volume</span>
-              <span className="font-semibold text-emerald-700">ETB {fmt(totalVolume)}</span>
+              <span className="font-semibold text-[var(--pro-azure-dark)]">ETB {fmt(totalVolume)}</span>
             </div>
           </>
         )}
@@ -168,7 +170,7 @@ const FeeCalculatorTab: React.FC = () => {
             {[
               { label: 'Payment Amount', value: `ETB ${fmt(amountNum)}`, cls: '' },
               { label: `${GATEWAY_LABELS[selected]} Fee`, value: `ETB ${fmt(fee)}`, cls: 'text-rose-600' },
-              { label: 'Net Amount Received', value: `ETB ${fmt(net)}`, cls: 'text-emerald-700 font-black text-[14px]' },
+              { label: 'Net Amount Received', value: `ETB ${fmt(net)}`, cls: 'text-[var(--pro-azure-dark)] font-black text-[14px]' },
             ].map(r => (
               <div key={r.label} className="flex justify-between text-[12px]">
                 <span className="text-slate-500">{r.label}</span>
@@ -196,7 +198,7 @@ const FeeCalculatorTab: React.FC = () => {
               const f = amountNum > 0 ? calcGatewayFee(g, amountNum) : 0;
               const feeConfig = GATEWAY_FEES[g];
               return (
-                <AppTr key={g} className={selected === g ? 'bg-emerald-50/50 dark:bg-emerald-950/10' : ''}>
+                <AppTr key={g} className={selected === g ? 'bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10' : ''}>
                   <AppTd>
                     <div className="flex items-center gap-2">
                       <span>{GATEWAY_ICONS[g]}</span>
@@ -211,7 +213,7 @@ const FeeCalculatorTab: React.FC = () => {
                     </span>
                   </AppTd>
                   <AppTd align="right">
-                    <span className={`text-[11px] font-bold tabular-nums ${f > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                    <span className={`text-[11px] font-bold tabular-nums ${f > 0 ? 'text-rose-600' : 'text-[var(--pro-azure)]'}`}>
                       {amountNum > 0 ? `ETB ${fmt(f)}` : '—'}
                     </span>
                   </AppTd>
@@ -278,10 +280,10 @@ const PaymentGatewayScreen: React.FC = () => {
   const successTx = transactions.filter(t => t.status === 'SUCCESS');
   const kpiCells = [
     { label: 'Total Transactions', value: transactions.length, color: 'sky'     as const },
-    { label: 'Successful',         value: successTx.length,    color: 'emerald' as const },
+    { label: 'Successful',         value: successTx.length,    color: 'green' as const },
     { label: 'Pending',            value: transactions.filter(t => t.status === 'PENDING').length, color: 'amber' as const },
     { label: 'Failed',             value: transactions.filter(t => t.status === 'FAILED').length,  color: 'rose'  as const },
-    { label: 'Total Volume',       value: `ETB ${fmt(successTx.reduce((s, t) => s + Number(t.amount), 0))}`, color: 'emerald' as const },
+    { label: 'Total Volume',       value: `ETB ${fmt(successTx.reduce((s, t) => s + Number(t.amount), 0))}`, color: 'green' as const },
     { label: 'Active Gateways',    value: ENABLED_GATEWAYS.filter(g => enabledMap[g]).length, color: 'sky' as const },
   ];
 
@@ -362,7 +364,7 @@ const PaymentGatewayScreen: React.FC = () => {
                     </div>
                   </AppTd>
                   <AppTd>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${tx.direction === 'INBOUND' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${tx.direction === 'INBOUND' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
                       {tx.direction}
                     </span>
                   </AppTd>
@@ -418,7 +420,7 @@ const PaymentGatewayScreen: React.FC = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Volume</span>
-                      <span className="font-bold text-emerald-700">ETB {fmt(stats.totalVolume)}</span>
+                      <span className="font-bold text-[var(--pro-azure-dark)]">ETB {fmt(stats.totalVolume)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Est. Fees</span>
@@ -426,7 +428,7 @@ const PaymentGatewayScreen: React.FC = () => {
                     </div>
                   </div>
                   <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${stats.txCount > 0 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white text-slate-400 border-slate-200'}`}>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${stats.txCount > 0 ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' : 'bg-white text-slate-400 border-slate-200'}`}>
                       {stats.txCount > 0 ? 'Active' : 'No transactions'}
                     </span>
                   </div>

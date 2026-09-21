@@ -7,14 +7,14 @@
  *
  * Modules: Core Operations → People → ovds → Compliance → Reporting → Admin → Developer
  */
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Package, FileText, BookOpen, TrendingUp, Globe, Banknote,
   CheckCircle2, ArrowRight, ChevronDown, ChevronUp, Shield,
   Receipt, BarChart3, Zap, Users, Building2, PieChart,
   ArrowDown, ArrowUp, Lock, Code2, GitBranch,
 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -49,7 +49,7 @@ interface ModuleCard {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const iconWrap = (icon: React.ReactNode, bg = 'bg-emerald-600') => (
+const iconWrap = (icon: React.ReactNode, bg = 'bg-[var(--pro-azure)]') => (
   <div className={`w-7 h-7 rounded-lg ${bg} text-white flex items-center justify-center shadow-sm shrink-0`}>
     {icon}
   </div>
@@ -64,9 +64,9 @@ const INCOME_CHAIN: FlowStep[] = [
     step: '1', label: 'Item / Service', sub: 'IAS 2 NRV · IAS 16',
     icon: iconWrap(<Package size={13} />), link: '/items', auto: false,
     legal: 'IAS 2 Inventories · IAS 16 PPE',
-    color: 'text-emerald-800 dark:text-emerald-200',
-    bg: 'bg-emerald-50 dark:bg-emerald-950/40',
-    border: 'border-emerald-200 dark:border-emerald-800',
+    color: 'text-[var(--pro-azure-dark)] dark:text-green-200',
+    bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/40',
+    border: 'border-[var(--pro-azure-100)] dark:border-green-800',
   },
   {
     step: '2', label: 'Invoice / Revenue', sub: 'IFRS 15 · TIN · QR',
@@ -102,11 +102,11 @@ const INCOME_CHAIN: FlowStep[] = [
   },
   {
     step: '6', label: 'ERCA eTax', sub: 'Monthly / Annual filing',
-    icon: iconWrap(<Globe size={13} />, 'bg-emerald-700'), link: 'https://etax.erca.gov.et', auto: false,
+    icon: iconWrap(<Globe size={13} />, 'bg-[var(--pro-azure-dark)]'), link: 'https://etax.erca.gov.et', auto: false,
     legal: 'MoR / SIGTAS API Submission',
-    color: 'text-emerald-900 dark:text-emerald-100',
-    bg: 'bg-emerald-100 dark:bg-emerald-900/40',
-    border: 'border-emerald-300 dark:border-emerald-700',
+    color: 'text-[var(--pro-azure-dark)] dark:text-green-100',
+    bg: 'bg-[var(--pro-azure-100)] dark:bg-green-900/40',
+    border: 'border-[var(--pro-azure-light)] dark:border-green-700',
   },
 ];
 
@@ -172,12 +172,12 @@ const EXPENSE_CHAIN: FlowStep[] = [
 const MODULES: ModuleCard[] = [
   {
     module: '1', label: 'Core Operations', icon: <Package size={14} />,
-    iconBg: 'bg-emerald-500', description: 'Sales, Procurement, Inventory',
-    link: '/items', tag: 'IFRS 15 · IAS 2', tagColor: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+    iconBg: 'bg-[var(--pro-azure-50)]0', description: 'Sales, Procurement, Inventory',
+    link: '/items', tag: 'IFRS 15 · IAS 2', tagColor: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]',
     items: [
       { label: 'Revenue Recognition', value: 'IFRS 15' },
       { label: 'Inventory Valuation', value: 'IAS 2 — Lower of cost / NRV' },
-      { label: 'VAT on Sales', value: '15% standard · 0% zero-rated', color: 'text-emerald-700' },
+      { label: 'VAT on Sales', value: '15% standard · 0% zero-rated', color: 'text-[var(--pro-azure-dark)]' },
       { label: 'TOT (Cat. B/C)', value: '2% goods · 10% services', color: 'text-sky-700' },
       { label: 'WHT on Purchases', value: '3% goods ≥20K · 3% svcs ≥10K', color: 'text-orange-700' },
     ],
@@ -227,8 +227,8 @@ const MODULES: ModuleCard[] = [
       { label: 'Comprehensive Income', value: 'IFRS 18 P&L categories' },
       { label: 'Cash Flow', value: 'IAS 7 — Operating/Investing/Financing' },
       { label: 'Schedule A (CIT/MAT)', value: 'Taxable income computation' },
-      { label: 'HR & Payroll MoR', value: 'PAYE · Pension · DRRF (IAS 19)', color: 'text-emerald-700' },
-      { label: 'VAT Return', value: 'Output − Input = Payable', color: 'text-emerald-700' },
+      { label: 'HR & Payroll MoR', value: 'PAYE · Pension · DRRF (IAS 19)', color: 'text-[var(--pro-azure-dark)]' },
+      { label: 'VAT Return', value: 'Output − Input = Payable', color: 'text-[var(--pro-azure-dark)]' },
     ],
   },
   {
@@ -273,7 +273,7 @@ const FlowRow: React.FC<{ steps: FlowStep[]; direction: 'income' | 'expense' }> 
             <div className="flex items-center justify-center gap-1">
               {s.icon}
               {s.auto && (
-                <span className="text-[7px] font-black bg-emerald-500 text-white px-1 rounded-full leading-tight">AUTO</span>
+                <span className="text-[7px] font-black bg-[var(--pro-azure)] text-white px-1 rounded-full leading-tight">AUTO</span>
               )}
             </div>
             <span className={`text-[8px] font-semibold uppercase tracking-wider opacity-50 ${s.color}`}>
@@ -301,7 +301,7 @@ const FlowRow: React.FC<{ steps: FlowStep[]; direction: 'income' | 'expense' }> 
         <div className="flex flex-col gap-1 px-3 py-2.5 rounded-xl border cursor-pointer min-w-[88px] text-center
                         bg-slate-800 border-slate-700 hover:bg-slate-700 transition-colors">
           <div className="flex items-center justify-center">
-            {iconWrap(direction === 'income' ? <TrendingUp size={12} /> : <TrendingUp size={12} />, direction === 'income' ? 'bg-emerald-500' : 'bg-rose-500')}
+            {iconWrap(direction === 'income' ? <TrendingUp size={12} /> : <TrendingUp size={12} />, direction === 'income' ? 'bg-[var(--pro-azure-50)]0' : 'bg-rose-500')}
           </div>
           <span className="text-[8px] font-semibold text-slate-400 uppercase">Net</span>
           <span className="text-[11px] font-bold text-white leading-tight">
@@ -341,14 +341,14 @@ const AccountingChainWidget: React.FC = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1 px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/30
-                           text-emerald-600 dark:text-emerald-400 text-[10px] font-medium
-                           rounded-full border border-emerald-200 dark:border-emerald-800">
-            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+          <span className="flex items-center gap-1 px-2 py-0.5 bg-[var(--pro-azure-50)] dark:bg-green-950/30
+                           text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] text-[10px] font-medium
+                           rounded-full border border-[var(--pro-azure-100)] dark:border-green-800">
+            <span className="w-1.5 h-1.5 bg-[var(--pro-azure-50)]0 rounded-full animate-pulse" />
             AUTO-POST
           </span>
           <Link to="/tax/dashboard"
-            className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+            className="text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
             Tax Center →
           </Link>
         </div>
@@ -357,9 +357,9 @@ const AccountingChainWidget: React.FC = () => {
       {/* Income flow */}
       <div className="px-5 pt-4 pb-2">
         <div className="flex items-center gap-2 mb-2.5">
-          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 border border-emerald-200 rounded-lg">
-            <ArrowUp size={10} className="text-emerald-600" />
-            <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Income Side</span>
+          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-lg">
+            <ArrowUp size={10} className="text-[var(--pro-azure)]" />
+            <span className="text-[10px] font-bold text-[var(--pro-azure-dark)] uppercase tracking-wider">Income Side</span>
           </div>
           <span className="text-[10px] text-slate-400">Sales · Invoices · Revenue Recognition (IFRS 15) · VAT/TOT</span>
         </div>
@@ -368,14 +368,14 @@ const AccountingChainWidget: React.FC = () => {
 
       {/* Net Profit bridge */}
       <div className="mx-5 my-1 flex items-center gap-3">
-        <div className="flex-1 h-px bg-gradient-to-r from-emerald-200 via-slate-200 to-rose-200 dark:from-emerald-800 dark:via-slate-700 dark:to-rose-800" />
+        <div className="flex-1 h-px bg-gradient-to-r from-[var(--pro-azure-200)] via-slate-200 to-rose-200 dark:from-green-800 dark:via-slate-700 dark:to-rose-800" />
         <Link to="/reports/mor-report"
           className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 text-white rounded-xl
                      text-[10px] font-bold hover:bg-slate-700 transition-colors shrink-0">
           <BarChart3 size={11} />
           Net Profit → IAS 12 → CIT 30%
         </Link>
-        <div className="flex-1 h-px bg-gradient-to-r from-rose-200 via-slate-200 to-emerald-200 dark:from-rose-800 dark:via-slate-700 dark:to-emerald-800" />
+        <div className="flex-1 h-px bg-gradient-to-r from-rose-200 via-slate-200 to-indigo-200 dark:from-rose-800 dark:via-slate-700 dark:to-indigo-800" />
       </div>
 
       {/* Expense flow */}
@@ -395,9 +395,9 @@ const AccountingChainWidget: React.FC = () => {
         <button
           onClick={() => setExpanded(v => !v)}
           className="flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold
-                     text-slate-400 hover:text-emerald-600 transition-colors
+                     text-slate-400 hover:text-[var(--pro-azure)] transition-colors
                      border border-dashed border-slate-200 dark:border-slate-700 rounded-xl
-                     hover:border-emerald-400/40"
+                     hover:border-[var(--pro-azure)]/40"
         >
           {expanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
           {expanded ? 'Hide compliance workflow' : 'Compliance submission workflow'}
@@ -421,7 +421,7 @@ const AccountingChainWidget: React.FC = () => {
           <p className="ovds-label mb-3">Compliance Submission Workflow</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {[
-              { n: '1', label: 'Record', desc: 'Invoice/Bill → auto Journal Entry posted', icon: <Receipt size={11} />, color: 'text-emerald-600' },
+              { n: '1', label: 'Record', desc: 'Invoice/Bill → auto Journal Entry posted', icon: <Receipt size={11} />, color: 'text-[var(--pro-azure)]' },
               { n: '2', label: 'Reconcile', desc: 'VAT/DRRF/WHT computation worksheets', icon: <BarChart3 size={11} />, color: 'text-violet-600' },
               { n: '3', label: 'Declare', desc: 'Monthly eTax portal (MoR/SIGTAS)', icon: <Globe size={11} />, color: 'text-orange-600' },
               { n: '4', label: 'IAS 12', desc: 'Deferred tax DTA/DTL reconciliation', icon: <GitBranch size={11} />, color: 'text-sky-600' },
@@ -466,7 +466,7 @@ const AccountingChainWidget: React.FC = () => {
             {MODULES.map(m => (
               <Link key={m.module} to={m.link}
                 className="group block p-4 bg-white dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700
-                           hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-sm transition-all">
+                           hover:border-[var(--pro-azure-light)] dark:hover:border-green-700 hover:shadow-sm transition-all">
                 <div className="flex items-start gap-3 mb-3">
                   <div className={`w-8 h-8 rounded-xl ${m.iconBg} text-white flex items-center justify-center shrink-0 shadow-sm`}>
                     {m.icon}

@@ -3,14 +3,15 @@
  * active engagements, open findings, and best-practice checklist progress.
  * Integrates with the AuditOutsourcing module.
  */
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import {
   ClipboardList, CheckCircle2, XCircle,
   ArrowRight, RefreshCw, Award, BookOpen,
 } from 'lucide-react';
-import api from '../../services/api';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+
 import { useBusiness } from '../../context/businessContext';
+import api from '../../services/api';
 
 interface AuditStats {
   firms: number;
@@ -54,10 +55,10 @@ const AuditReadinessWidget: React.FC = () => {
 
   const passedCount = checks.filter(c => c.passed).length;
   const score = Math.round((passedCount / checks.length) * 100);
-  const scoreColor = score >= 80 ? 'text-emerald-600 dark:text-emerald-400'
+  const scoreColor = score >= 80 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
     : score >= 60 ? 'text-amber-600 dark:text-amber-400'
     : 'text-rose-600 dark:text-rose-400';
-  const scoreBg = score >= 80 ? 'bg-emerald-500' : score >= 60 ? 'bg-amber-500' : 'bg-rose-500';
+  const scoreBg = score >= 80 ? 'bg-[var(--pro-azure-50)]0' : score >= 60 ? 'bg-amber-500' : 'bg-rose-500';
 
   return (
     <div className="ovds-widget-card shadow-sm overflow-hidden">
@@ -92,8 +93,8 @@ const AuditReadinessWidget: React.FC = () => {
       {!loading && stats && (
         <div className="px-5 py-3 grid grid-cols-4 gap-2">
           {[
-            { label: 'Firms', value: stats.firms, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/20' },
-            { label: 'Active', value: stats.active, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/20' },
+            { label: 'Firms', value: stats.firms, color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20' },
+            { label: 'Active', value: stats.active, color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20' },
             { label: 'Open', value: stats.openFindings, color: stats.openFindings > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500', bg: 'bg-amber-50 dark:bg-amber-950/20' },
             { label: 'Critical', value: stats.criticalFindings, color: stats.criticalFindings > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500', bg: stats.criticalFindings > 0 ? 'bg-rose-50 dark:bg-rose-950/20' : 'bg-white dark:bg-slate-800/50' },
           ].map(s => (
@@ -115,11 +116,11 @@ const AuditReadinessWidget: React.FC = () => {
           checks.map(c => (
             <div key={c.id} className={`flex items-center gap-3 px-3 py-2 rounded-xl border transition-all ${
               c.passed
-                ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/40'
+                ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-[var(--pro-azure-100)] dark:border-green-900/40'
                 : 'bg-rose-50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/40'
             }`}>
               {c.passed
-                ? <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                ? <CheckCircle2 size={13} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0" />
                 : <XCircle size={13} className="text-rose-600 dark:text-rose-400 shrink-0" />
               }
               <span className={`text-xs font-semibold flex-1 ${c.passed ? 'text-slate-700 dark:text-slate-300' : 'text-slate-600 dark:text-slate-400'}`}>
@@ -145,10 +146,10 @@ const AuditReadinessWidget: React.FC = () => {
 
       {/* Footer */}
       <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <Link to="/compliance/audit-outsourcing" className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+        <Link to="/compliance/audit-outsourcing" className="flex items-center gap-1.5 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
           <ClipboardList size={12} /> Audit Outsourcing
         </Link>
-        <Link to="/compliance/auditor" className="flex items-center gap-1 text-[10px] font-bold text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors">
+        <Link to="/compliance/auditor" className="flex items-center gap-1 text-[10px] font-bold text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">
           Compliance <ArrowRight size={9} />
         </Link>
       </div>

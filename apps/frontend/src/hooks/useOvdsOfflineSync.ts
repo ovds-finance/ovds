@@ -1,4 +1,5 @@
-import { useEffect, useCallback, useState } from 'react';
+﻿import { useEffect, useCallback, useState } from 'react';
+
 import {
   saveOfflineTransaction,
   getPendingTransactions,
@@ -34,6 +35,7 @@ export function useOvdsOfflineSync(companyCode: string) {
       window.removeEventListener('online', goOnline);
       window.removeEventListener('offline', goOffline);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshCount]);
 
   const triggerSync = useCallback(async () => {
@@ -66,7 +68,11 @@ export function useOvdsOfflineSync(companyCode: string) {
         }
       }
     } catch (error: any) {
-      console.error('[OVDS Sync] Failed:', error);
+      // Only log full error in dev — avoid leaking internal details in production
+      if (import.meta.env.DEV) {
+         
+        console.error('[OVDS Sync] Failed:', error);
+      }
       const pending = await getPendingTransactions();
       for (const tx of pending) {
         await markSyncError(tx.transactionId, error.message);

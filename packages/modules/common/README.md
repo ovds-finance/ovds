@@ -1,8 +1,8 @@
-# Common Cross-Cutting Utilities
+﻿# Common Cross-Cutting Utilities
 
 Canonical OVDS module (`packages/modules/common`).
 
-Akaunting-inspired, DDD-aligned module layout:
+Ovds SaaS DDD-aligned module layout:
 
 ```
 modules/common/

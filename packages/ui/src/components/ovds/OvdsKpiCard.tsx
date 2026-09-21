@@ -17,9 +17,9 @@ interface ovdsKpiCardProps {
   trend?: number;          // percentage change, positive = up
   trendLabel?: string;     // e.g. "vs last month"
   icon: React.ReactNode;
-  iconBg: string;          // Tailwind bg class e.g. "bg-emerald-50"
-  iconColor: string;       // Tailwind text class e.g. "text-emerald-600"
-  accentColor?: string;    // Tailwind border-l color e.g. "border-emerald-500"
+  iconBg: string;          // Tailwind bg class e.g. "bg-[var(--pro-azure-50)]"
+  iconColor: string;       // Tailwind text class e.g. "text-[var(--pro-azure-dark)]"
+  accentColor?: string;    // Tailwind border-l color e.g. "border-[var(--pro-azure)]"
   sparkData?: SparkPoint[];
   loading?: boolean;
   onClick?: () => void;
@@ -53,7 +53,7 @@ const MiniSparkline: React.FC<{ data: SparkPoint[]; color: string }> = ({ data, 
 };
 
 const SPARK_COLORS: Record<string, string> = {
-  'bg-emerald-50': '#00E784',
+  'bg-[var(--pro-azure-50)]': '#00E784',
   'bg-rose-50':    '#f43f5e',
   'bg-amber-50':   '#f59e0b',
   'bg-sky-50':     '#0ea5e9',
@@ -63,7 +63,7 @@ const SPARK_COLORS: Record<string, string> = {
 
 export const ovdsKpiCard: React.FC<ovdsKpiCardProps> = ({
   label, tooltip, value, subValue, trend, trendLabel = 'vs last month',
-  icon, iconBg, iconColor, accentColor = 'border-emerald-500',
+  icon, iconBg, iconColor, accentColor = 'border-[var(--pro-azure)]',
   sparkData, loading, onClick, badge, badgeCls,
 }) => {
   const sparkColor = SPARK_COLORS[iconBg] ?? '#00E784';
@@ -94,7 +94,7 @@ export const ovdsKpiCard: React.FC<ovdsKpiCardProps> = ({
         'border-l-4', accentColor,
         'shadow-[0_1px_3px_0_rgb(0_0_0/0.05)]',
         onClick ? 'cursor-pointer hover:shadow-[0_4px_16px_0_rgb(0_0_0/0.08)] hover:-translate-y-0.5 transition-all duration-150' : '',
-        'focus:outline-none focus:ring-2 focus:ring-emerald-500/30',
+        'focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/30',
       ].join(' ')}
     >
       {/* Header row */}
@@ -104,7 +104,7 @@ export const ovdsKpiCard: React.FC<ovdsKpiCardProps> = ({
             {icon}
           </div>
           {badge && (
-            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${badgeCls ?? 'bg-emerald-100 text-emerald-700'}`}>
+            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${badgeCls ?? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'}`}>
               {badge}
             </span>
           )}
@@ -146,7 +146,7 @@ export const ovdsKpiCard: React.FC<ovdsKpiCardProps> = ({
         )}
         {!trendNeutral && (
           <div className={`flex items-center gap-0.5 text-[10px] font-bold ml-auto ${
-            trendUp ? 'text-emerald-600' : 'text-rose-500'
+            trendUp ? 'text-[var(--pro-azure-dark)]' : 'text-rose-500'
           }`}>
             {trendUp
               ? <TrendingUp size={11} />

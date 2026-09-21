@@ -13,7 +13,16 @@
  *   • Ethiopia Customs Trade Portal     → ects.mor.gov.et
  *   • Ethiopian Customs Commission      → customs.gov.et
  */
+import { Loader2 } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
+
+import {
+  AppPage, AppTable, AppTh, AppTd, AppTr,
+  Btn, Icon, Modal, FormField, Input,
+  fmtCurrency, fmtDateTime,
+} from '../components/ui';
+import { useBusiness } from '../context/businessContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useAuth } from '../rbac/AuthContext';
 import {
@@ -22,20 +31,15 @@ import {
   useCheckETaxStatus,
   type ETaxSubmission,
 } from '../services/iotApi';
-import { useVatFilings } from '../services/vatApi';
 import {
   getETaxExportUrl,
   useDeclarationReadiness,
   downloadPurchaseAnnexure,
   type DeclarationReadinessResult,
 } from '../services/newTaxApi';
-import {
-  AppPage, AppTable, AppTh, AppTd, AppTr,
-  Btn, Icon, Modal, FormField, Input,
-  fmtCurrency, fmtDateTime,
-} from '../components/ui';
-import toast from 'react-hot-toast';
-import { useBusiness } from '../context/businessContext';
+import { useVatFilings } from '../services/vatApi';
+
+
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -48,7 +52,7 @@ const MOR_PORTALS = [
     name: 'Ministry of Revenue Online e-Tax',
     url:  'https://etax.mor.gov.et',
     desc: 'VAT, PAYE, Business Income Tax declarations and payments.',
-    color: 'emerald',
+    color: 'green',
   },
   {
     code: 'TASS',
@@ -77,7 +81,7 @@ const STATUS_STYLE: Record<string, string> = {
   DRAFT:     'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400',
   PENDING:   'bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300',
   SUBMITTED: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
-  ACCEPTED:  'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+  ACCEPTED:  'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300',
   REJECTED:  'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300',
   FAILED:    'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300',
 };
@@ -116,6 +120,7 @@ const ETaxDeclaration: React.FC = () => {
 
   // useVatFilings returns { filings, summary, loading, error, refetch }
   const vatFilings$ = useVatFilings?.();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const filings:  any[] = vatFilings$?.filings  ?? [];
   const summary:  any   = vatFilings$?.summary   ?? {};
 
@@ -124,7 +129,7 @@ const ETaxDeclaration: React.FC = () => {
 
   // Declaration readiness check for the selected period
   const { data: readiness, loading: readinessLoading, refetch: refetchReadiness } =
-    useDeclarationReadiness(selectedPeriod, selectedCompanyId);
+    useDeclarationReadiness(selectedPeriod, selectedCompanyId ?? undefined);
 
   // Unique periods from filings, newest first
   const periods = useMemo(
@@ -229,17 +234,17 @@ const ETaxDeclaration: React.FC = () => {
       {/* ── KPI strip ──────────────────────────────────────────────────────── */}
       <div className="px-4 pt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
         <StatCard label="Submitted"         value={submittedCount}                      color="sky"     />
-        <StatCard label="Accepted"          value={acceptedCount}                       color="emerald" />
+        <StatCard label="Accepted"          value={acceptedCount}                       color="indigo" />
         <StatCard label="Rejected"          value={rejectedCount > 0 ? rejectedCount : '—'} color={rejectedCount > 0 ? 'rose' : 'slate'} />
         <StatCard label="Total Tax Paid (ETB)" value={fmtCurrency(totalPaid, 'ETB')}   color="violet"  />
       </div>
 
       {/* ── Authority banner ───────────────────────────────────────────────── */}
       <div className="px-4 pt-4">
-        <div className="p-4 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/20">
+        <div className="p-4 rounded-xl border border-[var(--pro-azure-100)] dark:border-green-800 bg-[var(--pro-azure-50)] dark:bg-green-950/20">
           <div className="flex items-start gap-3">
-            <Icon name="INFO" size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-            <div className="space-y-1.5 text-[12px] text-emerald-800 dark:text-emerald-300">
+            <Icon name="INFO" size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5" />
+            <div className="space-y-1.5 text-[12px] text-[var(--pro-azure-dark)] dark:text-green-300">
               <p className="font-semibold">
                 Ministry of Revenues (MoR) — formerly Ethiopian Revenues and Customs Authority (ERCA)
               </p>
@@ -251,7 +256,7 @@ const ETaxDeclaration: React.FC = () => {
               </p>
               <p>
                 This module submits VAT returns to the MoR e-Tax portal via the Ministry of Revenues API.
-                Set <code className="font-mono bg-emerald-100 dark:bg-emerald-900/40 px-1 rounded">ETAX_MODE=live</code> in
+                Set <code className="font-mono bg-[var(--pro-azure-100)] dark:bg-green-900/40 px-1 rounded">ETAX_MODE=live</code> in
                 your environment to enable live submissions. In <strong>stub</strong> mode (default),
                 a reference number is generated locally for testing.
               </p>
@@ -328,12 +333,12 @@ const ETaxDeclaration: React.FC = () => {
 
         {readinessLoading ? (
           <div className="h-16 flex items-center justify-center text-[12px] text-slate-400">
-            <Icon name="LOADER" size={14} className="animate-spin mr-2" /> Checking readiness…
+            <Loader2 size={14} className="animate-spin mr-2" /> Checking readiness…
           </div>
         ) : readiness ? (
           <div className={`p-4 rounded-xl border ${
             readiness.ready
-              ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/20'
+              ? 'border-[var(--pro-azure-100)] dark:border-green-800 bg-[var(--pro-azure-50)] dark:bg-green-950/20'
               : 'border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/20'
           }`}>
             {/* Header */}
@@ -341,9 +346,9 @@ const ETaxDeclaration: React.FC = () => {
               <Icon
                 name={readiness.ready ? 'CHECK_CIRCLE' : 'X_CIRCLE'}
                 size={16}
-                className={readiness.ready ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}
+                className={readiness.ready ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-rose-500'}
               />
-              <span className={`text-[13px] font-bold ${readiness.ready ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'}`}>
+              <span className={`text-[13px] font-bold ${readiness.ready ? 'text-[var(--pro-azure-dark)] dark:text-green-300' : 'text-rose-700 dark:text-rose-300'}`}>
                 {readiness.ready ? 'Ready to submit' : 'Not ready — resolve errors below'}
               </span>
               {readiness.periodLocked && (
@@ -402,10 +407,10 @@ const ETaxDeclaration: React.FC = () => {
         </p>
         <div className="flex flex-wrap gap-2">
           {([
-            { label: 'Sales Annexure (A)',     type: 'vat-sales' as const,          icon: 'FILE_TEXT',   color: 'emerald', desc: 'Output VAT + WHT + DRRF' },
+            { label: 'Sales Annexure (A)',     type: 'vat-sales' as const,          icon: 'FILE_TEXT',   color: 'green', desc: 'Output VAT + WHT + DRRF' },
             { label: 'Purchase Annexure (12)', type: 'purchase-annexure' as const,  icon: 'FILE_TEXT',   color: 'sky',     desc: 'Input VAT from bills' },
             { label: 'WHT Certificates',       type: 'wht-certificates' as const,   icon: 'SHIELD_CHECK',color: 'violet',  desc: 'Issued WHT certs' },
-            { label: 'PAYE Salary (Sched. A)', type: 'paye-salary' as const,        icon: 'USERS',       color: 'indigo',  desc: 'PIT + Pension' },
+            { label: 'PAYE Salary (Sched. A)', type: 'paye-salary' as const,        icon: 'USERS',       color: 'green',  desc: 'PIT + Pension' },
             { label: 'TOT Log',                type: 'tot-log' as const,             icon: 'RECEIPT',     color: 'amber',   desc: 'Turnover Tax (Cat B)' },
             { label: 'DRRF Register',          type: 'drrf-register' as const,      icon: 'SHIELD_CHECK',color: 'rose',    desc: '1% levy register' },
           ] as const).map(({ label, type, icon, color, desc }) => (
@@ -508,7 +513,7 @@ const ETaxDeclaration: React.FC = () => {
 
                 <AppTd>
                   <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                    s.mode === 'live'    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' :
+                    s.mode === 'live'    ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300' :
                     s.mode === 'sandbox' ? 'bg-amber-100  text-amber-700  dark:bg-amber-900/40  dark:text-amber-300'  :
                                            'bg-slate-100  text-slate-400  dark:bg-slate-800      dark:text-slate-500'
                   }`}>
@@ -518,7 +523,7 @@ const ETaxDeclaration: React.FC = () => {
 
                 <AppTd>
                   {s.ercaReferenceNo
-                    ? <span className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400">{s.ercaReferenceNo}</span>
+                    ? <span className="font-mono text-[11px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{s.ercaReferenceNo}</span>
                     : <span className="text-slate-300 dark:text-slate-600">—</span>}
                 </AppTd>
 
@@ -530,7 +535,7 @@ const ETaxDeclaration: React.FC = () => {
 
                 <AppTd>
                   {s.acceptedAt
-                    ? <span className="text-[11px] text-emerald-600 dark:text-emerald-400">{fmtDateTime(s.acceptedAt)}</span>
+                    ? <span className="text-[11px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{fmtDateTime(s.acceptedAt)}</span>
                     : s.status === 'REJECTED'
                       ? <span className="text-[11px] text-rose-500" title={s.rejectionReason ?? ''}>Rejected</span>
                       : <span className="text-slate-300 dark:text-slate-600">—</span>}
@@ -622,7 +627,7 @@ const ETaxDeclaration: React.FC = () => {
             {readiness && (
               <div className={`flex items-center gap-2 p-3 rounded-xl border text-[11px] ${
                 readiness.ready
-                  ? 'border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-300'
+                  ? 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)] dark:border-green-800 dark:bg-green-950/20 text-[var(--pro-azure-dark)] dark:text-green-300'
                   : 'border-rose-200 bg-rose-50 dark:border-rose-800 dark:bg-rose-950/20 text-rose-700 dark:text-rose-300'
               }`}>
                 <Icon name={readiness.ready ? 'CHECK_CIRCLE' : 'X_CIRCLE'} size={13} className="shrink-0" />
@@ -665,7 +670,7 @@ const ETaxDeclaration: React.FC = () => {
                   <span className="text-[12px] font-bold text-slate-700 dark:text-slate-200">
                     Total Payable to MoR
                   </span>
-                  <span className="text-[14px] font-bold text-emerald-600 dark:text-emerald-400">
+                  <span className="text-[14px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                     {fmtCurrency(selectedFiling.netPayable ?? 0, 'ETB')}
                   </span>
                 </div>

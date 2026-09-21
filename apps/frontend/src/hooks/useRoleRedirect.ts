@@ -14,8 +14,9 @@
  */
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../rbac/AuthContext';
+
 import { rbac, type AppRole, type Permission } from '../rbac';
+import { useAuth } from '../rbac/AuthContext';
 
 interface UseRoleRedirectOptions {
   /** Roles that are allowed — redirect everyone else */

@@ -2,26 +2,29 @@
  * ExpenseClaims — Ovds-inspired UI
  * Clean white cards · teal accents · pill status badges · icon-labeled fields
  */
-import React, { useState, useCallback } from 'react';
+import { evalMath } from '@ovds/ui';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Receipt, Plus, Edit2, Trash2, RefreshCw, MoreHorizontal,
   CheckCircle2, XCircle, Wallet, FileText, Clock,
   Tag, User, AlignLeft, Link2, DollarSign, ChevronDown,
 } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { confirm } from '../utils/confirm';
-import { fmtCurrency, fmtDate } from '../utils/fmt';
-import api from '../services/api';
-import { evalMath } from '@ovds/ui';
+
 import {
   AppPage, AppTable, AppTh, AppTd, AppTr,
   Btn, Modal, EmptyState, Pagination, Amount, SearchBar,
   StatusBadge,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { confirm } from '../utils/confirm';
+import { fmtCurrency, fmtDate } from '../utils/fmt';
+
+
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -67,7 +70,7 @@ const fmt = (n: number, code = 'ETB') => fmtCurrency(n, code);
 
 const STATUS_META: Record<string, { label: string; dot: string; bg: string; text: string }> = {
   PENDING:    { label: 'Pending',    dot: 'bg-amber-400',   bg: 'bg-amber-50',   text: 'text-amber-700'  },
-  APPROVED:   { label: 'Approved',   dot: 'bg-emerald-400', bg: 'bg-emerald-50', text: 'text-emerald-700'},
+  APPROVED:   { label: 'Approved',   dot: 'bg-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)]', text: 'text-[var(--pro-azure-dark)]'},
   REJECTED:   { label: 'Rejected',   dot: 'bg-rose-400',    bg: 'bg-rose-50',    text: 'text-rose-700'   },
   REIMBURSED: { label: 'Reimbursed', dot: 'bg-sky-400',     bg: 'bg-sky-50',     text: 'text-sky-700'    },
 };
@@ -383,8 +386,8 @@ const ExpenseClaims: React.FC = () => {
           accent="bg-amber-50 dark:bg-amber-900/20" />
         <KpiCard label="Approved"     value={stats?.approved ?? 0}
           sub={stats ? fmt(stats.approvedAmount) : undefined}
-          icon={<CheckCircle2 size={18} className="text-emerald-500" />}
-          accent="bg-emerald-50 dark:bg-emerald-900/20" />
+          icon={<CheckCircle2 size={18} className="text-[var(--pro-azure)]" />}
+          accent="bg-[var(--pro-azure-50)] dark:bg-green-900/20" />
         <KpiCard label="Reimbursed"   value={stats?.reimbursed ?? 0}
           icon={<Wallet size={18} className="text-sky-500" />}
           accent="bg-sky-50 dark:bg-sky-900/20" />
@@ -487,7 +490,7 @@ const ExpenseClaims: React.FC = () => {
                       <>
                         <ActionBtn
                           icon={<CheckCircle2 size={13} />}
-                          cls="text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                          cls="text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-900/20"
                           title="Approve"
                           onClick={() => handleAction(claim, 'approve')}
                         />

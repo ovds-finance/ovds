@@ -44,4 +44,46 @@ export interface SettingOption {
     value: string;
     description?: string;
 }
+export interface RbacRoleDTO {
+    id: string;
+    name: string;
+    label: string;
+    description?: string;
+    isActive: boolean;
+    isSystem: boolean;
+    apiAccess: boolean;
+    companyId?: string | null;
+    permissions: string[];
+    createdAt?: string;
+    updatedAt?: string;
+}
+export interface RbacPermissionDTO {
+    id: string;
+    key: string;
+    label: string;
+    description?: string;
+    category?: string;
+    module?: string;
+    isCritical?: boolean;
+    retentionYears?: number;
+    regulation?: string;
+    createdAt?: string;
+}
+export interface SodRuleDTO {
+    id: string;
+    name: string;
+    risk: 'critical' | 'high' | 'medium' | 'low';
+    perm1: string;
+    perm2: string;
+    description: string;
+    remediation?: string[];
+}
+export interface AuditEventCatalogDTO {
+    id: string;
+    permission: string;
+    event: string;
+    severity: 'critical' | 'high' | 'medium' | 'low';
+    regulation: string;
+    retentionYears: number;
+}
 //# sourceMappingURL=settings.types.d.ts.map

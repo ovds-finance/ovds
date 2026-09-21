@@ -23,7 +23,7 @@ export interface ContextualInsightProps {
 const VARIANT_CONFIG: Record<InsightVariant, { icon: React.ReactNode; cls: string }> = {
   info: {
     icon: <Info size={11} />,
-    cls: 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-100 dark:border-emerald-900/50 text-emerald-600 dark:text-emerald-400',
+    cls: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)] dark:border-green-900/50 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
   },
   warning: {
     icon: <AlertTriangle size={11} />,
@@ -31,7 +31,7 @@ const VARIANT_CONFIG: Record<InsightVariant, { icon: React.ReactNode; cls: strin
   },
   positive: {
     icon: <TrendingUp size={11} />,
-    cls: 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-100 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-300',
+    cls: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)] dark:border-green-900/50 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
   },
   neutral: {
     icon: <Lightbulb size={11} />,

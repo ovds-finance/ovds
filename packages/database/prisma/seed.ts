@@ -71,9 +71,10 @@ async function seedCore() {
   // 1. Companies
   const company = await (prisma as any).company.upsert({
     where: { name: 'Ovds Technologies PLC' },
-    update: {},
+    update: { subdomain: 'ovds' },
     create: {
       name: 'Ovds Technologies PLC',
+      subdomain: 'ovds',
       type: 'LARGE_ENTERPRISE',
       currencyCode: 'ETB',
       settings: JSON.stringify({
@@ -86,9 +87,10 @@ async function seedCore() {
 
   const company2 = await (prisma as any).company.upsert({
     where: { name: 'Tigray Manufacturing PLC' },
-    update: {},
+    update: { subdomain: 'tigmfg' },
     create: {
       name: 'Tigray Manufacturing PLC',
+      subdomain: 'tigmfg',
       type: 'MANUFACTURING',
       currencyCode: 'ETB',
       settings: JSON.stringify({
@@ -367,7 +369,7 @@ async function seedCore() {
   const categoryTemplates = [
     { name: 'Sales', type: 'income', color: '#10b981' },
     { name: 'Consulting', type: 'income', color: '#3b82f6' },
-    { name: 'Other Income', type: 'income', color: '#6366f1' },
+    { name: 'Other Income', type: 'income', color: '#4FBA6F' },
     { name: 'Rent', type: 'expense', color: '#f59e0b' },
     { name: 'Utilities', type: 'expense', color: '#ef4444' },
     { name: 'Travel', type: 'expense', color: '#8b5cf6' },

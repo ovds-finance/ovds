@@ -1,5 +1,3 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Building2, ChevronRight, ChevronLeft, Check, X,
   Banknote, Users, Package, ShieldCheck, Zap, Upload,
@@ -7,10 +5,15 @@ import {
   Phone, Mail, Hash, Globe, FileSpreadsheet, Plus, Trash2,
   Key, Eye, EyeOff, ExternalLink, Settings,
 } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
+
+import { useBusiness } from '../context/businessContext';
 import api from '../services/api';
 import { setupApi } from '../services/setupApi';
-import toast from 'react-hot-toast';
-import { useBusiness } from '../context/businessContext';
+
+
 
 // -- Helpers --------------------------------------------------------------------
 
@@ -226,7 +229,7 @@ function downloadTemplate(key: string, label: string) {
 
 // -- Helpers -------------------------------------------------------------------
 
-const inputCls = 'w-full px-3 py-2.5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:border-gray-300 dark:hover:border-slate-600 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/40 focus:border-emerald-400 transition-all placeholder:text-gray-400 dark:placeholder:text-slate-600 text-gray-800 dark:text-slate-200';
+const inputCls = 'w-full px-3 py-2.5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:border-gray-300 dark:hover:border-slate-600 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure-100)] dark:focus:ring-green-900/40 focus:border-[var(--pro-azure)] transition-all placeholder:text-gray-400 dark:placeholder:text-slate-600 text-gray-800 dark:text-slate-200';
 const labelCls = 'block text-[10px] font-bold text-gray-500 dark:text-slate-500 uppercase tracking-widest mb-1.5';
 const errorCls = 'text-[11px] text-red-500 mt-1.5 flex items-center gap-1.5 font-semibold';
 
@@ -237,7 +240,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void 
       role="switch"
       aria-checked={checked}
       onClick={onChange}
-      className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${checked ? 'bg-emerald-500' : 'bg-gray-200 dark:bg-slate-700'}`}
+      className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${checked ? 'bg-[var(--pro-azure-50)]0' : 'bg-gray-200 dark:bg-slate-700'}`}
     >
       <span className={`absolute top-1 w-4 h-4 bg-white dark:bg-slate-200 rounded-full shadow transition-transform ${checked ? 'translate-x-6' : 'translate-x-1'}`} />
     </button>
@@ -562,11 +565,11 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                   aria-label={`Go to step ${i + 1}: ${s.title}`}
                   title={s.title}
                   disabled={i >= step}
-                  className={`flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-bold transition-all duration-200 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 ${
+                  className={`flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-bold transition-all duration-200 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pro-azure)]/50 ${
                     i < step
                       ? 'cursor-pointer hover:scale-110'
                       : i === step
-                      ? 'ring-2 ring-emerald-400/40 ring-offset-1 cursor-default'
+                      ? 'ring-2 ring-[var(--pro-azure)]/40 ring-offset-1 cursor-default'
                       : 'bg-gray-100 dark:bg-slate-700 text-gray-400 dark:text-slate-500 cursor-default'
                   }`}
                   style={i <= step ? { background: '#55bc7e', color: '#fff' } : {}}
@@ -588,7 +591,7 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
         <div ref={contentRef} className="flex-1 overflow-y-auto p-5 bg-gray-50 dark:bg-slate-950">
           {/* Step header */}
           <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-200 dark:border-slate-800">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border border-emerald-100 dark:border-emerald-900" style={{ background: '#f0fdf4', color: '#16a34a' }}>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border border-[var(--pro-azure-100)] dark:border-green-900" style={{ background: '#f0fdf4', color: '#16a34a' }}>
               {currentStep.icon}
             </div>
             <div>
@@ -605,7 +608,7 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                 {[
                   {
                     key: 'cloud' as const,
-                    icon: <Cloud size={24} className="text-emerald-500" />,
+                    icon: <Cloud size={24} className="text-[var(--pro-azure)]" />,
                     title: 'OVDS Cloud',
                     desc: 'Hosted by OVDS. Maintenance, updates, and backups handled for you.',
                     badge: 'RECOMMENDED',
@@ -625,8 +628,8 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                       onClick={() => setC({ deploymentType: opt.key })}
                       className={`relative flex flex-col items-start gap-3 p-4 rounded-xl border-2 text-left transition-all duration-150 ${
                         active
-                          ? 'border-emerald-500 bg-white dark:bg-slate-900 shadow-sm'
-                          : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-emerald-300 dark:hover:border-emerald-700'
+                          ? 'border-[var(--pro-azure)] bg-white dark:bg-slate-900 shadow-sm'
+                          : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-[var(--pro-azure-light)] dark:hover:border-green-700'
                       }`}
                     >
                       {opt.badge && (
@@ -635,16 +638,16 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                         </span>
                       )}
                       {/* Icon in a coloured box */}
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${active ? 'bg-emerald-50 dark:bg-emerald-950/40' : 'bg-gray-50 dark:bg-slate-800'}`}>
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${active ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/40' : 'bg-gray-50 dark:bg-slate-800'}`}>
                         {opt.icon}
                       </div>
                       <div>
-                        <p className={`text-[13px] font-extrabold leading-tight ${active ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-800 dark:text-slate-200'}`}>{opt.title}</p>
+                        <p className={`text-[13px] font-extrabold leading-tight ${active ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-gray-800 dark:text-slate-200'}`}>{opt.title}</p>
                         <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-1 leading-relaxed">{opt.desc}</p>
                       </div>
                       {/* Radio dot */}
                       <div className={`absolute bottom-3 right-3 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${
-                        active ? 'border-emerald-500' : 'border-gray-300 dark:border-slate-600'
+                        active ? 'border-[var(--pro-azure)]' : 'border-gray-300 dark:border-slate-600'
                       }`} style={active ? { background: '#55bc7e' } : {}}>
                         {active && <Check size={9} className="text-white" />}
                       </div>
@@ -668,7 +671,7 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                       <Key size={11} /> API Key
                     </label>
                     <a href="https://ovds.com.et/login" target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 hover:text-emerald-700 hover:underline transition-colors">
+                      className="flex items-center gap-1 text-[10px] font-bold text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] hover:underline transition-colors">
                       Get key at ovds.com.et <ExternalLink size={9} />
                     </a>
                   </div>
@@ -679,14 +682,14 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                       value={company.apiKey}
                       onChange={e => setC({ apiKey: e.target.value })}
                       placeholder="Paste your API key from ovds.com.et"
-                      className="w-full pl-8 pr-10 py-2.5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:border-gray-300 dark:hover:border-slate-600 rounded-xl text-sm font-mono text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-600 placeholder:font-sans focus:outline-none focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/40 focus:border-emerald-400 transition-all"
+                      className="w-full pl-8 pr-10 py-2.5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:border-gray-300 dark:hover:border-slate-600 rounded-xl text-sm font-mono text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-600 placeholder:font-sans focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure-100)] dark:focus:ring-green-900/40 focus:border-[var(--pro-azure)] transition-all"
                     />
                     <button type="button" onClick={() => setShowApiKey(v => !v)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition-colors">
                       {showApiKey ? <EyeOff size={14} /> : <Eye size={14} />}
                     </button>
                   </div>
-                  <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-1">Sign up at <a href="https://ovds.com.et" target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">ovds.com.et</a> → log in → copy the API key from the top of your Account Dashboard.</p>
+                  <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-1">Sign up at <a href="https://ovds.com.et" target="_blank" rel="noopener noreferrer" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold hover:underline">ovds.com.et</a> → log in → copy the API key from the top of your Account Dashboard.</p>
                 </div>
               )}
             </div>
@@ -928,8 +931,8 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
           {/* -- Step 3: Users -- */}
           {step === 3 && (
             <div className="space-y-3">
-              <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl">
-                <p className="text-xs text-emerald-700 dark:text-emerald-400">
+              <div className="p-3 bg-[var(--pro-azure-50)] dark:bg-green-950/30 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl">
+                <p className="text-xs text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
                   Users will be created with a secure temporary password — they should change it on first login. You can also add users later from <span className="font-bold">Settings → Users</span>.
                 </p>
               </div>
@@ -949,7 +952,7 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                     <select
                       value={inv.role}
                       onChange={e => setInvites(prev => prev.map((x, j) => j === i ? { ...x, role: e.target.value } : x))}
-                      className="px-3 py-2.5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/40 shrink-0 transition-all"
+                      className="px-3 py-2.5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure-100)] dark:focus:ring-green-900/40 shrink-0 transition-all"
                     >
                       <option value="ADMIN">Admin</option>
                        <option value="OVDS">OVDS</option>
@@ -971,7 +974,7 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
               </div>
               <button
                 onClick={() => setInvites(prev => [...prev, { email: '', role: 'EMPLOYEE' }])}
-                className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:underline"
+                className="flex items-center gap-1.5 text-xs font-bold text-[var(--pro-azure)] hover:underline"
               >
                 <Plus size={12} /> Add another user
               </button>
@@ -990,16 +993,16 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                 <p className="text-[10px] font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-2">Pre-Installed</p>
                 <div className="space-y-2">
                   {APPS.filter(a => a.preInstalled).map(app => (
-                    <div key={app.key} className="flex items-center gap-3 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20">
+                    <div key={app.key} className="flex items-center gap-3 p-3 rounded-xl border border-[var(--pro-azure-100)] dark:border-green-800 bg-[var(--pro-azure-50)]/50 dark:bg-green-950/20">
                       <span className="text-lg shrink-0">{app.icon}</span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-bold text-gray-800 dark:text-slate-200">{app.label}</p>
-                          <span className="px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-[10px] font-medium rounded uppercase tracking-wider">Installed</span>
+                          <span className="px-1.5 py-0.5 bg-[var(--pro-azure-100)] dark:bg-green-900/40 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] text-[10px] font-medium rounded uppercase tracking-wider">Installed</span>
                         </div>
                         <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-0.5 leading-snug">{app.desc}</p>
                       </div>
-                      <Check size={15} className="text-emerald-500 shrink-0" />
+                      <Check size={15} className="text-[var(--pro-azure)] shrink-0" />
                     </div>
                   ))}
                 </div>
@@ -1018,8 +1021,8 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                         aria-pressed={active}
                         className={`flex items-start gap-2.5 p-3 rounded-xl border text-left transition-all ${
                           active
-                            ? 'border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/20'
-                            : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-emerald-500/40'
+                            ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/20'
+                            : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-[var(--pro-azure)]/40'
                         }`}
                       >
                         <span className="text-base shrink-0 mt-0.5">{app.icon}</span>
@@ -1028,7 +1031,7 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                           <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-0.5 leading-snug line-clamp-2">{app.desc}</p>
                         </div>
                         <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all ${
-                          active ? 'border-emerald-600 bg-emerald-500' : 'border-gray-300 dark:border-slate-600'
+                          active ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]0' : 'border-gray-300 dark:border-slate-600'
                         }`}>
                           {active && <Check size={8} className="text-white" />}
                         </div>
@@ -1051,8 +1054,8 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                         aria-pressed={active}
                         className={`w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${
                           active
-                            ? 'border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/20'
-                            : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-emerald-500/40'
+                            ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/20'
+                            : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-[var(--pro-azure)]/40'
                         }`}
                       >
                         <span className="text-lg shrink-0">{app.icon}</span>
@@ -1064,7 +1067,7 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                           <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-0.5 leading-snug">{app.desc}</p>
                         </div>
                         <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                          active ? 'border-emerald-600 bg-emerald-500' : 'border-gray-300 dark:border-slate-600'
+                          active ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]0' : 'border-gray-300 dark:border-slate-600'
                         }`}>
                           {active && <Check size={8} className="text-white" />}
                         </div>
@@ -1092,18 +1095,18 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                   const file = importFiles[tpl.key];
                   return (
                     <div key={tpl.key} className="flex items-center gap-3 p-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl">
-                      <FileSpreadsheet size={16} className="text-emerald-500 shrink-0" />
+                      <FileSpreadsheet size={16} className="text-[var(--pro-azure)] shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-bold text-gray-700 dark:text-slate-200">{tpl.label}</p>
                         {file
-                          ? <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-0.5 truncate">{file.name}</p>
+                          ? <p className="text-[10px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] mt-0.5 truncate">{file.name}</p>
                           : <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-0.5">{tpl.ext} template</p>
                         }
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <button
                           onClick={() => downloadTemplate(tpl.key, tpl.label)}
-                          className="text-[10px] font-bold text-emerald-600 hover:underline flex items-center gap-1"
+                          className="text-[10px] font-bold text-[var(--pro-azure)] hover:underline flex items-center gap-1"
                         >
                           ↓ Template
                         </button>
@@ -1142,8 +1145,8 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
           {step === 6 && (
             <div className="space-y-3">
               {/* Chain of Evidence visual */}
-              <div className="p-4 bg-emerald-700 rounded-xl border border-emerald-800">
-                <p className="text-[10px] font-medium uppercase tracking-wider text-emerald-200 mb-3">Ethiopian Accounting Chain of Evidence — 2026</p>
+              <div className="p-4 bg-[var(--pro-azure-dark)] rounded-xl border border-[var(--pro-azure-dark)]">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-green-200 mb-3">Ethiopian Accounting Chain of Evidence — 2026</p>
                 <div className="flex items-center gap-1 overflow-x-auto pb-1">
                   {[
                     { n: 1, label: 'Item',    icon: '📦' },
@@ -1157,13 +1160,13 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                     <div key={s.n} className="flex items-center shrink-0">
                       <div className="flex flex-col items-center gap-0.5">
                         <span className="text-sm">{s.icon}</span>
-                        <span className="text-[8px] font-bold text-emerald-100 whitespace-nowrap">{s.label}</span>
+                        <span className="text-[8px] font-bold text-green-100 whitespace-nowrap">{s.label}</span>
                       </div>
-                      {i < arr.length - 1 && <div className="w-4 h-px bg-emerald-500 mx-1" />}
+                      {i < arr.length - 1 && <div className="w-4 h-px bg-[var(--pro-azure-50)]0 mx-1" />}
                     </div>
                   ))}
                 </div>
-                <p className="text-[9px] text-emerald-300 mt-2">Every step must be linked. A missing journal entry breaks the chain → audit penalties.</p>
+                <p className="text-[9px] text-green-300 mt-2">Every step must be linked. A missing journal entry breaks the chain → audit penalties.</p>
               </div>
 
               <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl">
@@ -1215,21 +1218,21 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                 const score = [erca.tinVerified, erca.etaxActive, erca.qrEnabled, erca.monthlyFiling, erca.withholdingAgent, erca.drrfEnabled, erca.bitRegistered].filter(Boolean).length;
                 const pct = Math.round((score / 7) * 100);
                 return (
-                  <div className={`p-3 rounded-xl border ${pct >= 80 ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800' : pct >= 50 ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800' : 'bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700'}`}>
+                  <div className={`p-3 rounded-xl border ${pct >= 80 ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)] dark:border-green-800' : pct >= 50 ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800' : 'bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700'}`}>
                     <div className="flex items-center justify-between mb-1.5">
                       <p className="text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">Compliance Readiness</p>
-                      <span className={`text-xs font-semibold ${pct >= 80 ? 'text-emerald-600' : pct >= 50 ? 'text-amber-600' : 'text-gray-500'}`}>{pct}%</span>
+                      <span className={`text-xs font-semibold ${pct >= 80 ? 'text-[var(--pro-azure)]' : pct >= 50 ? 'text-amber-600' : 'text-gray-500'}`}>{pct}%</span>
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div className={`h-full rounded-full transition-all duration-500 ${pct >= 80 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-500' : 'bg-gray-400'}`} style={{ width: `${pct}%` }} />
+                      <div className={`h-full rounded-full transition-all duration-500 ${pct >= 80 ? 'bg-[var(--pro-azure-50)]0' : pct >= 50 ? 'bg-amber-500' : 'bg-gray-400'}`} style={{ width: `${pct}%` }} />
                     </div>
                     <p className="text-[10px] text-gray-400 mt-1">{score}/7 compliance items configured. {pct < 80 ? 'Enable more items to reduce audit risk.' : 'Excellent compliance posture.'}</p>
                   </div>
                 );
               })()}
 
-              <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl">
-                <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+              <div className="p-3 bg-[var(--pro-azure-50)] dark:bg-green-950/30 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl">
+                <p className="text-[10px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold">
                   These settings configure your compliance modules. You can update them anytime from Settings → Compliance. The system will auto-post journal entries for every invoice and bill to maintain the chain of evidence.
                 </p>
               </div>
@@ -1289,20 +1292,20 @@ const CompanySetupWizard: React.FC<Props> = ({ onClose, onComplete }) => {
                     <span className="text-base shrink-0 mt-0.5">{item.icon}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-lg">{item.standard}</span>
+                        <span className="text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/40 px-2 py-0.5 rounded-lg">{item.standard}</span>
                         <span className="text-xs font-bold text-gray-700 dark:text-slate-200">{item.title}</span>
                       </div>
                       <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-0.5 leading-relaxed">{item.desc}</p>
                     </div>
-                    <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0 mt-0.5">
-                      <Check size={11} className="text-emerald-600 dark:text-emerald-400" />
+                    <div className="w-5 h-5 rounded-full bg-[var(--pro-azure-100)] dark:bg-green-900/40 flex items-center justify-center shrink-0 mt-0.5">
+                      <Check size={11} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl">
-                <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">
+              <div className="p-3 bg-[var(--pro-azure-50)] dark:bg-green-950/30 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl">
+                <p className="text-[10px] text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] font-bold">
                   OVDS is pre-configured for full IFRS compliance as required by the Accounting and Auditing Board of Ethiopia (AABE). All financial reports include IFRS standard references and are audit-ready.
                 </p>
               </div>

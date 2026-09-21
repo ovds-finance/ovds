@@ -1,12 +1,19 @@
-import { Controller, Post, Body, UseGuards, Request, Get, Patch, Delete, Param, HttpCode, HttpStatus, BadRequestException, Res } from '@nestjs/common';
-import { Response } from 'express';
-import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { Controller, Post, Body, UseGuards, Request, Get, Patch, Delete, Param, Query, HttpCode, HttpStatus, BadRequestException, ConflictException, NotImplementedException, Res, ServiceUnavailableException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { Throttle } from '../common/throttle.decorator';
-import { CsrfProtectionMiddleware } from '../common/csrf-protection.middleware';
 import { ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_MAX_AGE, THROTTLE_TTL_MS, AUTH_LOGIN_THROTTLE_LIMIT, AUTH_REGISTER_THROTTLE_LIMIT } from '@ovds/shared';
+import { Response } from 'express';
+
+import { CsrfProtectionMiddleware } from '../common/csrf-protection.middleware';
+import { PasswordPolicyPipe } from '../common/password-policy.pipe';
+import { Throttle } from '../common/throttle.decorator';
+
+import { AuthService } from './auth.service';
+import { Permissions } from './decorators/permissions.decorator';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import { PermissionsGuard } from './guards/permissions.guard';
+import { RolesGuard } from './guards/roles.guard';
+
 
 @ApiTags('auth')
 @Controller('auth')
@@ -15,20 +22,27 @@ export class AuthController {
 
   private setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
     const isProduction = process.env.NODE_ENV === 'production';
-    const cookieBase = {
+
+    // Access token cookie:
+    //  - HttpOnly: JS cannot read it (XSS-safe)
+    //  - Secure: transmitted over HTTPS only
+    //  - SameSite=Strict: never sent on cross-site requests (strongest CSRF protection)
+    //  - Path=/api: scope cookie to API paths only (not served to static assets)
+    res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: 'lax' as const,
-      path: '/',
-    };
-
-    res.cookie('access_token', accessToken, {
-      ...cookieBase,
+      sameSite: 'strict',
+      path: '/api',
       maxAge: ACCESS_TOKEN_MAX_AGE,
     });
 
+    // Refresh token: same flags but longer-lived and scoped to the refresh endpoint
+    // so it is not sent on every API call.
     res.cookie('refresh_token', refreshToken, {
-      ...cookieBase,
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'strict',
+      path: '/api/auth/refresh',
       maxAge: REFRESH_TOKEN_MAX_AGE,
     });
 
@@ -40,6 +54,14 @@ export class AuthController {
     res.clearCookie('access_token', { path: '/' });
     res.clearCookie('refresh_token', { path: '/' });
     res.clearCookie('csrf_token', { path: '/' });
+  }
+
+  private getOtpService(): any {
+    const svc = (this.authService as any).otpService;
+    if (!svc) {
+      throw new ServiceUnavailableException('OTP service is not available');
+    }
+    return svc;
   }
 
   @Post('login')
@@ -60,19 +82,92 @@ export class AuthController {
   @Throttle(THROTTLE_TTL_MS, AUTH_REGISTER_THROTTLE_LIMIT)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register a new user' })
-  async register(@Body() body: { email: string; password: string; username: string; companyId?: string }) {
-    return this.authService.register(body);
+  async register(
+    @Body('password', PasswordPolicyPipe) _password: string,
+    @Body() body: {
+      email: string;
+      password: string;
+      username?: string;
+      companyId?: string;
+      firstName?: string;
+      lastName?: string;
+      companyName?: string;
+      phone?: string;
+      businessType?: string;
+      registrationType?: string;
+      website?: string;
+      referralCode?: string;
+      role?: string;
+      registrationMethod?: string;
+    },
+    @Res() res: Response,
+  ) {
+    const result = await this.authService.register({
+      ...body,
+      username: body.username || [body.firstName, body.lastName].filter(Boolean).join(' ') || body.email.split('@')[0],
+    });
+
+    // Set auth cookies — token delivered via HttpOnly cookie ONLY.
+    // access_token is intentionally omitted from the response body.
+    const csrfToken = this.setAuthCookies(res, result.access_token, result.refresh_token);
+    const { access_token, refresh_token, ...safe } = result;
+
+    return res.status(HttpStatus.CREATED).json({
+      success: true,
+      data: {
+        user: safe.user,
+        csrf_token: csrfToken,
+        // token_delivery indicates the client should read the HttpOnly cookie,
+        // not a body token. Omitting access_token here is intentional.
+        token_delivery: 'cookie',
+      },
+    });
+  }
+
+  @Get('check-email')
+  @Throttle(THROTTLE_TTL_MS, AUTH_REGISTER_THROTTLE_LIMIT)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Check whether an email is already registered' })
+  async checkEmail(@Query('email') email: string) {
+    if (!email) throw new BadRequestException('Email is required');
+    const exists = await this.authService.emailExists(email.trim().toLowerCase());
+    if (exists) throw new ConflictException('An account with this email already exists.');
+    return { success: true, available: true };
   }
 
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiOperation({ summary: 'Get current user profile from JWT payload (fast, no DB)' })
   getProfile(@Request() req: any) {
     return req.user;
   }
 
+  /**
+   * GET /auth/me
+   *
+   * Live DB profile endpoint used by AuthContext.tsx on every session mount
+   * to validate the stored JWT and sync any role/company changes made by an
+   * admin since the token was issued.
+   *
+   * Returns the same AuthUser shape the frontend login response provides so
+   * the context can merge the response directly into state.
+   */
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @Throttle(60000, 30)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get live DB profile for the authenticated user — used by frontend AuthContext on mount' })
+  @ApiResponse({ status: 200, description: 'Current user profile from database' })
+  @ApiResponse({ status: 401, description: 'Unauthorized — token invalid or expired' })
+  @ApiResponse({ status: 404, description: 'User record not found' })
+  async getMe(@Request() req: any) {
+    const data = await this.authService.getMe(req.user.userId);
+    return { success: true, data };
+  }
+
   @Post('logout')
   @UseGuards(JwtAuthGuard)
+  @Throttle(60000, 20)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout current user' })
   async logout(@Request() req: any, @Res() res: Response) {
@@ -85,6 +180,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @Throttle(60000, 10)
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh access token' })
@@ -101,8 +197,12 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Change password for current user' })
-  async changePassword(@Request() req: any, @Body() body: { oldPassword: string; newPassword: string }) {
-    return this.authService.changePassword(req.user.userId, body.oldPassword, body.newPassword);
+  async changePassword(
+    @Request() req: any,
+    @Body('oldPassword') oldPassword: string,
+    @Body('newPassword', PasswordPolicyPipe) newPassword: string,
+  ) {
+    return this.authService.changePassword(req.user.userId, oldPassword, newPassword);
   }
 
   @Get('api-keys')
@@ -131,6 +231,86 @@ export class AuthController {
     return this.authService.deleteApiKey(req.user.userId, id);
   }
 
+  @Get('users')
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+  @Permissions('users:read')
+  @Throttle(60000, 30)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'List users' })
+  async listUsers(@Query() query: any) {
+    const result = await this.authService.listUsers({
+      page: query.page ? parseInt(query.page) : undefined,
+      limit: query.limit ? parseInt(query.limit) : undefined,
+      search: query.search,
+      companyId: query.companyId,
+    });
+    return { success: true, data: result.data, total: result.total };
+  }
+
+  @Patch('users/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+  @Permissions('users:write')
+  @Throttle(60000, 20)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update a user' })
+  async updateUser(
+    @Param('id') id: string,
+    @Body() body: {
+      username?: string;
+      email?: string;
+      firstName?: string;
+      lastName?: string;
+      phone?: string;
+      role?: string;
+      isActive?: boolean;
+      companyId?: string;
+      businessType?: string;
+    },
+  ) {
+    return this.authService.updateUser(id, body);
+  }
+
+  @Delete('users/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+  @Permissions('users:delete')
+  @Throttle(60000, 10)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Delete a user' })
+  async deleteUser(@Param('id') id: string) {
+    return this.authService.deleteUser(id);
+  }
+
+  @Patch('users/:id/reset-password')
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+  @Permissions('users:write')
+  @Throttle(60000, 5)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset user password' })
+  async adminResetPassword(@Param('id') id: string, @Body() body: { newPassword: string }) {
+    return this.authService.resetUserPassword(id, body.newPassword);
+  }
+
+  @Get('users/:id/roles')
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+  @Permissions('users:read')
+  @Throttle(60000, 30)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get custom roles for a user' })
+  async getUserRoles(@Param('id') id: string) {
+    const roles = await this.authService.getUserRoles(id);
+    return { success: true, data: roles };
+  }
+
+  @Post('users/:id/roles')
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+  @Permissions('users:write')
+  @Throttle(60000, 10)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Assign custom roles to a user' })
+  async assignUserRoles(@Param('id') id: string, @Body() body: { roleIds: string[] }) {
+    return this.authService.assignUserRoles(id, body.roleIds);
+  }
+
   @Post('otp/send')
   @Throttle(60000, 3)
   @HttpCode(HttpStatus.OK)
@@ -145,7 +325,7 @@ export class AuthController {
     if (!allowedPurposes.includes(purpose.toUpperCase())) {
       throw new BadRequestException('Invalid OTP purpose');
     }
-    const code = await (this.authService as any).otpService?.generateOtp(email, purpose.toUpperCase());
+    await this.getOtpService().generateOtp(email, purpose.toUpperCase());
     return { success: true, message: 'OTP sent to email' };
   }
 
@@ -159,7 +339,7 @@ export class AuthController {
     if (!email || !code || !purpose) {
       throw new BadRequestException('Email, code, and purpose are required');
     }
-    const valid = await (this.authService as any).otpService?.verifyOtp(email, code, purpose.toUpperCase());
+    const valid = await this.getOtpService().verifyOtp(email, code, purpose.toUpperCase());
     return { success: valid, message: valid ? 'OTP verified' : 'Invalid OTP' };
   }
 
@@ -172,7 +352,7 @@ export class AuthController {
     if (!body.email) {
       throw new BadRequestException('Email is required');
     }
-    const code = await (this.authService as any).otpService?.generateOtp(body.email, 'PASSWORD_RESET');
+    await this.getOtpService().generateOtp(body.email, 'PASSWORD_RESET');
     return { success: true, message: 'Password reset OTP sent to email' };
   }
 
@@ -185,16 +365,20 @@ export class AuthController {
     if (!body.email || !body.code || !body.newPassword) {
       throw new BadRequestException('Email, code, and new password are required');
     }
-    const valid = await (this.authService as any).otpService?.verifyOtp(body.email, body.code, 'PASSWORD_RESET');
+    const valid = await this.getOtpService().verifyOtp(body.email, body.code, 'PASSWORD_RESET');
     if (!valid) {
       throw new BadRequestException('Invalid or expired OTP');
     }
+    // Validate password policy before persisting
+    const policyPipe = new PasswordPolicyPipe();
+    policyPipe.transform(body.newPassword);
     const result = await this.authService.changePasswordByEmail(body.email, body.newPassword);
     return result;
   }
 
   @Post('fcm-token')
   @UseGuards(JwtAuthGuard)
+  @Throttle(60000, 10)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Register Firebase Cloud Messaging token for push notifications' })
   async registerFcmToken(@Request() req: any, @Body() body: { token: string }) {
@@ -212,38 +396,71 @@ export class AuthController {
   }
 
   @Post('auth0/session')
-  @HttpCode(HttpStatus.NOT_IMPLEMENTED)
-  @ApiOperation({ summary: 'Create session from Auth0 token' })
-  @ApiResponse({ status: 501, description: 'Auth0 session requires proper token verification' })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Create session from Auth0 token (requires AUTH0_DOMAIN + AUTH0_CLIENT_SECRET)' })
+  @ApiResponse({ status: 501, description: 'Auth0 SSO not configured on this deployment' })
   async auth0Session(@Body() body: { token: string }) {
-    return { statusCode: HttpStatus.NOT_IMPLEMENTED, message: 'Auth0 SSO requires proper token verification via Auth0 JWKS' };
+    if (!body.token) throw new BadRequestException('token is required');
+    if (!(process.env['AUTH0_DOMAIN'] && process.env['AUTH0_CLIENT_SECRET'])) {
+      throw new NotImplementedException(
+        'Auth0 SSO is not configured. Set AUTH0_DOMAIN, AUTH0_CLIENT_ID, and AUTH0_CLIENT_SECRET.',
+      );
+    }
+    // Auth0 is configured — real JWKS verification delegated to authService
+    // when AUTH0_JWKS_URI integration is completed.
+    throw new NotImplementedException(
+      'Auth0 JWKS token verification requires the auth0-jwks-rsa package to be configured.',
+    );
   }
 
   @Get('google/status')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Check Google OAuth status' })
+  @ApiOperation({ summary: 'Check Google OAuth availability' })
   getGoogleStatus() {
-    return { enabled: false, provider: 'google' };
+    const enabled = !!(process.env['GOOGLE_CLIENT_ID'] && process.env['GOOGLE_CLIENT_SECRET']);
+    return { enabled, provider: 'google' };
   }
 
   @Post('fayda')
-  @HttpCode(HttpStatus.NOT_IMPLEMENTED)
-  @ApiOperation({ summary: 'Login with Fayda ID (Ethiopian digital ID)' })
+  @Throttle(THROTTLE_TTL_MS, AUTH_LOGIN_THROTTLE_LIMIT)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login with Fayda national digital ID (requires FAYDA_API_KEY)' })
+  @ApiResponse({ status: 501, description: 'Fayda API key not configured' })
   faydaLogin(@Body() body: { nationalId: string; pin: string }) {
-    return { statusCode: HttpStatus.NOT_IMPLEMENTED, message: 'Fayda requires FAYDA_API_KEY' };
+    if (!process.env['FAYDA_API_KEY']) {
+      throw new NotImplementedException(
+        'Fayda digital ID login is not available. Contact your system administrator to configure FAYDA_API_KEY.',
+      );
+    }
+    // Real Fayda integration goes here once the API key is provisioned
+    throw new NotImplementedException('Fayda API integration pending provisioning by the Ethiopian NIDP.');
   }
 
   @Post('tin')
-  @HttpCode(HttpStatus.NOT_IMPLEMENTED)
-  @ApiOperation({ summary: 'Login with TIN and PIN' })
+  @Throttle(THROTTLE_TTL_MS, AUTH_LOGIN_THROTTLE_LIMIT)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login with TIN and PIN (requires TIN_API_KEY)' })
+  @ApiResponse({ status: 501, description: 'TIN login API key not configured' })
   tinLogin(@Body() body: { tin: string; pin: string }) {
-    return { statusCode: HttpStatus.NOT_IMPLEMENTED, message: 'TIN login requires TIN_API_KEY' };
+    if (!process.env['TIN_API_KEY']) {
+      throw new NotImplementedException(
+        'TIN-based login is not available. Configure TIN_API_KEY to enable ERCA TIN authentication.',
+      );
+    }
+    throw new NotImplementedException('TIN API integration pending ERCA provisioning.');
   }
 
   @Post('ekyb/verify')
-  @HttpCode(HttpStatus.NOT_IMPLEMENTED)
-  @ApiOperation({ summary: 'Verify eKYB (electronic Know Your Business)' })
+  @Throttle(THROTTLE_TTL_MS, AUTH_LOGIN_THROTTLE_LIMIT)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify eKYB (electronic Know Your Business) via Fayda (requires EKYB_API_KEY)' })
+  @ApiResponse({ status: 501, description: 'eKYB API key not configured' })
   ekybVerify(@Body() body: { faydaId: string; tin?: string }) {
-    return { statusCode: HttpStatus.NOT_IMPLEMENTED, message: 'eKYB requires EKYB_API_KEY' };
+    if (!process.env['EKYB_API_KEY']) {
+      throw new NotImplementedException(
+        'eKYB verification is not available. Configure EKYB_API_KEY to enable electronic business verification.',
+      );
+    }
+    throw new NotImplementedException('eKYB API integration pending NIDP/ERCA provisioning.');
   }
 }

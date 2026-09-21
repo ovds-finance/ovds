@@ -5,22 +5,27 @@ import { Sparkline } from './ChartWidgets';
 import { useCountUp } from '../hooks/useCountUp';
 import { Icon } from './ui/icon';
 
+/**
+ * StatsCard — Ovds SaaS style KPI card.
+ *
+ * Design (matches .aki-kpi-card pattern):
+ *  - White surface, 1px border, 8px radius, subtle shadow
+ *  - Coloured 4px left-border accent stripe (Ovds SaaS signature)
+ *  - Icon badge: 48×48, rounded-xl, gradient bg
+ *  - Value: 24px bold mono tabular
+ *  - Trend pill: indigo / rose / slate
+ *  - Hover: translateY(-1px) + stronger shadow
+ *  - Sparkline: optional mini chart at bottom
+ *  - Insight: AI contextual strip at bottom
+ */
+
 interface StatsCardProps {
   label: string;
   value: string | number;
   icon?: React.ReactNode;
   color?:
-    | 'blue'
-    | 'green'
-    | 'yellow'
-    | 'red'
-    | 'purple'
-    | 'slate'
-    | 'orange'
-    | 'teal'
-    | 'emerald'
-    | 'amber'
-    | 'indigo';
+    | 'blue' | 'green' | 'indigo' | 'yellow' | 'amber'
+    | 'red' | 'purple' | 'slate' | 'orange' | 'teal' | 'indigo';
   trend?: number;
   trendLabel?: string;
   sub?: string;
@@ -30,169 +35,62 @@ interface StatsCardProps {
   sparkline?: number[];
   sparklineType?: 'area' | 'bar' | 'line';
   compact?: boolean;
-  /** Tooltip shown on hover */
   tooltip?: string;
-  /** Small badge label (e.g. "RBAC: read-only") */
   badge?: string;
-  /** Contextual AI-style insight shown at the bottom of the card */
   insight?: string;
 }
 
-const colorConfig: Record<
-  string,
-  {
-    bg: string;
-    text: string;
-    gradient: string;
-    shadow: string;
-    ring: string;
-    spark: string;
-    insightBg: string;
-  }
-> = {
-  blue: {
-    bg: 'bg-sky-50',
-    text: 'text-sky-600',
-    gradient: 'from-sky-500 to-sky-600',
-    shadow: 'shadow-sky-500/20',
-    ring: 'hover:ring-sky-200',
-    spark: '#0ea5e9',
-    insightBg: 'bg-sky-50 border-sky-200 text-sky-700',
-  },
-  green: {
-    bg: 'bg-emerald-50',
-    text: 'text-emerald-600',
-    gradient: 'from-emerald-500 to-emerald-600',
-    shadow: 'shadow-emerald-500/20',
-    ring: 'hover:ring-emerald-200',
-    spark: '#10b981',
-    insightBg: 'bg-emerald-50 border-emerald-200 text-emerald-700',
-  },
-  emerald: {
-    bg: 'bg-emerald-50',
-    text: 'text-emerald-600',
-    gradient: 'from-emerald-500 to-emerald-600',
-    shadow: 'shadow-emerald-500/20',
-    ring: 'hover:ring-emerald-200',
-    spark: '#10b981',
-    insightBg: 'bg-emerald-50 border-emerald-200 text-emerald-700',
-  },
-  yellow: {
-    bg: 'bg-amber-50',
-    text: 'text-amber-600',
-    gradient: 'from-amber-500 to-amber-600',
-    shadow: 'shadow-amber-500/20',
-    ring: 'hover:ring-amber-200',
-    spark: '#f59e0b',
-    insightBg: 'bg-amber-50 border-amber-200 text-amber-700',
-  },
-  amber: {
-    bg: 'bg-amber-50',
-    text: 'text-amber-600',
-    gradient: 'from-amber-500 to-amber-600',
-    shadow: 'shadow-amber-500/20',
-    ring: 'hover:ring-amber-200',
-    spark: '#f59e0b',
-    insightBg: 'bg-amber-50 border-amber-200 text-amber-700',
-  },
-  red: {
-    bg: 'bg-rose-50',
-    text: 'text-rose-600',
-    gradient: 'from-rose-500 to-rose-600',
-    shadow: 'shadow-rose-500/20',
-    ring: 'hover:ring-rose-200',
-    spark: '#f43f5e',
-    insightBg: 'bg-rose-50 border-rose-200 text-rose-700',
-  },
-  slate: {
-    bg: 'bg-slate-100',
-    text: 'text-slate-600',
-    gradient: 'from-slate-500 to-slate-600',
-    shadow: 'shadow-slate-500/20',
-    ring: 'hover:ring-slate-200',
-    spark: '#64748b',
-    insightBg: 'bg-slate-100 border-slate-200 text-slate-600',
-  },
-  orange: {
-    bg: 'bg-orange-50',
-    text: 'text-orange-600',
-    gradient: 'from-orange-500 to-orange-600',
-    shadow: 'shadow-orange-500/20',
-    ring: 'hover:ring-orange-200',
-    spark: '#f97316',
-    insightBg: 'bg-orange-50 border-orange-200 text-orange-700',
-  },
-  indigo: {
-    bg: 'bg-indigo-50',
-    text: 'text-indigo-600',
-    gradient: 'from-indigo-500 to-indigo-600',
-    shadow: 'shadow-indigo-500/20',
-    ring: 'hover:ring-indigo-200',
-    spark: '#6366f1',
-    insightBg: 'bg-indigo-50 border-indigo-200 text-indigo-700',
-  },
-  purple: {
-    bg: 'bg-violet-50',
-    text: 'text-violet-600',
-    gradient: 'from-violet-500 to-violet-600',
-    shadow: 'shadow-violet-500/20',
-    ring: 'hover:ring-violet-200',
-    spark: '#a855f7',
-    insightBg: 'bg-violet-50 border-violet-200 text-violet-700',
-  },
-  teal: {
-    bg: 'bg-teal-50',
-    text: 'text-teal-600',
-    gradient: 'from-teal-500 to-teal-600',
-    shadow: 'shadow-teal-500/20',
-    ring: 'hover:ring-teal-200',
-    spark: '#14b8a6',
-    insightBg: 'bg-teal-50 border-teal-200 text-teal-700',
-  },
+/* ── Colour config — border accent + icon gradient + sparkline ── */
+const COLOR_CFG: Record<string, {
+  border: string;
+  gradFrom: string;
+  gradTo: string;
+  shadow: string;
+  spark: string;
+  insightBg: string;
+  insightBorder: string;
+  insightText: string;
+}> = {
+  blue:    { border:'var(--pro-azure)',    gradFrom:'var(--pro-azure)',    gradTo:'var(--pro-azure-dark)', shadow:'rgba(79,186,111,0.25)',  spark:'var(--pro-azure)',    insightBg:'var(--pro-azure-50)',  insightBorder:'var(--pro-azure-100)',  insightText:'var(--pro-azure-dark)' },
+  green:   { border:'var(--pro-green)',    gradFrom:'var(--pro-green)',    gradTo:'var(--pro-green-dark)', shadow:'rgba(46,212,122,0.28)',  spark:'var(--pro-green)',    insightBg:'var(--pro-green-50)',  insightBorder:'var(--pro-green-100)',  insightText:'var(--pro-green-700)' },
+  indigo:  { border:'var(--pro-azure)',    gradFrom:'var(--pro-azure)',    gradTo:'var(--pro-azure-dark)', shadow:'rgba(79,186,111,0.25)',  spark:'var(--pro-azure)',    insightBg:'var(--pro-azure-50)',  insightBorder:'var(--pro-azure-100)',  insightText:'var(--pro-azure-dark)' },
+  yellow:  { border:'var(--pro-amber)',    gradFrom:'var(--pro-amber)',    gradTo:'#B7770D',               shadow:'rgba(230,126,34,0.22)',  spark:'var(--pro-amber)',    insightBg:'#FFFBEB',             insightBorder:'#FDE68A',              insightText:'#92400E' },
+  amber:   { border:'var(--pro-amber)',    gradFrom:'var(--pro-amber)',    gradTo:'#B7770D',               shadow:'rgba(230,126,34,0.22)',  spark:'var(--pro-amber)',    insightBg:'#FFFBEB',             insightBorder:'#FDE68A',              insightText:'#92400E' },
+  red:     { border:'var(--pro-rose)',     gradFrom:'var(--pro-rose)',     gradTo:'#B03A2E',               shadow:'rgba(231,76,60,0.22)',   spark:'var(--pro-rose)',     insightBg:'#FEF2F2',             insightBorder:'#FECACA',              insightText:'#991B1B' },
+  purple:  { border:'var(--pro-violet)',   gradFrom:'var(--pro-violet)',   gradTo:'#5B21B6',               shadow:'rgba(124,58,237,0.22)',  spark:'var(--pro-violet)',   insightBg:'#F5F3FF',             insightBorder:'#DDD6FE',              insightText:'#5B21B6' },
+  slate:   { border:'#94A3B8',             gradFrom:'#64748B',             gradTo:'#475569',               shadow:'rgba(100,116,139,0.22)', spark:'#64748B',             insightBg:'#F8FAFC',             insightBorder:'#E2E8F0',              insightText:'#475569' },
+  orange:  { border:'#F97316',             gradFrom:'#F97316',             gradTo:'#C2410C',               shadow:'rgba(249,115,22,0.22)',  spark:'#F97316',             insightBg:'#FFF7ED',             insightBorder:'#FED7AA',              insightText:'#9A3412' },
+  teal:    { border:'var(--pro-cyan)',      gradFrom:'var(--pro-cyan)',     gradTo:'#1F618D',               shadow:'rgba(41,128,185,0.22)',  spark:'var(--pro-cyan)',     insightBg:'#F0FDFA',             insightBorder:'#99F6E4',              insightText:'#134E4A' },
 };
 
-const AnimatedValue: React.FC<{ value: string | number; className: string }> = ({ value, className }) => {
-  // Coerce objects/null to safe string before passing to useCountUp
-  const safeValue = (value === null || value === undefined || typeof value === 'object')
-    ? '0'
-    : value;
-  const animated = useCountUp(safeValue);
-  return <p className={className}>{animated}</p>;
+const AnimatedValue: React.FC<{ value: string | number; style?: React.CSSProperties }> = ({ value, style }) => {
+  const safe = (value == null || typeof value === 'object') ? '0' : value;
+  const animated = useCountUp(safe);
+  return (
+    <p className="text-[24px] font-bold tabular-nums tracking-tight leading-none" style={style}>
+      {animated}
+    </p>
+  );
 };
 
 export const StatsCard: React.FC<StatsCardProps> = ({
-  label,
-  value,
-  icon,
-  color = 'blue',
-  trend,
-  trendLabel,
-  sub,
-  onClick,
-  link,
-  loading,
-  sparkline,
-  sparklineType = 'area',
-  compact = false,
-  tooltip,
-  badge,
-  insight,
+  label, value, icon, color = 'blue',
+  trend, trendLabel, sub, onClick, link,
+  loading, sparkline, sparklineType = 'area',
+  compact = false, tooltip, badge, insight,
 }) => {
-  const c = colorConfig[color];
-  const hasTrend = trend !== undefined;
-  const trendUp = hasTrend && trend > 0;
-  const trendDown = hasTrend && trend < 0;
-  const trendFlat = hasTrend && trend === 0;
-  const pad = compact ? 'p-3' : 'p-3.5';
+  const c = COLOR_CFG[color] ?? COLOR_CFG.blue;
   const [copied, setCopied] = useState(false);
+
+  const hasTrend  = trend !== undefined;
+  const trendUp   = hasTrend && trend! > 0;
+  const trendDown = hasTrend && trend! < 0;
+  const trendFlat = hasTrend && trend === 0;
 
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    // Safely convert value to string, handling objects/null
-    const str = (value === null || value === undefined || typeof value === 'object')
-      ? '0'
-      : String(value);
+    const str = (value == null || typeof value === 'object') ? '0' : String(value);
     navigator.clipboard.writeText(str).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
@@ -201,20 +99,35 @@ export const StatsCard: React.FC<StatsCardProps> = ({
 
   const inner = (
     <>
-      {/* Watermark icon — subtler, scales on hover */}
-      <div className="absolute -bottom-3 -right-3 opacity-[0.035] group-hover:opacity-[0.065] group-hover:scale-105 transition-all duration-700 ease-out pointer-events-none select-none">
+      {/* Watermark icon */}
+      <div
+        className="absolute -bottom-3 -right-3 pointer-events-none select-none"
+        style={{ opacity: 0.035 }}
+        aria-hidden="true"
+      >
         <div className="w-24 h-24">{icon}</div>
       </div>
 
       <div className="flex items-start justify-between gap-3 relative z-10">
         <div className="flex-1 min-w-0">
-          {/* Label row */}
-          <div className="flex items-center gap-1.5">
-            <p className="block text-[11px] font-black text-ovds-text-muted dark:text-ovds-text-subtle uppercase tracking-widest mb-2 ml-1 truncate">
+
+          {/* Label */}
+          <div className="flex items-center gap-1.5 mb-2">
+            <p
+              className="text-[10px] font-black uppercase tracking-widest truncate"
+              style={{ color: 'var(--text-4)' }}
+            >
               {label}
             </p>
             {badge && (
-              <span className="shrink-0 text-[8px] font-semibold px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded uppercase tracking-wider border border-slate-200">
+              <span
+                className="shrink-0 text-[8px] font-semibold px-1.5 py-0.5 rounded uppercase tracking-wider"
+                style={{
+                  background: 'var(--surface-alt)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-4)',
+                }}
+              >
                 {badge}
               </span>
             )}
@@ -222,30 +135,28 @@ export const StatsCard: React.FC<StatsCardProps> = ({
 
           {/* Value */}
           {loading ? (
-            <div className="mt-2 space-y-1.5">
-              <div className="h-7 w-24 bg-slate-100 rounded-lg ovds-shimmer" />
-              {sub && <div className="h-3 w-20 bg-slate-100 rounded ovds-shimmer" />}
+            <div className="space-y-1.5">
+              <div className="h-6 w-24 rounded-lg" style={{ background: 'var(--border)', animation: 'aki-shimmer 1.4s ease-in-out infinite' }} />
+              {sub && <div className="h-3 w-20 rounded" style={{ background: 'var(--border)' }} />}
             </div>
           ) : (
             <>
               <div className="flex items-center gap-1.5 group/val">
-                <AnimatedValue
-                  value={value}
-                  className={`${compact ? 'text-lg' : 'text-2xl'} font-black tracking-tight mt-1 count-up ${c.text} tabular-nums`}
-                />
+                <AnimatedValue value={value} style={{ color: c.border }} />
                 <button
                   onClick={handleCopy}
-                  className="opacity-0 group-hover/val:opacity-100 mt-1.5 p-1 rounded-lg hover:bg-slate-100 transition-all"
+                  className="opacity-0 group-hover/val:opacity-100 mt-0.5 p-1 rounded-lg transition-all"
+                  style={{ color: 'var(--text-4)' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-alt)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   title="Copy value"
+                  aria-label="Copy value"
                 >
-                  {copied
-                    ? <Check size={11} className="text-emerald-500" />
-                    : <Copy size={11} className="text-slate-400" />
-                  }
+                  {copied ? <Check size={11} style={{ color: 'var(--pro-azure)' }} /> : <Copy size={11} />}
                 </button>
               </div>
               {sub && (
-                <p className="text-[10px] text-slate-400 font-medium mt-0.5 truncate leading-relaxed">
+                <p className="text-[10px] font-medium mt-0.5 truncate" style={{ color: 'var(--text-4)' }}>
                   {sub}
                 </p>
               )}
@@ -255,55 +166,97 @@ export const StatsCard: React.FC<StatsCardProps> = ({
           {/* Trend */}
           {!loading && hasTrend && (
             <div
-              className={`inline-flex items-center gap-1 mt-2 px-1.5 py-0.5 rounded-lg text-[10px] font-semibold transition-colors ${
+              className="inline-flex items-center gap-1 mt-2 px-1.5 py-0.5 rounded-lg text-[10px] font-semibold"
+              style={
                 trendUp
-                  ? 'bg-emerald-50 text-emerald-600'
+                  ? { background: 'var(--pro-azure-50)', color: 'var(--pro-azure-dark)' }
                   : trendDown
-                    ? 'bg-rose-50 text-rose-600'
-                    : 'bg-slate-100 text-slate-500'
-              }`}
+                    ? { background: '#FEF2F2', color: '#9F1239' }
+                    : { background: 'var(--surface-alt)', color: 'var(--text-4)' }
+              }
             >
-              {trendUp && <TrendingUp size={10} />}
+              {trendUp   && <TrendingUp  size={10} />}
               {trendDown && <TrendingDown size={10} />}
               {trendFlat && <Minus size={10} />}
               <span>{trendUp ? '+' : ''}{trend}%</span>
-              {trendLabel && (
-                <span className="opacity-60 font-normal">{trendLabel}</span>
-              )}
+              {trendLabel && <span style={{ opacity: 0.65, fontWeight: 400 }}>{trendLabel}</span>}
             </div>
           )}
         </div>
 
-        {/* Icon badge — emerald bg, white icon */}
-        <div
-          className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${c.gradient} flex items-center justify-center text-white shadow-xl ${c.shadow} group-hover:scale-105 transition-all duration-200 shrink-0 ${loading ? 'opacity-40' : ''}`}
-        >
-          <span>{icon}</span>
-        </div>
+        {/* Icon badge */}
+        {icon && (
+          <div
+            className="w-12 h-12 rounded-xl flex items-center justify-center text-white shrink-0 transition-transform duration-200 group-hover:scale-105"
+            style={{
+              background: `linear-gradient(135deg, ${c.gradFrom} 0%, ${c.gradTo} 100%)`,
+              boxShadow: `0 4px 14px ${c.shadow}`,
+              opacity: loading ? 0.4 : 1,
+            }}
+          >
+            {icon}
+          </div>
+        )}
       </div>
 
       {/* Sparkline */}
       {!loading && sparkline && sparkline.length > 1 && (
         <div className="mt-3 -mx-1">
-          <Sparkline data={sparkline} color={c.spark} type={sparklineType} height={34} />
+          <Sparkline data={sparkline} color={c.spark} type={sparklineType} height={32} />
         </div>
       )}
 
-      {/* Contextual insight — shown only when provided and not loading */}
+      {/* Contextual insight */}
       {!loading && insight && (
-        <div className={`mt-3 flex items-start gap-1.5 px-2.5 py-2 rounded-xl border text-[10px] font-medium leading-snug ${c.insightBg} animate-in fade-in duration-500`}>
-          <Icon name="INFO" size={10} className="shrink-0 mt-0.5 opacity-70" />
+        <div
+          className="mt-3 flex items-start gap-1.5 px-2.5 py-2 rounded-xl border text-[10px] font-medium leading-snug"
+          style={{
+            background: c.insightBg,
+            borderColor: c.insightBorder,
+            color: c.insightText,
+            animation: 'aki-fade-in 500ms ease both',
+          }}
+        >
+          <Icon name="INFO" size={10} style={{ flexShrink: 0, marginTop: 1, opacity: 0.7 }} />
           <span>{insight}</span>
         </div>
       )}
     </>
   );
 
-  const cls = `${compact ? 'p-4' : 'p-6'} bg-ovds-surface dark:bg-ovds-surface-dark border border-ovds-border dark:border-ovds-muted-dark rounded-3xl transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1 hover:border-emerald-500/50 group relative overflow-hidden ${onClick || link ? 'cursor-pointer active:scale-[0.99]' : ''}`;
+  const cls = [
+    compact ? 'p-4' : 'p-5',
+    'relative overflow-hidden group rounded-lg transition-all duration-200',
+    onClick || link ? 'cursor-pointer active:scale-[0.99]' : '',
+  ].join(' ');
+
+  const style: React.CSSProperties = {
+    background: 'var(--surface)',
+    border: '1px solid var(--border)',
+    borderLeft: `4px solid ${c.border}`,       // ← Ovds SaaS signature left accent
+    boxShadow: 'var(--card-shadow)',
+  };
+
+  const hoverStyle = {
+    boxShadow: 'var(--card-shadow-hover)',
+    transform: 'translateY(-1px)',
+    borderColor: 'var(--border)',              // keep right/top/bottom consistent
+  };
 
   if (link) {
     return (
-      <Link to={link} className={cls} aria-label={`${label}: ${value}`} title={tooltip}>
+      <Link
+        to={link}
+        className={cls}
+        style={style}
+        aria-label={`${label}: ${value}`}
+        title={tooltip}
+        onMouseEnter={e => Object.assign((e.currentTarget as HTMLElement).style, hoverStyle)}
+        onMouseLeave={e => {
+          (e.currentTarget as HTMLElement).style.boxShadow = 'var(--card-shadow)';
+          (e.currentTarget as HTMLElement).style.transform = '';
+        }}
+      >
         {inner}
       </Link>
     );
@@ -313,10 +266,16 @@ export const StatsCard: React.FC<StatsCardProps> = ({
     <div
       onClick={onClick}
       className={cls}
+      style={style}
       role={onClick ? 'button' : undefined}
       aria-label={onClick ? `${label}: ${value}` : undefined}
       tabIndex={onClick ? 0 : undefined}
       title={tooltip}
+      onMouseEnter={e => { if (onClick || !onClick) Object.assign((e.currentTarget as HTMLElement).style, hoverStyle); }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLElement).style.boxShadow = 'var(--card-shadow)';
+        (e.currentTarget as HTMLElement).style.transform = '';
+      }}
     >
       {inner}
     </div>

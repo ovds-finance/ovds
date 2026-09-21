@@ -1,4 +1,3 @@
-import React, { useState, useMemo } from 'react';
 import {
   useAccreditationList,
   useAccreditation,
@@ -10,7 +9,6 @@ import {
   useAccreditationSummary,
 } from '@ovds/features/eims';
 import { ACCREDITATION_SECTION_META, ACCREDITATION_SECTION_ORDER } from '@ovds/shared';
-import toast from 'react-hot-toast';
 import {
   Shield, Plus, ChevronRight, ChevronLeft, Trash2, Search,
   ClipboardList, BarChart3, FileText, CheckCircle2, X, Save,
@@ -18,16 +16,18 @@ import {
   Server, Smartphone, Monitor, Cloud, ShoppingCart, Award,
   UserCheck, FlaskConical, AlertTriangle,
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
 
 const STATUS_COLORS: Record<string, string> = {
   DRAFT: 'text-slate-600 bg-slate-100',
   IN_PROGRESS: 'text-amber-600 bg-amber-50',
-  COMPLETED: 'text-emerald-600 bg-emerald-50',
+  COMPLETED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   PENDING: 'text-slate-500 bg-slate-100',
-  PASS: 'text-emerald-600 bg-emerald-50',
+  PASS: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   FAIL: 'text-rose-600 bg-rose-50',
   NOT_APPLICABLE: 'text-slate-400 bg-slate-50',
-  RECOMMENDED: 'text-emerald-600 bg-emerald-50',
+  RECOMMENDED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   NOT_RECOMMENDED: 'text-rose-600 bg-rose-50',
   WITH_CONDITIONS: 'text-amber-600 bg-amber-50',
 };
@@ -147,7 +147,7 @@ const AccreditationChecklistPage: React.FC = () => {
 
   const handleUpdateItem = async (id: string, data: Record<string, unknown>) => {
     try {
-      await updateItem.mutateAsync({ id, data });
+      await updateItem.mutateAsync({ checklistId: selectedId ?? '', itemId: id, data });
       refetchItems();
     } catch (e: any) {
       toast.error(e.message);
@@ -170,8 +170,8 @@ const AccreditationChecklistPage: React.FC = () => {
   };
 
   const filteredChecklists = useMemo(() => {
-    if (!listData?.data) return [];
-    return listData.data.filter((c: any) => {
+    if (!listData) return [];
+    return (listData as any[]).filter((c: any) => {
       const matchesSearch = !searchQuery ||
         c.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         c.softwareName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -241,14 +241,14 @@ const AccreditationChecklistPage: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <Shield className="text-blue-600" size={22} />
+              <Shield className="text-[var(--pro-azure)]" size={22} />
               Sales Registration Systems Accreditation
             </h1>
             <p className="text-sm text-slate-500 mt-1">Directive No. 1142/2026 Compliance Checklist</p>
           </div>
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-lg hover:bg-[var(--pro-azure-dark)] text-sm font-medium"
           >
             <Plus size={16} />
             New Checklist
@@ -267,11 +267,11 @@ const AccreditationChecklistPage: React.FC = () => {
               <div className="text-xs text-slate-500 mt-1">In Progress</div>
             </div>
             <div className="bg-white rounded-xl border border-slate-200 p-4">
-              <div className="text-2xl font-bold text-emerald-600">{summaryData.completedChecklists}</div>
+              <div className="text-2xl font-bold text-[var(--pro-azure)]">{summaryData.completedChecklists}</div>
               <div className="text-xs text-slate-500 mt-1">Completed</div>
             </div>
             <div className="bg-white rounded-xl border border-slate-200 p-4">
-              <div className="text-2xl font-bold text-blue-600">{summaryData.complianceScore}%</div>
+              <div className="text-2xl font-bold text-[var(--pro-azure)]">{summaryData.complianceScore}%</div>
               <div className="text-xs text-slate-500 mt-1">Avg Compliance</div>
             </div>
           </div>
@@ -324,7 +324,7 @@ const AccreditationChecklistPage: React.FC = () => {
                     <td className="px-4 py-3">
                       <button
                         onClick={() => setSelectedId(c.id)}
-                        className="font-medium text-slate-900 hover:text-blue-600"
+                        className="font-medium text-slate-900 hover:text-[var(--pro-azure)]"
                       >
                         {c.title}
                       </button>
@@ -343,7 +343,7 @@ const AccreditationChecklistPage: React.FC = () => {
                     <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => setSelectedId(c.id)}
-                        className="p-1.5 text-slate-400 hover:text-blue-600 rounded"
+                        className="p-1.5 text-slate-400 hover:text-[var(--pro-azure)] rounded"
                       >
                         <ChevronRight size={16} />
                       </button>
@@ -441,7 +441,7 @@ const AccreditationChecklistPage: React.FC = () => {
                 <button
                   onClick={handleCreate}
                   disabled={createChecklist.isPending}
-                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  className="px-4 py-2 text-sm bg-[var(--pro-azure)] text-white rounded-lg hover:bg-[var(--pro-azure-dark)] disabled:opacity-50"
                 >
                   {createChecklist.isPending ? 'Creating...' : 'Create Checklist'}
                 </button>
@@ -501,11 +501,11 @@ const AccreditationChecklistPage: React.FC = () => {
         <div className="bg-white rounded-xl border border-slate-200 p-4 mb-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold text-slate-700">Overall Compliance</span>
-            <span className="text-lg font-bold text-blue-600">{overallStats.score}%</span>
+            <span className="text-lg font-bold text-[var(--pro-azure)]">{overallStats.score}%</span>
           </div>
           <div className="h-3 bg-slate-100 rounded-full overflow-hidden flex">
             {overallStats.pass > 0 && (
-              <div className="bg-emerald-500 h-full" style={{ width: `${(overallStats.pass / overallStats.total) * 100}%` }} />
+              <div className="bg-[var(--pro-azure-50)]0 h-full" style={{ width: `${(overallStats.pass / overallStats.total) * 100}%` }} />
             )}
             {overallStats.na > 0 && (
               <div className="bg-slate-300 h-full" style={{ width: `${(overallStats.na / overallStats.total) * 100}%` }} />
@@ -518,7 +518,7 @@ const AccreditationChecklistPage: React.FC = () => {
             )}
           </div>
           <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Pass: {overallStats.pass}</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[var(--pro-azure-50)]0" /> Pass: {overallStats.pass}</span>
             <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-500" /> Fail: {overallStats.fail}</span>
             <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-300" /> N/A: {overallStats.na}</span>
             <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-100 border border-slate-200" /> Pending: {overallStats.pending}</span>
@@ -573,7 +573,7 @@ const AccreditationChecklistPage: React.FC = () => {
             onClick={() => setItemFilter(f)}
             className={`px-2.5 py-1 text-xs rounded-full font-medium ${
               itemFilter === f
-                ? 'bg-blue-100 text-blue-700'
+                ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
@@ -595,13 +595,13 @@ const AccreditationChecklistPage: React.FC = () => {
               {/* Section Header */}
               <div className="bg-slate-50 px-4 py-3 flex items-center justify-between border-b border-slate-200">
                 <div className="flex items-center gap-2">
-                  <span className="text-blue-600">{SECTION_ICONS[sectionKey]}</span>
+                  <span className="text-[var(--pro-azure)]">{SECTION_ICONS[sectionKey]}</span>
                   <span className="text-sm font-semibold text-slate-700">{meta.label}</span>
                   <span className="text-xs text-slate-400">({meta.directive})</span>
                 </div>
                 {stats && (
                   <div className="flex items-center gap-2 text-xs">
-                    <span className="text-emerald-600 font-medium">{stats.pass}P</span>
+                    <span className="text-[var(--pro-azure)] font-medium">{stats.pass}P</span>
                     <span className="text-rose-600 font-medium">{stats.fail}F</span>
                     <span className="text-slate-400 font-medium">{stats.na}N/A</span>
                     <span className="text-slate-400">({stats.total})</span>
@@ -650,7 +650,7 @@ const AccreditationChecklistPage: React.FC = () => {
         <div className="mt-6 rounded-xl border border-slate-200 overflow-hidden">
           <div className="bg-slate-50 px-4 py-3 border-b border-slate-200">
             <div className="flex items-center gap-2">
-              <BarChart3 size={14} className="text-blue-600" />
+              <BarChart3 size={14} className="text-[var(--pro-azure)]" />
               <span className="text-sm font-semibold text-slate-700">Overall Assessment & Recommendation</span>
             </div>
           </div>

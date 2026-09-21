@@ -24,7 +24,7 @@ const features = [
 
 const alias: Record<string, string> = {};
 for (const d of domains) {
-  alias[`@ovds/domains/${d}`] = path.resolve(__dirname, `packages/domains/${d}/src/index.ts`);
+  alias[`@ovds/domains-${d}`] = path.resolve(__dirname, `packages/domains/${d}/src/index.ts`);
 }
 for (const f of features) {
   alias[`@ovds/features/${f}`] = path.resolve(__dirname, `packages/features/${f}/src/index.ts`);
@@ -35,7 +35,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
-    setupFiles: ['apps/backend/test/jest-compat.setup.ts'],
+    setupFiles: [path.resolve(__dirname, 'apps/backend/test/jest-compat.setup.ts')],
     pool: 'threads',
     poolOptions: {
       threads: {

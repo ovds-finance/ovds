@@ -1,4 +1,4 @@
-/**
+﻿/**
  * TabManager — Browser-like persistent multi-tab navigation
  *
  * Allows users to keep multiple pages open simultaneously (e.g., an invoice
@@ -12,9 +12,6 @@
  *   - Cmd+T / Ctrl+T opens current route in new tab
  *   - Tab state persisted to localStorage
  */
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Icon } from '../ui';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -23,6 +20,10 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+import { Icon } from '../ui';
 
 export interface Tab {
   id: string;
@@ -122,6 +123,7 @@ export const TabManagerProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setTabs([newTab]);
       setActiveTabId(newTab.id);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, location.search]);
 
   const openTab = useCallback((path: string, title: string, icon?: string) => {
@@ -209,6 +211,7 @@ export const TabManagerProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTabManager() {
   const ctx = useContext(TabManagerContext);
   if (!ctx) throw new Error('useTabManager must be used inside TabManagerProvider');
@@ -235,32 +238,47 @@ const SortableTab: React.FC<{
   return (
     <div
       ref={setNodeRef}
-      style={style}
       {...attributes}
       {...listeners}
       role="tab"
       aria-selected={isActive}
       onClick={onActivate}
       onMouseDown={e => e.button === 1 && onClose()}
-      className={[
-        'group/tab relative flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium',
-        'border-r border-slate-200 dark:border-slate-700 max-w-[180px] min-w-[80px] shrink-0',
-        'transition-colors cursor-pointer select-none',
-        isActive
-          ? 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 border-b-2 border-b-[#0056D2] -mb-px'
-          : 'bg-white dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-700',
-      ].join(' ')}
+      className="group/tab relative flex items-center gap-1.5 px-3 py-0 text-[11px] font-medium max-w-[180px] min-w-[80px] shrink-0 cursor-pointer select-none transition-colors"
+      style={{
+        ...style,
+        height: '100%',
+        borderRight: '1px solid var(--border)',
+        background: isActive ? 'var(--surface)' : 'transparent',
+        color: isActive ? 'var(--text)' : 'var(--text-4)',
+        marginBottom: isActive ? 0 : undefined,
+        boxShadow: isActive
+          ? 'inset 0 -2px 0 var(--pro-azure)'
+          : undefined,
+        fontWeight: isActive ? 600 : 500,
+      }}
+      onMouseEnter={e => {
+        if (!isActive)
+          (e.currentTarget as HTMLDivElement).style.background = 'var(--surface-alt)';
+      }}
+      onMouseLeave={e => {
+        if (!isActive)
+          (e.currentTarget as HTMLDivElement).style.background = 'transparent';
+      }}
     >
       {/* Pin indicator */}
       {tab.pinned && (
-        <span className="shrink-0 text-amber-500">
+        <span className="shrink-0" style={{ color: 'var(--pro-amber)' }}>
           <Icon name="STAR" size={9} className="fill-current" />
         </span>
       )}
 
       {/* Icon */}
       {tab.icon && (
-        <span className={`shrink-0 ${isActive ? 'text-[#0056D2]' : 'text-slate-400'}`}>
+        <span
+          className="shrink-0 transition-colors"
+          style={{ color: isActive ? 'var(--pro-azure)' : 'var(--text-5)' }}
+        >
           <Icon name={tab.icon as any} size={11} />
         </span>
       )}
@@ -268,30 +286,32 @@ const SortableTab: React.FC<{
       {/* Title */}
       <span className="truncate flex-1 leading-none">{tab.title}</span>
 
-      {/* Close / pin actions */}
+      {/* Close button */}
       {tab.closeable !== false && !tab.pinned && (
         <button
           type="button"
           onClick={e => { e.stopPropagation(); onClose(); }}
-          className="shrink-0 w-3.5 h-3.5 flex items-center justify-center rounded
-                     text-slate-400 hover:text-slate-600 dark:hover:text-slate-200
-                     opacity-0 group-hover/tab:opacity-100 transition-opacity"
+          className="shrink-0 w-3.5 h-3.5 flex items-center justify-center rounded opacity-0 group-hover/tab:opacity-100 transition-opacity"
+          style={{ color: 'var(--text-4)' }}
+          onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = 'var(--text)')}
+          onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = 'var(--text-4)')}
           aria-label={`Close ${tab.title}`}
         >
           <Icon name="CLOSE" size={9} />
         </button>
       )}
 
-      {/* Context menu on right-click */}
+      {/* Pin toggle */}
       <button
         type="button"
         onClick={e => { e.stopPropagation(); onPin(); }}
         title={tab.pinned ? 'Unpin tab' : 'Pin tab'}
-        className="shrink-0 w-3.5 h-3.5 flex items-center justify-center rounded
-                   text-slate-400 hover:text-amber-500
-                   opacity-0 group-hover/tab:opacity-100 transition-opacity"
+        className="shrink-0 w-3.5 h-3.5 flex items-center justify-center rounded opacity-0 group-hover/tab:opacity-100 transition-opacity"
+        style={{ color: tab.pinned ? 'var(--pro-amber)' : 'var(--text-4)' }}
+        onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = 'var(--pro-amber)')}
+        onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = tab.pinned ? 'var(--pro-amber)' : 'var(--text-4)')}
       >
-        <Icon name="STAR" size={9} className={tab.pinned ? 'fill-current text-amber-500' : ''} />
+        <Icon name="STAR" size={9} className={tab.pinned ? 'fill-current' : ''} />
       </button>
     </div>
   );
@@ -328,10 +348,20 @@ export const TabBar: React.FC = () => {
     <div
       role="tablist"
       aria-label="Open pages"
-      className="flex items-stretch h-9 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 overflow-hidden"
+      style={{
+        display: 'flex',
+        alignItems: 'stretch',
+        height: 36,
+        background: 'var(--surface)',
+        borderBottom: '1px solid var(--border)',
+        overflow: 'hidden',
+      }}
     >
       {/* Tabs scroll container */}
-      <div ref={scrollRef} className="flex-1 flex items-stretch overflow-x-auto overflow-y-hidden scrollbar-hide">
+      <div
+        ref={scrollRef}
+        className="flex-1 flex items-stretch overflow-x-auto overflow-y-hidden scrollbar-hide"
+      >
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={tabs.map(t => t.id)} strategy={horizontalListSortingStrategy}>
             {tabs.map(tab => (
@@ -354,10 +384,20 @@ export const TabBar: React.FC = () => {
           type="button"
           onClick={() => openTab(location.pathname, document.title.replace(' · Ovds', '') || location.pathname)}
           title="Open current page in new tab (Ctrl+T)"
-          className="shrink-0 w-8 flex items-center justify-center
-                     text-slate-400 hover:text-[#0056D2] hover:bg-slate-50 dark:hover:bg-slate-700
-                     border-l border-slate-200 dark:border-slate-700 transition-colors"
           aria-label="New tab"
+          className="shrink-0 w-8 flex items-center justify-center transition-colors"
+          style={{
+            color: 'var(--text-5)',
+            borderLeft: '1px solid var(--border)',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.color    = 'var(--pro-azure)';
+            (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-alt)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.color    = 'var(--text-5)';
+            (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+          }}
         >
           <Icon name="PLUS" size={13} />
         </button>
@@ -365,7 +405,14 @@ export const TabBar: React.FC = () => {
 
       {/* Tab count badge when close to limit */}
       {tabs.length >= MAX_TABS - 2 && (
-        <div className="shrink-0 flex items-center px-2 text-[9px] font-bold text-slate-400">
+        <div
+          className="shrink-0 flex items-center px-2"
+          style={{
+            fontSize: 9, fontWeight: 700,
+            color: 'var(--text-5)',
+            fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+          }}
+        >
           {tabs.length}/{MAX_TABS}
         </div>
       )}

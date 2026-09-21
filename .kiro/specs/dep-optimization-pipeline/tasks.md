@@ -160,7 +160,7 @@
     - Undo the whitespace change
     - _Requirements: 7.1_
 
-- [-] 8. Checkpoint — ensure all checks pass end-to-end
+- [x] 8. Checkpoint — ensure all checks pass end-to-end
   - Run the full local pipeline: `npm run optimize:local` (or `pwsh -File scripts/optimize.ps1`)
   - Confirm exit code 0 and no warnings in the summary at `.reports/optimize-summary.md`
   - Run `npm run optimize:ci` (the CI-equivalent strict run without a build step) and confirm exit 0

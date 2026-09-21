@@ -2,8 +2,9 @@
  * useGlCompliance — AABE audit-readiness, statutory reports, dual-ledger, MoR package hooks
  */
 import { useQuery } from '@tanstack/react-query';
-import { orpcUtils } from '../../../lib/orpc';
+
 import { useBusiness } from '../../../context/businessContext';
+import { orpcUtils } from '../../../lib/orpc';
 
 /** Real-time GL + tax compliance dashboard */
 export function useGlDashboard(period?: string) {

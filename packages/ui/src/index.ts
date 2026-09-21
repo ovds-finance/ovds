@@ -8,6 +8,14 @@
  * DO NOT duplicate any of these in apps/frontend/src/
  */
 
+// -- Ovds SaaS Grid-over-Card UI system --------------------------------
+// GridShell: layout shell (header, actions row, metrics slot, content area)
+export * from './components/GridShell';
+// MetricsGrid: ReceivablesMetric, PayablesMetric, CashFlowMetric, MetricsCard, MetricsGrid
+export * from './components/MetricsGrid';
+// AkDataGrid: high-density data grid with hover-to-reveal row actions
+export * from './components/AkDataGrid';
+
 // -- Components ----------------------------------------------------------------
 // Ovds-signature premium UI components (single source of truth)
 export * from './components/AkiComponents';
@@ -130,6 +138,9 @@ export * from './hooks/useLocalStorage';
 export * from './hooks/useLastRefreshed';
 export * from './hooks/useFormDirty';
 export * from './hooks/useFormValidation';
+export * from './hooks/useZodForm';
+export * from './hooks/useDesignTokens';
+export * from './hooks/useStatusColor';
 export * from './hooks/useAnimatedValue';
 export * from './hooks/useToast';
 export type { StructuredToastOptions, ToastVariant } from './hooks/useToast';
@@ -158,10 +169,13 @@ export * from './hooks/useWindowSize';
 export * from './hooks/useIdleTimer';
 export * from './hooks/useKeyboardNav';
 export * from './hooks/use-offline';
+export * from './hooks/useApiError';
 
 // -- Utilities -----------------------------------------------------------------
 export * from './lib/utils';
 export * from './lib/download';
+export * from './utils/typed-api';
+export * from './utils/errors';
 
 // -- Enterprise-grade multi-entity, multi-currency, chart of accounts -----
 export * from './enterprise';

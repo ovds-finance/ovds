@@ -1,5 +1,5 @@
 /**
- * @ovds/domains/accounting
+ * @ovds/domains-accounting
  *
  * Backend domain library for the Accounting domain.
  * Exports services and types needed by the thin NestJS app module/controllers.

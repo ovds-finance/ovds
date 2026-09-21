@@ -1,5 +1,5 @@
 /**
- * @ovds/domains/vat
+ * @ovds/domains-vat
  *
  * Backend domain library for the VAT domain.
  * Holds VAT declaration filing logic (data-access) previously duplicated in

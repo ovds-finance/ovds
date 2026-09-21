@@ -1,6 +1,10 @@
+// Role, AccountType, AccountCategory are defined in ./roles and ./accounting
+// and barrel-exported from packages/shared/src/types/index.ts directly.
+// They are re-exported here only to preserve backward-compat imports of the form:
+//   import { Role } from '@ovds/shared/types/entities'
+// Do NOT add more re-exports here — use the canonical source files instead.
 import { Role } from './roles';
 import { AccountType, AccountCategory } from './accounting';
-
 export { Role, AccountType, AccountCategory };
 
 export enum CompanyType {
@@ -24,11 +28,10 @@ export enum AppEnvironment {
   DEVELOPMENT = 'DEVELOPMENT',
 }
 
-export enum AppEnv {
-  STAGING = 'STAGING',
-  PRODUCTION = 'PRODUCTION',
-  DEVELOPMENT = 'DEVELOPMENT',
-}
+/** @deprecated Use AppEnvironment — this duplicate will be removed in a future release. */
+export const AppEnv = AppEnvironment;
+/** @deprecated Use AppEnvironment */
+export type AppEnv = AppEnvironment;
 
 export enum CompanyReleaseStatus {
   AVAILABLE = 'AVAILABLE',
@@ -64,6 +67,7 @@ export interface User {
 export interface Company {
   id: string;
   name: string;
+  subdomain?: string | null;
   type: CompanyType;
   currencyCode: string;
   tin?: string | null;
@@ -178,12 +182,23 @@ export interface Partnership {
 export type PartnershipType = 'JOINT_VENTURE' | 'CONSORTIUM' | 'STRATEGIC_ALLIANCE' | 'DISTRIBUTOR' | 'RESELLER' | 'TECHNOLOGY_PARTNER';
 export type PartnershipStatus = 'ACTIVE' | 'INACTIVE' | 'DISSOLVED' | 'PENDING';
 
+/**
+ * PaginatedResult — the backend/shared pagination envelope.
+ *
+ * This is the canonical shape used by NestJS services and domain libraries.
+ * The optional `pagination` field is a legacy sub-object still emitted by
+ * `packages/domains/infrastructure/src/pagination.helper.ts#paginate()`.
+ *
+ * Frontend-only consumers should prefer the leaner shape from:
+ *   import type { PaginatedResult } from '@ovds/contracts/schemas/common';
+ */
 export interface PaginatedResult<T> {
   data: T[];
   total: number;
   page: number;
   limit: number;
   totalPages: number;
+  /** @deprecated Legacy sub-object. Use the top-level fields instead. */
   pagination?: {
     page: number;
     take: number;
@@ -220,8 +235,3 @@ export interface ApiResponse<T> {
 export type UIStatus = 'IDLE' | 'LOADING' | 'SUCCESS' | 'ERROR';
 export type UIVariant = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info' | 'ghost';
 export type UISize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-
-export interface SharedComponentProps {
-  className?: string;
-  children?: React.ReactNode;
-}

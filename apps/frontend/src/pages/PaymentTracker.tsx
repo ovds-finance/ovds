@@ -3,22 +3,23 @@
  * AppPage · AppKpi · AppTable · useApiCrud
  * Track outstanding payments, overdue alerts, collection pipeline
  */
-import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   CreditCard, RefreshCw, Download, AlertTriangle,
   Clock, Calendar, ShieldCheck, ChevronDown,
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import api from '../services/api';
-import { fmtETB } from '../utils/ethiopianTax';
+
+import { PaymentVerificationPanel } from '../components/ovds';
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, SearchBar, EmptyState, Pagination, Amount,
 } from '../components/ui';
-import { PaymentVerificationPanel } from '../components/ovds';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { fmtETB } from '../utils/ethiopianTax';
 
 interface PaymentItem {
   id: string;
@@ -107,7 +108,7 @@ const PaymentTracker: React.FC = () => {
     return [
       { label: 'Overdue',   value: overdue.length,   color: 'rose' as const },
       { label: 'Due Soon',  value: dueSoon.length,   color: 'amber' as const },
-      { label: 'AR Total',  value: fmtETB(totalAR),  color: 'emerald' as const },
+      { label: 'AR Total',  value: fmtETB(totalAR),  color: 'green' as const },
       { label: 'AP Total',  value: fmtETB(totalAP),  color: 'violet' as const },
     ];
   }, [rows]);
@@ -158,10 +159,10 @@ const PaymentTracker: React.FC = () => {
         <button
           type="button"
           onClick={() => setShowVerify(v => !v)}
-          className="flex items-center gap-2 w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-left hover:border-emerald-300 hover:bg-emerald-50/30 transition-all group"
+          className="flex items-center gap-2 w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-left hover:border-[var(--pro-azure-light)] hover:bg-[var(--pro-azure-50)]/30 transition-all group"
         >
-          <div className="w-6 h-6 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
-            <ShieldCheck size={13} className="text-emerald-600" />
+          <div className="w-6 h-6 rounded-lg bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] flex items-center justify-center shrink-0">
+            <ShieldCheck size={13} className="text-[var(--pro-azure)]" />
           </div>
           <span className="text-[12px] font-semibold text-slate-700 flex-1">
             Verify Customer Payment
@@ -211,7 +212,7 @@ const PaymentTracker: React.FC = () => {
             return (
               <AppTr key={`${r.type}-${r.id}`}>
                 <AppTd>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold border ${r.type === 'INVOICE' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-amber-50 text-amber-700 border-amber-100'}`}>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold border ${r.type === 'INVOICE' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' : 'bg-amber-50 text-amber-700 border-amber-100'}`}>
                     {r.type}
                   </span>
                 </AppTd>

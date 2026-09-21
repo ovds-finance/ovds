@@ -1,7 +1,12 @@
 /**
- * Re-export shim — this module has moved to @ovds/domains/projects.
+ * @deprecated — this package is a backward-compat re-export shim.
  *
- * All existing imports continue to work.
- * New code should import from the canonical path directly.
+ * `@ovds/domains-manufacturing` has been consolidated into `@ovds/domains-projects`.
+ * Migrate all imports to the canonical path:
+ *
+ *   import { ... } from '@ovds/domains-projects';
+ *
+ * This shim will be removed in a future cleanup pass once all consumers
+ * have been updated.
  */
-export * from '@ovds/domains/projects';
+export * from '@ovds/domains-projects';

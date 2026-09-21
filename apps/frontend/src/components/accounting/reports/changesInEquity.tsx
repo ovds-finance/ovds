@@ -11,13 +11,14 @@
  *
  * Applies to all business types: Manufacturing, Large Enterprise, SMB, Freelancer, Government
  */
-import React, { useState, useEffect } from 'react';
-import api from '../../../services/api';
-import toast from 'react-hot-toast';
-import { Download, Printer, Calendar, RefreshCw, Info, ChevronDown } from 'lucide-react';
 import { format, startOfYear, endOfYear } from 'date-fns';
+import { Download, Printer, Calendar, RefreshCw, Info, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+
 import { useBusiness } from '../../../context/businessContext';
 import { useIFRSAccess } from '../../../hooks/useIfrsAccess';
+import api from '../../../services/api';
 import { fmtDecimal } from '../../../utils/fmt';
 
 const fmt = fmtDecimal;
@@ -217,7 +218,7 @@ const ChangesInEquityReport: React.FC = () => {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded-full uppercase tracking-wider">Full IFRS · IAS 1.106</span>
+              <span className="text-[10px] font-medium text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 px-2 py-0.5 rounded-full uppercase tracking-wider">Full IFRS · IAS 1.106</span>
             </div>
             <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">Statement of Changes in Equity</h2>
             <p className="text-sm text-slate-500 mt-0.5">For the year ended {format(new Date(year, 11, 31), 'MMMM dd, yyyy')}</p>
@@ -245,9 +246,9 @@ const ChangesInEquityReport: React.FC = () => {
       </div>
 
       {/* IAS 1 note */}
-      <div className="flex items-start gap-2.5 px-4 py-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 rounded-xl">
-        <Info size={14} className="text-emerald-500 shrink-0 mt-0.5" />
-        <p className="text-xs text-emerald-700 dark:text-emerald-300">
+      <div className="flex items-start gap-2.5 px-4 py-3 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900/40 rounded-xl">
+        <Info size={14} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
+        <p className="text-xs text-[var(--pro-azure-dark)] dark:text-green-300">
           <strong>IAS 1.106</strong> — Reconciles opening and closing balances for each equity component: Share Capital, Share Premium, Retained Earnings, Revaluation Reserve (IAS 16/38), FVOCI Reserve (IFRS 9), Translation Reserve (IAS 21). Total Comprehensive Income = Profit or Loss + Other Comprehensive Income (IAS 1.81A).
         </p>
       </div>
@@ -264,7 +265,7 @@ const ChangesInEquityReport: React.FC = () => {
 
       {/* OCI toggle */}
       <button onClick={() => setShowOCI(v => !v)}
-        className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors">
+        className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">
         <ChevronDown size={13} className={`transition-transform ${showOCI ? 'rotate-180' : ''}`} />
         {showOCI ? 'Hide' : 'Show'} OCI breakdown columns (IAS 1.82A)
       </button>
@@ -278,14 +279,14 @@ const ChangesInEquityReport: React.FC = () => {
                 <tr className="bg-white dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                   <th className="text-left px-4 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider sticky left-0 bg-white dark:bg-slate-800/50 min-w-[160px]">Component</th>
                   <th className="text-right px-3 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Opening</th>
-                  <th className="text-right px-3 py-3 text-[10px] font-medium text-emerald-600 uppercase tracking-wider">Profit / Loss</th>
+                  <th className="text-right px-3 py-3 text-[10px] font-medium text-[var(--pro-azure)] uppercase tracking-wider">Profit / Loss</th>
                   {showOCI && <>
-                    <th className="text-right px-3 py-3 text-[10px] font-medium text-emerald-500 uppercase tracking-wider">Revaluation</th>
-                    <th className="text-right px-3 py-3 text-[10px] font-medium text-emerald-500 uppercase tracking-wider">FVOCI</th>
-                    <th className="text-right px-3 py-3 text-[10px] font-medium text-emerald-500 uppercase tracking-wider">Translation</th>
-                    <th className="text-right px-3 py-3 text-[10px] font-medium text-emerald-500 uppercase tracking-wider">Actuarial</th>
+                    <th className="text-right px-3 py-3 text-[10px] font-medium text-[var(--pro-azure)] uppercase tracking-wider">Revaluation</th>
+                    <th className="text-right px-3 py-3 text-[10px] font-medium text-[var(--pro-azure)] uppercase tracking-wider">FVOCI</th>
+                    <th className="text-right px-3 py-3 text-[10px] font-medium text-[var(--pro-azure)] uppercase tracking-wider">Translation</th>
+                    <th className="text-right px-3 py-3 text-[10px] font-medium text-[var(--pro-azure)] uppercase tracking-wider">Actuarial</th>
                   </>}
-                  <th className="text-right px-3 py-3 text-[10px] font-medium text-emerald-600 uppercase tracking-wider">Total OCI</th>
+                  <th className="text-right px-3 py-3 text-[10px] font-medium text-[var(--pro-azure)] uppercase tracking-wider">Total OCI</th>
                   <th className="text-right px-3 py-3 text-[10px] font-medium text-teal-600 uppercase tracking-wider">Total CI</th>
                   <th className="text-right px-3 py-3 text-[10px] font-medium text-rose-500 uppercase tracking-wider">Dividends</th>
                   <th className="text-right px-3 py-3 text-[10px] font-medium text-violet-600 uppercase tracking-wider">Capital</th>
@@ -301,16 +302,16 @@ const ChangesInEquityReport: React.FC = () => {
                       <p className="text-[9px] text-slate-400 font-mono">{c.iasRef}</p>
                     </td>
                     <td className="px-3 py-3 text-right font-mono text-slate-600 dark:text-slate-400">{fmt(c.openingBalance)}</td>
-                    <td className={`px-3 py-3 text-right font-mono font-bold ${c.profitOrLoss > 0 ? 'text-emerald-600' : c.profitOrLoss < 0 ? 'text-rose-600' : 'text-slate-400'}`}>
+                    <td className={`px-3 py-3 text-right font-mono font-bold ${c.profitOrLoss > 0 ? 'text-[var(--pro-azure)]' : c.profitOrLoss < 0 ? 'text-rose-600' : 'text-slate-400'}`}>
                       {c.profitOrLoss !== 0 ? fmt(c.profitOrLoss) : '—'}
                     </td>
                     {showOCI && <>
-                      <td className="px-3 py-3 text-right font-mono text-emerald-500">{c.oci_revaluation !== 0 ? fmt(c.oci_revaluation) : '—'}</td>
-                      <td className="px-3 py-3 text-right font-mono text-emerald-500">{c.oci_fvoci !== 0 ? fmt(c.oci_fvoci) : '—'}</td>
-                      <td className="px-3 py-3 text-right font-mono text-emerald-500">{c.oci_translation !== 0 ? fmt(c.oci_translation) : '—'}</td>
-                      <td className="px-3 py-3 text-right font-mono text-emerald-500">{c.oci_actuarial !== 0 ? fmt(c.oci_actuarial) : '—'}</td>
+                      <td className="px-3 py-3 text-right font-mono text-[var(--pro-azure)]">{c.oci_revaluation !== 0 ? fmt(c.oci_revaluation) : '—'}</td>
+                      <td className="px-3 py-3 text-right font-mono text-[var(--pro-azure)]">{c.oci_fvoci !== 0 ? fmt(c.oci_fvoci) : '—'}</td>
+                      <td className="px-3 py-3 text-right font-mono text-[var(--pro-azure)]">{c.oci_translation !== 0 ? fmt(c.oci_translation) : '—'}</td>
+                      <td className="px-3 py-3 text-right font-mono text-[var(--pro-azure)]">{c.oci_actuarial !== 0 ? fmt(c.oci_actuarial) : '—'}</td>
                     </>}
-                    <td className="px-3 py-3 text-right font-mono text-emerald-600">{c.totalOCI !== 0 ? fmt(c.totalOCI) : '—'}</td>
+                    <td className="px-3 py-3 text-right font-mono text-[var(--pro-azure)]">{c.totalOCI !== 0 ? fmt(c.totalOCI) : '—'}</td>
                     <td className={`px-3 py-3 text-right font-mono font-bold ${c.totalComprehensiveIncome > 0 ? 'text-teal-600' : c.totalComprehensiveIncome < 0 ? 'text-rose-600' : 'text-slate-400'}`}>
                       {c.totalComprehensiveIncome !== 0 ? fmt(c.totalComprehensiveIncome) : '—'}
                     </td>
@@ -325,14 +326,14 @@ const ChangesInEquityReport: React.FC = () => {
                 <tr>
                   <td className="px-4 py-4 font-semibold text-slate-800 dark:text-slate-100 text-[10px] uppercase tracking-wider sticky left-0 bg-white dark:bg-slate-800/50">Total Equity</td>
                   <td className="px-3 py-4 text-right font-mono font-semibold text-slate-700 dark:text-slate-200">{fmt(data.totalOpeningEquity)}</td>
-                  <td className={`px-3 py-4 text-right font-mono font-semibold ${data.totalProfitOrLoss >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>{fmt(data.totalProfitOrLoss)}</td>
+                  <td className={`px-3 py-4 text-right font-mono font-semibold ${data.totalProfitOrLoss >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-700'}`}>{fmt(data.totalProfitOrLoss)}</td>
                   {showOCI && <><td colSpan={4} className="px-3 py-4 text-center text-slate-400 text-[9px]">—</td></>}
-                  <td className="px-3 py-4 text-right font-mono font-semibold text-emerald-700">{fmt(data.totalOCI)}</td>
+                  <td className="px-3 py-4 text-right font-mono font-semibold text-[var(--pro-azure-dark)]">{fmt(data.totalOCI)}</td>
                   <td className={`px-3 py-4 text-right font-mono font-semibold ${data.totalComprehensiveIncome >= 0 ? 'text-teal-700' : 'text-rose-700'}`}>{fmt(data.totalComprehensiveIncome)}</td>
                   <td className="px-3 py-4 text-right font-mono text-slate-500">—</td>
                   <td className="px-3 py-4 text-right font-mono text-slate-500">—</td>
                   <td className="px-3 py-4 text-right font-mono text-slate-500">—</td>
-                  <td className="px-4 py-4 text-right font-mono font-semibold text-emerald-600 dark:text-emerald-400 text-sm">{fmt(data.totalClosingEquity)}</td>
+                  <td className="px-4 py-4 text-right font-mono font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] text-sm">{fmt(data.totalClosingEquity)}</td>
                 </tr>
               </tfoot>
             </table>
@@ -345,9 +346,9 @@ const ChangesInEquityReport: React.FC = () => {
         <div className="ovds-grid-layout cols-4">
           {[
             { label: 'Opening Equity', value: data.totalOpeningEquity, color: 'text-slate-700 dark:text-slate-200', bg: 'bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700' },
-            { label: 'Profit or Loss', value: data.totalProfitOrLoss, color: data.totalProfitOrLoss >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400', bg: data.totalProfitOrLoss >= 0 ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900' : 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900' },
+            { label: 'Profit or Loss', value: data.totalProfitOrLoss, color: data.totalProfitOrLoss >= 0 ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-700 dark:text-rose-400', bg: data.totalProfitOrLoss >= 0 ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)] dark:border-green-900' : 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900' },
             { label: 'Total Comprehensive Income', value: data.totalComprehensiveIncome, color: data.totalComprehensiveIncome >= 0 ? 'text-teal-700 dark:text-teal-400' : 'text-rose-700 dark:text-rose-400', bg: 'bg-teal-50 dark:bg-teal-950/30 border-teal-200 dark:border-teal-900' },
-            { label: 'Closing Equity', value: data.totalClosingEquity, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900' },
+            { label: 'Closing Equity', value: data.totalClosingEquity, color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)] dark:border-green-900' },
           ].map(k => (
             <div key={k.label} className={`rounded-2xl border p-4 ${k.bg}`}>
               <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1">{k.label}</p>

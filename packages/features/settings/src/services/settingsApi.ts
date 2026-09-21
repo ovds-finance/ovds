@@ -5,6 +5,8 @@
  * system administration, setup wizard.
  */
 
+import type { RbacRoleDTO, RbacPermissionDTO, SodRuleDTO, AuditEventCatalogDTO } from '../types/settings.types';
+
 function getBase(): string {
   return (typeof window !== 'undefined' && (window as any)._VITE_API_URL) || '/api';
 }
@@ -243,6 +245,78 @@ export const advancedAccessApi = {
     const q = companyId ? `?companyId=${encodeURIComponent(companyId)}` : '';
     await post<any>('/settings/advanced-access', { overrides, companyId });
   },
+};
+
+// ── RBAC — Roles ──────────────────────────────────────────────────────────────
+
+export const rolesApi = {
+  /** List all roles (system + tenant-custom). Pass companyId to include custom roles for a tenant. */
+  list: (companyId?: string | null) =>
+    get<RbacRoleDTO[]>(`/settings/rbac/roles${qs({ companyId })}`),
+
+  /** Get a single role by id. */
+  get: (id: string) =>
+    get<RbacRoleDTO>(`/settings/rbac/roles/${encodeURIComponent(id)}`),
+
+  /** Create a new custom role for a tenant. */
+  create: (dto: { name: string; label: string; description?: string; permissions: string[]; apiAccess?: boolean; companyId: string }) =>
+    post<RbacRoleDTO>('/settings/rbac/roles', dto),
+
+  /** Update role metadata / permissions. */
+  update: (id: string, dto: Partial<{ label: string; description: string; permissions: string[]; apiAccess: boolean }>) =>
+    patch<RbacRoleDTO>(`/settings/rbac/roles/${encodeURIComponent(id)}`, dto),
+
+  /** Delete a custom role (system roles are protected server-side). */
+  remove: (id: string) =>
+    del<void>(`/settings/rbac/roles/${encodeURIComponent(id)}`),
+
+  /** Seed/sync system roles from the shared RBAC constants. */
+  seed: () =>
+    post<{ seeded: number }>('/settings/rbac/roles/seed', {}),
+};
+
+// ── RBAC — Permissions ────────────────────────────────────────────────────────
+
+export const permissionsApi = {
+  /** List all permissions, optionally filtered by category or module. */
+  list: (params: { category?: string; module?: string; companyId?: string | null } = {}) =>
+    get<RbacPermissionDTO[]>(`/settings/rbac/permissions${qs(params)}`),
+
+  /** Get a single permission by key. */
+  get: (key: string) =>
+    get<RbacPermissionDTO>(`/settings/rbac/permissions/${encodeURIComponent(key)}`),
+
+  /** Seed/sync permissions from the shared permission catalog. */
+  seed: () =>
+    post<{ seeded: number }>('/settings/rbac/permissions/seed', {}),
+};
+
+// ── RBAC — SoD Rules ──────────────────────────────────────────────────────────
+
+export const sodRulesApi = {
+  /** List all Segregation-of-Duties rules (global + tenant-specific). */
+  list: (companyId?: string | null) =>
+    get<SodRuleDTO[]>(`/settings/rbac/sod-rules${qs({ companyId })}`),
+
+  /** Create a tenant-specific SoD rule. */
+  create: (dto: Omit<SodRuleDTO, 'id'> & { companyId: string }) =>
+    post<SodRuleDTO>('/settings/rbac/sod-rules', dto),
+
+  /** Update an existing SoD rule. */
+  update: (id: string, dto: Partial<Omit<SodRuleDTO, 'id'>>) =>
+    patch<SodRuleDTO>(`/settings/rbac/sod-rules/${encodeURIComponent(id)}`, dto),
+
+  /** Delete a tenant-specific SoD rule. */
+  remove: (id: string) =>
+    del<void>(`/settings/rbac/sod-rules/${encodeURIComponent(id)}`),
+};
+
+// ── RBAC — Audit Event Catalog ────────────────────────────────────────────────
+
+export const auditEventCatalogApi = {
+  /** List audit event catalog entries. */
+  list: (companyId?: string | null) =>
+    get<AuditEventCatalogDTO[]>(`/settings/rbac/audit-events${qs({ companyId })}`),
 };
 
 

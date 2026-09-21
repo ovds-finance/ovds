@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ContinuousCloseWidget
  *
  * Implements the "continuous closing" concept described in the OVDS features doc:
@@ -12,16 +12,17 @@
  *   - Open period lock status
  *   - Last auto-reconcile run
  */
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import {
   CheckCircle2, AlertTriangle, Clock, Lock, Unlock,
   RefreshCw, ArrowRight, XCircle, Zap, BookOpen,
   Scale, Banknote, FileText,
 } from 'lucide-react';
-import api from '../../services/api';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+
 import { useBusiness } from '../../context/businessContext';
 import { useInterval } from '../../hooks';
+import api from '../../services/api';
 
 // -- Types ---------------------------------------------------------------------
 
@@ -234,8 +235,8 @@ const ContinuousCloseWidget: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
-            <Zap size={13} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="w-7 h-7 rounded-lg bg-[var(--pro-azure-50)] dark:bg-green-950/30 flex items-center justify-center">
+            <Zap size={13} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div>
             <p className="ovds-card-title">Continuous Close</p>
@@ -245,7 +246,7 @@ const ContinuousCloseWidget: React.FC = () => {
         <button
           onClick={() => load(true)}
           disabled={refreshing}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-colors"
+          className="p-1.5 rounded-lg text-slate-400 hover:text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-950/20 transition-colors"
           title="Refresh"
           aria-label="Refresh close health"
         >
@@ -284,7 +285,7 @@ const ContinuousCloseWidget: React.FC = () => {
                   {issueCount} item{issueCount !== 1 ? 's' : ''} need attention
                 </p>
               ) : (
-                <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5 font-semibold">
+                <p className="text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] mt-0.5 font-semibold">
                   Books are fully reconciled ✓
                 </p>
               )}
@@ -301,7 +302,7 @@ const ContinuousCloseWidget: React.FC = () => {
             <div className="space-y-0 divide-y divide-slate-50 dark:divide-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-xl overflow-hidden">
               {checks.map((c) => {
                 const urgencyCls = {
-                  ok:    'text-emerald-500',
+                  ok:    'text-[var(--pro-azure)]',
                   warn:  'text-amber-500',
                   error: 'text-rose-500',
                 }[c.urgency];
@@ -333,7 +334,7 @@ const ContinuousCloseWidget: React.FC = () => {
                     </span>
                     <ArrowRight
                       size={10}
-                      className="shrink-0 text-slate-200 dark:text-slate-700 group-hover:text-emerald-500 transition-colors ml-1"
+                      className="shrink-0 text-slate-200 dark:text-slate-700 group-hover:text-[var(--pro-azure)] transition-colors ml-1"
                     />
                   </Link>
                 );
@@ -358,7 +359,7 @@ const ContinuousCloseWidget: React.FC = () => {
         </span>
         <Link
           to="/accounting/period-close"
-          className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
+          className="flex items-center gap-1 text-[11px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline"
         >
           Period Close <ArrowRight size={10} />
         </Link>

@@ -1,10 +1,3 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useAuth } from '../rbac/AuthContext';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { confirm } from '../utils/confirm';
 import { GridHero, ContextStrip, ContextPill, MetricCard } from '@ovds/ui';
 import {
   AlertCircle,
@@ -50,6 +43,13 @@ import {
   FileJson,
   User,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { confirm } from '../utils/confirm';
 
 // -- Types ---------------------------------------------------------------------
 interface Submission {
@@ -107,8 +107,8 @@ const AUTO_REFRESH_SECS = 60;
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; dot: string; ring: string }> = {
   PENDING:   { label: 'Pending',   color: 'text-amber-600 dark:text-amber-400',     bg: 'bg-amber-50 dark:bg-amber-900/20',     dot: 'bg-amber-400',   ring: 'ring-amber-400/30' },
-  IN_REVIEW: { label: 'In Review', color: 'text-emerald-600 dark:text-emerald-400 dark:text-emerald-400',       bg: 'bg-emerald-50 dark:bg-emerald-900/20',       dot: 'bg-teal-400',    ring: 'ring-emerald-500/20' },
-  COMPLETED: { label: 'Completed', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20', dot: 'bg-emerald-400', ring: 'ring-emerald-400/30' },
+  IN_REVIEW: { label: 'In Review', color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',       bg: 'bg-[var(--pro-azure-50)] dark:bg-green-900/20',       dot: 'bg-teal-400',    ring: 'ring-[var(--pro-azure)]/20' },
+  COMPLETED: { label: 'Completed', color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-900/20', dot: 'bg-[var(--pro-azure-light)]', ring: 'ring-[var(--pro-azure)]/30' },
   REJECTED:  { label: 'Rejected',  color: 'text-rose-600 dark:text-rose-400',       bg: 'bg-rose-50 dark:bg-rose-900/20',       dot: 'bg-rose-400',    ring: 'ring-rose-400/30' },
 };
 
@@ -163,7 +163,7 @@ const HighlightText: React.FC<{ text: string; query: string }> = ({ text, query 
 };
 
 const CompletionBar: React.FC<{ score: number; compact?: boolean }> = ({ score, compact }) => {
-  const color = score >= 80 ? 'bg-emerald-500' : score >= 50 ? 'bg-amber-400' : 'bg-rose-400';
+  const color = score >= 80 ? 'bg-[var(--pro-azure-50)]0' : score >= 50 ? 'bg-amber-400' : 'bg-rose-400';
   if (compact) return (
     <div className="flex items-center gap-1.5">
       <div className="flex-1 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -184,7 +184,7 @@ const CompletionBar: React.FC<{ score: number; compact?: boolean }> = ({ score, 
 
 const AgeBar: React.FC<{ days: number }> = ({ days }) => {
   const pct = Math.min(100, (days / 14) * 100);
-  const color = days >= 7 ? 'bg-rose-400' : days >= 3 ? 'bg-amber-400' : 'bg-emerald-400';
+  const color = days >= 7 ? 'bg-rose-400' : days >= 3 ? 'bg-amber-400' : 'bg-[var(--pro-azure-light)]';
   return (
     <div className="flex items-center gap-1" title={`${days}d old`}>
       <div className="w-10 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -230,7 +230,7 @@ const FunnelChart: React.FC<{ stats: Stats }> = ({ stats }) => {
   const steps = [
     { label: 'Submitted',  value: stats.total,     color: 'bg-slate-400' },
     { label: 'In Review',  value: stats.inReview,  color: 'bg-sky-500' },
-    { label: 'Completed',  value: stats.completed, color: 'bg-emerald-500' },
+    { label: 'Completed',  value: stats.completed, color: 'bg-[var(--pro-azure-50)]0' },
   ];
   const max = Math.max(stats.total, 1);
   return (
@@ -279,7 +279,7 @@ const AutoRefreshRing: React.FC<{ seconds: number; total: number; onRefresh: () 
     <button onClick={onRefresh} title={`Auto-refresh in ${seconds}s — click to refresh now`} className="relative flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
       <svg width="24" height="24" viewBox="0 0 24 24" className="-rotate-90 absolute">
         <circle cx="12" cy="12" r={r} fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-100 dark:text-slate-800" />
-        <circle cx="12" cy="12" r={r} fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray={`${dash} ${circ}`} className="text-emerald-600 dark:text-emerald-400 transition-all duration-1000" />
+        <circle cx="12" cy="12" r={r} fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray={`${dash} ${circ}`} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-all duration-1000" />
       </svg>
       <RefreshCw size={12} className="text-slate-500 dark:text-slate-400 relative z-10" />
     </button>
@@ -314,14 +314,14 @@ const KanbanBoard: React.FC<{
         return (
           <div key={status} onDragOver={e => e.preventDefault()} onDrop={() => handleDrop(status)}
             className={`rounded-2xl border-2 border-dashed transition-colors min-h-[200px] ${
-              dragging ? 'border-emerald-300 dark:border-emerald-600 bg-emerald-50/30 dark:bg-emerald-900/10' : 'border-slate-200 dark:border-slate-700'
+              dragging ? 'border-[var(--pro-azure-light)] dark:border-[var(--pro-azure-light)] bg-[var(--pro-azure-50)]/30 dark:bg-green-900/10' : 'border-slate-200 dark:border-slate-700'
             }`}>
             <div className={`flex items-center justify-between px-3 py-2.5 rounded-t-xl ${cfg.bg}`}>
               <div className="flex items-center gap-2">
                 <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
                 <span className={`text-xs font-semibold uppercase tracking-wider ${cfg.color}`}>{cfg.label}</span>
               </div>
-              <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 dark:bg-white/50 dark:bg-black/20 ${cfg.color}`}>{cards.length}</span>
+              <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full bg-[var(--pro-azure-50)] dark:bg-white/50 dark:bg-black/20 ${cfg.color}`}>{cards.length}</span>
             </div>
             <div className="p-2 space-y-2">
               {cards.length === 0 && (
@@ -360,7 +360,7 @@ const KanbanBoard: React.FC<{
                     <div className="flex items-center justify-between mt-1.5">
                       <AgeBar days={days} />
                       {s.assignedTo && (
-                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400 truncate max-w-[60px]">→ {s.assignedTo}</span>
+                        <span className="text-[10px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] truncate max-w-[60px]">→ {s.assignedTo}</span>
                       )}
                     </div>
                   </div>
@@ -509,7 +509,7 @@ const DetailDrawer: React.FC<{
                 const score = completionScore(s);
                 return (
                   <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold ${
-                    score >= 80 ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
+                    score >= 80 ? 'bg-[var(--pro-azure-50)] dark:bg-green-900/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
                     : score >= 50 ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
                   }`} title="Form completion score">
@@ -584,7 +584,7 @@ const DetailDrawer: React.FC<{
             <button key={tab} onClick={() => setActiveTab(tab)} className={[
               'flex-1 py-2.5 text-xs font-bold capitalize transition-colors',
               activeTab === tab
-                ? 'text-emerald-600 dark:text-emerald-400 dark:text-emerald-400 border-b-2 border-emerald-600 dark:border-emerald-400'
+                ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border-b-2 border-[var(--pro-azure)] dark:border-[var(--pro-azure)]'
                 : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300',
             ].join(' ')}>
               {tab === 'notes' && notesDirty ? `${tab} ●` : tab}
@@ -657,7 +657,7 @@ const DetailDrawer: React.FC<{
                   <span className={`text-[10px] font-mono ${notes.length > 1800 ? 'text-rose-400' : 'text-slate-400'}`}>{notes.length}/2000</span>
                 </div>
               </div>
-              <button onClick={() => saveNotes(notes, assignedTo)} disabled={savingNotes || !notesDirty} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold disabled:opacity-50 transition-all">
+              <button onClick={() => saveNotes(notes, assignedTo)} disabled={savingNotes || !notesDirty} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-sm font-bold disabled:opacity-50 transition-all">
                 {savingNotes
                   ? <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Saving...</>
                   : <><Save size={14} /> Save Notes</>}
@@ -679,10 +679,10 @@ const DetailDrawer: React.FC<{
                   <div className="space-y-4">
                     {timeline.map((ev, i) => {
                       const iconMap = {
-                        created: <Sparkles size={12} className="text-emerald-600 dark:text-emerald-400" />,
+                        created: <Sparkles size={12} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />,
                         status: <Zap size={12} className="text-amber-500" />,
                         note: <StickyNote size={12} className="text-violet-500" />,
-                        email: <Mail size={12} className="text-emerald-500" />,
+                        email: <Mail size={12} className="text-[var(--pro-azure)]" />,
                       };
                       return (
                         <div key={i} className="flex items-start gap-3 pl-1">
@@ -693,7 +693,7 @@ const DetailDrawer: React.FC<{
                             <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{ev.label}</p>
                             <div className="flex items-center gap-2 mt-0.5">
                               <span className="ovds-caption">{relativeTime(ev.at)}</span>
-                              {ev.by && <span className="text-[10px] text-emerald-600 dark:text-emerald-400">by {ev.by}</span>}
+                              {ev.by && <span className="text-[10px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">by {ev.by}</span>}
                             </div>
                           </div>
                         </div>
@@ -707,7 +707,7 @@ const DetailDrawer: React.FC<{
         </div>
         {/* Footer */}
         <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex gap-2">
-          <a href={`mailto:${s.contactEmail}`} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold transition-all">
+          <a href={`mailto:${s.contactEmail}`} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-sm font-bold transition-all">
             <Mail size={14} /> Email Client
           </a>
           <button onClick={() => copyToClipboard(s.contactEmail, 'Email copied')} className="px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" title="Copy email">
@@ -760,9 +760,9 @@ const EmailComposer: React.FC<{ submission: Submission }> = ({ submission: s }) 
   if (sent) {
     return (
       <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
-        <CheckCircle2 size={36} className="text-emerald-500" />
+        <CheckCircle2 size={36} className="text-[var(--pro-azure)]" />
         <p className="font-bold text-slate-700 dark:text-slate-300">Email sent to {s.contactEmail}</p>
-        <button onClick={() => setSent(false)} className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline">Send another</button>
+        <button onClick={() => setSent(false)} className="text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">Send another</button>
       </div>
     );
   }
@@ -773,7 +773,7 @@ const EmailComposer: React.FC<{ submission: Submission }> = ({ submission: s }) 
         <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-2">Quick templates</p>
         <div className="flex flex-wrap gap-1.5">
           {EMAIL_TEMPLATES.map(tpl => (
-            <button key={tpl.label} onClick={() => applyTemplate(tpl)} className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-400 transition-all">
+            <button key={tpl.label} onClick={() => applyTemplate(tpl)} className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-900/20 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] dark:hover:text-[var(--pro-azure-light)] transition-all">
               {tpl.label}
             </button>
           ))}
@@ -803,7 +803,7 @@ const EmailComposer: React.FC<{ submission: Submission }> = ({ submission: s }) 
           onChange={e => setBody(e.target.value)}
         />
       </div>
-      <button onClick={send} disabled={sending || !subject.trim() || !body.trim()} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold disabled:opacity-50 transition-all">
+      <button onClick={send} disabled={sending || !subject.trim() || !body.trim()} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-sm font-bold disabled:opacity-50 transition-all">
         {sending
           ? <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Sending...</>
           : <><Send size={14} /> Send Email</>}
@@ -820,13 +820,13 @@ const BulkBar: React.FC<{
   onClear: () => void;
   loading: boolean;
 }> = ({ count, onStatusChange, onDelete, onClear, loading }) => (
-  <div className="flex items-center gap-3 px-4 py-3 bg-emerald-500 rounded-xl text-white shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10 flex-wrap">
+  <div className="flex items-center gap-3 px-4 py-3 bg-[var(--pro-azure-50)]0 rounded-xl text-white shadow-lg shadow-green-500/20 dark:shadow-green-500/10 flex-wrap">
     <span className="text-sm font-bold">{count} selected</span>
     <div className="flex items-center gap-2 flex-wrap flex-1">
       {STATUSES.map(st => {
         const c = STATUS_CONFIG[st];
         return (
-          <button key={st} onClick={() => onStatusChange(st)} disabled={loading} className="px-2.5 py-1 rounded-lg text-xs font-bold transition-all disabled:opacity-50 bg-emerald-100 dark:bg-white/10 hover:bg-white/20 text-white">
+          <button key={st} onClick={() => onStatusChange(st)} disabled={loading} className="px-2.5 py-1 rounded-lg text-xs font-bold transition-all disabled:opacity-50 bg-[var(--pro-azure-100)] dark:bg-white/10 hover:bg-white/20 text-white">
             → {c.label}
           </button>
         );
@@ -835,7 +835,7 @@ const BulkBar: React.FC<{
     <button onClick={onDelete} disabled={loading} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold transition-all disabled:opacity-50">
       <Trash2 size={12} /> Delete
     </button>
-    <button onClick={onClear} className="p-1.5 rounded-lg hover:bg-emerald-100 dark:bg-white/10 transition-colors" title="Clear selection">
+    <button onClick={onClear} className="p-1.5 rounded-lg hover:bg-[var(--pro-azure-100)] dark:bg-white/10 transition-colors" title="Clear selection">
       <X size={15} />
     </button>
   </div>
@@ -954,7 +954,7 @@ export default function OnboardingAdmin() {
     setStats(prev => {
       const old = submissions.find(s => s.id === id);
       if (!old) return prev;
-      const dec = (k: keyof Stats) => ({ ...prev, [k]: Math.max(0, (prev[k] as number) - 1) });
+      const _dec = (k: keyof Stats) => ({ ...prev, [k]: Math.max(0, (prev[k] as number) - 1) });
       const oldKey = old.status === 'IN_REVIEW' ? 'inReview' : old.status.toLowerCase() as keyof Stats;
       const newKey = status === 'IN_REVIEW' ? 'inReview' : status.toLowerCase() as keyof Stats;
       return { ...prev, [oldKey]: Math.max(0, (prev[oldKey] as number) - 1), [newKey]: (prev[newKey] as number) + 1 };
@@ -1062,7 +1062,7 @@ export default function OnboardingAdmin() {
       <div className="p-5 flex flex-col items-center gap-4">
         <AlertCircle size={40} className="text-rose-400" />
         <p className="text-slate-600 dark:text-slate-400">{error}</p>
-        <button onClick={fetchAll} className="px-4 py-2 rounded-xl bg-emerald-500 text-white text-sm font-bold">
+        <button onClick={fetchAll} className="px-4 py-2 rounded-xl bg-[var(--pro-azure)] text-white text-sm font-bold">
           Retry
         </button>
       </div>
@@ -1136,7 +1136,7 @@ export default function OnboardingAdmin() {
           amount={stats.completed}
           percentage={0}
           isPositive={true}
-          color="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400"
+          color="bg-[var(--pro-azure-50)] dark:bg-green-900/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]"
           onClick={() => setStatusFilter(statusFilter === 'COMPLETED' ? '' : 'COMPLETED')}
           active={statusFilter === 'COMPLETED'}
         />
@@ -1188,14 +1188,14 @@ export default function OnboardingAdmin() {
       {/* ── Content ────────────────────────────────────────────────────── */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-[var(--pro-azure)] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
         <div className="ovds-empty py-20">
           <FileText size={36} strokeWidth={1.5} className="mx-auto mb-3 opacity-30" />
           <p className="text-sm">No submissions found</p>
           {(search || statusFilter) && (
-            <button onClick={() => { setSearch(''); setStatusFilter(''); }} className="mt-2 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">
+            <button onClick={() => { setSearch(''); setStatusFilter(''); }} className="mt-2 text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold hover:underline">
               Clear filters
             </button>
           )}
@@ -1215,9 +1215,9 @@ export default function OnboardingAdmin() {
                 <thead>
                   <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40">
                     <th className="px-4 py-3 text-left w-10">
-                      <button onClick={toggleAllBulk} className="text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors">
+                      <button onClick={toggleAllBulk} className="text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">
                         {bulkIds.size === paginated.length && paginated.length > 0
-                          ? <CheckSquare size={15} className="text-emerald-600 dark:text-emerald-400" />
+                          ? <CheckSquare size={15} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                           : <Square size={15} />}
                       </button>
                     </th>
@@ -1246,10 +1246,10 @@ export default function OnboardingAdmin() {
                     const score = completionScore(s);
                     return (
                       <tr key={s.id}
-                        className={`hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors cursor-pointer group ${bulkIds.has(s.id) ? 'bg-emerald-50/40 dark:bg-emerald-900/10' : ''}`}>
+                        className={`hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors cursor-pointer group ${bulkIds.has(s.id) ? 'bg-[var(--pro-azure-50)]/40 dark:bg-green-900/10' : ''}`}>
                         <td className="px-4 py-3.5" onClick={e => { e.stopPropagation(); toggleBulk(s.id); }}>
                           {bulkIds.has(s.id)
-                            ? <CheckSquare size={14} className="text-emerald-600 dark:text-emerald-400" />
+                            ? <CheckSquare size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                             : <Square size={14} className="text-slate-300 hover:text-slate-500" />}
                         </td>
                         <td className="px-4 py-3.5" onClick={() => setSelected(s)}>
@@ -1290,7 +1290,7 @@ export default function OnboardingAdmin() {
                         <td className="px-4 py-3.5">
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button onClick={() => setSelected(s)}
-                              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors"
+                              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors"
                               title="View details">
                               <Eye size={13} />
                             </button>
@@ -1331,7 +1331,7 @@ export default function OnboardingAdmin() {
                     p === '...'
                       ? <span key={`e-${i}`} className="px-2 ovds-caption text-slate-400">…</span>
                       : <button key={p} onClick={() => setPage(p as number)}
-                          className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${page === p ? 'bg-emerald-500 text-white' : 'border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                          className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${page === p ? 'bg-[var(--pro-azure)] text-white' : 'border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
                           {p}
                         </button>
                   )}

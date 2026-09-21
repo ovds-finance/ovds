@@ -1,8 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
-import type { INotificationChannel } from './notification-channel.interface';
+
 import type { EmailJobData } from '../notification.jobs';
+
+import type { INotificationChannel } from './notification-channel.interface';
 
 @Injectable()
 export class EmailChannel implements INotificationChannel<EmailJobData> {

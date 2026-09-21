@@ -1,24 +1,26 @@
-import React, { useState, useMemo } from 'react';
 import {
   useEimsRegistrations,
   useRegisterInvoiceEims,
   useEimsInvoiceCancel,
   useEimsInvoiceRetry,
 } from '@ovds/features/eims';
-import toast from 'react-hot-toast';
-import { useBusiness } from '../../context/businessContext';
 import {
   Search, RefreshCw, CheckCircle2, XCircle, AlertTriangle, Eye, FileText,
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
+
+import { useBusiness } from '../../context/businessContext';
+
 
 const STATUS_COLORS: Record<string, string> = {
-  APPROVED: 'text-emerald-600 bg-emerald-50',
+  APPROVED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   PENDING: 'text-amber-600 bg-amber-50',
-  ISSUED: 'text-emerald-600 bg-emerald-50',
+  ISSUED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   EXPIRING: 'text-orange-600 bg-orange-50',
   FAILED: 'text-rose-600 bg-rose-50',
-  REGISTERED: 'text-emerald-600 bg-emerald-50',
-  COMPLETED: 'text-emerald-600 bg-emerald-50',
+  REGISTERED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
+  COMPLETED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   EXPIRED: 'text-rose-600 bg-rose-50',
 };
 

@@ -3,7 +3,7 @@
  *
  * Pure UI component (no app-specific hooks). Follows OVDS design system:
  * - Compact typography scale
- * - Emerald accent for active/complete steps
+ * - green accent for active/complete steps
  * - Accessible aria-* attributes
  */
 import React from 'react';
@@ -64,10 +64,10 @@ const VerticalStepper: React.FC<WizardStepperProps> = ({
                 'w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-200 text-xs font-bold border-2',
                 status === 'complete'
                   ? isClickable
-                    ? 'bg-emerald-500 border-emerald-500 text-white cursor-pointer hover:bg-emerald-600 hover:border-emerald-600'
-                    : 'bg-emerald-500 border-emerald-500 text-white cursor-default'
+                    ? 'bg-[var(--pro-azure)] border-[var(--pro-azure)] text-white cursor-pointer hover:bg-[var(--pro-azure-dark)] hover:border-[var(--pro-azure-dark)]'
+                    : 'bg-[var(--pro-azure)] border-[var(--pro-azure)] text-white cursor-default'
                   : status === 'current'
-                  ? 'bg-white dark:bg-slate-900 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-md shadow-emerald-500/20'
+                  ? 'bg-white dark:bg-slate-900 border-[var(--pro-azure)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shadow-md shadow-green-500/20'
                   : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-400 cursor-default',
               ].join(' ')}
             >
@@ -85,7 +85,7 @@ const VerticalStepper: React.FC<WizardStepperProps> = ({
                 className={[
                   'w-0.5 flex-1 my-1 rounded-full transition-colors duration-500',
                   status === 'complete'
-                    ? 'bg-emerald-400'
+                    ? 'bg-[var(--pro-azure)]'
                     : 'bg-slate-200 dark:bg-slate-700',
                 ].join(' ')}
               />
@@ -98,7 +98,7 @@ const VerticalStepper: React.FC<WizardStepperProps> = ({
               className={[
                 'ovds-label leading-tight',
                 status === 'current'
-                  ? 'text-emerald-600 dark:text-emerald-400'
+                  ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
                   : status === 'complete'
                   ? 'text-slate-500 dark:text-slate-400'
                   : 'text-slate-400 dark:text-slate-600',
@@ -148,10 +148,10 @@ const HorizontalStepper: React.FC<WizardStepperProps> = ({
                 'w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold border-2 transition-all duration-200',
                 status === 'complete'
                   ? isClickable
-                    ? 'bg-emerald-500 border-emerald-500 text-white cursor-pointer hover:scale-110'
-                    : 'bg-emerald-500 border-emerald-500 text-white cursor-default'
+                    ? 'bg-[var(--pro-azure)] border-[var(--pro-azure)] text-white cursor-pointer hover:scale-110'
+                    : 'bg-[var(--pro-azure)] border-[var(--pro-azure)] text-white cursor-default'
                   : status === 'current'
-                  ? 'bg-white dark:bg-slate-900 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm shadow-emerald-500/20 scale-110'
+                   ? 'bg-white dark:bg-slate-900 border-[var(--pro-azure)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shadow-sm shadow-green-500/20 scale-110'
                   : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-400 cursor-default',
               ].join(' ')}
             >
@@ -161,7 +161,7 @@ const HorizontalStepper: React.FC<WizardStepperProps> = ({
               className={[
                 'ovds-caption whitespace-nowrap hidden sm:block',
                 status === 'current'
-                  ? 'text-emerald-600 dark:text-emerald-400 font-bold'
+                  ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold'
                   : 'text-slate-400',
               ].join(' ')}
             >
@@ -172,7 +172,7 @@ const HorizontalStepper: React.FC<WizardStepperProps> = ({
             <div
               className={[
                 'h-0.5 flex-1 mx-1 rounded-full transition-colors duration-500',
-                status === 'complete' ? 'bg-emerald-400' : 'bg-slate-200 dark:bg-slate-700',
+                status === 'complete' ? 'bg-[var(--pro-azure)]' : 'bg-slate-200 dark:bg-slate-700',
               ].join(' ')}
             />
           )}

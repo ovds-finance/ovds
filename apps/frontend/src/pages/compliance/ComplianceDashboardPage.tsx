@@ -1,18 +1,19 @@
-import React from 'react';
-import toast from 'react-hot-toast';
-import { useBusiness } from '../../context/businessContext';
 import { useEimsReadiness, useEimsCertificateExpiry, useEimsRegistrations, useEimsDashboard } from '@ovds/features/eims';
 import {
-  Shield, AlertTriangle, CheckCircle2, FileText, Key, Server, Layers,
+  Shield, AlertTriangle, CheckCircle2, Circle, FileText, Key, Server, Layers,
   ArrowRight, ClipboardList, BarChart2,
 } from 'lucide-react';
+import React from 'react';
+import toast from 'react-hot-toast';
+
+import { useBusiness } from '../../context/businessContext';
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING: 'text-amber-600 bg-amber-50',
-  REGISTERED: 'text-emerald-600 bg-emerald-50',
+  REGISTERED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   FAILED: 'text-rose-600 bg-rose-50',
-  COMPLETED: 'text-emerald-600 bg-emerald-50',
-  ACTIVE: 'text-emerald-600 bg-emerald-50',
+  COMPLETED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
+  ACTIVE: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   EXPIRED: 'text-rose-600 bg-rose-50',
 };
 
@@ -24,7 +25,7 @@ const Badge: React.FC<{ status: string }> = ({ status }) => (
 
 const ComplianceDashboardPage: React.FC = () => {
   const { selectedCompanyId } = useBusiness();
-  const { data: readiness, isLoading: loadingReadiness, refetch: refetchReadiness } = useEimsReadiness();
+  const { data: readiness, isLoading: loadingReadiness, refetch: _refetchReadiness } = useEimsReadiness();
   const { data: expiringCerts = [] } = useEimsCertificateExpiry();
   const { data: registrations = [] } = useEimsRegistrations();
   const { data: dashboard } = useEimsDashboard();
@@ -64,7 +65,7 @@ const ComplianceDashboardPage: React.FC = () => {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Registered', value: dashboard?.summary?.registered ?? registered, color: 'text-emerald-600' },
+          { label: 'Registered', value: dashboard?.summary?.registered ?? registered, color: 'text-[var(--pro-azure)]' },
           { label: 'Pending', value: dashboard?.summary?.pending ?? pending, color: 'text-amber-600' },
           { label: 'Failed', value: dashboard?.summary?.failed ?? failed, color: 'text-rose-600' },
           { label: 'Receipts', value: dashboard?.summary?.receipts ?? 0, color: 'text-teal-600' },
@@ -94,7 +95,7 @@ const ComplianceDashboardPage: React.FC = () => {
         <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium">EIMS Readiness</p>
-            <div className={`px-3 py-1 rounded-full text-xs font-semibold ${readiness.ready ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+            <div className={`px-3 py-1 rounded-full text-xs font-semibold ${readiness.ready ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : 'bg-amber-100 text-amber-700'}`}>
               {readiness.ready ? 'Ready' : 'Not Ready'}
             </div>
           </div>
@@ -103,7 +104,7 @@ const ComplianceDashboardPage: React.FC = () => {
             {readiness.steps?.map((step: any) => (
               <div key={step.step} className="flex items-center gap-2 text-xs">
                 {step.complete
-                  ? <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
+                  ? <CheckCircle2 size={14} className="text-[var(--pro-azure)] shrink-0" />
                   : <Circle size={14} className="text-slate-300 shrink-0" />}
                 <span className={step.complete ? 'text-slate-700' : 'text-slate-400'}>{step.title}</span>
               </div>

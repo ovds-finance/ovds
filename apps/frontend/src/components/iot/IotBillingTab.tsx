@@ -3,11 +3,13 @@
  * and allows attaching them to invoices.
  */
 import React, { useState } from 'react';
-import { useIotBillingTriggers, useAttachTriggersToInvoice, type IotBillingTrigger } from '../../services/iotApi';
-import { AppTable, AppTh, AppTd, AppTr, Btn, Icon, Amount, Modal, FormField, Input } from '../ui';
-import { useAuth } from '../../rbac/AuthContext';
 import toast from 'react-hot-toast';
+
+import { useAuth } from '../../rbac/AuthContext';
+import { useIotBillingTriggers, useAttachTriggersToInvoice, type IotBillingTrigger } from '../../services/iotApi';
 import { fmtDateTime, fmtCurrency } from '../../utils/fmt';
+import { AppTable, AppTh, AppTd, AppTr, Btn, Icon, Amount, Modal, FormField, Input } from '../ui';
+
 
 const IotBillingTab: React.FC = () => {
   const { can } = useAuth();
@@ -57,7 +59,7 @@ const IotBillingTab: React.FC = () => {
         </div>
         <div className="ovds-card p-4">
           <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Already Invoiced</p>
-          <p className="text-[24px] font-bold text-emerald-600">
+          <p className="text-[24px] font-bold text-[var(--pro-azure)]">
             {triggers.filter(t => t.invoiced).length}
           </p>
         </div>
@@ -76,7 +78,7 @@ const IotBillingTab: React.FC = () => {
               onClick={() => setFilter(v as any)}
               className={[
                 'px-3 py-1.5 text-[11px] font-semibold transition-colors',
-                filter === v ? 'bg-emerald-500 text-white' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800',
+                filter === v ? 'bg-[var(--pro-azure)] text-white' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800',
               ].join(' ')}
             >
               {l}
@@ -158,14 +160,14 @@ const IotBillingTab: React.FC = () => {
               </AppTd>
               <AppTd>
                 <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                  t.invoiced ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                  t.invoiced ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : 'bg-amber-100 text-amber-700'
                 }`}>
                   {t.invoiced ? 'INVOICED' : 'PENDING'}
                 </span>
               </AppTd>
               <AppTd>
                 {t.linkedInvoiceNo ? (
-                  <span className="text-[11px] font-mono text-emerald-600">{t.linkedInvoiceNo}</span>
+                  <span className="text-[11px] font-mono text-[var(--pro-azure)]">{t.linkedInvoiceNo}</span>
                 ) : <span className="text-slate-300">—</span>}
               </AppTd>
               <AppTd>

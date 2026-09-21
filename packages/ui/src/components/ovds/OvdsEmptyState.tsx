@@ -107,7 +107,7 @@ export const OvdsEmptyState: React.FC<ovdsEmptyStateProps> = ({
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
       {/* Icon */}
-      <div className="w-16 h-16 rounded-3xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-400 mb-5 shadow-sm">
+      <div className="w-16 h-16 rounded-3xl bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] flex items-center justify-center text-[var(--pro-azure-light)] mb-5 shadow-sm">
         {icon ?? cfg.icon}
       </div>
 
@@ -121,7 +121,7 @@ export const OvdsEmptyState: React.FC<ovdsEmptyStateProps> = ({
       {onAction && (
         <button
           onClick={onAction}
-          className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-[12px] font-bold transition-all shadow-sm shadow-emerald-500/20 hover:shadow-md hover:shadow-emerald-500/25"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[var(--pro-azure)] hover:bg-[var(--pro-azure-dark)] text-white rounded-xl text-[12px] font-bold transition-all shadow-sm shadow-green-500/20 hover:shadow-md hover:shadow-green-500/25"
         >
           <Plus size={14} />
           {actionLabel ?? cfg.actionLabel}

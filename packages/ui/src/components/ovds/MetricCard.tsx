@@ -12,14 +12,15 @@ export interface MetricCardProps {
   isPositive: boolean;
   /** Optional icon element */
   icon?: React.ReactNode;
-  /** Accent colour: 'blue' | 'emerald' | 'amber' | 'rose' */
-  accent?: 'blue' | 'emerald' | 'amber' | 'rose';
+  /** Accent colour: 'blue' | 'green' | 'amber' | 'rose' */
+  accent?: 'blue' | 'green' | 'indigo' | 'amber' | 'rose';
   onClick?: () => void;
 }
 
 const ACCENT_BORDER: Record<string, string> = {
-  blue:    'border-l-[var(--aki-blue)]',
-  emerald: 'border-l-emerald-500',
+  blue:    'border-l-[var(--pro-azure)]',
+  indigo: 'border-l-[var(--pro-azure)]',
+  green:  'border-l-[var(--pro-azure)]',
   amber:   'border-l-amber-500',
   rose:    'border-l-rose-500',
 };
@@ -56,7 +57,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         {title}
       </span>
       {icon && (
-        <span className="w-8 h-8 rounded-xl bg-[var(--aki-blue-50)] text-[var(--aki-blue)] flex items-center justify-center shrink-0">
+        <span className="w-8 h-8 rounded-xl bg-[var(--pro-azure-50)] text-[var(--pro-azure)] flex items-center justify-center shrink-0">
           {icon}
         </span>
       )}
@@ -64,7 +65,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         <span className={[
           'text-[10px] font-bold px-2 py-0.5 rounded-full',
           isPositive
-            ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
+            ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
             : 'bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400',
         ].join(' ')}>
           {isPositive ? '+' : ''}{percentage}%
@@ -84,7 +85,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         <span className={[
           'flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full',
           isPositive
-            ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
+            ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
             : 'bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400',
         ].join(' ')}>
           {isPositive ? '↑' : '↓'} {Math.abs(percentage)}%

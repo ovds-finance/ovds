@@ -1,0 +1,116 @@
+{
+  "gs": {
+    "page_title": "Getting Started",
+    "hero": {
+      "badge": "System Administration Onboarding · Configure · Deploy · Operate",
+      "title_prefix": "Setting Up",
+      "title_brand": "Ovds Cloud",
+      "subtitle": "Initialize your corporate profile, configure Ethiopian tax compliance, and activate IFRS-ready accounting in minutes.",
+      "welcome": "Welcome, {{name}}! ",
+      "cta_get_started": "Get Started",
+      "cta_self_hosting": "Self-Hosting Guide",
+      "cta_enterprise": "Enterprise Client ↓",
+      "cta_invoice_module": "Invoice Module ↓",
+      "activation_progress": "Activation Progress"
+    },
+    "tabs": {
+      "checklist": "Setup Checklist",
+      "pit": "PIT Calculator",
+      "tax": "Tax Reference",
+      "guide": "Ethiopian Tax Guide",
+      "shortcuts": "Shortcuts"
+    },
+    "checklist": {
+      "setup_progress": "Setup Progress",
+      "steps_complete": "{{done}} of {{total}} steps complete",
+      "reset": "Reset",
+      "go": "Go",
+      "scope_summary": "Scope Summary",
+      "steps_suffix_one": "step",
+      "steps_suffix_other": "steps",
+      "module_activities": "Module Activities",
+      "no_scopes": "No scopes configured yet. Start the wizard to track your setup progress.",
+      "no_activities": "No activities yet. Complete wizard steps to log module configuration.",
+      "admin_setup_wizard": "Admin Setup Wizard",
+      "all_set_title": "You're all set!",
+      "all_set_body": "Your Ovds account is fully configured. Head to the Dashboard to get started.",
+      "dashboard": "Dashboard"
+    },
+    "pit": {
+      "heading": "Proclamation 1395/2025 Calculator",
+      "subheading": "Official Ethiopian PIT Brackets",
+      "gross_salary_label": "Gross Monthly Salary",
+      "gross_salary_placeholder": "0.00",
+      "effective_rate": "Effective Rate",
+      "net_salary": "Net Salary",
+      "pit_deducted": "PIT Deducted",
+      "emp_pension": "Employee Pension (7%)",
+      "empr_pension": "Employer Pension (11%)",
+      "take_home": "Take Home",
+      "toggle_brackets": "Show PIT Brackets",
+      "hide_brackets": "Hide Brackets"
+    },
+    "tax": {
+      "deadline_prefix": "Deadline:"
+    },
+    "guide": {
+      "heading": "Ethiopian Tax Classification Guide",
+      "subheading": "Schedules A–E · Trade Sectors · Business Categories · Indirect Taxes",
+      "schedules_nav": "Income Tax Schedules (A–E)",
+      "sectors_nav": "Trade Sectors",
+      "categories_nav": "Business Categories (A/B)",
+      "indirect_nav": "Indirect Taxes",
+      "schedules_intro": "Ethiopia divides income taxes into five official categories (Schedules A–E) under Proclamation No. 1395/2025, administered by the Ministry of Revenues (MoR) via the MoR e-Tax Portal.",
+      "go_to_module": "Go to Module",
+      "tax_name_header": "Tax",
+      "rate_header": "Rate",
+      "applies_header": "Applies",
+      "vat_required": "VAT Required",
+      "vat_not_required": "VAT Not Required",
+      "bookkeeping": "Bookkeeping",
+      "tax_method": "Tax Method",
+      "mor_etax_portal": "MoR e-Tax Portal"
+    },
+    "shortcuts": {
+      "heading": "Keyboard Shortcuts"
+    },
+    "sidebar": {
+      "api_key_title": "Your API Key",
+      "api_key_sub": "Required for company setup & apps",
+      "api_key_cta": "Get API Key at ovds.com.et",
+      "compliance_hub": "Compliance Hub",
+      "pit_facts_title": "Quick PIT Facts",
+      "official_resources": "Official Resources",
+      "pro_tip": "Pro Tip",
+      "pro_tip_body": "Press {{kbd_q}} anywhere in the app to open the full shortcuts panel. Use {{kbd_ctrl_k}} for global search.",
+      "payroll_module": "Payroll Module"
+    },
+    "deadline": {
+      "title": "Tax Deadline Calendar",
+      "next_days": "Next 45 days",
+      "overdue": "Overdue",
+      "urgent": "Urgent"
+    },
+    "faq": {
+      "heading": "Frequently Asked Questions",
+      "subheading": "Common questions about Ovds features, setup, and Ethiopian tax compliance"
+    },
+    "toasts": {
+      "step_completed": "Step completed",
+      "wizard_reset": "Wizard reset",
+      "failed_update_step": "Failed to update step",
+      "failed_reset": "Failed to reset wizard"
+    },
+    "cat_labels": {
+      "deployment": "Deployment & Environment",
+      "company": "Core Company Data",
+      "financial": "Financial Parameters",
+      "modules": "Modules & Scope",
+      "users": "Users & Access",
+      "system": "System Controls",
+      "tax": "Tax Configuration",
+      "compliance": "Compliance",
+      "localization": "Localization"
+    }
+  }
+}

@@ -44,7 +44,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({
               type="text"
               onChange={(e) => onSearch?.(e.target.value)}
               placeholder="Search commands, records..."
-              className="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[12px] text-slate-700 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-aki-blue/20 focus:border-aki-blue transition-all"
+              className="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[12px] text-slate-700 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)] transition-all"
             />
           </div>
         )}
@@ -57,7 +57,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({
         {showCommandHint && onCommandPalette && (
           <button
             onClick={onCommandPalette}
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[11px] font-medium text-slate-500 dark:text-slate-400 hover:border-aki-blue hover:text-aki-blue transition-all"
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-[11px] font-medium text-slate-500 dark:text-slate-400 hover:border-[var(--pro-azure)] hover:text-[var(--pro-azure)] transition-all"
           >
             <Command size={12} />
             <span>K</span>

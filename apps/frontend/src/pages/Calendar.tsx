@@ -1,21 +1,23 @@
-/**
+﻿/**
  * Calendar — Business activity calendar
  * Shows invoices, bills, payroll runs, project deadlines, leaves, and holidays
  * in a monthly grid view with a day-detail side panel.
  * Inspired by ovds's Calendar app logic.
  */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { AppPage } from '@ovds/ui';
 import {
   ChevronLeft, ChevronRight, Calendar as CalendarIcon,
   FileText, Receipt, Users, FolderKanban, CalendarDays,
   Star, DollarSign, RefreshCw, Filter, X, Clock,
   CheckCircle2, AlertTriangle, Circle,
 } from 'lucide-react';
-import { usePageTitle } from '../hooks/usePageTitle';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+
 import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
 import api from '../services/api';
 import { fmtCurrency } from '../utils/fmt';
-import { AppPage, Btn } from '@ovds/ui';
+
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
@@ -35,13 +37,13 @@ interface CalEvent {
 
 // -- Event type config ---------------------------------------------------------
 const EVENT_CONFIG: Record<EventType, { color: string; bg: string; dot: string; icon: React.ReactNode }> = {
-  invoice:  { color: 'text-emerald-700 dark:text-emerald-300',   bg: 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800',   dot: 'bg-emerald-500',    icon: <FileText size={11} /> },
+  invoice:  { color: 'text-[var(--pro-azure-dark)] dark:text-green-300',   bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/40 border-[var(--pro-azure-100)] dark:border-green-800',   dot: 'bg-[var(--pro-azure-50)]0',    icon: <FileText size={11} /> },
   bill:     { color: 'text-rose-700 dark:text-rose-300',   bg: 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800',   dot: 'bg-rose-500',    icon: <Receipt size={11} /> },
-  payroll:  { color: 'text-emerald-700 dark:text-emerald-300', bg: 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800', dot: 'bg-emerald-500', icon: <DollarSign size={11} /> },
+  payroll:  { color: 'text-[var(--pro-azure-dark)] dark:text-green-300', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/40 border-[var(--pro-azure-100)] dark:border-green-800', dot: 'bg-[var(--pro-azure-50)]0', icon: <DollarSign size={11} /> },
   project:  { color: 'text-violet-700 dark:text-violet-300', bg: 'bg-violet-50 dark:bg-violet-950/40 border-violet-200 dark:border-violet-800', dot: 'bg-violet-500', icon: <FolderKanban size={11} /> },
   leave:    { color: 'text-amber-700 dark:text-amber-300', bg: 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800', dot: 'bg-amber-500',   icon: <Users size={11} /> },
   holiday:  { color: 'text-teal-700 dark:text-teal-300',   bg: 'bg-teal-50 dark:bg-teal-950/40 border-teal-200 dark:border-teal-800',   dot: 'bg-teal-500',    icon: <Star size={11} /> },
-  payment:  { color: 'text-indigo-700 dark:text-indigo-300', bg: 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800', dot: 'bg-indigo-500', icon: <CheckCircle2 size={11} /> },
+  payment:  { color: 'text-[var(--pro-azure-dark)] dark:text-green-300', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/40 border-[var(--pro-azure-100)] dark:border-green-800', dot: 'bg-[var(--pro-azure-50)]0', icon: <CheckCircle2 size={11} /> },
 };
 
 const FILTER_TYPES: { key: EventType; label: string }[] = [
@@ -212,6 +214,7 @@ const Calendar: React.FC = () => {
 
     setEvents(collected);
     setLoading(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [year, month, selectedCompanyId]);
 
   useEffect(() => { fetchEvents(); }, [fetchEvents]);
@@ -228,7 +231,7 @@ const Calendar: React.FC = () => {
     setSelectedDay(null);
   };
 
-  const goToday = () => {
+  const _goToday = () => {
     setYear(today.getFullYear());
     setMonth(today.getMonth());
     setSelectedDay(toYMD(today));
@@ -325,14 +328,14 @@ const Calendar: React.FC = () => {
                   key={dateStr}
                   onClick={() => setSelectedDay(isSelected ? null : dateStr)}
                   className={`min-h-[90px] border-b border-r border-slate-100 dark:border-slate-800 p-1.5 cursor-pointer transition-all ${
-                    isSelected ? 'bg-emerald-50 dark:bg-emerald-950/30 ring-2 ring-inset ring-emerald-400' :
-                    isToday ? 'bg-emerald-50/50 dark:bg-emerald-950/20' :
+                    isSelected ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 ring-2 ring-inset ring-[var(--pro-azure)]' :
+                    isToday ? 'bg-[var(--pro-azure-50)]/50 dark:bg-green-950/20' :
                     isWeekend ? 'bg-slate-50/50 dark:bg-slate-800/20' :
                     'hover:bg-slate-50 dark:hover:bg-slate-800/30'
                   }`}
                 >
                   <div className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold mb-1 ${
-                    isToday ? 'bg-emerald-500 text-white' : 'text-slate-600 dark:text-slate-400'
+                    isToday ? 'bg-[var(--pro-azure-50)]0 text-white' : 'text-slate-600 dark:text-slate-400'
                   }`}>
                     {day}
                   </div>

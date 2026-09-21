@@ -1,6 +1,7 @@
+import { createHmac, timingSafeEqual } from 'crypto';
+
 import { Injectable, CanActivate, ExecutionContext, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createHmac, timingSafeEqual } from 'crypto';
 
 @Injectable()
 export class WebhookVerificationGuard {

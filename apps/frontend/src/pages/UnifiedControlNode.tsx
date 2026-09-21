@@ -9,8 +9,8 @@
  *     IoT Smart Devices, external Apps & Extensions, OTA firmware, billing
  *     triggers, and the full IoT ↔ Ethiopian Tax Pipeline with TASS/SRM.
  */
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { AppPage, AppTabs, AppStat, Btn, Icon, StatusBadge, EmptyState } from '@ovds/ui';
+import { fmtTin, fmtCurrency } from '@ovds/ui';
 import {
   Building2, BadgeCheck, Fingerprint, ShieldCheck, Cpu, Warehouse,
   ScanLine, Scale, AppWindow, ArrowRight, Activity, Circle, CheckCircle2,
@@ -19,16 +19,14 @@ import {
   Zap, SlidersHorizontal, CreditCard, LayoutGrid, Receipt, Banknote,
   Download, ChevronRight, Radio, TrendingUp, Wifi, WifiOff,
 } from 'lucide-react';
-import { AppPage, AppTabs, AppStat, Btn, Icon, StatusBadge, EmptyState } from '@ovds/ui';
+import React, { useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+
+import { useApiQuery } from '../hooks/useApiQuery';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useAuth } from '../rbac/AuthContext';
-import { useApiQuery } from '../hooks/useApiQuery';
-import { fmtDate, fmtRelativeTime } from '../utils/fmt';
-import { fmtTin, fmtCurrency } from '@ovds/ui';
-import { useUnifiedControlNode } from '../services/unifiedControlApi';
 import { useDeviceControlPolicies } from '../services/deviceControlApi';
-import { setupApi, type CompanySetupProgress } from '../services/setupApi';
-import toast from 'react-hot-toast';
 import {
   useIotDevices,
   useIotDashboard,
@@ -41,6 +39,11 @@ import {
   useResolveAlert,
   type IotDevice,
 } from '../services/iotApi';
+import { setupApi, type CompanySetupProgress } from '../services/setupApi';
+import { useUnifiedControlNode } from '../services/unifiedControlApi';
+import { fmtDate, fmtRelativeTime } from '../utils/fmt';
+
+
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -97,7 +100,7 @@ const SystemLocalPanel: React.FC = () => {
   const activities: any[] = Array.isArray(activitiesRaw) ? activitiesRaw : [];
 
   const [wizardProgress, setWizardProgress] = useState<CompanySetupProgress | null>(null);
-  const [wizardLoading, setWizardLoading] = useState(false);
+  const [_wizardLoading, setWizardLoading] = useState(false);
 
   useEffect(() => {
     if (!user?.companyId) return;
@@ -200,15 +203,15 @@ const SystemLocalPanel: React.FC = () => {
       {/* KPI strips */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <AppStat label="Users"        value={unifiedLoading || usersLoading ? '—' : totalUsers}  icon={<Icon name="USERS"   size={16} />} color="blue" />
-        <AppStat label="Active users" value={unifiedLoading || usersLoading ? '—' : activeUsers} icon={<Icon name="SUCCESS" size={16} />} color="emerald" />
+        <AppStat label="Active users" value={unifiedLoading || usersLoading ? '—' : activeUsers} icon={<Icon name="SUCCESS" size={16} />} color="indigo" />
         <AppStat label="Roles"        value={unifiedLoading || usersLoading ? '—' : roleCount}   icon={<Icon name="LOCK"    size={16} />} color="violet" />
         <AppStat label="Access policies" value={unifiedLoading || usersLoading ? '—' : totalUsers} icon={<Icon name="SHIELD" size={16} />} color="sky" />
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <AppStat label="Version"     value={unified?.system?.version     ?? '—'} icon={<Icon name="ITEM"     size={16} />} color="slate" />
-        <AppStat label="Uptime"      value={unified?.system?.uptime      ?? '—'} icon={<Icon name="ACTIVITY" size={16} />} color="emerald" />
-        <AppStat label="Environment" value={unified?.system?.environment ?? '—'} icon={<Monitor size={16} />}              color="blue" />
-        <AppStat label="Node"        value={unified?.system?.nodeName    ?? '—'} icon={<Server size={16} />}               color="violet" />
+        <AppStat label="Version"     value={String(unified?.system?.version     ?? '—')} icon={<Icon name="ITEM"     size={16} />} color="slate" />
+        <AppStat label="Uptime"      value={String(unified?.system?.uptime      ?? '—')} icon={<Icon name="ACTIVITY" size={16} />} color="indigo" />
+        <AppStat label="Environment" value={String(unified?.system?.environment ?? '—')} icon={<Monitor size={16} />}              color="blue" />
+        <AppStat label="Node"        value={String(unified?.system?.nodeName    ?? '—')} icon={<Server size={16} />}               color="violet" />
       </div>
 
       {/* Setup wizard progress banner */}
@@ -223,7 +226,7 @@ const SystemLocalPanel: React.FC = () => {
               </span>
             </div>
             <button onClick={() => navigate('/settings/setup-wizard')}
-              className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+              className="text-[12px] font-semibold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
               Continue Setup <ArrowRight size={13} />
             </button>
           </div>
@@ -237,13 +240,13 @@ const SystemLocalPanel: React.FC = () => {
         </div>
       )}
       {isWizardComplete && (
-        <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-2xl p-4 flex items-center justify-between">
+        <div className="bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-2xl p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CheckCircle2 size={18} className="text-emerald-600 dark:text-emerald-400" />
-            <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Setup complete — system fully configured</p>
+            <CheckCircle2 size={18} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
+            <p className="text-sm font-semibold text-[var(--pro-azure-dark)] dark:text-green-300">Setup complete — system fully configured</p>
           </div>
           <button onClick={() => navigate('/settings/setup-wizard')}
-            className="text-[12px] font-semibold text-emerald-700 dark:text-emerald-400 hover:underline">Review</button>
+            className="text-[12px] font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] hover:underline">Review</button>
         </div>
       )}
 
@@ -251,15 +254,15 @@ const SystemLocalPanel: React.FC = () => {
       {unified?.company && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-3">
-            <FileText size={16} className="text-emerald-600 dark:text-emerald-400" />
+            <FileText size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Fiscal & Currency</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { label: 'Currency',         value: unified.company.currency },
-              { label: 'Fiscal Year Start',value: `Month ${unified.company.fiscalYearStart}` },
-              { label: 'Language',         value: unified.company.language },
-              { label: 'Timezone',         value: unified.company.timezone.replace(/_/g,' ') },
+              { label: 'Currency',         value: String(unified.settings?.currency         ?? '—') },
+              { label: 'Fiscal Year Start',value: `Month ${unified.settings?.fiscalYearStart ?? '—'}` },
+              { label: 'Language',         value: String(unified.settings?.language          ?? '—') },
+              { label: 'Timezone',         value: String(unified.settings?.timezone          ?? '—').replace(/_/g,' ') },
             ].map(({ label, value }) => (
               <div key={label} className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3">
                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">{label}</p>
@@ -282,21 +285,21 @@ const SystemLocalPanel: React.FC = () => {
               </span>
             </div>
             <button onClick={() => navigate('/settings/setup-wizard')}
-              className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+              className="text-[12px] font-semibold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
               Open Setup Wizard <ArrowRight size={13} />
             </button>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
             {PIPELINE_STEPS.map((item) => {
               const stepStatus = wizardStepStatusMap.get(item.key);
-              const clr = stepStatus === 'completed' ? 'text-emerald-500' : stepStatus === 'in_progress' ? 'text-amber-500' : 'text-slate-300';
+              const clr = stepStatus === 'completed' ? 'text-[var(--pro-azure)]' : stepStatus === 'in_progress' ? 'text-amber-500' : 'text-slate-300';
               const icon = stepStatus === 'completed' ? <CheckCircle2 size={14} className={clr} />
                 : stepStatus === 'in_progress' ? <RefreshCw size={12} className={clr} />
                 : <Circle size={12} className={clr} />;
               return (
                 <button key={item.step} onClick={() => navigate(item.to)}
                   className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl px-3 py-2 transition-colors text-left group">
-                  <span className="text-slate-500 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors shrink-0">
+                  <span className="text-slate-500 dark:text-slate-400 group-hover:text-[var(--pro-azure)] transition-colors shrink-0">
                     {item.icon}
                   </span>
                   <div className="min-w-0 flex-1">
@@ -316,7 +319,7 @@ const SystemLocalPanel: React.FC = () => {
         {cards.map((c) => (
           <div key={c.key} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col">
             <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-[var(--pro-azure-50)] text-[var(--pro-azure)] flex items-center justify-center">
                 {c.icon}
               </div>
               <div className="min-w-0">
@@ -337,7 +340,7 @@ const SystemLocalPanel: React.FC = () => {
             </div>
             {can(c.perm as any) && (
               <button onClick={() => navigate(c.to)}
-                className="mt-4 w-full flex items-center justify-center gap-1.5 text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+                className="mt-4 w-full flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[var(--pro-azure)] hover:underline">
                 {c.cta} <ArrowRight size={13} />
               </button>
             )}
@@ -380,7 +383,7 @@ const SystemLocalPanel: React.FC = () => {
                       {u.role ?? u.roles?.[0] ?? 'Member'}
                     </span>
                     {u.status === 'ACTIVE' || u.isActive
-                      ? <CheckCircle2 size={14} className="text-emerald-500" />
+                      ? <CheckCircle2 size={14} className="text-[var(--pro-azure)]" />
                       : <CircleSlash size={14} className="text-slate-300" />}
                   </div>
                 </div>
@@ -391,7 +394,7 @@ const SystemLocalPanel: React.FC = () => {
         {can('role_permissions:read') && (
           <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-800 flex justify-end">
             <button onClick={() => navigate('/settings/roles')}
-              className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+              className="text-[12px] font-semibold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
               Roles & Permissions <ArrowRight size={13} />
             </button>
           </div>
@@ -408,7 +411,7 @@ const SystemLocalPanel: React.FC = () => {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { label: 'Mode',        value: unified.deployment.mode ?? '—' },
-              { label: 'Environment', value: unified.system.environment },
+              { label: 'Environment', value: unified.system?.environment ?? '—' },
               { label: 'Offline Mode',value: unified.deployment.offlineMode ? 'Enabled' : 'Disabled' },
               { label: 'Edge Nodes',  value: String(unified.deployment.edgeNodeCount ?? 0) },
             ].map(({ label, value }) => (
@@ -431,7 +434,7 @@ const SystemLocalPanel: React.FC = () => {
             </div>
             {can('apps:read') && (
               <button onClick={() => navigate('/settings/app-store')}
-                className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+                className="text-[12px] font-semibold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
                 App Store <ArrowUpRight size={12} />
               </button>
             )}
@@ -466,14 +469,14 @@ const SystemLocalPanel: React.FC = () => {
               { label: 'Pension', enabled: unified.tax.pensionEnabled },
             ].map((t) => (
               <div key={t.label} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-2">
-                {t.enabled ? <CheckCircle2 size={14} className="text-emerald-500" /> : <CircleSlash size={14} className="text-slate-300" />}
+                {t.enabled ? <CheckCircle2 size={14} className="text-[var(--pro-azure)]" /> : <CircleSlash size={14} className="text-slate-300" />}
                 <span className="text-[12px] font-medium text-slate-600 dark:text-slate-300">{t.label}</span>
               </div>
             ))}
           </div>
           {can('tax:read' as any) && (
             <button onClick={() => navigate('/ovds/tax')}
-              className="mt-3 text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+              className="mt-3 text-[12px] font-semibold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
               Tax Settings <ArrowRight size={13} />
             </button>
           )}
@@ -508,7 +511,7 @@ const SystemLocalPanel: React.FC = () => {
       {unified?.compliance && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-3">
-            <ShieldCheck size={16} className="text-emerald-600 dark:text-emerald-400" />
+            <ShieldCheck size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Compliance & Regulatory</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -521,7 +524,7 @@ const SystemLocalPanel: React.FC = () => {
               { label: 'IFRS',          ok: unified.compliance.ifrsEnabled },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-2">
-                {item.ok ? <CheckCircle2 size={14} className="text-emerald-500" /> : <CircleSlash size={14} className="text-slate-300" />}
+                {item.ok ? <CheckCircle2 size={14} className="text-[var(--pro-azure)]" /> : <CircleSlash size={14} className="text-slate-300" />}
                 <span className="text-[12px] font-medium text-slate-600 dark:text-slate-300">{item.label}</span>
               </div>
             ))}
@@ -532,7 +535,7 @@ const SystemLocalPanel: React.FC = () => {
       {/* Setup Validation */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
         <div className="flex items-center gap-2 mb-3">
-          <ShieldCheck size={16} className="text-emerald-600 dark:text-emerald-400" />
+          <ShieldCheck size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Setup Validation</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -548,7 +551,7 @@ const SystemLocalPanel: React.FC = () => {
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-2 text-[12px]">
               {item.ok
-                ? <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
+                ? <CheckCircle2 size={14} className="text-[var(--pro-azure)] shrink-0" />
                 : <AlertTriangle size={14} className="text-amber-500 shrink-0" />}
               <span className={`font-medium ${item.ok ? 'text-slate-600 dark:text-slate-300' : 'text-slate-400 dark:text-slate-500'}`}>
                 {item.label}
@@ -568,7 +571,7 @@ const SystemLocalPanel: React.FC = () => {
             </div>
             {can('audit_logs:read') && (
               <button onClick={() => navigate('/settings/audit-logs')}
-                className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+                className="text-[12px] font-semibold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
                 Audit Trail <ArrowRight size={13} />
               </button>
             )}
@@ -618,6 +621,7 @@ const IotAppsPanel: React.FC = () => {
   const pendingOtaJobs = otaJobs.filter((j: any) => j.status === 'PENDING' || j.status === 'IN_PROGRESS');
 
   const { data: billingTriggersRaw = [] } = useIotBillingTriggers(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const billingTriggers: any[] = Array.isArray(billingTriggersRaw) ? billingTriggersRaw : [];
 
   const { data: fiscalEventsRaw = [] } = useIotFiscalEvents();
@@ -635,6 +639,7 @@ const IotAppsPanel: React.FC = () => {
   const acknowledgeAlert = useAcknowledgeAlert();
   const resolveAlert = useResolveAlert();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const devices: IotDevice[] = devicesData?.devices ?? [];
   const liveStreams = useMemo(
     () => devices.filter((d) => d.status === 'ACTIVE' || d.status === 'OFFLINE'),
@@ -662,7 +667,7 @@ const IotAppsPanel: React.FC = () => {
       {/* KPI strip — now with criticalAlerts + unbilled */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <AppStat label="Devices"       value={summary?.totalDevices  ?? (devicesLoading ? '—' : devices.length)} icon={<Icon name="MONITOR"      size={16} />} color="sky" />
-        <AppStat label="Online"        value={summary?.activeDevices ?? 0}   icon={<Icon name="ACTIVITY"     size={16} />} color="emerald" />
+        <AppStat label="Online"        value={summary?.activeDevices ?? 0}   icon={<Icon name="ACTIVITY"     size={16} />} color="indigo" />
         <AppStat label="Critical ⚡"   value={summary?.criticalAlerts ?? 0}  icon={<Icon name="BELL"         size={16} />} color={(summary?.criticalAlerts ?? 0) > 0 ? 'amber' : 'slate'} />
         <AppStat label="Apps linked"   value={apps.filter((a) => a.isActive).length} icon={<Icon name="ITEM" size={16} />} color="violet" />
         <AppStat label="Unbilled"      value={billingTriggers.length}         icon={<Banknote size={16} />}                color={billingTriggers.length > 0 ? 'amber' : 'slate'} />
@@ -675,7 +680,7 @@ const IotAppsPanel: React.FC = () => {
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">IoT Smart Devices — configuration modules</p>
           {can('iot:write') && (
             <button onClick={() => navigate('/iot/devices')}
-              className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+              className="text-[12px] font-semibold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
               Device registry <ArrowRight size={13} />
             </button>
           )}
@@ -717,7 +722,7 @@ const IotAppsPanel: React.FC = () => {
                   <div className="flex items-center justify-between gap-2 text-[11px]">
                     <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
                       {live
-                        ? <Circle size={8} className="fill-emerald-500 text-emerald-500 animate-pulse" />
+                        ? <Circle size={8} className="fill-indigo-500 text-[var(--pro-azure)] animate-pulse" />
                         : <Circle size={8} className="fill-slate-300 text-slate-300" />}
                       <span>→</span>
                       <button onClick={() => navigate(stream.to)}
@@ -751,7 +756,7 @@ const IotAppsPanel: React.FC = () => {
             </div>
             {can('iot:write') && (
               <button onClick={() => navigate('/iot/devices')}
-                className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+                className="text-[12px] font-semibold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
                 Manage OTA <ArrowRight size={13} />
               </button>
             )}
@@ -801,7 +806,7 @@ const IotAppsPanel: React.FC = () => {
             </div>
             {can('iot:read') && (
               <button onClick={() => navigate('/iot/alerts')}
-                className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+                className="text-[12px] font-semibold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
                 View all <ArrowRight size={13} />
               </button>
             )}
@@ -826,7 +831,7 @@ const IotAppsPanel: React.FC = () => {
                         ACK
                       </button>
                       <button onClick={() => resolveAlert.mutate(alert.id)}
-                        className="text-[11px] px-2 py-0.5 rounded-lg border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 transition-colors">
+                        className="text-[11px] px-2 py-0.5 rounded-lg border border-[var(--pro-azure-100)] dark:border-green-800 hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-950/30 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">
                         Resolve
                       </button>
                     </div>
@@ -851,7 +856,7 @@ const IotAppsPanel: React.FC = () => {
             </div>
             {can('invoices:write') && (
               <button onClick={() => navigate('/sales/invoices')}
-                className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+                className="text-[12px] font-semibold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
                 Create invoice <ArrowRight size={13} />
               </button>
             )}
@@ -888,7 +893,7 @@ const IotAppsPanel: React.FC = () => {
               </span>
             </div>
             <button onClick={() => navigate('/tax/vat')}
-              className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+              className="text-[12px] font-semibold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
               VAT filings <ArrowRight size={13} />
             </button>
           </div>
@@ -963,7 +968,7 @@ const IotAppsPanel: React.FC = () => {
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Apps & Extensions — configuration modules</p>
           {can('apps:read') && (
             <button onClick={() => navigate('/settings/app-store')}
-              className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+              className="text-[12px] font-semibold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
               App Store <ArrowRight size={13} />
             </button>
           )}
@@ -987,7 +992,7 @@ const IotAppsPanel: React.FC = () => {
                 <button
                   onClick={() => toggleApp(a.id, a.isActive)}
                   disabled={!can('apps:write' as any)}
-                  className={`relative w-10 h-5 rounded-full transition-colors shrink-0 ${a.isActive ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'} disabled:opacity-50`}
+                  className={`relative w-10 h-5 rounded-full transition-colors shrink-0 ${a.isActive ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-200 dark:bg-slate-700'} disabled:opacity-50`}
                   aria-label={a.isActive ? 'Disable app' : 'Enable app'}
                 >
                   <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${a.isActive ? 'translate-x-5' : 'translate-x-0.5'}`} />
@@ -1011,7 +1016,7 @@ const IotAppsPanel: React.FC = () => {
             </div>
             {can('device_control:read') && (
               <button onClick={() => navigate('/device-control')}
-                className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+                className="text-[12px] font-semibold text-[var(--pro-azure)] hover:underline flex items-center gap-1">
                 Governance <ArrowRight size={13} />
               </button>
             )}
@@ -1039,7 +1044,7 @@ const IotAppsPanel: React.FC = () => {
       {liveStreams.length > 0 && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-3">
-            <Activity size={15} className="text-emerald-500" />
+            <Activity size={15} className="text-[var(--pro-azure)]" />
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Automated stream monitor</p>
             <span className="text-[11px] text-slate-400">raw events → Inventory / Payroll logs</span>
           </div>
@@ -1051,7 +1056,7 @@ const IotAppsPanel: React.FC = () => {
                 <div key={d.id} className="flex items-center justify-between text-[12px] px-2 py-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50">
                   <div className="flex items-center gap-2 min-w-0">
                     {live
-                      ? <Wifi size={12} className="text-emerald-500 shrink-0" />
+                      ? <Wifi size={12} className="text-[var(--pro-azure)] shrink-0" />
                       : <WifiOff size={12} className="text-slate-300 shrink-0" />}
                     <span className="font-medium text-slate-700 dark:text-slate-200 truncate">{d.name}</span>
                     <span className="text-slate-400 truncate">→ {stream.log}</span>

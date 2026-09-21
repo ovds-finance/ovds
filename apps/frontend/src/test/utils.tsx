@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Custom render utility that wraps components with all required providers.
  * Use this instead of @testing-library/react's render directly.
  *
@@ -6,11 +6,12 @@
  *   import { render, screen } from '../test/utils';
  *   render(<MyComponent />);
  */
-import React, { type ReactElement } from 'react';
-import { render, type RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter } from 'react-router-dom';
+import { render, type RenderOptions } from '@testing-library/react';
+import React, { type ReactElement } from 'react';
 import { I18nextProvider } from 'react-i18next';
+import { MemoryRouter } from 'react-router-dom';
+
 import i18n from '../i18n';
 
 // Fresh QueryClient per test — no shared cache between tests
@@ -30,6 +31,7 @@ interface WrapperProps {
   initialRoute?: string;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 function AllProviders({ children, initialRoute = '/' }: WrapperProps) {
   const queryClient = createTestQueryClient();
   return (
@@ -60,6 +62,7 @@ function customRender(
 }
 
 // Re-export everything from testing-library so tests only need one import
+// eslint-disable-next-line react-refresh/only-export-components
 export * from '@testing-library/react';
 export { customRender as render };
 

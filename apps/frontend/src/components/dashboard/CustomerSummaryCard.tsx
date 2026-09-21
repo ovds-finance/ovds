@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Icon } from '../ui';
 
 interface CustomerSummaryCardProps {
   paidCount?: number;
@@ -40,14 +39,14 @@ const CustomerSummaryCard: React.FC<CustomerSummaryCardProps> = ({
         </div>
         <div className="flex items-center gap-2">
           {trend !== undefined && (
-            <span className={`text-[10px] font-bold flex items-center gap-0.5 ${trend >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
+            <span className={`text-[10px] font-bold flex items-center gap-0.5 ${trend >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-500'}`}>
               {trend >= 0 ? '↑' : '↓'} {Math.abs(trend)}%
               <span className="text-slate-400 font-normal">vs last month</span>
             </span>
           )}
           <Link
             to="/sales/invoices"
-            className="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 transition-colors"
+            className="text-[11px] font-bold text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] transition-colors"
           >
             View all
           </Link>
@@ -56,19 +55,19 @@ const CustomerSummaryCard: React.FC<CustomerSummaryCardProps> = ({
 
       <div className="grid grid-cols-3 gap-3">
         {/* Paid */}
-        <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-xl p-3 border border-emerald-100 dark:border-emerald-900/30">
+        <div className="bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl p-3 border border-[var(--pro-azure-100)] dark:border-green-900/30">
           <div className="flex items-center justify-between">
-            <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Paid</p>
-            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded-full">
+            <p className="text-[10px] font-bold text-[var(--pro-azure)] uppercase tracking-wider">Paid</p>
+            <span className="text-[10px] font-bold text-[var(--pro-azure)] bg-[var(--pro-azure-100)] dark:bg-green-900/30 px-1.5 py-0.5 rounded-full">
               {paidCount}
             </span>
           </div>
-          <p className="text-lg font-bold text-emerald-700 dark:text-emerald-400 mt-1 tabular-nums">
+          <p className="text-lg font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] mt-1 tabular-nums">
             {fmt(paidAmount)}
           </p>
-          <div className="mt-2 h-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full overflow-hidden">
+          <div className="mt-2 h-1.5 bg-[var(--pro-azure-100)] dark:bg-green-900/30 rounded-full overflow-hidden">
             <div
-              className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+              className="h-full bg-[var(--pro-azure-50)]0 rounded-full transition-all duration-500"
               style={{ width: `${paidPct}%` }}
             />
           </div>

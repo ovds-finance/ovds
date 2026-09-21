@@ -1,8 +1,8 @@
-# OVDS Module Restructure — Canonical Akaunting-Inspired Architecture
+# OVDS Module Restructure — Canonical Ovds SaaS Architecture
 
 > Goal: collapse the ~80 overlapping feature folders in `apps/backend/src` (plus the
 > redundant frontend/packages clusters) into a small number of **domain modules**, each
-> self-contained and Akaunting-style, and delete the now-redundant originals.
+> self-contained and Ovds SaaS style, and delete the now-redundant originals.
 
 ## Progress tracker
 
@@ -19,7 +19,7 @@
 | `security` | ✅ done | New `security/` module: folded `device-control`, `iot`, `nodes`, `infrastructure` in (kept `SecurityController`); originals deleted |
 | `platform` | ✅ done | New `platform/` module: folded `nav`, `admin`, `appstore`, `system-modules`, `releases`, `offline`, `sync`, `helpdesk`; originals deleted |
 | `compliance` | ✅ done | Folded `master-compliance` into `compliance/` (kept `audit-log` as shared module used by `ovds`/`vat`); `master-compliance` deleted |
-| `tax` | ✅ done | `vat` (real `VatService` from `@ovds/domains/vat`) folded into `TaxModule` as the canonical VAT surface; `vat/` module folder deleted; `tax/vat/*` facade left in place (different route path) pending product decision |
+| `tax` | ✅ done | `vat` (real `VatService` from `@ovds/domains-vat`) folded into `TaxModule` as the canonical VAT surface; standalone `apps/backend/src/vat/vat.module.ts` deleted; `OvdsFacadeModule` now imports `TaxModule` directly |
 | `eims` | kept | Left as its own `EimsModule` (2968 LOC, distinct ERCA/ERA domain) |
 | `cyber-audit`, `security-assessment` | kept | Left as distinct modules (real implementations) |
 | `auth`, `common`, `core`, `types`, `orpc`, `ovds` | kept | Cross-cutting; not part of the duplication problem |
@@ -27,8 +27,30 @@
 Every cluster above was gated by a green `npx nx typecheck backend` (EXIT=0).
 
 ### Remaining (separate efforts, not yet done)
-- **Backend `tax`/`vat`** — needs the product decision above.
+- ~~**Backend `tax`/`vat`**~~ — ✅ resolved: `VatModule` removed; `OvdsFacadeModule` imports `TaxModule`.
 - **Frontend** (`apps/frontend/src`, `apps/portal/src`) and **packages** (`domains`, `features`, `modules`, `ui`) — duplicate UI slices (`accounting`, `banks`, `invoices`, `payroll`, `device-control`, `DisasterFund`, `crm`, `employees`, …) still overlap; follow §1 map per app. This is a larger, separate pass.
+
+---
+
+## Cross-cutting cleanup (completed September 2026)
+
+These changes were applied on top of the module consolidation above to eliminate
+non-module-level technical debt.
+
+| Issue | Resolution |
+|-------|-----------|
+| `RoleSchema` in `packages/contracts/src/schemas/auth.ts` out of sync | Added `FINANCE`, `SALES`, `PURCHASES`, `SECURITY`, `COMPLIANCE`, `DATA_CLERK`; fixed `'ovds'` → `'OVDS'`. Now matches all 22 roles in `packages/shared/src/types/roles.ts`. |
+| 20 ghost `tsconfig.base.json` path aliases pointing to non-existent `packages/domains/*` dirs | Removed: `iot`, `workflow`, `monetization`, `device-control`, `offline-sync`, `loyalty`, `release`, `onboarding`, `disaster-fund`, `nodes`, `currency`, `cost-centers`, `notifications`, `dashboard`, `websocket`, `appstore`, `security-evaluator`, `expense-claims`, `fiscal`, `custom-fields`. |
+| 9 shim `packages/domains/*` packages with no real implementation | Marked `@deprecated` with migration instructions in each `index.ts`. Their tsconfig aliases removed (callers should use canonical alias directly). Shim directories retained until a final delete pass confirms no active imports. |
+| `TenantContext` name collision between `apps/backend/src/common/tenant-context.middleware.ts` and `packages/database/src/tenant-scoped.ts` | Renamed the middleware interface to `RequestContext` with clarifying JSDoc. Also dropped unused `tap` import. |
+| `Company`, `TaxRate`, `Partnership`, `Integration` defined inline in `packages/features/accounting/src/services/ovdsApi.ts` | Migrated to `packages/contracts/src/schemas/ovds.ts` as proper Zod schemas with `Create*` / `Update*` variants. `ovdsApi.ts` now imports them from `@ovds/contracts/schemas`. |
+| `packages/modules/items/src/domain/index.ts` and `packages/modules/purchases/src/domain/index.ts` double-hopped through shim aliases | Updated to import directly from the canonical packages (`@ovds/domains-inventory` and `@ovds/domains-invoice` respectively). |
+| Standalone `apps/backend/src/vat/vat.module.ts` — duplicate DI wrapper for `VatService` | Deleted. `OvdsFacadeModule` now imports `TaxModule` (which already owns and exports `VatService` and `VatController`). |
+
+### Next cleanup pass (not yet scheduled)
+- **Delete shim `packages/domains/` directories** once knip confirms zero active consumers: `items`, `payroll`, `treasury`, `manufacturing`, `procurement`, `purchases`, `receipts`, `expenses`, `trade`.
+- **Frontend package restructure** — `apps/frontend/src`, `apps/portal/src`, `packages/domains`, `packages/features`, `packages/modules` still have overlapping UI slices (see §7 of the original plan above).
+
 
 ## 1. Target module taxonomy (the "perfect module arrangement")
 
@@ -68,7 +90,7 @@ Canonical domains:
 ## 2. Duplicate / overlap findings (must resolve before delete)
 
 - **`tax` ⇄ `vat`** — both expose VAT filings/summary/ledgers. `vat` uses
-  `VatService` from `@ovds/domains/vat`; `tax` uses a local `TaxService` facade.
+  `VatService` from `@ovds/domains-vat`; `tax` uses a local `TaxService` facade.
   **Resolution:** keep `tax` as the single module; fold `vat`'s ERCA/eTax/IRN
   endpoints into `tax/vat/*` and retire the standalone `vat` module + `VatController`
   registration in `app.module.ts`.
@@ -113,7 +135,7 @@ For each domain row in §1:
 ## 5. Why this is phased and not a single blind rename
 
 The current tree has controllers wired by hand in `app.module.ts` while the real module
-logic also lives in `@ovds/core` (`*Module` factories) and `@ovds/domains/*` services.
+logic also lives in `@ovds/core` (`*Module` factories) and `@ovds/domains-*` services.
 A single sweeping rename would silently break routes and imports across ~300 files with
 no green build to catch it. The domain-by-domain approach above keeps each step
 verifiable and reversible.
@@ -164,7 +186,7 @@ Old `features/*` / `domains/*` packages remain as-is (they are the live implemen
 and the canonical modules re-export them. The clear duplicate `invoice`/`invoicing` has
 been collapsed: `features/invoicing` (stub) and `domains/invoicing` were deleted, and the
 shim chain `receipts` / `purchases` / `procurement` / `expenses` now points straight at
-the canonical `@ovds/domains/invoice` (exposed via the `sales` module).
+the canonical `@ovds/domains-invoice` (exposed via the `sales` module).
 
 ### Finishing the move (delete old)
 `scripts/consolidate-modules.mjs report` enumerates the remaining import sites (≈101)

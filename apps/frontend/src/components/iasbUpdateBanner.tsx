@@ -5,8 +5,9 @@
  * Shown across all IFRS components — dismissible per session per update.
  * Enhanced: readiness score, role-aware action items, print/export.
  */
-import React, { useState, useMemo } from 'react';
 import { Bell, ChevronDown, ChevronUp, X, AlertTriangle, Clock, CheckCircle2, Zap, ExternalLink, Printer, Download, TrendingUp } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+
 import { useIFRSAccess } from '../hooks/useIfrsAccess';
 
 export interface IASBUpdate {
@@ -23,6 +24,7 @@ export interface IASBUpdate {
   replacesOrAmends?: string;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const IASB_UPDATES_2024_2027: IASBUpdate[] = [
   {
     id: 'ifrs18',
@@ -154,7 +156,7 @@ export const IASB_UPDATES_2024_2027: IASBUpdate[] = [
 const STATUS_CONFIG = {
   mandatory:       { label: 'Mandatory',       cls: 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300',       icon: <AlertTriangle size={11} /> },
   'early-adoption':{ label: 'Early Adoption',  cls: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300', icon: <Clock size={11} /> },
-  'exposure-draft':{ label: 'Exposure Draft',  cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-600 dark:text-emerald-300',    icon: <Zap size={11} /> },
+  'exposure-draft':{ label: 'Exposure Draft',  cls: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-[var(--pro-azure)] dark:text-green-300',    icon: <Zap size={11} /> },
 };
 
 const IMPACT_CONFIG = {
@@ -237,8 +239,8 @@ const IASBUpdateBanner: React.FC<Props> = ({ businessType = 'ALL', compact = fal
   }, [allRelevant, readiness]);
 
   const readinessGrade = overallReadiness >= 80 ? 'A' : overallReadiness >= 65 ? 'B' : overallReadiness >= 50 ? 'C' : overallReadiness >= 35 ? 'D' : 'F';
-  const readinessColor = { A: 'text-emerald-600', B: 'text-emerald-600', C: 'text-amber-600', D: 'text-orange-600', F: 'text-rose-600' }[readinessGrade];
-  const readinessBg    = { A: 'bg-emerald-50 dark:bg-emerald-950/30', B: 'bg-emerald-50 dark:bg-emerald-950/30', C: 'bg-amber-50 dark:bg-amber-950/30', D: 'bg-orange-50 dark:bg-orange-950/30', F: 'bg-rose-50 dark:bg-rose-950/30' }[readinessGrade];
+  const readinessColor = { A: 'text-[var(--pro-azure)]', B: 'text-[var(--pro-azure)]', C: 'text-amber-600', D: 'text-orange-600', F: 'text-rose-600' }[readinessGrade];
+  const readinessBg    = { A: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30', B: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30', C: 'bg-amber-50 dark:bg-amber-950/30', D: 'bg-orange-50 dark:bg-orange-950/30', F: 'bg-rose-50 dark:bg-rose-950/30' }[readinessGrade];
 
   if (relevant.length === 0 && !showReadiness) return null;
 
@@ -251,7 +253,7 @@ const IASBUpdateBanner: React.FC<Props> = ({ businessType = 'ALL', compact = fal
       <div className="flex items-center gap-3 px-4 py-2.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl">
         <Bell size={13} className="text-amber-600 dark:text-amber-400 shrink-0" />
         <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
-          <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded-md">{top.standard}</span>
+          <span className="text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 px-2 py-0.5 rounded-md">{top.standard}</span>
           <span className={`flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full ${sc.cls}`}>{sc.icon} {sc.label}</span>
           <span className="text-xs font-bold text-amber-800 dark:text-amber-200 truncate">{top.title}</span>
           <span className="text-[9px] text-amber-600 dark:text-amber-400">Effective: {top.effectiveDate}</span>
@@ -320,7 +322,7 @@ const IASBUpdateBanner: React.FC<Props> = ({ businessType = 'ALL', compact = fal
     <div className="rounded-2xl border border-amber-200 dark:border-amber-800 overflow-hidden">
       {/* Readiness score panel */}
       {showReadiness && (
-        <div className="px-5 py-4 bg-emerald-50 dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-800 text-white flex flex-wrap items-center gap-4">
+        <div className="px-5 py-4 bg-[var(--pro-azure-50)] dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-800 text-white flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-3">
             <div className={`w-14 h-14 rounded-xl flex items-center justify-center font-semibold text-2xl ${readinessBg}`}>
               <span className={readinessColor}>{readinessGrade}</span>
@@ -332,9 +334,9 @@ const IASBUpdateBanner: React.FC<Props> = ({ businessType = 'ALL', compact = fal
             </div>
           </div>
           <div className="flex-1 min-w-[160px]">
-            <div className="h-2 bg-emerald-100 dark:bg-white/10 rounded-full overflow-hidden">
+            <div className="h-2 bg-[var(--pro-azure-100)] dark:bg-white/10 rounded-full overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all duration-700 ${readinessGrade === 'A' ? 'bg-emerald-400' : readinessGrade === 'B' ? 'bg-teal-400' : readinessGrade === 'C' ? 'bg-amber-400' : 'bg-rose-400'}`}
+                className={`h-full rounded-full transition-all duration-700 ${readinessGrade === 'A' ? 'bg-[var(--pro-azure-light)]' : readinessGrade === 'B' ? 'bg-teal-400' : readinessGrade === 'C' ? 'bg-amber-400' : 'bg-rose-400'}`}
                 style={{ width: `${overallReadiness}%` }}
               />
             </div>
@@ -343,10 +345,10 @@ const IASBUpdateBanner: React.FC<Props> = ({ businessType = 'ALL', compact = fal
             </p>
           </div>
           <div className="flex items-center gap-2 ml-auto">
-            <button onClick={printUpdates} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 dark:bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold text-slate-500 dark:text-white/70 hover:text-white transition-colors">
+            <button onClick={printUpdates} className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-100)] dark:bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold text-slate-500 dark:text-white/70 hover:text-white transition-colors">
               <Printer size={12} /> Print
             </button>
-            <button onClick={exportUpdates} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 dark:bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold text-slate-500 dark:text-white/70 hover:text-white transition-colors">
+            <button onClick={exportUpdates} className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-100)] dark:bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold text-slate-500 dark:text-white/70 hover:text-white transition-colors">
               <Download size={12} /> CSV
             </button>
           </div>
@@ -415,7 +417,7 @@ const IASBUpdateBanner: React.FC<Props> = ({ businessType = 'ALL', compact = fal
               <div className="flex items-start gap-3 px-4 py-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded-md">
+                    <span className="text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 px-2 py-0.5 rounded-md">
                       {update.standard}
                     </span>
                     <span className={`flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full ${sc.cls}`}>
@@ -437,7 +439,7 @@ const IASBUpdateBanner: React.FC<Props> = ({ businessType = 'ALL', compact = fal
                         <ul className="space-y-1">
                           {update.keyChanges.map(c => (
                             <li key={c} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
-                              <CheckCircle2 size={11} className="text-emerald-500 mt-0.5 shrink-0" />
+                              <CheckCircle2 size={11} className="text-[var(--pro-azure)] mt-0.5 shrink-0" />
                               {c}
                             </li>
                           ))}
@@ -451,7 +453,7 @@ const IASBUpdateBanner: React.FC<Props> = ({ businessType = 'ALL', compact = fal
 
                       {/* Role-aware action hint */}
                       <div className="flex items-start gap-2 bg-white dark:bg-slate-800/50 rounded-xl p-3 border border-slate-100 dark:border-slate-700">
-                        <TrendingUp size={12} className="text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
+                        <TrendingUp size={12} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] mt-0.5 shrink-0" />
                         <div>
                           <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-0.5">Your Role ({roleLabel})</p>
                           <p className="text-[10px] text-slate-600 dark:text-slate-300">
@@ -468,12 +470,12 @@ const IASBUpdateBanner: React.FC<Props> = ({ businessType = 'ALL', compact = fal
                       <div>
                         <div className="flex items-center justify-between mb-1">
                           <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Your Readiness</p>
-                          <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{score}%</span>
+                          <span className="text-xs font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{score}%</span>
                         </div>
                         <input
                           type="range" min={0} max={100} step={5} value={score}
                           onChange={e => setScore(update.id, Number(e.target.value))}
-                          className="w-full h-1.5 rounded-full accent-emerald-600 cursor-pointer"
+                          className="w-full h-1.5 rounded-full accent-indigo-600 cursor-pointer"
                         />
                         <div className="flex justify-between text-[9px] text-slate-300 mt-0.5">
                           <span>Not started</span><span>In progress</span><span>Ready</span>
@@ -491,13 +493,13 @@ const IASBUpdateBanner: React.FC<Props> = ({ businessType = 'ALL', compact = fal
                   <div className="flex items-center gap-3 mt-2">
                     <button
                       onClick={() => setExpanded(isOpen ? null : update.id)}
-                      className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+                      className="flex items-center gap-1 text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline"
                     >
                       {isOpen ? <><ChevronUp size={11} /> Less</> : <><ChevronDown size={11} /> Details</>}
                     </button>
                     {/* Readiness pill (collapsed) */}
                     {!isOpen && score > 0 && (
-                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${score >= 80 ? 'bg-emerald-100 text-emerald-700' : score >= 50 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}`}>
+                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${score >= 80 ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : score >= 50 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}`}>
                         {score}% ready
                       </span>
                     )}
@@ -505,7 +507,7 @@ const IASBUpdateBanner: React.FC<Props> = ({ businessType = 'ALL', compact = fal
                       href="https://www.ifrs.org/issued-standards/list-of-standards/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-[10px] font-semibold text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors"
+                      className="flex items-center gap-1 text-[10px] font-semibold text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors"
                     >
                       <ExternalLink size={10} /> IASB.org
                     </a>

@@ -1,10 +1,12 @@
-import React, { useState, useRef } from 'react';
 import {
   Tag, Upload, RotateCcw, Save, Eye, Palette,
   Type, Layout, CheckCircle, Image,
 } from 'lucide-react';
-import { useLocalStorage } from '../hooks';
+import React, { useState, useRef } from 'react';
 import toast from 'react-hot-toast';
+
+import { useLocalStorage } from '../hooks';
+
 
 interface WhiteLabelConfig {
   brandName: string;
@@ -86,7 +88,7 @@ const WhiteLabelSettings: React.FC<Props> = ({ canWrite }) => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setPreview(v => !v)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all ${preview ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'}`}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all ${preview ? 'bg-[var(--pro-azure)] text-white border-[var(--pro-azure)]' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'}`}
           >
             <Eye size={13} /> {preview ? 'Hide Preview' : 'Preview'}
           </button>
@@ -111,7 +113,7 @@ const WhiteLabelSettings: React.FC<Props> = ({ canWrite }) => {
           )}
           <div>
             <p className="font-semibold text-slate-900 dark:text-white" style={{ color: config.primaryColor }}>{config.brandName || 'Your Brand'}</p>
-            <p className="ovds-caption">ERP Platform</p>
+            <p className="ovds-caption">FINCLOUD</p>
           </div>
           <div className="ml-auto flex items-center gap-2">
             <div className="w-6 h-6 rounded-full" style={{ background: config.primaryColor }} title="Primary" />
@@ -154,7 +156,7 @@ const WhiteLabelSettings: React.FC<Props> = ({ canWrite }) => {
                 <button
                   onClick={() => logoRef.current?.click()}
                   disabled={!canWrite}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-200/10 text-slate-800 rounded-lg text-xs font-bold hover:bg-emerald-200/20 transition-all disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-200)]/10 text-slate-800 rounded-lg text-xs font-bold hover:bg-[var(--pro-azure-200)]/20 transition-all disabled:opacity-50"
                 >
                   <Upload size={12} /> Upload Logo
                 </button>
@@ -179,7 +181,7 @@ const WhiteLabelSettings: React.FC<Props> = ({ canWrite }) => {
               aria-checked={config.hidePoweredBy}
               disabled={!canWrite}
               onClick={() => update({ hidePoweredBy: !config.hidePoweredBy })}
-              className={`relative w-11 h-6 rounded-full transition-colors duration-200 disabled:opacity-50 ${config.hidePoweredBy ? 'bg-emerald-600' : 'bg-slate-200 dark:bg-slate-700'}`}
+              className={`relative w-11 h-6 rounded-full transition-colors duration-200 disabled:opacity-50 ${config.hidePoweredBy ? 'bg-[var(--pro-azure)]' : 'bg-slate-200 dark:bg-slate-700'}`}
             >
               <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${config.hidePoweredBy ? 'translate-x-6' : 'translate-x-1'}`} />
             </button>
@@ -247,7 +249,7 @@ const WhiteLabelSettings: React.FC<Props> = ({ canWrite }) => {
             <div className="flex gap-2">
               {(['default', 'compact', 'wide'] as const).map(l => (
                 <button key={l} onClick={() => update({ dashboardLayout: l })} disabled={!canWrite}
-                  className={`flex-1 py-2 rounded-xl border text-xs font-bold capitalize transition-all disabled:opacity-50 ${config.dashboardLayout === l ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-emerald-500'}`}>
+                  className={`flex-1 py-2 rounded-xl border text-xs font-bold capitalize transition-all disabled:opacity-50 ${config.dashboardLayout === l ? 'bg-[var(--pro-azure)] text-white border-[var(--pro-azure)]' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[var(--pro-azure)]'}`}>
                   {l}
                 </button>
               ))}
@@ -259,7 +261,7 @@ const WhiteLabelSettings: React.FC<Props> = ({ canWrite }) => {
             <div className="flex gap-2">
               {(['default', 'serif', 'mono'] as const).map(f => (
                 <button key={f} onClick={() => update({ fontStyle: f })} disabled={!canWrite}
-                  className={`flex-1 py-2 rounded-xl border text-xs font-bold capitalize transition-all disabled:opacity-50 ${config.fontStyle === f ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-emerald-500'}`}>
+                  className={`flex-1 py-2 rounded-xl border text-xs font-bold capitalize transition-all disabled:opacity-50 ${config.fontStyle === f ? 'bg-[var(--pro-azure)] text-white border-[var(--pro-azure)]' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[var(--pro-azure)]'}`}>
                   {f}
                 </button>
               ))}
@@ -307,7 +309,7 @@ const WhiteLabelSettings: React.FC<Props> = ({ canWrite }) => {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 text-white rounded-lg text-sm font-medium hover:bg-emerald-600 transition-all shadow-sm shadow-emerald-500/20 dark:shadow-emerald-500/10/30 disabled:opacity-60"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[var(--pro-azure)] text-white rounded-lg text-sm font-medium hover:bg-[var(--pro-azure-dark)] transition-all shadow-sm shadow-green-500/20 dark:shadow-green-500/10/30 disabled:opacity-60"
           >
             <Save size={14} />
             {saving ? 'Saving…' : 'Save White-Label Settings'}

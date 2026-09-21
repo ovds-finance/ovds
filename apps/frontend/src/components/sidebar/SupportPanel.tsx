@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { Icon } from '../ui';
+
 import { PanelShell, PanelRow, PanelDivider, PanelSectionLabel } from './PanelPrimitives';
 
 interface SupportPanelProps {
@@ -13,12 +15,18 @@ export const SupportPanel: React.FC<SupportPanelProps> = ({ onClose, onNavClick 
   const go = (path: string) => { navigate(path); onClose(); onNavClick?.(); };
   return (
     <PanelShell title="Help & Support" onClose={onClose}>
-      <div className="px-4 py-4 border-b border-slate-100">
-        <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center mb-3">
-          <Icon name="HELP_CIRCLE" size={20} className="text-blue-500" />
+      <div
+        className="px-4 py-4"
+        style={{ borderBottom: '1px solid var(--border)' }}
+      >
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
+          style={{ background: 'var(--sys-bg-accent)', border: '1px solid var(--sys-border-accent)' }}
+        >
+          <Icon name="HELP_CIRCLE" size={20} style={{ color: 'var(--pro-azure)' }} />
         </div>
-        <p className="text-[13px] font-bold text-slate-700">How can we help?</p>
-        <p className="text-[11px] text-slate-500 mt-0.5">Find answers, guides, and support resources.</p>
+        <p className="text-[13px] font-bold" style={{ color: 'var(--text)' }}>How can we help?</p>
+        <p className="text-[11px] mt-0.5" style={{ color: 'var(--text-4)' }}>Find answers, guides, and support resources.</p>
       </div>
       <PanelSectionLabel label="Resources" />
       <PanelRow icon={<Icon name="BOOK_OPEN" size={15} />} label="Documentation" sub="Guides & tutorials" onClick={() => go('/docs')} />

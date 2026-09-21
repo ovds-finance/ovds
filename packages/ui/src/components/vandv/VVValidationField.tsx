@@ -22,7 +22,7 @@ export interface VVValidationFieldProps {
 }
 
 const SIDE_TINT: Record<string, string> = {
-  debit: 'bg-emerald-50/60 border-emerald-200 focus-within:border-emerald-400 focus-within:ring-emerald-500/20',
+  debit: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] focus-within:border-[var(--pro-azure)] focus-within:ring-[var(--pro-azure)]/20',
   credit: 'bg-rose-50/50 border-rose-200 focus-within:border-rose-400 focus-within:ring-rose-500/20',
 };
 
@@ -50,7 +50,7 @@ export const VVValidationField: React.FC<VVValidationFieldProps> = ({
             className={cn(
               'text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded',
               field.side === 'debit'
-                ? 'bg-emerald-100 text-emerald-700'
+                ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'
                 : 'bg-rose-100 text-rose-700',
             )}
           >
@@ -63,7 +63,7 @@ export const VVValidationField: React.FC<VVValidationFieldProps> = ({
         className={cn(
           'relative rounded-oki border bg-white dark:bg-slate-900 transition-all',
           'focus-within:ring-2',
-          field.side ? SIDE_TINT[field.side] : 'border-slate-200 dark:border-slate-700 focus-within:border-aki-blue focus-within:ring-aki-blue/20',
+          field.side ? SIDE_TINT[field.side] : 'border-slate-200 dark:border-slate-700 focus-within:border-[var(--pro-azure)] focus-within:ring-[var(--pro-azure)]/20',
           invalid && 'border-rose-400 ring-2 ring-rose-500/20 bg-rose-50/40',
         )}
         onMouseEnter={() => setHovered(true)}
@@ -112,7 +112,7 @@ export const VVValidationField: React.FC<VVValidationFieldProps> = ({
           {invalid ? (
             <AlertCircle size={15} className="text-rose-500" />
           ) : showError && !error && value !== null && value !== undefined && String(value).trim() !== '' ? (
-            <CheckCircle2 size={15} className="text-emerald-500" />
+            <CheckCircle2 size={15} className="text-[var(--pro-azure)]" />
           ) : null}
         </span>
       </div>

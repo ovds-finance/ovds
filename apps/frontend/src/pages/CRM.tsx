@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useCallback } from 'react';
 import {
   Users, UserPlus, Phone, Mail, MapPin, Edit2, Trash2,
   CheckCircle, Download, FileText, ChevronDown, X,
@@ -11,18 +10,20 @@ import {
   Layers, Users2, Zap, Bell,
   CheckSquare, Flag,
 } from 'lucide-react';
-import api from '../services/api';
+import React, { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useDebounce } from '../hooks';
-import { confirm } from '../utils/confirm';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { EmptyState, AppPage, Btn, Icon, MetricCard } from '../components/ui';
+
+import { EmptyState, AppPage, Btn, MetricCard } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useDebounce } from '../hooks';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import type { Permission } from '../rbac/rbac';
+import api from '../services/api';
+import { confirm } from '../utils/confirm';
 import { downloadCSV } from '../utils/download';
 import { fmtCurrency } from '../utils/fmt';
-import type { Permission } from '../rbac/rbac';
 
 // -- Design tokens -------------------------------------------------------------
 const inp = 'w-full px-4 py-3.5 bg-ovds-surface dark:bg-ovds-surface-dark border border-ovds-border dark:border-ovds-muted-dark rounded-2xl text-sm text-ovds-text-main dark:text-ovds-surface outline-none focus:ring-4 focus:ring-teal-400/10 focus:border-teal-400 transition-all placeholder:text-ovds-text-subtle font-bold';
@@ -142,8 +143,8 @@ const Avatar: React.FC<{ name: string; size?: 'sm' | 'md' | 'lg' }> = ({ name, s
   const safeName = name || '?';
   const initials = safeName.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || '?';
   const colors = [
-    'from-violet-500 to-purple-600', 'from-emerald-500 to-indigo-600',
-    'from-emerald-500 to-teal-600', 'from-orange-500 to-amber-600',
+    'from-violet-500 to-purple-600', 'from-green-500 to-green-600',
+    'from-[var(--pro-azure)] to-teal-600', 'from-orange-500 to-amber-600',
     'from-rose-500 to-pink-600', 'from-cyan-500 to-sky-600',
   ];
   const color = colors[safeName.charCodeAt(0) % colors.length];
@@ -160,10 +161,10 @@ const Avatar: React.FC<{ name: string; size?: 'sm' | 'md' | 'lg' }> = ({ name, s
 const StageBadge: React.FC<{ stage: DealStage }> = ({ stage }) => {
   const map: Record<DealStage, { label: string; cls: string }> = {
     LEAD:        { label: 'Lead',        cls: 'bg-ovds-muted text-ovds-text-muted dark:bg-ovds-muted-dark dark:text-ovds-text-subtle' },
-    QUALIFIED:   { label: 'Qualified',   cls: 'bg-emerald-50 text-emerald-600' },
+    QUALIFIED:   { label: 'Qualified',   cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
     PROPOSAL:    { label: 'Proposal',    cls: 'bg-violet-50 text-violet-600' },
     NEGOTIATION: { label: 'Negotiation', cls: 'bg-amber-50 text-amber-600' },
-    CLOSED_WON:  { label: 'Won',         cls: 'bg-emerald-50 text-emerald-600' },
+    CLOSED_WON:  { label: 'Won',         cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
     CLOSED_LOST: { label: 'Lost',        cls: 'bg-rose-50 text-rose-600' },
   };
   const { label, cls } = map[stage] ?? map.LEAD;
@@ -172,9 +173,9 @@ const StageBadge: React.FC<{ stage: DealStage }> = ({ stage }) => {
 
 const ActivityIcon: React.FC<{ type: ActivityType; size?: number }> = ({ type, size = 16 }) => {
   const map: Record<ActivityType, { icon: React.ReactNode; cls: string }> = {
-    CALL:      { icon: <PhoneIcon size={size} />,    cls: 'text-emerald-600' },
+    CALL:      { icon: <PhoneIcon size={size} />,    cls: 'text-[var(--pro-azure)]' },
     EMAIL:     { icon: <MailIcon size={size} />,     cls: 'text-violet-600' },
-    MEETING:   { icon: <Users size={size} />,        cls: 'text-emerald-600' },
+    MEETING:   { icon: <Users size={size} />,        cls: 'text-[var(--pro-azure)]' },
     TASK:      { icon: <CheckSquare size={size} />,  cls: 'text-amber-600' },
     NOTE:      { icon: <StickyNote size={size} />,   cls: 'text-ovds-text-subtle' },
     FOLLOW_UP: { icon: <Bell size={size} />,         cls: 'text-rose-600' },
@@ -256,19 +257,19 @@ const ContactModal: React.FC<{
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-end bg-ovds-sidebar/60 backdrop-blur-md animate-in fade-in duration-300">
       <div className="w-full max-w-xl h-full bg-ovds-surface dark:bg-ovds-surface-dark shadow-2xl flex flex-col border-l border-ovds-border dark:border-ovds-muted-dark animate-in slide-in-from-right duration-500">
-        <div className="px-8 py-8 bg-emerald-50 border-b border-ovds-border dark:border-ovds-muted-dark">
+        <div className="px-8 py-8 bg-[var(--pro-azure-50)] border-b border-ovds-border dark:border-ovds-muted-dark">
           <div className="flex items-center justify-between mb-6">
-            <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-500/20">
+            <div className="w-14 h-14 bg-[var(--pro-azure-50)]0 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-green-500/20">
               <UserPlus size={28} strokeWidth={2.5} />
             </div>
-            <button onClick={onClose} className="p-3 rounded-2xl bg-ovds-surface dark:bg-ovds-surface-dark border border-ovds-border dark:border-ovds-muted-dark text-emerald-600 hover:text-slate-800 transition-all shadow-sm hover:shadow-md">
+            <button onClick={onClose} className="p-3 rounded-2xl bg-ovds-surface dark:bg-ovds-surface-dark border border-ovds-border dark:border-ovds-muted-dark text-[var(--pro-azure)] hover:text-slate-800 transition-all shadow-sm hover:shadow-md">
               <X size={20} />
             </button>
           </div>
           <h2 className="text-3xl font-black text-ovds-text-main dark:text-ovds-surface tracking-tight">
             {contact ? 'Edit Contact' : 'New Contact'}
           </h2>
-          <p className="text-sm text-emerald-600 font-bold mt-1.5 uppercase tracking-widest">
+          <p className="text-sm text-[var(--pro-azure)] font-bold mt-1.5 uppercase tracking-widest">
             {contact ? `Updating: ${contact.name}` : 'Add a new contact to your CRM'}
           </p>
         </div>
@@ -287,13 +288,13 @@ const ContactModal: React.FC<{
 
             {tab === 'IDENTITY' && (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="p-5 bg-emerald-50 rounded-3xl border border-ovds-border dark:border-ovds-muted-dark">
+                <div className="p-5 bg-[var(--pro-azure-50)] rounded-3xl border border-ovds-border dark:border-ovds-muted-dark">
                   <label className={lbl}>Contact Type</label>
                   <div className="grid grid-cols-2 gap-3 mt-3">
                     {(['PERSON', 'COMPANY'] as const).map(t => (
                       <button key={t} type="button" onClick={() => set('type', t)}
                         className={`py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all flex items-center justify-center gap-2 ${
-                          form.type === t ? 'bg-ovds-surface dark:bg-ovds-surface-dark border-emerald-500 text-emerald-600 shadow-sm' : 'bg-transparent border-ovds-border dark:border-ovds-muted-dark text-emerald-600 hover:text-slate-800'
+                          form.type === t ? 'bg-ovds-surface dark:bg-ovds-surface-dark border-[var(--pro-azure)] text-[var(--pro-azure)] shadow-sm' : 'bg-transparent border-ovds-border dark:border-ovds-muted-dark text-[var(--pro-azure)] hover:text-slate-800'
                         }`}>
                         {t === 'PERSON' ? <Users size={14} /> : <Building2 size={14} />} {t}
                       </button>
@@ -342,13 +343,13 @@ const ContactModal: React.FC<{
                     <input value={form.website} onChange={e => set('website', e.target.value)} className={`${inp} pl-12`} placeholder="https://www.example.com" />
                   </div>
                 </div>
-                <div className="p-5 bg-emerald-50 rounded-3xl border border-ovds-border dark:border-ovds-muted-dark">
+                <div className="p-5 bg-[var(--pro-azure-50)] rounded-3xl border border-ovds-border dark:border-ovds-muted-dark">
                   <label className={lbl}>Status</label>
                   <div className="ovds-grid-layout cols-3 gap-sm mt-3">
                     {(['ACTIVE', 'INACTIVE', 'BLOCKED'] as const).map(s => (
                       <button key={s} type="button" onClick={() => set('status', s)}
                         className={`py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${
-                          form.status === s ? 'bg-ovds-surface dark:bg-ovds-surface-dark border-emerald-500 text-emerald-600 shadow-sm' : 'bg-transparent border-ovds-border dark:border-ovds-muted-dark text-emerald-600 hover:text-slate-800'
+                          form.status === s ? 'bg-ovds-surface dark:bg-ovds-surface-dark border-[var(--pro-azure)] text-[var(--pro-azure)] shadow-sm' : 'bg-transparent border-ovds-border dark:border-ovds-muted-dark text-[var(--pro-azure)] hover:text-slate-800'
                         }`}>
                         {s}
                       </button>
@@ -367,8 +368,8 @@ const ContactModal: React.FC<{
                     <textarea value={form.address} onChange={e => set('address', e.target.value)} rows={6} className={`${inp} pl-12 pt-5 resize-none`} placeholder="Street, Building, City, Region..." />
                   </div>
                 </div>
-                <div className="p-5 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl border border-emerald-200 dark:border-emerald-800 flex gap-4">
-                  <div className="w-10 h-10 bg-ovds-surface dark:bg-ovds-surface-dark rounded-xl flex items-center justify-center text-emerald-600 shadow-sm shrink-0 mt-1">
+                <div className="p-5 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl border border-[var(--pro-azure-100)] dark:border-green-800 flex gap-4">
+                  <div className="w-10 h-10 bg-ovds-surface dark:bg-ovds-surface-dark rounded-xl flex items-center justify-center text-[var(--pro-azure)] shadow-sm shrink-0 mt-1">
                     <Info size={18} />
                   </div>
                   <div>
@@ -471,8 +472,8 @@ const ContactModal: React.FC<{
                     <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-ovds-text-subtle pointer-events-none" />
                   </div>
                 </div>
-                <div className="p-5 bg-emerald-50 rounded-3xl border border-ovds-border dark:border-ovds-muted-dark flex gap-4">
-                  <div className="w-10 h-10 bg-ovds-surface dark:bg-ovds-surface-dark rounded-xl flex items-center justify-center text-emerald-600 shadow-sm shrink-0 mt-1">
+                <div className="p-5 bg-[var(--pro-azure-50)] rounded-3xl border border-ovds-border dark:border-ovds-muted-dark flex gap-4">
+                  <div className="w-10 h-10 bg-ovds-surface dark:bg-ovds-surface-dark rounded-xl flex items-center justify-center text-[var(--pro-azure)] shadow-sm shrink-0 mt-1">
                     <Zap size={18} />
                   </div>
                   <div>
@@ -486,11 +487,11 @@ const ContactModal: React.FC<{
             )}
           </div>
 
-          <div className="p-8 border-t border-ovds-border dark:border-ovds-muted-dark bg-emerald-50 flex gap-4">
-            <button type="button" onClick={onClose} className="flex-1 px-6 py-4 border border-ovds-border dark:border-ovds-muted-dark rounded-[1.5rem] text-sm font-black text-emerald-600 hover:bg-emerald-50 transition-all">
+          <div className="p-8 border-t border-ovds-border dark:border-ovds-muted-dark bg-[var(--pro-azure-50)] flex gap-4">
+            <button type="button" onClick={onClose} className="flex-1 px-6 py-4 border border-ovds-border dark:border-ovds-muted-dark rounded-[1.5rem] text-sm font-black text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)] transition-all">
               Discard
             </button>
-            <button type="submit" disabled={saving} className="flex-[2] px-6 py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-[1.5rem] text-sm font-black disabled:opacity-50 transition-all flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/30">
+            <button type="submit" disabled={saving} className="flex-[2] px-6 py-4 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-[1.5rem] text-sm font-black disabled:opacity-50 transition-all flex items-center justify-center gap-3 shadow-xl shadow-green-500/30">
               {saving ? <RefreshCw size={18} className="animate-spin" /> : <BadgeCheck size={18} strokeWidth={3} />}
               {saving ? 'Processing...' : contact ? 'Update Contact' : 'Add Contact'}
             </button>
@@ -555,12 +556,12 @@ const CompanyModal: React.FC<{
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-end bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
       <div className="w-full max-w-xl h-full bg-ovds-surface dark:bg-ovds-surface-dark shadow-2xl flex flex-col border-l border-ovds-border animate-in slide-in-from-right duration-500">
-        <div className="px-8 py-8 bg-emerald-50 border-b border-ovds-border">
+        <div className="px-8 py-8 bg-[var(--pro-azure-50)] border-b border-ovds-border">
           <div className="flex items-center justify-between mb-6">
-            <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-500/20">
+            <div className="w-14 h-14 bg-[var(--pro-azure-50)]0 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-green-500/20">
               <Building2 size={28} strokeWidth={2.5} />
             </div>
-            <button onClick={onClose} className="p-3 rounded-2xl bg-ovds-surface dark:bg-ovds-surface-dark border border-emerald-200 text-emerald-600 hover:text-emerald-700 transition-all shadow-sm hover:shadow-md">
+            <button onClick={onClose} className="p-3 rounded-2xl bg-ovds-surface dark:bg-ovds-surface-dark border border-[var(--pro-azure-100)] text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] transition-all shadow-sm hover:shadow-md">
               <X size={20} />
             </button>
           </div>
@@ -651,13 +652,13 @@ const CompanyModal: React.FC<{
                 <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={3} className={`${inp} pl-12 pt-5 resize-none`} placeholder="Internal notes about this company..." />
               </div>
             </div>
-            <div className="p-5 bg-emerald-50 rounded-3xl border border-ovds-border">
+            <div className="p-5 bg-[var(--pro-azure-50)] rounded-3xl border border-ovds-border">
               <label className={lbl}>Status</label>
               <div className="grid grid-cols-2 gap-3 mt-3">
                 {(['ACTIVE', 'INACTIVE'] as const).map(s => (
                   <button key={s} type="button" onClick={() => set('status', s)}
                     className={`py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${
-                      form.status === s ? 'bg-ovds-surface dark:bg-ovds-surface-dark border-emerald-600 text-emerald-600 shadow-sm' : 'bg-transparent border-emerald-200 text-emerald-600 hover:text-emerald-700'
+                      form.status === s ? 'bg-ovds-surface dark:bg-ovds-surface-dark border-[var(--pro-azure)] text-[var(--pro-azure)] shadow-sm' : 'bg-transparent border-[var(--pro-azure-100)] text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)]'
                     }`}>
                     {s}
                   </button>
@@ -666,11 +667,11 @@ const CompanyModal: React.FC<{
             </div>
           </div>
 
-          <div className="p-8 border-t border-ovds-border bg-emerald-50 flex gap-4">
-            <button type="button" onClick={onClose} className="flex-1 px-6 py-4 border border-emerald-200 rounded-[1.5rem] text-sm font-black text-emerald-700 hover:bg-emerald-50 transition-all">
+          <div className="p-8 border-t border-ovds-border bg-[var(--pro-azure-50)] flex gap-4">
+            <button type="button" onClick={onClose} className="flex-1 px-6 py-4 border border-[var(--pro-azure-100)] rounded-[1.5rem] text-sm font-black text-[var(--pro-azure-dark)] hover:bg-[var(--pro-azure-50)] transition-all">
               Discard
             </button>
-            <button type="submit" disabled={saving} className="flex-[2] px-6 py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-[1.5rem] text-sm font-black disabled:opacity-50 transition-all flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/30">
+            <button type="submit" disabled={saving} className="flex-[2] px-6 py-4 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-[1.5rem] text-sm font-black disabled:opacity-50 transition-all flex items-center justify-center gap-3 shadow-xl shadow-green-500/30">
               {saving ? <RefreshCw size={18} className="animate-spin" /> : <BadgeCheck size={18} strokeWidth={3} />}
               {saving ? 'Processing...' : company ? 'Update Company' : 'Add Company'}
             </button>
@@ -686,10 +687,10 @@ const CompanyModal: React.FC<{
 // ══════════════════════════════════════════════════════════════════════════════
 const DEAL_STAGES: { key: DealStage; label: string; prob: number; color: string }[] = [
   { key: 'LEAD',        label: 'Lead',        prob: 10,  color: 'bg-slate-400' },
-  { key: 'QUALIFIED',   label: 'Qualified',   prob: 25,  color: 'bg-emerald-500' },
+  { key: 'QUALIFIED',   label: 'Qualified',   prob: 25,  color: 'bg-[var(--pro-azure-50)]0' },
   { key: 'PROPOSAL',    label: 'Proposal',    prob: 50,  color: 'bg-teal-500' },
   { key: 'NEGOTIATION', label: 'Negotiation', prob: 75,  color: 'bg-amber-400' },
-  { key: 'CLOSED_WON',  label: 'Closed Won',  prob: 100, color: 'bg-emerald-500' },
+  { key: 'CLOSED_WON',  label: 'Closed Won',  prob: 100, color: 'bg-[var(--pro-azure-50)]0' },
   { key: 'CLOSED_LOST', label: 'Closed Lost', prob: 0,   color: 'bg-rose-400' },
 ];
 
@@ -734,12 +735,12 @@ const DealModal: React.FC<{
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-end bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
       <div className="w-full max-w-xl h-full bg-ovds-surface dark:bg-ovds-surface-dark shadow-2xl flex flex-col border-l border-ovds-border animate-in slide-in-from-right duration-500">
-        <div className="px-8 py-8 bg-emerald-50 border-b border-ovds-border">
+        <div className="px-8 py-8 bg-[var(--pro-azure-50)] border-b border-ovds-border">
           <div className="flex items-center justify-between mb-6">
-            <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-500/20">
+            <div className="w-14 h-14 bg-[var(--pro-azure-50)]0 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-green-500/20">
               <Briefcase size={28} strokeWidth={2.5} />
             </div>
-            <button onClick={onClose} className="p-3 rounded-2xl bg-ovds-surface dark:bg-ovds-surface-dark border border-emerald-200 text-emerald-600 hover:text-emerald-700 transition-all shadow-sm hover:shadow-md">
+            <button onClick={onClose} className="p-3 rounded-2xl bg-ovds-surface dark:bg-ovds-surface-dark border border-[var(--pro-azure-100)] text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] transition-all shadow-sm hover:shadow-md">
               <X size={20} />
             </button>
           </div>
@@ -790,7 +791,7 @@ const DealModal: React.FC<{
                     onClick={() => { set('stage', s.key); set('probability', String(s.prob)); }}
                     className={`py-2.5 px-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all flex items-center gap-2 ${
                       form.stage === s.key
-                        ? 'bg-ovds-surface dark:bg-ovds-surface-dark dark:bg-slate-700 border-emerald-600 text-emerald-600 shadow-sm'
+                        ? 'bg-ovds-surface dark:bg-ovds-surface-dark dark:bg-slate-700 border-[var(--pro-azure)] text-[var(--pro-azure)] shadow-sm'
                         : 'bg-transparent border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600'
                     }`}>
                     <span className={`w-2 h-2 rounded-full ${s.color} shrink-0`} />
@@ -819,11 +820,11 @@ const DealModal: React.FC<{
             </div>
           </div>
 
-          <div className="p-8 border-t border-ovds-border bg-emerald-50 flex gap-4">
-            <button type="button" onClick={onClose} className="flex-1 px-6 py-4 border border-emerald-200 rounded-2xl text-sm font-black text-emerald-700 hover:bg-emerald-50 transition-all shadow-sm">
+          <div className="p-8 border-t border-ovds-border bg-[var(--pro-azure-50)] flex gap-4">
+            <button type="button" onClick={onClose} className="flex-1 px-6 py-4 border border-[var(--pro-azure-100)] rounded-2xl text-sm font-black text-[var(--pro-azure-dark)] hover:bg-[var(--pro-azure-50)] transition-all shadow-sm">
               Discard
             </button>
-            <button type="submit" disabled={saving} className="flex-[2] px-6 py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-sm font-black disabled:opacity-50 transition-all flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/30">
+            <button type="submit" disabled={saving} className="flex-[2] px-6 py-4 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-2xl text-sm font-black disabled:opacity-50 transition-all flex items-center justify-center gap-3 shadow-xl shadow-green-500/30">
               {saving ? <RefreshCw size={18} className="animate-spin" /> : <CheckCircle size={18} strokeWidth={3} />}
               {saving ? 'Processing…' : deal ? 'Update Deal' : 'Create Deal'}
             </button>
@@ -887,12 +888,12 @@ const ActivityModal: React.FC<{
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-end bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
       <div className="w-full max-w-xl h-full bg-ovds-surface dark:bg-ovds-surface-dark shadow-2xl flex flex-col border-l border-ovds-border animate-in slide-in-from-right duration-500">
-        <div className="px-8 py-8 bg-emerald-50 border-b border-ovds-border">
+        <div className="px-8 py-8 bg-[var(--pro-azure-50)] border-b border-ovds-border">
           <div className="flex items-center justify-between mb-6">
             <div className="w-14 h-14 bg-amber-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-amber-500/20">
               <Activity size={28} strokeWidth={2.5} />
             </div>
-            <button onClick={onClose} className="p-3 rounded-2xl bg-ovds-surface dark:bg-ovds-surface-dark border border-emerald-200 text-emerald-600 hover:text-emerald-700 transition-all shadow-sm hover:shadow-md">
+            <button onClick={onClose} className="p-3 rounded-2xl bg-ovds-surface dark:bg-ovds-surface-dark border border-[var(--pro-azure-100)] text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] transition-all shadow-sm hover:shadow-md">
               <X size={20} />
             </button>
           </div>
@@ -965,13 +966,13 @@ const ActivityModal: React.FC<{
             </div>
 
             {/* Status */}
-            <div className="p-5 bg-emerald-50 rounded-3xl border border-ovds-border">
+            <div className="p-5 bg-[var(--pro-azure-50)] rounded-3xl border border-ovds-border">
               <label className={lbl}>Status</label>
               <div className="ovds-grid-layout cols-3 gap-sm mt-3">
                 {(['PENDING', 'DONE', 'CANCELLED'] as ActivityStatus[]).map(s => (
                   <button key={s} type="button" onClick={() => set('status', s)}
                     className={`py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${
-                      form.status === s ? 'bg-ovds-surface dark:bg-ovds-surface-dark border-amber-500 text-amber-600 shadow-sm' : 'bg-transparent border-emerald-200 text-emerald-600 hover:text-emerald-700'
+                      form.status === s ? 'bg-ovds-surface dark:bg-ovds-surface-dark border-amber-500 text-amber-600 shadow-sm' : 'bg-transparent border-[var(--pro-azure-100)] text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)]'
                     }`}>
                     {s}
                   </button>
@@ -980,8 +981,8 @@ const ActivityModal: React.FC<{
             </div>
           </div>
 
-          <div className="p-8 border-t border-ovds-border bg-emerald-50 flex gap-4">
-            <button type="button" onClick={onClose} className="flex-1 px-6 py-4 border border-emerald-200 rounded-2xl text-sm font-black text-emerald-700 hover:bg-emerald-50 transition-all shadow-sm">
+          <div className="p-8 border-t border-ovds-border bg-[var(--pro-azure-50)] flex gap-4">
+            <button type="button" onClick={onClose} className="flex-1 px-6 py-4 border border-[var(--pro-azure-100)] rounded-2xl text-sm font-black text-[var(--pro-azure-dark)] hover:bg-[var(--pro-azure-50)] transition-all shadow-sm">
               Discard
             </button>
             <button type="submit" disabled={saving} className="flex-[2] px-6 py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl text-sm font-black disabled:opacity-50 transition-all flex items-center justify-center gap-3 shadow-xl shadow-amber-500/30">
@@ -1057,17 +1058,17 @@ const PipelineSettingsModal: React.FC<{
     } finally { setSaving(false); }
   };
 
-  const STAGE_COLORS = ['#94a3b8', '#00E784', '#8b5cf6', '#f59e0b', '#00E784', '#ef4444', '#06b6d4', '#f97316'];
+  const _STAGE_COLORS = ['#94a3b8', '#00E784', '#8b5cf6', '#f59e0b', '#00E784', '#ef4444', '#06b6d4', '#f97316'];
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-end bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
       <div className="w-full max-w-2xl h-full bg-ovds-surface dark:bg-ovds-surface-dark shadow-2xl flex flex-col border-l border-ovds-border animate-in slide-in-from-right duration-500">
-        <div className="px-8 py-8 bg-emerald-50 border-b border-ovds-border">
+        <div className="px-8 py-8 bg-[var(--pro-azure-50)] border-b border-ovds-border">
           <div className="flex items-center justify-between mb-6">
-            <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-500/20">
+            <div className="w-14 h-14 bg-[var(--pro-azure-50)]0 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-green-500/20">
               <Layers size={28} strokeWidth={2.5} />
             </div>
-            <button onClick={onClose} className="p-3 rounded-2xl bg-ovds-surface dark:bg-ovds-surface-dark border border-emerald-200 text-emerald-600 hover:text-emerald-700 transition-all shadow-sm hover:shadow-md">
+            <button onClick={onClose} className="p-3 rounded-2xl bg-ovds-surface dark:bg-ovds-surface-dark border border-[var(--pro-azure-100)] text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] transition-all shadow-sm hover:shadow-md">
               <X size={20} />
             </button>
           </div>
@@ -1092,7 +1093,7 @@ const PipelineSettingsModal: React.FC<{
                 <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} className={`${inp} resize-none pt-4`} placeholder="What kind of deals does this pipeline track?" />
               </div>
               <label className="flex items-center gap-3 cursor-pointer group">
-                <div className={`w-12 h-6 rounded-full transition-all relative ${isDefault ? 'bg-emerald-500' : 'bg-slate-200'}`}
+                <div className={`w-12 h-6 rounded-full transition-all relative ${isDefault ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-200'}`}
                   onClick={() => setIsDefault(v => !v)}>
                   <div className={`absolute top-1 w-4 h-4 bg-ovds-surface dark:bg-ovds-surface-dark rounded-full shadow transition-all ${isDefault ? 'left-7' : 'left-1'}`} />
                 </div>
@@ -1103,7 +1104,7 @@ const PipelineSettingsModal: React.FC<{
             {/* Stages */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-[11px] font-black text-emerald-600 uppercase tracking-widest">Customer Stages</h3>
+                <h3 className="text-[11px] font-black text-[var(--pro-azure)] uppercase tracking-widest">Customer Stages</h3>
                 <span className="text-[10px] font-black text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">{stages.length} stages</span>
               </div>
 
@@ -1116,18 +1117,18 @@ const PipelineSettingsModal: React.FC<{
                         className="w-8 h-8 rounded-xl border-2 border-white shadow-sm cursor-pointer" />
                     </div>
                     <input value={stage.name} onChange={e => updateStage(stage.id, 'name', e.target.value)}
-                      className="flex-1 bg-transparent text-sm font-black text-ovds-text-main dark:text-ovds-surface outline-none border-b-2 border-transparent focus:border-indigo-500 transition-all pb-1" />
+                      className="flex-1 bg-transparent text-sm font-black text-ovds-text-main dark:text-ovds-surface outline-none border-b-2 border-transparent focus:border-[var(--pro-azure)] transition-all pb-1" />
                     <div className="flex items-center gap-2 shrink-0">
                       <span className="text-[10px] font-black text-slate-400 uppercase">Prob.</span>
                       <input type="number" min="0" max="100" value={stage.probability}
                         onChange={e => updateStage(stage.id, 'probability', Number(e.target.value))}
-                        className="w-16 text-center bg-ovds-surface dark:bg-ovds-surface-dark dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-black text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500/20 py-1.5" />
+                        className="w-16 text-center bg-ovds-surface dark:bg-ovds-surface-dark dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-black text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 py-1.5" />
                       <span className="text-[10px] font-black text-slate-400">%</span>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       <button type="button" onClick={() => updateStage(stage.id, 'isWon', !stage.isWon)}
                         title="Mark as Won stage"
-                        className={`p-1.5 rounded-lg text-[10px] font-black transition-all ${stage.isWon ? 'bg-ovds-border text-emerald-600' : 'text-slate-300 hover:text-emerald-600'}`}>
+                        className={`p-1.5 rounded-lg text-[10px] font-black transition-all ${stage.isWon ? 'bg-ovds-border text-[var(--pro-azure)]' : 'text-slate-300 hover:text-[var(--pro-azure)]'}`}>
                         <CheckCircle size={14} />
                       </button>
                       <button type="button" onClick={() => removeStage(stage.id)}
@@ -1145,31 +1146,31 @@ const PipelineSettingsModal: React.FC<{
                   onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addStage())}
                   className={`${inp} flex-1`} placeholder="New stage name..." />
                 <button type="button" onClick={addStage}
-                  className="px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-sm font-black transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+                  className="px-5 py-3 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-2xl text-sm font-black transition-all shadow-lg shadow-green-500/20 flex items-center gap-2">
                   <Plus size={16} strokeWidth={3} /> Add
                 </button>
               </div>
             </div>
 
             {/* Color palette hint */}
-            <div className="p-5 bg-emerald-50 rounded-3xl border border-ovds-border flex gap-4">
-              <div className="w-10 h-10 bg-ovds-surface dark:bg-ovds-surface-dark rounded-xl flex items-center justify-center text-emerald-600 shadow-sm shrink-0 mt-1">
+            <div className="p-5 bg-[var(--pro-azure-50)] rounded-3xl border border-ovds-border flex gap-4">
+              <div className="w-10 h-10 bg-ovds-surface dark:bg-ovds-surface-dark rounded-xl flex items-center justify-center text-[var(--pro-azure)] shadow-sm shrink-0 mt-1">
                 <Flag size={18} />
               </div>
               <div>
-                <h4 className="text-sm font-black text-indigo-900 dark:text-indigo-100">Stage Tips</h4>
-                <p className="text-xs text-indigo-700/80 dark:text-indigo-300/80 leading-relaxed mt-1 font-bold">
+                <h4 className="text-sm font-black text-[var(--pro-azure-dark)] dark:text-green-100">Stage Tips</h4>
+                <p className="text-xs text-[var(--pro-azure-dark)]/80 dark:text-green-300/80 leading-relaxed mt-1 font-bold">
                   Mark a stage as "Won" (✓) to count deals as closed revenue. Probability % helps forecast expected revenue across your pipeline.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="p-8 border-t border-ovds-border bg-emerald-50 flex gap-4">
-            <button type="button" onClick={onClose} className="flex-1 px-6 py-4 border border-emerald-200 rounded-2xl text-sm font-black text-emerald-700 hover:bg-emerald-50 transition-all shadow-sm">
+          <div className="p-8 border-t border-ovds-border bg-[var(--pro-azure-50)] flex gap-4">
+            <button type="button" onClick={onClose} className="flex-1 px-6 py-4 border border-[var(--pro-azure-100)] rounded-2xl text-sm font-black text-[var(--pro-azure-dark)] hover:bg-[var(--pro-azure-50)] transition-all shadow-sm">
               Discard
             </button>
-            <button type="submit" disabled={saving} className="flex-[2] px-6 py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-sm font-black disabled:opacity-50 transition-all flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/30">
+            <button type="submit" disabled={saving} className="flex-[2] px-6 py-4 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-2xl text-sm font-black disabled:opacity-50 transition-all flex items-center justify-center gap-3 shadow-xl shadow-green-500/30">
               {saving ? <RefreshCw size={18} className="animate-spin" /> : <CheckCircle size={18} strokeWidth={3} />}
               {saving ? 'Processing…' : pipeline ? 'Update Pipeline' : 'Create Pipeline'}
             </button>
@@ -1216,7 +1217,7 @@ const ContactsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean
         if (c?.id && !seen.has(c.id)) { seen.add(c.id); merged.push(c); }
       }
       setContacts(merged);
-    } catch (err) {
+    } catch (_err) {
       toast.error('Failed to load contacts');
     }
     finally { setLoading(false); }
@@ -1291,7 +1292,7 @@ const ContactsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean
       <div className="ovds-panel overflow-hidden flex flex-col">
         <div className="p-6 border-b border-ovds-border flex flex-col md:flex-row gap-4 items-center bg-white dark:bg-slate-950/20">
           <div className="relative flex-1 w-full group">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-600 transition-colors" />
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--pro-azure)] transition-colors" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, email, or TIN..."
               className="w-full pl-12 pr-6 py-4 bg-ovds-surface dark:bg-ovds-surface-dark dark:bg-slate-800 border-transparent rounded-2xl text-sm font-bold focus:ring-4 focus:ring-teal-400/10 transition-all dark:text-slate-200 shadow-sm" />
           </div>
@@ -1299,19 +1300,19 @@ const ContactsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean
             <div className="flex bg-slate-200/50 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700">
               {(['ALL', 'ACTIVE', 'BLOCKED'] as const).map(t => (
                 <button key={t} onClick={() => setFilter(t)}
-                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === t ? 'bg-ovds-surface dark:bg-ovds-surface-dark dark:bg-slate-700 text-emerald-600 shadow-md' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === t ? 'bg-ovds-surface dark:bg-ovds-surface-dark dark:bg-slate-700 text-[var(--pro-azure)] shadow-md' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
                   {t}
                 </button>
               ))}
             </div>
-            <button onClick={handleExport} className="p-3.5 rounded-2xl bg-ovds-surface dark:bg-ovds-surface-dark dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-emerald-600 hover:shadow-md transition-all active:scale-95">
+            <button onClick={handleExport} className="p-3.5 rounded-2xl bg-ovds-surface dark:bg-ovds-surface-dark dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-[var(--pro-azure)] hover:shadow-md transition-all active:scale-95">
               <Download size={18} />
             </button>
-            <button onClick={fetchContacts} className="p-3.5 rounded-2xl bg-ovds-surface dark:bg-ovds-surface-dark dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-emerald-600 hover:shadow-md transition-all active:scale-95">
+            <button onClick={fetchContacts} className="p-3.5 rounded-2xl bg-ovds-surface dark:bg-ovds-surface-dark dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-[var(--pro-azure)] hover:shadow-md transition-all active:scale-95">
               <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
             </button>
             <button onClick={() => { setEditContact(null); setShowModal(true); }}
-              className="flex items-center gap-2 px-5 py-3 bg-emerald-500 shadow-xl shadow-emerald-500/20 transition-all active:scale-95 uppercase tracking-widest">
+              className="flex items-center gap-2 px-5 py-3 bg-[var(--pro-azure-50)]0 shadow-xl shadow-green-500/20 transition-all active:scale-95 uppercase tracking-widest">
               <Plus size={18} strokeWidth={3} /> Add Contact
             </button>
           </div>
@@ -1320,8 +1321,8 @@ const ContactsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean
         <div className="overflow-x-auto min-h-[400px] scrollbar-hide">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-[300px] gap-4">
-              <RefreshCw size={40} className="text-emerald-600 animate-spin" strokeWidth={2.5} />
-              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Loading Contacts...</p>
+              <RefreshCw size={40} className="text-[var(--pro-azure)] animate-spin" strokeWidth={2.5} />
+              <p className="text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em]">Loading Contacts...</p>
             </div>
           ) : filtered.length === 0 ? (
             <div className="h-[300px] flex items-center justify-center">
@@ -1334,18 +1335,18 @@ const ContactsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean
           ) : (
             <table className="ovds-table w-full text-left">
               <thead>
-                <tr className="bg-emerald-50 border-b border-ovds-border dark:border-ovds-muted-dark">
-                  <th className="px-8 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Contact</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Company / Role</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Contact Info</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] text-right">Balance</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] text-center">Status</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] text-right">Actions</th>
+                <tr className="bg-[var(--pro-azure-50)] border-b border-ovds-border dark:border-ovds-muted-dark">
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em]">Contact</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em]">Company / Role</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em]">Contact Info</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em] text-right">Balance</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em] text-center">Status</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em] text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-ovds-border dark:divide-ovds-muted-dark">
                 {filtered.map(c => (
-                  <tr key={c.id} className="hover:bg-emerald-50 transition-colors group">
+                  <tr key={c.id} className="hover:bg-[var(--pro-azure-50)] transition-colors group">
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-4">
                         <Avatar name={c.name} size="sm" />
@@ -1374,7 +1375,7 @@ const ContactsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean
                       <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ${
                         c.status === 'BLOCKED' ? 'bg-rose-50 text-rose-600' :
                         c.status === 'INACTIVE' ? 'bg-ovds-muted text-ovds-text-subtle dark:bg-ovds-muted-dark' :
-                        'bg-emerald-50 text-emerald-600'
+                        'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]'
                       }`}>
                         {c.status ?? 'ACTIVE'}
                       </span>
@@ -1382,7 +1383,7 @@ const ContactsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean
                     <td className="px-8 py-5">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button onClick={() => { setEditContact(c); setShowModal(true); }}
-                          className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-all">
+                          className="p-2.5 rounded-xl bg-[var(--pro-azure-50)] text-[var(--pro-azure)] hover:bg-[var(--pro-azure-100)] transition-all">
                           <Edit2 size={14} strokeWidth={2.5} />
                         </button>
                         <button onClick={() => handleDelete(c.id)}
@@ -1453,7 +1454,7 @@ const CompaniesTab: React.FC<{ companyId: string; can: (p: Permission) => boolea
   });
 
   const INDUSTRY_COLORS: Record<string, string> = {
-    Technology: 'bg-emerald-50 text-emerald-600', ovds: 'bg-emerald-50 text-emerald-600',
+    Technology: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]', ovds: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]',
     Healthcare: 'bg-rose-50 text-rose-600', Manufacturing: 'bg-amber-50 text-amber-600',
     Retail: 'bg-violet-50 text-violet-600', Agriculture: 'bg-lime-50 text-lime-600',
   };
@@ -1493,7 +1494,7 @@ const CompaniesTab: React.FC<{ companyId: string; can: (p: Permission) => boolea
               <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
             </button>
             <button onClick={() => { setEditCompany(null); setShowModal(true); }}
-              className="flex items-center gap-2 px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-[11px] font-black transition-all shadow-xl shadow-emerald-500/30 active:scale-95 uppercase tracking-widest">
+              className="flex items-center gap-2 px-5 py-3 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-2xl text-[11px] font-black transition-all shadow-xl shadow-green-500/30 active:scale-95 uppercase tracking-widest">
               <Plus size={18} strokeWidth={3} /> Add Company
             </button>
           </div>
@@ -1503,7 +1504,7 @@ const CompaniesTab: React.FC<{ companyId: string; can: (p: Permission) => boolea
           {loading ? (
             <div className="flex flex-col items-center justify-center h-[300px] gap-4">
               <RefreshCw size={40} className="text-violet-600 animate-spin" strokeWidth={2.5} />
-              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Loading Companies...</p>
+              <p className="text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em]">Loading Companies...</p>
             </div>
           ) : filtered.length === 0 ? (
             <div className="h-[300px] flex items-center justify-center">
@@ -1561,7 +1562,7 @@ const CompaniesTab: React.FC<{ companyId: string; can: (p: Permission) => boolea
                       </div>
                     </div>
                     <span className={`inline-flex items-center px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest ${
-                      c.status === 'INACTIVE' ? 'bg-slate-100 text-slate-500 dark:bg-slate-800' : 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30'
+                      c.status === 'INACTIVE' ? 'bg-slate-100 text-slate-500 dark:bg-slate-800' : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:bg-green-950/30'
                     }`}>
                       {c.status ?? 'ACTIVE'}
                     </span>
@@ -1649,10 +1650,10 @@ const DealsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean }>
 
   const STAGE_CONFIG: Record<DealStage, { headerBg: string; cardBg: string; border: string; dot: string; color: string }> = {
     LEAD:        { headerBg: 'bg-slate-100 dark:bg-slate-800',        cardBg: 'bg-slate-50/60 dark:bg-slate-800/40',   border: 'border-slate-200 dark:border-slate-700',   dot: 'bg-slate-400',   color: 'text-slate-600 dark:text-slate-300' },
-    QUALIFIED:   { headerBg: 'bg-emerald-50 dark:bg-emerald-950/30',        cardBg: 'bg-emerald-50/40 dark:bg-emerald-950/20',     border: 'border-emerald-200 dark:border-emerald-800',     dot: 'bg-emerald-500',    color: 'text-emerald-600 dark:text-emerald-400' },
+    QUALIFIED:   { headerBg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',        cardBg: 'bg-[var(--pro-azure-50)]/40 dark:bg-green-950/20',     border: 'border-[var(--pro-azure-100)] dark:border-green-800',     dot: 'bg-[var(--pro-azure-50)]0',    color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
     PROPOSAL:    { headerBg: 'bg-teal-50 dark:bg-teal-950/30',    cardBg: 'bg-teal-50/40 dark:bg-teal-950/20', border: 'border-teal-200 dark:border-teal-800', dot: 'bg-teal-500',  color: 'text-teal-600 dark:text-teal-400' },
     NEGOTIATION: { headerBg: 'bg-amber-50 dark:bg-amber-950/30',      cardBg: 'bg-amber-50/40 dark:bg-amber-950/20',   border: 'border-amber-200 dark:border-amber-800',   dot: 'bg-amber-400',   color: 'text-amber-600 dark:text-amber-400' },
-    CLOSED_WON:  { headerBg: 'bg-emerald-50 dark:bg-emerald-950/30',  cardBg: 'bg-emerald-50/40 dark:bg-emerald-950/20', border: 'border-emerald-200 dark:border-emerald-800', dot: 'bg-emerald-500', color: 'text-emerald-600 dark:text-emerald-400' },
+    CLOSED_WON:  { headerBg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',  cardBg: 'bg-[var(--pro-azure-50)]/40 dark:bg-green-950/20', border: 'border-[var(--pro-azure-100)] dark:border-green-800', dot: 'bg-[var(--pro-azure-50)]0', color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
     CLOSED_LOST: { headerBg: 'bg-rose-50 dark:bg-rose-950/30',        cardBg: 'bg-rose-50/40 dark:bg-rose-950/20',     border: 'border-rose-200 dark:border-rose-800',     dot: 'bg-rose-400',    color: 'text-rose-600 dark:text-rose-400' },
   };
 
@@ -1690,19 +1691,19 @@ const DealsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean }>
           <div className="relative flex-1 w-full max-w-md">
             <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search deals or contacts..."
-              className="w-full pl-12 pr-4 py-3 bg-emerald-50 border-transparent rounded-2xl text-sm font-black focus:bg-ovds-surface dark:bg-ovds-surface-dark focus:ring-4 focus:ring-teal-400/10 transition-all text-emerald-800" />
+              className="w-full pl-12 pr-4 py-3 bg-[var(--pro-azure-50)] border-transparent rounded-2xl text-sm font-black focus:bg-ovds-surface dark:bg-ovds-surface-dark focus:ring-4 focus:ring-teal-400/10 transition-all text-[var(--pro-azure-dark)]" />
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex bg-emerald-50 p-1.5 rounded-2xl">
+            <div className="flex bg-[var(--pro-azure-50)] p-1.5 rounded-2xl">
               <button
                 onClick={() => setView('kanban')}
-                className={`p-2 rounded-xl transition-all ${view === 'kanban' ? 'bg-ovds-surface dark:bg-ovds-surface-dark text-emerald-600 shadow-lg' : 'text-emerald-400 hover:text-emerald-600'}`}
+                className={`p-2 rounded-xl transition-all ${view === 'kanban' ? 'bg-ovds-surface dark:bg-ovds-surface-dark text-[var(--pro-azure)] shadow-lg' : 'text-[var(--pro-azure-light)] hover:text-[var(--pro-azure)]'}`}
               >
                 <LayoutGrid size={18} strokeWidth={2.5} />
               </button>
               <button
                 onClick={() => setView('list')}
-                className={`p-2 rounded-xl transition-all ${view === 'list' ? 'bg-ovds-surface dark:bg-ovds-surface-dark text-emerald-600 shadow-lg' : 'text-emerald-400 hover:text-emerald-600'}`}
+                className={`p-2 rounded-xl transition-all ${view === 'list' ? 'bg-ovds-surface dark:bg-ovds-surface-dark text-[var(--pro-azure)] shadow-lg' : 'text-[var(--pro-azure-light)] hover:text-[var(--pro-azure)]'}`}
               >
                 <List size={18} strokeWidth={2.5} />
               </button>
@@ -1716,7 +1717,7 @@ const DealsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean }>
               <ChevronRight size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 rotate-90 pointer-events-none" />
             </div>
             <button onClick={() => { setEditDeal(null); setShowModal(true); }}
-              className="flex items-center gap-2 px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-[11px] font-black transition-all shadow-xl shadow-emerald-500/30 active:scale-95 uppercase tracking-widest">
+              className="flex items-center gap-2 px-5 py-3 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-2xl text-[11px] font-black transition-all shadow-xl shadow-green-500/30 active:scale-95 uppercase tracking-widest">
               <Plus size={18} strokeWidth={3} /> New Deal
             </button>
           </div>
@@ -1725,8 +1726,8 @@ const DealsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean }>
         <div className="flex-1 overflow-x-auto p-8 scrollbar-hide">
           {loading ? (
             <div className="h-full flex flex-col items-center justify-center gap-4 py-32">
-              <RefreshCw size={40} className="text-emerald-600 animate-spin" strokeWidth={2.5} />
-              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Loading Pipeline...</p>
+              <RefreshCw size={40} className="text-[var(--pro-azure)] animate-spin" strokeWidth={2.5} />
+              <p className="text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em]">Loading Pipeline...</p>
             </div>
           ) : view === 'kanban' ? (
             <div className="flex gap-6 h-full min-w-max">
@@ -1747,17 +1748,17 @@ const DealsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean }>
                     <div className="flex-1 space-y-4 min-h-[300px]">
                       {stageDeals.map(deal => (
                         <div key={deal.id}
-                          className="bg-ovds-surface dark:bg-ovds-surface-dark dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 hover:border-emerald-500/40 transition-all group cursor-pointer"
+                          className="bg-ovds-surface dark:bg-ovds-surface-dark dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl hover:shadow-green-500/10 hover:border-[var(--pro-azure)]/40 transition-all group cursor-pointer"
                           onClick={() => { setEditDeal(deal); setShowModal(true); }}>
                           <div className="flex items-start justify-between gap-3 mb-3">
-                            <p className="text-sm font-black text-ovds-text-main dark:text-ovds-surface leading-tight line-clamp-2 group-hover:text-emerald-600 transition-colors">{deal.title}</p>
+                            <p className="text-sm font-black text-ovds-text-main dark:text-ovds-surface leading-tight line-clamp-2 group-hover:text-[var(--pro-azure)] transition-colors">{deal.title}</p>
                             <button onClick={e => { e.stopPropagation(); handleDelete(deal.id); }}
                               className="p-1.5 rounded-lg text-slate-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all shrink-0">
                               <Trash2 size={13} />
                             </button>
                           </div>
                           <div className="flex items-center gap-2 mb-3 ovds-label">
-                            <Users size={11} className="text-emerald-600" />
+                            <Users size={11} className="text-[var(--pro-azure)]" />
                             <span className="truncate">{deal.customerName}</span>
                           </div>
                           <div className="flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50 rounded-xl p-2.5 mb-3">
@@ -1777,7 +1778,7 @@ const DealsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean }>
                             </div>
                             {nextStage && !['CLOSED_WON', 'CLOSED_LOST'].includes(deal.stage) && (
                               <button onClick={e => { e.stopPropagation(); handleMove(deal.id, nextStage.key); }}
-                                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-500 text-[9px] font-black text-white hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 uppercase tracking-widest">
+                                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[var(--pro-azure-50)]0 text-[9px] font-black text-white hover:bg-[var(--pro-azure-dark)] transition-all shadow-lg shadow-green-500/20 uppercase tracking-widest">
                                 {nextStage.label} <ArrowRight size={11} strokeWidth={3} />
                               </button>
                             )}
@@ -1799,13 +1800,13 @@ const DealsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean }>
             <div className="ovds-panel overflow-hidden">
               <table className="ovds-table w-full text-left">
                 <thead>
-                  <tr className="bg-emerald-50/50 border-b border-ovds-border">
-                    <th className="px-8 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Deal</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Contact</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] text-right">Value</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] text-center">Stage</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Close Date</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] text-right">Actions</th>
+                  <tr className="bg-[var(--pro-azure-50)]/50 border-b border-ovds-border">
+                    <th className="px-8 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em]">Deal</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em]">Contact</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em] text-right">Value</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em] text-center">Stage</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em]">Close Date</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em] text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
@@ -1834,7 +1835,7 @@ const DealsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean }>
                       <td className="px-8 py-5">
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button onClick={() => { setEditDeal(d); setShowModal(true); }}
-                            className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-ovds-border transition-all">
+                            className="p-2.5 rounded-xl bg-[var(--pro-azure-50)] text-[var(--pro-azure)] hover:bg-ovds-border transition-all">
                             <Edit2 size={14} strokeWidth={2.5} />
                           </button>
                           <button onClick={() => handleDelete(d.id)}
@@ -1997,7 +1998,7 @@ const ActivitiesTab: React.FC<{ companyId: string; can: (p: Permission) => boole
           {loading ? (
             <div className="flex flex-col items-center justify-center h-[300px] gap-4">
               <RefreshCw size={40} className="text-amber-500 animate-spin" strokeWidth={2.5} />
-              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Loading Activities...</p>
+              <p className="text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em]">Loading Activities...</p>
             </div>
           ) : filtered.length === 0 ? (
             <div className="h-[300px] flex items-center justify-center">
@@ -2013,9 +2014,9 @@ const ActivitiesTab: React.FC<{ companyId: string; can: (p: Permission) => boole
                 <div key={a.id} className={`flex items-start gap-5 px-8 py-5 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group ${isOverdue(a) ? 'bg-rose-50/30 dark:bg-rose-950/10' : ''}`}>
                   {/* Type icon */}
                   <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 mt-0.5 ${
-                    a.type === 'CALL' ? 'bg-emerald-50' :
+                    a.type === 'CALL' ? 'bg-[var(--pro-azure-50)]' :
                     a.type === 'EMAIL' ? 'bg-violet-50 dark:bg-violet-900/20' :
-                    a.type === 'MEETING' ? 'bg-emerald-50' :
+                    a.type === 'MEETING' ? 'bg-[var(--pro-azure-50)]' :
                     a.type === 'TASK' ? 'bg-amber-50 dark:bg-amber-900/20' :
                     a.type === 'FOLLOW_UP' ? 'bg-rose-50 dark:bg-rose-900/20' :
                     'bg-white dark:bg-slate-800'
@@ -2030,12 +2031,12 @@ const ActivitiesTab: React.FC<{ companyId: string; can: (p: Permission) => boole
                         <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                           {a.contactName && (
                             <span className="flex items-center gap-1.5 ovds-label">
-                              <Users size={11} className="text-emerald-400" />{a.contactName}
+                              <Users size={11} className="text-[var(--pro-azure-light)]" />{a.contactName}
                             </span>
                           )}
                           {a.dealTitle && (
                             <span className="flex items-center gap-1.5 ovds-label">
-                              <Briefcase size={11} className="text-emerald-400" />{a.dealTitle}
+                              <Briefcase size={11} className="text-[var(--pro-azure-light)]" />{a.dealTitle}
                             </span>
                           )}
                           {a.assignedTo && (
@@ -2048,7 +2049,7 @@ const ActivitiesTab: React.FC<{ companyId: string; can: (p: Permission) => boole
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest ${
-                          a.status === 'DONE' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30' :
+                          a.status === 'DONE' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:bg-green-950/30' :
                           a.status === 'CANCELLED' ? 'bg-slate-100 text-slate-500 dark:bg-slate-800' :
                           isOverdue(a) ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/30' :
                           'bg-amber-50 text-amber-600 dark:bg-amber-950/30'
@@ -2066,7 +2067,7 @@ const ActivitiesTab: React.FC<{ companyId: string; can: (p: Permission) => boole
                       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         {a.status === 'PENDING' && (
                           <button onClick={() => handleMarkDone(a.id)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest hover:bg-ovds-border transition-all">
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--pro-azure-50)] text-[var(--pro-azure)] text-[10px] font-black uppercase tracking-widest hover:bg-ovds-border transition-all">
                             <Check size={12} strokeWidth={3} /> Done
                           </button>
                         )}
@@ -2157,7 +2158,7 @@ const SettingsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean
           <button key={s.key} onClick={() => setActiveSection(s.key)}
             className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${
               activeSection === s.key
-                ? 'bg-emerald-900 text-white shadow-lg'
+                ? 'bg-[var(--pro-azure-dark)] text-white shadow-lg'
                 : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
             }`}>
             {s.icon} {s.label}
@@ -2174,24 +2175,24 @@ const SettingsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean
               <p className="text-sm text-slate-400 font-bold mt-1">Configure deal stages and customer journey steps</p>
             </div>
             <button onClick={() => { setEditPipeline(null); setShowPipelineModal(true); }}
-              className="flex items-center gap-2 px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-[11px] font-black transition-all shadow-xl shadow-emerald-500/30 active:scale-95 uppercase tracking-widest">
+              className="flex items-center gap-2 px-5 py-3 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-2xl text-[11px] font-black transition-all shadow-xl shadow-green-500/30 active:scale-95 uppercase tracking-widest">
               <Plus size={18} strokeWidth={3} /> New Pipeline
             </button>
           </div>
 
           {loading ? (
             <div className="flex items-center justify-center h-40">
-              <RefreshCw size={32} className="text-emerald-600 animate-spin" />
+              <RefreshCw size={32} className="text-[var(--pro-azure)] animate-spin" />
             </div>
           ) : pipelines.length === 0 ? (
             <div className="ovds-panel p-16 flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 bg-emerald-50 rounded-3xl flex items-center justify-center mb-6">
-                <Layers size={28} className="text-emerald-600" />
+              <div className="w-16 h-16 bg-[var(--pro-azure-50)] rounded-3xl flex items-center justify-center mb-6">
+                <Layers size={28} className="text-[var(--pro-azure)]" />
               </div>
               <h4 className="text-lg font-black text-slate-700 dark:text-slate-200 mb-2">No Pipelines Yet</h4>
               <p className="text-sm text-slate-400 font-bold mb-6 max-w-sm">Create your first pipeline to define the stages your deals move through.</p>
               <button onClick={() => { setEditPipeline(null); setShowPipelineModal(true); }}
-                className="flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-emerald-500/30">
+                className="flex items-center gap-2 px-6 py-3 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-green-500/30">
                 <Plus size={18} strokeWidth={3} /> Create Pipeline
               </button>
             </div>
@@ -2204,14 +2205,14 @@ const SettingsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean
                       <div className="flex items-center gap-3">
                         <h4 className="text-base font-black text-slate-800 dark:text-slate-100">{p.name}</h4>
                         {p.isDefault && (
-                          <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 rounded-lg text-[9px] font-black uppercase tracking-widest">Default</span>
+                          <span className="px-2 py-0.5 bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:bg-green-900/30 rounded-lg text-[9px] font-black uppercase tracking-widest">Default</span>
                         )}
                       </div>
                       {p.description && <p className="text-xs text-slate-400 font-bold mt-1">{p.description}</p>}
                     </div>
                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button onClick={() => { setEditPipeline(p); setShowPipelineModal(true); }}
-                        className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-ovds-border transition-all">
+                        className="p-2.5 rounded-xl bg-[var(--pro-azure-50)] text-[var(--pro-azure)] hover:bg-ovds-border transition-all">
                         <Edit2 size={14} strokeWidth={2.5} />
                       </button>
                       <button onClick={() => handleDeletePipeline(p.id)}
@@ -2276,7 +2277,7 @@ const SettingsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean
                     <input type="color" value={at.color}
                       onChange={e => setActivityTypes(prev => prev.map((a, i) => i === idx ? { ...a, color: e.target.value } : a))}
                       className="w-8 h-8 rounded-xl border-2 border-white shadow-sm cursor-pointer" />
-                    <div className={`w-12 h-6 rounded-full transition-all relative cursor-pointer ${at.enabled ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}
+                    <div className={`w-12 h-6 rounded-full transition-all relative cursor-pointer ${at.enabled ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-200 dark:bg-slate-700'}`}
                       onClick={() => setActivityTypes(prev => prev.map((a, i) => i === idx ? { ...a, enabled: !a.enabled } : a))}>
                       <div className={`absolute top-1 w-4 h-4 bg-ovds-surface dark:bg-ovds-surface-dark rounded-full shadow transition-all ${at.enabled ? 'left-7' : 'left-1'}`} />
                     </div>
@@ -2327,13 +2328,13 @@ const SettingsTab: React.FC<{ companyId: string; can: (p: Permission) => boolean
               ))}
             </div>
           </div>
-          <div className="p-5 bg-emerald-50 rounded-3xl border border-ovds-border flex gap-4">
-            <div className="w-10 h-10 bg-ovds-surface dark:bg-ovds-surface-dark rounded-xl flex items-center justify-center text-emerald-600 shadow-sm shrink-0 mt-1">
+          <div className="p-5 bg-[var(--pro-azure-50)] rounded-3xl border border-ovds-border flex gap-4">
+            <div className="w-10 h-10 bg-ovds-surface dark:bg-ovds-surface-dark rounded-xl flex items-center justify-center text-[var(--pro-azure)] shadow-sm shrink-0 mt-1">
               <Zap size={18} />
             </div>
             <div>
-              <h4 className="text-sm font-black text-indigo-900 dark:text-indigo-100">Customer Journey Tracking</h4>
-              <p className="text-xs text-indigo-700/80 dark:text-indigo-300/80 leading-relaxed mt-1 font-bold">
+              <h4 className="text-sm font-black text-[var(--pro-azure-dark)] dark:text-green-100">Customer Journey Tracking</h4>
+              <p className="text-xs text-[var(--pro-azure-dark)]/80 dark:text-green-300/80 leading-relaxed mt-1 font-bold">
                 Customer stages help you understand where each contact is in their journey. Move contacts between stages as relationships develop.
               </p>
             </div>
@@ -2383,19 +2384,19 @@ export default function CRM() {
   };
 
   const TABS: { key: CRMTab; label: string; icon: React.ReactNode; color: string; permission?: Permission }[] = [
-    { key: 'contacts',   label: 'Contacts',   icon: <Users size={16} />,      color: 'text-emerald-600',    permission: 'crm:read' },
+    { key: 'contacts',   label: 'Contacts',   icon: <Users size={16} />,      color: 'text-[var(--pro-azure)]',    permission: 'crm:read' },
     { key: 'companies',  label: 'Companies',  icon: <Building2 size={16} />,  color: 'text-violet-600',  permission: 'crm:read' },
-    { key: 'deals',      label: 'Deals',      icon: <Briefcase size={16} />,  color: 'text-emerald-600', permission: 'crm:deals:read' },
+    { key: 'deals',      label: 'Deals',      icon: <Briefcase size={16} />,  color: 'text-[var(--pro-azure)]', permission: 'crm:deals:read' },
     { key: 'activities', label: 'Activities', icon: <Activity size={16} />,   color: 'text-amber-600',   permission: 'crm:activities:read' },
     { key: 'settings',   label: 'Settings',   icon: <Settings size={16} />,   color: 'text-slate-600',   permission: 'crm:settings:read' },
   ];
 
   const visibleTabs = TABS.filter(t => !t.permission || can(t.permission));
 
-  const TAB_ACCENT: Record<CRMTab, string> = {
-    contacts:   'border-emerald-600 text-emerald-600',
+  const _TAB_ACCENT: Record<CRMTab, string> = {
+    contacts:   'border-[var(--pro-azure)] text-[var(--pro-azure)]',
     companies:  'border-violet-600 text-violet-600',
-    deals:      'border-emerald-600 text-emerald-600',
+    deals:      'border-[var(--pro-azure)] text-[var(--pro-azure)]',
     activities: 'border-amber-500 text-amber-600',
     settings:   'border-slate-600 text-slate-600',
   };
@@ -2403,8 +2404,8 @@ export default function CRM() {
   if (businessLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-        <RefreshCw size={40} className="text-emerald-600 animate-spin" strokeWidth={2.5} />
-        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Loading CRM...</p>
+        <RefreshCw size={40} className="text-[var(--pro-azure)] animate-spin" strokeWidth={2.5} />
+        <p className="text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-[0.2em]">Loading CRM...</p>
       </div>
     );
   }
@@ -2412,8 +2413,8 @@ export default function CRM() {
   if (!selectedCompanyId) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-        <div className="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center">
-          <Users size={36} className="text-emerald-600" />
+        <div className="w-20 h-20 bg-[var(--pro-azure-50)] rounded-3xl flex items-center justify-center">
+          <Users size={36} className="text-[var(--pro-azure)]" />
         </div>
         <div className="text-center">
           <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100">Select a Company</h2>
@@ -2428,7 +2429,7 @@ export default function CRM() {
       title="CRM"
       subtitle="Manage contacts, companies, deals, and customer journeys — all in one place. CRM · Customer Relationship Management · Consumer Insights · Market Segmentation · Banking & ovds · Retail & E-commerce · IT & Software · Competitive Landscape"
       icon={<Users2 size={18} />}
-      iconBg="bg-gradient-to-br from-emerald-500 to-indigo-600"
+      iconBg="bg-gradient-to-br from-green-500 to-green-600"
       crumbs={[{ label: 'CRM' }]}
       actions={
         <>

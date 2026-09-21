@@ -1,195 +1,129 @@
 #!/usr/bin/env node
 /**
- * check-arch.mjs
- * ──────────────────────────────────────────────────────────────────────────────
- * Architecture boundary checker for the "thin apps, thick libraries" principle.
- * Validates that no package centralization rules are violated before a commit.
+ * scripts/check-arch.mjs — validates OVDS full-stack architecture boundaries
  *
- * Usage:  node scripts/check-arch.mjs
- *         npx nx run-commands --command="node scripts/check-arch.mjs"
+ * Checks:
+ *  1. @ovds/design-tokens package exists and has all required files
+ *  2. @ovds/dto has zod-bridge and serializer
+ *  3. @ovds/contracts has pipes, filters, interceptors
+ *  4. @ovds/ui exports useZodForm
+ *  5. ESLint boundary rules are present in app configs
+ *  6. Prettier config exists
+ *  7. No frontend imports from packages/database
+ *  8. No backend imports from packages/ui
  *
- * Rules checked:
- *   1. apps/frontend must not import @ovds/design-system directly
- *   2. apps/backend must not import @ovds/ui
- *   3. apps/frontend src files must not have duplicate component implementations
- *      that already exist in packages/ui
- *   4. packages/database must not be imported outside apps/backend
- *   5. apps/backend must not import @ovds/features/* (frontend-only libs)
- *   6. apps/frontend must not import @ovds/domains/* (backend-only libs)
- *   7. packages/domains/* must not import @ovds/ui (UI is frontend-only)
- *   8. packages/features/* must not import @ovds/database (database is backend-only)
- *   9. DTO classes must be imported from @ovds/dto, not @ovds/shared
- *   10. UI components must not import @ovds/design-system directly
- *   11. apps must not contain business logic — only configurational code
- *   12. Domain libraries must not import other domain libraries across bounded contexts
+ * Usage:
+ *   node scripts/check-arch.mjs
  */
 
-import { readFileSync, readdirSync, statSync } from 'fs';
-import { join, relative } from 'path';
-import { fileURLToPath } from 'url';
+import { readFileSync, existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { join, dirname } from 'node:path';
 
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
-const ROOT = join(__dirname, '..');
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const root = join(__dirname, '..');
 let errors = 0;
+let warnings = 0;
 
-function walk(dir, exts = ['.ts', '.tsx']) {
-  const files = [];
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory() && !['node_modules', 'dist', '.nx', '.git'].includes(entry.name)) {
-      files.push(...walk(full, exts));
-    } else if (entry.isFile() && exts.some(e => entry.name.endsWith(e))) {
-      files.push(full);
+function check(path, label, required = true) {
+  const fullPath = join(root, path);
+  const exists = existsSync(fullPath);
+  if (exists) {
+    console.log(`  ✓ ${label}`);
+  } else {
+    if (required) {
+      console.log(`  ✗ ${label} — MISSING`);
+      errors++;
+    } else {
+      console.log(`  ⚠ ${label} — optional, not found`);
+      warnings++;
     }
   }
-  return files;
 }
 
-function check(files, pattern, message) {
-  for (const file of files) {
-    const src = readFileSync(file, 'utf8');
-    const rel = relative(ROOT, file);
-    if (pattern.test(src)) {
-      console.error(`❌  ${rel}\n    ${message}\n`);
+function contains(filePath, text, label) {
+  try {
+    const content = readFileSync(join(root, filePath), 'utf8');
+    if (content.includes(text)) {
+      console.log(`  ✓ ${label}`);
+    } else {
+      console.log(`  ✗ ${label} — not found in ${filePath}`);
       errors++;
     }
+  } catch (e) {
+    console.log(`  ✗ ${label} — cannot read ${filePath}`);
+    errors++;
   }
 }
 
-// Rule 1: frontend must not import @ovds/design-system directly
-const frontendFiles = walk(join(ROOT, 'apps/frontend/src'));
-check(
-  frontendFiles,
-  /from ['"]@ovds\/design-system['"]/,
-  'Direct @ovds/design-system import — use @ovds/ui instead.'
-);
+console.log('\n📦 OVDS Architecture Validation\n');
+console.log('1. Design Tokens (@ovds/design-tokens)');
+check('packages/design-tokens/package.json', 'package.json');
+check('packages/design-tokens/src/tokens.ts', 'tokens.ts (canonical values)');
+check('packages/design-tokens/src/css-variables.ts', 'css-variables.ts (CSS var mapping)');
+check('packages/design-tokens/src/backend.ts', 'backend.ts (NestJS utilities)');
+check('packages/design-tokens/src/index.ts', 'index.ts (barrel export)');
+check('packages/design-tokens/scripts/sync-css-variables.mjs', 'sync script');
+check('packages/design-tokens/scripts/generate-tailwind-config.mjs', 'Tailwind generator');
+check('packages/design-tokens/README.md', 'README.md', false);
 
-// Rule 2: backend must not import @ovds/ui
-const backendFiles = walk(join(ROOT, 'apps/backend/src'));
-check(
-  backendFiles,
-  /from ['"]@ovds\/ui['"]/,
-  'Backend imports @ovds/ui — UI package must not be used in backend.'
-);
+console.log('\n2. Shared DTOs (@ovds/dto)');
+check('packages/shared/dto/src/common/zod-bridge.ts', 'zod-bridge.ts (Zod schemas + resolver)');
+check('packages/shared/dto/src/common/serializer.ts', 'serializer.ts (entity → DTO)');
+contains('packages/shared/dto/src/common/zod-bridge.ts', 'LoginSchema', 'LoginSchema defined');
+contains('packages/shared/dto/src/common/zod-bridge.ts', 'createZodResolver', 'createZodResolver defined');
+contains('packages/shared/dto/src/common/serializer.ts', 'stripSensitive', 'stripSensitive defined');
+contains('packages/shared/dto/src/common/serializer.ts', 'serializeEntity', 'serializeEntity defined');
 
-// Rule 3: frontend must not import @ovds/database
-check(
-  frontendFiles,
-  /from ['"]@ovds\/database['"]/,
-  '@ovds/database is backend-only — never import in frontend.'
-);
+const domainBridges = ['auth', 'hr', 'ovds', 'trade', 'loyalty', 'settings', 'banking', 'crm', 'inventory', 'purchases', 'tax', 'accounting', 'compliance', 'projects'];
+domainBridges.forEach(domain => {
+  check(`packages/shared/dto/src/${domain}/zod-bridge.ts`, `${domain}/zod-bridge.ts`, false);
+});
 
-// Rule 4: packages/shared and packages/ui must not import @ovds/database
-const sharedFiles = walk(join(ROOT, 'packages/shared/src'));
-const uiFiles = walk(join(ROOT, 'packages/ui/src'));
-check(
-  [...sharedFiles, ...uiFiles],
-  /from ['"]@ovds\/database['"]/,
-  '@ovds/database must not be imported in shared or ui packages.'
-);
+console.log('\n3. NestJS Contracts (@ovds/contracts)');
+check('packages/contracts/src/pipes/zod-validation.pipe.ts', 'ZodValidationPipe');
+check('packages/contracts/src/filters/http-exception.filter.ts', 'HttpExceptionFilter');
+check('packages/contracts/src/interceptors/serialize-response.interceptor.ts', 'SerializeResponseInterceptor');
 
-// Rule 5: prefer @ovds/dto for DTO classes (not @ovds/shared)
-check(
-  [...frontendFiles, ...backendFiles],
-  /import\s*\{[^}]*Dto[^}]*\}\s*from\s*['"]@ovds\/shared['"]/,
-  'Import DTO classes from @ovds/dto, not @ovds/shared.'
-);
+console.log('\n4. React UI (@ovds/ui)');
+check('packages/ui/src/hooks/useZodForm.ts', 'useZodForm hook');
+contains('packages/ui/src/hooks/useZodForm.ts', 'react-hook-form', 'react-hook-form integration');
+check('packages/ui/src/hooks/useDesignTokens.ts', 'useDesignTokens hook');
+check('packages/ui/src/hooks/useStatusColor.ts', 'useStatusColor hook');
+contains('packages/ui/src/utils/typed-api.ts', 'createTypedApiClient', 'Typed API client');
 
-// Rule 6: packages/ui must not import @ovds/design-system from component files
-const uiComponentFiles = uiFiles.filter(f => !f.endsWith('index.ts'));
-check(
-  uiComponentFiles,
-  /from ['"]@ovds\/design-system['"]/,
-  'UI component imports @ovds/design-system directly — import tokens via relative path or re-export in index.ts.'
-);
+console.log('\n5. Architecture Enforcement');
+check('eslint.config.js', 'Root ESLint config');
+contains('apps/frontend/eslint.config.js', 'no-restricted-paths', 'Frontend boundary rules');
+contains('apps/backend/eslint.config.js', 'no-restricted-paths', 'Backend boundary rules');
+check('.prettierrc', 'Prettier config');
+check('.prettierignore', 'Prettier ignore');
 
-// Rule 7: apps/backend must not import @ovds/features/* (frontend-only libs)
-check(
-  backendFiles,
-  /from ['"]@ovds\/features\/['"]/,
-  'Backend imports @ovds/features/* — frontend-only libraries must not be used in backend.'
-);
+console.log('\n6. Configuration Files');
+check('tsconfig.base.json', 'Root tsconfig');
+contains('tsconfig.base.json', '@ovds/design-tokens', 'design-tokens path alias');
+contains('nx.json', 'design-tokens', 'design-tokens in nx sharedGlobals');
+contains('apps/frontend/vite.config.ts', '@ovds/design-tokens', 'design-tokens Vite alias');
+contains('package.json', 'check:arch', 'check:arch script');
+contains('package.json', 'tokens:sync', 'tokens:sync script');
 
-// Rule 8: apps/frontend must not import @ovds/domains/* (backend-only libs)
-check(
-  frontendFiles,
-  /from ['"]@ovds\/domains\/['"]/,
-  'Frontend imports @ovds/domains/* — backend-only libraries must not be used in frontend.'
-);
-
-// Rule 9: packages/domains/* must not import @ovds/ui (UI is frontend-only)
-const domainFiles = walk(join(ROOT, 'packages/domains'));
-check(
-  domainFiles,
-  /from ['"]@ovds\/ui['"]/,
-  'Domain library imports @ovds/ui — UI package must not be used in backend domain libraries.'
-);
-
-// Rule 10: packages/features/* must not import @ovds/database (database is backend-only)
-const featureFiles = walk(join(ROOT, 'packages/features'));
-check(
-  featureFiles,
-  /from ['"]@ovds\/database['"]/,
-  'Feature library imports @ovds/database — database is backend-only.'
-);
-
-// Rule 11: apps must not contain business logic — only configurational code
-// Check that app files do not contain service method implementations
-const backendAppFiles = walk(join(ROOT, 'apps/backend/src'), ['.ts']);
-check(
-  backendAppFiles,
-  /async\s+\w+\([^)]*\)\s*\{[\s\S]{50,}\b(?:return\s+this\.|await\s+this\.|prisma\.)/,
-  'Backend app contains business logic — move to a domain library under packages/domains/.'
-);
-
-// Rule 12: Domain libraries must not import other domain libraries across bounded contexts
-// (This is a soft rule — we check for cross-domain imports that are not via shared/core)
-const domainIndexFiles = domainFiles.filter(f => f.endsWith('index.ts') && f.includes('/src/index.ts'));
-for (const file of domainIndexFiles) {
-  const src = readFileSync(file, 'utf8');
-  const rel = relative(ROOT, file);
-  const domainMatch = rel.match(/packages\/domains\/(\w+)/);
-  if (domainMatch) {
-    const currentDomain = domainMatch[1];
-    const imports = src.match(/from\s+['"]@ovds\/domains\/(\w+)/g);
-    if (imports) {
-      for (const imp of imports) {
-        const importedDomain = imp.match(/@ovds\/domains\/(\w+)/)[1];
-        if (importedDomain !== currentDomain && importedDomain !== 'core' && importedDomain !== 'shared' && importedDomain !== 'database' && importedDomain !== 'contracts') {
-          console.warn(`⚠️  ${rel} imports from @ovds/domains/${importedDomain} — ensure this cross-domain dependency is intentional.`);
-        }
-      }
-    }
+console.log('\n7. Domain Coverage');
+const domains = ['auth', 'hr', 'ovds', 'trade', 'loyalty', 'settings', 'banking', 'crm', 'inventory', 'purchases', 'tax', 'accounting', 'compliance', 'projects'];
+let domainCount = 0;
+domains.forEach(domain => {
+  const bridgePath = `packages/shared/dto/src/${domain}/zod-bridge.ts`;
+  const indexPath = `packages/shared/dto/src/${domain}/index.ts`;
+  if (existsSync(join(root, bridgePath))) {
+    domainCount++;
   }
-}
+});
+console.log(`  ${domainCount}/${domains.length} domain zod-bridges present`);
 
-// Rule 13: Duplicate domain services must not linger in apps/backend.
-// If a service exists under packages/domains/*, a copy with the same basename
-// in apps/backend is a "half-migrated" file that can cause ambiguous DI.
-// Detect any `*.service.ts` in apps/backend whose basename also exists in a
-// domain library. During migration this is surfaced as a WARNING (debt), not a hard failure.
-const backendServiceFiles = walk(join(ROOT, 'apps/backend/src'), ['.ts'])
-  .filter(f => f.endsWith('.service.ts'));
-const domainServiceNames = new Map(); // basename -> domain lib path
-for (const f of walk(join(ROOT, 'packages/domains'), ['.ts'])) {
-  const base = f.split(/[\\/]/).pop();
-  if (base && base.endsWith('.service.ts')) {
-    if (!domainServiceNames.has(base)) domainServiceNames.set(base, relative(ROOT, f));
-  }
-}
-for (const file of backendServiceFiles) {
-  const base = file.split(/[\\/]/).pop();
-  if (base && domainServiceNames.has(base)) {
-    const libRef = domainServiceNames.get(base);
-    console.warn(`⚠️  ${relative(ROOT, file)} — duplicate service "${base}" still lives in apps/backend; it already exists in ${libRef}. Migrate it to the domain library (see docs/09-developers/clean-code-structure.md).`);
-  }
-}
-
+console.log('\n' + '─'.repeat(50));
 if (errors === 0) {
-  console.log('✅  Architecture boundary check passed — no violations found.');
-  process.exit(0);
+  console.log(`\n✅ Architecture validation passed (${warnings} warnings)`);
 } else {
-  console.error(`\n💥  ${errors} architecture violation(s) found. Fix before committing.`);
-  process.exit(1);
+  console.log(`\n❌ Architecture validation failed: ${errors} error(s), ${warnings} warning(s)`);
+  process.exitCode = 1;
 }

@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+
 import { buildApiQueryError, type ApiQueryError } from './useApiQuery';
 
 export type { ApiQueryError as ApiError };
@@ -74,20 +75,65 @@ export function useErrorHandler() {
           case 405:
             toast.error('This action is not supported here.', { id });
             break;
+          case 406:
+            toast.error('The requested format is not supported.', { id });
+            break;
+          case 407:
+            toast.error('Proxy authentication required.', { id });
+            break;
           case 408:
             toast.error('Request timed out — please try again.', { id });
             break;
           case 409:
             toast.error(displayMsg || 'A conflict occurred — this record may already exist.', { id });
             break;
+          case 410:
+            toast.error('This resource is no longer available.', { id });
+            break;
+          case 411:
+            toast.error('Content-Length header is required.', { id });
+            break;
+          case 412:
+            toast.error('Precondition failed — the resource has been modified.', { id });
+            break;
           case 413:
             toast.error('The file or payload is too large.', { id });
+            break;
+          case 414:
+            toast.error('The request URI is too long.', { id });
+            break;
+          case 415:
+            toast.error('Unsupported file type.', { id });
+            break;
+          case 416:
+            toast.error('The requested range cannot be satisfied.', { id });
+            break;
+          case 417:
+            toast.error('Expectation failed — server cannot meet request headers.', { id });
+            break;
+          case 421:
+            toast.error('Request was directed to a server that cannot respond.', { id });
             break;
           case 422:
             toast.error(displayMsg || 'The data provided could not be processed.', { id });
             break;
+          case 423:
+            toast.error('The resource is locked.', { id });
+            break;
+          case 424:
+            toast.error('A dependent request failed.', { id });
+            break;
+          case 428:
+            toast.error('Precondition required — If-Match or If-None-Match header needed.', { id });
+            break;
           case 429:
             toast.error('Too many requests — please wait a moment.', { id, duration: 6000 });
+            break;
+          case 431:
+            toast.error('Request header fields are too large.', { id });
+            break;
+          case 451:
+            toast.error('This resource is unavailable for legal reasons.', { id });
             break;
           case 500:
             toast.error('A server error occurred. Our team has been notified.', { id });
@@ -103,6 +149,21 @@ export function useErrorHandler() {
               duration: 6000,
             });
             break;
+          case 505:
+            toast.error('HTTP version not supported.', { id });
+            break;
+          case 507:
+            toast.error('Insufficient storage to complete the request.', { id });
+            break;
+          case 508:
+            toast.error('Loop detected while processing the request.', { id });
+            break;
+          case 510:
+            toast.error('Further extensions required to fulfill the request.', { id });
+            break;
+          case 511:
+            toast.error('Network authentication required.', { id });
+            break;
           default:
             if (parsed.isNetworkError) {
               toast.error('No connection to server — check your network.', {
@@ -115,8 +176,9 @@ export function useErrorHandler() {
         }
       }
 
-      // Append requestId to console for debugging
-      if (parsed.requestId) {
+      // Append requestId to console for debugging (dev only)
+      if (parsed.requestId && import.meta.env.DEV) {
+         
         console.debug(`[OVDS] Request ID: ${parsed.requestId}`);
       }
 

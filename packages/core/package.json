@@ -13,6 +13,20 @@
       "require": "./dist/index.js",
       "default": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./vat": {
+      "source": "./src/vat/index.ts",
+      "import": "./dist/vat/index.js",
+      "require": "./dist/vat/index.js",
+      "default": "./dist/vat/index.js",
+      "types": "./dist/vat/index.d.ts"
+    },
+    "./vat/report": {
+      "source": "./src/vat/report/index.ts",
+      "import": "./dist/vat/report/index.js",
+      "require": "./dist/vat/report/index.js",
+      "default": "./dist/vat/report/index.js",
+      "types": "./dist/vat/report/index.d.ts"
     }
   },
   "sideEffects": false,

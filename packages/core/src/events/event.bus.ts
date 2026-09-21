@@ -40,6 +40,10 @@ export class EventBus implements EventBusInterface {
     return this.dispatcher.getListeners(eventName);
   }
 
+  getAllListeners(): Array<import('./event.interface').EventListener & { eventName: string }> {
+    return this.dispatcher.getAllListeners();
+  }
+
   getHistory(eventName?: string): import('./event.interface').Event[] {
     return this.dispatcher.getHistory(eventName);
   }

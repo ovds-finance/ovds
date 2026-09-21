@@ -3,12 +3,13 @@
  * Shows the user's complete notification feed with filter tabs, bulk actions,
  * and real-time updates via the useNotifications hook.
  */
-import React, { useState } from 'react';
 import {
   Bell, CheckCheck, Trash2, Check,
   Info, AlertTriangle, AlertCircle, ExternalLink,
 } from 'lucide-react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { useNotifications, type AppNotification } from '../hooks/useNotifications';
 import { usePageTitle } from '../hooks/usePageTitle';
 
@@ -39,7 +40,7 @@ export default function NotificationsPage() {
     const t = (n as any).type as string | undefined;
     if (t === 'WARNING') return <AlertTriangle size={15} style={{ color: '#f59e0b' }} />;
     if (t === 'ERROR')   return <AlertCircle  size={15} style={{ color: '#ef4444' }} />;
-    return                      <Info         size={15} style={{ color: 'var(--lv, #4f46e5)' }} />;
+    return                      <Info         size={15} style={{ color: 'var(--lv, #4FBA6F)' }} />;
   };
 
   return (
@@ -52,10 +53,10 @@ export default function NotificationsPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
             width: 36, height: 36, borderRadius: 10,
-            background: 'var(--lv-dim, #eef2ff)',
+            background: 'var(--lv-dim, #F0FDF4)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <Bell size={17} style={{ color: 'var(--lv, #4f46e5)' }} />
+            <Bell size={17} style={{ color: 'var(--lv, #4FBA6F)' }} />
           </div>
           <div>
             <h1 style={{ fontWeight: 800, fontSize: '1.125rem', color: '#111827', lineHeight: 1.2 }}>
@@ -157,7 +158,7 @@ export default function NotificationsPage() {
               {/* Icon */}
               <div style={{
                 width: 34, height: 34, borderRadius: 9, flexShrink: 0,
-                background: n.isRead ? '#f3f4f6' : 'var(--lv-dim, #eef2ff)',
+                background: n.isRead ? '#f3f4f6' : 'var(--lv-dim, #F0FDF4)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 marginTop: 1,
               }}>
@@ -188,7 +189,7 @@ export default function NotificationsPage() {
                 {n.link && (
                   <span style={{
                     display: 'inline-flex', alignItems: 'center', gap: 3,
-                    fontSize: '0.75rem', color: 'var(--lv, #4f46e5)',
+                    fontSize: '0.75rem', color: 'var(--lv, #4FBA6F)',
                     marginTop: 4, fontWeight: 600,
                   }}>
                     View details <ExternalLink size={11} />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { Icon } from '@ovds/ui';
 
@@ -29,7 +29,7 @@ const ClientPortalLayout: React.FC<ClientPortalLayoutProps> = ({ children }) => 
               <Icon name="MENU" size={20} className="text-slate-600 dark:text-slate-400" />
             </button>
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-black text-sm shadow-sm">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--pro-azure)] to-teal-600 flex items-center justify-center text-white font-black text-sm shadow-sm">
                 O
               </div>
               <div>
@@ -41,7 +41,7 @@ const ClientPortalLayout: React.FC<ClientPortalLayoutProps> = ({ children }) => 
           <div className="flex items-center gap-2">
             <a
               href="/login"
-              className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300"
+              className="text-xs font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:text-[var(--pro-azure-dark)] dark:hover:text-[var(--pro-azure-light)]"
             >
               Admin
             </a>
@@ -61,7 +61,7 @@ const ClientPortalLayout: React.FC<ClientPortalLayoutProps> = ({ children }) => 
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                       isActive
-                        ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
+                        ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`
                   }
@@ -96,7 +96,7 @@ const ClientPortalLayout: React.FC<ClientPortalLayoutProps> = ({ children }) => 
                       className={({ isActive }) =>
                         `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                           isActive
-                            ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
+                            ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                             : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                         }`
                       }
@@ -121,3 +121,4 @@ const ClientPortalLayout: React.FC<ClientPortalLayoutProps> = ({ children }) => 
 };
 
 export default ClientPortalLayout;
+

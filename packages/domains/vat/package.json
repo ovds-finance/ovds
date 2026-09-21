@@ -1,21 +1,22 @@
 {
-  "name": "@ovds/domains/vat",
+  "name": "@ovds/domains-vat",
   "version": "0.0.1",
   "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc --noEmit",
+"scripts": {
+    "build": "node ../../../scripts/bin-run.mjs typescript/bin/tsc -p tsconfig.json",
+    "typecheck": "node ../../../scripts/bin-run.mjs typescript/bin/tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
     "@nestjs/common": "*",
-    "@ovds/domains/infrastructure": "*",
-    "@ovds/shared": "*",
+    "@ovds/domains-infrastructure": "workspace:*",
+    "@ovds/shared": "workspace:*",
     "@prisma/client": "*",
     "class-transformer": "0.5.1",
     "class-validator": "0.14.4",
     "zod": "*"
   }
 }
+

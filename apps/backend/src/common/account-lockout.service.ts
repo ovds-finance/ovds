@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
-import { PrismaService } from '../common/prisma.service';
 import { ConfigService } from '@nestjs/config';
+
+import { PrismaService } from '../common/prisma.service';
 
 @Injectable()
 export class AccountLockoutService {

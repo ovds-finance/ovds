@@ -1,6 +1,6 @@
 /**
  * Custom HTTP exceptions shared across all domain libraries.
- * Import from @ovds/domains/infrastructure — never redefine per domain.
+ * Import from @ovds/domains-infrastructure — never redefine per domain.
  *
  * These match the implementations previously in apps/backend/src/common/exceptions/.
  * The originals now re-export from here (backward-compatible shim pattern).

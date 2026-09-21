@@ -24,7 +24,7 @@ export const VVSavedIndicator: React.FC<VVSavedIndicatorProps> = ({
     <div
       className={cn(
         'flex items-center gap-1.5 text-[10px] font-semibold transition-colors',
-        saving ? 'text-slate-400' : time ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-300',
+        saving ? 'text-slate-400' : time ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-slate-300',
         className,
       )}
       aria-live="polite"

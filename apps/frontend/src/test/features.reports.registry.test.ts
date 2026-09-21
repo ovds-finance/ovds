@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { ALL_TEMPLATES, STANDARD_REPORTS, MODULAR_REPORTS, findTemplate, templatesByCategory } from '../features/reports/reportRegistry';
 import type { ReportCategory } from '../features/reports/types';
 

@@ -214,9 +214,9 @@ export const VVProcessScreen: React.FC<VVProcessScreenProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-2.5 rounded-oki border border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/20 px-4 py-3">
-                <ShieldCheck size={16} className="text-emerald-500 shrink-0" />
-                <p className="text-[12px] font-semibold text-emerald-700 dark:text-emerald-300">
+              <div className="flex items-center gap-2.5 rounded-oki border border-[var(--pro-azure-100)] dark:border-green-800 bg-[var(--pro-azure-50)]/60 dark:bg-green-950/20 px-4 py-3">
+                <ShieldCheck size={16} className="text-[var(--pro-azure)] shrink-0" />
+                <p className="text-[12px] font-semibold text-[var(--pro-azure-dark)] dark:text-green-300">
                   All fields validated — review the parsed totals below
                 </p>
               </div>
@@ -259,7 +259,7 @@ export const VVProcessScreen: React.FC<VVProcessScreenProps> = ({
           <div className="space-y-5" data-aki-step="confirm">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <p className="text-[12px] font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-2">
-                <FileCheck2 size={15} className="text-aki-blue" />
+                <FileCheck2 size={15} className="text-[var(--pro-azure)]" />
                 Final review — confirm accuracy before submission to the ledger
               </p>
               <button

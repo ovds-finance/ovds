@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
 import {
   Settings, Plus, Edit2, Trash2, RefreshCw,
   Banknote, Layers, Tag, Shield, ToggleLeft, ToggleRight,
 } from 'lucide-react';
-import api from '../../services/api';
+import React, { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
+
 import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
 
 // -- Payroll Settings Panel ----------------------------------------------------
 // Covers: Pay Commissions, Pay Band Categories, Grade Pay Scales, Levels,
@@ -89,7 +90,7 @@ const CrudList: React.FC<{
             <RefreshCw size={12} className="text-slate-400" />
           </button>
           {canWrite && (
-            <button onClick={openNew} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-xs font-bold hover:bg-emerald-600 transition-colors">
+            <button onClick={openNew} className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-lg text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-colors">
               <Plus size={12} /> Add
             </button>
           )}
@@ -118,7 +119,7 @@ const CrudList: React.FC<{
           </div>
           <div className="flex gap-2">
             <button onClick={() => setShowForm(false)} className="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold">Cancel</button>
-            <button onClick={handleSave} className="px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-xs font-bold hover:bg-emerald-600">Save</button>
+            <button onClick={handleSave} className="px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-lg text-xs font-bold hover:bg-[var(--pro-azure-dark)]">Save</button>
           </div>
         </div>
       )}
@@ -149,7 +150,7 @@ const CrudList: React.FC<{
                   {canWrite && (
                     <td className="px-3 py-2">
                       <div className="flex gap-1">
-                        <button onClick={() => openEdit(item)} className="p-1 text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors"><Edit2 size={11} /></button>
+                        <button onClick={() => openEdit(item)} className="p-1 text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors"><Edit2 size={11} /></button>
                         <button onClick={() => handleDelete(item.id)} className="p-1 text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={11} /></button>
                       </div>
                     </td>
@@ -208,7 +209,7 @@ const FeatureSettings: React.FC<{ canWrite: boolean }> = ({ canWrite }) => {
             <p className="text-xs text-slate-400 mt-0.5">{f.desc}</p>
           </div>
           <button onClick={() => toggle(f.key)} disabled={!canWrite}
-            className={`shrink-0 transition-colors ${settings[f.key] ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-300 dark:text-slate-600'} disabled:opacity-50`}>
+            className={`shrink-0 transition-colors ${settings[f.key] ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-slate-300 dark:text-slate-600'} disabled:opacity-50`}>
             {settings[f.key] ? <ToggleRight size={28} /> : <ToggleLeft size={28} />}
           </button>
         </div>
@@ -229,7 +230,7 @@ const PayrollSettingsPanel: React.FC = () => {
       <div className="w-48 shrink-0 space-y-1">
         {SECTIONS.map(s => (
           <button key={s.key} onClick={() => setActiveSection(s.key)}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${activeSection === s.key ? 'bg-emerald-500 text-white' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${activeSection === s.key ? 'bg-[var(--pro-azure)] text-white' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-300'}`}>
             {s.icon} {s.label}
           </button>
         ))}

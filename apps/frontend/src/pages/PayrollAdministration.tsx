@@ -1,34 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useAuth } from '../rbac/AuthContext';
-import { useAuditLog } from '../hooks/useAuditLog';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useSearchParams } from 'react-router-dom';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import { confirm } from '../utils/confirm';
-import { fmtETB } from '../utils/ethiopianTax';
-import { Send } from 'lucide-react';
-import DOMPurify from 'dompurify';
-import {
-  AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
-  Btn, Select, Toolbar,
-  Icon, Amount, StatusBadge,
-} from '../components/ui';
-import { downloadCSV } from '../utils/download';
-import LoansPanel from '../components/payroll/loansPanel';
-import FinancialCyclesPanel from '../components/payroll/financialCyclesPanel';
-import PayrollSettingsPanel from '../components/payroll/payrollSettingsPanel';
-import BulkUploadPanel from '../components/payroll/bulkUploadPanel';
-import EmployeePayrollConfigPanel from '../components/payroll/employeePayrollConfigPanel';
-import IncrementPanel from '../components/payroll/incrementPanel';
-import ArrearPanel from '../components/payroll/arrearPanel';
-import OtherPaymentPanel from '../components/payroll/otherPaymentPanel';
-import PFSubscriptionsPanel from '../components/payroll/pfSubscriptionsPanel';
-import ReimbursementPanel from '../components/payroll/reimbursementPanel';
-import { EmptyState } from '../components';
-import { PipelineStageHeader } from '../components/pipelineComponents';
-import { useBusiness } from '../context/businessContext';
 import { payCalendarsApi } from '@ovds/features/hr';
+import DOMPurify from 'dompurify';
+import { Send } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import toast from 'react-hot-toast';
+import { useSearchParams } from 'react-router-dom';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -42,9 +17,36 @@ import {
   Legend,
 } from 'recharts';
 
+import { EmptyState } from '../components';
+import ArrearPanel from '../components/payroll/arrearPanel';
+import BulkUploadPanel from '../components/payroll/bulkUploadPanel';
+import EmployeePayrollConfigPanel from '../components/payroll/employeePayrollConfigPanel';
+import FinancialCyclesPanel from '../components/payroll/financialCyclesPanel';
+import IncrementPanel from '../components/payroll/incrementPanel';
+import LoansPanel from '../components/payroll/loansPanel';
+import OtherPaymentPanel from '../components/payroll/otherPaymentPanel';
+import PayrollSettingsPanel from '../components/payroll/payrollSettingsPanel';
+import PFSubscriptionsPanel from '../components/payroll/pfSubscriptionsPanel';
+import ReimbursementPanel from '../components/payroll/reimbursementPanel';
+import { PipelineStageHeader } from '../components/pipelineComponents';
+import {
+  AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
+  Btn, Select, Toolbar,
+  Icon, Amount, StatusBadge,
+} from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useAuditLog } from '../hooks/useAuditLog';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { confirm } from '../utils/confirm';
+import { downloadCSV } from '../utils/download';
+import { fmtETB } from '../utils/ethiopianTax';
+
+
 const STATUS_COLORS: Record<string, string> = {
-  APPROVED: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
-  GENERATED: 'bg-emerald-100 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-900/40 dark:text-emerald-300',
+  APPROVED: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300',
+  GENERATED: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:text-green-400 dark:bg-green-900/40 dark:text-green-300',
   VERIFIED: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
   FINALIZED: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
   PAID: 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300',
@@ -52,10 +54,10 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const WORKFLOW_STEPS = [
-  { key: 'GENERATED', label: 'Generated', role: 'PDA', color: 'bg-emerald-500', light: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800' },
+  { key: 'GENERATED', label: 'Generated', role: 'PDA', color: 'bg-[var(--pro-azure)]', light: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-900/30 dark:text-green-300 dark:border-green-800' },
   { key: 'VERIFIED', label: 'Verified', role: 'PVO', color: 'bg-amber-500', light: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800' },
   { key: 'FINALIZED', label: 'Finalized', role: 'PFO', color: 'bg-teal-500', light: 'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800' },
-  { key: 'APPROVED', label: 'Approved', role: 'AR', color: 'bg-emerald-500', light: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800' },
+  { key: 'APPROVED', label: 'Approved', role: 'AR', color: 'bg-[var(--pro-azure)]', light: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-900/30 dark:text-green-300 dark:border-green-800' },
 ];
 
 const fmt = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -250,7 +252,7 @@ const PayrollAdministration: React.FC = () => {
           {payCalendars.length > 0 && (
             <div className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 mr-2">
               <Icon name="CLOCK" size={13} className="text-slate-400" />
-              <select value={payCalendarId} onChange={(e) => setPayCalendarId(e)} className="bg-transparent text-[11px] font-bold text-slate-700 dark:text-slate-200 outline-none">
+              <select value={payCalendarId} onChange={(e) => setPayCalendarId(e.target.value)} className="bg-transparent text-[11px] font-bold text-slate-700 dark:text-slate-200 outline-none">
                 <option value="">Select Calendar</option>
                 {payCalendars.map((c: any) => <option key={c.id} value={c.id}>{c.name} ({c.frequency.replace(/_/g, ' ')})</option>)}
               </select>
@@ -305,17 +307,17 @@ const PayrollAdministration: React.FC = () => {
                     <span>{stats.processed} / {stats.totalEmployees} employees ({coverage}%)</span>
                   </div>
                   <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full transition-all duration-700" style={{ width: `${coverage}%` }} />
+                    <div className="h-full bg-[var(--pro-azure)] rounded-full transition-all duration-700" style={{ width: `${coverage}%` }} />
                   </div>
                 </div>
                 <div className="flex items-center gap-3 text-xs font-bold shrink-0">
-                  <span className="flex items-center gap-1 text-emerald-600"><Icon name="SUCCESS" size={12} /> {stats.approved} approved</span>
+                  <span className="flex items-center gap-1 text-[var(--pro-azure)]"><Icon name="SUCCESS" size={12} /> {stats.approved} approved</span>
                   <span className="flex items-center gap-1 text-amber-600"><Icon name="CLOCK" size={12} /> {stats.pending} pending</span>
                 </div>
               </div>
             )}
 
-            <AppKpi cells={summaryCards.map((c) => ({ label: c.label, value: String(c.value), icon: c.icon, color: 'emerald' }))} />
+            <AppKpi cells={summaryCards.map((c) => ({ label: c.label, value: String(c.value), icon: c.icon, color: 'green' }))} />
 
             <div className="ovds-widget-card p-4 shadow-sm">
               <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Payroll Workflow — {monthName}</p>
@@ -325,8 +327,8 @@ const PayrollAdministration: React.FC = () => {
                   const isDone = records.length > 0 && count === 0 && i < WORKFLOW_STEPS.findIndex((s) => records.some((r) => r.status === s.key));
                   return (
                     <div key={step.key} className="flex items-center flex-1">
-                      <div className={`flex-1 flex flex-col items-center gap-1 px-2 py-2.5 rounded-xl border text-center transition-all ${count > 0 ? step.light : isDone ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800' : 'bg-white border-slate-200 dark:bg-slate-800/40 dark:border-slate-700'}`}>
-                        <div className={`text-lg font-semibold ${count > 0 ? '' : isDone ? 'text-emerald-600' : 'text-slate-300 dark:text-slate-600'}`}>{count > 0 ? count : isDone ? '✓' : '—'}</div>
+                      <div className={`flex-1 flex flex-col items-center gap-1 px-2 py-2.5 rounded-xl border text-center transition-all ${count > 0 ? step.light : isDone ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] dark:bg-green-900/20 dark:border-green-800' : 'bg-white border-slate-200 dark:bg-slate-800/40 dark:border-slate-700'}`}>
+                        <div className={`text-lg font-semibold ${count > 0 ? '' : isDone ? 'text-[var(--pro-azure)]' : 'text-slate-300 dark:text-slate-600'}`}>{count > 0 ? count : isDone ? '✓' : '—'}</div>
                         <div className="text-[10px] font-medium uppercase tracking-wider">{step.label}</div>
                         <div className="text-[8px] text-slate-400">{step.role}</div>
                       </div>
@@ -362,7 +364,7 @@ const PayrollAdministration: React.FC = () => {
             <AppTable>
               <thead>
                 <tr>
-                  <AppTh width="40px"><input type="checkbox" onChange={toggleAll} checked={selectedIds.size === records.filter((r) => r.status !== 'APPROVED').length && records.length > 0} className="accent-emerald-500" /></AppTh>
+                  <AppTh width="40px"><input type="checkbox" onChange={toggleAll} checked={selectedIds.size === records.filter((r) => r.status !== 'APPROVED').length && records.length > 0} className="accent-green-500" /></AppTh>
                   <AppTh>Employee</AppTh>
                   <AppTh>Dept</AppTh>
                   <AppTh align="right">Gross Total</AppTh>
@@ -380,7 +382,7 @@ const PayrollAdministration: React.FC = () => {
                 ) : (
                   filteredRecords.map((r) => (
                     <AppTr key={r.id} selected={selectedIds.has(r.id)} onClick={() => r.status !== 'APPROVED' && toggleSelect(r.id)} className="cursor-pointer">
-                      <AppTd onClick={(e) => e.stopPropagation()}><input type="checkbox" checked={selectedIds.has(r.id)} onChange={() => toggleSelect(r.id)} disabled={r.status === 'APPROVED'} className="accent-emerald-500" /></AppTd>
+                      <AppTd onClick={(e) => e.stopPropagation()}><input type="checkbox" checked={selectedIds.has(r.id)} onChange={() => toggleSelect(r.id)} disabled={r.status === 'APPROVED'} className="accent-green-500" /></AppTd>
                       <AppTd><div className="font-bold">{r.employee?.firstName} {r.employee?.lastName}</div><div className="ovds-caption">{r.employee?.employeeId}</div></AppTd>
                       <AppTd>{r.employee?.department?.name ?? '—'}</AppTd>
                       <AppTd align="right"><Amount value={r.grossTotal ?? r.grossPay} size="sm" /></AppTd>
@@ -403,7 +405,7 @@ const PayrollAdministration: React.FC = () => {
             onChange={setVariableAdjustments}
             year={year}
             month={month}
-            companyId={selectedCompanyId}
+            companyId={selectedCompanyId ?? undefined}
             onApply={fetchRecords}
           />
         )}
@@ -513,9 +515,9 @@ const BankFileTab: React.FC<{
 
   return (
     <div className="space-y-5 max-w-2xl">
-      <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl text-[11px]">
-        <p className="font-bold text-emerald-800 dark:text-emerald-200 text-[12px] mb-1">💳 Bank Payment File</p>
-        <p className="text-emerald-700 dark:text-emerald-300 leading-relaxed">
+      <div className="p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl text-[11px]">
+        <p className="font-bold text-[var(--pro-azure-dark)] dark:text-green-200 text-[12px] mb-1">💳 Bank Payment File</p>
+        <p className="text-[var(--pro-azure)] dark:text-green-300 leading-relaxed">
           Generates a bank-formatted CSV for <strong>{monthName}</strong> salary disbursement.
           Only <span className="font-bold">APPROVED</span> records with a bank account on file are included.
           Upload the file directly to your bank's bulk payment portal.
@@ -532,8 +534,8 @@ const BankFileTab: React.FC<{
               onClick={() => setBank(b.id)}
               className={`flex items-start gap-3 p-3 rounded-xl border-2 text-left transition-all ${
                 bank === b.id
-                  ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20'
-                  : 'border-slate-200 dark:border-slate-700 hover:border-emerald-300'
+                  ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/20'
+                  : 'border-slate-200 dark:border-slate-700 hover:border-[var(--pro-azure-light)]'
               }`}
             >
               <span className="text-xl mt-0.5">{b.logo}</span>
@@ -549,14 +551,14 @@ const BankFileTab: React.FC<{
           <button
             onClick={handleDownload}
             disabled={downloading}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white text-sm font-bold rounded-xl transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--pro-azure)] hover:bg-[var(--pro-azure-dark)] disabled:opacity-60 text-white text-sm font-bold rounded-xl transition-colors"
           >
             <Icon name="DOWNLOAD" size={14} />
             {downloading ? 'Generating…' : `Download ${chosen.id} File`}
           </button>
           {result && (
             <div className="text-[11px] text-slate-600 dark:text-slate-300">
-              <span className="font-bold text-emerald-700">{result.count}</span> employees ·{' '}
+              <span className="font-bold text-[var(--pro-azure-dark)]">{result.count}</span> employees ·{' '}
               <span className="font-bold">ETB {result.total.toLocaleString()}</span> total
             </div>
           )}
@@ -625,7 +627,7 @@ const PssaReportTab: React.FC<{
       <div className="ovds-grid-layout cols-3 gap-sm">
         {[
           { label: 'Employee Rate',   value: '7%',  desc: 'of insurable earnings',    accent: 'bg-violet-500' },
-          { label: 'Employer Rate',   value: '11%', desc: 'of insurable earnings',    accent: 'bg-emerald-500' },
+          { label: 'Employer Rate',   value: '11%', desc: 'of insurable earnings',    accent: 'bg-[var(--pro-azure)]' },
           { label: 'Earnings Cap',    value: 'ETB 15,000', desc: 'insurable earnings cap', accent: 'bg-amber-500' },
         ].map(c => (
           <div key={c.label} className="ovds-widget-card p-4">
@@ -659,7 +661,7 @@ const PssaReportTab: React.FC<{
             <div className="p-3 bg-violet-50 dark:bg-violet-950/20 border border-violet-200 dark:border-violet-700 rounded-xl text-[11px] space-y-1">
               <p><span className="font-bold text-violet-700">{result.count}</span> employees included</p>
               <p>Employee contribution: <span className="font-bold text-violet-700">ETB {result.empContrib.toLocaleString()}</span></p>
-              <p>Employer contribution: <span className="font-bold text-emerald-700">ETB {result.emplrContrib.toLocaleString()}</span></p>
+              <p>Employer contribution: <span className="font-bold text-[var(--pro-azure-dark)]">ETB {result.emplrContrib.toLocaleString()}</span></p>
               <p className="font-bold">Total: ETB {(result.empContrib + result.emplrContrib).toLocaleString()}</p>
             </div>
           )}
@@ -695,7 +697,7 @@ const VariableInputPanel: React.FC<{
   }, {} as Record<string, { bonus: number; deduction: number; notes: string }>));
 
   const updateAdj = (id: string, field: 'bonus' | 'deduction' | 'notes', value: number | string) => {
-    setLocalAdj(prev => ({
+    setLocalAdj((prev: Record<string, { bonus: number; deduction: number; notes: string }>) => ({
       ...prev,
       [id]: { ...prev[id], [field]: value },
     }));
@@ -745,7 +747,7 @@ const VariableInputPanel: React.FC<{
           <div className="flex items-center gap-2">
             <div className="text-right text-[11px]">
               <p className="text-slate-500">Bonuses</p>
-              <p className="font-bold text-emerald-700">{fmtETB(totalBonuses)}</p>
+              <p className="font-bold text-[var(--pro-azure-dark)]">{fmtETB(totalBonuses)}</p>
             </div>
             <div className="text-right text-[11px]">
               <p className="text-slate-500">Deductions</p>
@@ -753,7 +755,7 @@ const VariableInputPanel: React.FC<{
             </div>
             <div className="text-right text-[11px] pl-3 border-l border-slate-200">
               <p className="text-slate-500">Net Adjustment</p>
-              <p className={`font-bold ${netAdjustment >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>{fmtETB(netAdjustment)}</p>
+              <p className={`font-bold ${netAdjustment >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-700'}`}>{fmtETB(netAdjustment)}</p>
             </div>
             <Btn variant="primary" size="sm" icon={<Send size={12} />} onClick={applyAdjustments} loading={saving}>
               Apply Adjustments
@@ -781,7 +783,7 @@ const VariableInputPanel: React.FC<{
                   <tr key={r.id} className="hover:bg-slate-50">
                     <td className="px-3 py-2.5">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-[9px] font-bold">
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center text-white text-[9px] font-bold">
                           {String(r.employee?.firstName ?? '?')[0].toUpperCase()}
                         </div>
                         <div>
@@ -792,14 +794,14 @@ const VariableInputPanel: React.FC<{
                     </td>
                     <td className="px-3 py-2.5 text-right text-[11px] font-mono text-slate-600">{fmtETB(Number(r.grossTotal ?? r.grossPay ?? 0))}</td>
                     <td className="px-3 py-2.5 text-right">
-                      <input type="number" step="0.01" min="0" value={adj.bonus ?? 0} onChange={e => updateAdj(r.id, 'bonus', parseFloat(e.target.value) || 0)} className="w-24 text-right text-[11px] border border-emerald-200 rounded-lg px-2 py-1 bg-emerald-50/50 focus:border-emerald-400 focus:outline-none" placeholder="0.00" />
+                      <input type="number" step="0.01" min="0" value={adj.bonus ?? 0} onChange={e => updateAdj(r.id, 'bonus', parseFloat(e.target.value) || 0)} className="w-24 text-right text-[11px] border border-[var(--pro-azure-100)] rounded-lg px-2 py-1 bg-[var(--pro-azure-50)]/50 focus:border-[var(--pro-azure)] focus:outline-none" placeholder="0.00" />
                     </td>
                     <td className="px-3 py-2.5 text-right">
                       <input type="number" step="0.01" min="0" value={adj.deduction ?? 0} onChange={e => updateAdj(r.id, 'deduction', parseFloat(e.target.value) || 0)} className="w-24 text-right text-[11px] border border-rose-200 rounded-lg px-2 py-1 bg-rose-50/50 focus:border-rose-400 focus:outline-none" placeholder="0.00" />
                     </td>
-                    <td className={`px-3 py-2.5 text-right text-[11px] font-bold tabular-nums ${net >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>{fmtETB(net)}</td>
+                    <td className={`px-3 py-2.5 text-right text-[11px] font-bold tabular-nums ${net >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-700'}`}>{fmtETB(net)}</td>
                     <td className="px-3 py-2.5">
-                      <input type="text" value={adj.notes ?? ''} onChange={e => updateAdj(r.id, 'notes', e.target.value)} placeholder="e.g. Overtime, bonus, deduction reason…" className="w-48 text-[11px] border border-slate-200 rounded-lg px-2 py-1 focus:border-emerald-400 focus:outline-none" />
+                      <input type="text" value={adj.notes ?? ''} onChange={e => updateAdj(r.id, 'notes', e.target.value)} placeholder="e.g. Overtime, bonus, deduction reason…" className="w-48 text-[11px] border border-slate-200 rounded-lg px-2 py-1 focus:border-[var(--pro-azure)] focus:outline-none" />
                     </td>
                   </tr>
                 );

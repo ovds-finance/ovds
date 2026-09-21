@@ -1,18 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Banknote, TrendingUp, TrendingDown, PiggyBank,
   CreditCard, ArrowRight, ChevronRight, AlertTriangle,
   CheckCircle2, Clock, Wallet,
 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+
 import api from '../../services/api';
-import { fmtCompact } from '../../utils/fmt';
 import { PIT_BRACKETS as SHARED_PIT } from '../../utils/ethiopianTax';
+import { fmtCompact } from '../../utils/fmt';
 
 // Display PIT_BRACKETS with colour coding derived from shared constants
 const PIT_BRACKETS = [
-  { ...SHARED_PIT[0], range: '0 – 2,000',        rate: '0%',  color: 'text-emerald-600 dark:text-emerald-400' },
-  { ...SHARED_PIT[1], range: '2,001 – 4,000',    rate: '15%', color: 'text-emerald-600 dark:text-emerald-400' },
+  { ...SHARED_PIT[0], range: '0 – 2,000',        rate: '0%',  color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
+  { ...SHARED_PIT[1], range: '2,001 – 4,000',    rate: '15%', color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
   { ...SHARED_PIT[2], range: '4,001 – 7,000',    rate: '20%', color: 'text-teal-600 dark:text-teal-400' },
   { ...SHARED_PIT[3], range: '7,001 – 10,000',   rate: '25%', color: 'text-violet-600 dark:text-violet-400' },
   { ...SHARED_PIT[4], range: '10,001 – 14,000',  rate: '30%', color: 'text-amber-600 dark:text-amber-400' },
@@ -60,8 +61,8 @@ const PayrollInsightsWidget: React.FC<PayrollInsightsWidgetProps> = ({
 
   useEffect(() => {
     const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth() + 1;
+    const _year = now.getFullYear();
+    const _month = now.getMonth() + 1;
     api.get(`/payroll/dashboard-stats`, { headers: { 'x-background': '1' } } as any).then((res: { data: { data?: { pending?: number }; pending?: number } }) => {
       const d = res.data?.data ?? res.data;
       setPendingApprovals(d?.pending ?? 0);
@@ -91,8 +92,8 @@ const PayrollInsightsWidget: React.FC<PayrollInsightsWidgetProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl flex items-center justify-center">
-            <Banknote size={15} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="w-8 h-8 bg-[var(--pro-azure-50)] dark:bg-green-950/30 rounded-xl flex items-center justify-center">
+            <Banknote size={15} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div>
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Payroll Insights</p>
@@ -105,7 +106,7 @@ const PayrollInsightsWidget: React.FC<PayrollInsightsWidgetProps> = ({
               <Clock size={9} /> {pendingApprovals} pending
             </Link>
           )}
-          <Link to="/hr/payroll" className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+          <Link to="/hr/payroll" className="flex items-center gap-1 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
             Payroll <ChevronRight size={10} />
           </Link>
         </div>
@@ -113,20 +114,20 @@ const PayrollInsightsWidget: React.FC<PayrollInsightsWidgetProps> = ({
 
       <div className="p-5 space-y-4">
         {/* Net pay hero */}
-        <div className="flex items-center gap-4 p-4 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl border border-emerald-100 dark:border-emerald-900/40">
-          <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/50 rounded-xl flex items-center justify-center">
-            <Wallet size={18} className="text-emerald-600 dark:text-emerald-400" />
+        <div className="flex items-center gap-4 p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl border border-[var(--pro-azure-100)] dark:border-green-900/40">
+          <div className="w-10 h-10 bg-[var(--pro-azure-100)] dark:bg-green-900/50 rounded-xl flex items-center justify-center">
+            <Wallet size={18} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div className="flex-1">
             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Total Net Pay</p>
             {loading ? (
-              <div className="h-6 w-28 bg-emerald-100 dark:bg-emerald-900/30 rounded animate-pulse mt-1" />
+              <div className="h-6 w-28 bg-[var(--pro-azure-100)] dark:bg-green-900/30 rounded animate-pulse mt-1" />
             ) : (
-              <p className="text-xl font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums">{fmt(net)}</p>
+              <p className="text-xl font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] tabular-nums">{fmt(net)}</p>
             )}
           </div>
           {!loading && netMom !== 0 && (
-            <div className={`flex items-center gap-1 text-xs font-semibold ${netMom > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+            <div className={`flex items-center gap-1 text-xs font-semibold ${netMom > 0 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-rose-600 dark:text-rose-400'}`}>
               {netMom > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
               {netMom > 0 ? '+' : ''}{netMom}%
             </div>
@@ -137,7 +138,7 @@ const PayrollInsightsWidget: React.FC<PayrollInsightsWidgetProps> = ({
         <div className="space-y-3">
           <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Gross Breakdown</p>
           {[
-            { label: 'Net Pay', value: net, pct: netPct, color: 'bg-emerald-500', textColor: 'text-emerald-600 dark:text-emerald-400', icon: <Wallet size={11} /> },
+            { label: 'Net Pay', value: net, pct: netPct, color: 'bg-[var(--pro-azure-50)]0', textColor: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', icon: <Wallet size={11} /> },
             { label: 'Income Tax (PIT)', value: tax, pct: taxPct, color: 'bg-rose-400', textColor: 'text-rose-600 dark:text-rose-400', icon: <Banknote size={11} /> },
             { label: 'Pension (7%)', value: pension, pct: pensionPct, color: 'bg-amber-400', textColor: 'text-amber-600 dark:text-amber-400', icon: <PiggyBank size={11} /> },
             { label: 'Loan Deductions', value: loans, pct: loanPct, color: 'bg-violet-400', textColor: 'text-violet-600 dark:text-violet-400', icon: <CreditCard size={11} /> },
@@ -213,20 +214,20 @@ const PayrollInsightsWidget: React.FC<PayrollInsightsWidgetProps> = ({
             <ArrowRight size={12} className="text-amber-500 shrink-0" />
           </Link>
         ) : (
-          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl border border-emerald-200 dark:border-emerald-800">
-            <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">All payroll records approved</span>
+          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl border border-[var(--pro-azure-100)] dark:border-green-800">
+            <CheckCircle2 size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0" />
+            <span className="text-xs font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">All payroll records approved</span>
           </div>
         )}
       </div>
 
       {/* Footer */}
       <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <Link to="/hr/payroll" className="text-[10px] font-bold text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors">Payroll</Link>
+        <Link to="/hr/payroll" className="text-[10px] font-bold text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">Payroll</Link>
         <span className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-700" />
-        <Link to="/hr/payroll-administration" className="text-[10px] font-bold text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors">Administration</Link>
+        <Link to="/hr/payroll-administration" className="text-[10px] font-bold text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">Administration</Link>
         <span className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-700" />
-        <Link to="/reports" className="text-[10px] font-bold text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors">Reports</Link>
+        <Link to="/reports" className="text-[10px] font-bold text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">Reports</Link>
       </div>
     </div>
   );

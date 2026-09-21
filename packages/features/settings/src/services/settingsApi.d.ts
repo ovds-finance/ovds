@@ -4,6 +4,7 @@
  * Covers: Company settings, module enable/disable, settings catalog,
  * system administration, setup wizard.
  */
+import type { RbacRoleDTO, RbacPermissionDTO, SodRuleDTO, AuditEventCatalogDTO } from '../types/settings.types';
 export declare const companySettingsApi: {
     get: (companyId: string) => Promise<any>;
     update: (companyId: string, data: any) => Promise<any>;
@@ -209,5 +210,63 @@ export declare const maintainingTechnologyApi: {
 export declare const advancedAccessApi: {
     getOverrides: (companyId?: string) => Promise<any[]>;
     saveOverrides: (overrides: any[], companyId?: string) => Promise<void>;
+};
+export declare const rolesApi: {
+    /** List all roles (system + tenant-custom). Pass companyId to include custom roles for a tenant. */
+    list: (companyId?: string | null) => Promise<RbacRoleDTO[]>;
+    /** Get a single role by id. */
+    get: (id: string) => Promise<RbacRoleDTO>;
+    /** Create a new custom role for a tenant. */
+    create: (dto: {
+        name: string;
+        label: string;
+        description?: string;
+        permissions: string[];
+        apiAccess?: boolean;
+        companyId: string;
+    }) => Promise<RbacRoleDTO>;
+    /** Update role metadata / permissions. */
+    update: (id: string, dto: Partial<{
+        label: string;
+        description: string;
+        permissions: string[];
+        apiAccess: boolean;
+    }>) => Promise<RbacRoleDTO>;
+    /** Delete a custom role (system roles are protected server-side). */
+    remove: (id: string) => Promise<void>;
+    /** Seed/sync system roles from the shared RBAC constants. */
+    seed: () => Promise<{
+        seeded: number;
+    }>;
+};
+export declare const permissionsApi: {
+    /** List all permissions, optionally filtered by category or module. */
+    list: (params?: {
+        category?: string;
+        module?: string;
+        companyId?: string | null;
+    }) => Promise<RbacPermissionDTO[]>;
+    /** Get a single permission by key. */
+    get: (key: string) => Promise<RbacPermissionDTO>;
+    /** Seed/sync permissions from the shared permission catalog. */
+    seed: () => Promise<{
+        seeded: number;
+    }>;
+};
+export declare const sodRulesApi: {
+    /** List all Segregation-of-Duties rules (global + tenant-specific). */
+    list: (companyId?: string | null) => Promise<SodRuleDTO[]>;
+    /** Create a tenant-specific SoD rule. */
+    create: (dto: Omit<SodRuleDTO, "id"> & {
+        companyId: string;
+    }) => Promise<SodRuleDTO>;
+    /** Update an existing SoD rule. */
+    update: (id: string, dto: Partial<Omit<SodRuleDTO, "id">>) => Promise<SodRuleDTO>;
+    /** Delete a tenant-specific SoD rule. */
+    remove: (id: string) => Promise<void>;
+};
+export declare const auditEventCatalogApi: {
+    /** List audit event catalog entries. */
+    list: (companyId?: string | null) => Promise<AuditEventCatalogDTO[]>;
 };
 //# sourceMappingURL=settingsApi.d.ts.map

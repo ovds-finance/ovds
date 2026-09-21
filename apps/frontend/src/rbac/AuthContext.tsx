@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AuthContext — single runtime identity + session store.
  *
  * Responsibilities:
@@ -16,13 +16,16 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { rbac, type AppRole, type Permission, type PermissionContext } from './rbac';
-import { triggerAuth0Logout } from './auth0Logout';
+
 import { useBusiness } from '../context/businessContext';
-import api from '../services/api';
 import { clearQueryCache } from '../hooks/useApiQuery';
+import api, { bgConfig } from '../services/api';
 import { isHttpOnlyAuth, setCsrfToken, clearCsrfToken } from '../utils/authMode';
 import { BEARER_PREFIX } from '../utils/constants';
+import { clearSession } from '../utils/storage';
+
+import { triggerAuth0Logout } from './auth0Logout';
+import { rbac, type AppRole, type Permission, type PermissionContext } from './rbac';
 
 // -- Types ---------------------------------------------------------------------
 
@@ -165,33 +168,16 @@ function writeStorage(token: string | null, user: AuthUser, csrfToken?: string):
 }
 
 function clearStorage(): void {
+  // HttpOnly mode: token lives in a cookie, not localStorage — don't
+  // attempt to remove a key that doesn't exist in that mode.
   if (!isHttpOnlyAuth()) {
     localStorage.removeItem(TOKEN_KEY);
   }
-  localStorage.removeItem(USER_KEY);
-  localStorage.removeItem('auth0_token');
-  clearCsrfToken();
-  localStorage.removeItem('selectedCompanyId');
-  localStorage.removeItem('selectedBusinessType');
-  localStorage.removeItem('nav_tree_cache');
-  localStorage.removeItem('dashboards_config');
-  localStorage.removeItem('sidebar_groups');
-  localStorage.removeItem('sidebar_groups_v4');
-  localStorage.removeItem('sidebar_groups_v7');
-  localStorage.removeItem('sidebar_favorites_v2');
-  localStorage.removeItem('sidebar_recent');
-  localStorage.removeItem('sidebar_collapsed');
-  localStorage.removeItem('ovds_saved_reports');
-  localStorage.removeItem('ovds_recent_tabs');
-  localStorage.removeItem('ovds_backup_history');
-  localStorage.removeItem('col_vis_invoice_columns');
-  localStorage.removeItem('pinned_companies');
-  localStorage.removeItem('company_notes');
-  localStorage.removeItem('default_tab_reports');
-  localStorage.removeItem('global_search_recent');
-  localStorage.removeItem('chunk_retry');
+  clearSession();   // removes all UI/session keys via the central utility
+  clearCsrfToken(); // CSRF token lives in sessionStorage via authMode.ts
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function clearAllCache(): void {
   clearStorage();
   if (typeof window !== 'undefined') {
@@ -221,7 +207,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!user && !token) return;
     if (!isHttpOnlyAuth() && !token) return;
     // Use the axios instance so the JWT interceptor and error handling apply
-    api.get('/auth/me', { headers: { 'x-background': '1' } as any })
+    api.get('/auth/me', bgConfig())
       .then((res: any) => {
         const data = res.data?.data ?? res.data as AuthUser;
         if (user && data) {
@@ -262,8 +248,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           localStorage.setItem(TOKEN_KEY, data.access_token);
           setState((prev) => ({
             ...prev,
-            token: data.access_token,
-            expiresInMinutes: minutesUntilExpiry(data.access_token),
+            token: data.access_token ?? null,
+            expiresInMinutes: minutesUntilExpiry(data.access_token ?? ''),
             sessionExpiring: false,
           }));
           window.dispatchEvent(new CustomEvent('ovds:token-refreshed'));
@@ -399,7 +385,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const token = localStorage.getItem(TOKEN_KEY);
     if (!token && !isHttpOnlyAuth()) return;
     try {
-      const res = await api.get('/auth/me', { headers: { 'x-background': '1' } as any });
+      const res = await api.get('/auth/me', bgConfig());
       const data = (res.data?.data ?? res.data) as AuthUser;
       setState((prev) => {
         if (!prev.user) return prev;
@@ -453,6 +439,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>');

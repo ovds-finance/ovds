@@ -11,18 +11,20 @@
  *
  * Backend: GET /ovds/reports/consolidation/:parentCompanyId
  */
-import React, { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   GitMerge, RefreshCw, Building2, TrendingUp,
   ChevronDown, ChevronRight, ExternalLink, AlertTriangle,
   CheckCircle2, BarChart3,
 } from 'lucide-react';
+import React, { useState, useCallback, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+
+import { Can } from '../components/can';
 import { useBusiness } from '../context/businessContext';
 import { usePageTitle } from '../hooks/usePageTitle';
-import { Can } from '../components/can';
 import api from '../services/api';
-import toast from 'react-hot-toast';
+
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -161,7 +163,7 @@ const SectionTable: React.FC<{
                   </th>
                 ))}
                 <th className="text-right py-2 px-3 text-[10px] font-bold text-rose-400 uppercase tracking-widest">Elim.</th>
-                <th className="text-right py-2 px-3 text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Consol.</th>
+                <th className="text-right py-2 px-3 text-[10px] font-bold text-[var(--pro-azure)] uppercase tracking-widest">Consol.</th>
               </tr>
             </thead>
             <tbody>
@@ -292,7 +294,7 @@ const ConsolidatedStatements: React.FC = () => {
       {data && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: 'Group Assets',        value: bs?.totalAssets ?? 0,           accent: 'bg-emerald-500' },
+            { label: 'Group Assets',        value: bs?.totalAssets ?? 0,           accent: 'bg-[var(--pro-azure-50)]0' },
             { label: 'Group Net Profit',    value: pl?.groupNetProfit ?? 0,        accent: (pl?.groupNetProfit ?? 0) >= 0 ? 'bg-sky-500' : 'bg-rose-500' },
             { label: 'NCI in Equity',       value: bs?.nci ?? 0,                  accent: 'bg-violet-500' },
             { label: 'Total Eliminations',  value: (es?.totalIntercoSales ?? 0) + (es?.totalIntercoLoans ?? 0) + (es?.totalUnrealisedProfit ?? 0), accent: 'bg-rose-400' },
@@ -312,7 +314,7 @@ const ConsolidatedStatements: React.FC = () => {
       {bs && (
         <div className={`flex items-center gap-3 px-4 py-2.5 rounded-xl border text-xs font-semibold ${
           bs.isBalanced
-            ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/20 dark:border-emerald-800 dark:text-emerald-400'
+            ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/20 dark:border-green-800 dark:text-[var(--pro-azure-light)]'
             : 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/20 dark:border-rose-800 dark:text-rose-400'
         }`}>
           {bs.isBalanced
@@ -372,7 +374,7 @@ const ConsolidatedStatements: React.FC = () => {
             </p>
             <p className="text-[10px] text-slate-400 text-center">IAS 1.54 — All amounts ETB</p>
 
-            <SectionTable title="Assets"      items={bs.assets}      total={bs.totalAssets}    subs={subs} accent="bg-emerald-500" />
+            <SectionTable title="Assets"      items={bs.assets}      total={bs.totalAssets}    subs={subs} accent="bg-[var(--pro-azure-50)]0" />
             <SectionTable title="Liabilities" items={bs.liabilities} total={bs.liabilities.reduce((s,i)=>s+i.consolidatedAmount,0)} subs={subs} accent="bg-rose-500" />
             <SectionTable title="Equity"      items={bs.equity}      total={bs.equity.reduce((s,i)=>s+i.consolidatedAmount,0)}      subs={subs} accent="bg-violet-500" />
 
@@ -382,9 +384,9 @@ const ConsolidatedStatements: React.FC = () => {
                 <p className="text-[10px] font-bold text-violet-500 uppercase tracking-wider">Non-Controlling Interest (NCI)</p>
                 <p className="text-sm font-bold text-violet-700 dark:text-violet-300 tabular-nums mt-1">{fmtK(bs.nci)}</p>
               </div>
-              <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-lg p-3 text-center">
-                <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Parent Shareholders' Equity</p>
-                <p className="text-sm font-bold text-emerald-700 dark:text-emerald-300 tabular-nums mt-1">{fmtK(bs.parentEquity)}</p>
+              <div className="bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-lg p-3 text-center">
+                <p className="text-[10px] font-bold text-[var(--pro-azure)] uppercase tracking-wider">Parent Shareholders' Equity</p>
+                <p className="text-sm font-bold text-[var(--pro-azure-dark)] dark:text-green-300 tabular-nums mt-1">{fmtK(bs.parentEquity)}</p>
               </div>
             </div>
           </div>
@@ -403,12 +405,12 @@ const ConsolidatedStatements: React.FC = () => {
               Consolidated Statement of Profit or Loss — {data.period}
             </p>
 
-            <SectionTable title="Revenue"  items={pl.revenue}   total={pl.totalRevenue}   subs={subs} accent="bg-emerald-500" />
+            <SectionTable title="Revenue"  items={pl.revenue}   total={pl.totalRevenue}   subs={subs} accent="bg-[var(--pro-azure-50)]0" />
             <SectionTable title="Expenses" items={pl.expenses}  total={pl.totalExpenses}  subs={subs} accent="bg-rose-500" />
 
             <div className="grid grid-cols-3 gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
               {[
-                { label: 'Group Net Profit',      value: pl.groupNetProfit,      color: pl.groupNetProfit >= 0 ? 'emerald' : 'rose' },
+                { label: 'Group Net Profit',      value: pl.groupNetProfit,      color: pl.groupNetProfit >= 0 ? 'indigo' : 'rose' },
                 { label: 'NCI Share of Profit',   value: pl.nciShareOfProfit,    color: 'violet' },
                 { label: "Parent's Share",        value: pl.parentShareOfProfit, color: pl.parentShareOfProfit >= 0 ? 'sky' : 'rose' },
               ].map(k => (
@@ -532,7 +534,7 @@ const ConsolidatedStatements: React.FC = () => {
                       </div>
                     </td>
                     <td className="py-3 px-4">
-                      <span className="font-bold text-emerald-600">{s.ownershipPct.toFixed(1)}%</span>
+                      <span className="font-bold text-[var(--pro-azure)]">{s.ownershipPct.toFixed(1)}%</span>
                     </td>
                     <td className="py-3 px-4">
                       <span className="font-bold text-violet-600">{s.nciPct.toFixed(1)}%</span>

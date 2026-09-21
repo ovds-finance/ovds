@@ -2,24 +2,25 @@
  * Helpdesk — support ticket management with replies
  * Ovds style: AppPage · AppKpi · AppTable · reply thread · status workflow
  */
-import React, { useState, useMemo, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Ticket, Plus, Edit2, Trash2, RefreshCw, MessageSquare,
   CheckCircle2, User, Send, ChevronRight, Clock, AlertTriangle,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import api from '../services/api';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select, Textarea,
   SearchBar, EmptyState, Pagination,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { confirm } from '../utils/confirm';
 
 // -- Types ---------------------------------------------------------------------
 interface HelpdeskTicket {
@@ -200,7 +201,7 @@ const TicketDetail: React.FC<{
             <button onClick={() => changeStatus('IN_PROGRESS')} className="text-[10px] font-semibold text-sky-600 hover:underline">→ In Progress</button>
           )}
           {ticket.status !== 'RESOLVED' && (
-            <button onClick={() => changeStatus('RESOLVED')} className="text-[10px] font-semibold text-emerald-600 hover:underline">→ Resolve</button>
+            <button onClick={() => changeStatus('RESOLVED')} className="text-[10px] font-semibold text-[var(--pro-azure)] hover:underline">→ Resolve</button>
           )}
           {ticket.status !== 'CLOSED' && (
             <button onClick={() => changeStatus('CLOSED')} className="text-[10px] font-semibold text-slate-500 hover:underline">→ Close</button>
@@ -214,8 +215,8 @@ const TicketDetail: React.FC<{
           <p className="text-[11px] text-slate-400 text-center py-6">No replies yet. Be the first to respond.</p>
         ) : replies.map(r => (
           <div key={r.id} className={`flex gap-3 group ${r.isInternal ? 'opacity-75' : ''}`}>
-            <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
-              <User size={12} className="text-emerald-600" />
+            <div className="w-7 h-7 rounded-full bg-[var(--pro-azure-100)] flex items-center justify-center shrink-0 mt-0.5">
+              <User size={12} className="text-[var(--pro-azure)]" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
@@ -290,7 +291,7 @@ const Helpdesk: React.FC = () => {
   }, [rows, tab, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total',       value: rows.length,                                                color: 'emerald' as const },
+    { label: 'Total',       value: rows.length,                                                color: 'green' as const },
     { label: 'Open',        value: rows.filter(t => t.status === 'OPEN').length,               color: 'rose' as const },
     { label: 'In Progress', value: rows.filter(t => t.status === 'IN_PROGRESS').length,        color: 'amber' as const },
     { label: 'Resolved',    value: rows.filter(t => t.status === 'RESOLVED').length,           color: 'sky' as const },
@@ -373,16 +374,16 @@ const Helpdesk: React.FC = () => {
               ) : filtered.map(t => {
                 const isSelected = selected?.id === t.id;
                 return (
-                  <AppTr key={t.id} className={isSelected ? 'bg-emerald-50/50' : ''}>
+                  <AppTr key={t.id} className={isSelected ? 'bg-[var(--pro-azure-50)]/50' : ''}>
                     <AppTd>
-                      <button onClick={() => setSelected(isSelected ? null : t)} className="flex items-center gap-1 text-[10px] font-mono text-slate-500 hover:text-emerald-600">
+                      <button onClick={() => setSelected(isSelected ? null : t)} className="flex items-center gap-1 text-[10px] font-mono text-slate-500 hover:text-[var(--pro-azure)]">
                         {t.ticketNumber}
-                        <ChevronRight size={9} className={`transition-transform ${isSelected ? 'rotate-90 text-emerald-500' : 'text-slate-300'}`} />
+                        <ChevronRight size={9} className={`transition-transform ${isSelected ? 'rotate-90 text-[var(--pro-azure)]' : 'text-slate-300'}`} />
                       </button>
                     </AppTd>
                     <AppTd>
                       <button onClick={() => setSelected(isSelected ? null : t)} className="text-left">
-                        <p className="text-[12px] font-semibold text-slate-800 hover:text-emerald-600 line-clamp-1">{t.subject}</p>
+                        <p className="text-[12px] font-semibold text-slate-800 hover:text-[var(--pro-azure)] line-clamp-1">{t.subject}</p>
                         {t.description && <p className="text-[10px] text-slate-400 truncate max-w-[200px]">{t.description}</p>}
                       </button>
                     </AppTd>
@@ -416,7 +417,7 @@ const Helpdesk: React.FC = () => {
                           <button onClick={async () => {
                             await api.patch(`/helpdesk/${t.id}`, { status: 'RESOLVED' });
                             toast.success('Resolved'); refetch();
-                          }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Resolve">
+                          }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Resolve">
                             <CheckCircle2 size={11} />
                           </button>
                         )}

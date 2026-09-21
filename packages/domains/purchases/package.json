@@ -1,5 +1,5 @@
 {
-  "name": "@ovds/domains/purchases",
+  "name": "@ovds/domains-purchases",
   "version": "0.0.1",
   "private": true,
   "main": "./dist/index.js",
@@ -10,12 +10,13 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@ovds/core": "*",
-    "@ovds/shared": "*",
-    "@ovds/database": "*",
-    "@ovds/domains/invoice": "*"
+    "@ovds/core": "workspace:*",
+    "@ovds/shared": "workspace:*",
+    "@ovds/database": "workspace:*",
+    "@ovds/domains-invoice": "workspace:*"
   },
   "devDependencies": {
     "@nestjs/common": "*"
   }
 }
+

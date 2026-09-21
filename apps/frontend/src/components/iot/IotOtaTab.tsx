@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { useOtaJobs, useCreateOtaJob, useIotDevices, type OtaStatus } from '../../services/iotApi';
-import { AppTable, AppTh, AppTd, AppTr, Btn, Icon, Modal, FormField, Input } from '../ui';
-import { useAuth } from '../../rbac/AuthContext';
 import toast from 'react-hot-toast';
+
+import { useAuth } from '../../rbac/AuthContext';
+import { useOtaJobs, useCreateOtaJob, useIotDevices, type OtaStatus } from '../../services/iotApi';
 import { fmtDateTime } from '../../utils/fmt';
+import { AppTable, AppTh, AppTd, AppTr, Btn, Icon, Modal, FormField, Input } from '../ui';
+
 
 const STATUS_STYLES: Record<OtaStatus, string> = {
   PENDING:     'bg-sky-100 text-sky-700',
   IN_PROGRESS: 'bg-amber-100 text-amber-700',
-  SUCCESS:     'bg-emerald-100 text-emerald-700',
+  SUCCESS:     'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   FAILED:      'bg-rose-100 text-rose-700',
   ROLLED_BACK: 'bg-orange-100 text-orange-700',
   CANCELLED:   'bg-slate-100 text-slate-500',
@@ -110,7 +112,7 @@ const IotOtaTab: React.FC = () => {
               onClick={() => setStatusFilter(statusFilter === s ? '' : s)}
               className={`px-3 py-2 rounded-xl text-left transition-all border ${
                 statusFilter === s
-                  ? 'border-emerald-500 ring-1 ring-emerald-300'
+                  ? 'border-[var(--pro-azure)] ring-1 ring-[var(--pro-azure-light)]'
                   : 'border-slate-200 dark:border-slate-700'
               }`}
             >
@@ -161,7 +163,7 @@ const IotOtaTab: React.FC = () => {
                   <div className="flex items-center gap-1.5 text-[11px]">
                     <span className="font-mono text-slate-500">{j.fromVersion ?? '?'}</span>
                     <Icon name="ARROW_RIGHT" size={11} className="text-slate-400" />
-                    <span className="font-mono font-bold text-emerald-600">{j.targetVersion}</span>
+                    <span className="font-mono font-bold text-[var(--pro-azure)]">{j.targetVersion}</span>
                   </div>
                 </AppTd>
                 <AppTd>
@@ -181,7 +183,7 @@ const IotOtaTab: React.FC = () => {
                       <span className="text-[10px] font-bold">{j.progress}%</span>
                     </div>
                   ) : j.status === 'SUCCESS' ? (
-                    <Icon name="CHECK_CIRCLE" size={14} className="text-emerald-500" />
+                    <Icon name="CHECK_CIRCLE" size={14} className="text-[var(--pro-azure)]" />
                   ) : j.status === 'FAILED' ? (
                     <span title={j.errorMessage ?? ''}>
                       <Icon name="ALERT_TRIANGLE" size={14} className="text-rose-500" />

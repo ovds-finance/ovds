@@ -1,15 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useInterval } from '../hooks';
 import { AppPage, Skeleton } from '@ovds/ui';
-import IASBUpdateBanner from '../components/iasbUpdateBanner';
-import { NavLink } from 'react-router-dom';
-import api from '../services/api';
-import { useRbac } from '../rbac';
-import { usePageTitle } from '../hooks/usePageTitle';
-import RoleBadge from '../components/roleBadge';
-import PITCalculator from '../components/pitCalculator';
-import EthiopianComplianceGuide from '../components/ethiopianComplianceGuide';
-import RBACMatrix from '../components/rbacMatrix';
 import {
   Activity,
   AlertTriangle,
@@ -33,6 +22,19 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { NavLink } from 'react-router-dom';
+
+import EthiopianComplianceGuide from '../components/ethiopianComplianceGuide';
+import IASBUpdateBanner from '../components/iasbUpdateBanner';
+import PITCalculator from '../components/pitCalculator';
+import RBACMatrix from '../components/rbacMatrix';
+import RoleBadge from '../components/roleBadge';
+import { useInterval } from '../hooks';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useRbac } from '../rbac';
+import api from '../services/api';
+
 // -- Types ---------------------------------------------------------------------
 interface ComplianceItem {
   id: string;
@@ -54,7 +56,7 @@ interface AuditSummary {
 }
 // -- Helpers -------------------------------------------------------------------
 const STATUS_COLOR: Record<string, string> = {
-  OK: 'text-emerald-600 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800',
+  OK: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800',
   WARNING:
     'text-amber-600 bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800',
   CRITICAL:
@@ -403,7 +405,7 @@ const ComplianceAuditor: React.FC = () => {
       title="Compliance Auditor"
       subtitle="Ethiopian tax & IFRS compliance — VAT, DRRF, WHT, PAYE verification"
       icon={<ShieldCheck size={16} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       actions={
         <div className="flex items-center gap-2">
           <div className="relative">
@@ -416,7 +418,7 @@ const ComplianceAuditor: React.FC = () => {
           </div>
           <button
             onClick={() => setAutoRefresh(v => !v)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-colors ${autoRefresh ? 'bg-emerald-500 text-white' : 'border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-colors ${autoRefresh ? 'bg-[var(--pro-azure)] text-white' : 'border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
           >
             <RefreshCw size={13} className={autoRefresh ? 'animate-spin' : ''} />
             {autoRefresh ? 'Live' : 'Auto-refresh'}
@@ -431,7 +433,7 @@ const ComplianceAuditor: React.FC = () => {
         {/* Compliance split bar */}
         <div className="flex h-1.5">
           <div
-            className={`transition-all duration-700 ${complianceScore >= 80 ? 'bg-emerald-500' : complianceScore >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
+            className={`transition-all duration-700 ${complianceScore >= 80 ? 'bg-[var(--pro-azure-50)]0' : complianceScore >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
             style={{ width: `${complianceScore}%` }}
           />
           <div className="bg-slate-200 dark:bg-slate-700 flex-1" />
@@ -443,7 +445,7 @@ const ComplianceAuditor: React.FC = () => {
               value: `${complianceScore}%`,
               color:
                 complianceScore >= 80
-                  ? 'text-emerald-600 dark:text-emerald-400'
+                  ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
                   : complianceScore >= 50
                     ? 'text-amber-600 dark:text-amber-400'
                     : 'text-rose-600 dark:text-rose-400',
@@ -455,7 +457,7 @@ const ComplianceAuditor: React.FC = () => {
               color:
                 criticalCount > 0
                   ? 'text-rose-600 dark:text-rose-400'
-                  : 'text-emerald-600 dark:text-emerald-400',
+                  : 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
               sub: 'Immediate action',
             },
             {
@@ -470,7 +472,7 @@ const ComplianceAuditor: React.FC = () => {
             {
               label: 'Active Engagements',
               value: loading ? '—' : (auditSummary?.active ?? 0),
-              color: 'text-emerald-600 dark:text-emerald-400 dark:text-emerald-400',
+              color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
               sub: `${auditSummary?.totalEngagements ?? 0} total`,
             },
           ].map((s) => (
@@ -503,7 +505,7 @@ const ComplianceAuditor: React.FC = () => {
             <div>
               {' '}
               <h3 className="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                <ShieldCheck size={18} className="text-emerald-500" /> ERCA
+                <ShieldCheck size={18} className="text-[var(--pro-azure)]" /> ERCA
                 Compliance Checklist{' '}
               </h3>{' '}
               <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">
@@ -515,7 +517,7 @@ const ComplianceAuditor: React.FC = () => {
             <div className="flex items-center gap-2">
               {' '}
               <div
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium border ${complianceScore >= 80 ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800' : complianceScore >= 50 ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800' : 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-800'}`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium border ${complianceScore >= 80 ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800' : complianceScore >= 50 ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800' : 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-800'}`}
               >
                 {' '}
                 {complianceScore}% compliant{' '}
@@ -530,13 +532,13 @@ const ComplianceAuditor: React.FC = () => {
               <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                 {' '}
                 <div
-                  className={`h-full rounded-full transition-all duration-700 ${complianceScore >= 80 ? 'bg-emerald-500' : complianceScore >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                  className={`h-full rounded-full transition-all duration-700 ${complianceScore >= 80 ? 'bg-[var(--pro-azure-50)]0' : complianceScore >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
                   style={{ width: `${complianceScore}%` }}
                 />{' '}
               </div>{' '}
               <div className="flex gap-3 text-[10px] font-bold shrink-0">
                 {' '}
-                <span className="text-emerald-600 dark:text-emerald-400">
+                <span className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                   {okCount} OK
                 </span>{' '}
                 {warningCount > 0 && (
@@ -587,7 +589,7 @@ const ComplianceAuditor: React.FC = () => {
                   <div className="flex items-center gap-2 shrink-0">
                     {' '}
                     {item.ifrsRef && (
-                      <span className="text-[8px] font-semibold text-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 px-1.5 py-0.5 rounded-full hidden sm:inline">
+                      <span className="text-[8px] font-semibold text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 px-1.5 py-0.5 rounded-full hidden sm:inline">
                         {' '}
                         {item.ifrsRef}{' '}
                       </span>
@@ -603,7 +605,7 @@ const ComplianceAuditor: React.FC = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors opacity-0 group-hover:opacity-100"
+                          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors opacity-0 group-hover:opacity-100"
                         >
                           <ExternalLink size={13} />{' '}
                         </a>
@@ -611,7 +613,7 @@ const ComplianceAuditor: React.FC = () => {
                         <NavLink
                           to={item.link}
                           onClick={(e) => e.stopPropagation()}
-                          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors opacity-0 group-hover:opacity-100"
+                          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors opacity-0 group-hover:opacity-100"
                         >
                           <ChevronRight size={13} />{' '}
                         </NavLink>
@@ -622,14 +624,14 @@ const ComplianceAuditor: React.FC = () => {
                 {expandedItem === item.id && item.remediation && (
                   <div className="px-6 pb-4 animate-in slide-in-from-top-1 duration-150">
                     {' '}
-                    <div className="flex items-start gap-2.5 px-4 py-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 rounded-xl">
+                    <div className="flex items-start gap-2.5 px-4 py-3 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900/40 rounded-xl">
                       <Zap
                         size={13}
-                        className="text-emerald-500 shrink-0 mt-0.5"
+                        className="text-[var(--pro-azure)] shrink-0 mt-0.5"
                       />{' '}
                       <div className="flex-1 min-w-0">
                         {' '}
-                        <p className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider mb-1">
+                        <p className="text-[10px] font-semibold text-[var(--pro-azure-dark)] dark:text-green-300 uppercase tracking-wider mb-1">
                           {' '}
                           Remediation Steps{' '}
                           {item.ifrsRef && (
@@ -638,14 +640,14 @@ const ComplianceAuditor: React.FC = () => {
                             </span>
                           )}{' '}
                         </p>{' '}
-                        <p className="text-xs text-emerald-700 dark:text-emerald-300 leading-relaxed">
+                        <p className="text-xs text-[var(--pro-azure-dark)] dark:text-green-300 leading-relaxed">
                           {item.remediation}
                         </p>{' '}
                       </div>{' '}
                       {item.link && !item.link.startsWith('http') && (
                         <NavLink
                           to={item.link}
-                          className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 bg-emerald-500 text-white rounded-lg text-[10px] font-semibold hover:bg-emerald-600 transition-colors"
+                          className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 bg-[var(--pro-azure)] text-white rounded-lg text-[10px] font-semibold hover:bg-[var(--pro-azure-dark)] transition-colors"
                         >
                           {' '}
                           Fix Now <ChevronRight size={10} />{' '}
@@ -665,7 +667,7 @@ const ComplianceAuditor: React.FC = () => {
           <div className="ovds-widget-card shadow-sm p-5">
             {' '}
             <h4 className="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2 mb-3">
-              <Users size={16} className="text-emerald-600 dark:text-emerald-400" />{' '}
+              <Users size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />{' '}
               Your Access Level{' '}
             </h4>{' '}
             <div className="mb-3">
@@ -707,8 +709,8 @@ const ComplianceAuditor: React.FC = () => {
               ].map(({ label, value, icon }) => {
                 const levelColor = {
                   admin: 'text-rose-600 dark:text-rose-400',
-                  write: 'text-emerald-600 dark:text-emerald-400',
-                  read: 'text-emerald-600 dark:text-emerald-400',
+                  write: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+                  read: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
                   none: 'text-slate-300 dark:text-slate-600',
                 }[value];
                 return (
@@ -764,7 +766,7 @@ const ComplianceAuditor: React.FC = () => {
                   {done ? (
                     <CheckCircle2
                       size={12}
-                      className="text-emerald-500 shrink-0"
+                      className="text-[var(--pro-azure)] shrink-0"
                     />
                   ) : (
                     <Clock
@@ -807,16 +809,16 @@ const ComplianceAuditor: React.FC = () => {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-sm text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:text-emerald-400 transition-colors group"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-sm text-slate-600 dark:text-slate-300 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors group"
                 >
                   {' '}
-                  <span className="text-slate-400 group-hover:text-emerald-600 dark:text-emerald-400 transition-colors">
+                  <span className="text-slate-400 group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">
                     {link.icon}
                   </span>{' '}
                   <span className="flex-1 text-xs font-bold">{link.label}</span>
                   <ExternalLink
                     size={11}
-                    className="text-slate-300 group-hover:text-emerald-600 dark:text-emerald-400 transition-colors"
+                    className="text-slate-300 group-hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors"
                   />{' '}
                 </a>
               ))}{' '}
@@ -840,17 +842,17 @@ const ComplianceAuditor: React.FC = () => {
                 {
                   label: 'Zero-Rated (Exports)',
                   value: '0%',
-                  color: 'text-emerald-600 dark:text-emerald-400',
+                  color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
                 },
                 {
                   label: 'Exempt (Healthcare, Education)',
                   value: 'Exempt',
-                  color: 'text-emerald-600 dark:text-emerald-400',
+                  color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
                 },
                 {
                   label: 'Registration Threshold',
                   value: 'ETB 2M/yr — Reg. 570/2025',
-                  color: 'text-emerald-600 dark:text-emerald-400 dark:text-emerald-400',
+                  color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
                 },
                 {
                   label: 'Monthly Filing Deadline',
@@ -910,7 +912,7 @@ const ComplianceAuditor: React.FC = () => {
             </div>
             <NavLink
               to="/disaster-fund"
-              className="flex items-center gap-1.5 mt-3 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
+              className="flex items-center gap-1.5 mt-3 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline"
             >
               {' '}
               Disaster Fund Module <ChevronRight size={10} />{' '}
@@ -927,12 +929,12 @@ const ComplianceAuditor: React.FC = () => {
         <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           {' '}
           <h3 className="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <History size={18} className="text-emerald-600 dark:text-emerald-400" />{' '}
+            <History size={18} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />{' '}
             Recent Audit Activity{' '}
           </h3>
           <NavLink
             to="/settings/audit-logs"
-            className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
+            className="flex items-center gap-1.5 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline"
           >
             {' '}
             View All <ChevronRight size={13} />{' '}
@@ -1009,7 +1011,7 @@ const ComplianceAuditor: React.FC = () => {
             label: 'Audit Outsourcing',
             to: '/compliance/audit-outsourcing',
             icon: <ClipboardList size={20} />,
-            color: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-950/20',
+            color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/20',
           },
           {
             label: 'Disaster Fund',
@@ -1021,7 +1023,7 @@ const ComplianceAuditor: React.FC = () => {
             label: 'Income Tax',
             to: '/tax/business-income',
             icon: <Banknote size={20} />,
-            color: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-950/20',
+            color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/20',
           },
           {
             label: 'Reports',
@@ -1063,7 +1065,7 @@ export const SustainabilitySection: React.FC<{ pillar?: string }> = ({
     { key: 'governance', label: 'Governance', icon: '🏛️', color: 'violet' },
     { key: 'strategy', label: 'Strategy', icon: '🎯', color: 'blue' },
     { key: 'risk', label: 'Risk Mgmt', icon: '🛡️', color: 'amber' },
-    { key: 'metrics', label: 'Metrics', icon: '📊', color: 'emerald' },
+    { key: 'metrics', label: 'Metrics', icon: '📊', color: 'green' },
   ];
   const pillarContent: Record<
     string,
@@ -1170,10 +1172,10 @@ export const SustainabilitySection: React.FC<{ pillar?: string }> = ({
         'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
     },
     blue: {
-      bg: 'bg-emerald-50 dark:bg-emerald-950/20',
-      text: 'text-emerald-700 dark:text-emerald-300',
-      border: 'border-emerald-200 dark:border-emerald-800',
-      badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+      bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20',
+      text: 'text-[var(--pro-azure-dark)] dark:text-green-300',
+      border: 'border-[var(--pro-azure-100)] dark:border-green-800',
+      badge: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300',
     },
     amber: {
       bg: 'bg-amber-50 dark:bg-amber-950/20',
@@ -1182,12 +1184,12 @@ export const SustainabilitySection: React.FC<{ pillar?: string }> = ({
       badge:
         'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
     },
-    emerald: {
-      bg: 'bg-emerald-50 dark:bg-emerald-950/20',
-      text: 'text-emerald-700 dark:text-emerald-300',
-      border: 'border-emerald-200 dark:border-emerald-800',
+    indigo: {
+      bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20',
+      text: 'text-[var(--pro-azure-dark)] dark:text-green-300',
+      border: 'border-[var(--pro-azure-100)] dark:border-green-800',
       badge:
-        'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+        'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300',
     },
   };
   const active = pillars.find((p) => p.key === activePillar)!;
@@ -1200,7 +1202,7 @@ export const SustainabilitySection: React.FC<{ pillar?: string }> = ({
     >
       <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/30 flex items-center justify-center">
             <span className="text-lg">🌱</span>
           </div>
           <div>
@@ -1212,7 +1214,7 @@ export const SustainabilitySection: React.FC<{ pillar?: string }> = ({
             </p>
           </div>
         </div>
-        <span className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+        <span className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-[var(--pro-azure-100)] dark:bg-green-900/40 text-[var(--pro-azure-dark)] dark:text-green-300 border border-[var(--pro-azure-100)] dark:border-green-800">
           IFRS S1 · 2024
         </span>
       </div>

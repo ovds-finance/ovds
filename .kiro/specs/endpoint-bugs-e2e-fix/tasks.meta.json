@@ -1,0 +1,614 @@
+{
+  "pbtResults": {
+    "1. Write bug condition exploration tests (BEFORE implementing any fixes)": {
+      "status": "passed",
+      "failingExample": "All 28 tests passed on unfixed code — each test confirms a bug exists by asserting the wrong/buggy state:\nCat 3: mockStatsResponse has {draft, paid, pending, overdue} but NOT {draftCount, paidCount, pendingCount, overdueCount}\nCat 4: buildBuggyBillsWhere({companyId:'company-A'}) returns {} — companyId absent, all tenants' data returned\nCat 5: buggyCreateBillData({items:[{price:100,q:2}], total:9999}) stores total:9999 not 230 (100*2*1.15)\nCat 6: computeBuggyDaysOverdue({date:365dAgo, dueDate:7dAgo}) returns 365, not 7\nCat 7: caseSensitiveMatch('ACME CORP'.includes('acme corp')) returns false; customerName-only search misses invoiceNumber\nCat 8: typeof estimatesApi.delete === 'undefined'; calling estimatesApi.delete('id') throws TypeError",
+      "lastRunTimestamp": 1788264038992
+    }
+  },
+  "executionHistory": {
+    "1. Write bug condition exploration tests (BEFORE implementing any fixes)": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262890027
+      },
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262930818
+      },
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788264065383
+      }
+    ],
+    "2. Write preservation property tests (BEFORE implementing any fixes)": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262890271
+      },
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788264074402
+      },
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788264731419
+      }
+    ],
+    "3.1 Reorder static route handlers before dynamic `:id` handlers in OvdsController": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262890919
+      },
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788264748871
+      },
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788265047560
+      }
+    ],
+    "3.2 Verify route ordering exploration test now passes": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262891198
+      },
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788265253091
+      },
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788265912624
+      }
+    ],
+    "3.3 Verify preservation tests still pass after route reordering": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262891691
+      },
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788265919277
+      }
+    ],
+    "4.1 Add Estimate Prisma model to schema": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262892178
+      },
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788265927220
+      },
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788266808086
+      }
+    ],
+    "4.2 Create EstimatesService": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262892952
+      },
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788266813024
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788267817474
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788267907051
+      }
+    ],
+    "4.3 Add estimates routes and missing invoice handlers to OvdsController": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262893384
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788267913891
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788268294962
+      }
+    ],
+    "4.4 Verify missing endpoint exploration tests now pass": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262893997
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788268303200
+      }
+    ],
+    "4.5 Verify preservation tests still pass after adding endpoints": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262894375
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788268304564
+      }
+    ],
+    "5.1 Rename stats response keys in SalesService": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262895089
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788268316170
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788268429698
+      }
+    ],
+    "5.2 Fix flagOverdue HTTP contract in ovdsApi client": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262895624
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788268435593
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788268834615
+      }
+    ],
+    "5.3 Verify stats shape exploration tests now pass": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262896241
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788268841131
+      }
+    ],
+    "5.4 Verify preservation tests still pass after stats rename": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262896938
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788268849334
+      }
+    ],
+    "6.1 Inject JWT companyId in PurchasesController list methods": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262897311
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788268858705
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788269496367
+      }
+    ],
+    "6.2 Add companyId scoping in PurchasesService find methods": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262897642
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788269502858
+      }
+    ],
+    "6.3 Inject JWT companyId in OvdsController list handlers": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262898102
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788269510076
+      }
+    ],
+    "6.4 Guard BankingService against null companyId": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262898480
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788269517638
+      }
+    ],
+    "6.5 Verify tenant isolation exploration tests now pass": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262899012
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788269524659
+      }
+    ],
+    "6.6 Verify preservation tests still pass after tenant isolation fix": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262899424
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788269526416
+      }
+    ],
+    "7.1 Add calculateBillTotals helper and apply to createBill/updateBill": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262899728
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788269534577
+      }
+    ],
+    "7.2 Verify bill total calculation tests now pass": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262900075
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788269553498
+      }
+    ],
+    "7.3 Verify preservation tests still pass after bill total fix": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262900594
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788269552725
+      }
+    ],
+    "8.1 Change AP aging computation to use dueDate instead of date": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262900894
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788269535820
+      }
+    ],
+    "8.2 Verify AP aging test now passes": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262901334
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788269550748
+      }
+    ],
+    "8.3 Verify preservation tests still pass after AP aging fix": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262901717
+      }
+    ],
+    "9.1 Replace single-field case-sensitive search with OR + insensitive": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262903089
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788269536767
+      }
+    ],
+    "9.2 Verify invoice search exploration tests now pass": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262903337
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788269548693
+      }
+    ],
+    "9.3 Verify preservation tests still pass after search fix": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262903700
+      },
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788269554159
+      },
+      {
+        "executionId": "3217bc9e-880f-4787-9363-8004ad312d0e",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788270305080
+      }
+    ],
+    "10.1 Add delete and convert aliases to estimatesApi": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262904206
+      },
+      {
+        "executionId": "3217bc9e-880f-4787-9363-8004ad312d0e",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788270074339
+      },
+      {
+        "executionId": "3217bc9e-880f-4787-9363-8004ad312d0e",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788270269138
+      }
+    ],
+    "10.2 Verify API method name exploration tests now pass": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262904758
+      },
+      {
+        "executionId": "3217bc9e-880f-4787-9363-8004ad312d0e",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788270283262
+      }
+    ],
+    "10.3 Verify preservation tests still pass after alias addition": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262905318
+      },
+      {
+        "executionId": "3217bc9e-880f-4787-9363-8004ad312d0e",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788270285805
+      }
+    ],
+    "11.1 Replace Promise.all with Promise.allSettled in handleBulkDelete": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262905577
+      },
+      {
+        "executionId": "3217bc9e-880f-4787-9363-8004ad312d0e",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788270270009
+      }
+    ],
+    "11.2 Verify bulk delete partial failure test now passes": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262906467
+      },
+      {
+        "executionId": "3217bc9e-880f-4787-9363-8004ad312d0e",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788270287400
+      }
+    ],
+    "11.3 Verify preservation tests still pass after bulk delete fix": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262906852
+      },
+      {
+        "executionId": "3217bc9e-880f-4787-9363-8004ad312d0e",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788270288195
+      }
+    ],
+    "12.1 Add getOtpService guard helper and apply to all OTP endpoints": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262907716
+      },
+      {
+        "executionId": "3217bc9e-880f-4787-9363-8004ad312d0e",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788270272321
+      }
+    ],
+    "12.2 Verify OTP null-safety exploration tests now pass": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262908335
+      },
+      {
+        "executionId": "3217bc9e-880f-4787-9363-8004ad312d0e",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788270288877
+      }
+    ],
+    "12.3 Verify OTP preservation tests still pass after null-safety fix": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262908601
+      },
+      {
+        "executionId": "3217bc9e-880f-4787-9363-8004ad312d0e",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788270289560
+      }
+    ],
+    "13. Checkpoint — Ensure all tests pass": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788262908858
+      },
+      {
+        "executionId": "3217bc9e-880f-4787-9363-8004ad312d0e",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788270314379
+      },
+      {
+        "executionId": "ff89fc2d-e466-4b63-95fe-52dac5b1d354",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788271460393
+      }
+    ],
+    "3. Fix Category 1 — NestJS Route Ordering Conflicts": [
+      {
+        "executionId": "68d9f1f7-3eee-4db7-ab9f-4f8227350bb2",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788265919948
+      }
+    ],
+    "5. Fix Category 3 — Response Shape Mismatches": [
+      {
+        "executionId": "c716f78e-d0e6-4622-86c9-22edc6371c9a",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788268852002
+      }
+    ],
+    "9. Fix Category 7 — Invoice Search (Case-Insensitive, Multi-Field)": [
+      {
+        "executionId": "3217bc9e-880f-4787-9363-8004ad312d0e",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788270305642
+      }
+    ],
+    "4. Fix Category 2 — Missing Backend Endpoints": [
+      {
+        "executionId": "ff89fc2d-e466-4b63-95fe-52dac5b1d354",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788271476865
+      }
+    ],
+    "6. Fix Category 4 — Tenant Isolation Failures": [
+      {
+        "executionId": "ff89fc2d-e466-4b63-95fe-52dac5b1d354",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788271477518
+      }
+    ],
+    "7. Fix Category 5 — Bill Total Miscalculation": [
+      {
+        "executionId": "ff89fc2d-e466-4b63-95fe-52dac5b1d354",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788271479955
+      }
+    ],
+    "8. Fix Category 6 — AP Aging Date Field Error": [
+      {
+        "executionId": "ff89fc2d-e466-4b63-95fe-52dac5b1d354",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788271481707
+      }
+    ],
+    "10. Fix Category 8 — Frontend API Client Method Name Aliases": [
+      {
+        "executionId": "ff89fc2d-e466-4b63-95fe-52dac5b1d354",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788271482320
+      }
+    ],
+    "11. Fix Category 9 — Bulk Delete Partial Failure Handling": [
+      {
+        "executionId": "ff89fc2d-e466-4b63-95fe-52dac5b1d354",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788271482836
+      }
+    ],
+    "12. Fix Category 10 — OTP Service Null-Safety": [
+      {
+        "executionId": "ff89fc2d-e466-4b63-95fe-52dac5b1d354",
+        "chatSessionId": "sess_cf23320d-8f53-479b-b08d-2857100da64a",
+        "timestamp": 1788271483245
+      }
+    ]
+  }
+}

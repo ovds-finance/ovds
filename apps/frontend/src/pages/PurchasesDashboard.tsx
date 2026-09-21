@@ -1,22 +1,24 @@
-import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
 import {
   Building2, Receipt, CreditCard,
   Clock, AlertTriangle, CheckCircle2, Plus,
   Download, DollarSign, FileText, TrendingUp,
   BarChart3, RefreshCw,
 } from 'lucide-react';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiQuery, usePagination } from '../hooks';
-import { OvdsPageHeader } from '../components/ovds';
-import { downloadCSV } from '../utils/download';
-import { fmtDate, fmtCurrency } from '../utils/fmt';
+import React, { useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
+
+import { OvdsPageHeader } from '../components/ovds';
+import { useBusiness } from '../context/businessContext';
+import { useApiQuery, usePagination } from '../hooks';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { downloadCSV } from '../utils/download';
+import { fmtDate, fmtCurrency } from '../utils/fmt';
+
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
@@ -119,8 +121,8 @@ const PurchasesDashboard: React.FC = () => {
       value: fmt(paidAmount),
       sub: `${paidBills} bills`,
       icon: <CheckCircle2 size={18} />,
-      color: 'text-emerald-600',
-      bg: 'bg-emerald-50',
+      color: 'text-[var(--pro-azure)]',
+      bg: 'bg-[var(--pro-azure-50)]',
       onClick: () => window.location.href = '/purchases/bills?status=PAID',
     },
     {
@@ -224,7 +226,7 @@ const PurchasesDashboard: React.FC = () => {
               <BarChart data={chartData} margin={{ top: 4, right: 16, bottom: 4, left: 16 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={(v: number) => fmtCurrency(v, 'ETB', 0)} width={80} />
+                <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={(v: number) => fmtCurrency(v, 'ETB')} width={80} />
                 <Tooltip
                   formatter={(v: any) => [fmtCurrency(Number(v), 'ETB'), '']}
                   contentStyle={{ fontSize: 11, borderRadius: 12, border: '1px solid #e2e8f0' }}
@@ -316,7 +318,7 @@ const PurchasesDashboard: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search bills..."
-                className="w-40 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-400 placeholder:text-slate-300"
+                className="w-40 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-green-400 placeholder:text-slate-300"
               />
               <button
                 onClick={handleExport}
@@ -324,7 +326,7 @@ const PurchasesDashboard: React.FC = () => {
               >
                 <Download size={11} /> Export
               </button>
-              <Link to="/purchases/bills" className="text-xs text-emerald-600 font-semibold hover:underline">
+              <Link to="/purchases/bills" className="text-xs text-[var(--pro-azure)] font-semibold hover:underline">
                 View all
               </Link>
             </div>
@@ -356,7 +358,7 @@ const PurchasesDashboard: React.FC = () => {
                     return (
                       <tr key={bill.id} className="hover:bg-slate-50 transition-colors">
                         <td className="px-5 py-3">
-                          <Link to={`/purchases/bills/${bill.id}`} className="text-xs font-bold text-slate-800 hover:text-emerald-600 transition-colors font-mono">
+                          <Link to={`/purchases/bills/${bill.id}`} className="text-xs font-bold text-slate-800 hover:text-[var(--pro-azure)] transition-colors font-mono">
                             {bill.billNumber}
                           </Link>
                           <p className="text-[10px] text-slate-400 mt-0.5">{fmtDate(bill.date)}</p>
@@ -371,7 +373,7 @@ const PurchasesDashboard: React.FC = () => {
                         </td>
                         <td className="px-5 py-3 text-center">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                            bill.status === 'PAID' ? 'bg-emerald-50 text-emerald-700' :
+                            bill.status === 'PAID' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]' :
                             bill.status === 'OVERDUE' ? 'bg-rose-50 text-rose-700' :
                             bill.status === 'PENDING' ? 'bg-amber-50 text-amber-700' :
                             'bg-slate-50 text-slate-500'

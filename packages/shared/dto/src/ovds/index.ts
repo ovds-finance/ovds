@@ -11,3 +11,4 @@ export * from './period-close.dto';
 export * from './tax.dto';
 export * from './tax-rate.dto';
 export * from './treasury.dto';
+export * from './vat.dto';

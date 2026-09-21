@@ -1,3 +1,15 @@
-// DTO / contract definitions for the "Sales, Invoicing, Customers & CRM" module.
-// Centralized here as part of the DDD consolidation. Add zod/class-validator
-// contracts for this bounded context.
+/**
+ * @ovds/modules/sales — DTO / contract definitions.
+ *
+ * The Sales module covers invoices, estimates, credit notes, customers,
+ * vendors, bills, and bank accounts. Zod contracts span two schema files.
+ *
+ * Usage (backend):
+ *   import { InvoiceSchema, CustomerSchema } from '@ovds/modules/sales/dto';
+ *   import { BillSchema, VendorSchema } from '@ovds/modules/sales/dto';
+ */
+
+// Invoice, Customer, Vendor, Bill, BankAccount schemas
+export * from '@ovds/contracts/schemas/ovds';
+// Revenue, Estimate, CreditNote schemas
+export * from '@ovds/contracts/schemas/sales';

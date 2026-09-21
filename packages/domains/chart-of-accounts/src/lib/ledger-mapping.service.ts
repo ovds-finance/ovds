@@ -20,7 +20,7 @@ import {
   BaseService,
   IAuditLogger,
   IPrismaClient,
-} from '@ovds/domains/infrastructure';
+} from '@ovds/domains-infrastructure';
 
 // ── Input / Output types ───────────────────────────────────────────────────────
 

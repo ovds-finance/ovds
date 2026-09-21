@@ -145,6 +145,7 @@ export function DataTable<T extends Record<string, any>>({
           <ColumnToggleButton
             columns={columns}
             visibleKeys={visibleKeys}
+            hiddenCount={hiddenCount}
             onToggle={toggleColumn}
             onReset={resetColumns}
           />
@@ -174,7 +175,8 @@ export function DataTable<T extends Record<string, any>>({
             <tr>
               <td
                 colSpan={visibleColumns.length + (renderActions ? 1 : 0)}
-                className="px-4 py-10 text-center text-[12px] text-slate-400 dark:text-slate-500"
+                className="px-4 py-10 text-center text-[11px] font-medium"
+                style={{ color: 'var(--text-4)' }}
               >
                 {emptyMessage}
               </td>
@@ -213,67 +215,123 @@ export function DataTable<T extends Record<string, any>>({
 function ColumnToggleButton({
   columns,
   visibleKeys,
+  hiddenCount,
   onToggle,
   onReset,
 }: {
   columns: { key: string; label: string; required?: boolean }[];
   visibleKeys: string[];
+  hiddenCount: number;
   onToggle: (key: string) => void;
   onReset: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const visibleSet = useMemo(() => new Set(visibleKeys), [visibleKeys]);
-  const hiddenCount = columns.length - visibleSet.size;
+
   return (
     <div className="relative">
+      {/* Trigger button */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all ${
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pro-azure)] active:scale-[0.97]"
+        style={
           hiddenCount > 0
-            ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400'
-            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
-        }`}
-        title="Toggle columns"
+            ? { background: 'var(--pro-azure-50)', borderColor: 'var(--pro-azure-100)', color: 'var(--pro-azure-dark)' }
+            : { background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-3)' }
+        }
+        onMouseEnter={e => {
+          if (hiddenCount === 0) {
+            (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-alt)';
+          }
+        }}
+        onMouseLeave={e => {
+          if (hiddenCount === 0) {
+            (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)';
+          }
+        }}
+        title="Toggle visible columns"
+        aria-expanded={open}
+        aria-haspopup="listbox"
       >
-        <ChevronsUpDown size={13} />
+        <ChevronsUpDown size={12} />
         <span>Columns</span>
         {hiddenCount > 0 && (
-          <span className="px-1.5 py-0.5 bg-emerald-500 text-white text-[10px] font-medium rounded-full">
+          <span
+            className="px-1.5 py-0.5 rounded-full text-[9px] font-bold"
+            style={{ background: 'var(--pro-azure)', color: '#fff' }}
+          >
             {hiddenCount} hidden
           </span>
         )}
       </button>
+
+      {/* Dropdown */}
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-50 overflow-hidden">
-          <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">Visible Columns</p>
+        <div
+          className="absolute right-0 top-full mt-1.5 w-52 z-50 overflow-hidden rounded-xl"
+          role="listbox"
+          aria-label="Toggle columns"
+          style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)',
+            animation: 'aki-enter 150ms cubic-bezier(0.16,1,0.3,1) both',
+          }}
+        >
+          {/* Header */}
+          <div
+            className="px-3.5 py-2.5 flex items-center justify-between"
+            style={{ borderBottom: '1px solid var(--border-alt)' }}
+          >
+            <p className="text-[11px] font-bold" style={{ color: 'var(--text-2)' }}>
+              Visible Columns
+            </p>
             <button
               onClick={onReset}
-              className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+              className="text-[10px] font-bold transition-colors hover:underline"
+              style={{ color: 'var(--pro-azure)' }}
             >
               Reset
             </button>
           </div>
-          <div className="p-2 space-y-0.5 max-h-72 overflow-y-auto">
+
+          {/* Column list */}
+          <div className="p-1.5 space-y-0.5 max-h-64 overflow-y-auto">
             {columns.map((col) => {
               const isVisible = visibleSet.has(col.key);
               return (
                 <button
                   key={col.key}
+                  role="option"
+                  aria-selected={isVisible}
                   onClick={() => onToggle(col.key)}
                   disabled={col.required}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left text-xs font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-left text-[11px] font-medium transition-colors duration-100 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pro-azure)]"
+                  style={{ color: 'var(--text-2)' }}
+                  onMouseEnter={e => !col.required && ((e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-alt)')}
+                  onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = 'transparent')}
                 >
+                  {/* Checkbox indicator */}
                   <span
-                    className={`shrink-0 w-3.5 h-3.5 rounded border ${
+                    className="shrink-0 w-3.5 h-3.5 rounded flex items-center justify-center"
+                    style={
                       isVisible
-                        ? 'bg-emerald-500 border-emerald-500'
-                        : 'border-slate-300 dark:border-slate-600'
-                    }`}
-                  />
-                  <span className="flex-1">{col.label}</span>
+                        ? { background: 'var(--pro-azure)', border: '1px solid var(--pro-azure)' }
+                        : { background: 'transparent', border: '1.5px solid var(--border)' }
+                    }
+                  >
+                    {isVisible && (
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                        <path d="M1.5 4L3 5.5L6.5 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </span>
+                  <span className="flex-1 truncate">{col.label}</span>
                   {col.required && (
-                    <span className="text-[8px] font-semibold text-slate-300 uppercase tracking-wider">
+                    <span
+                      className="text-[8px] font-bold uppercase tracking-wider"
+                      style={{ color: 'var(--text-5)' }}
+                    >
                       Required
                     </span>
                   )}

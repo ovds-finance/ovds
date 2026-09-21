@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
+
 import {
   AppPage, Btn, Icon, FormField, Input, AppTable, AppTr, AppTd, AppTh,
 } from '../components/ui';
 import { useBusiness } from '../context/businessContext';
 import api from '../services/api';
 import { downloadBlob } from '../utils/download';
-import toast from 'react-hot-toast';
 
 interface TrialBalanceLine {
   id: string;
@@ -126,7 +127,7 @@ const TrialBalance: React.FC = () => {
         <div
           className={`flex items-center gap-3 p-3 rounded-xl border text-xs mb-6 ${
             isBalanced
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+              ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'
               : 'bg-rose-50 border-rose-200 text-rose-700'
           }`}
         >
@@ -146,10 +147,10 @@ const TrialBalance: React.FC = () => {
 
       <div className="ovds-grid-layout cols-4 gap-sm mb-6">
         {[
-          { label: 'Total Debits', value: totalDebits, color: 'text-emerald-600' },
+          { label: 'Total Debits', value: totalDebits, color: 'text-[var(--pro-azure)]' },
           { label: 'Total Credits', value: totalCredits, color: 'text-rose-600' },
-          { label: 'Accounts', value: data?.accounts?.length ?? 0, color: 'text-blue-600' },
-          { label: 'Balanced', value: isBalanced ? 100 : 0, suffix: '%', color: isBalanced ? 'text-emerald-600' : 'text-rose-600' },
+          { label: 'Accounts', value: data?.accounts?.length ?? 0, color: 'text-[var(--pro-azure)]' },
+          { label: 'Balanced', value: isBalanced ? 100 : 0, suffix: '%', color: isBalanced ? 'text-[var(--pro-azure)]' : 'text-rose-600' },
         ].map((k, i) => (
           <div key={i} className="ovds-widget-card p-4">
             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">{k.label}</p>
@@ -211,7 +212,7 @@ const TrialBalance: React.FC = () => {
                       </span>
                     </AppTd>
                     <AppTd align="right">
-                      <span className={`tabular-nums text-[12px] ${isDebit ? 'text-emerald-700 font-semibold' : 'text-slate-400'}`}>
+                      <span className={`tabular-nums text-[12px] ${isDebit ? 'text-[var(--pro-azure-dark)] font-semibold' : 'text-slate-400'}`}>
                         {isDebit ? fmt(balance) : '—'}
                       </span>
                     </AppTd>
@@ -232,7 +233,7 @@ const TrialBalance: React.FC = () => {
             {data && data.accounts.length > 0 && (
               <tr className="bg-slate-800 dark:bg-slate-700 text-white">
                 <td colSpan={3} className="px-4 py-3 font-black text-sm">TOTALS</td>
-                <td align="right" className="px-4 py-3 tabular-nums text-sm font-bold text-emerald-400">
+                <td align="right" className="px-4 py-3 tabular-nums text-sm font-bold text-[var(--pro-azure-light)]">
                   {fmt(totalDebits)}
                 </td>
                 <td align="right" className="px-4 py-3 tabular-nums text-sm font-bold text-rose-400">

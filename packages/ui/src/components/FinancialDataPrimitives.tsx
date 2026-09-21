@@ -34,11 +34,11 @@ export type ovdsBadgeStatus =
   | 'sent' | 'open' | 'info';
 
 const BADGE_CLS: Record<ovdsBadgeStatus, string> = {
-  paid:      'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800',
-  settled:   'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800',
-  approved:  'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800',
-  filed:     'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800',
-  active:    'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800',
+  paid:      'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-300 dark:border-green-800',
+  settled:   'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-300 dark:border-green-800',
+  approved:  'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-300 dark:border-green-800',
+  filed:     'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-300 dark:border-green-800',
+  active:    'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-300 dark:border-green-800',
   overdue:   'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-800',
   rejected:  'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-800',
   danger:    'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-800',
@@ -48,18 +48,18 @@ const BADGE_CLS: Record<ovdsBadgeStatus, string> = {
   cancelled: 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
   inactive:  'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
   closed:    'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
-  sent:      'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800',
+  sent:      'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-[var(--pro-azure-50)]/10 dark:text-[var(--pro-azure-light)] dark:border-[var(--pro-azure)]/20',
   open:      'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800',
   info:      'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/30 dark:text-sky-300 dark:border-sky-800',
 };
 
 const DOT_CLS: Record<ovdsBadgeStatus, string> = {
-  paid: 'bg-emerald-500', settled: 'bg-emerald-500', approved: 'bg-emerald-500',
-  filed: 'bg-emerald-500', active: 'bg-emerald-500',
+  paid: 'bg-[var(--pro-azure)]', settled: 'bg-[var(--pro-azure)]', approved: 'bg-[var(--pro-azure)]',
+  filed: 'bg-[var(--pro-azure)]', active: 'bg-[var(--pro-azure)]',
   overdue: 'bg-rose-500', rejected: 'bg-rose-500', danger: 'bg-rose-500',
   pending: 'bg-amber-500', warning: 'bg-amber-500',
   draft: 'bg-slate-400', cancelled: 'bg-slate-300', inactive: 'bg-slate-300', closed: 'bg-slate-300',
-  sent: 'bg-blue-500',
+  sent: 'bg-[var(--pro-azure)]',
   open: 'bg-violet-500',
   info: 'bg-sky-500',
 };
@@ -222,7 +222,7 @@ export const InvoiceLineItem: React.FC<InvoiceLineItemProps> = ({
 }) => {
   const inputCls = cn(
     'w-full bg-transparent outline-none text-[12px] font-medium text-slate-700 dark:text-slate-300',
-    'focus:bg-aki-blue-50 dark:focus:bg-blue-950/30 rounded px-1.5 py-1',
+    'focus:bg-[var(--pro-azure-50)] dark:focus:bg-blue-950/30 rounded px-1.5 py-1',
     'transition-colors duration-100',
     readOnly && 'cursor-default pointer-events-none',
   );
@@ -376,7 +376,7 @@ export const InvoiceLineItemList: React.FC<InvoiceLineItemListProps> = ({
         <button
           type="button"
           onClick={onAdd}
-          className="flex items-center gap-2 text-[12px] font-semibold text-aki-blue hover:text-aki-blue-dark transition-colors"
+          className="flex items-center gap-2 text-[12px] font-semibold text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] transition-colors"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
@@ -468,13 +468,13 @@ export const LedgerTable: React.FC<LedgerTableProps> = ({
                 <td className={cn('right mono', entry.debit ? 'text-slate-800 dark:text-slate-200' : 'muted')}>
                   {entry.debit ? fmt(entry.debit) : '—'}
                 </td>
-                <td className={cn('right mono', entry.credit ? 'text-emerald-600 dark:text-emerald-400' : 'muted')}>
+                <td className={cn('right mono', entry.credit ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'muted')}>
                   {entry.credit ? fmt(entry.credit) : '—'}
                 </td>
                 <td className={cn(
                   'right mono font-bold',
                   entry.balance >= 0
-                    ? 'text-emerald-600 dark:text-emerald-400'
+                    ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
                     : 'text-rose-500 dark:text-rose-400',
                 )}>
                   {fmt(entry.balance)}
@@ -521,7 +521,7 @@ export const AmountDiff: React.FC<AmountDiffProps> = ({
         <span className={cn(
           'text-[10px] font-bold px-1.5 py-0.5 rounded-full',
           positive
-            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'
+            ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)]'
             : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400',
         )}>
           {positive ? '+' : ''}{pct.toFixed(1)}%

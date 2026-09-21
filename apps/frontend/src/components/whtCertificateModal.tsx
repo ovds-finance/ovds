@@ -7,15 +7,17 @@
  * Fetches paid bills for the selected period, computes WHT per vendor,
  * and renders a printable certificate.
  */
-import React, { useState, useEffect, useRef } from 'react';
-import DOMPurify from 'dompurify';
 import { Bill, ETH_TAX } from '@ovds/ui';
-import { Icon } from './ui';
 import { zIndex } from '@ovds/ui';
-import api from '../services/api';
-import { Can } from './can';
+import DOMPurify from 'dompurify';
+import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-hot-toast';
+
+import api from '../services/api';
 import { fmtCurrencyDecimal } from '../utils/fmt';
+
+import { Can } from './can';
+import { Icon } from './ui';
 
 interface VendorWHT {
   vendorName: string;
@@ -142,8 +144,8 @@ const WHTCertificateModal: React.FC<Props> = ({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-ovds-border dark:border-ovds-muted-dark">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center">
-              <Icon name="INVOICE" size={16} className="text-emerald-600" />
+            <div className="w-9 h-9 bg-[var(--pro-azure-50)] rounded-xl flex items-center justify-center">
+              <Icon name="INVOICE" size={16} className="text-[var(--pro-azure)]" />
             </div>
             <div>
               <p className="font-semibold text-ovds-text-main dark:text-ovds-surface">WHT Certificate Generator</p>
@@ -177,14 +179,14 @@ const WHTCertificateModal: React.FC<Props> = ({
             </div>
 
             {/* Summary */}
-            <div className="px-4 py-3 bg-emerald-50 border-b border-ovds-border dark:border-ovds-muted-dark">
+            <div className="px-4 py-3 bg-[var(--pro-azure-50)] border-b border-ovds-border dark:border-ovds-muted-dark">
               <div className="flex justify-between text-xs mb-1">
                 <span className="text-ovds-text-muted">Total Paid</span>
                 <span className="font-semibold text-ovds-text-main dark:text-ovds-surface">{fmt(totalPaid)}</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-ovds-text-muted">Total WHT (2%)</span>
-                <span className="font-semibold text-emerald-600">{fmt(totalWHT)}</span>  // WHT @ 2%
+                <span className="font-semibold text-[var(--pro-azure)]">{fmt(totalWHT)}</span>  // WHT @ 2%
               </div>
             </div>
 
@@ -206,12 +208,12 @@ const WHTCertificateModal: React.FC<Props> = ({
                     key={v.vendorName}
                     onClick={() => setSelectedVendor(v)}
                     className={`w-full text-left px-4 py-3 border-b border-ovds-border-subtle dark:border-ovds-muted-dark hover:bg-ovds-muted dark:hover:bg-ovds-muted-dark/50 transition-colors ${
-                      selectedVendor?.vendorName === v.vendorName ? 'bg-emerald-50 border-l-2 border-l-emerald-500' : ''
+                      selectedVendor?.vendorName === v.vendorName ? 'bg-[var(--pro-azure-50)] border-l-2 border-l-indigo-500' : ''
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <p className="text-xs font-bold text-ovds-text-main dark:text-ovds-surface truncate">{v.vendorName}</p>
-                      <span className="text-[10px] font-semibold text-emerald-600">{fmt(v.whtAmount)}</span>
+                      <span className="text-[10px] font-semibold text-[var(--pro-azure)]">{fmt(v.whtAmount)}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-[10px] text-ovds-text-muted">{v.billCount} bill{v.billCount > 1 ? 's' : ''}</span>
@@ -239,14 +241,14 @@ const WHTCertificateModal: React.FC<Props> = ({
                 {/* Action bar */}
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <Icon name="SUCCESS" size={14} className="text-emerald-600" />
+                    <Icon name="SUCCESS" size={14} className="text-[var(--pro-azure)]" />
                     <span className="text-xs font-bold text-ovds-text-muted dark:text-ovds-text-subtle">
                       Certificate ready — {certNumber}
                     </span>
                   </div>
                   <button
                     onClick={handlePrint}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-xs font-medium hover:bg-emerald-600 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-lg text-xs font-medium hover:bg-[var(--pro-azure-dark)] transition-colors"
                   >
                     <Icon name="PRINTER" size={12} /> Print / Save PDF
                   </button>
@@ -282,10 +284,10 @@ const WHTCertificateModal: React.FC<Props> = ({
                       <p className="text-sm font-semibold text-ovds-text-main">{companyName}</p>
                       <p className="text-xs text-ovds-text-muted mt-0.5">TIN: {companyTin}</p>
                     </div>
-                    <div className="bg-emerald-50 rounded-xl p-4">
+                    <div className="bg-[var(--pro-azure-50)] rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-2">
-                        <Icon name="COMPANY" size={12} className="text-emerald-600" />
-                        <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider">Withholdee (Payee)</p>
+                        <Icon name="COMPANY" size={12} className="text-[var(--pro-azure)]" />
+                        <p className="text-[10px] font-semibold text-[var(--pro-azure)] uppercase tracking-wider">Withholdee (Payee)</p>
                       </div>
                       <p className="text-sm font-semibold text-ovds-text-main">{selectedVendor.vendorName}</p>
                       <p className="text-xs text-ovds-text-muted mt-0.5">TIN: {selectedVendor.vendorTin}</p>
@@ -313,15 +315,15 @@ const WHTCertificateModal: React.FC<Props> = ({
                         </td>
                         <td className="px-4 py-3 text-right font-bold text-ovds-text-main">{selectedVendor.whtRate}%</td>
                       </tr>
-                      <tr className="bg-emerald-50">
-                        <td className="px-4 py-3 font-semibold text-ovds-text-main">
-                          Withholding Tax Withheld
-                        </td>
-                        <td className="px-4 py-3 text-right font-semibold text-emerald-600 text-base">{fmt(selectedVendor.whtAmount)}</td>
+                       <tr className="bg-[var(--pro-azure-50)]">
+                         <td className="px-4 py-3 font-semibold text-ovds-text-main">
+                           Withholding Tax Withheld
+                         </td>
+                         <td className="px-4 py-3 text-right font-semibold text-[var(--pro-azure)] text-base">{fmt(selectedVendor.whtAmount)}</td>
                       </tr>
                       <tr>
                         <td className="px-4 py-3 text-ovds-text-main">Net Amount Paid to Vendor</td>
-                        <td className="px-4 py-3 text-right font-bold text-emerald-600">
+                         <td className="px-4 py-3 text-right font-bold text-[var(--pro-azure)]">
                           {fmt(selectedVendor.totalPaid - selectedVendor.whtAmount)}
                         </td>
                       </tr>

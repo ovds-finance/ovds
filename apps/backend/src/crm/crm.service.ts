@@ -1,10 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../common/prisma.service';
 import { PAGINATION_DEFAULT_LIMIT } from '@ovds/shared';
+
+import { PrismaService } from '../common/prisma.service';
+import { ModuleBootstrapService } from '../core/module-bootstrap.service';
 
 @Injectable()
 export class CrmService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly moduleBootstrap: ModuleBootstrapService,
+  ) {}
 
   async findLeads(query: { page?: number; limit?: number; status?: string; assignedTo?: string }) {
     const page = query.page ?? 1;
@@ -108,14 +113,47 @@ export class CrmService {
 
   async convertOpportunityToInvoice(id: string) {
     const opportunity = await this.findOpportunity(id);
+
+    // BUG FIX: was creating an invoice with totalAmount copied from the
+    // opportunity's value but subtotal/vatAmount/drrfAmount all null, and
+    // items = '[]'. The resulting invoice was financially inconsistent — totals
+    // didn't add up and it had no line items to edit.
+    // Now we create a single placeholder line item for the opportunity value so
+    // the invoice is self-consistent and the user can refine the lines after.
+    // Ovds SaaS opportunity→invoice conversion follows the same pattern.
+    const opportunityValue = Number(opportunity.value ?? 0);
     const invoice = await this.prisma.invoice.create({
       data: {
         customerId: opportunity.contactId,
-        customerName: opportunity.customerName,
+        customerName: opportunity.customerName ?? '',
+        companyId: (opportunity as any).companyId ?? null,
         status: 'DRAFT',
         date: new Date(),
-        totalAmount: opportunity.value,
-        items: '[]',
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // NET30 default
+        subtotal: opportunityValue,
+        vatAmount: 0,
+        drrfAmount: 0,
+        totalAmount: opportunityValue,
+        items: JSON.stringify([{
+          description: opportunity.customerName ?? 'Opportunity item',
+          quantity: 1,
+          price: opportunityValue,
+          showDiscount: false,
+          showTax: false,
+          discountType: 'FIXED',
+          discountValue: 0,
+        }]),
+        invoiceItem: {
+          create: [{
+            description: opportunity.customerName ?? 'Opportunity item',
+            quantity: 1,
+            salePrice: opportunityValue,
+            discount: 0,
+            discountType: 'FIXED',
+            discountValue: 0,
+            companyId: (opportunity as any).companyId ?? null,
+          }],
+        },
       },
     });
     return { success: true, invoiceId: invoice.id };
@@ -193,7 +231,9 @@ export class CrmService {
   }
 
   async createCompany(data: Record<string, unknown>) {
-    return this.prisma.company.create({ data: data as any });
+    const company = await this.prisma.company.create({ data: data as any });
+    await this.moduleBootstrap.seedDefaultModules(company.id);
+    return company;
   }
 
   async updateCompany(id: string, data: Record<string, unknown>) {
@@ -302,5 +342,57 @@ export class CrmService {
   async findCustomerByUserId(userId?: string) {
     if (!userId) return null;
     return this.prisma.customer.findFirst({ where: { userId } });
+  }
+
+  /** Sanitize payload — strip unknown fields, convert empty strings to null */
+  private sanitizeCustomer(data: Record<string, unknown>): Record<string, unknown> {
+    // Known Customer model fields (matches schema.prisma)
+    const ALLOWED = new Set([
+      'name', 'email', 'phone', 'address', 'tin', 'companyId', 'userId',
+      'notes', 'paymentTerms', 'creditScore', 'kycStatus', 'kycVerifiedAt',
+      'nationalId', 'businessType', 'currencyCode', 'creditLimit', 'riskLevel',
+      'vatNumber', 'buyerAddress',
+    ]);
+
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(data)) {
+      if (!ALLOWED.has(k)) continue;
+      // Convert empty strings to null for optional fields
+      out[k] = v === '' ? null : v;
+    }
+
+    // Pack address sub-fields into buyerAddress JSON if present
+    const addrFields = ['region', 'zone', 'kebele', 'wereda', 'city', 'houseNumber'];
+    const addrData = addrFields.reduce((acc, f) => {
+      const val = data[f];
+      if (val !== undefined && val !== '') acc[f] = val;
+      return acc;
+    }, {} as Record<string, unknown>);
+    if (Object.keys(addrData).length > 0) {
+      out['buyerAddress'] = JSON.stringify(addrData);
+    }
+
+    return out;
+  }
+
+  async createCustomer(data: Record<string, unknown>) {
+    return this.prisma.customer.create({ data: this.sanitizeCustomer(data) as any });
+  }
+
+  async updateCustomer(id: string, data: Record<string, unknown>) {
+    try {
+      const payload = this.sanitizeCustomer(data);
+      return await this.prisma.customer.update({ where: { id }, data: payload as any });
+    } catch (e) {
+      throw new NotFoundException('Customer not found');
+    }
+  }
+
+  async deleteCustomer(id: string) {
+    try {
+      return await this.prisma.customer.delete({ where: { id } });
+    } catch (e) {
+      throw new NotFoundException('Customer not found');
+    }
   }
 }

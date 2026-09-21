@@ -1,13 +1,15 @@
 import { Injectable, UnauthorizedException, NotFoundException, ConflictException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../common/prisma.service';
+import { JwtService } from '@nestjs/jwt';
+import { BCryptSaltRounds, JWT_REFRESH_EXPIRY } from '@ovds/shared';
+import * as bcrypt from 'bcryptjs';
+
 import { AccountLockoutService } from '../common/account-lockout.service';
 import { OtpService } from '../common/otp.service';
-import { TokenBlacklistService } from '../common/token-blacklist.service';
-import * as bcrypt from 'bcryptjs';
+import { PrismaService } from '../common/prisma.service';
 import { generateApiKey, hashToken, generateSecureToken } from '../common/security-utils';
-import { BCryptSaltRounds, JWT_REFRESH_EXPIRY } from '@ovds/shared';
+import { TokenBlacklistService } from '../common/token-blacklist.service';
+
 
 @Injectable()
 export class AuthService {
@@ -72,7 +74,7 @@ export class AuthService {
     }
 
     const jti = generateSecureToken(16);
-    const payload = {
+    const payload: { email: string; sub: string; role: string; jti: string; companyId: string | null } = {
       email: user.email,
       sub: user.id,
       role: user.role,
@@ -106,18 +108,84 @@ export class AuthService {
     }
   }
 
-  async register(data: { email: string; password: string; username: string; companyId?: string }) {
+  async emailExists(email: string): Promise<boolean> {
+    const user = await this.prisma.user.findFirst({ where: { email }, select: { id: true } });
+    return !!user;
+  }
+
+  async register(data: {
+    email: string;
+    password: string;
+    username: string;
+    companyId?: string;
+    // Extended registration fields from the multi-step form
+    firstName?: string;
+    lastName?: string;
+    companyName?: string;
+    phone?: string;
+    businessType?: string;
+    registrationType?: string;
+    website?: string;
+    referralCode?: string;
+    role?: string;
+  }) {
+    // Guard: reject duplicate emails with a clean 409
+    if (await this.emailExists(data.email.trim().toLowerCase())) {
+      throw new ConflictException('An account with this email already exists.');
+    }
+
     const hashed = await bcrypt.hash(data.password, BCryptSaltRounds);
-    return this.prisma.user.create({
+
+    // Determine role from registrationType
+    let userRole: any = 'EMPLOYEE';
+    if (data.role) {
+      userRole = data.role;
+    } else if (data.registrationType === 'customer') {
+      userRole = 'CLIENT';
+    }
+
+    // Build the username from firstName+lastName if not explicitly provided
+    const username = data.username ||
+      [data.firstName, data.lastName].filter(Boolean).join(' ').toLowerCase().replace(/\s+/g, '.') ||
+      data.email.split('@')[0];
+
+    const user = await this.prisma.user.create({
       data: {
         email: data.email,
-        username: data.username,
+        username,
         password: hashed,
         companyId: data.companyId,
-        role: 'EMPLOYEE',
+        role: userRole,
       },
-      select: { id: true, email: true, username: true, role: true, createdAt: true },
+      select: {
+        id: true, email: true, username: true, role: true, createdAt: true,
+      },
     });
+
+    // Issue a JWT so the frontend can log the user in immediately
+    const payload: { email: string; sub: string; role: string; jti: string; companyId: string | null } = {
+      email: user.email ?? '',
+      sub: user.id,
+      role: user.role,
+      jti: generateSecureToken(16),
+      companyId: data.companyId ?? null,
+    };
+
+    const access_token = this.jwtService.sign(payload);
+    const refresh_token = this.jwtService.sign(payload, {
+      secret: this.config.get<string>('JWT_REFRESH_SECRET'),
+      expiresIn: JWT_REFRESH_EXPIRY,
+    });
+
+    return {
+      access_token,
+      refresh_token,
+      user: {
+        ...user,
+        firstName: data.firstName,
+        lastName: data.lastName,
+      },
+    };
   }
 
   async blacklistToken(token: string): Promise<void> {
@@ -155,17 +223,25 @@ export class AuthService {
   async refreshToken(userId: string, oldRefreshToken?: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new UnauthorizedException('User not found');
+
+    // Enforce refresh-token verification against JWT_REFRESH_SECRET.
+    // A stolen or tampered refresh token must never silently succeed —
+    // if verification fails we reject the request immediately.
     if (oldRefreshToken) {
+      const refreshSecret = this.config.get<string>('JWT_REFRESH_SECRET');
       try {
-        const decoded = this.jwtService.verify(oldRefreshToken, { secret: this.config.get<string>('JWT_REFRESH_SECRET') });
+        this.jwtService.verify(oldRefreshToken, { secret: refreshSecret });
+        // Token is valid — blacklist it to enforce single-use rotation.
         await this.tokenBlacklistService.blacklistToken(oldRefreshToken, userId);
       } catch {
-        // invalid refresh token — proceed with rotation
+        // Invalid, expired, or tampered refresh token — deny the rotation.
+        throw new UnauthorizedException('Refresh token is invalid or has expired. Please log in again.');
       }
     }
+
     const jti = generateSecureToken(16);
-    const payload = {
-      email: user.email,
+    const payload: { email: string; sub: string; role: string; jti: string; companyId: string | null } = {
+      email: user.email ?? '',
       sub: user.id,
       role: user.role,
       jti,
@@ -203,17 +279,184 @@ export class AuthService {
 
   /**
    * Store or update the FCM push token for a user.
-   * Uses the user's `metadata` JSON column if available, or a dedicated
-   * `fcmToken` column — falls back to a no-op if neither exists in the schema.
    */
   async saveFcmToken(userId: string, token: string): Promise<void> {
-    try {
-      await (this.prisma.user as any).update({
-        where: { id: userId },
-        data: { fcmToken: token },
-      });
-    } catch {
-      // Column may not exist yet — silently ignore until migration is run
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { fcmToken: token },
+    });
+  }
+
+  async listUsers(params: { page?: number; limit?: number; search?: string; companyId?: string }): Promise<{ data: any[]; total: number }> {
+    const { page = 1, limit = 25, search, companyId } = params;
+    const where: any = {};
+    if (search) {
+      where.OR = [
+        { username: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+      ];
     }
+    if (companyId) {
+      where.OR = [
+        ...(where.OR ?? []),
+        { companyId },
+        { employee: { some: { companyId } } },
+      ];
+    }
+    const [data, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          role: true,
+          companyId: true,
+          isActive: true,
+          lastLoginAt: true,
+          failedLoginAttempts: true,
+          lockedUntil: true,
+          createdAt: true,
+          userRoles: { include: { role: true } },
+        },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+    const now = new Date();
+    return {
+      data: data.map(u => ({
+        ...u,
+        isLocked: (u.failedLoginAttempts ?? 0) >= 5 || (u.lockedUntil ? new Date(u.lockedUntil) > now : false),
+      })),
+      total,
+    };
+  }
+
+  async updateUser(id: string, data: { username?: string; email?: string; role?: string; isActive?: boolean; isLocked?: boolean; companyId?: string }): Promise<any> {
+    const updateData: any = {
+      ...(data.username !== undefined ? { username: data.username } : {}),
+      ...(data.email !== undefined ? { email: data.email } : {}),
+      ...(data.role !== undefined ? { role: data.role } : {}),
+      ...(data.isActive !== undefined ? { isActive: data.isActive } : {}),
+      ...(data.companyId !== undefined ? { companyId: data.companyId } : {}),
+    };
+    if (data.isLocked !== undefined) {
+      updateData.failedLoginAttempts = data.isLocked ? 5 : 0;
+      updateData.lockedUntil = data.isLocked ? new Date(Date.now() + 15 * 60 * 1000) : null;
+    }
+    const user = await this.prisma.user.update({
+      where: { id },
+      data: updateData,
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
+        companyId: true,
+        isActive: true,
+        lastLoginAt: true,
+        failedLoginAttempts: true,
+        lockedUntil: true,
+        createdAt: true,
+        userRoles: { include: { role: true } },
+      },
+    });
+    const isLocked = (user.failedLoginAttempts ?? 0) >= 5 || (user.lockedUntil ? new Date(user.lockedUntil) > new Date() : false);
+    return { ...user, isLocked };
+  }
+
+  async deleteUser(id: string): Promise<{ success: boolean }> {
+    await this.prisma.user.delete({ where: { id } });
+    return { success: true };
+  }
+
+  async resetUserPassword(id: string, newPassword: string): Promise<{ success: boolean }> {
+    const hashed = await bcrypt.hash(newPassword, BCryptSaltRounds);
+    await this.prisma.user.update({
+      where: { id },
+      data: { password: hashed },
+    });
+    await this.tokenBlacklistService.blacklistAllUserTokens(id);
+    return { success: true };
+  }
+
+  async assignUserRoles(userId: string, roleIds: string[]): Promise<{ success: boolean }> {
+    await this.prisma.userRole.deleteMany({ where: { userId } });
+    if (roleIds.length > 0) {
+      await this.prisma.userRole.createMany({
+        data: roleIds.map(roleId => ({ userId, roleId })),
+        skipDuplicates: true,
+      });
+    }
+    return { success: true };
+  }
+
+  async getUserRoles(userId: string): Promise<any[]> {
+    const userRoles = await this.prisma.userRole.findMany({
+      where: { userId },
+      include: { role: true },
+    });
+    return userRoles.map(ur => ({
+      id: ur.role.id,
+      name: ur.role.name,
+      description: ur.role.description,
+      isSystem: ur.role.isSystem,
+      apiAccess: ur.role.apiAccess,
+    }));
+  }
+
+  /**
+   * GET /auth/me — returns the full profile for the currently-authenticated
+   * user, resolving the latest role and companyId from the database so the
+   * frontend always receives up-to-date values even after an admin role change.
+   *
+   * Shape mirrors the AuthUser interface expected by AuthContext.tsx.
+   */
+  async getMe(userId: string): Promise<{
+    id: string;
+    username: string;
+    email: string;
+    role: string;
+    companyId: string | null;
+    isActive: boolean;
+    lastLoginAt?: string | null;
+  }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
+        companyId: true,
+        isActive: true,
+        lastLoginAt: true,
+      },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    // Resolve companyId: user's own FK first, then employee record fallback.
+    let resolvedCompanyId = user.companyId ?? null;
+    if (!resolvedCompanyId) {
+      const emp = await this.prisma.employee.findFirst({
+        where: { userId },
+        select: { companyId: true },
+      });
+      resolvedCompanyId = emp?.companyId ?? null;
+    }
+
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email ?? '',
+      role: user.role as string,
+      companyId: resolvedCompanyId,
+      isActive: user.isActive,
+      lastLoginAt: user.lastLoginAt?.toISOString() ?? null,
+    };
   }
 }

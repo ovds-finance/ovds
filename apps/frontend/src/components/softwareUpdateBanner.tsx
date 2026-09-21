@@ -1,5 +1,3 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Download,
   X,
@@ -15,9 +13,12 @@ import {
   ShieldCheck,
   ArrowRight,
 } from 'lucide-react';
-import { releaseApi, CompanyRelease, UpdateSettings } from '../services/releaseApi';
+import React, { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { AlertBox } from '@ovds/ui';
+import { Link } from 'react-router-dom';
+
+import { releaseApi, CompanyRelease, UpdateSettings } from '../services/releaseApi';
+
 
 interface SoftwareUpdateBannerProps {
   onNavigate?: (path: string) => void;
@@ -38,7 +39,7 @@ const CopyCommandBtn: React.FC<{ text: string }> = ({ text }) => {
     <button
       onClick={handleCopy}
       title="Copy to clipboard"
-      className="shrink-0 w-6 h-6 rounded flex items-center justify-center bg-slate-100 hover:bg-emerald-100 dark:bg-slate-700 dark:hover:bg-emerald-900/40 text-slate-500 hover:text-emerald-600 transition-all"
+      className="shrink-0 w-6 h-6 rounded flex items-center justify-center bg-slate-100 hover:bg-[var(--pro-azure-100)] dark:bg-slate-700 dark:hover:bg-green-900/40 text-slate-500 hover:text-[var(--pro-azure)] transition-all"
     >
       {copied ? <Check size={10} /> : <Copy size={10} />}
     </button>
@@ -50,7 +51,7 @@ const SoftwareUpdateBanner: React.FC<SoftwareUpdateBannerProps> = ({
   compact = false,
 }) => {
   const [available, setAvailable] = useState<CompanyRelease[]>([]);
-  const [settings, setSettings] = useState<UpdateSettings | null>(null);
+  const [_settings, setSettings] = useState<UpdateSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [dismissed, setDismissed] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -91,7 +92,7 @@ const SoftwareUpdateBanner: React.FC<SoftwareUpdateBannerProps> = ({
       icon: <Monitor size={12} />,
       title: 'One-Click Update',
       desc: 'Click "Install" next to any update below.',
-      color: 'text-emerald-600',
+      color: 'text-[var(--pro-azure)]',
     },
     {
       icon: <Terminal size={12} />,
@@ -179,7 +180,7 @@ const SoftwareUpdateBanner: React.FC<SoftwareUpdateBannerProps> = ({
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{step.desc}</p>
                 {step.cmd && (
                   <div className="mt-1 flex items-center gap-1.5">
-                    <code className="flex-1 px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-mono text-emerald-700 dark:text-emerald-400">
+                    <code className="flex-1 px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-mono text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
                       {step.cmd}
                     </code>
                     <CopyCommandBtn text={step.cmd} />

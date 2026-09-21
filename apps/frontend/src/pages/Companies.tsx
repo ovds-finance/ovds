@@ -2,23 +2,24 @@
  * Companies — ovds-style multi-company management
  * AppPage · AppKpi · AppTable · useApiCrud
  */
-import React, { useState, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Briefcase, Plus, Edit2, Trash2, RefreshCw,
   Building2, Settings,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
+import { useNavigate } from 'react-router-dom';
+
 import {
   AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select,
   SearchBar, EmptyState, Pagination, IFRSBadge,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
 
 interface Company {
   id: string;
@@ -89,7 +90,7 @@ const Companies: React.FC = () => {
   }, [rows, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total',       value: rows.length,                                                    color: 'emerald' as const },
+    { label: 'Total',       value: rows.length,                                                    color: 'green' as const },
     { label: 'Production',  value: rows.filter(c => c.environment === 'PRODUCTION' || !c.environment).length, color: 'sky' as const },
     { label: 'With TIN',    value: rows.filter(c => c.tin).length,                                color: 'violet' as const },
     { label: 'Auto-Update', value: rows.filter(c => c.autoUpdate).length,                         color: 'amber' as const },
@@ -150,14 +151,14 @@ const Companies: React.FC = () => {
             <AppTr key={c.id}>
               <AppTd>
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center text-[11px] font-bold text-emerald-700 shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--pro-azure-100)] to-[var(--pro-azure-100)] flex items-center justify-center text-[11px] font-bold text-[var(--pro-azure-dark)] shrink-0">
                     {c.name.slice(0, 2).toUpperCase()}
                   </div>
                   <div>
-                    <button onClick={() => setSelectedCompanyId(c.id)} className={`text-[12px] font-semibold hover:text-emerald-600 transition-colors text-left ${c.id === selectedCompanyId ? 'text-emerald-700' : 'text-slate-800'}`}>
+                    <button onClick={() => setSelectedCompanyId(c.id)} className={`text-[12px] font-semibold hover:text-[var(--pro-azure)] transition-colors text-left ${c.id === selectedCompanyId ? 'text-[var(--pro-azure-dark)]' : 'text-slate-800'}`}>
                       {c.name}
                     </button>
-                    {c.id === selectedCompanyId && <span className="text-[9px] text-emerald-600 font-bold block">● Active</span>}
+                    {c.id === selectedCompanyId && <span className="text-[9px] text-[var(--pro-azure)] font-bold block">● Active</span>}
                   </div>
                 </div>
               </AppTd>
@@ -171,7 +172,7 @@ const Companies: React.FC = () => {
                   <button onClick={() => navigate('/settings')} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-sky-50 hover:text-sky-600 transition-all" title="Settings"><Settings size={11} /></button>
                   {can('companies:write') && (
                     <>
-                      <button onClick={() => setModal({ open: true, data: { ...c } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Edit"><Edit2 size={11} /></button>
+                      <button onClick={() => setModal({ open: true, data: { ...c } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Edit"><Edit2 size={11} /></button>
                       <button onClick={() => handleDelete(c)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Delete"><Trash2 size={11} /></button>
                     </>
                   )}

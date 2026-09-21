@@ -10,9 +10,10 @@
  *
  * Links directly to the relevant setup pages.
  */
+import { CheckCircle, XCircle, AlertTriangle, Settings } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle, XCircle, AlertTriangle, Settings } from 'lucide-react';
+
 import api from '../../services/api';
 
 interface HealthCheck {
@@ -111,7 +112,7 @@ const AccountingSetupHealthWidget: React.FC<Props> = ({ companyId }) => {
         <div className="ml-auto flex items-center gap-2">
           <div className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${
             allOk
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800'
+              ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/20 dark:text-[var(--pro-azure-light)] dark:border-green-800'
               : score >= 60
               ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800'
               : 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-800'
@@ -124,7 +125,7 @@ const AccountingSetupHealthWidget: React.FC<Props> = ({ companyId }) => {
       {/* Progress bar */}
       <div className="h-1 bg-slate-100 dark:bg-slate-800">
         <div
-          className={`h-full transition-all duration-700 ${allOk ? 'bg-emerald-500' : score >= 60 ? 'bg-amber-400' : 'bg-rose-500'}`}
+          className={`h-full transition-all duration-700 ${allOk ? 'bg-[var(--pro-azure-50)]0' : score >= 60 ? 'bg-amber-400' : 'bg-rose-500'}`}
           style={{ width: `${score}%` }}
         />
       </div>
@@ -147,7 +148,7 @@ const AccountingSetupHealthWidget: React.FC<Props> = ({ companyId }) => {
                 {/* Status icon */}
                 <div className="mt-0.5 shrink-0">
                   {c.ok
-                    ? <CheckCircle size={14} className="text-emerald-500" />
+                    ? <CheckCircle size={14} className="text-[var(--pro-azure)]" />
                     : c.warning
                     ? <AlertTriangle size={14} className="text-amber-500" />
                     : <XCircle size={14} className="text-rose-500" />}
@@ -185,7 +186,7 @@ const AccountingSetupHealthWidget: React.FC<Props> = ({ companyId }) => {
         <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
           <p className="text-[10px] text-slate-500 dark:text-slate-400">
             Complete all setup steps for accurate financial statements and automated GL postings.{' '}
-            <Link to="/accounting/opening-balances" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
+            <Link to="/accounting/opening-balances" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold hover:underline">
               Fix now →
             </Link>
           </p>

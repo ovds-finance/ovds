@@ -4,23 +4,24 @@
  * Ethiopian PIT brackets · Pension 7%/11% · DRRF 1%
  * ERCA Proclamation No. 1395/2025
  */
-import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Banknote, Play, CheckCircle2, Download, RefreshCw,
   ChevronLeft, ChevronRight,
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import api from '../services/api';
-import { fmtETB, ETH_TAX } from '../utils/ethiopianTax';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, SearchBar, EmptyState, Pagination,
   Amount, IFRSBadge, Banner,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { fmtETB, ETH_TAX } from '../utils/ethiopianTax';
 
 interface PayrollRecord {
   id: string;
@@ -97,9 +98,9 @@ const Payroll: React.FC = () => {
   }), [rows]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Employees',    value: rows.length,                  color: 'emerald' as const },
+    { label: 'Employees',    value: rows.length,                  color: 'green' as const },
     { label: 'Gross Payroll',value: fmtETB(totals.gross),         color: 'sky' as const },
-    { label: 'Net Payroll',  value: fmtETB(totals.net),           color: 'emerald' as const },
+    { label: 'Net Payroll',  value: fmtETB(totals.net),           color: 'green' as const },
     { label: 'Income Tax',   value: fmtETB(totals.incomeTax),     color: 'rose' as const },
     { label: 'Pension (Emp)',value: fmtETB(totals.pensionEmployee),color: 'violet' as const },
     { label: 'DRRF (1%)',    value: fmtETB(totals.drrf),          color: 'amber' as const },
@@ -173,14 +174,14 @@ const Payroll: React.FC = () => {
     >
       {/* Month navigator */}
       <div className="flex items-center gap-3 mb-4 p-3 ovds-widget-card">
-        <button onClick={prevMonth} className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:border-emerald-500/40 hover:text-emerald-600 transition-all">
+        <button onClick={prevMonth} className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:border-[var(--pro-azure)]/40 hover:text-[var(--pro-azure)] transition-all">
           <ChevronLeft size={13} />
         </button>
         <div className="flex-1 text-center">
           <p className="ovds-card-title">{MONTHS[month - 1]} {year}</p>
           <p className="ovds-caption">Ethiopian Fiscal Year</p>
         </div>
-        <button onClick={nextMonth} className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:border-emerald-500/40 hover:text-emerald-600 transition-all">
+        <button onClick={nextMonth} className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:border-[var(--pro-azure)]/40 hover:text-[var(--pro-azure)] transition-all">
           <ChevronRight size={13} />
         </button>
       </div>
@@ -231,7 +232,7 @@ const Payroll: React.FC = () => {
             <AppTr key={r.id}>
               <AppTd>
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-[10px] font-bold shrink-0">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[var(--pro-azure)] to-teal-500 flex items-center justify-center text-white text-[10px] font-bold shrink-0">
                     {String(r.employeeName ?? r.employeeId ?? '?').charAt(0).toUpperCase()}
                   </div>
                   <span className="text-[12px] font-semibold text-slate-800">{r.employeeName ?? r.employeeId}</span>
@@ -247,7 +248,7 @@ const Payroll: React.FC = () => {
               <AppTd align="right">
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {r.status === 'DRAFT' && can('payroll:admin') && (
-                    <button onClick={() => approvePayroll.mutate(r.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Approve">
+                    <button onClick={() => approvePayroll.mutate(r.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Approve">
                       <CheckCircle2 size={11} />
                     </button>
                   )}

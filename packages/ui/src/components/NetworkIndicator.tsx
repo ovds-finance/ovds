@@ -37,7 +37,7 @@ export const NetworkIndicator: React.FC<NetworkIndicatorProps> = ({ className, s
         </>
       ) : (
         <>
-          <Wifi size={iconSize} className="text-emerald-500 dark:text-emerald-400" />
+          <Wifi size={iconSize} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           {showLabel && <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">Online</span>}
         </>
       )}

@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
 import { X } from 'lucide-react';
-import { useAuth } from '../../rbac/AuthContext';
+import React, { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
 import { useEscapeKey } from '../../hooks';
+import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
 import CustomFieldRenderer, { type CustomFieldValuesMap } from '../CustomFieldRenderer';
 
 interface VendorModalProps {

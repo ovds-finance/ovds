@@ -3,18 +3,19 @@
  * AppPage · AppKpi · AppTable · useApiCrud
  * Ethiopian WHT · cheque printing · payment scheduling
  */
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import { fmtCurrency, fmtDate } from '../utils/fmt';
-import api from '../services/api';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Textarea, Select,
   SearchBar, Amount, Pagination, EmptyState,
 } from '../components/ui';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { confirm } from '../utils/confirm';
+import { fmtCurrency, fmtDate } from '../utils/fmt';
 
 // -- Types ---------------------------------------------------------------------
 interface PaymentBatchItem {
@@ -54,7 +55,7 @@ type FilterTab = 'ALL' | 'DRAFT' | 'APPROVED' | 'SUBMITTED' | 'COMPLETED' | 'PAR
 type ProposalTab = 'ALL' | 'PRIORITY' | 'STANDARD';
 
 const BATCH_STATUS_TABS: FilterTab[] = ['ALL', 'DRAFT', 'APPROVED', 'SUBMITTED', 'COMPLETED', 'PARTIAL', 'CANCELLED'];
-const PROPOSAL_TABS: ProposalTab[] = ['ALL', 'PRIORITY', 'STANDARD'];
+const _PROPOSAL_TABS: ProposalTab[] = ['ALL', 'PRIORITY', 'STANDARD'];
 const PAYMENT_METHODS = ['BANK_TRANSFER', 'CHEQUE', 'CASH', 'MOBILE_MONEY'];
 const PRIORITY_OPTIONS = [
   { value: 'DUE_DATE', label: 'Due Date' },
@@ -86,7 +87,7 @@ const ProposalModal: React.FC<ProposalModalProps> = ({ open, onClose, onCreateBa
   });
   const [batchName, setBatchName] = useState(`Payment Run - ${new Date().toLocaleDateString()}`);
   const [paymentMethod, setPaymentMethod] = useState('BANK_TRANSFER');
-  const [bankAccountId, setBankAccountId] = useState('');
+  const [bankAccountId, _setBankAccountId] = useState('');
   const [notes, setNotes] = useState('');
 
   const buildProposal = async () => {
@@ -207,7 +208,7 @@ const ProposalModal: React.FC<ProposalModalProps> = ({ open, onClose, onCreateBa
               </div>
               <div className="bg-slate-50 rounded-lg p-3">
                 <div className="text-[10px] font-bold uppercase text-slate-500">Net Payable</div>
-                <div className="text-xl font-bold text-emerald-600">{fmtCurrency(proposal?.totalNetPayable ?? 0)}</div>
+                <div className="text-xl font-bold text-[var(--pro-azure)]">{fmtCurrency(proposal?.totalNetPayable ?? 0)}</div>
               </div>
             </div>
             <div className="border rounded-lg overflow-hidden">
@@ -264,7 +265,7 @@ const SupplierPaymentRun: React.FC = () => {
   const [showProposalModal, setShowProposal] = useState(false);
   const [search, setSearch] = useState('');
 
-  const { rows: batches, refetch, loading: isLoading } = useApiCrud<PaymentBatch>({
+  const { rows: batches, refetch, loading: _isLoading } = useApiCrud<PaymentBatch>({
     endpoint: '/treasury/supplier-payment-run/batches',
     autoFetch: true,
   });
@@ -359,17 +360,17 @@ const SupplierPaymentRun: React.FC = () => {
             <div className="text-[10px] font-bold uppercase text-amber-700">Draft</div>
             <div className="text-2xl font-bold text-amber-700">{kpis.draft}</div>
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <div className="text-[10px] font-bold uppercase text-blue-700">Approved</div>
-            <div className="text-2xl font-bold text-blue-700">{kpis.approved}</div>
+          <div className="bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-lg p-3">
+            <div className="text-[10px] font-bold uppercase text-[var(--pro-azure-dark)]">Approved</div>
+            <div className="text-2xl font-bold text-[var(--pro-azure-dark)]">{kpis.approved}</div>
           </div>
           <div className="bg-violet-50 border border-violet-200 rounded-lg p-3">
             <div className="text-[10px] font-bold uppercase text-violet-700">Submitted</div>
             <div className="text-2xl font-bold text-violet-700">{kpis.submitted}</div>
           </div>
-          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-            <div className="text-[10px] font-bold uppercase text-emerald-700">Completed</div>
-            <div className="text-2xl font-bold text-emerald-700">{kpis.completed}</div>
+          <div className="bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-lg p-3">
+            <div className="text-[10px] font-bold uppercase text-[var(--pro-azure-dark)]">Completed</div>
+            <div className="text-2xl font-bold text-[var(--pro-azure-dark)]">{kpis.completed}</div>
           </div>
           <div className="bg-slate-50 border rounded-lg p-3">
             <div className="text-[10px] font-bold uppercase text-slate-500">Total Value</div>
@@ -393,7 +394,7 @@ const SupplierPaymentRun: React.FC = () => {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
-                  activeTab === tab ? 'border-emerald-600 text-emerald-700' : 'border-transparent text-slate-500 hover:text-slate-700'
+                  activeTab === tab ? 'border-[var(--pro-azure)] text-[var(--pro-azure-dark)]' : 'border-transparent text-slate-500 hover:text-slate-700'
                 }`}
               >
                 {tab}

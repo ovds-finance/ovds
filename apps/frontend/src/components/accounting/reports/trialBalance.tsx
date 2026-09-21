@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import api from '../../../services/api';
-import toast from 'react-hot-toast';
+import { Button } from '@ovds/ui';
+import { Badge } from '@ovds/ui';
+import { format } from 'date-fns';
 import {
   Download,
   Printer,
@@ -10,9 +10,10 @@ import {
   TrendingUp,
   Search as SearchIcon,
 } from 'lucide-react';
-import { format } from 'date-fns';
-import { Button } from '@ovds/ui';
-import { Badge } from '@ovds/ui';
+import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+
+import api from '../../../services/api';
 import { fmtCurrencyDecimal } from '../../../utils/fmt';
 
 interface TrialBalanceItem {
@@ -140,7 +141,7 @@ const TrialBalanceReport: React.FC = () => {
           <div className="p-8 lg:p-12 print:p-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 print:grid-cols-1">
               <div>
-                <h1 className="text-4xl lg:text-5xl font-semibold bg-gradient-to-r from-emerald-700 to-emerald-900 dark:from-slate-100 dark:to-emerald-400 bg-clip-text text-transparent mb-4">
+                <h1 className="text-4xl lg:text-5xl font-semibold bg-gradient-to-r from-[var(--pro-azure-dark)] to-[var(--pro-azure-dark)] dark:from-slate-100 dark:to-[var(--pro-azure-light)] bg-clip-text text-transparent mb-4">
                   Trial Balance
                 </h1>
                 <p className="text-2xl font-bold text-slate-700">
@@ -149,7 +150,7 @@ const TrialBalanceReport: React.FC = () => {
                 <div className="mt-2 flex items-center gap-4 text-sm text-slate-500 bg-white px-4 py-2 rounded-xl">
                   <span>{data.companyName}</span>
                   <span>{data.currency}</span>
-                  <Badge variant={isBalanced ? 'emerald' : 'rose'} className="!px-3 !py-1 !text-sm font-bold">
+                  <Badge variant={isBalanced ? 'indigo' : 'rose'} className="!px-3 !py-1 !text-sm font-bold">
                     {isBalanced ? '✅ Balanced' : `⚠️ Unbalanced by ${fmt(data.unbalancedAmount)}`}
                   </Badge>
                 </div>
@@ -250,7 +251,7 @@ const TrialBalanceReport: React.FC = () => {
                       <div className="text-xs text-slate-500 mt-0.5 font-mono">{item.category.replace(/_/g, ' ')}</div>
                     </td>
                     
-                    <td className="px-12 py-4 text-right text-sm font-mono text-emerald-700 font-semibold">
+                    <td className="px-12 py-4 text-right text-sm font-mono text-[var(--pro-azure-dark)] font-semibold">
                       {fmt(item.debit)}
                     </td>
                     
@@ -261,7 +262,7 @@ const TrialBalanceReport: React.FC = () => {
                     <td className="px-16 py-4">
                       <div className="flex items-center justify-end gap-2">
                         <Badge 
-                          variant={item.balanceType === 'debit' ? 'emerald' : 'sky'} 
+                          variant={item.balanceType === 'debit' ? 'indigo' : 'sky'} 
                           className="font-mono !px-3 !py-1.5 !text-sm"
                         >
                           {item.balanceType.toUpperCase()}
@@ -286,12 +287,12 @@ const TrialBalanceReport: React.FC = () => {
               </tbody>
               
               {/* Totals */}
-              <tfoot className="bg-gradient-to-r from-emerald-50/70 to-sky-50/70 border-t-2 border-slate-200 print:bg-white">
+              <tfoot className="bg-gradient-to-r from-[var(--pro-azure-50)]/70 to-sky-50/70 border-t-2 border-slate-200 print:bg-white">
                 <tr className="font-semibold text-lg">
-                  <th className="px-6 py-6 text-right text-emerald-700 bg-transparent" colSpan={2}>
+                  <th className="px-6 py-6 text-right text-[var(--pro-azure-dark)] bg-transparent" colSpan={2}>
                     Total Debits
                   </th>
-                  <td className="px-12 py-6 text-right text-2xl bg-emerald-100 border-l-4 border-emerald-400">
+                  <td className="px-12 py-6 text-right text-2xl bg-[var(--pro-azure-100)] border-l-4 border-[var(--pro-azure)]">
                     {fmt(data.totalDebits)}
                   </td>
                   <td className="px-12 py-6 text-right bg-transparent"></td>
@@ -307,13 +308,13 @@ const TrialBalanceReport: React.FC = () => {
                   </td>
                   <td className="px-16 py-4 bg-transparent"></td>
                 </tr>
-                <tr className={isBalanced ? 'bg-emerald-50 border-t-4 border-emerald-400' : 'bg-rose-50 border-t-4 border-rose-400'}>
-                  <th className={`px-6 py-8 text-right font-semibold text-2xl ${isBalanced ? 'text-emerald-900' : 'text-rose-900'}`} colSpan={2}>
+                <tr className={isBalanced ? 'bg-[var(--pro-azure-50)] border-t-4 border-[var(--pro-azure)]' : 'bg-rose-50 border-t-4 border-rose-400'}>
+                  <th className={`px-6 py-8 text-right font-semibold text-2xl ${isBalanced ? 'text-[var(--pro-azure-dark)]' : 'text-rose-900'}`} colSpan={2}>
                     {isBalanced ? 'Grand Total (Balanced)' : `Difference`}
                   </th>
                   <td className="px-12 py-8 bg-transparent"></td>
                   <td className="px-12 py-8 bg-transparent"></td>
-                  <td className={`px-16 py-8 text-right text-3xl font-semibold ${isBalanced ? 'text-emerald-900' : 'text-rose-900'} font-mono min-w-[140px]`}>
+                  <td className={`px-16 py-8 text-right text-3xl font-semibold ${isBalanced ? 'text-[var(--pro-azure-dark)]' : 'text-rose-900'} font-mono min-w-[140px]`}>
                     {fmt(Math.abs(data.unbalancedAmount))}
                   </td>
                 </tr>
@@ -325,14 +326,14 @@ const TrialBalanceReport: React.FC = () => {
         {/* Summary Stats */}
         {!loading && filteredItems.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 print:hidden">
-            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-8 rounded-2xl border border-emerald-200 shadow-xl group hover:shadow-2xl">
+            <div className="bg-gradient-to-br from-[var(--pro-azure-50)] to-[var(--pro-azure-100)] p-8 rounded-2xl border border-[var(--pro-azure-100)] shadow-xl group hover:shadow-2xl">
               <div className="flex items-start gap-4 mb-4">
-                <div className="p-3 bg-emerald-500/10 rounded-2xl border-2 border-emerald-500/20">
-                  <FileText size={24} className="text-emerald-600" />
+                <div className="p-3 bg-[var(--pro-azure-50)]0/10 rounded-2xl border-2 border-[var(--pro-azure)]/20">
+                  <FileText size={24} className="text-[var(--pro-azure)]" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-xl text-emerald-900 mb-1">Active Accounts</h3>
-                  <div className="text-3xl font-semibold text-emerald-700">{filteredItems.length}</div>
+                  <h3 className="font-semibold text-xl text-[var(--pro-azure-dark)] mb-1">Active Accounts</h3>
+                  <div className="text-3xl font-semibold text-[var(--pro-azure-dark)]">{filteredItems.length}</div>
                 </div>
               </div>
             </div>
@@ -356,7 +357,7 @@ const TrialBalanceReport: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-xl text-slate-900 mb-1">Unbalanced</h3>
-                  <div className={`text-3xl font-semibold ${isBalanced ? 'text-emerald-700' : 'text-rose-700'}`}>
+                  <div className={`text-3xl font-semibold ${isBalanced ? 'text-[var(--pro-azure-dark)]' : 'text-rose-700'}`}>
                     {isBalanced ? '✅ 0.00' : fmt(data.unbalancedAmount)}
                   </div>
                 </div>

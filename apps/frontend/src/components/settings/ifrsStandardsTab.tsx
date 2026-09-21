@@ -14,11 +14,11 @@
  *   onSave: () => void                — triggers the parent save
  *   isSaving: boolean
  */
-import React, { useState } from 'react';
 import {
   Globe, CheckCircle2, AlertTriangle,
   Info, Save, ChevronDown, ChevronUp, ExternalLink,
 } from 'lucide-react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 
 // -- IFRS tier definitions (AABE — Proclamation 847/2014) ---------------------
@@ -34,7 +34,7 @@ const IFRS_TIERS = [
   {
     id: 'sme',
     label: 'Tier 2 — IFRS for SMEs',
-    badge: 'bg-emerald-100 text-emerald-600 dark:text-emerald-400 border-emerald-200',
+    badge: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border-[var(--pro-azure-100)]',
     description: 'Mandatory for entities meeting 2 of 4 criteria: turnover > ETB 20M, employees > 20, assets > ETB 20M, liabilities > ETB 20M.',
     standards: ['Section 2', 'Section 3', 'Section 4', 'Section 5', 'Section 6', 'Section 7', 'Section 11', 'Section 12', 'Section 13', 'Section 17', 'Section 19', 'Section 20', 'Section 21', 'Section 23', 'Section 25', 'Section 27', 'Section 28', 'Section 30'],
     since: '7 July 2024',
@@ -111,9 +111,9 @@ const IFRSStandardsTab: React.FC<IFRSStandardsTabProps> = ({
   return (
     <div className="space-y-8">
       {/* AABE header */}
-      <div className="flex items-start gap-4 p-5 bg-emerald-50 dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-800 rounded-xl text-white">
-        <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-xl flex items-center justify-center shrink-0">
-          <Globe size={18} className="text-emerald-600 dark:text-emerald-400" />
+      <div className="flex items-start gap-4 p-5 bg-[var(--pro-azure-50)] dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-800 rounded-xl text-white">
+        <div className="w-10 h-10 bg-[var(--pro-azure-100)] dark:bg-green-900/30 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl flex items-center justify-center shrink-0">
+          <Globe size={18} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
         </div>
         <div className="flex-1">
           <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-slate-500 dark:text-white/40 mb-0.5">AABE — Accounting and Auditing Board of Ethiopia</p>
@@ -143,7 +143,7 @@ const IFRSStandardsTab: React.FC<IFRSStandardsTabProps> = ({
               disabled={!canWrite}
               className={`text-left p-4 rounded-2xl border-2 transition-all ${
                 currentTier === tier.id
-                  ? 'border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/10 dark:bg-emerald-50 dark:bg-emerald-950/20'
+                  ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 dark:bg-[var(--pro-azure-50)] dark:bg-green-950/20'
                   : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-900'
               } disabled:opacity-60 disabled:cursor-not-allowed`}
             >
@@ -152,7 +152,7 @@ const IFRSStandardsTab: React.FC<IFRSStandardsTabProps> = ({
                   {tier.id === 'full' ? 'Full IFRS' : tier.id === 'sme' ? 'IFRS for SMEs' : 'Micro-entity'}
                 </span>
                 {currentTier === tier.id && (
-                  <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400" />
+                  <CheckCircle2 size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                 )}
               </div>
               <p className="text-xs font-semibold text-slate-800 dark:text-slate-100">{tier.label}</p>
@@ -205,7 +205,7 @@ const IFRSStandardsTab: React.FC<IFRSStandardsTabProps> = ({
                   key={std}
                   className={`rounded-2xl border transition-all ${
                     isEnabled
-                      ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/10 dark:bg-emerald-50 dark:bg-emerald-950/20'
+                      ? 'border-[var(--pro-azure-100)] dark:border-green-800 bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 dark:bg-[var(--pro-azure-50)] dark:bg-green-950/20'
                       : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900'
                   }`}
                 >
@@ -215,8 +215,8 @@ const IFRSStandardsTab: React.FC<IFRSStandardsTabProps> = ({
                       disabled={!canWrite}
                       className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all disabled:opacity-60 ${
                         isEnabled
-                          ? 'bg-emerald-500 border-emerald-500'
-                          : 'border-slate-300 dark:border-slate-600 hover:border-emerald-600'
+                          ? 'bg-[var(--pro-azure-50)]0 border-[var(--pro-azure)]'
+                          : 'border-slate-300 dark:border-slate-600 hover:border-[var(--pro-azure)]'
                       }`}
                       aria-label={`${isEnabled ? 'Disable' : 'Enable'} ${std}`}
                     >
@@ -232,7 +232,7 @@ const IFRSStandardsTab: React.FC<IFRSStandardsTabProps> = ({
                       {detail && isExpanded && (
                         <div className="mt-2 space-y-1">
                           <p className="text-[10px] text-slate-500 dark:text-slate-400">{detail.summary}</p>
-                          <p className="text-[10px] text-emerald-600 dark:text-emerald-400 dark:text-emerald-600 dark:text-emerald-400 font-bold">
+                          <p className="text-[10px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] dark:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold">
                             Impact: {detail.impact}
                           </p>
                         </div>
@@ -273,8 +273,8 @@ const IFRSStandardsTab: React.FC<IFRSStandardsTabProps> = ({
       </div>
 
       {/* Compliance note */}
-      <div className="flex items-start gap-3 p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900 rounded-2xl">
-        <Info size={15} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+      <div className="flex items-start gap-3 p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900 rounded-2xl">
+        <Info size={15} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5" />
         <p className="text-[10px] text-slate-600 dark:text-slate-300 leading-relaxed">
           <strong>Note:</strong> IFRS tier and enabled standards affect financial report generation, disclosure checklists,
           and the IFRS Compliance Matrix. Changing the tier does not retroactively alter posted journal entries.
@@ -286,7 +286,7 @@ const IFRSStandardsTab: React.FC<IFRSStandardsTabProps> = ({
       <button
         onClick={onSave}
         disabled={isSaving || !canWrite}
-        className="flex items-center gap-2 px-6 py-3 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 disabled:opacity-50 transition-all shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30"
+        className="flex items-center gap-2 px-6 py-3 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 transition-all shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30"
       >
         <Save size={16} />
         {isSaving ? 'Saving…' : 'Save IFRS Configuration'}

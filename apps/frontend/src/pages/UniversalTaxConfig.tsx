@@ -12,7 +12,11 @@
  *   Tab 6 — Sector Overrides  : exemptions per Ethiopian sector
  *   Tab 7 — RBAC Matrix       : who can do what with tax operations
  */
+import { updateCompanyTaxProfile } from '@ovds/features/tax';
 import React, { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
+import { AppPage, Btn, Icon } from '../components/ui';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useAuth } from '../rbac/AuthContext';
 import { rbac } from '../rbac/rbac';
@@ -22,9 +26,7 @@ import {
   useComplianceHealth,
   useFilingDeadlines,
 } from '../services/taxApi';
-import { updateCompanyTaxProfile } from '@ovds/features/tax';
-import { AppPage, Btn, Icon } from '../components/ui';
-import toast from 'react-hot-toast';
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -53,7 +55,7 @@ const IAS12_BADGE: Record<string, { label: string; cls: string }> = {
 };
 
 const IFRS18_BADGE: Record<string, { label: string; cls: string }> = {
-  OPERATING:   { label: 'Operating',   cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' },
+  OPERATING:   { label: 'Operating',   cls: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/40 dark:text-green-300' },
   INCOME_TAX:  { label: 'Income Tax',  cls: 'bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300' },
   FINANCING:   { label: 'Financing',   cls: 'bg-sky-100 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300' },
   INVESTING:   { label: 'Investing',   cls: 'bg-teal-100 text-teal-700 dark:bg-teal-950/40 dark:text-teal-300' },
@@ -66,11 +68,11 @@ const SEVERITY_CLS: Record<string, string> = {
 };
 
 const STATUS_CLS: Record<string, string> = {
-  COMPLIANT:       'text-emerald-600 dark:text-emerald-400',
+  COMPLIANT:       'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
   PENDING:         'text-amber-600 dark:text-amber-400',
   NOT_FILED:       'text-rose-600 dark:text-rose-400',
   OVERDUE:         'text-rose-600 dark:text-rose-400 font-semibold',
-  CURRENT:         'text-emerald-600 dark:text-emerald-400',
+  CURRENT:         'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
   NOT_APPLICABLE:  'text-slate-400 dark:text-slate-500',
   UNREMITTED:      'text-orange-600 dark:text-orange-400',
 };
@@ -237,7 +239,7 @@ function TaxRulesTab({ rules, loading }: { rules: any; loading: boolean }) {
         placeholder="Search tax code, name, or proclamation…"
         value={search}
         onChange={e => setSearch(e.target.value)}
-        className="w-full max-w-sm px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        className="w-full max-w-sm px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]"
       />
 
       {/* Summary KPI strip */}
@@ -276,7 +278,7 @@ function TaxRulesTab({ rules, loading }: { rules: any; loading: boolean }) {
                   : '—';
               return (
                 <tr key={code} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                  <td className="px-3 py-2.5 font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400 whitespace-nowrap">{code}</td>
+                  <td className="px-3 py-2.5 font-mono text-xs font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] whitespace-nowrap">{code}</td>
                   <td className="px-3 py-2.5 text-slate-700 dark:text-slate-200 min-w-[180px]">
                     <div className="font-medium">{rule.name}</div>
                     <div className="text-xs text-slate-400 dark:text-slate-500">{rule.notes?.slice(0, 70)}{rule.notes?.length > 70 ? '…' : ''}</div>
@@ -285,7 +287,7 @@ function TaxRulesTab({ rules, loading }: { rules: any; loading: boolean }) {
                   <td className="px-3 py-2.5 text-slate-600 dark:text-slate-300 whitespace-nowrap text-xs">{threshDisplay}</td>
                   <td className="px-3 py-2.5 whitespace-nowrap">
                     <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${
-                      rule.direction === 'OUTPUT' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' :
+                      rule.direction === 'OUTPUT' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/40 dark:text-green-300' :
                       rule.direction === 'INPUT'  ? 'bg-sky-100 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300' :
                       'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
                     }`}>{rule.direction}</span>
@@ -324,7 +326,7 @@ function ProfileTab({
   const [form, setForm] = useState<Record<string, unknown>>({});
   const [dirty, setDirty] = useState(false);
 
-  const set = (key: string, val: unknown) => {
+  const _set = (key: string, val: unknown) => {
     setForm(f => ({ ...f, [key]: val }));
     setDirty(true);
   };
@@ -341,7 +343,7 @@ function ProfileTab({
   const p = { ...profile, ...form };
 
   const bandColor = (band: string) =>
-    band === 'A' ? 'text-emerald-600 dark:text-emerald-400' :
+    band === 'A' ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' :
     band === 'B' ? 'text-amber-600 dark:text-amber-400' :
                   'text-slate-500 dark:text-slate-400';
 
@@ -404,10 +406,10 @@ function ProfileTab({
                 <div key={key}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm border transition-colors ${
                     active
-                      ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/30 dark:border-emerald-800 dark:text-emerald-300'
+                      ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:border-green-800 dark:text-green-300'
                       : 'bg-white border-slate-200 text-slate-400 dark:bg-slate-800/60 dark:border-slate-700 dark:text-slate-500'
                   }`}>
-                  <span className={`w-2 h-2 rounded-full flex-shrink-0 ${active ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                  <span className={`w-2 h-2 rounded-full flex-shrink-0 ${active ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-300 dark:bg-slate-600'}`} />
                   <span className="font-mono text-xs font-semibold">{key.replace(/([A-Z])/g, '_$1').toUpperCase()}</span>
                 </div>
               ))}
@@ -517,7 +519,7 @@ function GlAccountMapTab() {
                     ];
                     return (
                       <tr key={a.code} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                        <td className="px-4 py-2.5 font-mono font-bold text-sm text-emerald-700 dark:text-emerald-400">{a.code}</td>
+                        <td className="px-4 py-2.5 font-mono font-bold text-sm text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">{a.code}</td>
                         <td className="px-4 py-2.5 text-slate-700 dark:text-slate-200">{a.name}</td>
                         <td className="px-4 py-2.5">
                           <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${
@@ -557,7 +559,7 @@ function GlAccountMapTab() {
           ].map(({ label, dr, cr, ref }) => (
             <div key={label} className="bg-white dark:bg-slate-700/40 rounded-lg p-3 space-y-1">
               <p className="font-sans text-xs font-semibold text-slate-600 dark:text-slate-300">{label} <span className="text-slate-400 font-normal">— {ref}</span></p>
-              <p className="text-emerald-700 dark:text-emerald-400">Dr  {dr}</p>
+              <p className="text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">Dr  {dr}</p>
               <p className="text-amber-600 dark:text-amber-300 ml-6">Cr  {cr}</p>
             </div>
           ))}
@@ -682,7 +684,7 @@ function ReferenceCalendar() {
               <td className="px-4 py-2.5 font-semibold text-slate-700 dark:text-slate-200">{r.obligation}</td>
               <td className="px-4 py-2.5">
                 <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
-                  r.freq === 'Monthly'     ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300' :
+                  r.freq === 'Monthly'     ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:text-green-300' :
                   r.freq === 'Quarterly'   ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300' :
                   r.freq === 'Annual'      ? 'bg-violet-100 text-violet-700 dark:bg-violet-950/30 dark:text-violet-300' :
                   'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
@@ -708,7 +710,7 @@ function ComplianceHealthTab({ health, loading }: { health: any; loading: boolea
   if (!health) return <EmptyState message="Compliance health data not available." />;
 
   const score     = health.complianceScore ?? 0;
-  const scoreColor = score >= 80 ? 'text-emerald-600 dark:text-emerald-400' :
+  const scoreColor = score >= 80 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' :
                      score >= 50 ? 'text-amber-600 dark:text-amber-400' :
                                    'text-rose-600 dark:text-rose-400';
   const checks: any[] = health.checks ?? [];
@@ -722,7 +724,7 @@ function ComplianceHealthTab({ health, loading }: { health: any; loading: boolea
           <p className={`text-5xl font-extrabold ${scoreColor}`}>{score}<span className="text-xl">%</span></p>
           <div className="mt-2 h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
             <div
-              className={`h-2 rounded-full transition-all ${score >= 80 ? 'bg-emerald-500' : score >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
+              className={`h-2 rounded-full transition-all ${score >= 80 ? 'bg-[var(--pro-azure-50)]0' : score >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
               style={{ width: `${score}%` }}
             />
           </div>
@@ -748,11 +750,11 @@ function ComplianceHealthTab({ health, loading }: { health: any; loading: boolea
           <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
             {checks.map((c: any, i: number) => (
               <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                <td className="px-4 py-2.5 font-mono text-xs font-bold text-emerald-700 dark:text-emerald-400">{c.taxCode}</td>
+                <td className="px-4 py-2.5 font-mono text-xs font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">{c.taxCode}</td>
                 <td className="px-4 py-2.5 font-medium text-slate-700 dark:text-slate-200">{c.label}</td>
                 <td className="px-4 py-2.5">
                   {c.applicable
-                    ? <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold">✓ Yes</span>
+                    ? <span className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] text-xs font-semibold">✓ Yes</span>
                     : <span className="text-slate-400 text-xs">N/A</span>}
                 </td>
                 <td className="px-4 py-2.5 font-semibold text-sm">
@@ -816,7 +818,7 @@ function SectorOverridesTab() {
           onClick={() => setSelectedSector('ALL')}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
             selectedSector === 'ALL'
-              ? 'bg-emerald-600 text-white'
+              ? 'bg-[var(--pro-azure)] text-white'
               : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
           }`}>
           All Sectors
@@ -827,7 +829,7 @@ function SectorOverridesTab() {
             onClick={() => setSelectedSector(s)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               selectedSector === s
-                ? 'bg-emerald-600 text-white'
+                ? 'bg-[var(--pro-azure)] text-white'
                 : allHaveExemptions.has(s)
                   ? 'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/40'
                   : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
@@ -858,7 +860,7 @@ function SectorOverridesTab() {
               <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
                 {exs.map((ex, i) => (
                   <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                    <td className="px-4 py-2.5 font-mono font-bold text-xs text-emerald-700 dark:text-emerald-400">{ex.taxCode}</td>
+                    <td className="px-4 py-2.5 font-mono font-bold text-xs text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">{ex.taxCode}</td>
                     <td className="px-4 py-2.5">
                       <span className="text-xs font-semibold px-2 py-0.5 rounded bg-rose-100 text-rose-700 dark:bg-rose-950/30 dark:text-rose-300">EXEMPT</span>
                     </td>
@@ -919,7 +921,7 @@ function RbacMatrixTab() {
                     row.minLevel >= 150 ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300' :
                     row.minLevel >= 100 ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' :
                     row.minLevel >= 55  ? 'bg-sky-100 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300' :
-                    'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
+                    'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/40 dark:text-green-300'
                   }`}>
                     {row.minLevel}
                   </span>
@@ -929,7 +931,7 @@ function RbacMatrixTab() {
                     row.minLevel >= 190 ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/30 dark:text-rose-300' :
                     row.minLevel >= 100 ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300' :
                     row.minLevel >= 55  ? 'bg-sky-100 text-sky-700 dark:bg-sky-950/30 dark:text-sky-300' :
-                    'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300'
+                    'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:text-green-300'
                   }`}>{row.minRole}</span>
                 </td>
                 <td className="px-4 py-2.5 text-slate-600 dark:text-slate-300 text-xs">{row.desc}</td>
@@ -1016,7 +1018,7 @@ export default function UniversalTaxConfig() {
             onClick={() => setTab(t.id)}
             className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium rounded-t-lg border-b-2 transition-colors ${
               tab === t.id
-                ? 'border-emerald-500 text-emerald-700 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20'
+                ? 'border-[var(--pro-azure)] text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/20'
                 : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600'
             }`}
           >

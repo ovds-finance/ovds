@@ -3,7 +3,7 @@
  *
  * A clear, numbered horizontal tracker (Details → Validate → Confirm) showing
  * exactly where the user is in the Verification & Validation flow. Completed
- * steps are emerald; the current step is emphasised; upcoming steps are muted.
+ * steps are indigo; the current step is emphasised; upcoming steps are muted.
  */
 import React from 'react';
 import { Check } from 'lucide-react';
@@ -61,9 +61,9 @@ export const VVWizardHeader: React.FC<VVWizardHeaderProps> = ({
                 className={cn(
                   'w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold border-2 transition-all duration-200',
                   status === 'complete'
-                    ? 'bg-emerald-500 border-emerald-500 text-white'
+                    ? 'bg-[var(--pro-azure)] border-[var(--pro-azure)] text-white'
                     : status === 'current'
-                      ? 'bg-white dark:bg-slate-900 border-aki-blue text-aki-blue shadow-sm scale-110'
+                      ? 'bg-white dark:bg-slate-900 border-[var(--pro-azure)] text-[var(--pro-azure)] shadow-sm scale-110'
                       : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-400',
                 )}
               >
@@ -80,9 +80,9 @@ export const VVWizardHeader: React.FC<VVWizardHeaderProps> = ({
                   className={cn(
                     'text-[11px] font-bold uppercase tracking-wider',
                     status === 'current'
-                      ? 'text-aki-blue dark:text-blue-400'
+                      ? 'text-[var(--pro-azure)] dark:text-blue-400'
                       : status === 'complete'
-                        ? 'text-emerald-600 dark:text-emerald-400'
+                        ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
                         : 'text-slate-400',
                   )}
                 >
@@ -97,7 +97,7 @@ export const VVWizardHeader: React.FC<VVWizardHeaderProps> = ({
               <span
                 className={cn(
                   'h-0.5 flex-1 mx-2 rounded-full transition-colors duration-500',
-                  status === 'complete' ? 'bg-emerald-400' : 'bg-slate-200 dark:bg-slate-700',
+                  status === 'complete' ? 'bg-[var(--pro-azure)]' : 'bg-slate-200 dark:bg-slate-700',
                 )}
               />
             )}

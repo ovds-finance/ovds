@@ -1,19 +1,20 @@
-﻿/**
+/**
  * ComplianceStatusBar — sticky compliance status strip.
  * Shows VAT deadline, DRRF status, and payroll approval status.
  * Appears at the top of ovds/accounting pages when deadlines are near.
  * Subscribes to real-time payroll updates via WebSocket.
  */
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import {
   AlertTriangle, X, Globe,
   Shield, Banknote, ChevronRight, ShieldCheck,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import api from '../services/api';
+import { Link } from 'react-router-dom';
+
 import { useWebSocket } from '../hooks/useWebSocket';
 import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
 
 interface StatusItem {
   id: string;
@@ -32,7 +33,7 @@ interface ComplianceStatusBarProps {
 const SEVERITY_STYLES = {
   critical: 'bg-rose-600 text-white',
   warning:  'bg-amber-500 text-white',
-  ok:       'bg-emerald-500 text-white',
+  ok:       'bg-[var(--pro-azure)] text-white',
 };
 
 const ComplianceStatusBar: React.FC<ComplianceStatusBarProps> = ({ onlyWhenUrgent = true }) => {
@@ -45,7 +46,7 @@ const ComplianceStatusBar: React.FC<ComplianceStatusBarProps> = ({ onlyWhenUrgen
   const fetchPayrollPending = useCallback(async () => {
     if (!isAuthenticated) return;
     try {
-    const now = new Date();
+    const _now = new Date();
     const res = await api.get(`/payroll/dashboard-stats`, {
         headers: { 'x-background': '1' },
       } as any);

@@ -1,21 +1,23 @@
-import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import {
+  useOverdueInvoices,
+  useSendReminder,
+} from '@ovds/features/sales';
 import {
   Send, AlertTriangle, Clock, DollarSign, TrendingUp,
   RefreshCw, Mail, Search, ChevronRight, X, Filter,
   CalendarDays, User, FileText,
 } from 'lucide-react';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useAuth } from '../rbac/AuthContext';
+import React, { useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+
 import {
   AppPage, Btn, MetricCard, Skeleton, cn,
 } from '../components/ui';
-import {
-  useOverdueInvoices,
-  useSendReminder,
-} from '@ovds/features/sales';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+
 
 interface OverdueInvoice {
   id: string;
@@ -105,7 +107,7 @@ const Collections: React.FC = () => {
           <MetricCard title="Overdue Invoices" amount={stats.total.toString()} percentage={0} isPositive={stats.total === 0} variant="highlight-rose" />
           <MetricCard title="Total Overdue" amount={fmt(stats.totalAmount)} percentage={0} isPositive={false} variant="highlight-amber" />
           <MetricCard title="Avg Days Overdue" amount={`${stats.avgDays} days`} percentage={0} isPositive={stats.avgDays <= 14} variant="highlight-sky" />
-          <MetricCard title="Critical (>30d)" amount={stats.critical.toString()} percentage={0} isPositive={stats.critical === 0} variant="highlight-red" />
+          <MetricCard title="Critical (>30d)" amount={stats.critical.toString()} percentage={0} isPositive={stats.critical === 0} variant="highlight-rose" />
         </div>
       )}
 
@@ -288,7 +290,7 @@ const Collections: React.FC = () => {
         </button>
         <button onClick={() => navigate('/sales/revenue-recognition')} className="group bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-4 text-left transition-all duration-150 hover:shadow-md hover:-translate-y-0.5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:bg-green-900/20 dark:text-[var(--pro-azure-light)] flex items-center justify-center">
               <DollarSign size={18} />
             </div>
             <div>

@@ -1,15 +1,15 @@
-/**
+﻿/**
  * SetupWizardBanner — shown in the layout when the System Administration setup wizard is incomplete
  *
  * Displays a banner with setup progress and a link to continue the wizard.
  */
 
+import { Settings, X, ArrowRight } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Settings, X, ArrowRight } from 'lucide-react';
-import { setupApi } from '../services/setupApi';
+
 import { useAuth } from '../rbac/AuthContext';
-import toast from 'react-hot-toast';
+import { setupApi } from '../services/setupApi';
 
 const SetupWizardBanner: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
@@ -46,11 +46,13 @@ const SetupWizardBanner: React.FC = () => {
 
   if (loading || dismissed || !progress || progress.overallProgress === 100) return null;
 
-  const remainingRequired = progress.steps.filter(s => s.status !== 'completed' && s.isRequired).length;
-  const remainingOptional = progress.steps.filter(s => s.status !== 'completed' && !s.isRequired).length;
+  const remainingRequired = progress.steps.filter((s: any) => s.status !== 'completed' && s.isRequired).length;
+  const _remainingOptional = progress.steps.filter((s: any) => s.status !== 'completed' && !s.isRequired).length;
 
   return (
-    <div className="bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200 dark:border-amber-800 px-4 py-2.5">
+    // position:relative + explicit z-index keeps this banner inside its own
+    // stacking context and below any portal-rendered modal (z≥305).
+    <div className="bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200 dark:border-amber-800 px-4 py-2.5" style={{ position: 'relative', zIndex: 50 }}>
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0 flex-1">

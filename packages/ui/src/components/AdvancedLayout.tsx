@@ -73,7 +73,7 @@ export const StickyTableBar: React.FC<StickyTableBarProps> = ({
     <div className={cn('sticky-table-bar', className)}>
       <div className="flex items-center gap-3">
         <span className="inline-flex items-center gap-2 text-[12px] font-bold text-slate-700 dark:text-slate-200">
-          <span className="w-5 h-5 rounded-full bg-aki-blue text-white text-[10px] font-black flex items-center justify-center">
+          <span className="w-5 h-5 rounded-full bg-[var(--pro-azure)] text-white text-[10px] font-black flex items-center justify-center">
             {selectedCount > 99 ? '99+' : selectedCount}
           </span>
           selected

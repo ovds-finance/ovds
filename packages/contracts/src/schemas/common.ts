@@ -38,6 +38,13 @@ export type PaginatedResult<T> = {
 
 // ── API Envelope ──────────────────────────────────────────────────────────────
 
+/**
+ * ApiResponseSchema — Zod runtime validator for the standard API envelope.
+ *
+ * Kept in sync with the `ApiResponse<T>` interface in @ovds/shared.
+ * Fields marked "backend-only" are emitted by NestJS interceptors and are
+ * optional so frontend consumers that omit them still pass validation.
+ */
 export function ApiResponseSchema<T extends z.ZodTypeAny>(dataSchema: T) {
   return z.object({
     success: z.boolean(),
@@ -45,8 +52,14 @@ export function ApiResponseSchema<T extends z.ZodTypeAny>(dataSchema: T) {
     message: z.string().optional(),
     data: dataSchema.optional(),
     error: z.string().optional(),
+    /** Per-field validation error map — populated by class-validator pipes. */
+    fields: z.record(z.string(), z.string()).optional(),
     requestId: z.string().optional(),
     timestamp: z.string().optional(),
+    /** Server processing time in milliseconds. */
+    ms: z.string().optional(),
+    /** Array of error message strings (batch / multi-error responses). */
+    errors: z.array(z.string()).optional(),
   });
 }
 

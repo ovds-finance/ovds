@@ -85,7 +85,7 @@ export {
   aabeRegulations,
 } from './erpMenu';
 
-// -- Akaunting-inspired tree-view sidebar --------------------------------------
+// -- Ovds SaaS tree-view sidebar --------------------------------------
 export {
   TreeViewSidebar,
 } from './TreeViewSidebar';

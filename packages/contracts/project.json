@@ -11,8 +11,8 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run build -w @ovds/contracts",
-        "cwd": "."
+        "command": "node ../../scripts/bin-run.mjs --max-old-space-size=8192 typescript/bin/tsc && node ../../scripts/bin-run.mjs --max-old-space-size=8192 tsx scripts/build-cjs.ts",
+        "cwd": "packages/contracts"
       },
       "dependsOn": [
         "^build"
@@ -30,8 +30,8 @@
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run typecheck -w @ovds/contracts",
-        "cwd": "."
+        "command": "node ../../scripts/bin-run.mjs --max-old-space-size=4096 typescript/bin/tsc --noEmit",
+        "cwd": "packages/contracts"
       },
       "dependsOn": [
         "^build"

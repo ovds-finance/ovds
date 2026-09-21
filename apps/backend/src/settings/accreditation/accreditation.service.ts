@@ -1,14 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../common/prisma.service';
 import { ACCREDITATION_CHECKLIST_TEMPLATE, PAGINATION_DEFAULT_LIMIT } from '@ovds/shared';
+
+import { PrismaService } from '../../common/prisma.service';
 
 @Injectable()
 export class AccreditationService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findChecklists(query: { page?: number; limit?: number; status?: string }) {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? PAGINATION_DEFAULT_LIMIT;
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || PAGINATION_DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};

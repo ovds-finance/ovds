@@ -1,14 +1,14 @@
-# Purchases, Expenses, Bills & Vendors
+﻿# Purchases, Expenses, Bills & Vendors
 
 Canonical OVDS module (`packages/modules/purchases`).
 
-Akaunting-inspired, DDD-aligned module layout:
+Ovds SaaS DDD-aligned module layout:
 
 ```
 modules/purchases/
   src/
     index.ts        # public barrel (domain types + namespaced web)
-    domain/         # centralized domain types & rules  (@ovds/domains/purchases)
+    domain/         # centralized domain types & rules  (@ovds/domains-purchases)
     dto/            # zod / class-validator contracts
     web/            # React pages & components           (@ovds/features/purchases)
 ```

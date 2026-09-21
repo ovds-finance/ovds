@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../rbac/AuthContext';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
+import { Button } from '@ovds/ui';
+import { Badge } from '@ovds/ui';
+import { format } from 'date-fns';
 import {
   Plus,
   Search,
@@ -11,9 +10,11 @@ import {
   DollarSign,
   Clock,
 } from 'lucide-react';
-import { format } from 'date-fns';
-import { Button } from '@ovds/ui';
-import { Badge } from '@ovds/ui';
+import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+
+import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
 import { fmtCurrencyDecimal } from '../../utils/fmt';
 
 interface Vendor {
@@ -70,7 +71,7 @@ const VendorsTable: React.FC = () => {
   const fmt = (n: number) => fmtCurrencyDecimal(Math.abs(n), 'ETB');
 
   const riskColor = (score: number) => {
-    if (score < 30) return 'emerald';
+    if (score < 30) return 'indigo';
     if (score < 60) return 'amber';
     return 'rose';
   };
@@ -140,7 +141,7 @@ const VendorsTable: React.FC = () => {
                 <tr key={vendor.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${riskColor(vendor.riskScore) === 'emerald' ? 'from-emerald-500 to-emerald-600' : riskColor(vendor.riskScore) === 'amber' ? 'from-amber-500 to-amber-600' : 'from-rose-500 to-rose-600'} flex items-center justify-center shadow-lg`}>
+                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${riskColor(vendor.riskScore) === 'indigo' ? 'from-green-500 to-green-600' : riskColor(vendor.riskScore) === 'amber' ? 'from-amber-500 to-amber-600' : 'from-rose-500 to-rose-600'} flex items-center justify-center shadow-lg`}>
                         <span className="font-bold text-white text-sm uppercase">{vendor.name.slice(0, 2)}</span>
                       </div>
                       <div className="min-w-0 flex-1">
@@ -161,7 +162,7 @@ const VendorsTable: React.FC = () => {
                     <div className="text-xl font-semibold text-orange-600">{fmt(vendor.totalOwed)}</div>
                   </td>
                   
-                  <td className="px-8 py-5 text-right font-mono text-emerald-700 font-semibold">
+                  <td className="px-8 py-5 text-right font-mono text-[var(--pro-azure-dark)] font-semibold">
                     {fmt(vendor.current)}
                   </td>
                   

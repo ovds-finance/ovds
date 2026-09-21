@@ -14,7 +14,7 @@
  */
 import { readFileSync, writeFileSync, existsSync, unlinkSync } from 'fs';
 import { execFileSync } from 'child_process';
-import { resolve, dirname } from 'path';
+import { resolve, dirname, delimiter } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -127,15 +127,25 @@ if (allowInsecureTls) {
   );
 }
 
+// ── Ensure node_modules/.bin is on PATH so Prisma can locate generator binaries ─
+// Prisma's generator mechanism spawns providers (e.g. zod-prisma-types) by name.
+// On Windows + pnpm the .bin shims are not automatically on the child process PATH,
+// causing: Error: spawn zod-prisma-types ENOENT
+const binPath = resolve(root, 'node_modules', '.bin');
+const dbBinPath = resolve(dbPkg, 'node_modules', '.bin');
+const existingPath = process.env.PATH || '';
+const prismaEnv = {
+  ...process.env,
+  PATH: `${binPath}${delimiter}${dbBinPath}${delimiter}${existingPath}`,
+  ...(allowInsecureTls ? { NODE_TLS_REJECT_UNAUTHORIZED: '0' } : {}),
+};
+
 let exitCode = 0;
 try {
   execFileSync(process.execPath, [prismaEntry, ...prismaArgs], {
     stdio: 'inherit',
     cwd: dbPkg,
-    env: {
-      ...process.env,
-      ...(allowInsecureTls ? { NODE_TLS_REJECT_UNAUTHORIZED: '0' } : {}),
-    },
+    env: prismaEnv,
   });
 } catch (err) {
   exitCode = err.status ?? 1;
@@ -145,3 +155,5 @@ try {
 }
 
 process.exit(exitCode);
+
+

@@ -1,18 +1,22 @@
-import React, { useState, useCallback } from 'react';
-import { AppPage, AppTabs, Btn } from '@ovds/ui';
-import { BarChart3, Plus, FileText } from 'lucide-react';
+import type { ReportCategory, ReportTemplate, ReportConfig } from '@ovds/features/reporting';
 import {
   ReportGallery,
   ReportViewer,
   ReportBuilder,
   ScheduledDeliveryModal,
 } from '@ovds/features/reporting';
-import type { ReportCategory, ReportTemplate, ReportConfig } from '@ovds/features/reporting';
 import { defaultPeriod } from '@ovds/features/reporting';
+import { AppPage, AppTabs, Btn } from '@ovds/ui';
+import { BarChart3, Plus, FileText } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+
+import { useBusiness } from '../context/businessContext';
+import { downloadBlob } from '../utils/download';
 
 type Screen = 'gallery' | 'view' | 'builder' | 'delivery';
 
 export default function ReportsDashboard() {
+  const { selectedCompanyId } = useBusiness();
   const [screen, setScreen] = useState<Screen>('gallery');
   const [category, setCategory] = useState<ReportCategory | 'all'>('all');
   const [selectedReport, setSelectedReport] = useState<ReportTemplate | null>(null);
@@ -60,9 +64,9 @@ export default function ReportsDashboard() {
   return (
     <AppPage
       title="Reports Dashboard"
-      subtitle="Akaunting-style financial, tax, inventory, payroll and CRM reports — with a custom report builder and scheduled email delivery."
+      subtitle="Ovds SaaS style financial, tax, inventory, payroll and CRM reports — with a custom report builder and scheduled email delivery."
       icon={<BarChart3 size={16} className="text-white" />}
-      iconBg="bg-indigo-600"
+      iconBg="bg-[var(--pro-azure)]"
       crumbs={[{ label: 'Reports Dashboard' }]}
       actions={
         <>
@@ -97,11 +101,13 @@ export default function ReportsDashboard() {
           config={config}
           onBack={backToGallery}
           onSchedule={() => openDelivery('view')}
+          companyId={selectedCompanyId}
+          onDownloadBlob={downloadBlob}
         />
       )}
 
       {screen === 'builder' && (
-        <ReportBuilder onBack={() => setScreen(returnTo)} onComplete={handleComplete} />
+        <ReportBuilder onBack={() => setScreen(returnTo)} onComplete={handleComplete} companyId={selectedCompanyId} />
       )}
 
       {screen === 'delivery' && <ScheduledDeliveryModal onBack={() => setScreen(returnTo)} />}

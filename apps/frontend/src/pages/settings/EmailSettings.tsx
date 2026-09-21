@@ -1,11 +1,11 @@
-import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { orpc } from '../../lib/orpc';
-import toast from 'react-hot-toast';
-import { usePageTitle } from '../../hooks/usePageTitle';
 import {
   Mail, Save, Send, RefreshCw, CheckCircle2,
 } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
+import { usePageTitle } from '../../hooks/usePageTitle';
 import { BEARER_PREFIX } from '../../utils/constants';
 
 type EmailSettingsData = {

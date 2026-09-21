@@ -9,8 +9,10 @@
  */
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { INotificationChannel } from './notification-channel.interface';
+
 import type { PushJobData } from '../notification.jobs';
+
+import type { INotificationChannel } from './notification-channel.interface';
 
 interface FcmServiceAccount {
   project_id: string;

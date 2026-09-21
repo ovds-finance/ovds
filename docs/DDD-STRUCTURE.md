@@ -282,7 +282,7 @@ packages/
 ### 1. Domain Libraries (`packages/domains/*`)
 - **Own**: Business logic, entities, value objects, domain events, DTOs
 - **Do NOT own**: Controllers, NestJS modules, UI components
-- **Dependencies**: Can only import `@ovds/domains/infrastructure`, `@ovds/core`, `@ovds/shared`
+- **Dependencies**: Can only import `@ovds/domains-infrastructure`, `@ovds/core`, `@ovds/shared`
 - **Communication**: Via domain events or dependency interfaces (Deps pattern)
 
 ### 2. Feature Libraries (`packages/features/*`)
@@ -292,7 +292,7 @@ packages/
 
 ### 3. Application Layer (`apps/backend`)
 - **Own**: NestJS controllers, modules, guards, interceptors, pipes
-- **Dependencies**: Can import all `@ovds/domains/*`, `@ovds/modules/*`, `@ovds/contracts`
+- **Dependencies**: Can import all `@ovds/domains-*`, `@ovds/modules/*`, `@ovds/contracts`
 - **Responsibility**: Wire domain services together via DI, handle HTTP concerns
 
 ### 4. Frontend App (`apps/frontend`)

@@ -4,7 +4,7 @@ import {
   Calendar, Mail, Plus, Trash2, CheckCircle, PauseCircle, PlayCircle,
 } from 'lucide-react';
 // @ts-ignore app-level dependency
-import { useLocalStorage } from '../../../hooks';
+import { useLocalStorage } from '@ovds/ui';
 import { ALL_TEMPLATES } from '../lib/reportRegistry';
 import type { ScheduleEntry, ExportFormat, ScheduleFrequency } from '../types/reporting.types';
 import toast from 'react-hot-toast';

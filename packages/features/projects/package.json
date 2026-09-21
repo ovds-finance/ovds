@@ -10,9 +10,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@ovds/ui": "*",
-    "@ovds/shared": "*",
-    "@ovds/design-system": "*"
+    "@ovds/ui": "workspace:*",
+    "@ovds/shared": "workspace:*",
+    "@ovds/design-system": "workspace:*"
   },
   "devDependencies": {}
 }
+

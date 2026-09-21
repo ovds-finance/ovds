@@ -18,9 +18,9 @@
     "strictPropertyInitialization": false,
     "noEmit": false,
     "noEmitOnError": false,
+    "ignoreDeprecations": "5.0",
     "composite": true,
     "incremental": true,
-    "ignoreDeprecations": "6.0",
     "tsBuildInfoFile": "./dist/.tsbuildinfo"
   },
   "include": [

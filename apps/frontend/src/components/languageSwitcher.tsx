@@ -1,6 +1,7 @@
+import { Globe, Check } from 'lucide-react';
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Globe, Check } from 'lucide-react';
+
 import { useClickOutside } from '../hooks';
 
 interface Language {
@@ -44,12 +45,21 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   // -- Plain select variant (Login / Register / EntryPortal) ----------------
   if (variant === 'select') {
     return (
-      <div className={`flex items-center gap-1.5 bg-white border border-gray-200 hover:border-emerald-300 rounded-lg px-2.5 py-1.5 transition-all duration-150 ${className}`}>
-        <Globe size={13} className="text-gray-400 shrink-0" />
+      <div
+        className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 transition-all duration-150 ${className}`}
+        style={{
+          background:  'var(--surface)',
+          border:      '1px solid var(--border)',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--pro-azure-100)')}
+        onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}
+      >
+        <Globe size={13} style={{ color: 'var(--text-4)', flexShrink: 0 }} />
         <select
           value={currentLang.code}
           onChange={e => handleChange(e.target.value)}
-          className="bg-transparent border-none text-[11px] font-semibold text-gray-600 focus:ring-0 cursor-pointer outline-none"
+          className="bg-transparent border-none text-[11px] font-semibold focus:ring-0 cursor-pointer outline-none"
+          style={{ color: 'var(--text-2)' }}
           aria-label="Select language"
         >
           {LANGUAGES.map(l => (
@@ -67,35 +77,83 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
     <div ref={ref} className={`relative ${className}`}>
       <button
         onClick={() => setOpen(v => !v)}
-        className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+        className="w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pro-azure)] focus-visible:ring-offset-1"
+        style={{ color: 'var(--text-3)' }}
+        onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-alt)')}
+        onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = 'transparent')}
         aria-label={`Language: ${currentLang.label}`}
         title={`Language: ${currentLang.label}`}
+        aria-expanded={open}
+        aria-haspopup="menu"
       >
         <Globe size={16} />
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1.5 w-44 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-[200] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-          <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
-            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Language</p>
+        <div
+          className="absolute right-0 top-full mt-1.5 w-44 z-[200] overflow-hidden"
+          style={{
+            background:   'var(--surface)',
+            border:       '1px solid var(--border)',
+            borderRadius: 8,
+            boxShadow:    '0 8px 24px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)',
+            animation:    'aki-enter 150ms cubic-bezier(0.16,1,0.3,1) both',
+          }}
+          role="menu"
+        >
+          {/* Header */}
+          <div
+            className="px-3 py-2"
+            style={{ borderBottom: '1px solid var(--border-alt)' }}
+          >
+            <p
+              className="text-[9px] font-black uppercase tracking-widest"
+              style={{ color: 'var(--text-5)' }}
+            >
+              Language
+            </p>
           </div>
+
+          {/* Options */}
           <div className="py-1">
-            {LANGUAGES.map(lang => (
-              <button
-                key={lang.code}
-                onClick={() => handleChange(lang.code)}
-                className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left"
-              >
-                <span className="text-base leading-none">{lang.flag}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">{lang.nativeLabel}</p>
-                  <p className="ovds-caption">{lang.label}</p>
-                </div>
-                {currentLang.code === lang.code && (
-                  <Check size={12} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-                )}
-              </button>
-            ))}
+            {LANGUAGES.map(lang => {
+              const isActive = currentLang.code === lang.code;
+              return (
+                <button
+                  key={lang.code}
+                  role="menuitem"
+                  onClick={() => handleChange(lang.code)}
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition-colors duration-100 focus-visible:outline-none"
+                  style={{ background: 'transparent' }}
+                  onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = 'var(--sys-bg-subtle)')}
+                  onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = 'transparent')}
+                >
+                  <span className="text-base leading-none">{lang.flag}</span>
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className="text-[12px] font-semibold truncate"
+                      style={{ color: 'var(--text)' }}
+                    >
+                      {lang.nativeLabel}
+                    </p>
+                    <p
+                      className="text-[10px]"
+                      style={{ color: 'var(--text-4)' }}
+                    >
+                      {lang.label}
+                    </p>
+                  </div>
+                  {isActive && (
+                    <div
+                      className="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
+                      style={{ background: 'var(--pro-azure)', color: '#fff' }}
+                    >
+                      <Check size={9} />
+                    </div>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}

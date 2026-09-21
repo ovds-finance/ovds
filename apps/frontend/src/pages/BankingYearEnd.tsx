@@ -14,21 +14,22 @@
  *   GET  /accounting/periods                — existing period-close workflow
  *   POST /accounting/periods/:id/lock
  */
-import React, { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 import {
   Lock, CheckCircle2, AlertTriangle, Download,
   RefreshCw, ShieldCheck, FileText, ArrowRight,
   Calendar,
 } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import api from '../services/api';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useAuth } from '../rbac/AuthContext';
-import { fmtETB } from '../utils/ethiopianTax';
+import { useNavigate } from 'react-router-dom';
+
 import { AppPage, AppKpi, Card, Btn, Modal, FormField, Input } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { fmtETB } from '../utils/ethiopianTax';
 
 interface ReconStats  { total: number; reconciled: number; pending: number; reconciliationRate: number; }
 interface ReconPeriod { id: string; bankAccountId: string; statementDate: string; openingBalance: number; closingBalance: number; reconciledBalance: number; discrepancy: number; status: string; bankAccountName?: string; }
@@ -38,12 +39,12 @@ interface AccountingPeriod { id: string; name?: string; period: string; status: 
 const Step: React.FC<{ num: number; label: string; done: boolean; active: boolean; warn?: boolean }> = ({ num, label, done, active, warn }) => (
   <div className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
     active ? 'border-sky-300 bg-sky-50/50 dark:border-sky-700 dark:bg-sky-950/10' :
-    done   ? 'border-emerald-200 bg-emerald-50/30 dark:border-emerald-800 dark:bg-emerald-950/10' :
+    done   ? 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/30 dark:border-green-800 dark:bg-green-950/10' :
     warn   ? 'border-amber-200 bg-amber-50/30 dark:border-amber-800 dark:bg-amber-950/10' :
              'border-slate-100 dark:border-slate-800'
   }`}>
     <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
-      done  ? 'bg-emerald-500 text-white' :
+      done  ? 'bg-[var(--pro-azure)] text-white' :
       active? 'bg-sky-500 text-white' :
       warn  ? 'bg-amber-400 text-white' :
               'bg-slate-200 dark:bg-slate-700 text-slate-500'
@@ -52,7 +53,7 @@ const Step: React.FC<{ num: number; label: string; done: boolean; active: boolea
     </div>
     <p className={`text-[12px] font-semibold ${
       active ? 'text-sky-700 dark:text-sky-400' :
-      done   ? 'text-emerald-700 dark:text-emerald-400' :
+      done   ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' :
       warn   ? 'text-amber-700 dark:text-amber-400' :
                'text-slate-500 dark:text-slate-400'
     }`}>{label}</p>
@@ -80,7 +81,7 @@ const BankingYearEnd: React.FC = () => {
     staleTime: 30_000,
   });
 
-  const { data: periodsRaw = [], isLoading: periodsLoading, refetch: refetchPeriods } = useQuery({
+  const { data: periodsRaw = [], isLoading: _periodsLoading, refetch: refetchPeriods } = useQuery({
     queryKey: ['banking-recon-periods', selectedCompanyId],
     queryFn:  () => api.get(`/banking/reconciliation/periods${cq}`).then(r => {
       const d = r.data?.data ?? r.data; return Array.isArray(d?.data) ? d.data : Array.isArray(d) ? d : [];
@@ -105,10 +106,10 @@ const BankingYearEnd: React.FC = () => {
   const reconRate       = stats?.reconciliationRate ?? 0;
 
   const kpi = [
-    { label: 'Reconciliation Rate', value: `${reconRate}%`,              color: reconRate >= 100 ? 'emerald' as const : 'amber' as const },
-    { label: 'Pending Txns',        value: stats?.pending ?? '—',        color: (stats?.pending ?? 0) === 0 ? 'emerald' as const : 'rose' as const },
+    { label: 'Reconciliation Rate', value: `${reconRate}%`,              color: reconRate >= 100 ? 'indigo' as const : 'amber' as const },
+    { label: 'Pending Txns',        value: stats?.pending ?? '—',        color: (stats?.pending ?? 0) === 0 ? 'indigo' as const : 'rose' as const },
     { label: 'Total Transactions',  value: stats?.total ?? '—',          color: 'slate' as const },
-    { label: 'Reconciled',          value: stats?.reconciled ?? '—',     color: 'emerald' as const },
+    { label: 'Reconciled',          value: stats?.reconciled ?? '—',     color: "indigo" as const },
   ];
 
   // ── Actions ───────────────────────────────────────────────────────────────
@@ -177,7 +178,7 @@ const BankingYearEnd: React.FC = () => {
       a.click();
       URL.revokeObjectURL(url);
       toast.success('Ledger exported');
-    } catch (e: any) { toast.error('Export failed'); }
+    } catch (_e: any) { toast.error('Export failed'); }
     finally { setExportLoading(false); }
   }, [selectedCompanyId]);
 
@@ -187,7 +188,7 @@ const BankingYearEnd: React.FC = () => {
       subtitle="Finalize clearing · Lock period · Export ledgers for tax filing and audit"
       icon={<Lock size={18} />}
       iconBg="bg-slate-700"
-      crumbs={[{ label: 'Banking', href: '/banking' }, { label: 'Year-End Close' }]}
+      crumbs={[{ label: 'Banking', to: '/banking' }, { label: 'Year-End Close' }]}
       actions={
         <Btn variant="ghost" size="sm" icon={<RefreshCw size={11} />} onClick={() => { refetchStats(); refetchPeriods(); }}>
           Refresh
@@ -208,11 +209,11 @@ const BankingYearEnd: React.FC = () => {
       </Card>
 
       {/* Step 1 — Finalize clearing */}
-      <Card className={`p-5 ${allReconciled ? 'border-emerald-200 dark:border-emerald-800' : 'border-amber-200 dark:border-amber-800'}`}>
+      <Card className={`p-5 ${allReconciled ? 'border-[var(--pro-azure-100)] dark:border-green-800' : 'border-amber-200 dark:border-amber-800'}`}>
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 min-w-0">
             {allReconciled
-              ? <CheckCircle2 size={18} className="text-emerald-500 shrink-0 mt-0.5" />
+              ? <CheckCircle2 size={18} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
               : <AlertTriangle size={18} className="text-amber-500 shrink-0 mt-0.5" />}
             <div className="min-w-0">
               <p className="text-[13px] font-bold text-slate-700 dark:text-slate-200 mb-1">
@@ -257,10 +258,10 @@ const BankingYearEnd: React.FC = () => {
       </Card>
 
       {/* Step 3 — Lock period */}
-      <Card className={`p-5 ${hasLockedPeriod ? 'border-emerald-200 dark:border-emerald-800' : ''}`}>
+      <Card className={`p-5 ${hasLockedPeriod ? 'border-[var(--pro-azure-100)] dark:border-green-800' : ''}`}>
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 min-w-0">
-            <Lock size={18} className={`shrink-0 mt-0.5 ${hasLockedPeriod ? 'text-emerald-500' : 'text-slate-400'}`} />
+            <Lock size={18} className={`shrink-0 mt-0.5 ${hasLockedPeriod ? 'text-[var(--pro-azure)]' : 'text-slate-400'}`} />
             <div className="min-w-0">
               <p className="text-[13px] font-bold text-slate-700 dark:text-slate-200 mb-1">Step 3 — Lock Accounting Period</p>
               <p className="text-[11px] text-slate-500 mb-2">
@@ -269,7 +270,7 @@ const BankingYearEnd: React.FC = () => {
               {acctPeriods.filter(p => p.status === 'LOCKED').length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {acctPeriods.filter(p => p.status === 'LOCKED').map(p => (
-                    <span key={p.id} className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800">
+                    <span key={p.id} className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)] dark:bg-green-950/20 dark:text-[var(--pro-azure-light)] dark:border-green-800">
                       <Lock size={9} /> {p.period ?? p.name ?? p.id}
                     </span>
                   ))}
@@ -332,12 +333,12 @@ const BankingYearEnd: React.FC = () => {
                   <td className="px-4 py-2.5 text-slate-700 dark:text-slate-200">{p.bankAccountName ?? p.bankAccountId.slice(0, 12)}</td>
                   <td className="px-4 py-2.5 font-mono text-slate-500">{new Date(p.statementDate).toLocaleDateString()}</td>
                   <td className="px-4 py-2.5 text-right tabular-nums font-semibold text-slate-600 dark:text-slate-400">{fmtETB(p.closingBalance)}</td>
-                  <td className={`px-4 py-2.5 text-right tabular-nums font-bold ${Math.abs(p.discrepancy) < 0.01 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                  <td className={`px-4 py-2.5 text-right tabular-nums font-bold ${Math.abs(p.discrepancy) < 0.01 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-rose-600 dark:text-rose-400'}`}>
                     {Math.abs(p.discrepancy) < 0.01 ? '✓ 0.00' : fmtETB(p.discrepancy)}
                   </td>
                   <td className="px-4 py-2.5">
                     <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
-                      p.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800' :
+                      p.status === 'COMPLETED' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/20 dark:text-[var(--pro-azure-light)] dark:border-green-800' :
                       p.status === 'LOCKED'    ? 'bg-slate-100 text-slate-600 border-slate-300 dark:bg-slate-800 dark:text-slate-400' :
                       p.status === 'IN_PROGRESS'?'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/20 dark:text-sky-400 dark:border-sky-800' :
                                                  'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800'

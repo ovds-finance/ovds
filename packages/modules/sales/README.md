@@ -1,14 +1,14 @@
-# Sales, Invoicing, Customers & CRM
+﻿# Sales, Invoicing, Customers & CRM
 
 Canonical OVDS module (`packages/modules/sales`).
 
-Akaunting-inspired, DDD-aligned module layout:
+Ovds SaaS DDD-aligned module layout:
 
 ```
 modules/sales/
   src/
     index.ts        # public barrel (domain types + namespaced web)
-    domain/         # centralized domain types & rules  (@ovds/domains/sales)
+    domain/         # centralized domain types & rules  (@ovds/domains-sales)
     dto/            # zod / class-validator contracts
     web/            # React pages & components           (@ovds/features/sales)
 ```

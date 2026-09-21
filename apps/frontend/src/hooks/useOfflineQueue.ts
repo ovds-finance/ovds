@@ -20,6 +20,8 @@
  */
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
+
+import api from '../services/api';
 import {
   enqueue,
   drainQueue,
@@ -27,7 +29,6 @@ import {
   type QueuedActionType,
   type DrainResult,
 } from '../services/offlineQueue';
-import api from '../services/api';
 
 // ─── Handler map for immediate (online) submission ────────────────────────────
 

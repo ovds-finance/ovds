@@ -1,8 +1,8 @@
-# Security & Cyber Audit
+﻿# Security & Cyber Audit
 
 Canonical OVDS module (`packages/modules/security`).
 
-Akaunting-inspired, DDD-aligned module layout:
+Ovds SaaS DDD-aligned module layout:
 
 ```
 modules/security/

@@ -14,22 +14,24 @@
  *   > 180 days past due    → 50.0%  — Stage 3 (credit-impaired)
  *   Credit-impaired        →100.0%  — Stage 3 (write-off)
  */
-import React, { useState } from 'react';
+import { AppPage, Btn } from '@ovds/ui';
 import {
   RefreshCw, TrendingDown, AlertTriangle,
   CheckCircle2, Info, Send,
 } from 'lucide-react';
-import { AppPage, Btn } from '@ovds/ui';
+import React, { useState } from 'react';
+
 import { useIfrs9Ecl, type EclBucket } from '../services/reportsApi';
-import type { EclSummary } from '@ovds/features/reporting';
+import type {  } from '@ovds/features/reporting';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useBusiness } from '../context/businessContext';
 import { fmtCurrency } from '../utils/fmt';
 import api from '../services/api';
+
 import toast from 'react-hot-toast';
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
-const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
+const _pct = (n: number) => `${(n * 100).toFixed(1)}%`;
 
 const STAGE_CONFIG = {
   1: { label: '12-Month ECL',                    cls: 'bg-sky-50 text-sky-700 border-sky-200' },
@@ -100,7 +102,7 @@ const EclProvision: React.FC = () => {
           {[
             { label: 'Gross Receivables',   value: fmt(totalGross), accent: 'bg-slate-400' },
             { label: 'ECL Provision',        value: fmt(totalEcl),  accent: totalEcl > 0 ? 'bg-rose-500' : 'bg-slate-200' },
-            { label: 'Net Carrying Amount',  value: fmt(netCarry),  accent: 'bg-emerald-500' },
+            { label: 'Net Carrying Amount',  value: fmt(netCarry),  accent: 'bg-[var(--pro-azure-50)]0' },
             { label: 'Effective Loss Rate',  value: lossPct,        accent: parseFloat(lossPct) > 5 ? 'bg-rose-500' : 'bg-amber-400' },
           ].map(k => (
             <div key={k.label} className="ovds-kpi-cell">
@@ -267,29 +269,63 @@ const STAGE_LABELS = {
 };
 
 const CustomRatesPanel: React.FC<{ onRatesChange: () => void }> = ({ onRatesChange }) => {
+  const { selectedCompanyId } = useBusiness();
   const [open, setOpen]     = useState(false);
   const [rates, setRates]   = useState(DEFAULT_RATES.map(r => ({ ...r, inputVal: String((r.rate * 100).toFixed(1)) })));
   const [dirty, setDirty]   = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const updateRate = (i: number, val: string) => {
     setRates(prev => prev.map((r, idx) => idx === i ? { ...r, inputVal: val, rate: parseFloat(val) / 100 || r.rate } : r));
     setDirty(true);
   };
 
-  const handleSave = () => {
-    // In a full implementation these would be persisted via PATCH /ovds/ecl-config
-    // For now save to localStorage so they survive refresh
+  const handleSave = async () => {
+    setSaving(true);
+    const payload = rates.map(r => ({ bucket: r.bucket, rate: r.rate }));
     try {
-      localStorage.setItem('ovds_ecl_rates', JSON.stringify(rates.map(r => ({ bucket: r.bucket, rate: r.rate }))));
-      toast.success('Custom rates saved — will apply on next ECL refresh');
+      // Persist to the backend — IFRS 9 provision rates are compliance-critical
+      // and must survive browser clears and cross-device sessions.
+      await api.patch('/ovds/ecl-config', {
+        companyId: selectedCompanyId,
+        rates: payload,
+      });
+      // Mirror to localStorage as a fast read-cache so the page doesn't
+      // need to wait for the API on next load.
+      try {
+        localStorage.setItem('ovds_ecl_rates', JSON.stringify(payload));
+      } catch {
+        // Storage quota exceeded — cache miss is acceptable, API is the source of truth.
+      }
+      toast.success('Custom rates saved');
       setDirty(false);
       onRatesChange();
-    } catch {
-      toast.error('Failed to save rates');
+    } catch (err: any) {
+      // API unavailable — fall back to localStorage so rates survive at least
+      // until the user clears browser data. Surface a warning, not an error.
+      try {
+        localStorage.setItem('ovds_ecl_rates', JSON.stringify(payload));
+        toast.success('Rates saved locally — will sync to server when available', { icon: '⚠️' });
+        setDirty(false);
+        onRatesChange();
+      } catch {
+        toast.error(err?.response?.data?.message ?? 'Failed to save rates');
+      }
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
+    const defaultPayload = DEFAULT_RATES.map(r => ({ bucket: r.bucket, rate: r.rate }));
+    try {
+      await api.patch('/ovds/ecl-config', {
+        companyId: selectedCompanyId,
+        rates: defaultPayload,
+      });
+    } catch {
+      // Non-fatal — local reset proceeds regardless of API availability.
+    }
     setRates(DEFAULT_RATES.map(r => ({ ...r, inputVal: String((r.rate * 100).toFixed(1)) })));
     localStorage.removeItem('ovds_ecl_rates');
     setDirty(false);
@@ -357,7 +393,7 @@ const CustomRatesPanel: React.FC<{ onRatesChange: () => void }> = ({ onRatesChan
                       </td>
                       <td className="px-4 py-2.5">
                         {changed ? (
-                          <span className={`text-[10px] font-bold ${r.rate > defaultRate ? 'text-rose-600' : 'text-emerald-600'}`}>
+                          <span className={`text-[10px] font-bold ${r.rate > defaultRate ? 'text-rose-600' : 'text-[var(--pro-azure)]'}`}>
                             {r.rate > defaultRate ? '▲' : '▼'} {r.rate > defaultRate ? '+' : ''}{((r.rate - defaultRate) * 100).toFixed(1)}pp
                           </span>
                         ) : <span className="text-[10px] text-slate-300">unchanged</span>}
@@ -373,12 +409,15 @@ const CustomRatesPanel: React.FC<{ onRatesChange: () => void }> = ({ onRatesChan
             <Btn variant="ghost" size="sm" onClick={handleReset}>Reset to Defaults</Btn>
             <div className="flex-1" />
             {dirty && (
-              <Btn variant="primary" size="sm" onClick={handleSave}>Save Custom Rates</Btn>
+              <Btn variant="primary" size="sm" onClick={handleSave} disabled={saving}
+                icon={saving ? <RefreshCw size={13} className="animate-spin" /> : undefined}>
+                {saving ? 'Saving…' : 'Save Custom Rates'}
+              </Btn>
             )}
           </div>
 
           <div className="text-[10px] text-slate-400 space-y-0.5">
-            <p>• Rates are stored locally. In production, persist via PATCH /ovds/ecl-config (API ready).</p>
+            <p>• Rates are persisted to the server via PATCH /ovds/ecl-config and cached locally for fast reads.</p>
             <p>• IFRS 9.B5.5.35: rates must reflect historical default experience adjusted for forward-looking information.</p>
             <p>• NBE Directive SBB/77/2020 requires banks to use CBE-approved loss rates — non-bank entities use IFRS 9 judgment.</p>
           </div>

@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
-import { confirm } from '../../utils/confirm';
 import { Skeleton } from '@ovds/ui';
 import { PiggyBank, Plus, Trash2, RefreshCw, X, Edit2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
+import api from '../../services/api';
+import { confirm } from '../../utils/confirm';
 
 interface PFSubscription {
   id: string;
@@ -91,7 +92,7 @@ const PFSubscriptionsPanel: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <PiggyBank size={18} className="text-emerald-600 dark:text-emerald-400" /> PF Subscriptions
+            <PiggyBank size={18} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" /> PF Subscriptions
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">Ethiopian pension: Employee 7% · Employer 11%</p>
         </div>
@@ -100,7 +101,7 @@ const PFSubscriptionsPanel: React.FC = () => {
             <RefreshCw size={14} />
           </button>
           <button onClick={openNew}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600">
+            className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)]">
             <Plus size={14} /> Add Subscription
           </button>
         </div>
@@ -153,7 +154,7 @@ const PFSubscriptionsPanel: React.FC = () => {
             <label htmlFor="pf_active" className="text-sm text-slate-600 dark:text-slate-300">Active</label>
           </div>
           <div className="flex gap-3">
-            <button onClick={save} className="px-5 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600">
+            <button onClick={save} className="px-5 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)]">
               {editing ? 'Update' : 'Save'}
             </button>
             <button onClick={() => setShowForm(false)} className="px-5 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-bold">
@@ -192,19 +193,19 @@ const PFSubscriptionsPanel: React.FC = () => {
                   <span className="font-mono text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg">{sub.shortCode}</span>
                 </td>
                 <td className="px-5 py-3">
-                  <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">{sub.employeeRate}%</span>
+                  <span className="text-sm font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{sub.employeeRate}%</span>
                 </td>
                 <td className="px-5 py-3">
                   <span className="text-sm font-semibold text-violet-600 dark:text-violet-400">{sub.employerRate}%</span>
                 </td>
                 <td className="px-5 py-3">
-                  <span className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold ${sub.isActive ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
+                  <span className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold ${sub.isActive ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] dark:bg-green-900/20 dark:text-[var(--pro-azure-light)]' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
                     {sub.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </td>
                 <td className="px-5 py-3">
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => openEdit(sub)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors">
+                    <button onClick={() => openEdit(sub)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">
                       <Edit2 size={13} />
                     </button>
                     <button onClick={() => del(sub.id)} className="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-500 transition-colors">
@@ -219,9 +220,9 @@ const PFSubscriptionsPanel: React.FC = () => {
       </div>
 
       {/* Ethiopian context note */}
-      <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-xl p-4">
-        <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300 mb-1">Ethiopian Pension Rates (2026)</p>
-        <p className="text-xs text-emerald-600 dark:text-emerald-400">
+      <div className="bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900/30 rounded-xl p-4">
+        <p className="text-xs font-bold text-[var(--pro-azure-dark)] dark:text-green-300 mb-1">Ethiopian Pension Rates (2026)</p>
+        <p className="text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
           Employee contribution: <strong>7%</strong> of basic salary · Employer contribution: <strong>11%</strong> of basic salary.
           Both are deducted/added automatically during payroll generation and reflected in payslips.
         </p>

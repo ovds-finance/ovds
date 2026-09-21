@@ -6,15 +6,16 @@
  * Each section has a header + a grid of chevron-right action cards.
  * The Reports section uses pinnable report cards (push_pin).
  */
-import React from 'react';
-import { Link } from 'react-router-dom';
 import {
   Package, ChevronRight, FileText, Users, ShoppingCart,
   Receipt, Landmark, BarChart2, FileCheck, TrendingUp,
   ArrowLeftRight, Shield, Star, Link2, Plus,
 } from 'lucide-react';
-import { useAuth } from '../../rbac/AuthContext';
+import React from 'react';
+import { Link } from 'react-router-dom';
+
 import { useLocalStorage } from '../../hooks';
+import { useAuth } from '../../rbac/AuthContext';
 import type { Permission } from '../../rbac/rbac';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -77,7 +78,7 @@ const SECTIONS: ModuleSection[] = [
     key: 'sales-invoices',
     title: 'Sales — Invoices',
     icon: <FileText size={15} />,
-    iconBg: 'bg-emerald-50 text-emerald-600',
+    iconBg: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]',
     permission: 'invoices:read',
     actions: [
       { label: 'New Invoice',        desc: 'Enter the details and create your first invoice',           to: '/sales/invoices?action=new',      icon: <Plus size={13} />,        permission: 'invoices:write' },
@@ -138,7 +139,7 @@ const SECTIONS: ModuleSection[] = [
     key: 'banking',
     title: 'Banking',
     icon: <Landmark size={15} />,
-    iconBg: 'bg-emerald-50 text-emerald-600',
+    iconBg: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]',
     permission: 'fund_transfers:read',
     actions: [
       { label: 'New Income',         desc: 'Enter the details and create your first income',        to: '/banking/transactions?action=income',   icon: <Plus size={13} />,           permission: 'ovds:write' },
@@ -160,21 +161,21 @@ const ActionRow: React.FC<{ action: ModuleAction; onClick?: () => void }> = ({ a
     onClick={onClick}
     className="group flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border border-transparent hover:border-slate-100 dark:hover:border-slate-700/50"
   >
-    <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/30 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors shrink-0">
+    <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 group-hover:bg-[var(--pro-azure-50)] dark:group-hover:bg-green-950/30 group-hover:text-[var(--pro-azure)] dark:group-hover:text-[var(--pro-azure-light)] transition-colors shrink-0">
       {action.icon}
     </div>
     <div className="flex-1 min-w-0">
-      <p className="text-[12px] font-semibold text-slate-700 dark:text-slate-200 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors leading-tight">
+      <p className="text-[12px] font-semibold text-slate-700 dark:text-slate-200 group-hover:text-[var(--pro-azure-dark)] dark:group-hover:text-green-300 transition-colors leading-tight">
         {action.label}
       </p>
       <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-tight mt-0.5 truncate">{action.desc}</p>
     </div>
     {action.isNew && (
-      <span className="shrink-0 text-[8px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
+      <span className="shrink-0 text-[8px] font-bold px-1.5 py-0.5 rounded bg-[var(--pro-azure-100)] dark:bg-green-900/40 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] uppercase tracking-wide">
         New
       </span>
     )}
-    <ChevronRight size={13} className="shrink-0 text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors" />
+    <ChevronRight size={13} className="shrink-0 text-slate-300 dark:text-slate-600 group-hover:text-[var(--pro-azure)] dark:group-hover:text-[var(--pro-azure-light)] transition-colors" />
   </Link>
 );
 
@@ -210,11 +211,11 @@ const ReportCard: React.FC<{
   onTogglePin: (key: string) => void;
 }> = ({ report, pinned, onTogglePin }) => (
   <div className="group relative flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border border-transparent hover:border-slate-100 dark:hover:border-slate-700/50">
-    <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/30 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors shrink-0">
+    <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 group-hover:bg-[var(--pro-azure-50)] dark:group-hover:bg-green-950/30 group-hover:text-[var(--pro-azure)] dark:group-hover:text-[var(--pro-azure-light)] transition-colors shrink-0">
       {report.icon}
     </div>
     <Link to={report.to} className="flex-1 min-w-0">
-      <p className="text-[12px] font-semibold text-slate-700 dark:text-slate-200 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors leading-tight">
+      <p className="text-[12px] font-semibold text-slate-700 dark:text-slate-200 group-hover:text-[var(--pro-azure-dark)] dark:group-hover:text-green-300 transition-colors leading-tight">
         {report.label}
       </p>
       <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-tight mt-0.5">{report.desc}</p>
@@ -224,8 +225,8 @@ const ReportCard: React.FC<{
       title={pinned ? 'Unpin report' : 'Pin report'}
       className={`shrink-0 p-1 rounded transition-all ${
         pinned
-          ? 'text-emerald-500 opacity-100'
-          : 'text-slate-300 dark:text-slate-600 opacity-0 group-hover:opacity-100 hover:text-emerald-500'
+          ? 'text-[var(--pro-azure)] opacity-100'
+          : 'text-slate-300 dark:text-slate-600 opacity-0 group-hover:opacity-100 hover:text-[var(--pro-azure)]'
       }`}
     >
       <Star size={12} className={pinned ? 'fill-current' : ''} />
@@ -271,7 +272,7 @@ const ModuleQuickAccessPanel: React.FC = () => {
             </div>
             <Link
               to="/reports?action=new"
-              className="flex items-center gap-1 px-2.5 py-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-[10px] font-bold transition-colors"
+              className="flex items-center gap-1 px-2.5 py-1 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-lg text-[10px] font-bold transition-colors"
             >
               <Plus size={10} /> New Report
             </Link>
@@ -304,7 +305,7 @@ const ModuleQuickAccessPanel: React.FC = () => {
             <div className="px-3 pt-2 pb-1">
               <Link
                 to="/reports"
-                className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+                className="flex items-center gap-1.5 text-[11px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline"
               >
                 View all reports <ChevronRight size={11} />
               </Link>

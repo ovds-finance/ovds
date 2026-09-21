@@ -1,25 +1,27 @@
-import React, { createContext, useContext, ReactNode, useState, useEffect, useCallback, lazy, Suspense } from 'react';
-import type { CapturedInvoiceData } from './invoices/invoiceCaptureModal';
-import type { ReceiptEvidence } from './receiptViewer';
+﻿import React, { createContext, useContext, ReactNode, useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import toast from 'react-hot-toast';
+
+import { useBusiness } from '../context/businessContext';
 import type { Invoice } from '../pages/Invoices';
 import api from '../services/api';
 import { invoicesApi } from '../services/ovdsApi';
-import { useBusiness } from '../context/businessContext';
-import toast from 'react-hot-toast';
 import { prompt } from '../utils/confirm';
+
+import type { CapturedInvoiceData } from './invoice/invoiceCaptureModal';
+import type { ReceiptEvidence } from './receiptViewer';
 
 // -- Lazy-loaded modal sub-components ----------------------------------------
 // Each modal is only fetched when it's first opened, keeping the initial
 // Invoices page bundle lean.
-const AddInvoiceModal      = lazy(() => import('./invoices/addInvoiceModal'));
-const PreviewModalLazy     = lazy(() => import('./invoices/previewModal').then(m => ({ default: m.PreviewModal })));
-const RecordPaymentModal   = lazy(() => import('./invoices/recordPaymentModal'));
-const InvoiceCaptureModal  = lazy(() => import('./invoices/invoiceCaptureModal'));
+const AddInvoiceModal      = lazy(() => import('./invoice/addInvoiceModal'));
+const PreviewModalLazy     = lazy(() => import('./invoice/previewModal').then(m => ({ default: m.PreviewModal })));
+const RecordPaymentModal   = lazy(() => import('./invoice/recordPaymentModal'));
+const InvoiceCaptureModal  = lazy(() => import('./invoice/invoiceCaptureModal'));
 const TelecomReceiptViewer = lazy(() => import('./receiptViewer'));
-const CustomerRegistryModal = lazy(() => import('./invoices/customerRegistryModal'));
-const InvoiceBatchModal    = lazy(() => import('./invoices/invoiceBatchModal'));
-const IngestionHubModal    = lazy(() => import('./invoices/ingestionHubModal').then(m => ({ default: m.IngestionHubModal })));
-const InvoiceDrawer        = lazy(() => import('./invoices/invoiceDrawer'));
+const CustomerRegistryModal = lazy(() => import('./invoice/customerRegistryModal'));
+const InvoiceBatchModal    = lazy(() => import('./invoice/invoiceBatchModal'));
+const IngestionHubModal    = lazy(() => import('./invoice/ingestionHubModal').then(m => ({ default: m.IngestionHubModal })));
+const InvoiceDrawer        = lazy(() => import('./invoice/invoiceDrawer'));
 
 // -- Modal Context ------------------------------------------------------------
 interface ModalContextType {
@@ -60,6 +62,7 @@ interface ModalContextType {
 
 const ModalContext = createContext<ModalContextType | null>(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useModals = () => {
   const context = useContext(ModalContext);
   if (!context) throw new Error('useModals must be used within ModalProvider');
@@ -222,21 +225,25 @@ export const InvoiceModals: React.FC<Props> = ({
   });
   const [showTemplateMenu, setShowTemplateMenu] = useState(false);
 
+  // GAP-2 FIX: anchor dueDate to the invoice's own date field, not today.
+  // Ovds SaaS computes due = invoice_date + payment_term_days.  Using
+  // Date.now() means that editing an old invoice recalculates the due date
+  // relative to the current calendar day instead of the invoice date.
+  //
+  // GAP-3 FIX: the old useEffect read newInvoice?.paymentTerms and also
+  // called setNewInvoice, creating a dependency loop that fired on every
+  // unrelated newInvoice mutation.  All due-date logic is now consolidated
+  // inside applyPaymentTerms; the stale useEffect is removed entirely.
   const applyPaymentTerms = useCallback((terms: string) => {
     const days: Record<string, number> = { IMMEDIATE: 0, NET7: 7, NET15: 15, NET30: 30, NET60: 60, NET90: 90 };
     const d = days[terms] ?? 30;
-    const due = new Date(Date.now() + d * 86_400_000).toISOString().split('T')[0];
-    setNewInvoice((prev: any) => ({ ...prev, paymentTerms: terms, dueDate: due }));
+    setNewInvoice((prev: any) => {
+      // Base the due date off the invoice's own date when available.
+      const base = prev.date ? new Date(prev.date) : new Date();
+      const due  = new Date(base.getTime() + d * 86_400_000).toISOString().split('T')[0];
+      return { ...prev, paymentTerms: terms, dueDate: due };
+    });
   }, [setNewInvoice]);
-
-  // -- Auto-update dueDate when paymentTerms changes in the form ------------
-  useEffect(() => {
-    if (!newInvoice?.paymentTerms) return;
-    const days: Record<string, number> = { IMMEDIATE: 0, NET7: 7, NET15: 15, NET30: 30, NET60: 60, NET90: 90 };
-    const d = days[newInvoice.paymentTerms] ?? 30;
-    const due = new Date(Date.now() + d * 86_400_000).toISOString().split('T')[0];
-    setNewInvoice((prev: any) => ({ ...prev, dueDate: due }));
-  }, [newInvoice?.paymentTerms]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const saveTemplate = useCallback(async () => {
     const name = await prompt({ title: 'Save template', placeholder: 'Template name' });
@@ -373,7 +380,7 @@ export const InvoiceModals: React.FC<Props> = ({
             setReceiptViewerRef('');
             setEvidenceInvoice(null);
           }}
-          onApply={(evidence) => onSaveEvidence(evidenceInvoice?.id || '', evidence)}
+          onApply={(evidence: any) => onSaveEvidence(evidenceInvoice?.id || '', evidence)}
         />
       )}
 
@@ -541,8 +548,8 @@ const CustomerRegistryModalWrapper: React.FC<{
         ? `/ovds/customers/registry?companyId=${selectedCompanyId}`
         : `/ovds/customers/registry`;
       const r = await api.get(url);
-      // Handle both { data: [...] } and plain array responses
-      const raw = r.data?.data ?? r.data ?? [];
+      // Response shape: { data: { data: [...], total, page, limit } }
+      const raw = r.data?.data?.data ?? r.data?.data ?? r.data ?? [];
       setCustomers(Array.isArray(raw) ? raw : []);
     } catch {
       setCustomers([]);

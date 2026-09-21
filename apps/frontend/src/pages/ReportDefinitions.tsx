@@ -3,23 +3,25 @@
  *
  * Backend: ReportDefinitionController @Controller('ovds/reports/definitions')
  */
-import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, RefreshCw, FileText } from 'lucide-react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { confirm } from '../utils/confirm';
-import { reportDefinitionsApi } from '../services/ovdsApi';
+
 import {
   AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, Modal, FormField, Input, Select, EmptyState, SearchBar,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { reportDefinitionsApi } from '../services/ovdsApi';
+import { confirm } from '../utils/confirm';
 
 interface ReportDefinition {
   id: string;
   name: string;
   type: string;
   period: string;
+  definition: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -46,6 +48,7 @@ const ReportDefinitions: React.FC = () => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(() => { load(); }, []);
 
   const handleSave = async () => {
@@ -104,7 +107,7 @@ const ReportDefinitions: React.FC = () => {
       }
     >
       <AppKpi cells={[
-        { label: 'Total Definitions', value: defs.length, color: 'emerald' as const },
+        { label: 'Total Definitions', value: defs.length, color: 'green' as const },
         { label: 'Active', value: defs.filter(d => d.isActive).length, color: 'sky' as const },
       ]} />
 
@@ -132,7 +135,7 @@ const ReportDefinitions: React.FC = () => {
               <AppTd><span className="text-[12px] font-semibold text-slate-800">{d.name}</span></AppTd>
               <AppTd><span className="text-[10px] font-semibold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-100">{d.type}</span></AppTd>
               <AppTd><span className="text-[11px] text-slate-500">{d.period}</span></AppTd>
-              <AppTd><span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${d.isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>{d.isActive ? 'Active' : 'Inactive'}</span></AppTd>
+              <AppTd><span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${d.isActive ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>{d.isActive ? 'Active' : 'Inactive'}</span></AppTd>
               <AppTd align="right">
                 <div className="flex items-center justify-end gap-1">
                   <Btn size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => setModal({ open: true, data: { ...d } })}><Edit2 size={11} /></Btn>

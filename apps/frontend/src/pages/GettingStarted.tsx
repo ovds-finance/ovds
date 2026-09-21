@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useEimsReadiness } from '@ovds/features/eims';
+import { useSecurityReadiness } from '@ovds/features/security';
 import {
   ArrowRight,
   Calculator,
@@ -47,15 +47,19 @@ import {
   Zap,
   Target,
 } from 'lucide-react';
-import { useAuth } from '../rbac/AuthContext';
+import React, { useState, useMemo, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+
+import { useBusiness } from '../context/businessContext';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { useSetupComplianceSync } from '../hooks/useSetupComplianceSync';
+import { useAuth } from '../rbac/AuthContext';
+import setupApi, { type SetupStepDefinition, type CompanySetupProgress } from '../services/setupApi';
 import { calculatePIT } from '../utils/ethiopianTax';
 import { fmtDecimal } from '../utils/fmt';
-import setupApi, { type SetupStepDefinition, type SetupStepStatus, type CompanySetupProgress } from '../services/setupApi';
-import { useEimsReadiness } from '@ovds/features/eims';
-import { useSecurityReadiness } from '@ovds/features/security';
-import { useSetupComplianceSync } from '../hooks/useSetupComplianceSync';
-import toast from 'react-hot-toast';
+
 
 // -----------------------------------------------------------------------------
 // PIT Calculator
@@ -83,7 +87,7 @@ const PITCalculator: React.FC = () => {
               Gross Monthly Salary
             </label>
             <div className="relative group">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400 group-focus-within:text-emerald-600 transition-colors">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400 group-focus-within:text-[var(--pro-azure)] transition-colors">
                 ETB
               </span>
               <input
@@ -99,8 +103,8 @@ const PITCalculator: React.FC = () => {
           </div>
           {g > 0 && (
             <div className="sm:w-48">
-              <div className="h-full px-6 py-4 bg-emerald-500 rounded-xl text-center flex flex-col justify-center shadow-lg shadow-emerald-500/20">
-                <p className="text-[10px] font-bold text-emerald-100 uppercase tracking-widest">
+              <div className="h-full px-6 py-4 bg-[var(--pro-azure-50)]0 rounded-xl text-center flex flex-col justify-center shadow-lg shadow-green-500/20">
+                <p className="text-[10px] font-bold text-green-100 uppercase tracking-widest">
                   Effective Rate
                 </p>
                 <p className="text-3xl font-bold text-white mt-1">{rate}%</p>
@@ -138,8 +142,8 @@ const PITCalculator: React.FC = () => {
               {
                 label: 'Net Take-Home',
                 value: fmt2(net),
-                color: 'text-emerald-600 dark:text-emerald-400',
-                bg: 'bg-emerald-50/50 dark:bg-emerald-900/10',
+                color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+                bg: 'bg-[var(--pro-azure-50)]/50 dark:bg-green-900/10',
                 icon: <Sparkles size={16} />,
               },
             ].map((c) => (
@@ -160,17 +164,17 @@ const PITCalculator: React.FC = () => {
             ))}
           </div>
 
-          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl">
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-[var(--pro-azure-50)]/50 dark:bg-green-900/10 border border-[var(--pro-azure-100)] dark:border-green-900/30 rounded-2xl">
             <div className="flex flex-wrap justify-center sm:justify-start gap-4 text-xs font-medium text-slate-500 dark:text-slate-400">
               <span className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />{' '}
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--pro-azure-light)]" />{' '}
                 Employer pension (11%):{' '}
                 <strong className="text-slate-900 dark:text-white">
                   ETB {fmt2(emplPension)}
                 </strong>
               </span>
               <span className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />{' '}
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--pro-azure-light)]" />{' '}
                 Total employer cost:{' '}
                 <strong className="text-slate-900 dark:text-white">
                   ETB {fmt2(g + emplPension)}
@@ -179,7 +183,7 @@ const PITCalculator: React.FC = () => {
             </div>
             <button
               onClick={() => setShowTable((v) => !v)}
-              className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:shadow-md transition-all"
+              className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:shadow-md transition-all"
             >
               {showTable ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               {showTable ? 'Hide' : 'Show'} PIT Brackets
@@ -223,7 +227,7 @@ const PITCalculator: React.FC = () => {
                       <td className="px-5 py-3 font-medium text-slate-700 dark:text-slate-300">
                         {range}
                       </td>
-                      <td className="px-5 py-3 font-bold text-emerald-600 dark:text-emerald-400">
+                      <td className="px-5 py-3 font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                         {r}
                       </td>
                       <td className="px-5 py-3 text-slate-500 dark:text-slate-400 font-mono text-xs">
@@ -439,8 +443,8 @@ const TAX_SCHEDULES = [
     short: 'Corporate / Business',
     icon: <Briefcase size={15} />,
     color:
-      'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400',
-    accent: 'bg-emerald-500',
+      'bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-[var(--pro-azure-100)] dark:border-green-800 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
+    accent: 'bg-[var(--pro-azure-50)]0',
     rates: '30% flat (corp.) / up to 35% (sole)',
     basis:
       'Net profits from commercial, industrial, or professional businesses.',
@@ -531,7 +535,7 @@ const TRADE_SECTORS = [
     label: 'Service & Professional Trade',
     icon: <Briefcase size={14} />,
     color:
-      'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800',
+      'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/20 dark:text-[var(--pro-azure-light)] dark:border-green-800',
     examples: 'Consulting, legal, engineering, transport, hotels',
     taxes: [
       {
@@ -566,7 +570,7 @@ const BUSINESS_CATEGORIES = [
       'Full IFRS-aligned balance sheets, complete transactional records',
     taxMethod: 'Net Taxable Income: Gross sales minus authorised deductions',
     vatRequired: true,
-    color: 'border-l-emerald-500',
+    color: 'border-l-indigo-500',
   },
   {
     cat: 'Category B',
@@ -641,7 +645,7 @@ const EthiopianTaxGuide: React.FC = () => {
             className={`px-4 py-2 rounded-xl text-[11px] font-bold transition-all border ${
               section === s.id
                 ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white'
-                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 hover:border-emerald-400 dark:hover:border-emerald-600'
+                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 hover:border-[var(--pro-azure)] dark:hover:border-[var(--pro-azure-light)]'
             }`}
           >
             {s.label}
@@ -653,7 +657,7 @@ const EthiopianTaxGuide: React.FC = () => {
       {section === 'schedules' && (
         <div className="space-y-3">
           <p className="ovds-body text-slate-500 dark:text-slate-400 flex items-start gap-2">
-            <Info size={14} className="shrink-0 mt-0.5 text-emerald-500" />
+            <Info size={14} className="shrink-0 mt-0.5 text-[var(--pro-azure)]" />
             Ethiopia divides income taxes into five official categories
             (Schedules A–E) under Proclamation No. 1395/2025, administered by
             the Ministry of Revenues (MoR) via the MoR e-Tax Portal.
@@ -695,7 +699,7 @@ const EthiopianTaxGuide: React.FC = () => {
                         <li key={i} className="flex items-start gap-2 text-xs">
                           <CheckCircle2
                             size={11}
-                            className="mt-0.5 shrink-0 text-emerald-500"
+                            className="mt-0.5 shrink-0 text-[var(--pro-azure)]"
                           />
                           <span className="opacity-80">{d}</span>
                         </li>
@@ -719,7 +723,7 @@ const EthiopianTaxGuide: React.FC = () => {
       {section === 'sectors' && (
         <div className="space-y-4">
           <p className="ovds-body text-slate-500 dark:text-slate-400 flex items-start gap-2">
-            <Info size={14} className="shrink-0 mt-0.5 text-emerald-500" />
+            <Info size={14} className="shrink-0 mt-0.5 text-[var(--pro-azure)]" />
             The Ministry of Revenues links specific trade sectors to mandated
             tax types. Your sector determines which taxes apply to your business
             activities.
@@ -768,7 +772,7 @@ const EthiopianTaxGuide: React.FC = () => {
       {section === 'categories' && (
         <div className="space-y-4">
           <p className="ovds-body text-slate-500 dark:text-slate-400 flex items-start gap-2">
-            <Info size={14} className="shrink-0 mt-0.5 text-emerald-500" />
+            <Info size={14} className="shrink-0 mt-0.5 text-[var(--pro-azure)]" />
             Ethiopia classifies businesses into two legal categories based on
             annual gross revenue. Your category determines your bookkeeping
             requirements, income tax method, and VAT obligations.
@@ -790,7 +794,7 @@ const EthiopianTaxGuide: React.FC = () => {
                       </p>
                     </div>
                     <span
-                      className={`text-[11px] font-bold px-3 py-1 rounded-full border ${bc.vatRequired ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800' : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800'}`}
+                      className={`text-[11px] font-bold px-3 py-1 rounded-full border ${bc.vatRequired ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/20 dark:text-[var(--pro-azure-light)] dark:border-green-800' : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800'}`}
                     >
                       {bc.vatRequired
                         ? 'VAT Registered (mandatory)'
@@ -827,19 +831,19 @@ const EthiopianTaxGuide: React.FC = () => {
           <div className="flex flex-wrap gap-2 pt-1">
             <Link
               to="/settings/business-registration"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:border-emerald-400 transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:border-[var(--pro-azure)] transition-colors"
             >
               Business Registration <ArrowRight size={11} />
             </Link>
             <Link
               to="/tax/vat"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:border-emerald-400 transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:border-[var(--pro-azure)] transition-colors"
             >
               VAT Administration <ArrowRight size={11} />
             </Link>
             <Link
               to="/tax/tot"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:border-emerald-400 transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:border-[var(--pro-azure)] transition-colors"
             >
               TOT Filing <ArrowRight size={11} />
             </Link>
@@ -851,7 +855,7 @@ const EthiopianTaxGuide: React.FC = () => {
       {section === 'indirect' && (
         <div className="space-y-4">
           <p className="ovds-body text-slate-500 dark:text-slate-400 flex items-start gap-2">
-            <Info size={14} className="shrink-0 mt-0.5 text-emerald-500" />
+            <Info size={14} className="shrink-0 mt-0.5 text-[var(--pro-azure)]" />
             Indirect taxes are consumption-based fees collected by businesses
             during trade transactions and Remitted to MoR.
           </p>
@@ -859,10 +863,10 @@ const EthiopianTaxGuide: React.FC = () => {
             {INDIRECT_TAXES.map((t) => (
               <div
                 key={t.name}
-                className="flex items-start gap-4 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors group"
+                className="flex items-start gap-4 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-[var(--pro-azure-light)] dark:hover:border-green-700 transition-colors group"
               >
                 <div className="w-16 shrink-0 text-center">
-                  <span className="text-[13px] font-black text-emerald-600 dark:text-emerald-400">
+                  <span className="text-[13px] font-black text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                     {t.rate}
                   </span>
                 </div>
@@ -876,7 +880,7 @@ const EthiopianTaxGuide: React.FC = () => {
                 </div>
                 <Link
                   to={t.link}
-                  className="shrink-0 p-2 rounded-lg text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/20 transition-all"
+                  className="shrink-0 p-2 rounded-lg text-slate-300 dark:text-slate-600 group-hover:text-[var(--pro-azure)] group-hover:bg-[var(--pro-azure-50)] dark:group-hover:bg-green-950/20 transition-all"
                   title={`Go to ${t.name}`}
                 >
                   <ArrowRight size={13} />
@@ -888,7 +892,7 @@ const EthiopianTaxGuide: React.FC = () => {
             href="https://etax.mor.gov.et"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline mt-1"
+            className="inline-flex items-center gap-2 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline mt-1"
           >
             <ExternalLink size={12} /> MoR e-Tax Portal — etax.mor.gov.et
           </a>
@@ -918,7 +922,7 @@ const DEADLINES: DeadlineItem[] = [
     months: [],
     type: 'monthly',
     link: '/tax/vat',
-    color: 'bg-emerald-500',
+    color: 'bg-[var(--pro-azure-50)]0',
   },
   {
     label: 'TOT Filing',
@@ -1046,6 +1050,7 @@ const TaxDeadlineCalendar: React.FC = () => {
           ) === i,
       )
       .slice(0, 7);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [thisMonth, thisDay, thisYear]);
 
   return (
@@ -1053,7 +1058,7 @@ const TaxDeadlineCalendar: React.FC = () => {
       <div className="flex items-center gap-2">
         <CalendarDays
           size={14}
-          className="text-emerald-600 dark:text-emerald-400"
+          className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]"
         />
         <p className="text-xs font-black text-slate-800 dark:text-slate-200">
           Tax Deadline Calendar
@@ -1107,7 +1112,7 @@ const TaxDeadlineCalendar: React.FC = () => {
               )}
               <ArrowRight
                 size={11}
-                className="shrink-0 text-slate-300 group-hover:text-emerald-500 transition-colors"
+                className="shrink-0 text-slate-300 group-hover:text-[var(--pro-azure)] transition-colors"
               />
             </Link>
           );
@@ -1117,7 +1122,7 @@ const TaxDeadlineCalendar: React.FC = () => {
         href="https://etax.mor.gov.et"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline pt-1"
+        className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline pt-1"
       >
         <Globe size={10} /> MoR e-Tax Portal
       </a>
@@ -1217,6 +1222,7 @@ function useChecklistProgress(ids: string[]) {
       }
       try {
         localStorage.setItem(CHECKLIST_KEY, JSON.stringify([...next]));
+      // eslint-disable-next-line no-empty
       } catch {}
       return next;
     });
@@ -1226,6 +1232,7 @@ function useChecklistProgress(ids: string[]) {
     setChecked(new Set());
     try {
       localStorage.removeItem(CHECKLIST_KEY);
+    // eslint-disable-next-line no-empty
     } catch {}
   };
 
@@ -1246,8 +1253,8 @@ function useChecklistProgress(ids: string[]) {
 const SidebarApiKey: React.FC = () => (
   <div className="p-6 ovds-widget-card shadow-sm space-y-4">
     <div className="flex items-center gap-3">
-      <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 flex items-center justify-center shrink-0">
-        <Key size={16} className="text-emerald-600 dark:text-emerald-400" />
+      <div className="w-9 h-9 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/20 flex items-center justify-center shrink-0">
+        <Key size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
       </div>
       <div>
         <p className="text-xs font-black text-slate-800 dark:text-slate-200">
@@ -1267,7 +1274,7 @@ const SidebarApiKey: React.FC = () => (
       href="https://ovds.com.et/login"
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center justify-center gap-2 w-full py-2.5 bg-emerald-500 text-white rounded-xl text-xs font-black hover:bg-emerald-600 transition-all"
+      className="flex items-center justify-center gap-2 w-full py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-black hover:bg-[var(--pro-azure-dark)] transition-all"
     >
       Get API Key at ovds.com.et <ArrowRight size={12} />
     </a>
@@ -1276,8 +1283,8 @@ const SidebarApiKey: React.FC = () => (
 
 const SidebarComplianceHub: React.FC = () => (
   <div className="p-8 bg-slate-900 rounded-xl text-white space-y-6 relative overflow-hidden shadow-2xl">
-    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-100 rounded-full blur-[40px] -mr-16 -mt-16 pointer-events-none" />
-    <h3 className="text-xs font-black text-emerald-400 uppercase tracking-widest">
+    <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--pro-azure-100)] rounded-full blur-[40px] -mr-16 -mt-16 pointer-events-none" />
+    <h3 className="text-xs font-black text-[var(--pro-azure-light)] uppercase tracking-widest">
       Compliance Hub
     </h3>
     <div className="space-y-4">
@@ -1286,7 +1293,7 @@ const SidebarComplianceHub: React.FC = () => (
           label: 'DRRF Rate',
           value: '1.0% — 5.0%',
           sub: 'Auto-calculated per Procl.',
-          subCls: 'text-emerald-400',
+          subCls: 'text-[var(--pro-azure-light)]',
         },
         {
           label: 'Pension (Co.)',
@@ -1327,7 +1334,7 @@ const SidebarPitTips: React.FC = () => (
     <div className="flex items-center gap-2">
       <Calculator
         size={14}
-        className="text-emerald-600 dark:text-emerald-400"
+        className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]"
       />
       <p className="text-xs font-black text-slate-800 dark:text-slate-200">
         Quick PIT Facts
@@ -1355,7 +1362,7 @@ const SidebarPitTips: React.FC = () => (
     </div>
     <Link
       to="/hr/payroll"
-      className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline pt-1"
+      className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline pt-1"
     >
       Payroll Module <ArrowRight size={11} />
     </Link>
@@ -1365,7 +1372,7 @@ const SidebarPitTips: React.FC = () => (
 const SidebarTaxLinks: React.FC = () => (
   <div className="p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl space-y-3">
     <div className="flex items-center gap-2">
-      <Landmark size={14} className="text-emerald-600 dark:text-emerald-400" />
+      <Landmark size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
       <p className="text-xs font-black text-slate-800 dark:text-slate-200">
         Official Resources
       </p>
@@ -1386,14 +1393,14 @@ const SidebarTaxLinks: React.FC = () => (
         >
           <Globe
             size={11}
-            className="text-slate-400 shrink-0 group-hover:text-emerald-500"
+            className="text-slate-400 shrink-0 group-hover:text-[var(--pro-azure)]"
           />
-          <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 flex-1 truncate">
+          <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 group-hover:text-[var(--pro-azure)] dark:group-hover:text-[var(--pro-azure-light)] flex-1 truncate">
             {link.label}
           </span>
           <ExternalLink
             size={10}
-            className="text-slate-300 shrink-0 group-hover:text-emerald-400"
+            className="text-slate-300 shrink-0 group-hover:text-[var(--pro-azure-light)]"
           />
         </a>
       ))}
@@ -1403,7 +1410,7 @@ const SidebarTaxLinks: React.FC = () => (
 
 const SidebarShortcutHint: React.FC = () => (
   <div className="p-5 bg-slate-900 rounded-xl text-white space-y-3">
-    <p className="text-xs font-black text-emerald-400 uppercase tracking-widest">
+    <p className="text-xs font-black text-[var(--pro-azure-light)] uppercase tracking-widest">
       Pro Tip
     </p>
     <p className="text-xs text-slate-400 leading-relaxed">
@@ -1419,7 +1426,7 @@ const SidebarShortcutHint: React.FC = () => (
     </p>
     <Link
       to="/dashboard"
-      className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 hover:underline"
+      className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--pro-azure-light)] hover:underline"
     >
       Go to Dashboard <ArrowRight size={11} />
     </Link>
@@ -1431,8 +1438,10 @@ const SidebarShortcutHint: React.FC = () => (
 // -----------------------------------------------------------------------------
 
 const GettingStarted: React.FC = () => {
-  usePageTitle('Getting Started');
-  const { user, companyId } = useAuth();
+  const { t } = useTranslation();
+  usePageTitle(t('gs.page_title'));
+  const { user } = useAuth();
+  const { selectedCompanyId: companyId } = useBusiness();
   type ActiveTab = 'checklist' | 'tax' | 'shortcuts' | 'pit' | 'guide';
   const [activeTab, setActiveTab] = useState<ActiveTab>('checklist');
   const checklistIds = CHECKLIST.map((c) => c.id);
@@ -1440,8 +1449,8 @@ const GettingStarted: React.FC = () => {
 
   const [wizardSteps, setWizardSteps] = useState<SetupStepDefinition[]>([]);
   const [wizardProgress, setWizardProgress] = useState<CompanySetupProgress | null>(null);
-  const [wizardLoading, setWizardLoading] = useState(false);
-  const [wizardSaving, setWizardSaving] = useState(false);
+  const [_wizardLoading, setWizardLoading] = useState(false);
+  const [_wizardSaving, setWizardSaving] = useState(false);
 
   const { data: eimsReadiness } = useEimsReadiness();
   const { data: securityReadiness } = useSecurityReadiness();
@@ -1487,10 +1496,10 @@ const GettingStarted: React.FC = () => {
       } else if (step.status === 'pending') {
         const updated = await setupApi.completeStep(companyId, stepKey, {});
         setWizardProgress(updated);
-        toast.success('Step completed');
+        toast.success(t('gs.toasts.step_completed'));
       }
     } catch (e: any) {
-      toast.error(e?.message ?? 'Failed to update step');
+      toast.error(e?.message ?? t('gs.toasts.failed_update_step'));
     } finally {
       setWizardSaving(false);
     }
@@ -1502,9 +1511,9 @@ const GettingStarted: React.FC = () => {
     try {
       const result = await setupApi.resetProgress(companyId);
       setWizardProgress(result.progress);
-      toast.success('Wizard reset');
+      toast.success(t('gs.toasts.wizard_reset'));
     } catch (e: any) {
-      toast.error(e?.message ?? 'Failed to reset wizard');
+      toast.error(e?.message ?? t('gs.toasts.failed_reset'));
     } finally {
       setWizardSaving(false);
     }
@@ -1532,15 +1541,15 @@ const GettingStarted: React.FC = () => {
       return ia - ib;
     });
     const catMeta: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-      deployment:  { label: 'Deployment & Environment', icon: <Cloud size={13} />, color: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/30 dark:text-sky-300 dark:border-sky-800' },
-      company:     { label: 'Core Company Data',       icon: <Building2 size={13} />, color: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800' },
-      financial:   { label: 'Financial Parameters',   icon: <Banknote size={13} />, color: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800' },
-      modules:     { label: 'Modules & Scope',        icon: <Package size={13} />, color: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800' },
-      users:       { label: 'Users & Access',         icon: <Users size={13} />, color: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-800' },
-      system:      { label: 'System Controls',        icon: <SlidersHorizontal size={13} />, color: 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800/40 dark:text-slate-300 dark:border-slate-700' },
-      tax:         { label: 'Tax Configuration',      icon: <Shield size={13} />, color: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-300 dark:border-indigo-800' },
-      compliance:  { label: 'Compliance',             icon: <CheckCircle2 size={13} />, color: 'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-300 dark:border-teal-800' },
-      localization:{ label: 'Localization',           icon: <Globe size={13} />, color: 'bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/30 dark:text-cyan-300 dark:border-cyan-800' },
+      deployment:  { label: t('gs.cat_labels.deployment'),  icon: <Cloud size={13} />, color: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/30 dark:text-sky-300 dark:border-sky-800' },
+      company:     { label: t('gs.cat_labels.company'),     icon: <Building2 size={13} />, color: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-300 dark:border-green-800' },
+      financial:   { label: t('gs.cat_labels.financial'),   icon: <Banknote size={13} />, color: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800' },
+      modules:     { label: t('gs.cat_labels.modules'),     icon: <Package size={13} />, color: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800' },
+      users:       { label: t('gs.cat_labels.users'),       icon: <Users size={13} />, color: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-800' },
+      system:      { label: t('gs.cat_labels.system'),      icon: <SlidersHorizontal size={13} />, color: 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800/40 dark:text-slate-300 dark:border-slate-700' },
+      tax:         { label: t('gs.cat_labels.tax'),         icon: <Shield size={13} />, color: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-300 dark:border-green-800' },
+      compliance:  { label: t('gs.cat_labels.compliance'),  icon: <CheckCircle2 size={13} />, color: 'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-300 dark:border-teal-800' },
+      localization:{ label: t('gs.cat_labels.localization'),icon: <Globe size={13} />, color: 'bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/30 dark:text-cyan-300 dark:border-cyan-800' },
     };
     return sortedCats.map((cat) => {
       const meta = catMeta[cat] || { label: cat, icon: <Settings size={13} />, color: 'bg-slate-50 text-slate-700 border-slate-200' };
@@ -1564,7 +1573,7 @@ const GettingStarted: React.FC = () => {
                   className={`group relative ovds-widget-card p-6 transition-all duration-200 cursor-pointer select-none ${
                     done
                       ? 'opacity-70 bg-white dark:bg-slate-800/40'
-                      : 'hover:border-emerald-300 dark:hover:border-emerald-700'
+                      : 'hover:border-[var(--pro-azure-light)] dark:hover:border-green-700'
                   }`}
                   onClick={() => toggle(step.key)}
                 >
@@ -1572,14 +1581,14 @@ const GettingStarted: React.FC = () => {
                     <div
                       className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all ${
                         done
-                          ? 'bg-emerald-500 text-white'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-emerald-500 group-hover:text-white'
+                          ? 'bg-[var(--pro-azure)] text-white'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-[var(--pro-azure-dark)] group-hover:text-white'
                       }`}
                     >
                       {done ? <CheckCircle2 size={18} /> : (STEP_ICON_MAP[step.key] ?? <Settings size={14} />)}
                     </div>
                     <span
-                      className={`mt-1 transition-colors ${done ? 'text-emerald-500' : 'text-slate-300 dark:text-slate-600 group-hover:text-slate-400'}`}
+                      className={`mt-1 transition-colors ${done ? 'text-[var(--pro-azure)]' : 'text-slate-300 dark:text-slate-600 group-hover:text-slate-400'}`}
                     >
                       {done ? <CheckSquare size={14} /> : <Square size={14} />}
                     </span>
@@ -1596,9 +1605,9 @@ const GettingStarted: React.FC = () => {
                     <Link
                       to={route}
                       onClick={(e) => e.stopPropagation()}
-                      className="mt-3 inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
+                      className="mt-3 inline-flex items-center gap-1 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline"
                     >
-                      Go <ArrowRight size={10} />
+                      {t('gs.checklist.go')} <ArrowRight size={10} />
                     </Link>
                   )}
                 </div>
@@ -1613,7 +1622,7 @@ const GettingStarted: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 space-y-12">
       {/* Hero Header - High fidelity glassmorphism */}
-      <div className="relative p-10 lg:p-16 rounded-xl bg-slate-900 overflow-hidden shadow-2xl shadow-emerald-900/20">
+      <div className="relative p-10 lg:p-16 rounded-xl bg-slate-900 overflow-hidden shadow-2xl shadow-green-900/20">
         <div
           className="absolute inset-0 opacity-[0.05]"
           style={{
@@ -1622,70 +1631,69 @@ const GettingStarted: React.FC = () => {
             backgroundSize: '32px 32px',
           }}
         />
-        <div className="absolute -top-32 -right-32 w-96 h-96 bg-emerald-100 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-emerald-50 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute -top-32 -right-32 w-96 h-96 bg-[var(--pro-azure-100)] rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-[var(--pro-azure-50)] rounded-full blur-[100px] pointer-events-none" />
 
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-10">
           <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-              <Sparkles size={14} className="text-emerald-400" />
-              <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">
-                System Administration Onboarding · Configure · Deploy · Operate
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[var(--pro-azure-50)]0/10 border border-[var(--pro-azure)]/20 rounded-full">
+              <Sparkles size={14} className="text-[var(--pro-azure-light)]" />
+              <span className="text-[10px] font-black text-[var(--pro-azure-light)] uppercase tracking-widest">
+                {t('gs.hero.badge')}
               </span>
             </div>
             <h1 className="text-4xl lg:text-6xl font-black text-white leading-tight tracking-tighter">
-              Setting Up{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-300">
-                Ovds Cloud
+              {t('gs.hero.title_prefix')}{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--pro-azure-light)] to-[var(--pro-azure-light)]">
+                {t('gs.hero.title_brand')}
               </span>
             </h1>
             <p className="text-slate-400 text-lg max-w-xl leading-relaxed font-medium">
-              {user ? `Welcome, ${user.username}! ` : ''}
-              Initialize your corporate profile, configure Ethiopian tax
-              compliance, and activate IFRS-ready accounting in minutes.
+              {user ? t('gs.hero.welcome', { name: user.username }) : ''}
+              {t('gs.hero.subtitle')}
             </p>
             <div className="flex flex-wrap gap-4 pt-4">
               <a
                 href="https://ovds.com.et"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-8 py-4 bg-emerald-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all active:scale-95"
+                className="px-8 py-4 bg-[var(--pro-azure)] text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-green-500/20 hover:bg-[var(--pro-azure-dark)] transition-all active:scale-95"
               >
-                Get Started
+                {t('gs.hero.cta_get_started')}
               </a>
               <Link
                 to="/getting-started/on-premise"
                 className="px-8 py-4 bg-white/5 border border-white/10 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-white/10 transition-all"
               >
-                Self-Hosting Guide
+                {t('gs.hero.cta_self_hosting')}
               </Link>
               <Link
                 to="/getting-started/client"
                 className="px-8 py-4 bg-amber-500/10 border border-amber-400/20 text-amber-300 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-amber-500/20 transition-all"
               >
-                Enterprise Client ↓
+                {t('gs.hero.cta_enterprise')}
               </Link>
               <Link
                 to="/getting-started/invoice-module"
-                className="px-8 py-4 bg-emerald-500/10 border border-emerald-400/20 text-emerald-300 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all"
+                className="px-8 py-4 bg-[var(--pro-azure-50)]0/10 border border-[var(--pro-azure)]/20 text-green-300 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[var(--pro-azure-dark)]/20 transition-all"
               >
-                Invoice Module ↓
+                {t('gs.hero.cta_invoice_module')}
               </Link>
             </div>
           </div>
 
           <div className="hidden lg:block w-72 h-72 relative">
-            <div className="absolute inset-0 bg-emerald-500/10 rounded-xl rotate-6 scale-95" />
+            <div className="absolute inset-0 bg-[var(--pro-azure-50)]0/10 rounded-xl rotate-6 scale-95" />
             <div className="absolute inset-0 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl flex flex-col items-center justify-center p-8 text-center -rotate-3 transition-transform hover:rotate-0 duration-500">
-              <Rocket size={48} className="text-emerald-400 mb-6" />
+              <Rocket size={48} className="text-[var(--pro-azure-light)] mb-6" />
               <div className="h-2 w-32 bg-slate-700 rounded-full mb-3 overflow-hidden">
                 <div
-                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                  className="h-full bg-[var(--pro-azure-50)]0 rounded-full transition-all duration-500"
                   style={{ width: `${wizardSteps.length > 0 ? wizardPct : 65}%` }}
                 />
               </div>
               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                Activation Progress
+                {t('gs.hero.activation_progress')}
               </p>
               <p className="text-2xl font-black text-white mt-1">{wizardSteps.length > 0 ? wizardPct : 65}%</p>
             </div>
@@ -1698,21 +1706,21 @@ const GettingStarted: React.FC = () => {
         {[
           {
             id: 'checklist',
-            label: 'Setup Checklist',
+            label: t('gs.tabs.checklist'),
             icon: <CheckCircle2 size={14} />,
           },
           {
             id: 'pit',
-            label: 'PIT Calculator',
+            label: t('gs.tabs.pit'),
             icon: <Calculator size={14} />,
           },
-          { id: 'tax', label: 'Tax Reference', icon: <Shield size={14} /> },
+          { id: 'tax', label: t('gs.tabs.tax'), icon: <Shield size={14} /> },
           {
             id: 'guide',
-            label: 'Ethiopian Tax Guide',
+            label: t('gs.tabs.guide'),
             icon: <Landmark size={14} />,
           },
-          { id: 'shortcuts', label: 'Shortcuts', icon: <Keyboard size={14} /> },
+          { id: 'shortcuts', label: t('gs.tabs.shortcuts'), icon: <Keyboard size={14} /> },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -1720,7 +1728,7 @@ const GettingStarted: React.FC = () => {
             className={`flex items-center gap-2.5 px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
               activeTab === tab.id
                 ? 'bg-slate-900 border-slate-900 text-white shadow-xl translate-y-[-2px]'
-                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 hover:border-emerald-500'
+                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 hover:border-[var(--pro-azure)]'
             }`}
           >
             {tab.icon} {tab.label}
@@ -1737,31 +1745,31 @@ const GettingStarted: React.FC = () => {
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                      Setup Progress
+                      {t('gs.checklist.setup_progress')}
                     </p>
-                    <p className="text-xs font-black text-emerald-600 dark:text-emerald-400">
+                    <p className="text-xs font-black text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                       {pct}%
                     </p>
                   </div>
                   <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                      className="h-full bg-[var(--pro-azure-50)]0 rounded-full transition-all duration-500"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
                   <p className="ovds-caption mt-1.5">
                     {wizardSteps.length > 0
-                      ? `${wizardChecked.size} of ${wizardSteps.length} steps complete`
-                      : `${checklistIds.filter((id) => checked.has(id)).length} of ${checklistIds.length} steps complete`}
+                      ? t('gs.checklist.steps_complete', { done: wizardChecked.size, total: wizardSteps.length })
+                      : t('gs.checklist.steps_complete', { done: checklistIds.filter((id) => checked.has(id)).length, total: checklistIds.length })}
                   </p>
                 </div>
                 {pct > 0 && (
                   <button
                     onClick={reset}
                     className="text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors shrink-0"
-                    title="Reset progress"
+                    title={t('gs.checklist.reset')}
                   >
-                    Reset
+                    {t('gs.checklist.reset')}
                   </button>
                 )}
                </div>
@@ -1776,7 +1784,7 @@ const GettingStarted: React.FC = () => {
                             className={`group relative ovds-widget-card p-6 transition-all duration-200 cursor-pointer select-none ${
                               done
                                 ? 'opacity-70 bg-white dark:bg-slate-800/40'
-                                : 'hover:border-emerald-300 dark:hover:border-emerald-700'
+                                : 'hover:border-[var(--pro-azure-light)] dark:hover:border-green-700'
                             }`}
                             onClick={() => toggle(item.id)}
                           >
@@ -1784,14 +1792,14 @@ const GettingStarted: React.FC = () => {
                             <div
                               className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all ${
                                 done
-                                  ? 'bg-emerald-500 text-white'
-                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-emerald-500 group-hover:text-white'
+                                  ? 'bg-[var(--pro-azure)] text-white'
+                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-[var(--pro-azure-dark)] group-hover:text-white'
                               }`}
                             >
                               {done ? <CheckCircle2 size={18} /> : item.icon}
                             </div>
                             <span
-                              className={`mt-1 transition-colors ${done ? 'text-emerald-500' : 'text-slate-300 dark:text-slate-600 group-hover:text-slate-400'}`}
+                              className={`mt-1 transition-colors ${done ? 'text-[var(--pro-azure)]' : 'text-slate-300 dark:text-slate-600 group-hover:text-slate-400'}`}
                             >
                               {done ? (
                                 <CheckSquare size={14} />
@@ -1811,9 +1819,9 @@ const GettingStarted: React.FC = () => {
                           <Link
                             to={item.to}
                             onClick={(e) => e.stopPropagation()}
-                            className="mt-3 inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
+                            className="mt-3 inline-flex items-center gap-1 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline"
                           >
-                            Go <ArrowRight size={10} />
+                            {t('gs.checklist.go')} <ArrowRight size={10} />
                           </Link>
                         </div>
                       );
@@ -1825,13 +1833,13 @@ const GettingStarted: React.FC = () => {
               {wizardSteps.length > 0 && (
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-slate-500">
-                    {wizardChecked.size} of {wizardSteps.length} steps complete
+                    {t('gs.checklist.steps_complete', { done: wizardChecked.size, total: wizardSteps.length })}
                   </p>
                   <Link
                     to="/settings/setup-wizard"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-black hover:bg-emerald-600 transition-all"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-black hover:bg-[var(--pro-azure-dark)] transition-all"
                   >
-                    <Settings size={12} /> Admin Setup Wizard
+                    <Settings size={12} /> {t('gs.checklist.admin_setup_wizard')}
                   </Link>
                 </div>
               )}
@@ -1839,21 +1847,21 @@ const GettingStarted: React.FC = () => {
               {wizardSteps.length > 0 && wizardProgress && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="ovds-widget-card p-5">
-                    <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">Scope Summary</p>
+                    <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">{t('gs.checklist.scope_summary')}</p>
                     <div className="space-y-2">
                       {Object.entries(wizardProgress.scopeSummary ?? {}).map(([scope, steps]) => (
                         <div key={scope} className="flex items-center justify-between text-[12px]">
                           <span className="text-slate-600 dark:text-slate-300 capitalize">{scope}</span>
-                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">{steps.length} step{steps.length === 1 ? '' : 's'}</span>
+                          <span className="text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{steps.length} step{steps.length === 1 ? '' : 's'}</span>
                         </div>
                       ))}
                       {!wizardProgress.scopeSummary || Object.keys(wizardProgress.scopeSummary).length === 0 && (
-                        <p className="text-[11px] text-slate-400">No scopes configured yet. Start the wizard to track your setup progress.</p>
+                        <p className="text-[11px] text-slate-400">{t('gs.checklist.no_scopes')}</p>
                       )}
                     </div>
                   </div>
                   <div className="ovds-widget-card p-5">
-                    <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">Module Activities</p>
+                    <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">{t('gs.checklist.module_activities')}</p>
                     <div className="space-y-2">
                       {(wizardProgress.moduleActivities ?? []).slice(-5).reverse().map((activity, i) => (
                         <div key={i} className="flex items-center justify-between text-[12px]">
@@ -1862,7 +1870,7 @@ const GettingStarted: React.FC = () => {
                         </div>
                       ))}
                       {(!wizardProgress.moduleActivities || wizardProgress.moduleActivities.length === 0) && (
-                        <p className="text-[11px] text-slate-400">No activities yet. Complete wizard steps to log module configuration.</p>
+                        <p className="text-[11px] text-slate-400">{t('gs.checklist.no_activities')}</p>
                       )}
                     </div>
                   </div>
@@ -1870,22 +1878,21 @@ const GettingStarted: React.FC = () => {
               )}
 
               {pct === 100 && (
-                <div className="flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl animate-in fade-in duration-300">
-                  <Sparkles size={18} className="text-emerald-500 shrink-0" />
+                <div className="flex items-center gap-3 p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl animate-in fade-in duration-300">
+                  <Sparkles size={18} className="text-[var(--pro-azure)] shrink-0" />
                   <div>
-                    <p className="text-sm font-black text-emerald-700 dark:text-emerald-400">
-                      You're all set!
+                    <p className="text-sm font-black text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
+                      {t('gs.checklist.all_set_title')}
                     </p>
-                    <p className="text-xs text-emerald-600 dark:text-emerald-500 mt-0.5">
-                      Your Ovds account is fully configured. Head to the
-                      Dashboard to get started.
+                    <p className="text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure)] mt-0.5">
+                      {t('gs.checklist.all_set_body')}
                     </p>
                   </div>
                   <Link
                     to="/dashboard"
-                    className="ml-auto flex items-center gap-1.5 px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-black hover:bg-emerald-600 transition-all shrink-0"
+                    className="ml-auto flex items-center gap-1.5 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-black hover:bg-[var(--pro-azure-dark)] transition-all shrink-0"
                   >
-                    Dashboard <ArrowRight size={12} />
+                    {t('gs.checklist.dashboard')} <ArrowRight size={12} />
                   </Link>
                 </div>
               )}
@@ -1894,17 +1901,17 @@ const GettingStarted: React.FC = () => {
 
           {activeTab === 'pit' && (
             <div className="ovds-widget-card p-10 shadow-sm overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-[40px] pointer-events-none" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--pro-azure-50)]0/5 rounded-full blur-[40px] pointer-events-none" />
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-2xl bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure)] flex items-center justify-center">
                   <Calculator size={24} />
                 </div>
                 <div>
                   <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                    Proclamation 1395/2025 Calculator
+                    {t('gs.pit.heading')}
                   </h2>
                   <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">
-                    Official Ethiopian PIT Brackets
+                    {t('gs.pit.subheading')}
                   </p>
                 </div>
               </div>
@@ -1923,7 +1930,7 @@ const GettingStarted: React.FC = () => {
                     >
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{tax.label}</span>
-                        <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-xs font-black rounded-lg">
+                        <span className="px-3 py-1 bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure)] text-xs font-black rounded-lg">
                           {tax.rate}
                         </span>
                       </div>
@@ -1945,7 +1952,7 @@ const GettingStarted: React.FC = () => {
               {KEYBOARD_SHORTCUTS.map((s, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl group hover:border-emerald-500 transition-all"
+                  className="flex items-center justify-between p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl group hover:border-[var(--pro-azure)] transition-all"
                 >
                   <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
                     {s.action}
@@ -1954,7 +1961,7 @@ const GettingStarted: React.FC = () => {
                     {s.keys.map((k) => (
                       <kbd
                         key={k}
-                        className="px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[10px] font-black shadow-sm group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-500 transition-all"
+                        className="px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[10px] font-black shadow-sm group-hover:bg-[var(--pro-azure-dark)] group-hover:text-white group-hover:border-[var(--pro-azure)] transition-all"
                       >
                         {k}
                       </kbd>
@@ -1968,16 +1975,15 @@ const GettingStarted: React.FC = () => {
           {activeTab === 'guide' && (
             <div className="ovds-widget-card p-8 shadow-sm">
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-2xl bg-[var(--pro-azure-50)]0/10 text-[var(--pro-azure)] flex items-center justify-center">
                   <Landmark size={22} />
                 </div>
                 <div>
                   <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                    Ethiopian Tax Classification Guide
+                    {t('gs.guide.heading')}
                   </h2>
                   <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">
-                    Schedules A–E · Trade Sectors · Business Categories ·
-                    Indirect Taxes
+                    {t('gs.guide.subheading')}
                   </p>
                 </div>
               </div>
@@ -2028,14 +2034,13 @@ const GettingStarted: React.FC = () => {
       <div className="space-y-6">
         <div className="text-center">
           <div className="inline-flex items-center gap-2 mb-3">
-            <HelpCircle size={18} className="text-emerald-500" />
+            <HelpCircle size={18} className="text-[var(--pro-azure)]" />
             <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">
-              Frequently Asked Questions
+              {t('gs.faq.heading')}
             </h2>
           </div>
           <p className="text-sm text-slate-500 mt-1">
-            Common questions about Ovds features, setup, and Ethiopian tax
-            compliance
+            {t('gs.faq.subheading')}
           </p>
         </div>
         <div className="max-w-3xl mx-auto space-y-3">

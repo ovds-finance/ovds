@@ -26,7 +26,8 @@
     },
     "composite": true,
     "incremental": true,
-    "tsBuildInfoFile": "./dist/.tsbuildinfo"
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "rootDir": "src"
   },
   "include": [
     "src/**/*.ts"

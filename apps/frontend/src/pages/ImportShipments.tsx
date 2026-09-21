@@ -1,24 +1,22 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import { fmtDate } from '../utils/fmt';
-import { fmtETB } from '../utils/ethiopianTax';
-import {
-  AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
-  StatusBadge, Btn, Modal, FormField, Input, Textarea, Select,
-  SearchBar, Amount, Pagination, Icon, EmptyState,
-} from '../components/ui';
-import { OvdsEmptyState } from '../components/ovds';
-import api from '../services/api';
 import {
    Ship, Plus, Edit2, Trash2, Download, RefreshCw,
    Anchor, Plane, ChevronDown, ChevronUp,
    Link2,
  } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
+import {
+  AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
+  StatusBadge, Btn, Modal, FormField, Input, Textarea, Select,
+  SearchBar, Amount, Pagination, Icon, EmptyState,
+} from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
+import { fmtDate } from '../utils/fmt';
 
  const toCsv = (rows: any[], filename: string) => {
    if (!rows.length) { toast.error('No data to export'); return; }
@@ -61,11 +59,11 @@ interface ImportShipment {
 
 const SHIPMENT_TABS: ShipmentStatus[] = ['ALL', 'BOOKED', 'IN_TRANSIT', 'ARRIVED', 'CLEARED', 'DELIVERED', 'CANCELLED'];
 
-const STATUS_COLORS: Record<string, string> = {
+const _STATUS_COLORS: Record<string, string> = {
   BOOKED: 'bg-slate-100 text-slate-600',
   IN_TRANSIT: 'bg-sky-100 text-sky-700',
   ARRIVED: 'bg-amber-100 text-amber-700',
-  CLEARED: 'bg-emerald-100 text-emerald-700',
+  CLEARED: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   DELIVERED: 'bg-violet-100 text-violet-700',
   CANCELLED: 'bg-rose-100 text-rose-700',
 };
@@ -141,7 +139,7 @@ const ImportShipments: React.FC = () => {
   }, [rows, tab, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total Shipments', value: rows.length, color: 'emerald' as const },
+    { label: 'Total Shipments', value: rows.length, color: 'green' as const },
     { label: 'In Transit', value: rows.filter(s => s.status === 'IN_TRANSIT').length, color: 'sky' as const },
     { label: 'Arrived', value: rows.filter(s => s.status === 'ARRIVED').length, color: 'amber' as const },
     { label: 'Cleared', value: rows.filter(s => s.status === 'CLEARED').length, color: 'violet' as const },
@@ -273,10 +271,10 @@ const ImportShipments: React.FC = () => {
                 <AppTd><StatusBadge status={s.status} /></AppTd>
                 <AppTd align="right">
                   <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => handleLinkLC(s.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Link to L/C"><Link2 size={11} /></button>
+                    <button onClick={() => handleLinkLC(s.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Link to L/C"><Link2 size={11} /></button>
                     <button onClick={() => handleLinkPO(s.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-sky-50 hover:text-sky-600 transition-all" title="Link to PO"><Link2 size={11} /></button>
                     <button onClick={() => handleLinkCustoms(s.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-violet-50 hover:text-violet-600 transition-all" title="Link to Customs"><Link2 size={11} /></button>
-                    <button onClick={() => setModal({ open: true, data: { ...s } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Edit"><Edit2 size={11} /></button>
+                    <button onClick={() => setModal({ open: true, data: { ...s } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Edit"><Edit2 size={11} /></button>
                     <button onClick={async () => { if (await confirm({ title: `Delete "${s.shipmentRef}"?`, variant: 'danger' })) remove(s.id); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Delete"><Trash2 size={11} /></button>
                   </div>
                 </AppTd>
@@ -288,7 +286,7 @@ const ImportShipments: React.FC = () => {
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tracking Events</p>
                       {s.trackingEvents.map((ev, idx) => (
                         <div key={ev.id || idx} className="flex items-center gap-3 text-[11px] text-slate-600 bg-white px-3 py-2 rounded-lg border border-slate-100">
-                          <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                          <span className="w-2 h-2 rounded-full bg-[var(--pro-azure-light)] shrink-0" />
                           <span className="font-semibold">{ev.event}</span>
                           <span className="text-slate-400">{ev.location}</span>
                           <span className="text-slate-400 ml-auto">{fmtDate(ev.timestamp)}</span>

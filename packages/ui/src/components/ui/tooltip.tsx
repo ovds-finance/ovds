@@ -46,14 +46,14 @@ const VARIANT_CLS: Record<TooltipVariant, string> = {
   default: 'bg-slate-800 text-white dark:bg-slate-700',
   danger:  'bg-rose-600 text-white',
   info:    'bg-sky-600 text-white',
-  success: 'bg-emerald-600 text-white',
+  success: 'bg-[var(--pro-azure)] text-white',
 };
 
 const ARROW_CLS: Record<TooltipVariant, string> = {
   default: 'border-t-slate-800 dark:border-t-slate-700',
   danger:  'border-t-rose-600',
   info:    'border-t-sky-600',
-  success: 'border-t-emerald-600',
+  success: 'border-t-[var(--pro-azure)]',
 };
 
 export const Tooltip: React.FC<TooltipProps> = ({

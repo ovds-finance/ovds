@@ -203,7 +203,7 @@ const confidenceConfig: Record<AiConfidenceLevel, { label: string; cls: string; 
   },
   high: {
     label: 'High confidence',
-    cls: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800',
+    cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-300 dark:border-green-800',
     icon: <CheckCircle2 size={12} />,
   },
   verified: {
@@ -337,7 +337,7 @@ export const AiAcceptRejectActions: React.FC<AiAcceptRejectActionsProps> = ({
       type="button"
       disabled={disabled}
       onClick={onAccept}
-      className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[11px] font-bold text-emerald-700 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-50"
+      className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[11px] font-bold text-[var(--pro-azure-dark)] hover:bg-[var(--pro-azure-50)] disabled:cursor-not-allowed disabled:opacity-50"
     >
       <CheckCircle2 size={12} />
       {acceptLabel}
@@ -359,7 +359,7 @@ const inheritanceConfig: Record<InheritanceStatus, { label: string; icon: React.
   local: {
     label: 'Local',
     icon: <Lock size={11} />,
-    cls: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800',
+    cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-300 dark:border-green-800',
   },
   risk: {
     label: 'Risk',
@@ -452,7 +452,7 @@ export const ImpactAnalysisModal: React.FC<ImpactAnalysisModalProps> = ({
           <button type="button" onClick={onCancel} className="rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-2 text-[12px] font-bold text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-900">
             {cancelLabel}
           </button>
-          <button type="button" onClick={onProceed} className="rounded-lg bg-aki-blue px-3 py-2 text-[12px] font-bold text-white hover:bg-aki-blue-dark">
+          <button type="button" onClick={onProceed} className="rounded-lg bg-[var(--pro-azure)] px-3 py-2 text-[12px] font-bold text-white hover:bg-[var(--pro-azure-dark)]">
             {proceedLabel}
           </button>
         </div>
@@ -576,7 +576,7 @@ export const DualAuthorizationGate: React.FC<DualAuthorizationGateProps> = ({
           <h2 className="text-[13px] font-bold text-slate-900 dark:text-slate-100">Dual authorization required</h2>
           <p className="mt-1 text-[11px] text-slate-500">{approvedCount} of {requiredApprovals} approvals received</p>
         </div>
-        <span className={cn('rounded-full border px-2 py-1 text-[10px] font-bold', ready ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200')}>
+        <span className={cn('rounded-full border px-2 py-1 text-[10px] font-bold', ready ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' : 'bg-amber-50 text-amber-700 border-amber-200')}>
           {ready ? 'Ready' : 'Pending'}
         </span>
       </div>
@@ -588,7 +588,7 @@ export const DualAuthorizationGate: React.FC<DualAuthorizationGateProps> = ({
               <p className="text-[10px] text-slate-500">{approver.email ?? approver.role ?? 'Reviewer'}</p>
             </div>
             {approver.approved ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--pro-azure-50)] px-2 py-1 text-[10px] font-bold text-[var(--pro-azure-dark)]">
                 <Check size={11} /> Approved
               </span>
             ) : (
@@ -637,7 +637,7 @@ export const AuditTrailDrawer: React.FC<AuditTrailDrawerProps> = ({
         <div className="relative border-l border-slate-200 dark:border-slate-700 pl-4">
           {entries.map((entry, index) => (
             <div key={entry.id ?? index} className="mb-4 relative">
-              <span className="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full bg-aki-blue" />
+              <span className="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full bg-[var(--pro-azure)]" />
               <div className="rounded-lg border border-slate-100 dark:border-slate-800 p-3">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-[12px] font-bold text-slate-800 dark:text-slate-200">{entry.userName ?? entry.userRole ?? entry.action}</p>
@@ -691,7 +691,7 @@ export const SmartSaveButton: React.FC<SmartSaveButtonProps> = ({
       label: 'Publish',
       icon: <Save size={13} />,
       onClick: onPublish,
-      cls: 'bg-aki-blue text-white border-aki-blue hover:bg-aki-blue-dark',
+      cls: 'bg-[var(--pro-azure)] text-white border-[var(--pro-azure)] hover:bg-[var(--pro-azure-dark)]',
     },
   }[readiness];
 
@@ -730,9 +730,9 @@ export const SmartSearchInput: React.FC<SmartSearchInputProps> = ({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder={placeholder}
-          className="h-9 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 pl-9 pr-3 text-[12px] text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-aki-blue-100 focus:border-aki-blue"
+          className="h-9 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 pl-9 pr-3 text-[12px] text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure-100)] focus:border-[var(--pro-azure)]"
         />
-        {loading && <Loader2 size={13} className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-aki-blue" />}
+        {loading && <Loader2 size={13} className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-[var(--pro-azure)]" />}
       </div>
       {(filtered.length > 0 || showRecent) && (
         <div className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 shadow-dropdown">
@@ -766,7 +766,7 @@ export const SmartSearchInput: React.FC<SmartSearchInputProps> = ({
                   onClick={() => onSelect?.(suggestion)}
                   className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left hover:bg-aki-ai-muted"
                 >
-                  <span className="text-aki-blue">{suggestion.icon ?? <Sparkles size={12} />}</span>
+                  <span className="text-[var(--pro-azure)]">{suggestion.icon ?? <Sparkles size={12} />}</span>
                   <span className="flex-1">
                     <span className="block text-[11px] font-bold text-slate-800 dark:text-slate-100">{suggestion.label}</span>
                     {suggestion.hint && <span className="block text-[10px] text-slate-500">{suggestion.hint}</span>}
@@ -790,7 +790,7 @@ export const ToastStack: React.FC<ToastStackProps> = ({ toasts, onDismiss, class
         info: 'bg-sky-50 text-sky-800 border-sky-200',
         warning: 'bg-amber-50 text-amber-800 border-amber-200',
         error: 'bg-rose-50 text-rose-800 border-rose-200',
-        success: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+        success: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
       }[severity];
       return (
         <div key={toast.id} className={cn('rounded-xl border p-3 shadow-sm', cfg)}>

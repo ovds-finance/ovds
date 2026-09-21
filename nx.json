@@ -22,10 +22,11 @@
       "!{projectRoot}/tsconfig.spec.json"
     ],
     "sharedGlobals": [
-      "{workspaceRoot}/packages/design-system/src/**/*",
-      "{workspaceRoot}/packages/core/src/**/*",
-      "{workspaceRoot}/packages/ui/src/**/*",
-      "{workspaceRoot}/packages/shared/src/**/*",
+      "{workspaceRoot}/packages/design-system/src/index.ts",
+      "{workspaceRoot}/packages/design-tokens/src/index.ts",
+      "{workspaceRoot}/packages/core/src/index.ts",
+      "{workspaceRoot}/packages/ui/src/index.ts",
+      "{workspaceRoot}/packages/shared/src/index.ts",
       "{workspaceRoot}/packages/database/prisma/schema.prisma",
       "{workspaceRoot}/packages/database/prisma.config.js",
       "{workspaceRoot}/tsconfig.base.json"

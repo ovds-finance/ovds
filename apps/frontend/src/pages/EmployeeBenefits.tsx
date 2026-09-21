@@ -13,18 +13,20 @@
  *
  * IAS 19.83: discount at Ethiopian government bond yield (~10%).
  */
-import React, { useState, useCallback, useEffect } from 'react';
+import { AppPage, Btn } from '@ovds/ui';
 import {
   RefreshCw, Users, TrendingUp, AlertTriangle,
   CheckCircle2, Info, Send, Download,
 } from 'lucide-react';
-import { AppPage, Btn } from '@ovds/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { fmtCurrency } from '../utils/fmt';
-import { Icon } from '../components/ui';
-import api from '../services/api';
+import React, { useState, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
+
+import { Icon } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { fmtCurrency } from '../utils/fmt';
+
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
@@ -161,7 +163,7 @@ const EmployeeBenefits: React.FC = () => {
             { label: 'Employees with Entitlement', value: String(data?.employees.length ?? '—'),       accent: 'bg-slate-400' },
             { label: 'Gross Obligation (Undiscounted)', value: data ? fmt(data.totalGrossObligation) : '—', accent: 'bg-amber-500' },
             { label: 'Present Value (IAS 19.83)',    value: data ? fmt(data.totalPresentValue)    : '—', accent: 'bg-teal-500' },
-            { label: 'Total Funded',                 value: data ? fmt(data.totalFunded)          : '—', accent: 'bg-emerald-500' },
+            { label: 'Total Funded',                 value: data ? fmt(data.totalFunded)          : '—', accent: 'bg-[var(--pro-azure-50)]0' },
             { label: 'Unfunded Deficit',             value: data ? fmt(data.totalDeficit)         : '—', accent: hasDeficit ? 'bg-rose-500' : 'bg-slate-200' },
           ].map(kpi => (
             <div key={kpi.label} className="ovds-kpi-cell">
@@ -179,11 +181,11 @@ const EmployeeBenefits: React.FC = () => {
           <div className={`flex items-start gap-3 px-4 py-3 rounded-xl border text-sm ${
             hasDeficit
               ? 'bg-amber-50 border-amber-200 text-amber-800'
-              : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'
           }`}>
             {hasDeficit
               ? <AlertTriangle size={16} className="shrink-0 mt-0.5 text-amber-600" />
-              : <CheckCircle2  size={16} className="shrink-0 mt-0.5 text-emerald-600" />}
+              : <CheckCircle2  size={16} className="shrink-0 mt-0.5 text-[var(--pro-azure)]" />}
             <div>
               <strong>IAS 19 Recognition:</strong>{' '}
               {hasDeficit
@@ -249,7 +251,7 @@ const EmployeeBenefits: React.FC = () => {
                         <td className="px-4 py-3 text-xs tabular-nums text-right text-amber-600 font-medium">{emp.gratuityMonths.toFixed(1)}</td>
                         <td className="px-4 py-3 text-xs tabular-nums text-right">{fmt(emp.grossObligation)}</td>
                         <td className="px-4 py-3 text-xs tabular-nums text-right text-teal-600 font-semibold">{fmt(emp.presentValue)}</td>
-                        <td className="px-4 py-3 text-xs tabular-nums text-right text-emerald-600">{fmt(emp.fundedAmount)}</td>
+                        <td className="px-4 py-3 text-xs tabular-nums text-right text-[var(--pro-azure)]">{fmt(emp.fundedAmount)}</td>
                         <td className="px-4 py-3 text-xs tabular-nums text-right">
                           <span className={emp.deficit > 0 ? 'text-rose-600 font-bold' : 'text-slate-300'}>
                             {emp.deficit > 0 ? fmt(emp.deficit) : '—'}
@@ -263,7 +265,7 @@ const EmployeeBenefits: React.FC = () => {
                         <td colSpan={5} className="px-4 py-3 text-xs font-bold text-slate-600">Total</td>
                         <td className="px-4 py-3 text-sm tabular-nums text-right text-slate-800">{fmt(data.totalGrossObligation)}</td>
                         <td className="px-4 py-3 text-sm tabular-nums text-right text-teal-700 font-bold">{fmt(data.totalPresentValue)}</td>
-                        <td className="px-4 py-3 text-sm tabular-nums text-right text-emerald-700">{fmt(data.totalFunded)}</td>
+                        <td className="px-4 py-3 text-sm tabular-nums text-right text-[var(--pro-azure-dark)]">{fmt(data.totalFunded)}</td>
                         <td className="px-4 py-3 text-sm tabular-nums text-right">
                           <span className={data.totalDeficit > 0 ? 'text-rose-600 font-bold' : 'text-slate-300'}>
                             {data.totalDeficit > 0 ? fmt(data.totalDeficit) : '—'}

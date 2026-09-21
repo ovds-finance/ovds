@@ -1,18 +1,4 @@
-﻿// AddInvoiceModal — Ovds-style invoice builder
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import {
-  X, Mail, Phone, MapPin, Plus, Trash2, FileText, Send, Eye,
-  AlertTriangle, QrCode, Save,
-  ChevronLeft, ChevronRight, ChevronDown, Repeat2, Tag,
-  User, CheckCircle2, ShieldCheck, Percent,
-  StickyNote, LayoutTemplate, Upload, BookOpen,
-  Loader2, Link2, Hash, Paperclip, UserPlus,
-  GripVertical, RefreshCw,
-} from 'lucide-react';
-import CustomFieldRenderer, { type CustomFieldValuesMap } from '../CustomFieldRenderer';
-import { NBE_INTERACTION_TYPES, ARCH_INTEGRATION_TYPES, PROCESS_INTEGRATION_TYPES } from './constants';
-import { QR_CODE_SERVICE_URL } from '../../utils/constants';
-import { evalMath } from '@ovds/ui';
+// AddInvoiceModal — Ovds-style invoice builder
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor,
   useSensor, useSensors, DragEndEvent,
@@ -22,13 +8,29 @@ import {
   verticalListSortingStrategy, useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import toast from 'react-hot-toast';
-import { invoicesApi } from '../../services/ovdsApi';
 import { currencyApi } from '@ovds/features/accounting';
+import { evalMath } from '@ovds/ui';
+import {
+  X, Mail, Phone, MapPin, Plus, Trash2, FileText, Send, Eye,
+  AlertTriangle, QrCode, Save,
+  ChevronLeft, ChevronRight, ChevronDown, Repeat2, Tag,
+  User, CheckCircle2, ShieldCheck, Percent,
+  StickyNote, LayoutTemplate, Upload, BookOpen,
+  Loader2, Link2, Hash, Paperclip, UserPlus,
+  GripVertical, RefreshCw, Wand2, ExternalLink,
+  Columns, Sparkles, Type, Palette,
+} from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
+import toast from 'react-hot-toast';
+
 import { useBusiness } from '../../context/businessContext';
 import { useWarehouses } from '../../services/inventoryApi';
-import { amountInWords } from '../../utils/fmt';
+import { invoicesApi } from '../../services/ovdsApi';
+import { QR_CODE_SERVICE_URL } from '../../utils/constants';
 import { calcLineTax } from '../../utils/ethiopianTax';
+import { amountInWords } from '../../utils/fmt';
+import CustomFieldRenderer, { type CustomFieldValuesMap } from '../CustomFieldRenderer';
 
 interface AddInvoiceModalProps {
   showAddModal: boolean;
@@ -58,9 +60,9 @@ interface AddInvoiceModalProps {
   onCustomFieldsChange?: (values: CustomFieldValuesMap) => void;
 }
 
-// ── Shared style tokens (Akaunting-aligned, maps to CSS variables) ──────────
-const inp = "aki-input";
-const lbl = "aki-label";
+// ── Shared style tokens (Ovds SaaS-aligned, maps to CSS variables) ──────────
+const _inp = "aki-input";
+const _lbl = "aki-label";
 
 const PAYMENT_TERMS = [
   { value: 'IMMEDIATE', label: 'Due Immediately' },
@@ -376,7 +378,9 @@ export default function AddInvoiceModal({
   onCustomFieldsChange,
 }: AddInvoiceModalProps) {
   const { warehouses } = useWarehouses();
-  const { selectedCompanyId } = useBusiness();
+  const { selectedCompanyId: ctxCompanyId, companies } = useBusiness();
+  // Fallback: if selectedCompanyId is null but companies exist, use the first one
+  const selectedCompanyId = ctxCompanyId ?? (companies.length > 0 ? companies[0].id : null);
 
   // ── Currency conversion ────────────────────────────────────────────────────
   const [fxRate, setFxRate] = useState<number | null>(null);
@@ -409,13 +413,18 @@ export default function AddInvoiceModal({
     onCustomFieldsChange?.(values);
   }, [onCustomFieldsChange]);
 
+  // ── Invoice number loading state ─────────────────────────────────────
+  // Tracks the async nextNumber API fetch so the UI can show a pending
+  // indicator instead of a bare '—' while the number is being generated.
+  const [isLoadingInvoiceNumber, setIsLoadingInvoiceNumber] = useState(false);
+
   // ── New-customer inline form state ────────────────────────────────────
   const [showNewCustomerForm, setShowNewCustomerForm] = useState(false);
   const [newCustomerDraft, setNewCustomerDraft] = useState({ name: '', currency: 'ETB', email: '', phone: '' });
 
   // ── Send To inline email panel state ─────────────────────────────────
-  const [showSendPanel, setShowSendPanel] = useState(false);
-  const [sendEmail, setSendEmail] = useState({ to: '', subject: '', message: '' });
+  const [_showSendPanel, setShowSendPanel] = useState(false);
+  const [_sendEmail, setSendEmail] = useState({ to: '', subject: '', message: '' });
 
   const commitNewCustomer = () => {
     if (!newCustomerDraft.name.trim()) { toast.error('Customer name is required'); return; }
@@ -431,7 +440,7 @@ export default function AddInvoiceModal({
     toast.success('Customer added');
   };
 
-  const openSendPanel = useCallback(() => {
+  const _openSendPanel = useCallback(() => {
     const subTotal = (newInvoice.items || []).reduce((acc: number, item: any) => {
       const gross = Number(item.price) * Number(item.quantity);
       const disc = item.showDiscount
@@ -533,7 +542,7 @@ export default function AddInvoiceModal({
     }));
     setShowTaxSelector(false);
   };
-  const updateNamedTax = (id: string, changes: Partial<InvoiceTax>) =>
+  const _updateNamedTax = (id: string, changes: Partial<InvoiceTax>) =>
     setNewInvoice((prev: any) => ({
       ...prev,
       taxes: (prev.taxes || []).map((t: InvoiceTax) => t.id === id ? { ...t, ...changes } : t),
@@ -551,6 +560,7 @@ export default function AddInvoiceModal({
   useEffect(() => {
     if (!showAddModal || newInvoice.id || newInvoice.invoiceNumber || !selectedCompanyId) return;
     // Use the typed API helper which correctly passes companyId as a query param
+    setIsLoadingInvoiceNumber(true);
     invoicesApi.nextNumber(selectedCompanyId)
       .then((res: { nextNumber: string }) => {
         if (res?.nextNumber) {
@@ -560,7 +570,8 @@ export default function AddInvoiceModal({
           }));
         }
       })
-      .catch(() => {/* non-fatal — user can still enter manually */});
+      .catch(() => {/* non-fatal — user can still enter manually */})
+      .finally(() => setIsLoadingInvoiceNumber(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showAddModal, selectedCompanyId]);
 
@@ -644,44 +655,55 @@ export default function AddInvoiceModal({
     return acc + (item.showTax !== false ? calcLineTax(net, rate) : 0);
   }, 0);
 
+  // BUG FIX (DRRF base): DRRF is levied on the post-discount subtotal, not the
+  // pre-discount one. The backend's calculateInvoiceTotals() was computing
+  // drrfAmount = subtotal * 0.01 (before invoice-level discount), causing the
+  // stored value to exceed what the customer is shown here. Both sides now use
+  // subtotalAfterDisc so the UI, the PDF, and the DB agree.
   const drrfAmount = subtotalAfterDisc * 0.01;
-  const whtAmount  = subtotalAfterDisc >= 10000 ? subtotalAfterDisc * 0.02 : 0;
+
+  // WHT note: WHT is a withholding obligation on the payer, not a tax collected
+  // by the seller. It reduces the net cash received but does not change the
+  // invoice total. Removed the dead `whtAmount` variable — it was computed at
+  // the wrong rate (2% vs the correct ETH_TAX.WHT_GOODS_RATE of 3%) and was
+  // never added to any total or rendered anywhere.
 
   const namedTaxes: InvoiceTax[] = (newInvoice.taxes || []).map((t: InvoiceTax) => ({
     ...t,
     amount: t.type === 'PERCENT' ? subtotalAfterDisc * (t.rate / 100) : t.rate,
   }));
   const hasNamedTaxes = namedTaxes.length > 0;
+  // BUG FIX (grand total): when namedTaxes are present the old formula silently
+  // dropped drrfAmount from the total. DRRF is always due regardless of whether
+  // custom taxes are also applied, so it must be included in both branches.
   const grandTotal = hasNamedTaxes
-    ? subtotalAfterDisc + vatAmount + namedTaxes.reduce((s: number, t: InvoiceTax) => s + t.amount, 0)
+    ? subtotalAfterDisc + vatAmount + drrfAmount + namedTaxes.reduce((s: number, t: InvoiceTax) => s + t.amount, 0)
     : subtotalAfterDisc + vatAmount + drrfAmount;
 
   const fmt2 = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 2 });
   const cur  = newInvoice.invoiceCurrency || currency;
 
   // ── Completeness & ERCA checks ────────────────────────────────────────
-  const completenessFields = [
-    { label: 'Customer name',        done: !!newInvoice.customer },
-    { label: 'Invoice date',         done: !!newInvoice.date },
-    { label: 'Due date',             done: !!newInvoice.dueDate },
-    { label: 'Line item with price', done: (newInvoice.items || []).some((i: any) => Number(i.price) > 0) },
-    { label: 'Customer email',       done: !!newInvoice.customerEmail },
-    { label: 'Customer TIN',         done: !!newInvoice.customerTin },
-    // FS No. is only required for VAT-registered businesses
-    { label: 'FS No. (SRM)',         done: !!(newInvoice as any).fsNo || (newInvoice as any).isVatRegistered === false },
-    { label: 'Invoice number',       done: !!newInvoice.invoiceNumber || !!newInvoice.id },
+  // ── Single source of truth for ERCA completeness ─────────────────────────
+  // Used both for the % score and for the rendered checklist — keeps them in sync.
+  // FS No. is only required for VAT-registered businesses; treat undefined as required.
+  const isNotVatRegistered = (newInvoice as any).isVatRegistered === false;
+  // While the invoice number is being fetched, treat it as provisionally satisfied
+  // so the score doesn't momentarily plunge to 0% on every open.
+  const invoiceNumOk = !!newInvoice.invoiceNumber || !!newInvoice.id || isLoadingInvoiceNumber;
+  const ercaChecks = [
+    { label: 'Invoice # set',    ok: invoiceNumOk,   pending: isLoadingInvoiceNumber && !newInvoice.invoiceNumber },
+    { label: 'Customer set',     ok: !!newInvoice.customer,                                                         pending: false },
+    { label: 'Date set',         ok: !!newInvoice.date && !!newInvoice.dueDate,                                     pending: false },
+    { label: 'Items with price', ok: (newInvoice.items || []).some((i: any) => Number(i.price) > 0),               pending: false },
+    { label: 'VAT 15% applied',  ok: vatAmount > 0,                                                                pending: false },
+    { label: 'Customer TIN set', ok: !!newInvoice.customerTin,                                                      pending: false },
+    // FS No. required only for VAT-registered businesses
+    { label: 'FS No. set',       ok: !!(newInvoice as any).fsNo || isNotVatRegistered,                              pending: false },
   ];
   const completenessScore = Math.round(
-    (completenessFields.filter(f => f.done).length / completenessFields.length) * 100
+    (ercaChecks.filter(c => c.ok).length / ercaChecks.length) * 100
   );
-  const ercaChecks = [
-    { label: 'VAT 15% applied',   ok: vatAmount > 0 },
-    { label: 'DRRF 1% included',  ok: drrfAmount > 0 },
-    { label: 'Customer TIN set',  ok: !!newInvoice.customerTin },
-    { label: 'FS No. set',        ok: !!(newInvoice as any).fsNo || !(newInvoice as any).isVatRegistered },
-    { label: 'Invoice # set',     ok: !!newInvoice.invoiceNumber },
-    { label: 'NBE-IQR QR ready',  ok: true },
-  ];
 
   // No JS measurement needed — Layout sets --sidebar-w on <html> synchronously
   // on every collapse/expand. The panel uses it directly via inline style.
@@ -693,11 +715,13 @@ export default function AddInvoiceModal({
   const hasItems = (newInvoice.items || []).some((i: any) => Number(i.price) > 0);
 
   // Step completion guards
-  const step1Done = !!newInvoice.invoiceNumber && !!newInvoice.date && !!newInvoice.dueDate;
+  // Invoice # may arrive async from the API — treat it as done if a number is
+  // being fetched (i.e. the modal is open for a new invoice with a company set).
+  const step1Done = (!!newInvoice.invoiceNumber || !!newInvoice.id || !!selectedCompanyId) && !!newInvoice.date && !!newInvoice.dueDate;
   const step2Done = !!newInvoice.customer;
   const step3Done = hasItems;
 
-  const canGoNext = (step: number) => {
+  const _canGoNext = (step: number) => {
     if (step === 1) return step1Done;
     if (step === 2) return step2Done;
     if (step === 3) return step3Done;
@@ -705,22 +729,34 @@ export default function AddInvoiceModal({
   };
 
   // Auto-advance to next step on completion
-  const goNext = () => { if (wizardStep < 4) setWizardStep(s => s + 1); };
-  const goBack = () => { if (wizardStep > 1) setWizardStep(s => s - 1); };
+  const _goNext = () => { if (wizardStep < 4) setWizardStep(s => s + 1); };
+  const _goBack = () => { if (wizardStep > 1) setWizardStep(s => s - 1); };
 
   if (!showAddModal) return null;
 
 
   // ════════════════════════════════════════════════════════════════════════
-  // RENDER — Refrens/Akaunting single-page invoice form
+  // RENDER — Refrens/Ovds SaaS single-page invoice form
   // ════════════════════════════════════════════════════════════════════════
-  return (
+  // Portal to document.body so the modal escapes any stacking context
+  // created by ancestor elements (e.g. <main overflow-y:auto> in layout.tsx).
+  // Without the portal, overflow-y:auto on <main> creates a new stacking
+  // context that can render above a fixed z-[310] child of the root.
+  return createPortal(
     <>
-      {/* Backdrop */}
-      <div className="fixed inset-0 z-[115]" style={{ background: 'rgba(10,16,30,0.45)' }} onClick={onClose} aria-hidden="true" />
+      {/* Backdrop — sits between sidebar (z:110) and modal panel (z:115), only covers the content area */}
+      <div
+        className="fixed top-0 bottom-0 right-0 z-[112]"
+        style={{ left: 'var(--sidebar-w, 0px)', background: 'rgba(10,16,30,0.35)' }}
+        onClick={onClose}
+        aria-hidden="true"
+      />
 
-      {/* Full-screen panel */}
-      <div className="fixed inset-0 z-[120] flex flex-col overflow-hidden" style={{ background: 'var(--surface)' }}>
+      {/* Full-screen panel — starts after the sidebar, sidebar (z:110) stays visible above */}
+      <div
+        className="fixed top-0 bottom-0 right-0 z-[113] flex flex-col overflow-hidden"
+        style={{ left: 'var(--sidebar-w, 0px)', background: 'var(--surface)' }}
+      >
 
         {/* ── TOP BAR ──────────────────────────────────────────────── */}
         <div className="shrink-0 flex items-center justify-between px-5" style={{ height: 48, borderBottom: '1px solid var(--border)', background: 'var(--surface)' }}>
@@ -773,11 +809,11 @@ export default function AddInvoiceModal({
           </div>
         </div>
 
-        {/* ── SPLIT BODY: LEFT form | RIGHT live preview ─────────── */}
-        <div className="flex-1 overflow-hidden flex">
+        {/* ── SPLIT BODY: LEFT form 45% | RIGHT live preview 55% ─── */}
+        <div className="flex-1 min-h-0 flex overflow-hidden">
 
-          {/* ══ LEFT: Form column ════════════════════════════════════ */}
-          <div className="w-full max-w-xl shrink-0 flex flex-col overflow-y-auto" style={{ borderRight: '1px solid var(--border)', background: '#F8FAFC' }}>
+          {/* ══ LEFT: Form column — 45% width, min 380px ═════════════ */}
+          <div className="invoice-form-col flex flex-col overflow-y-auto shrink-0" style={{ width: '45%', minWidth: 380, maxWidth: 560, borderRight: '1px solid var(--border)', background: 'var(--surface)' }}>
             <form id="invoice-form" onSubmit={onSubmit}>
               <div className="px-5 py-5 space-y-4">
 
@@ -815,29 +851,35 @@ export default function AddInvoiceModal({
                     <div className="flex items-center gap-2"><Hash size={12} style={{ color: 'var(--aki-blue)' }} /><span className="text-[12px] font-bold" style={{ color: 'var(--text)' }}>Invoice Details</span></div>
                     {newInvoice.invoiceNumber && <span className="aki-badge sm solid-info font-mono"># {newInvoice.invoiceNumber}</span>}
                   </div>
-                  <div className="px-4 py-3 grid grid-cols-2 gap-3">
-                    <div className="aki-field col-span-2 sm:col-span-1">
-                      <label className="aki-label">Invoice #</label>
-                      <div className="flex gap-1">
-                        <input type="text" placeholder="INV-001" className="aki-input flex-1 min-w-0 font-mono" value={newInvoice.invoiceNumber}
-                          onChange={e => setNewInvoice({ ...newInvoice, invoiceNumber: e.target.value })} />
-                        {!newInvoice.invoiceNumber && (
-                          <button type="button" className="aki-btn aki-btn-secondary icon-only shrink-0" title="Auto-generate"
-                            onClick={async () => {
-                              try { const r = await invoicesApi.nextNumber(selectedCompanyId ?? ''); if (r?.nextNumber) setNewInvoice((p: any) => ({ ...p, invoiceNumber: r.nextNumber })); }
-                              catch { setNewInvoice((p: any) => ({ ...p, invoiceNumber: `INV-${new Date().getFullYear()}-${String(Math.floor(Math.random()*900)+100)}` })); }
-                            }}><RefreshCw size={12} /></button>
-                        )}
+                  <div className="px-4 py-4 space-y-3">
+
+                    {/* Row 1: Invoice # + Currency */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div>
+                        <label className="aki-label">Invoice #</label>
+                        <div className="flex gap-1">
+                          <input type="text" placeholder="INV-001" className="aki-input flex-1 min-w-0 font-mono" value={newInvoice.invoiceNumber}
+                            onChange={e => setNewInvoice({ ...newInvoice, invoiceNumber: e.target.value })} />
+                          {!newInvoice.invoiceNumber && (
+                            <button type="button" className="aki-btn aki-btn-secondary icon-only shrink-0" title="Auto-generate"
+                              onClick={async () => {
+                                try { const r = await invoicesApi.nextNumber(selectedCompanyId ?? ''); if (r?.nextNumber) setNewInvoice((p: any) => ({ ...p, invoiceNumber: r.nextNumber })); }
+                                catch { setNewInvoice((p: any) => ({ ...p, invoiceNumber: `INV-${new Date().getFullYear()}-${String(Math.floor(Math.random()*900)+100)}` })); }
+                              }}><RefreshCw size={12} /></button>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="aki-label">Currency</label>
+                        <select className="aki-input aki-select" value={newInvoice.invoiceCurrency} onChange={e => setNewInvoice({ ...newInvoice, invoiceCurrency: e.target.value })}>
+                          {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.symbol} {c.code} — {c.name}</option>)}
+                        </select>
                       </div>
                     </div>
-                    <div className="aki-field">
-                      <label className="aki-label">Currency</label>
-                      <select className="aki-input aki-select" value={newInvoice.invoiceCurrency} onChange={e => setNewInvoice({ ...newInvoice, invoiceCurrency: e.target.value })}>
-                        {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.symbol} {c.code} — {c.name}</option>)}
-                      </select>
-                    </div>
+
+                    {/* Exchange rate — only when foreign currency selected */}
                     {newInvoice.invoiceCurrency && newInvoice.invoiceCurrency !== baseCurrency && (
-                      <div className="aki-field col-span-2 sm:col-span-1">
+                      <div>
                         <label className="aki-label">Exchange Rate</label>
                         <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg" style={{ background: 'var(--surface-alt)', border: '1px solid var(--border-alt)' }}>
                           {fxLoading ? (
@@ -853,49 +895,66 @@ export default function AddInvoiceModal({
                         </div>
                       </div>
                     )}
-                    <div className="aki-field">
-                      <label className="aki-label">Invoice Date <span style={{ color: '#F43F5E' }}>*</span></label>
-                      <input type="date" className="aki-input" value={newInvoice.date} onChange={e => setNewInvoice({ ...newInvoice, date: e.target.value })} />
+
+                    {/* Row 2: Invoice Date + Due Date */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div>
+                        <label className="aki-label">Invoice Date <span style={{ color: '#F43F5E' }}>*</span></label>
+                        <input type="date" className="aki-input" value={newInvoice.date} onChange={e => setNewInvoice({ ...newInvoice, date: e.target.value })} />
+                      </div>
+                      <div>
+                        <label className="aki-label">Due Date <span style={{ color: '#F43F5E' }}>*</span></label>
+                        <input type="date" className="aki-input" value={newInvoice.dueDate} onChange={e => setNewInvoice({ ...newInvoice, dueDate: e.target.value })} />
+                      </div>
                     </div>
-                    <div className="aki-field">
-                      <label className="aki-label">Due Date <span style={{ color: '#F43F5E' }}>*</span></label>
-                      <input type="date" className="aki-input" value={newInvoice.dueDate} onChange={e => setNewInvoice({ ...newInvoice, dueDate: e.target.value })} />
+
+                    {/* Row 3: Payment Terms + Payment Source */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div>
+                        <label className="aki-label">Payment Terms</label>
+                        <select className="aki-input aki-select" value={newInvoice.paymentTerms} onChange={e => applyPaymentTerms(e.target.value)}>
+                          {PAYMENT_TERMS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="aki-label">Payment Source</label>
+                        <select className="aki-input aki-select" value={newInvoice.paymentSource} onChange={e => setNewInvoice({ ...newInvoice, paymentSource: e.target.value })}>
+                          {PAYMENT_SOURCES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                        </select>
+                      </div>
                     </div>
-                    <div className="aki-field">
-                      <label className="aki-label">Payment Terms</label>
-                      <select className="aki-input aki-select" value={newInvoice.paymentTerms} onChange={e => applyPaymentTerms(e.target.value)}>
-                        {PAYMENT_TERMS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                      </select>
+
+                    {/* Row 4: Order / PO # + Warehouse */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div>
+                        <label className="aki-label">Order / PO #</label>
+                        <input type="text" placeholder="PO-2026-001" className="aki-input" value={newInvoice.orderNumber || ''} onChange={e => setNewInvoice({ ...newInvoice, orderNumber: e.target.value })} />
+                      </div>
+                      <div>
+                        <label className="aki-label">Warehouse</label>
+                        <select className="aki-input aki-select" value={newInvoice.warehouseId || ''} onChange={e => setNewInvoice({ ...newInvoice, warehouseId: e.target.value })}>
+                          <option value="">Select…</option>
+                          {warehouses.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
+                        </select>
+                      </div>
                     </div>
-                    <div className="aki-field">
-                      <label className="aki-label">Payment Source</label>
-                      <select className="aki-input aki-select" value={newInvoice.paymentSource} onChange={e => setNewInvoice({ ...newInvoice, paymentSource: e.target.value })}>
-                        {PAYMENT_SOURCES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-                      </select>
-                    </div>
-                    <div className="aki-field">
-                      <label className="aki-label">Order / PO #</label>
-                      <input type="text" placeholder="PO-2026-001" className="aki-input" value={newInvoice.orderNumber || ''} onChange={e => setNewInvoice({ ...newInvoice, orderNumber: e.target.value })} />
-                    </div>
-                    <div className="aki-field">
-                      <label className="aki-label">Warehouse</label>
-                      <select className="aki-input aki-select" value={newInvoice.warehouseId || ''} onChange={e => setNewInvoice({ ...newInvoice, warehouseId: e.target.value })}>
-                        <option value="">Select…</option>
-                        {warehouses.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
-                      </select>
-                    </div>
+
+                    {/* Conditional: telebirr Reference */}
                     {newInvoice.paymentSource === 'TELECOM' && (
-                      <div className="aki-field col-span-2">
+                      <div>
                         <label className="aki-label">telebirr Reference</label>
                         <input type="text" className="aki-input font-mono" placeholder="M-XXXXX" value={newInvoice.telecomReceiptRef || ''} onChange={e => setNewInvoice({ ...newInvoice, telecomReceiptRef: e.target.value })} />
                       </div>
                     )}
+
+                    {/* Conditional: Bank Name */}
                     {newInvoice.paymentSource === 'BANK_TRANSFER' && (
-                      <div className="aki-field col-span-2">
+                      <div>
                         <label className="aki-label">Bank Name</label>
                         <input type="text" className="aki-input" placeholder="CBE / Awash / Dashen…" value={newInvoice.bankName || ''} onChange={e => setNewInvoice({ ...newInvoice, bankName: e.target.value })} />
                       </div>
                     )}
+
                   </div>
                 </div>
 
@@ -922,7 +981,7 @@ export default function AddInvoiceModal({
                             <div className="max-h-[180px] overflow-y-auto p-1">
                               {customers.filter(c => c.toLowerCase().includes((newInvoice._customerSearch || '').toLowerCase())).map((c, i) => (
                                 <button key={i} type="button" onClick={() => { setNewInvoice((p: any) => ({ ...p, customer: c, _customerSearch: undefined })); setShowCustomerSuggestions(false); }}
-                                  className="w-full text-left px-3 py-2 text-[13px] font-semibold rounded-lg flex items-center gap-2.5 hover:bg-blue-50 transition-colors" style={{ color: 'var(--text-2)' }}>
+                                  className="w-full text-left px-3 py-2 text-[13px] font-semibold rounded-lg flex items-center gap-2.5 hover:bg-[var(--pro-azure-50)] transition-colors" style={{ color: 'var(--text-2)' }}>
                                   <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0" style={{ background: 'var(--surface-alt)', color: 'var(--text-3)' }}>{c[0]?.toUpperCase()}</div>
                                   {c}
                                 </button>
@@ -930,7 +989,7 @@ export default function AddInvoiceModal({
                             </div>
                             <div className="p-2" style={{ borderTop: '1px solid var(--border-alt)' }}>
                               <button type="button" onClick={() => { setShowCustomerSuggestions(false); setShowNewCustomerForm(true); }}
-                                className="w-full flex items-center justify-center gap-2 py-1.5 text-[12px] font-bold rounded-lg hover:bg-blue-50 transition-colors" style={{ color: 'var(--aki-blue)' }}>
+                                className="w-full flex items-center justify-center gap-2 py-1.5 text-[12px] font-bold rounded-lg hover:bg-[var(--pro-azure-50)] transition-colors" style={{ color: 'var(--aki-blue)' }}>
                                 <UserPlus size={12} /> New Customer
                               </button>
                             </div>
@@ -999,7 +1058,7 @@ export default function AddInvoiceModal({
                                {tinValidating ? <Loader2 size={11} className="animate-spin" /> : <ShieldCheck size={11} />}
                              </button>
                            </div>
-                           {tinResult && <p className="aki-field-hint mt-1 flex items-center gap-1 font-semibold" style={{ color: tinResult.valid ? '#059669' : '#E11D48' }}>{tinResult.valid ? <CheckCircle2 size={10} /> : <AlertTriangle size={10} />} {tinResult.message}</p>}
+                           {tinResult && <p className="aki-field-hint mt-1 flex items-center gap-1 font-semibold" style={{ color: tinResult.valid ? '#4FBA6F' : '#E11D48' }}>{tinResult.valid ? <CheckCircle2 size={10} /> : <AlertTriangle size={10} />} {tinResult.message}</p>}
                            <p className="aki-field-hint mt-1" style={{ color: 'var(--text-4)' }}>10-digit buyer TIN — must not match your company TIN</p>
                          </div>
                          <div className="pt-2" style={{ borderTop: '1px solid var(--border-alt)' }}>
@@ -1140,61 +1199,174 @@ export default function AddInvoiceModal({
                 </div>
 
                 {/* ── Branding & Layout card ── */}
-                <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                  <div className="flex items-center gap-2 px-4 py-2.5" style={{ borderBottom: '1px solid var(--border-alt)', background: 'var(--surface-alt)' }}>
-                    <LayoutTemplate size={12} style={{ color: 'var(--text-3)' }} />
-                    <span className="text-[12px] font-bold" style={{ color: 'var(--text)' }}>Branding & Layout</span>
-                  </div>
-                  <div className="px-4 py-3 space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="aki-field">
-                        <label className="aki-label">Document Title</label>
-                        <select className="aki-input aki-select" value={(newInvoice as any).companyTitle || 'TAX INVOICE'} onChange={e => setNewInvoice({ ...newInvoice, companyTitle: e.target.value } as any)}>
-                          {['TAX INVOICE', 'PROFORMA INVOICE', 'RECEIPT', 'QUOTE', 'CREDIT NOTE'].map(t => (
-                            <option key={t} value={t}>{t}</option>
-                          ))}
-                        </select>
+                {(() => {
+                  const activeColor = (newInvoice as any).invoiceColor || '#10B981';
+                  return (
+                    <div className="rounded-xl border border-slate-200 overflow-hidden" style={{ background: 'var(--surface)' }}>
+                      {/* Card header — live color accent strip */}
+                      <div
+                        className="flex items-center gap-2 px-4 py-2.5"
+                        style={{
+                          borderBottom: '1px solid var(--border-alt)',
+                          background: `linear-gradient(90deg, ${activeColor}18 0%, var(--surface-alt) 60%)`,
+                          borderLeft: `3px solid ${activeColor}`,
+                        }}
+                      >
+                        <LayoutTemplate size={12} style={{ color: activeColor }} />
+                        <span className="text-[12px] font-bold" style={{ color: 'var(--text)' }}>Branding & Layout</span>
+                        {/* Live color dot */}
+                        <span
+                          className="ml-auto w-4 h-4 rounded-full border-2 border-white/60 shadow-sm shrink-0"
+                          style={{ background: activeColor }}
+                          title={`Active theme: ${activeColor}`}
+                        />
                       </div>
-                      <div className="aki-field">
-                        <label className="aki-label">Layout</label>
-                        <select className="aki-input aki-select" value={(newInvoice as any).invoiceTemplate || 'modern'} onChange={e => setNewInvoice({ ...newInvoice, invoiceTemplate: e.target.value } as any)}>
-                          {['simple', 'modern', 'detailed'].map(t => (
-                            <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                    <div className="aki-field">
-                      <label className="aki-label">Invoice Color Theme</label>
-                      <div className="flex gap-2 flex-wrap">
-                        {[
-                          { name: 'Blue', value: '#2563EB', text: '#fff' },
-                          { name: 'Indigo', value: '#4F46E5', text: '#fff' },
-                          { name: 'Violet', value: '#7C3AED', text: '#fff' },
-                          { name: 'Emerald', value: '#059669', text: '#fff' },
-                          { name: 'Rose', value: '#E11D48', text: '#fff' },
-                          { name: 'Slate', value: '#475569', text: '#fff' },
-                        ].map(c => (
-                          <button key={c.name} type="button"
-                            onClick={() => setNewInvoice({ ...newInvoice, invoiceColor: c.value } as any)}
-                            className="w-7 h-7 rounded-lg border-2 transition-all"
-                            style={{
-                              background: c.value,
-                              color: c.text,
-                              borderColor: (newInvoice as any).invoiceColor === c.value ? '#111827' : 'transparent',
-                              transform: (newInvoice as any).invoiceColor === c.value ? 'scale(1.15)' : 'scale(1)',
-                            }}
-                            title={c.name}
+
+                      <div className="px-4 py-3 space-y-3">
+                        {/* Document title + layout */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="aki-field">
+                            <label className="aki-label">Document Title</label>
+                            <select
+                              className="aki-input aki-select"
+                              value={(newInvoice as any).companyTitle || 'TAX INVOICE'}
+                              onChange={e => setNewInvoice({ ...newInvoice, companyTitle: e.target.value } as any)}
+                            >
+                              {['TAX INVOICE', 'INVOICE', 'PROFORMA INVOICE', 'RECEIPT', 'QUOTE', 'CREDIT NOTE', 'DEBIT NOTE'].map(t => (
+                                <option key={t} value={t}>{t}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="aki-field">
+                            <label className="aki-label">Layout Template</label>
+                            <select
+                              className="aki-input aki-select"
+                              value={(newInvoice as any).invoiceTemplate || 'modern'}
+                              onChange={e => setNewInvoice({ ...newInvoice, invoiceTemplate: e.target.value } as any)}
+                            >
+                              <option value="simple">Simple</option>
+                              <option value="modern">Modern</option>
+                              <option value="detailed">Detailed</option>
+                              <option value="compact">Compact</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Color theme */}
+                        <div className="aki-field">
+                          <label className="aki-label flex items-center gap-1.5">
+                            <Palette size={11} style={{ color: 'var(--text-4)' }} />
+                            Invoice Color Theme
+                          </label>
+                          <div className="flex gap-2 flex-wrap items-center">
+                            {[
+                              { name: 'Emerald',  value: '#10B981' },
+                              { name: 'Blue',     value: '#2563EB' },
+                              { name: 'Indigo',   value: '#4F46E5' },
+                              { name: 'Violet',   value: '#7C3AED' },
+                              { name: 'Purple',   value: '#6366F1' },
+                              { name: 'Rose',     value: '#E11D48' },
+                              { name: 'Amber',    value: '#D97706' },
+                              { name: 'Teal',     value: '#0D9488' },
+                              { name: 'Slate',    value: '#475569' },
+                              { name: 'Black',    value: '#111827' },
+                            ].map(c => (
+                              <button
+                                key={c.name}
+                                type="button"
+                                title={c.name}
+                                onClick={() => setNewInvoice({ ...newInvoice, invoiceColor: c.value } as any)}
+                                className="w-6 h-6 rounded-md border-2 transition-all focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+                                style={{
+                                  background: c.value,
+                                  borderColor: activeColor === c.value ? '#111827' : 'transparent',
+                                  transform: activeColor === c.value ? 'scale(1.25)' : 'scale(1)',
+                                  boxShadow: activeColor === c.value ? `0 0 0 1px white, 0 0 0 3px ${c.value}` : 'none',
+                                }}
+                                aria-label={c.name}
+                                aria-pressed={activeColor === c.value}
+                              />
+                            ))}
+                            {/* Custom hex */}
+                            <div className="flex items-center gap-1.5 ml-1">
+                              <div className="w-5 h-5 rounded border border-slate-200 dark:border-slate-600 shrink-0" style={{ background: activeColor }} />
+                              <input
+                                type="text"
+                                maxLength={7}
+                                value={activeColor}
+                                onChange={e => {
+                                  const v = e.target.value;
+                                  if (/^#[0-9A-Fa-f]{0,6}$/.test(v)) setNewInvoice({ ...newInvoice, invoiceColor: v } as any);
+                                }}
+                                className="aki-input text-xs font-mono"
+                                style={{ width: 72 }}
+                                placeholder="#10B981"
+                                aria-label="Custom color hex"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Custom background URL */}
+                        <div className="aki-field">
+                          <label className="aki-label flex items-center gap-1.5">
+                            <Type size={11} style={{ color: 'var(--text-4)' }} />
+                            Background Image URL
+                            <span className="ml-auto text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-600">Pro</span>
+                          </label>
+                          <input
+                            type="url"
+                            className="aki-input"
+                            placeholder="https://cdn.example.com/letterhead.png"
+                            value={(newInvoice as any).backgroundImageUrl || ''}
+                            onChange={e => setNewInvoice({ ...newInvoice, backgroundImageUrl: e.target.value } as any)}
                           />
-                        ))}
+                          <p className="text-[9px] mt-1" style={{ color: 'var(--text-4)' }}>
+                            Use a letterhead or watermark image as the PDF background. Full layout control available in the{' '}
+                            <a href="/apps/invoice-templates" className="font-semibold" style={{ color: 'var(--aki-blue)' }}>Template Builder</a>.
+                          </p>
+                        </div>
+
+                        {/* Custom Terms & Conditions */}
+                        <div className="aki-field">
+                          <label className="aki-label">Custom Terms & Conditions</label>
+                          <textarea
+                            placeholder="Payment terms, late fees, dispute resolution…"
+                            className="aki-textarea"
+                            style={{ minHeight: 48 }}
+                            value={(newInvoice as any).terms || ''}
+                            onChange={e => setNewInvoice({ ...newInvoice, terms: e.target.value } as any)}
+                          />
+                        </div>
+
+                        {/* Template builder callout */}
+                        <div
+                          className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg"
+                          style={{ background: 'linear-gradient(90deg,#7c3aed18,#6366f110)', border: '1px solid #c4b5fd50' }}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Wand2 size={13} style={{ color: '#7C3AED', flexShrink: 0 }} />
+                            <div className="min-w-0">
+                              <p className="text-[11px] font-bold truncate" style={{ color: '#5b21b6' }}>Print-ready Invoice Template App</p>
+                              <p className="text-[9px] leading-tight" style={{ color: '#7c3aed' }}>
+                                Drag-and-drop builder · unlimited custom fields · multiple templates
+                              </p>
+                            </div>
+                          </div>
+                          <a
+                            href="/apps/invoice-templates"
+                            className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-white transition-colors"
+                            style={{ background: '#7C3AED' }}
+                            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#6d28d9')}
+                            onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = '#7C3AED')}
+                          >
+                            Open <ExternalLink size={9} />
+                          </a>
+                        </div>
                       </div>
                     </div>
-                    <div className="aki-field">
-                      <label className="aki-label">Custom Terms & Conditions</label>
-                      <textarea placeholder="Payment terms, late fees, dispute resolution…" className="aki-textarea" style={{ minHeight: 48 }} value={(newInvoice as any).terms || ''} onChange={e => setNewInvoice({ ...newInvoice, terms: e.target.value } as any)} />
-                    </div>
-                  </div>
-                </div>
+                  );
+                })()}
 
                 {/* ── Notes, Footer & Options card ── */}
                 <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
@@ -1313,174 +1485,478 @@ export default function AddInvoiceModal({
             </form>
           </div>{/* end left column */}
 
-          {/* ══ RIGHT: Live Invoice Document Preview ═══════════════ */}
-          <div className="flex-1 overflow-y-auto p-6 hidden lg:flex justify-center" style={{ background: '#F0F4F8' }}>
-            <div className="w-full max-w-lg">
-              {/* Sticky "Live Preview" label */}
-              <div className="flex items-center gap-2 mb-3">
-                <Eye size={12} style={{ color: 'var(--text-4)' }} />
-                <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-4)' }}>Live Preview</span>
+          {/* ══ RIGHT: Live Invoice Document Preview — 55% ══════════ */}
+          <div
+            className="hidden lg:flex flex-col flex-1 overflow-hidden"
+            style={{ background: '#F1F5F9' }}
+          >
+            {/* ── Top bar: "Live Preview" label ── */}
+            <div
+              className="flex items-center justify-between gap-2 px-5 py-2 shrink-0"
+              style={{
+                borderBottom: `2px solid ${(newInvoice as any).invoiceColor || '#2563EB'}`,
+                background: '#E2E8F0',
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <Eye size={11} style={{ color: '#64748B' }} />
+                <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#64748B' }}>
+                  Live Preview
+                </span>
                 <span className="aki-badge sm pill solid-info ml-1">Auto-updates</span>
               </div>
-              {/* Paper card */}
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="flex items-center gap-2">
+                {isLoadingInvoiceNumber && (
+                  <span
+                    className="text-[9px] font-semibold px-2 py-0.5 rounded-full"
+                    style={{ background: '#FEF3C7', color: '#92400E', border: '1px solid #FDE68A' }}
+                  >
+                    Generating #…
+                  </span>
+                )}
+                {newInvoice.invoiceNumber && (
+                  <span
+                    className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full"
+                    style={{
+                      background: `${(newInvoice as any).invoiceColor || '#2563EB'}15`,
+                      color: (newInvoice as any).invoiceColor || '#2563EB',
+                      border: `1px solid ${(newInvoice as any).invoiceColor || '#2563EB'}40`,
+                    }}
+                  >
+                    # {newInvoice.invoiceNumber}
+                  </span>
+                )}
+                <span className="text-[10px]" style={{ color: '#94A3B8' }}>
+                  {(newInvoice as any).companyTitle || 'TAX INVOICE'}
+                </span>
+              </div>
+            </div>
 
-                {/* Header: company + "Invoice" label */}
-                <div className="px-7 py-5" style={{ borderBottom: '1px solid #E5E7EB' }}>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center text-[14px] font-black shrink-0" style={{ background: (newInvoice as any).invoiceColor || 'var(--aki-blue)', color: '#fff' }}>
-                        {(settings?.company_name || 'O')[0]?.toUpperCase()}
+            {/* ── Scrollable paper area — centred, max-width keeps it A4-ish ── */}
+            <div className="flex-1 overflow-y-auto flex justify-center py-5 px-6" style={{ background: '#F1F5F9' }}>
+              <div className="w-full" style={{ maxWidth: 480 }}>
+
+                {/* ════════════════════════════════════════════════
+                    PAPER CARD — A4-style, matches reference design
+                    ════════════════════════════════════════════════ */}
+                <div
+                  className="bg-white overflow-hidden"
+                  style={{
+                    borderRadius: 8,
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06)',
+                    border: '1px solid #E2E8F0',
+                    fontFamily: "'Segoe UI', Arial, sans-serif",
+                  }}
+                >
+                  {/* ── HEADER: seller top-left · document title top-right ── */}
+                  <div className="px-6 pt-5 pb-4" style={{ borderBottom: `3px solid ${(newInvoice as any).invoiceColor || '#2563EB'}` }}>
+                    <div className="flex items-start justify-between gap-4">
+                      {/* Left: seller identity */}
+                      <div className="min-w-0 flex-1">
+                        <p
+                          className="text-[16px] font-black leading-tight truncate"
+                          style={{ color: '#111827' }}
+                        >
+                          {settings?.company_name || 'Your Company'}
+                        </p>
+                        {settings?.company_address && (
+                          <p className="text-[10px] mt-0.5 leading-snug" style={{ color: '#4B5563' }}>
+                            {settings.company_address}
+                          </p>
+                        )}
+                        {settings?.company_phone && (
+                          <p className="text-[10px]" style={{ color: '#4B5563' }}>{settings.company_phone}</p>
+                        )}
+                        {settings?.company_email && (
+                          <p className="text-[10px]" style={{ color: '#4B5563' }}>{settings.company_email}</p>
+                        )}
+                        {settings?.company_tin && (
+                          <p className="text-[10px] mt-1" style={{ color: '#6B7280' }}>
+                            <span className="font-semibold">TAX ID</span>{' '}
+                            <span className="font-mono">{settings.company_tin}</span>
+                          </p>
+                        )}
+                        {settings?.company_vat_number && (
+                          <p className="text-[10px]" style={{ color: '#6B7280' }}>
+                            <span className="font-semibold">VAT No.</span>{' '}
+                            <span className="font-mono">{settings.company_vat_number}</span>
+                          </p>
+                        )}
                       </div>
-                      <div>
-                        <p className="text-[13px] font-bold" style={{ color: '#111827' }}>{settings?.company_name || 'Your Company'}</p>
-                        {settings?.company_address && <p className="text-[10px] mt-0.5" style={{ color: '#6B7280' }}>{settings.company_address}</p>}
-                        {settings?.company_tin && <p className="text-[10px]" style={{ color: '#9CA3AF' }}>TIN: {settings.company_tin}</p>}
+
+                      {/* Right: document title + number */}
+                      <div className="text-right shrink-0">
+                        <p
+                          className="text-[20px] font-black tracking-tight leading-none"
+                          style={{ color: (newInvoice as any).invoiceColor || '#2563EB' }}
+                        >
+                          {(newInvoice as any).companyTitle || 'TAX INVOICE'}
+                        </p>
+                        {newInvoice.invoiceNumber ? (
+                          <p className="text-[11px] font-mono font-bold mt-1" style={{ color: '#374151' }}>
+                            {newInvoice.invoiceNumber}
+                          </p>
+                        ) : isLoadingInvoiceNumber ? (
+                          <p className="text-[10px] italic mt-1" style={{ color: '#D97706' }}>Generating…</p>
+                        ) : null}
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-[16px] font-black" style={{ color: (newInvoice as any).invoiceColor || '#111827' }}>{(newInvoice as any).companyTitle || 'Invoice'}</p>
-                      {newInvoice.invoiceNumber && <p className="text-[11px] font-mono mt-0.5" style={{ color: 'var(--aki-blue)' }}>{newInvoice.invoiceNumber}</p>}
-                    </div>
                   </div>
-                </div>
 
-                {/* Bill To + meta */}
-                <div className="grid grid-cols-2 px-7 py-4 gap-5" style={{ borderBottom: '1px solid #E5E7EB' }}>
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-wider mb-1.5" style={{ color: '#9CA3AF' }}>Bill To</p>
-                    {newInvoice.customer
-                      ? <>
-                          <p className="text-[13px] font-bold" style={{ color: '#111827' }}>{newInvoice.customer}</p>
-                          {newInvoice.customerAddress && <p className="text-[11px] mt-0.5" style={{ color: '#4B5563' }}>{newInvoice.customerAddress}</p>}
-                          {newInvoice.customerPhone && <p className="text-[11px]" style={{ color: '#4B5563' }}>{newInvoice.customerPhone}</p>}
-                          {newInvoice.customerEmail && <p className="text-[11px]" style={{ color: '#6B7280' }}>{newInvoice.customerEmail}</p>}
-                          {newInvoice.customerTin && <p className="text-[10px] font-mono mt-1" style={{ color: '#9CA3AF' }}>TIN: {newInvoice.customerTin}</p>}
-                        </>
-                      : <p className="text-[12px] italic" style={{ color: '#9CA3AF' }}>No customer selected</p>
-                    }
-                  </div>
-                  <div className="space-y-1.5">
-                    {[
-                      { label: 'Invoice Number', value: newInvoice.invoiceNumber || '—' },
-                      { label: 'Order Number',   value: newInvoice.orderNumber  || '—' },
-                      { label: 'Invoice Date',   value: newInvoice.date    ? new Date(newInvoice.date).toLocaleDateString('en-ET', { day: '2-digit', month: 'short', year: 'numeric' }) : '—' },
-                      { label: 'Due Date',       value: newInvoice.dueDate ? new Date(newInvoice.dueDate).toLocaleDateString('en-ET', { day: '2-digit', month: 'short', year: 'numeric' }) : '—' },
-                    ].map(row => (
-                      <div key={row.label} className="flex items-baseline justify-between gap-3">
-                        <span className="text-[11px] font-semibold shrink-0" style={{ color: '#374151' }}>{row.label}:</span>
-                        <span className="text-[11px] font-bold text-right" style={{ color: '#111827' }}>{row.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Items table */}
-                <div>
-                  <div className="grid px-7 py-2.5" style={{ gridTemplateColumns: '1fr 60px 88px 88px', background: (newInvoice as any).invoiceColor || '#3730A3' }}>
-                    {['Items', 'Qty', 'Price', 'Amount'].map((h, i) => (
-                      <span key={h} className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#fff', textAlign: i > 0 ? 'right' : 'left' }}>{h}</span>
-                    ))}
-                  </div>
-                  {(newInvoice.items || []).filter((i: any) => Number(i.price) > 0 || i.itemId).length > 0
-                    ? (newInvoice.items as any[]).filter((i: any) => Number(i.price) > 0 || i.itemId).map((item: any, idx: number) => {
-                        const gross = Number(item.price || 0) * Number(item.quantity || 1);
-                        const disc = item.showDiscount ? (item.discountType === 'PERCENT' ? gross * (Number(item.discountValue) / 100) : Number(item.discountValue)) : 0;
-                        const lineTotal = Math.max(0, gross - disc);
-                        const itemName = item.customName || (itemsList.find((it: any) => it.id === item.itemId)?.name) || item.itemId || `Item ${idx + 1}`;
-                        return (
-                          <div key={idx} className="grid px-7 py-2.5" style={{ gridTemplateColumns: '1fr 60px 88px 88px', borderBottom: '1px solid #F3F4F6' }}>
-                            <div>
-                              <p className="text-[12px] font-semibold" style={{ color: '#111827' }}>{itemName}</p>
-                              {item.description && <p className="text-[10px] mt-0.5 line-clamp-2" style={{ color: '#6B7280' }}>{item.description}</p>}
-                            </div>
-                            <p className="text-[12px] text-right tabular-nums" style={{ color: '#374151' }}>{Number(item.quantity || 1)}</p>
-                            <p className="text-[12px] text-right tabular-nums" style={{ color: '#374151' }}>{cur} {Number(item.price || 0).toFixed(2)}</p>
-                            <p className="text-[12px] font-semibold text-right tabular-nums" style={{ color: '#111827' }}>{cur} {lineTotal.toFixed(2)}</p>
-                          </div>
-                        );
-                      })
-                    : <div className="px-7 py-5 text-center"><p className="text-[11px] italic" style={{ color: '#9CA3AF' }}>Add items to see them here</p></div>
-                  }
-                </div>
-
-                {/* Totals */}
-                {(newInvoice.items || []).some((i: any) => Number(i.price) > 0) && (
-                  <div className="px-7 py-4 flex justify-end" style={{ borderTop: '1px solid #E5E7EB' }}>
-                    <div className="w-48 space-y-1.5">
-                      <div className="flex justify-between text-[12px]"><span style={{ color: '#6B7280' }}>Subtotal</span><span className="font-semibold tabular-nums" style={{ color: '#111827' }}>{cur} {fmt2(subtotal)}</span></div>
-                      {vatAmount > 0 && <div className="flex justify-between text-[12px]"><span style={{ color: '#8B5CF6' }}>VAT (15%)</span><span className="font-semibold tabular-nums" style={{ color: '#8B5CF6' }}>{cur} {fmt2(vatAmount)}</span></div>}
-                      {invoiceDisc > 0 && <div className="flex justify-between text-[12px]"><span style={{ color: '#F43F5E' }}>Discount</span><span className="font-semibold tabular-nums" style={{ color: '#F43F5E' }}>− {cur} {fmt2(invoiceDisc)}</span></div>}
-                      {!hasNamedTaxes && subtotal > 0 && <div className="flex justify-between text-[12px]"><span style={{ color: '#6B7280' }}>DRRF (1%)</span><span className="font-semibold tabular-nums" style={{ color: '#374151' }}>{cur} {fmt2(drrfAmount)}</span></div>}
-                      {namedTaxes.map((t: InvoiceTax) => <div key={t.id} className="flex justify-between text-[12px]"><span style={{ color: '#10B981' }}>{t.name} {t.type === 'PERCENT' ? `${t.rate}%` : ''}</span><span className="font-semibold tabular-nums" style={{ color: '#10B981' }}>{cur} {fmt2(t.amount)}</span></div>)}
-                      <div className="flex justify-between pt-2 items-baseline" style={{ borderTop: '2px solid #E5E7EB' }}>
-                        <span className="text-[13px] font-bold" style={{ color: '#111827' }}>Total</span>
-                        <span className="text-[16px] font-black tabular-nums" style={{ color: '#1D4ED8', letterSpacing: '-0.02em' }}>{cur} {fmt2(grandTotal)}</span>
-                      </div>
-                      <p className="text-[9px] italic leading-relaxed pt-1" style={{ color: '#6B7280' }}>{amountInWords(grandTotal, cur)}</p>
-                      {fxRate && fxRate !== 1 && (
-                        <div className="flex justify-between items-baseline pt-1">
-                          <span className="text-[10px] font-semibold" style={{ color: '#6B7280' }}>= {baseCurrency}</span>
-                          <span className="text-[11px] font-bold tabular-nums" style={{ color: '#374151' }}>{fmt2(convertToBase(grandTotal)!)} {baseCurrency}</span>
+                  {/* ── INVOICE META: invoice details left · bill-to right ── */}
+                  <div className="grid px-6 py-4" style={{ gridTemplateColumns: '1fr 1fr', gap: 16, borderBottom: '1px dashed #D1D5DB' }}>
+                    {/* Left: invoice meta */}
+                    <div className="space-y-1">
+                      {[
+                        { l: 'Invoice:', v: newInvoice.invoiceNumber || (isLoadingInvoiceNumber ? '…' : '—') },
+                        { l: 'Client:', v: newInvoice.customer || '—' },
+                        { l: 'Date:', v: newInvoice.date ? new Date(newInvoice.date).toLocaleDateString('en-ET', { day: '2-digit', month: 'short', year: 'numeric' }) : '—' },
+                        ...(newInvoice.dueDate ? [{ l: 'Due:', v: new Date(newInvoice.dueDate).toLocaleDateString('en-ET', { day: '2-digit', month: 'short', year: 'numeric' }) }] : []),
+                        ...((newInvoice as any).orderNumber ? [{ l: 'Order #:', v: (newInvoice as any).orderNumber }] : []),
+                        ...((newInvoice as any).fsNo ? [{ l: 'FS No.:', v: (newInvoice as any).fsNo }] : []),
+                      ].map(row => (
+                        <div key={row.l} className="flex items-baseline gap-2">
+                          <span className="text-[10px] font-semibold w-14 shrink-0" style={{ color: '#6B7280' }}>{row.l}</span>
+                          <span className="text-[11px] font-bold" style={{ color: '#111827' }}>{row.v}</span>
                         </div>
+                      ))}
+                    </div>
+
+                    {/* Right: bill-to */}
+                    <div>
+                      <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: '#9CA3AF' }}>Bill To</p>
+                      {newInvoice.customer ? (
+                        <div className="space-y-0.5">
+                          <p className="text-[12px] font-bold" style={{ color: '#111827' }}>{newInvoice.customer}</p>
+                          {newInvoice.customerAddress && (
+                            <p className="text-[10px]" style={{ color: '#4B5563' }}>{newInvoice.customerAddress}</p>
+                          )}
+                          {newInvoice.customerPhone && (
+                            <p className="text-[10px]" style={{ color: '#4B5563' }}>{newInvoice.customerPhone}</p>
+                          )}
+                          {newInvoice.customerEmail && (
+                            <p className="text-[10px]" style={{ color: '#6B7280' }}>{newInvoice.customerEmail}</p>
+                          )}
+                          {newInvoice.customerTin && (
+                            <p className="text-[10px] font-mono mt-0.5" style={{ color: '#9CA3AF' }}>
+                              TIN: {newInvoice.customerTin}
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-[10px] italic" style={{ color: '#9CA3AF' }}>No customer selected</p>
                       )}
                     </div>
                   </div>
-                )}
 
-                {/* Notes / footer preview */}
-                {(newInvoice.customerNotes || newInvoice.footer || (newInvoice as any).terms) && (
-                  <div className="px-7 py-3 space-y-2" style={{ borderTop: '1px solid #E5E7EB', background: '#F9FAFB' }}>
-                    {newInvoice.customerNotes && <div><p className="text-[9px] font-black uppercase tracking-wider mb-0.5" style={{ color: '#9CA3AF' }}>Notes</p><p className="text-[11px]" style={{ color: '#4B5563' }}>{newInvoice.customerNotes}</p></div>}
-                    {newInvoice.footer && <div><p className="text-[9px] font-black uppercase tracking-wider mb-0.5" style={{ color: '#9CA3AF' }}>Footer</p><p className="text-[11px]" style={{ color: '#4B5563' }}>{newInvoice.footer}</p></div>}
-                    {(newInvoice as any).terms && <div><p className="text-[9px] font-black uppercase tracking-wider mb-0.5" style={{ color: '#9CA3AF' }}>Terms & Conditions</p><p className="text-[11px]" style={{ color: '#4B5563' }}>{(newInvoice as any).terms}</p></div>}
-                  </div>
-                )}
-
-                {/* QR strip */}
-                {newInvoice.invoiceNumber && grandTotal > 0 && (
-                  <div className="px-7 py-3 flex items-center gap-3" style={{ borderTop: '1px solid #E5E7EB', background: `${(newInvoice as any).invoiceColor || '#7C3AED'}10` }}>
-                     <img src={`${QR_CODE_SERVICE_URL}?size=48x48&data=${encodeURIComponent(`NBE-IQR|${settings?.ovds_merchant_id || 'Ovds-01'}|${grandTotal.toFixed(2)}|${newInvoice.invoiceNumber}|${cur}|${vatAmount.toFixed(2)}`)}`}
-                      alt="NBE QR" className="rounded shrink-0" style={{ width: 40, height: 40, border: `1.5px solid ${(newInvoice as any).invoiceColor || '#DDD6FE'}` }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                    <div>
-                      <p className="text-[10px] font-bold" style={{ color: (newInvoice as any).invoiceColor || '#6D28D9' }}>NBE-IQR · ERCA Compliant</p>
-                      <p className="text-[9px] mt-0.5" style={{ color: (newInvoice as any).invoiceColor || '#7C3AED' }}>Regulation 570/2025</p>
+                  {/* ── ITEMS TABLE ── */}
+                  <div>
+                    {/* Table header */}
+                    <div
+                      className="grid px-5 py-2"
+                      style={{
+                        gridTemplateColumns: '1fr 52px 80px 80px',
+                        background: (newInvoice as any).invoiceColor || '#2563EB',
+                      }}
+                    >
+                      {['Description', 'QTY', 'Price', 'Total (ETB)'].map((h, i) => (
+                        <span
+                          key={h}
+                          className="text-[9px] font-bold uppercase tracking-wider text-white"
+                          style={{ textAlign: i === 0 ? 'left' : 'right' }}
+                        >
+                          {h}
+                        </span>
+                      ))}
                     </div>
+
+                    {/* Table rows */}
+                    {(newInvoice.items || []).filter((i: any) => Number(i.price) > 0 || i.itemId).length > 0
+                      ? (newInvoice.items as any[])
+                          .filter((i: any) => Number(i.price) > 0 || i.itemId)
+                          .map((item: any, idx: number) => {
+                            const gross = Number(item.price || 0) * Number(item.quantity || 1);
+                            const disc = item.showDiscount
+                              ? (item.discountType === 'PERCENT'
+                                  ? gross * (Number(item.discountValue) / 100)
+                                  : Number(item.discountValue))
+                              : 0;
+                            const lineTotal = Math.max(0, gross - disc);
+                            const itemName =
+                              item.customName ||
+                              (itemsList.find((it: any) => it.id === item.itemId)?.name) ||
+                              item.itemId ||
+                              `Item ${idx + 1}`;
+                            return (
+                              <div key={idx}>
+                                <div
+                                  className="grid px-5 py-2"
+                                  style={{
+                                    gridTemplateColumns: '1fr 52px 80px 80px',
+                                    background: idx % 2 === 1 ? '#F9FAFB' : '#FFFFFF',
+                                  }}
+                                >
+                                  <div className="min-w-0 pr-2">
+                                    <p className="text-[11px] font-semibold leading-tight truncate" style={{ color: '#111827' }}>
+                                      {itemName}
+                                    </p>
+                                    {item.description && (
+                                      <p className="text-[9px] mt-0.5 leading-snug line-clamp-2 italic" style={{ color: '#6B7280' }}>
+                                        {item.description}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <span className="text-[11px] tabular-nums text-right shrink-0" style={{ color: '#374151' }}>
+                                    {Number(item.quantity || 1)}
+                                  </span>
+                                  <span className="text-[11px] tabular-nums text-right shrink-0" style={{ color: '#374151' }}>
+                                    {Number(item.price || 0).toFixed(2)}
+                                  </span>
+                                  <span className="text-[11px] font-semibold tabular-nums text-right shrink-0" style={{ color: '#111827' }}>
+                                    {lineTotal.toFixed(2)}
+                                  </span>
+                                </div>
+                                {/* Dotted separator between rows */}
+                                <div style={{ borderBottom: '1px dashed #E5E7EB' }} />
+                              </div>
+                            );
+                          })
+                      : (
+                        <div className="px-6 py-6 flex items-center justify-center">
+                          <p className="text-[11px] italic" style={{ color: '#9CA3AF' }}>Add items to see them here</p>
+                        </div>
+                      )
+                    }
                   </div>
-                )}
 
-              </div>{/* end paper card */}
-
-              {/* ERCA Readiness below the paper */}
-              <div className="mt-4 bg-white rounded-xl border border-slate-200 overflow-hidden">
-                <div className="px-5 py-3" style={{ borderBottom: '1px solid var(--border-alt)', background: 'var(--surface-alt)' }}>
-                  <p className="text-[12px] font-bold flex items-center gap-2" style={{ color: 'var(--text)' }}><ShieldCheck size={12} style={{ color: 'var(--aki-blue)' }} /> ERCA Readiness</p>
-                </div>
-                <div className="px-5 py-3 space-y-1.5">
-                  {[
-                    { label: 'Invoice # set',    ok: !!newInvoice.invoiceNumber },
-                    { label: 'Customer set',     ok: !!newInvoice.customer },
-                    { label: 'Date set',         ok: !!newInvoice.date && !!newInvoice.dueDate },
-                    { label: 'Items with price', ok: (newInvoice.items || []).some((i: any) => Number(i.price) > 0) },
-                    { label: 'VAT 15% applied',  ok: vatAmount > 0 },
-                    { label: 'Customer TIN set', ok: !!newInvoice.customerTin },
-                    { label: 'FS No. set',       ok: !!(newInvoice as any).fsNo },
-                  ].map(c => (
-                    <div key={c.label} className="flex items-center gap-2">
-                      <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0" style={{ background: c.ok ? '#D1FAE5' : '#FEE2E2', border: `1px solid ${c.ok ? '#A7F3D0' : '#FECACA'}` }}>
-                        {c.ok ? <CheckCircle2 size={8} style={{ color: '#059669' }} /> : <AlertTriangle size={7} style={{ color: '#DC2626' }} />}
+                  {/* ── TOTALS ── */}
+                  {(newInvoice.items || []).some((i: any) => Number(i.price) > 0) && (
+                    <div className="px-5 py-3 flex justify-end" style={{ borderTop: '1px dashed #D1D5DB' }}>
+                      <div style={{ minWidth: 200 }}>
+                        {[
+                          { l: 'Subtotal', v: fmt2(subtotal), color: '#374151' },
+                          ...(vatAmount > 0 ? [{ l: `VAT (15%)`, v: fmt2(vatAmount), color: '#7C3AED' }] : []),
+                          ...(invoiceDisc > 0 ? [{ l: 'Discount', v: `− ${fmt2(invoiceDisc)}`, color: '#EF4444' }] : []),
+                          ...(!hasNamedTaxes && subtotal > 0 ? [{ l: 'DRRF (1%)', v: fmt2(drrfAmount), color: '#374151' }] : []),
+                          ...namedTaxes.map((t: InvoiceTax) => ({
+                            l: `${t.name}${t.type === 'PERCENT' ? ` ${t.rate}%` : ''}`,
+                            v: fmt2(t.amount),
+                            color: '#10B981',
+                          })),
+                        ].map(row => (
+                          <div key={row.l} className="flex items-baseline justify-between gap-8 mb-1">
+                            <span className="text-[11px]" style={{ color: '#6B7280' }}>{row.l}</span>
+                            <span className="text-[11px] font-semibold tabular-nums" style={{ color: row.color }}>
+                              {cur} {row.v}
+                            </span>
+                          </div>
+                        ))}
+                        {/* Dotted separator before total */}
+                        <div className="my-1.5" style={{ borderTop: '1px dashed #D1D5DB' }} />
+                        <div className="flex items-baseline justify-between gap-8">
+                          <span className="text-[13px] font-bold" style={{ color: '#111827' }}>Total</span>
+                          <span
+                            className="text-[15px] font-black tabular-nums"
+                            style={{ color: (newInvoice as any).invoiceColor || '#2563EB', letterSpacing: '-0.02em' }}
+                          >
+                            {cur} {fmt2(grandTotal)}
+                          </span>
+                        </div>
+                        <p className="text-[9px] italic mt-1 text-right leading-relaxed" style={{ color: '#9CA3AF' }}>
+                          {amountInWords(grandTotal, cur)}
+                        </p>
+                        {fxRate && fxRate !== 1 && (
+                          <div className="flex items-baseline justify-between gap-8 mt-1">
+                            <span className="text-[10px] font-semibold" style={{ color: '#9CA3AF' }}>= {baseCurrency}</span>
+                            <span className="text-[10px] font-bold tabular-nums" style={{ color: '#374151' }}>
+                              {fmt2(convertToBase(grandTotal)!)} {baseCurrency}
+                            </span>
+                          </div>
+                        )}
                       </div>
-                      <span className="text-[11px]" style={{ color: c.ok ? 'var(--text-3)' : '#BE123C' }}>{c.label}</span>
                     </div>
-                  ))}
+                  )}
+
+                  {/* ── NOTES / FOOTER / TERMS ── */}
+                  {(newInvoice.customerNotes || newInvoice.footer || (newInvoice as any).terms) && (
+                    <div className="px-6 py-3 space-y-2" style={{ borderTop: '1px dashed #D1D5DB', background: '#F9FAFB' }}>
+                      {newInvoice.customerNotes && (
+                        <div>
+                          <p className="text-[9px] font-black uppercase tracking-widest mb-0.5" style={{ color: '#9CA3AF' }}>Notes</p>
+                          <p className="text-[10px] leading-snug" style={{ color: '#4B5563' }}>{newInvoice.customerNotes}</p>
+                        </div>
+                      )}
+                      {(newInvoice.footer || (newInvoice as any).terms) && (
+                        <div>
+                          <p className="text-[9px] font-black uppercase tracking-widest mb-0.5" style={{ color: '#9CA3AF' }}>Terms</p>
+                          <p className="text-[10px] leading-snug" style={{ color: '#4B5563' }}>
+                            {newInvoice.footer || (newInvoice as any).terms}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* ── PAYMENT + SIGNATURE block (matches reference image) ── */}
+                  {grandTotal > 0 && (
+                    <div className="px-6 py-4" style={{ borderTop: '1px dashed #D1D5DB' }}>
+                      {/* Authorised signature line */}
+                      <div className="flex items-end justify-between">
+                        <div>
+                          <div style={{ height: 28, borderBottom: '1px solid #374151', width: 120, marginBottom: 4 }} />
+                          <p className="text-[9px]" style={{ color: '#6B7280' }}>
+                            {settings?.company_name || 'Authorised Signatory'}
+                          </p>
+                          {settings?.company_name && (
+                            <p className="text-[9px] italic" style={{ color: '#9CA3AF' }}>
+                              Note: Payment will be processed per agreed terms.
+                            </p>
+                          )}
+                        </div>
+                        {/* Bank / payment info */}
+                        {(settings?.company_bank_account || settings?.company_bank_name) && (
+                          <div className="text-right text-[9px]" style={{ color: '#6B7280' }}>
+                            {settings.company_bank_name && (
+                              <p>Payment via <strong>{settings.company_bank_name}</strong></p>
+                            )}
+                            {settings.company_bank_account && (
+                              <p className="font-mono">A/C: {settings.company_bank_account}</p>
+                            )}
+                            {settings.company_swift && (
+                              <p>SWIFT: {settings.company_swift}</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      {/* Dotted payment footer line */}
+                      <div className="mt-3 pt-2" style={{ borderTop: '1px dashed #D1D5DB' }}>
+                        <p className="text-[9px] text-center" style={{ color: '#9CA3AF' }}>
+                          {newInvoice.footer ||
+                            `Payment made via bank transfer in the name of ${settings?.company_name || 'company'}. Reference invoice number on all remittances.`}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── QR STRIP — shown as soon as there are items, even while number is loading ── */}
+                  {grandTotal > 0 && (
+                    <div
+                      className="flex items-center gap-3 px-6 py-3"
+                      style={{
+                        borderTop: '1px solid #E5E7EB',
+                        background: `${(newInvoice as any).invoiceColor || '#2563EB'}0D`,
+                      }}
+                    >
+                      {newInvoice.invoiceNumber ? (
+                        <img
+                          src={`${QR_CODE_SERVICE_URL}?size=48x48&data=${encodeURIComponent(
+                            `NBE-IQR|${settings?.ovds_merchant_id || 'Ovds-01'}|${grandTotal.toFixed(2)}|${newInvoice.invoiceNumber}|${cur}|${vatAmount.toFixed(2)}`
+                          )}`}
+                          alt="NBE QR"
+                          className="rounded shrink-0"
+                          style={{
+                            width: 40, height: 40,
+                            border: `1.5px solid ${(newInvoice as any).invoiceColor || '#BFDBFE'}`,
+                          }}
+                          onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        />
+                      ) : (
+                        /* Placeholder box while invoice number is being generated */
+                        <div
+                          className="rounded shrink-0 flex items-center justify-center"
+                          style={{
+                            width: 40, height: 40,
+                            border: `1.5px dashed ${(newInvoice as any).invoiceColor || '#BFDBFE'}`,
+                            background: `${(newInvoice as any).invoiceColor || '#2563EB'}08`,
+                          }}
+                        >
+                          <span style={{ fontSize: 16 }}>⏳</span>
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-[10px] font-bold" style={{ color: (newInvoice as any).invoiceColor || '#2563EB' }}>
+                          NBE-IQR · ERCA Compliant
+                        </p>
+                        <p className="text-[9px] mt-0.5" style={{ color: '#6B7280' }}>
+                          {newInvoice.invoiceNumber
+                            ? 'Regulation 570/2025'
+                            : isLoadingInvoiceNumber
+                            ? 'QR generates once invoice # is ready'
+                            : 'Enter invoice # to generate QR'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                </div>{/* end paper card */}
+
+                {/* ════════════════════════════════════════════════
+                    ERCA READINESS CARD
+                    ════════════════════════════════════════════════ */}
+                <div
+                  className="mt-3 bg-white overflow-hidden"
+                  style={{ borderRadius: 8, border: '1px solid #E2E8F0', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}
+                >
+                  {/* Header row */}
+                  <div
+                    className="flex items-center justify-between px-5 py-2.5"
+                    style={{ borderBottom: '1px solid #E5E7EB', background: '#F9FAFB' }}
+                  >
+                    <p className="flex items-center gap-1.5 text-[11px] font-bold" style={{ color: '#111827' }}>
+                      <ShieldCheck size={12} style={{ color: '#2563EB' }} />
+                      ERCA Readiness
+                    </p>
+                    <span
+                      className="text-[10px] font-black tabular-nums"
+                      style={{ color: completenessScore === 100 ? '#4FBA6F' : completenessScore >= 60 ? '#D97706' : '#DC2626' }}
+                    >
+                      {completenessScore}%
+                    </span>
+                  </div>
+
                   {/* Progress bar */}
-                  <div className="pt-2">
-                    <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
-                      <div className="h-full rounded-full transition-all" style={{ width: `${completenessScore}%`, background: completenessScore === 100 ? '#10B981' : completenessScore >= 60 ? '#F59E0B' : '#F43F5E' }} />
+                  <div className="px-5 pt-2.5 pb-1">
+                    <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: '#E5E7EB' }}>
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${completenessScore}%`,
+                          background: completenessScore === 100 ? '#10B981' : completenessScore >= 60 ? '#F59E0B' : '#EF4444',
+                        }}
+                      />
                     </div>
-                    <p className="text-[10px] font-bold mt-1 text-right tabular-nums" style={{ color: completenessScore === 100 ? '#10B981' : completenessScore >= 60 ? '#F59E0B' : '#F43F5E' }}>{completenessScore}% complete</p>
+                  </div>
+
+                  {/* Checklist — two columns */}
+                  <div className="px-5 pb-3 pt-2 grid grid-cols-2 gap-x-3 gap-y-1.5">
+                    {ercaChecks.map(c => (
+                      <div key={c.label} className="flex items-center gap-1.5">
+                        <div
+                          className="w-3 h-3 rounded-full flex items-center justify-center shrink-0"
+                          style={{
+                            background: c.pending ? '#FEF3C7' : c.ok ? '#D1FAE5' : '#FEE2E2',
+                            border: `1px solid ${c.pending ? '#FDE68A' : c.ok ? '#6EE7B7' : '#FECACA'}`,
+                          }}
+                        >
+                          {c.pending
+                            ? <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#D97706', display: 'block' }} />
+                            : c.ok
+                            ? <CheckCircle2 size={7} style={{ color: '#4FBA6F' }} />
+                            : <AlertTriangle size={6} style={{ color: '#DC2626' }} />}
+                        </div>
+                        <span
+                          className="text-[10px] leading-tight"
+                          style={{ color: c.pending ? '#92400E' : c.ok ? '#374151' : '#BE123C' }}
+                        >
+                          {c.label}{c.pending ? '…' : ''}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
+
+                {/* bottom breathing room */}
+                <div style={{ height: 24 }} />
               </div>
             </div>
           </div>{/* end right column */}
@@ -1520,6 +1996,8 @@ export default function AddInvoiceModal({
         </div>
 
       </div>{/* end full-screen panel */}
-    </>
+    </>,
+    document.body,
   );
 }
+

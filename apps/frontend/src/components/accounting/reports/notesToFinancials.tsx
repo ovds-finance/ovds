@@ -12,8 +12,9 @@
  *         IAS 23, IAS 24, IAS 28, IAS 36, IAS 37, IAS 38, IAS 40, IAS 41,
  *         IFRS 3, IFRS 7, IFRS 8, IFRS 9, IFRS 10, IFRS 15, IFRS 16
  */
-import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, BookOpen, Shield, Banknote, Package, Building2, Users, BarChart3, Globe, Layers } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { useBusiness } from '../../../context/businessContext';
 import { useIFRSAccess } from '../../../hooks/useIfrsAccess';
 
@@ -416,13 +417,13 @@ const NotesToFinancials: React.FC = () => {
       {/* Header */}
       <div className="ovds-widget-card p-5 shadow-sm">
         <div className="flex items-start gap-3">
-          <div className="w-9 h-9 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl flex items-center justify-center shrink-0">
-            <BookOpen size={16} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="w-9 h-9 bg-[var(--pro-azure-50)] dark:bg-green-950/30 rounded-xl flex items-center justify-center shrink-0">
+            <BookOpen size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div>
             <div className="flex items-center gap-2 mb-0.5">
               <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Notes to the Financial Statements</h2>
-              <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded-full uppercase tracking-wider">Full IFRS · IAS 1.112</span>
+              <span className="text-[10px] font-medium text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 px-2 py-0.5 rounded-full uppercase tracking-wider">Full IFRS · IAS 1.112</span>
             </div>
             <p className="ovds-caption">
               For the period ending {reportDate} · {company?.name ?? 'Company'} · ETB
@@ -442,7 +443,7 @@ const NotesToFinancials: React.FC = () => {
             onClick={() => toggle(note.id)}
             className="w-full flex items-center gap-3 px-5 py-4 hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors text-left"
           >
-            <span className="w-6 h-6 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+            <span className="w-6 h-6 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-lg flex items-center justify-center text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0">
               {note.icon}
             </span>
             <span className="flex-1 text-sm font-bold text-slate-700 dark:text-slate-200">

@@ -91,9 +91,9 @@ const STEP_STATUS_CONFIG: Record<CloseStepStatus, { icon: React.ReactNode; cls: 
     bar:  'bg-amber-400',
   },
   PASSED: {
-    icon: <CheckCircle size={13} className="text-emerald-500" />,
-    cls:  'border-emerald-200 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-950/10',
-    bar:  'bg-emerald-500',
+    icon: <CheckCircle size={13} className="text-[var(--pro-azure)]" />,
+    cls:  'border-[var(--pro-azure-100)] dark:border-green-800 bg-[var(--pro-azure-50)]/40 dark:bg-green-950/10',
+    bar:  'bg-[var(--pro-azure-50)]0',
   },
   FAILED: {
     icon: <XCircle size={13} className="text-rose-500" />,
@@ -110,7 +110,7 @@ const STEP_STATUS_CONFIG: Record<CloseStepStatus, { icon: React.ReactNode; cls: 
 const WORKFLOW_STATUS_CONFIG = {
   NOT_STARTED: { label: 'Not Started', cls: 'bg-slate-100 text-slate-600 border-slate-200' },
   IN_PROGRESS: { label: 'In Progress', cls: 'bg-amber-50 text-amber-700 border-amber-200' },
-  COMPLETED:   { label: 'Completed',   cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  COMPLETED:   { label: 'Completed',   cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' },
   FAILED:      { label: 'Needs Action',cls: 'bg-rose-50 text-rose-700 border-rose-200' },
 };
 
@@ -135,7 +135,7 @@ const StepCard: React.FC<{
       >
         {/* Step number */}
         <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 border
-          ${step.status === 'PASSED'  ? 'bg-emerald-500 border-emerald-500 text-white'
+          ${step.status === 'PASSED'  ? 'bg-[var(--pro-azure-50)]0 border-[var(--pro-azure)] text-white'
           : step.status === 'FAILED'  ? 'bg-rose-500 border-rose-500 text-white'
           : step.status === 'RUNNING' ? 'bg-amber-500 border-amber-500 text-white'
           : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500'}`}>
@@ -149,7 +149,7 @@ const StepCard: React.FC<{
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <p className={`text-[12px] font-bold truncate
-              ${step.status === 'PASSED'  ? 'text-emerald-700 dark:text-emerald-400'
+              ${step.status === 'PASSED'  ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
               : step.status === 'FAILED'  ? 'text-rose-700 dark:text-rose-400'
               : step.status === 'RUNNING' ? 'text-amber-700 dark:text-amber-400'
               : 'text-slate-700 dark:text-slate-300'}`}>
@@ -343,7 +343,7 @@ const WorkflowPanel: React.FC<{
           <div className="hidden sm:flex items-center gap-2">
             <div className="w-32 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
               <div
-                className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                className="h-full bg-[var(--pro-azure-50)]0 rounded-full transition-all duration-500"
                 style={{ width: `${progressPct}%` }}
               />
             </div>
@@ -394,9 +394,9 @@ const WorkflowPanel: React.FC<{
       {workflow.summary && (
         <div className="ovds-grid-layout cols-4">
           {[
-            { label: 'Revenue',      value: workflow.summary.revenue,     color: 'text-emerald-600' },
+            { label: 'Revenue',      value: workflow.summary.revenue,     color: 'text-[var(--pro-azure)]' },
             { label: 'Expenses',     value: workflow.summary.expenses,    color: 'text-rose-600' },
-            { label: 'Net Profit',   value: workflow.summary.netProfit,   color: workflow.summary.netProfit >= 0 ? 'text-emerald-700' : 'text-rose-700' },
+            { label: 'Net Profit',   value: workflow.summary.netProfit,   color: workflow.summary.netProfit >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-700' },
             { label: 'Total Assets', value: workflow.summary.totalAssets, color: 'text-slate-800 dark:text-slate-100' },
           ].map((c, i) => (
             <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3">
@@ -502,7 +502,7 @@ const PeriodClose: React.FC = () => {
   });
 
   const kpiCells = useMemo(() => [
-    { label: 'Total Periods', value: periods.length,                                     color: 'emerald' as const },
+    { label: 'Total Periods', value: periods.length,                                     color: 'green' as const },
     { label: 'Open',          value: periods.filter(p => p.status === 'OPEN').length,    color: 'sky' as const },
     { label: 'Locked',        value: periods.filter(p => p.status === 'LOCKED').length,  color: 'violet' as const },
     { label: 'Current Year',  value: getEthFiscalYear(),                                 color: 'amber' as const, isText: true },
@@ -580,7 +580,7 @@ const PeriodClose: React.FC = () => {
               onClick={() => setActiveTab(t.id)}
               className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold transition-colors ${
                 activeTab === t.id
-                  ? 'bg-emerald-600 text-white'
+                  ? 'bg-[var(--pro-azure)] text-white'
                   : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
@@ -647,12 +647,12 @@ const PeriodClose: React.FC = () => {
                         <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0
                           ${p.status === 'LOCKED' ? 'bg-violet-50 dark:bg-violet-950/20'
                           : p.status === 'CLOSED' ? 'bg-amber-50 dark:bg-amber-950/20'
-                          : 'bg-emerald-50 dark:bg-emerald-950/20'}`}>
+                          : 'bg-[var(--pro-azure-50)] dark:bg-green-950/20'}`}>
                           {p.status === 'LOCKED'
                             ? <Lock size={11} className="text-violet-600 dark:text-violet-400" />
                             : p.status === 'CLOSED'
                               ? <Lock size={11} className="text-amber-600 dark:text-amber-400" />
-                              : <Unlock size={11} className="text-emerald-600 dark:text-emerald-400" />
+                              : <Unlock size={11} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                           }
                         </div>
                         <span className="font-mono text-[12px] font-semibold text-slate-800 dark:text-slate-100">

@@ -24,7 +24,6 @@
  * MoR), otherwise it calls the real endpoint over HTTPS with the cached
  * Bearer token.
  */
-import axios, { AxiosInstance } from 'axios';
 import {
   EimsAuthRequest,
   EimsAuthResponse,
@@ -48,6 +47,7 @@ import {
   EIMS_RETRY_JITTER_MS,
   EIMS_RETRY_AFTER_SEC,
 } from '@ovds/shared';
+import axios, { AxiosInstance } from 'axios';
 
 interface SigningMaterial {
   privateKeyPem: string;

@@ -11,6 +11,9 @@
  *   4. Architecture info panel
  */
 import React, { useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
+
+import { useAuth } from '../../rbac/AuthContext';
 import {
   useIotFiscalEvents,
   useIotTaxSummary,
@@ -21,13 +24,12 @@ import {
   type IotTaxType,
   type IotIndustryContext,
 } from '../../services/iotApi';
+import { fmtDateTime, fmtCurrency } from '../../utils/fmt';
 import {
   AppTable, AppTh, AppTd, AppTr,
   Btn, Icon, Modal, FormField, Input, Amount,
 } from '../ui';
-import { useAuth } from '../../rbac/AuthContext';
-import toast from 'react-hot-toast';
-import { fmtDateTime, fmtCurrency } from '../../utils/fmt';
+
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -39,8 +41,8 @@ const TAX_TYPE_LABEL: Record<IotTaxType | string, string> = {
 };
 
 const TAX_TYPE_COLOR: Record<IotTaxType | string, string> = {
-  VAT_15:          'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300',
-  TOT_GOODS_2:     'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300',
+  VAT_15:          'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
+  TOT_GOODS_2:     'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/40 dark:text-green-300',
   TOT_SERVICES_10: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300',
   EXEMPT:          'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400',
 };
@@ -134,14 +136,14 @@ const IotTaxPipelineTab: React.FC = () => {
       {/* Pipeline diagram */}
       <div className="ovds-card p-4">
         <h3 className="ovds-card-title flex items-center gap-2 mb-3">
-          <Icon name="ACTIVITY" size={14} className="text-emerald-500" />
+          <Icon name="ACTIVITY" size={14} className="text-[var(--pro-azure)]" />
           Three-Tier Data Pipeline — IoT → OVDS AIS → MoR e-Tax
         </h3>
         <div className="flex items-center gap-2 flex-wrap text-[11px]">
           {[
             { label: 'Edge Devices', sub: 'Sensors · PoS · GPS', color: 'bg-sky-50 border-sky-200 dark:bg-sky-950/20 dark:border-sky-800 text-sky-700 dark:text-sky-300' },
             { arrow: true },
-            { label: 'OVDS AIS', sub: 'VAT 15% / TOT 2%–10%', color: 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300' },
+            { label: 'OVDS AIS', sub: 'VAT 15% / TOT 2%–10%', color: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] dark:bg-green-950/20 dark:border-green-800 text-[var(--pro-azure-dark)] dark:text-green-300' },
             { arrow: true },
             { label: 'MoR e-Tax Portal', sub: 'etax.mor.gov.et', color: 'bg-violet-50 border-violet-200 dark:bg-violet-950/20 dark:border-violet-800 text-violet-700 dark:text-violet-300' },
           ].map((item, i) =>
@@ -181,8 +183,8 @@ const IotTaxPipelineTab: React.FC = () => {
         {[
           { label: 'Fiscal Events', value: totals.events, color: 'text-slate-800 dark:text-slate-100' },
           { label: 'Gross Revenue (ETB)', value: fmtCurrency(totals.grossETB, 'ETB'), color: 'text-slate-800 dark:text-slate-100' },
-          { label: 'Tax Collected (ETB)', value: fmtCurrency(totals.taxETB, 'ETB'), color: 'text-blue-600' },
-          { label: 'Net Payable (ETB)',   value: fmtCurrency(totals.netETB, 'ETB'),  color: 'text-emerald-600' },
+          { label: 'Tax Collected (ETB)', value: fmtCurrency(totals.taxETB, 'ETB'), color: 'text-[var(--pro-azure)]' },
+          { label: 'Net Payable (ETB)',   value: fmtCurrency(totals.netETB, 'ETB'),  color: 'text-[var(--pro-azure)]' },
         ].map(c => (
           <div key={c.label} className="ovds-card p-4">
             <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">{c.label}</p>
@@ -207,7 +209,7 @@ const IotTaxPipelineTab: React.FC = () => {
                   <p className="text-[10px] text-slate-400 mt-1">{row.eventCount} event{row.eventCount !== 1 ? 's' : ''}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[12px] font-bold text-blue-600">{fmtCurrency(row.totalTax, 'ETB')}</p>
+                  <p className="text-[12px] font-bold text-[var(--pro-azure)]">{fmtCurrency(row.totalTax, 'ETB')}</p>
                   <p className="text-[10px] text-slate-400">on {fmtCurrency(row.totalGross, 'ETB')}</p>
                 </div>
               </div>
@@ -233,7 +235,7 @@ const IotTaxPipelineTab: React.FC = () => {
             className={[
               'flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold border-b-2 -mb-px transition-colors',
               section === key
-                ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
+                ? 'border-[var(--pro-azure)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
                 : 'border-transparent text-slate-400 hover:text-slate-600',
             ].join(' ')}
           >
@@ -248,7 +250,7 @@ const IotTaxPipelineTab: React.FC = () => {
       {section === 'fiscal' && (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Icon name="SHIELD" size={13} className="text-emerald-500" />
+            <Icon name="SHIELD" size={13} className="text-[var(--pro-azure)]" />
             <p className="text-[11px] text-slate-500">
               Immutable records — each has a SHA-256 fiscal signature that prevents backdating.
               Required by MoR for IoT-sourced transactions.
@@ -323,7 +325,7 @@ const IotTaxPipelineTab: React.FC = () => {
                             onError: (e: any) => toast.error(e?.response?.data?.message ?? 'Failed'),
                           })
                         }
-                        className="text-[10px] font-bold text-emerald-600 hover:underline"
+                        className="text-[10px] font-bold text-[var(--pro-azure)] hover:underline"
                         title="Re-apply tax to this trigger"
                       >
                         Re-apply
@@ -358,7 +360,7 @@ const IotTaxPipelineTab: React.FC = () => {
             {/* Register SRM card */}
             <div className="ovds-card p-4 space-y-3">
               <h4 className="text-[12px] font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                <Icon name="MONITOR" size={13} className="text-emerald-500" />
+                <Icon name="MONITOR" size={13} className="text-[var(--pro-azure)]" />
                 Register Device as SRM
               </h4>
               <p className="text-[11px] text-slate-500">
@@ -375,7 +377,7 @@ const IotTaxPipelineTab: React.FC = () => {
             {/* Validate fiscal receipt card */}
             <div className="ovds-card p-4 space-y-3">
               <h4 className="text-[12px] font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                <Icon name="RECEIPT" size={13} className="text-blue-500" />
+                <Icon name="RECEIPT" size={13} className="text-[var(--pro-azure)]" />
                 Validate ERCA Fiscal Receipt
               </h4>
               <p className="text-[11px] text-slate-500">
@@ -403,11 +405,11 @@ const IotTaxPipelineTab: React.FC = () => {
                 return (
                 <div className={`p-3 rounded-lg text-[11px] ${
                   d.valid
-                    ? 'bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800'
+                    ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800'
                     : 'bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800'
                 }`}>
                   {d.valid ? (
-                    <div className="space-y-0.5 text-emerald-700 dark:text-emerald-300">
+                    <div className="space-y-0.5 text-[var(--pro-azure-dark)] dark:text-green-300">
                       <p><strong>Valid</strong> · {d.businessName}</p>
                       <p>TIN: <span className="font-mono">{d.tin}</span></p>
                       <p>Total: ETB {(d.totalAmount ?? 0).toFixed(2)} · VAT: ETB {(d.vatAmount ?? 0).toFixed(2)}</p>
@@ -441,9 +443,9 @@ const IotTaxPipelineTab: React.FC = () => {
                   rel="noopener noreferrer"
                   className="flex items-start gap-2 p-3 rounded-xl bg-white dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
                 >
-                  <Icon name="EXTERNAL_LINK" size={12} className="text-slate-400 group-hover:text-emerald-500 mt-0.5 shrink-0" />
+                  <Icon name="EXTERNAL_LINK" size={12} className="text-slate-400 group-hover:text-[var(--pro-azure)] mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-700 dark:text-slate-200 group-hover:text-emerald-600">{p.label}</p>
+                    <p className="text-[11px] font-semibold text-slate-700 dark:text-slate-200 group-hover:text-[var(--pro-azure)]">{p.label}</p>
                     <p className="text-[10px] text-slate-400">{p.desc}</p>
                   </div>
                 </a>
@@ -490,7 +492,7 @@ const IotTaxPipelineTab: React.FC = () => {
                       </span>
                     ))}
                   </div>
-                  <p className="text-[11px] font-semibold text-emerald-600">{ind.tax}</p>
+                  <p className="text-[11px] font-semibold text-[var(--pro-azure)]">{ind.tax}</p>
                   <p className="text-[10px] text-slate-400">{ind.note}</p>
                 </div>
               ))}
@@ -536,7 +538,7 @@ const IotTaxPipelineTab: React.FC = () => {
                 ['RAW_MATERIAL_COST_ETB', '0  # per-unit COGS cost'],
               ].map(([k, v]) => (
                 <div key={k}>
-                  <span className="text-emerald-400">{k}</span>
+                  <span className="text-[var(--pro-azure-light)]">{k}</span>
                   <span className="text-slate-500">=</span>
                   <span className="text-amber-300">{v}</span>
                 </div>

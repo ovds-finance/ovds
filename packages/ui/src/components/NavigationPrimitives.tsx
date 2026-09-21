@@ -40,7 +40,7 @@ export const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({
             </svg>
           )}
           {item.href ? (
-            <a href={item.href} className="hover:text-aki-blue dark:hover:text-blue-400 transition-colors font-medium truncate max-w-[120px]">
+            <a href={item.href} className="hover:text-[var(--pro-azure)] dark:hover:text-blue-400 transition-colors font-medium truncate max-w-[120px]">
               {item.label}
             </a>
           ) : (
@@ -92,9 +92,9 @@ export const SmartNavSearch: React.FC<SmartNavSearchProps> = ({
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full pl-8 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-aki-blue/30"
+        className="w-full pl-8 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/30"
       />
-      {loading && <div className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 border-2 border-aki-blue border-t-transparent rounded-full animate-spin" />}
+      {loading && <div className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 border-2 border-[var(--pro-azure)] border-t-transparent rounded-full animate-spin" />}
     </div>
   );
 };
@@ -209,7 +209,7 @@ export interface QuickActionsBarProps {
 
 const ACTION_CLS: Record<string, string> = {
   default: 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-100',
-  primary: 'text-aki-blue dark:text-blue-400 hover:bg-aki-blue-50 dark:hover:bg-blue-950/30',
+  primary: 'text-[var(--pro-azure)] dark:text-blue-400 hover:bg-[var(--pro-azure-50)] dark:hover:bg-blue-950/30',
   danger:  'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20',
 };
 

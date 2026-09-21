@@ -16,11 +16,12 @@
  *  in the Referer header. They are visible in browser history — so we clear
  *  the fragment from the URL immediately after extraction using replaceState().
  */
+import { Loader2, ShieldAlert, ArrowLeft, Shield } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { useAuth } from '../rbac/AuthContext';
 import { rbac } from '../rbac/rbac';
-import { Loader2, ShieldAlert, ArrowLeft, Shield } from 'lucide-react';
 import { BEARER_PREFIX } from '../utils/constants';
 
 const API_BASE =

@@ -12,7 +12,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run build",
+        "command": "pnpm run build",
         "cwd": "packages/design-system"
       },
       "inputs": [
@@ -34,7 +34,7 @@
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run typecheck",
+        "command": "pnpm run typecheck",
         "cwd": "packages/design-system"
       },
       "inputs": [
@@ -45,3 +45,4 @@
     }
   }
 }
+

@@ -2,14 +2,14 @@
   "name": "@ovds/features-eims",
   "version": "0.0.1",
   "private": true,
-  "main": "./src/index.js",
+  "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ovds/shared": "*",
+    "@ovds/shared": "workspace:*",
     "@tanstack/react-query": "5.102.4"
   }
 }

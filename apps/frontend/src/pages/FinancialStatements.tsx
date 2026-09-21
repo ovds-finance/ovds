@@ -12,7 +12,9 @@
  * Ethiopian AABE standard chart structure assumed.
  */
 import React, { useState, useCallback, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { Link, useSearchParams } from 'react-router-dom';
+
 import {
   AppPage,
   AppTabs,
@@ -24,12 +26,10 @@ import {
   Btn,
   Icon,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
 import api from '../services/api';
-import { useFinancialBundle } from '@ovds/features/reporting';
-import toast from 'react-hot-toast';
 import { downloadBlob } from '../utils/download';
 
 // -- Types ---------------------------------------------------------------------
@@ -116,7 +116,7 @@ const BalanceSheetTab: React.FC<{
   const [data, setData] = useState<BalanceSheet | null>(null);
   const [priorData, setPrior] = useState<BalanceSheet | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showNotes, setShowNotes] = useState(false);
+  const [_showNotes, _setShowNotes] = useState(false);
 
   const fetch = useCallback(async () => {
     setLoading(true);
@@ -229,7 +229,7 @@ const BalanceSheetTab: React.FC<{
         <span className="text-sm font-black text-white flex-1">
           TOTAL {title}
         </span>
-        <span className="tabular-nums text-sm font-black text-emerald-400 min-w-[90px] text-right">
+        <span className="tabular-nums text-sm font-black text-[var(--pro-azure-light)] min-w-[90px] text-right">
           {fmt(total)}
         </span>
         {comparePrior && priorTotal !== undefined && (
@@ -245,7 +245,7 @@ const BalanceSheetTab: React.FC<{
     <div className="space-y-6">
       {data && (
         <div
-          className={`flex items-center gap-3 p-3 rounded-xl border text-xs ${balanced ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-rose-50 border-rose-200 text-rose-700'}`}
+          className={`flex items-center gap-3 p-3 rounded-xl border text-xs ${balanced ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : 'bg-rose-50 border-rose-200 text-rose-700'}`}
         >
           <Icon name={balanced ? 'SUCCESS' : 'WARNING'} size={13} />
           <span className="font-semibold">
@@ -266,7 +266,7 @@ const BalanceSheetTab: React.FC<{
           {
             label: 'Total Assets',
             value: data?.totalAssets ?? 0,
-            accent: 'bg-emerald-500',
+            accent: 'bg-[var(--pro-azure-50)]0',
           },
           {
             label: 'Total Liabilities',
@@ -282,7 +282,7 @@ const BalanceSheetTab: React.FC<{
             label: 'Balanced',
             value: balanced ? 100 : 0,
             suffix: '%',
-            accent: balanced ? 'bg-emerald-500' : 'bg-rose-500',
+            accent: balanced ? 'bg-[var(--pro-azure-50)]0' : 'bg-rose-500',
           },
         ].map((k) => (
           <div key={k.label} className="ovds-widget-card p-4">
@@ -319,7 +319,7 @@ const BalanceSheetTab: React.FC<{
                 'Assets',
                 data.assets,
                 data.totalAssets,
-                'bg-emerald-500',
+                'bg-[var(--pro-azure-50)]0',
                 priorData?.assets,
                 priorData?.totalAssets,
               )}
@@ -388,10 +388,10 @@ const WaterfallBar: React.FC<{
   if (!revenue || revenue === 0) return null;
   const pct = (v: number) => Math.max(0, Math.min(100, (Math.abs(v) / Math.abs(revenue)) * 100));
   const steps = [
-    { label: 'Revenue', value: revenue, color: 'bg-emerald-500', pct: 100 },
+    { label: 'Revenue', value: revenue, color: 'bg-[var(--pro-azure-50)]0', pct: 100 },
     { label: 'Gross Profit', value: grossProfit, color: grossProfit >= 0 ? 'bg-sky-500' : 'bg-rose-400', pct: pct(grossProfit) },
     { label: 'EBIT', value: operatingProfit, color: operatingProfit >= 0 ? 'bg-violet-500' : 'bg-rose-400', pct: pct(operatingProfit) },
-    { label: 'Net Profit', value: netProfit, color: netProfit >= 0 ? 'bg-emerald-600' : 'bg-rose-600', pct: pct(netProfit) },
+    { label: 'Net Profit', value: netProfit, color: netProfit >= 0 ? 'bg-[var(--pro-azure)]' : 'bg-rose-600', pct: pct(netProfit) },
   ];
   return (
     <div className="ovds-widget-card p-5">
@@ -437,14 +437,14 @@ const MarginRatios: React.FC<{
 
   const Pill = ({ label, value, suffix = '%', delta }: { label: string; value: number; suffix?: string; delta?: number | null }) => {
     const isNeg = value < 0;
-    const bgCls = isNeg ? 'bg-rose-50 border-rose-200 dark:bg-rose-950/20 dark:border-rose-800' : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-800';
-    const txtCls = isNeg ? 'text-rose-700 dark:text-rose-400' : 'text-emerald-700 dark:text-emerald-400';
+    const bgCls = isNeg ? 'bg-rose-50 border-rose-200 dark:bg-rose-950/20 dark:border-rose-800' : 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] dark:bg-green-950/20 dark:border-green-800';
+    const txtCls = isNeg ? 'text-rose-700 dark:text-rose-400' : 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]';
     return (
       <div className={`flex items-center justify-between px-4 py-2.5 rounded-xl border ${bgCls}`}>
         <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</span>
         <div className="flex items-center gap-2">
           {delta !== null && delta !== undefined && (
-            <span className={`text-[10px] font-bold ${delta >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+            <span className={`text-[10px] font-bold ${delta >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>
               {delta >= 0 ? '▲' : '▼'} {Math.abs(delta).toFixed(1)}pp
             </span>
           )}
@@ -516,7 +516,7 @@ const IncomeStatementTab: React.FC<{
   }, [fetch]);
 
   const catMeta: Record<string, { label: string; color: string; bg: string; border: string; dot: string }> = {
-    OPERATING:    { label: 'Operating Activities',    color: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50/60 dark:bg-emerald-950/10',  border: 'border-emerald-200 dark:border-emerald-800', dot: 'bg-emerald-500' },
+    OPERATING:    { label: 'Operating Activities',    color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)]/60 dark:bg-green-950/10',  border: 'border-[var(--pro-azure-100)] dark:border-green-800', dot: 'bg-[var(--pro-azure-50)]0' },
     INVESTING:    { label: 'Investing Activities',    color: 'text-sky-700 dark:text-sky-400',         bg: 'bg-sky-50/60 dark:bg-sky-950/10',           border: 'border-sky-200 dark:border-sky-800',         dot: 'bg-sky-500' },
     FINANCING:    { label: 'Financing Activities',    color: 'text-violet-700 dark:text-violet-400',   bg: 'bg-violet-50/60 dark:bg-violet-950/10',     border: 'border-violet-200 dark:border-violet-800',   dot: 'bg-violet-500' },
     INCOME_TAX:   { label: 'Income Tax',              color: 'text-rose-700 dark:text-rose-400',       bg: 'bg-rose-50/60 dark:bg-rose-950/10',         border: 'border-rose-200 dark:border-rose-800',       dot: 'bg-rose-500' },
@@ -535,10 +535,10 @@ const IncomeStatementTab: React.FC<{
       {/* KPI cards */}
       <div className="ovds-grid-layout cols-4 gap-sm">
         {([
-          { label: 'Revenue',           value: data?.revenue ?? 0,         priorVal: priorData?.revenue,         accent: 'bg-emerald-500' },
+          { label: 'Revenue',           value: data?.revenue ?? 0,         priorVal: priorData?.revenue,         accent: 'bg-[var(--pro-azure-50)]0' },
           { label: 'Gross Profit',      value: data?.grossProfit ?? 0,     priorVal: priorData?.grossProfit,     accent: 'bg-sky-500' },
-          { label: 'Operating Profit',  value: data?.operatingProfit ?? 0, priorVal: priorData?.operatingProfit, accent: (data?.operatingProfit ?? 0) >= 0 ? 'bg-emerald-500' : 'bg-rose-500' },
-          { label: 'Net Profit/(Loss)', value: data?.netProfit ?? 0,       priorVal: priorData?.netProfit,       accent: (data?.netProfit ?? 0) >= 0 ? 'bg-emerald-500' : 'bg-rose-500' },
+          { label: 'Operating Profit',  value: data?.operatingProfit ?? 0, priorVal: priorData?.operatingProfit, accent: (data?.operatingProfit ?? 0) >= 0 ? 'bg-[var(--pro-azure-50)]0' : 'bg-rose-500' },
+          { label: 'Net Profit/(Loss)', value: data?.netProfit ?? 0,       priorVal: priorData?.netProfit,       accent: (data?.netProfit ?? 0) >= 0 ? 'bg-[var(--pro-azure-50)]0' : 'bg-rose-500' },
         ] as const).map((k) => {
           const vp = comparePrior && k.priorVal !== undefined && k.priorVal !== null ? varPct(k.value, k.priorVal) : null;
           return (
@@ -551,7 +551,7 @@ const IncomeStatementTab: React.FC<{
                 </p>
               )}
               {vp !== null && !loading && (
-                <p className={`text-[10px] font-bold mt-1 tabular-nums ${vp >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                <p className={`text-[10px] font-bold mt-1 tabular-nums ${vp >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>
                   {vp >= 0 ? '▲' : '▼'} {Math.abs(vp).toFixed(1)}% vs prior
                 </p>
               )}
@@ -660,7 +660,7 @@ const IncomeStatementTab: React.FC<{
                           {l.amount < 0 ? `(${fmt(Math.abs(l.amount))})` : fmt(l.amount)}
                         </span>
                         {comparePrior && <span className="tabular-nums shrink-0 min-w-[90px] text-right text-[11px] text-slate-400">{priorLine ? (priorLine.amount < 0 ? `(${fmt(Math.abs(priorLine.amount))})` : fmt(priorLine.amount)) : '—'}</span>}
-                        {comparePrior && <span className={`tabular-nums shrink-0 min-w-[64px] text-right text-[10px] font-bold ${vp === null ? 'text-slate-300' : vp >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{vp !== null ? `${vp >= 0 ? '▲' : '▼'} ${Math.abs(vp).toFixed(1)}%` : '—'}</span>}
+                        {comparePrior && <span className={`tabular-nums shrink-0 min-w-[64px] text-right text-[10px] font-bold ${vp === null ? 'text-slate-300' : vp >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>{vp !== null ? `${vp >= 0 ? '▲' : '▼'} ${Math.abs(vp).toFixed(1)}%` : '—'}</span>}
                       </div>
                     );
                   })}
@@ -681,7 +681,7 @@ const IncomeStatementTab: React.FC<{
                     {l.amount < 0 ? `(${fmt(Math.abs(l.amount))})` : fmt(l.amount)}
                   </span>
                   {comparePrior && <span className="tabular-nums shrink-0 min-w-[90px] text-right text-[11px] text-slate-400">{priorLine ? (priorLine.amount < 0 ? `(${fmt(Math.abs(priorLine.amount))})` : fmt(priorLine.amount)) : '—'}</span>}
-                  {comparePrior && <span className={`tabular-nums shrink-0 min-w-[64px] text-right text-[10px] font-bold ${vp === null ? 'text-slate-300' : vp >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{vp !== null ? `${vp >= 0 ? '▲' : '▼'} ${Math.abs(vp).toFixed(1)}%` : '—'}</span>}
+                  {comparePrior && <span className={`tabular-nums shrink-0 min-w-[64px] text-right text-[10px] font-bold ${vp === null ? 'text-slate-300' : vp >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>{vp !== null ? `${vp >= 0 ? '▲' : '▼'} ${Math.abs(vp).toFixed(1)}%` : '—'}</span>}
                 </div>
               );
             })
@@ -696,7 +696,7 @@ const IncomeStatementTab: React.FC<{
                   {priorData.netProfit < 0 ? `(${fmtK(Math.abs(priorData.netProfit))})` : fmtK(priorData.netProfit)}
                 </span>
               )}
-              <span className={`text-xl font-black tabular-nums ${netProfit < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+              <span className={`text-xl font-black tabular-nums ${netProfit < 0 ? 'text-rose-400' : 'text-[var(--pro-azure-light)]'}`}>
                 {netProfit < 0 ? `(${fmtK(Math.abs(netProfit))})` : fmtK(netProfit)}
               </span>
             </div>
@@ -712,14 +712,14 @@ const IncomeStatementTab: React.FC<{
               <Icon name="CALCULATOR" size={13} className="text-amber-500" />
               Indicative CIT Estimate — Schedule A (30% BIT)
             </p>
-            <Link to="/compliance/bit" className="text-[10px] text-emerald-600 underline font-semibold">File at Compliance →</Link>
+            <Link to="/compliance/bit" className="text-[10px] text-[var(--pro-azure)] underline font-semibold">File at Compliance →</Link>
           </div>
           <div className="px-5 py-4 grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { label: 'Accounting Profit', value: fmtK(netProfit), color: 'text-slate-800 dark:text-slate-100' },
               { label: 'Taxable Income (est.)', value: fmtK(taxableIncome), color: 'text-slate-800 dark:text-slate-100' },
               { label: 'CIT @ 30%', value: fmtK(citEst), color: 'text-rose-600' },
-              { label: 'Effective Tax Rate', value: `${effectiveTaxRate.toFixed(1)}%`, color: effectiveTaxRate > 30 ? 'text-rose-600' : 'text-emerald-600' },
+              { label: 'Effective Tax Rate', value: `${effectiveTaxRate.toFixed(1)}%`, color: effectiveTaxRate > 30 ? 'text-rose-600' : 'text-[var(--pro-azure)]' },
             ].map((k) => (
               <div key={k.label}>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{k.label}</p>
@@ -783,7 +783,7 @@ const CashFlowTab: React.FC<{
   }, [fetch]);
 
   const SECTION_COLORS = {
-    OPERATING: 'bg-emerald-500',
+    OPERATING: 'bg-[var(--pro-azure-50)]0',
     INVESTING: 'bg-sky-500',
     FINANCING: 'bg-violet-500',
   };
@@ -802,7 +802,7 @@ const CashFlowTab: React.FC<{
             <button
               key={m}
               onClick={() => setMethod(m)}
-              className={`px-4 py-1.5 text-xs font-bold transition-colors ${method === m ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+              className={`px-4 py-1.5 text-xs font-bold transition-colors ${method === m ? 'bg-[var(--pro-azure)] text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
             >
               {m}
             </button>
@@ -820,7 +820,7 @@ const CashFlowTab: React.FC<{
           {
             label: 'Operating Activities',
             value: data?.operating ?? 0,
-            accent: 'bg-emerald-500',
+            accent: 'bg-[var(--pro-azure-50)]0',
           },
           {
             label: 'Investing Activities',
@@ -836,7 +836,7 @@ const CashFlowTab: React.FC<{
             label: 'Net Cash Change',
             value: data?.netChange ?? 0,
             accent:
-              (data?.netChange ?? 0) >= 0 ? 'bg-emerald-500' : 'bg-rose-500',
+              (data?.netChange ?? 0) >= 0 ? 'bg-[var(--pro-azure-50)]0' : 'bg-rose-500',
           },
         ].map((k) => (
           <div key={k.label} className="ovds-widget-card p-4">
@@ -931,7 +931,7 @@ const CashFlowTab: React.FC<{
                       Net {section} Cash Flow
                     </span>
                     <span
-                      className={`tabular-nums text-sm font-black ${(total ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}
+                      className={`tabular-nums text-sm font-black ${(total ?? 0) >= 0 ? 'text-[var(--pro-azure-light)]' : 'text-rose-400'}`}
                     >
                       {(total ?? 0) < 0
                         ? `(${fmt(Math.abs(total ?? 0))})`
@@ -959,7 +959,7 @@ const CashFlowTab: React.FC<{
               ].map((r) => (
                 <div
                   key={r.label}
-                  className={`flex justify-between px-4 py-2 ${r.bold ? 'bg-emerald-600 rounded-lg' : ''}`}
+                  className={`flex justify-between px-4 py-2 ${r.bold ? 'bg-[var(--pro-azure)] rounded-lg' : ''}`}
                 >
                   <span
                     className={`${r.bold ? 'text-sm font-black text-white' : 'text-[12px] font-semibold text-slate-700 dark:text-slate-200'}`}
@@ -992,6 +992,7 @@ const CashFlowTab: React.FC<{
 };
 
 // -- Notes to Financial Statements ---------------------------------------------
+// eslint-disable-next-line react-refresh/only-export-components
 export const STANDARD_NOTES: NoteLine[] = [
   {
     ref: 'IAS 1.112',
@@ -1115,7 +1116,7 @@ const NotesTab: React.FC = () => {
         </p>
         <Link
           to="/settings"
-          className="text-xs text-emerald-600 underline mt-1 inline-block"
+          className="text-xs text-[var(--pro-azure)] underline mt-1 inline-block"
         >
           Configure accounting policies in Settings →
         </Link>
@@ -1192,7 +1193,7 @@ const TrialBalanceTab: React.FC<{ endDate: string; companyId?: string }> = ({
         </div>
         <span className="ovds-caption">{filtered.length} accounts</span>
         <div
-          className={`px-3 py-1.5 rounded-lg text-xs font-bold ${Math.abs(totals.debit - totals.credit) < 0.01 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}
+          className={`px-3 py-1.5 rounded-lg text-xs font-bold ${Math.abs(totals.debit - totals.credit) < 0.01 ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]' : 'bg-rose-50 text-rose-700'}`}
         >
           {Math.abs(totals.debit - totals.credit) < 0.01
             ? '✓ Balanced'
@@ -1266,10 +1267,10 @@ const TrialBalanceTab: React.FC<{ endDate: string; companyId?: string }> = ({
               >
                 TOTALS
               </td>
-              <td className="px-4 py-3 text-right tabular-nums text-sm font-black text-emerald-400">
+              <td className="px-4 py-3 text-right tabular-nums text-sm font-black text-[var(--pro-azure-light)]">
                 {fmt(totals.debit)}
               </td>
-              <td className="px-4 py-3 text-right tabular-nums text-sm font-black text-emerald-400">
+              <td className="px-4 py-3 text-right tabular-nums text-sm font-black text-[var(--pro-azure-light)]">
                 {fmt(totals.credit)}
               </td>
               <td className="px-4 py-3 text-right tabular-nums text-sm font-black text-white">
@@ -1371,7 +1372,7 @@ const RelatedPartiesTab: React.FC<{
           {
             label: 'Interco Transactions',
             value: data.summary?.totalIntercoTransactions ?? 0,
-            accent: 'bg-emerald-500',
+            accent: 'bg-[var(--pro-azure-50)]0',
           },
           {
             label: 'Total Interco Volume',
@@ -1465,7 +1466,7 @@ const RelatedPartiesTab: React.FC<{
               <Icon
                 name="ARROW_LEFT_RIGHT"
                 size={13}
-                className="text-emerald-500"
+                className="text-[var(--pro-azure)]"
               />
               Intercompany Transactions — IAS 24.17 & IFRS 10.B86
             </p>
@@ -1504,7 +1505,7 @@ const RelatedPartiesTab: React.FC<{
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                         tx.direction === 'OUTGOING'
                           ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/20 dark:text-rose-400'
-                          : 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/20 dark:text-emerald-400'
+                          : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:bg-green-950/20 dark:text-[var(--pro-azure-light)]'
                       }`}
                     >
                       {tx.direction}
@@ -1541,7 +1542,7 @@ const RelatedPartiesTab: React.FC<{
                   <AppTd className="font-semibold">{b.relatedPartyName}</AppTd>
                   <AppTd
                     align="right"
-                    className="tabular-nums text-emerald-600 font-semibold"
+                    className="tabular-nums text-[var(--pro-azure)] font-semibold"
                   >
                     {fmtETB(b.receivable)}
                   </AppTd>
@@ -1553,7 +1554,7 @@ const RelatedPartiesTab: React.FC<{
                   </AppTd>
                   <AppTd
                     align="right"
-                    className={`tabular-nums font-bold ${b.netBalance >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}
+                    className={`tabular-nums font-bold ${b.netBalance >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-700'}`}
                   >
                     {fmtETB(b.netBalance)}
                   </AppTd>
@@ -1686,16 +1687,16 @@ const FinancialStatements: React.FC = () => {
       banners={
         <Link to="/reports/mor-report"
           className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl
-                     bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700
-                     hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors">
-          <div className="flex items-center gap-2 text-sm text-indigo-700 dark:text-indigo-300">
+                     bg-[var(--pro-azure-50)] dark:bg-green-900/20 border border-[var(--pro-azure-100)] dark:border-green-700
+                     hover:bg-[var(--pro-azure-100)] dark:hover:bg-green-900/30 transition-colors">
+          <div className="flex items-center gap-2 text-sm text-[var(--pro-azure-dark)] dark:text-green-300">
             <Icon name="FILE_TEXT" size={14} />
             <span className="font-semibold">MoR IFRS Report</span>
             <span className="text-xs font-normal opacity-75">
               — Bilingual (Amharic/English) · Schedule A CIT/MAT · HR Payroll · Compliance · etax.mor.gov.et
             </span>
           </div>
-          <Icon name="ARROW_RIGHT" size={13} className="text-indigo-500 flex-shrink-0" />
+          <Icon name="ARROW_RIGHT" size={13} className="text-[var(--pro-azure)] flex-shrink-0" />
         </Link>
       }
       actions={
@@ -1706,7 +1707,7 @@ const FinancialStatements: React.FC = () => {
               type="checkbox"
               checked={comparePrior}
               onChange={(e) => setComparePrior(e.target.checked)}
-              className="rounded accent-emerald-500"
+              className="rounded accent-indigo-500"
             />
             Prior year
           </label>

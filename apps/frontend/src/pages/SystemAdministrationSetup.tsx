@@ -13,8 +13,7 @@
  *   - Skip/reset functionality
  */
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Role } from '@ovds/shared';
 import {
   ArrowRight,
   CheckCircle2,
@@ -35,11 +34,13 @@ import {
   BarChart3,
   Undo2,
   Search,
+  Shield,
+  Scale,
 } from 'lucide-react';
-import { useAuth } from '../rbac';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { setupApi, type SetupStepDefinition, type CompanySetupProgress } from '../services/setupApi';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
+
 import {
   Btn,
   ContextPill,
@@ -49,15 +50,20 @@ import {
   Select,
   Textarea,
 } from '../components/ui';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac';
+import { rbac } from '../rbac';
+import { setupApi, type SetupStepDefinition, type CompanySetupProgress } from '../services/setupApi';
 
 const CATEGORY_META: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
   deployment:  { label: 'Deployment & Environment', icon: <Cloud size={14} />, color: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/30 dark:text-sky-300 dark:border-sky-800' },
-  company:     { label: 'Core Company Data',       icon: <Settings size={14} />, color: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800' },
+  company:     { label: 'Core Company Data',       icon: <Settings size={14} />, color: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-300 dark:border-green-800' },
   financial:   { label: 'Financial Parameters',   icon: <Banknote size={14} />, color: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800' },
   modules:     { label: 'Modules & Scope',        icon: <LayoutGrid size={14} />, color: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800' },
   users:       { label: 'Users & Access',         icon: <Users size={14} />, color: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-800' },
   system:      { label: 'System Controls',        icon: <SlidersHorizontal size={14} />, color: 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800/40 dark:text-slate-300 dark:border-slate-700' },
-  tax:         { label: 'Tax Configuration',      icon: <Receipt size={14} />, color: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-300 dark:border-indigo-800' },
+  security:    { label: 'Security & Access',      icon: <Shield size={14} />, color: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-800' },
+  tax:         { label: 'Tax Configuration',      icon: <Receipt size={14} />, color: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-300 dark:border-green-800' },
   compliance:  { label: 'Compliance',             icon: <CheckCircle2 size={14} />, color: 'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-300 dark:border-teal-800' },
   localization:{ label: 'Localization',           icon: <Globe size={14} />, color: 'bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/30 dark:text-cyan-300 dark:border-cyan-800' },
 };
@@ -115,11 +121,16 @@ const SystemAdministrationSetup: React.FC = () => {
   const [hasCelebrated, setHasCelebrated] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const [legalName, setLegalName] = useState('');
-  const [tin, setTin] = useState('—');
-  const [licenseStatus, setLicenseStatus] = useState('UNKNOWN');
-  const [totalUsers, setTotalUsers] = useState(0);
-  const [roleCount, setRoleCount] = useState(0);
+  const [legalName, _setLegalName] = useState('');
+  const [tin, _setTin] = useState('—');
+  const [licenseStatus, _setLicenseStatus] = useState('UNKNOWN');
+  const [totalUsers, _setTotalUsers] = useState(0);
+  const [roleCount, _setRoleCount] = useState(0);
+
+  const [sodConflicts, setSodConflicts] = useState(0);
+  const [highRiskRoles, setHighRiskRoles] = useState(0);
+  const [complianceScore, setComplianceScore] = useState(100);
+  const [seedingRbac, setSeedingRbac] = useState(false);
 
   const companyId = user?.companyId;
 
@@ -264,6 +275,17 @@ const SystemAdministrationSetup: React.FC = () => {
         { value: 'open', label: 'Open' },
       ], required: true },
     ],
+    security_baseline: [
+      { key: 'rbac_policy', label: 'RBAC Policy', type: 'select', options: [
+        { value: 'least_privilege', label: 'Least Privilege (Recommended)' },
+        { value: 'moderate', label: 'Moderate' },
+        { value: 'open', label: 'Open' },
+      ], required: true },
+      { key: 'sod_enforcement', label: 'SoD Enforcement', type: 'select', options: [
+        { value: 'strict', label: 'Strict — block conflicts' },
+        { value: 'warn', label: 'Warn — allow with logging' },
+      ], required: true },
+    ],
     onboarding: [
       { key: 'welcome_email_template', label: 'Welcome Email Template ID', type: 'text', placeholder: 'welcome-001', required: true },
     ],
@@ -385,6 +407,37 @@ const SystemAdministrationSetup: React.FC = () => {
     }).catch(() => {
       setLoading(false);
     });
+  }, [companyId]);
+
+  useEffect(() => {
+    if (!companyId) return;
+    const ALL_ROLES = Object.values(Role) as string[];
+    type SodRule = { id: string; perm1: string; perm2: string };
+    const SOD_RULES: SodRule[] = [
+      { id: 'SOD-001', perm1: 'payroll:generate', perm2: 'payroll:approve' },
+      { id: 'SOD-002', perm1: 'invoices:write', perm2: 'ovds:approve' },
+      { id: 'SOD-003', perm1: 'vat:file', perm2: 'audit_logs:write' },
+      { id: 'SOD-004', perm1: 'users:delete', perm2: 'audit_logs:write' },
+      { id: 'SOD-005', perm1: 'fund_transfers:write', perm2: 'fund_transfers:approve' },
+      { id: 'SOD-006', perm1: 'banking:kyc:write', perm2: 'banking:kyc:approve' },
+      { id: 'SOD-007', perm1: 'banking:loan_application:write', perm2: 'business_loans:approve' },
+      { id: 'SOD-008', perm1: 'period_close:write', perm2: 'reports:financial:full' },
+    ];
+    function calcRoleRisk(role: string): number {
+      if (role === 'SPURADMIN' || role === 'SUPERADMIN') return 100;
+      const perms = new Set(rbac.permissionsFor(role as any));
+      const criticalHits = ['fund_transfers:approve', 'payroll:approve', 'users:delete', 'vat:file', 'companies:delete', 'role_permissions:write', 'system:deploy', 'banking:kyc:approve', 'banking:aml:flag', 'payroll:admin', 'ovds:delete', 'audit_logs:write', 'banking:loan_application:submit', 'external_audit:certify', 'period_close:write', 'ifrs10:consolidation:approve'].filter(p => perms.has(p as any)).length;
+      const adminPerms = rbac.permissionsFor(role as any).filter((p: string) => p.includes(':delete') || p.includes(':approve') || p.includes(':admin') || p.includes(':deploy') || p.includes(':certify')).length;
+      const writePerms = rbac.permissionsFor(role as any).filter((p: string) => p.includes(':write') || p.includes(':generate') || p.includes(':file') || p.includes(':calculate')).length;
+      const score = Math.min(100, Math.round((criticalHits * 8 + adminPerms * 3 + writePerms * 1.5) / 1.2));
+      return score;
+    }
+    const sodConflicts = SOD_RULES.filter(rule => ALL_ROLES.some(role => rbac.can(role as any, rule.perm1 as any) && rbac.can(role as any, rule.perm2 as any))).length;
+    const highRiskRoles = ALL_ROLES.filter(r => calcRoleRisk(r) >= 61).length;
+    const complianceScore = Math.max(0, 100 - (sodConflicts * 8) - (highRiskRoles * 4));
+    setSodConflicts(sodConflicts);
+    setHighRiskRoles(highRiskRoles);
+    setComplianceScore(complianceScore);
   }, [companyId]);
 
   // ── Derived values (defined before effects that depend on them) ──────────────
@@ -599,6 +652,27 @@ const SystemAdministrationSetup: React.FC = () => {
     }
   };
 
+  const handleSeedRbac = async () => {
+    if (!companyId || !canWrite) return;
+    setSeedingRbac(true);
+    try {
+      const result = await setupApi.seedRbac(companyId);
+      toast.success(`RBAC seeded: ${result.roles.created} roles, ${result.permissions.created} permissions`);
+      const updated = await setupApi.getProgress(companyId);
+      setProgress(updated);
+      const secStep = stepMap.get('security_baseline');
+      if (secStep && updated.steps.some(s => s.stepKey === 'security_baseline' && s.status !== 'completed')) {
+        await setupApi.completeStep(companyId, 'security_baseline', { rbac_policy: 'least_privilege', sod_enforcement: 'strict' });
+        const finalProgress = await setupApi.getProgress(companyId);
+        setProgress(finalProgress);
+      }
+    } catch (e: any) {
+      toast.error(e?.message ?? 'Failed to seed RBAC');
+    } finally {
+      setSeedingRbac(false);
+    }
+  };
+
   const isStepAvailable = (step: SetupStepDefinition): boolean => {
     if (!step.dependsOn) return true;
     const depStatus = stepStatusMap.get(step.dependsOn);
@@ -622,7 +696,7 @@ const SystemAdministrationSetup: React.FC = () => {
                 animationDelay: `${Math.random() * 0.5}s`,
               }}
             >
-              <PartyPopper size={16 + Math.random() * 12} className="text-emerald-500" />
+              <PartyPopper size={16 + Math.random() * 12} className="text-[var(--pro-azure)]" />
             </div>
           ))}
         </div>
@@ -658,7 +732,7 @@ const SystemAdministrationSetup: React.FC = () => {
               placeholder="Search steps... (press / to focus)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2.5 pl-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              className="w-full px-4 py-2.5 pl-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)] transition-all"
             />
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" />
@@ -687,7 +761,7 @@ const SystemAdministrationSetup: React.FC = () => {
             onClick={() => setActiveCategoryFilter(null)}
             className={`px-3 py-1.5 text-[10px] font-bold rounded-lg border transition-colors ${
               !activeCategoryFilter
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800'
+                ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-green-300 dark:border-green-800'
                 : 'bg-white text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 hover:bg-slate-50'
             }`}
           >
@@ -760,6 +834,56 @@ const SystemAdministrationSetup: React.FC = () => {
         )}
       </div>
 
+      {/* -- Security Baseline -- */}
+      <div className="ovds-widget-card p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-rose-50 dark:bg-rose-500/10 rounded-lg border border-rose-200 dark:border-rose-500/30">
+              <Shield className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Security Baseline</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Roles, permissions and SoD guardrails</p>
+            </div>
+          </div>
+          {canWrite && (
+            <Btn variant="secondary" onClick={handleSeedRbac} disabled={seedingRbac}>
+              {seedingRbac ? <RefreshCw size={14} className="animate-spin" /> : <Shield size={14} />}
+              {seedingRbac ? 'Seeding...' : 'Initialize Baseline'}
+            </Btn>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className={`rounded-xl border p-4 text-center ${complianceScore >= 80 ? 'bg-[var(--pro-azure-50)]/5 border-[var(--pro-azure)]/20' : complianceScore >= 50 ? 'bg-amber-500/5 border-amber-500/20' : 'bg-rose-500/5 border-rose-500/20'}`}>
+            <div className={`text-2xl font-bold ${complianceScore >= 80 ? 'text-[var(--pro-azure-light)]' : complianceScore >= 50 ? 'text-amber-400' : 'text-rose-400'}`}>
+              {complianceScore}/100
+            </div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 font-medium">Compliance Score</div>
+            <div className="text-[9px] text-slate-400 mt-0.5">{complianceScore >= 80 ? 'COMPLIANT' : complianceScore >= 50 ? 'NEEDS REVIEW' : 'AT RISK'}</div>
+          </div>
+          <div className={`rounded-xl border p-4 text-center ${sodConflicts > 0 ? 'bg-rose-500/5 border-rose-500/20' : 'bg-[var(--pro-azure-50)]/5 border-[var(--pro-azure)]/20'}`}>
+            <div className={`text-2xl font-bold ${sodConflicts > 0 ? 'text-rose-400' : 'text-[var(--pro-azure-light)]'}`}>{sodConflicts}</div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 font-medium">SoD Conflicts</div>
+            <div className="text-[9px] text-slate-400 mt-0.5">Penalty: -{sodConflicts * 8} pts</div>
+          </div>
+          <div className={`rounded-xl border p-4 text-center ${highRiskRoles > 0 ? 'bg-amber-500/5 border-amber-500/20' : 'bg-[var(--pro-azure-50)]/5 border-[var(--pro-azure)]/20'}`}>
+            <div className={`text-2xl font-bold ${highRiskRoles > 0 ? 'text-amber-400' : 'text-[var(--pro-azure-light)]'}`}>{highRiskRoles}</div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 font-medium">High-Risk Roles</div>
+            <div className="text-[9px] text-slate-400 mt-0.5">Penalty: -{highRiskRoles * 4} pts</div>
+          </div>
+        </div>
+
+        <div className="mt-3 flex items-center gap-2">
+          <Link to="/settings/roles" className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
+            <Scale size={14} /> Review Roles & Permissions
+          </Link>
+          <Link to="/settings/security" className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
+            <Shield size={14} /> Security Assessment
+          </Link>
+        </div>
+      </div>
+
       {/* -- Category-based steps -- */}
       {Object.keys(filteredCategories).length === 0 ? (
         <div className="ovds-widget-card p-10 text-center">
@@ -827,13 +951,13 @@ const SystemAdministrationSetup: React.FC = () => {
                         key={step.key}
                         className={`flex items-start gap-4 p-4 transition-colors ${
                           isLast ? '' : 'border-b border-slate-100 dark:border-slate-800'
-                        } ${!isAvailable ? 'opacity-50' : ''} ${isActive ? 'bg-emerald-50/50 dark:bg-emerald-950/10' : ''}`}
+                        } ${!isAvailable ? 'opacity-50' : ''} ${isActive ? 'bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10' : ''}`}
                       >
                         {/* Status indicator */}
                         <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                          isCompleted ? 'bg-emerald-500 text-white' :
+                          isCompleted ? 'bg-[var(--pro-azure)] text-white' :
                           isSkipped ? 'bg-slate-300 text-slate-500' :
-                          isActive ? 'bg-emerald-100 text-emerald-600 ring-2 ring-emerald-500 ring-offset-1' :
+                          isActive ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure)] ring-2 ring-[var(--pro-azure)] ring-offset-1' :
                           isAvailable ? 'bg-slate-200 dark:bg-slate-700 text-slate-400' :
                           'bg-slate-100 dark:bg-slate-800 text-slate-300'
                         }`}>
@@ -847,7 +971,7 @@ const SystemAdministrationSetup: React.FC = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-3">
                             <div>
-                              <h3 className={`text-sm font-bold ${isCompleted ? 'text-emerald-600 dark:text-emerald-400 line-through' : 'text-slate-900 dark:text-white'}`}>
+                              <h3 className={`text-sm font-bold ${isCompleted ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] line-through' : 'text-slate-900 dark:text-white'}`}>
                                 {step.label}
                               </h3>
                               <div className="flex items-center gap-2 mt-0.5">
@@ -889,7 +1013,7 @@ const SystemAdministrationSetup: React.FC = () => {
                                 <Link
                                   to={route}
                                   onClick={() => setActiveStep(step.key)}
-                                  className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
+                                  className="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline"
                                 >
                                   Go <ArrowRight size={10} />
                                 </Link>
@@ -908,7 +1032,7 @@ const SystemAdministrationSetup: React.FC = () => {
                                   <button
                                     onClick={() => handleComplete(step.key)}
                                     disabled={saving}
-                                    className="px-3 py-1.5 text-[10px] font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg transition-colors disabled:opacity-50"
+                                    className="px-3 py-1.5 text-[10px] font-bold text-white bg-[var(--pro-azure)] hover:bg-[var(--pro-azure-dark)] rounded-lg transition-colors disabled:opacity-50"
                                   >
                                     Complete
                                   </button>
@@ -1084,7 +1208,7 @@ const SystemAdministrationSetup: React.FC = () => {
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-2 text-[12px]">
                     {item.ok ? (
-                      <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
+                      <CheckCircle2 size={14} className="text-[var(--pro-azure)] shrink-0" />
                     ) : (
                       <AlertTriangle size={14} className="text-amber-500 shrink-0" />
                     )}

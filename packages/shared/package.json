@@ -16,11 +16,11 @@
       "types": "./dist/index.d.ts"
     },
     "./types": {
-      "source": "./src/types.ts",
-      "import": "./dist/types.js",
-      "require": "./dist/types.js",
-      "default": "./dist/types.js",
-      "types": "./dist/types.d.ts"
+      "source": "./src/types/index.ts",
+      "import": "./dist/types/index.js",
+      "require": "./dist/types/index.js",
+      "default": "./dist/types/index.js",
+      "types": "./dist/types/index.d.ts"
     },
     "./ovds/*": {
       "source": "./src/ovds/*.ts",
@@ -52,7 +52,9 @@
     "test": "node ../../scripts/bin-run.mjs vitest/vitest.mjs --run --config vitest.config.ts",
     "test:watch": "node ../../scripts/bin-run.mjs vitest/vitest.mjs --config vitest.config.ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@ovds/core": "workspace:*"
+  },
   "devDependencies": {
     "typescript": "5.9.3"
   }

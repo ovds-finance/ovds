@@ -1,5 +1,5 @@
+﻿import { ModuleInterface, ModuleAppHealth } from '@ovds/core';
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { ModuleInterface, ModuleAppHealth } from '@ovds/core';
 
 interface ModuleContextValue {
   modules: ModuleInterface[];
@@ -15,6 +15,7 @@ interface ModuleContextValue {
 
 const ModuleContext = createContext<ModuleContextValue | undefined>(undefined);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useModules(): ModuleContextValue {
   const ctx = useContext(ModuleContext);
   if (!ctx) throw new Error('useModules must be used within ModuleProvider');

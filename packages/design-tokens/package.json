@@ -1,0 +1,50 @@
+{
+  "name": "@ovds/design-tokens",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OVDS design token bridge — single source of truth for colors, typography, spacing, and status values consumed by CSS, Tailwind, React, and NestJS",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "source": "./src/index.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "import": "./src/index.ts",
+      "require": "./src/index.ts",
+      "default": "./src/index.ts",
+      "types": "./src/index.ts"
+    },
+    "./tokens": {
+      "source": "./src/tokens.ts",
+      "import": "./src/tokens.ts",
+      "require": "./src/tokens.ts",
+      "default": "./src/tokens.ts",
+      "types": "./src/tokens.ts"
+    },
+    "./css-variables": {
+      "source": "./src/css-variables.ts",
+      "import": "./src/css-variables.ts",
+      "require": "./src/css-variables.ts",
+      "default": "./src/css-variables.ts",
+      "types": "./src/css-variables.ts"
+    },
+    "./backend": {
+      "source": "./src/backend.ts",
+      "import": "./src/backend.ts",
+      "require": "./src/backend.ts",
+      "default": "./src/backend.ts",
+      "types": "./src/backend.ts"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "node ../../scripts/bin-run.mjs typescript/bin/tsc",
+    "build:clean": "node ../../scripts/bin-run.mjs typescript/bin/tsc --build --clean && node ../../scripts/bin-run.mjs typescript/bin/tsc",
+    "typecheck": "node ../../scripts/bin-run.mjs typescript/bin/tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

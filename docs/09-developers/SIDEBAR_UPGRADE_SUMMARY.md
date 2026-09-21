@@ -1,9 +1,9 @@
-<!-- 📌 CORE CONFIG: [docs/CORE-CONFIG.md](../CORE-CONFIG.md)`n     📌 FILING LIFECYCLE: [../FILING-LIFECYCLE.md](../FILING-LIFECYCLE.md)`n     📌 SUBSCRIPTION: [docs/subscription and monitaizetion.md](../subscription%20and%20monitaizetion.md)`n     📌 UBIQUITOUS LANGUAGE: [docs/UBIQUITOUS-LANGUAGE.md](../UBIQUITOUS-LANGUAGE.md)`n     🔄 Last synced: 2026-08-27 -->
+﻿<!-- 📌 CORE CONFIG: [docs/CORE-CONFIG.md](../CORE-CONFIG.md)`n     📌 FILING LIFECYCLE: [../FILING-LIFECYCLE.md](../FILING-LIFECYCLE.md)`n     📌 SUBSCRIPTION: [docs/subscription and monitaizetion.md](../subscription%20and%20monitaizetion.md)`n     📌 UBIQUITOUS LANGUAGE: [docs/UBIQUITOUS-LANGUAGE.md](../UBIQUITOUS-LANGUAGE.md)`n     🔄 Last synced: 2026-08-27 -->
 # Sidebar Architecture — OVDS Layout Paradigm
 
-> **Note:** This document describes the planned/aspirational sidebar architecture. The current implementation uses a hardcoded `AKAUNTING_PARENTS` constant in `apps/frontend/src/components/sidebar/index.tsx` (lines 16–34) defining 12 navigation domains. The `navGroups.ts` file contains only TypeScript interfaces (`NavItem`, `NavGroup`), not a `NAV_GROUPS` data array.
+> **Note:** This document describes the planned/aspirational sidebar architecture. The current implementation uses a hardcoded `OVDS_NAV_PARENTS` constant in `apps/frontend/src/components/sidebar/index.tsx` (lines 16–34) defining 12 navigation domains. The `navGroups.ts` file contains only TypeScript interfaces (`NavItem`, `NavGroup`), not a `NAV_GROUPS` data array.
 
-The OVDS sidebar has been updated to follow the classic OVDS structure, providing a clean UX pattern optimized for clarity. It is driven entirely by the `AKAUNTING_PARENTS` constant in `apps/frontend/src/components/sidebar/index.tsx`.
+The OVDS sidebar has been updated to follow the classic OVDS structure, providing a clean UX pattern optimized for clarity. It is driven entirely by the `OVDS_NAV_PARENTS` constant in `apps/frontend/src/components/sidebar/index.tsx`.
 
 ---
 
@@ -47,7 +47,7 @@ The layout has moved away from the four-phase workflow to a classic module-based
 
 ## 3. Group & Item Definitions
 
-All groups live in `AKAUNTING_PARENTS` in `apps/frontend/src/components/sidebar/index.tsx`. The `NavGroup` interface (from `navGroups.ts`):
+All groups live in `OVDS_NAV_PARENTS` in `apps/frontend/src/components/sidebar/index.tsx`. The `NavGroup` interface (from `navGroups.ts`):
 
 ```typescript
 interface NavGroup {

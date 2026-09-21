@@ -54,7 +54,7 @@ export const STANDARD_REPORTS: ReportTemplate[] = [
     icon: 'shield-check',
     permission: 'reports:read',
     basisSupported: ['accrual'],
-    endpoint: '/tax/summary',
+    endpoint: '/ovds/reports/tax-summary',
     groupByOptions: ['tax-rate', 'document-type'],
   },
 ];

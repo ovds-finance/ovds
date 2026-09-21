@@ -18,8 +18,8 @@
  *     }}
  *   />
  */
-import React from 'react';
 import { Package, Users2, Receipt, ShoppingCart, Warehouse, Banknote, BookOpen, FileText, BarChart3 } from 'lucide-react';
+import React from 'react';
 
 export type ItemLifecycleStage = 'ITEMS' | 'CRM' | 'SALES' | 'PURCHASES' | 'INVENTORY' | 'BANKING' | 'ACCOUNTING' | 'TAX' | 'IFRS' | 'REPORTS';
 
@@ -83,7 +83,7 @@ export const ItemLifecycleTracker: React.FC<ItemLifecycleTrackerProps> = ({
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
         {/* Multi-color top bar */}
         <div className="flex h-2">
-          {STAGES.map((stage, i) => {
+          {STAGES.map((stage, _i) => {
             const stageCompleted = isStageCompleted(stage.key);
             return (
               <div
@@ -108,7 +108,7 @@ export const ItemLifecycleTracker: React.FC<ItemLifecycleTrackerProps> = ({
             return (
               <div
                 key={stage.key}
-                className={`p-4 text-center transition-all ${isActive ? 'bg-emerald-50 dark:bg-emerald-600/10' : ''}`}
+                className={`p-4 text-center transition-all ${isActive ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]/10' : ''}`}
               >
                 {/* Icon circle */}
                 <div
@@ -147,7 +147,7 @@ export const ItemLifecycleTracker: React.FC<ItemLifecycleTrackerProps> = ({
           {metrics.totalInvoiced !== undefined && (
             <div className="bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200 dark:border-slate-800">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Invoiced</p>
-              <p className="text-lg font-black text-emerald-600 tabular-nums mt-1">
+              <p className="text-lg font-black text-[var(--pro-azure)] tabular-nums mt-1">
                 ETB {metrics.totalInvoiced.toLocaleString()}
               </p>
             </div>

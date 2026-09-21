@@ -2,15 +2,18 @@
  * InventoryDashboard — advanced inventory analytics dashboard
  * with charts, aging analysis, reorder suggestions, and movement tracking.
  */
-import React, { useState, useMemo } from 'react';
+import { AppPage, Btn } from '@ovds/ui';
 import { 
   Package, TrendingUp, TrendingDown, AlertTriangle, ArrowUpRight,
   Activity, BarChart3, PieChart, LineChart as LineChartIcon,
   RefreshCw, Download, Filter
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
-import { Skeleton, AppPage, Btn } from '@ovds/ui';
+import { BarChart, Bar, PieChart as RechartsPie, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
 import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
 import {
   useLowStockAlerts,
   useOutOfStockAlerts,
@@ -25,8 +28,6 @@ import {
   useSupplierPerformance,
 } from '../services/inventoryApi';
 import { fmtCurrency, fmtDate } from '../utils/fmt';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { LineChart, Line, BarChart, Bar, PieChart as RechartsPie, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 type Tab = 'OVERVIEW' | 'AGING' | 'MOVEMENTS' | 'REORDER' | 'FORECAST' | 'SUPPLIERS';
 
@@ -59,7 +60,7 @@ const InventoryDashboard: React.FC = () => {
     return Object.entries(buckets).map(([name, value]) => ({ name, value: Math.round(value * 100) / 100 }));
   }, [aging]);
 
-  const categoryData = useMemo(() => {
+  const _categoryData = useMemo(() => {
     if (!salesPerf?.length) return [];
     return salesPerf.slice(0, 8).map(p => ({
       name: p.itemName.length > 15 ? p.itemName.slice(0, 15) + '…' : p.itemName,
@@ -74,7 +75,7 @@ const InventoryDashboard: React.FC = () => {
       title="Inventory Dashboard"
       subtitle="Real-time analytics · Supply Chain · Manufacturing & Logistics · Retail & E-commerce"
       icon={<Package size={18} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       crumbs={[{ label: 'Inventory Dashboard' }]}
       actions={
         <div className="flex gap-2">
@@ -86,9 +87,9 @@ const InventoryDashboard: React.FC = () => {
 
       {/* KPI Cards */}
       <div className="ovds-grid-layout cols-4 gap-lg mb-8">
-        <KPICard label="Total Stock Value" value={fmtCurrency(totalStockValue)} trend={2.4} icon={<BarChart3 size={22} />} accent="bg-emerald-500" />
+        <KPICard label="Total Stock Value" value={fmtCurrency(totalStockValue)} trend={2.4} icon={<BarChart3 size={22} />} accent="bg-[var(--pro-azure-50)]0" />
         <KPICard label="Active Items" value={totalItems.toString()} trend={1.2} icon={<Package size={22} />} accent="bg-sky-500" />
-        <KPICard label="Critical Alerts" value={criticalCount.toString()} trend={-5.1} icon={<AlertTriangle size={22} />} accent={criticalCount > 0 ? 'bg-rose-500' : 'bg-emerald-500'} invertTrend />
+        <KPICard label="Critical Alerts" value={criticalCount.toString()} trend={-5.1} icon={<AlertTriangle size={22} />} accent={criticalCount > 0 ? 'bg-rose-500' : 'bg-[var(--pro-azure-50)]0'} invertTrend />
         <KPICard label="Total Revenue" value={fmtCurrency(salesPerf?.reduce((s, p) => s + p.totalRevenue, 0) ?? 0)} trend={8.3} icon={<TrendingUp size={22} />} accent="bg-violet-500" />
       </div>
 
@@ -104,7 +105,7 @@ const InventoryDashboard: React.FC = () => {
         ].map(t => (
           <button key={t.id} onClick={() => setActiveTab(t.id)} className={[
             'flex items-center gap-2 px-4 py-2 rounded-xl text-[12px] font-bold uppercase tracking-wide transition-all duration-150',
-            activeTab === t.id ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200 dark:border-slate-700' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/60 dark:hover:bg-slate-700/50',
+            activeTab === t.id ? 'bg-white dark:bg-slate-900 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shadow-sm border border-slate-200 dark:border-slate-700' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/60 dark:hover:bg-slate-700/50',
           ].join(' ')}>
             {t.icon} {t.label}
           </button>
@@ -112,12 +113,12 @@ const InventoryDashboard: React.FC = () => {
       </div>
 
       <div className="mt-6">
-        {activeTab === 'OVERVIEW' && <OverviewTab valuation={valuation} salesPerf={salesPerf} summary={summary} />}
-        {activeTab === 'AGING' && <AgingTab aging={aging} agingData={agingData} />}
-        {activeTab === 'MOVEMENTS' && <MovementsTab movements={movements} />}
-        {activeTab === 'REORDER' && <ReorderTab suggestions={reorderSuggestions} />}
-        {activeTab === 'FORECAST' && <ForecastTab forecast={forecast} />}
-        {activeTab === 'SUPPLIERS' && <SuppliersTab suppliers={suppliers} />}
+        {activeTab === 'OVERVIEW' && <OverviewTab valuation={valuation} salesPerf={salesPerf ?? []} summary={summary} />}
+        {activeTab === 'AGING' && <AgingTab aging={aging ?? []} agingData={agingData ?? []} />}
+        {activeTab === 'MOVEMENTS' && <MovementsTab movements={movements ?? []} />}
+        {activeTab === 'REORDER' && <ReorderTab suggestions={reorderSuggestions ?? []} />}
+        {activeTab === 'FORECAST' && <ForecastTab forecast={forecast ?? []} />}
+        {activeTab === 'SUPPLIERS' && <SuppliersTab suppliers={suppliers ?? []} />}
       </div>
     </AppPage>
   );
@@ -133,7 +134,7 @@ const KPICard: React.FC<{ label: string; value: string; trend?: number; icon: Re
         {icon}
       </div>
       {trend !== undefined && (
-        <span className={`text-[11px] font-extrabold px-2.5 py-1 rounded-full ${(invertTrend ? trend < 0 : trend >= 0) ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+        <span className={`text-[11px] font-extrabold px-2.5 py-1 rounded-full ${(invertTrend ? trend < 0 : trend >= 0) ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' : 'bg-rose-50 text-rose-600'}`}>
           {(invertTrend ? trend < 0 : trend >= 0) ? '↑' : '↓'} {Math.abs(trend)}%
         </span>
       )}
@@ -160,7 +161,7 @@ const OverviewTab: React.FC<{ valuation: any; salesPerf: any[]; summary: any }> 
                   <p className="text-[10px] text-slate-400">{item.itemCode} · {item.currentQty} units</p>
                 </div>
                 <div className="text-right ml-3">
-                  <p className="text-[13px] font-black text-emerald-600 tabular-nums">{fmtCurrency(item.currentValue)}</p>
+                  <p className="text-[13px] font-black text-[var(--pro-azure)] tabular-nums">{fmtCurrency(item.currentValue)}</p>
                   <p className="text-[10px] text-slate-400">{fmtCurrency(item.unitCost)}/unit</p>
                 </div>
               </div>
@@ -182,8 +183,8 @@ const OverviewTab: React.FC<{ valuation: any; salesPerf: any[]; summary: any }> 
                   <p className="text-[10px] text-slate-400">{p.unit} · {p.transactionCount} txns</p>
                 </div>
                 <div className="text-right ml-3">
-                  <p className="text-[13px] font-black text-emerald-600 tabular-nums">{fmtCurrency(p.totalRevenue)}</p>
-                  <p className={`text-[10px] font-bold ${p.marginPct >= 30 ? 'text-emerald-600' : p.marginPct >= 10 ? 'text-amber-600' : 'text-rose-600'}`}>
+                  <p className="text-[13px] font-black text-[var(--pro-azure)] tabular-nums">{fmtCurrency(p.totalRevenue)}</p>
+                  <p className={`text-[10px] font-bold ${p.marginPct >= 30 ? 'text-[var(--pro-azure)]' : p.marginPct >= 10 ? 'text-amber-600' : 'text-rose-600'}`}>
                     {p.marginPct}% margin
                   </p>
                 </div>
@@ -225,7 +226,7 @@ const AgingTab: React.FC<{ aging: any[]; agingData: any[] }> = ({ aging, agingDa
         ) : (
           <ResponsiveContainer width="100%" height={280}>
             <RechartsPie>
-              <Pie data={agingData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}>
+              <Pie data={agingData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label={({ name, percent }: { name?: string; percent?: number }) => `${name ?? 'Unknown'}: ${((percent ?? 0) * 100).toFixed(0)}%`}>
                 {agingData.map((entry, index) => (
                   <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
                 ))}
@@ -283,7 +284,7 @@ const AgingTab: React.FC<{ aging: any[]; agingData: any[] }> = ({ aging, agingDa
                       a.agingBucket === '90+' ? 'bg-rose-50 text-rose-600' :
                       a.agingBucket === '61-90' ? 'bg-amber-50 text-amber-600' :
                       a.agingBucket === '31-60' ? 'bg-sky-50 text-sky-600' :
-                      'bg-emerald-50 text-emerald-600'
+                      'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]'
                     }`}>{a.agingBucket}</span>
                   </td>
                   <td className="px-4 py-2.5 tabular-nums font-bold text-slate-800">{fmtCurrency(a.totalValue)}</td>
@@ -322,7 +323,7 @@ const MovementsTab: React.FC<{ movements: any }> = ({ movements }) => (
                 <td className="px-4 py-2.5 text-slate-600">{fmtDate(m.createdAt)}</td>
                 <td className="px-4 py-2.5">
                   <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                    m.type === 'IN' || m.type === 'PURCHASE' ? 'bg-emerald-50 text-emerald-600' :
+                    m.type === 'IN' || m.type === 'PURCHASE' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' :
                     m.type === 'OUT' || m.type === 'SALE' ? 'bg-rose-50 text-rose-600' :
                     'bg-amber-50 text-amber-600'
                   }`}>{m.type}</span>
@@ -363,8 +364,8 @@ const ReorderTab: React.FC<{ suggestions: any[] }> = ({ suggestions }) => {
     <div className="space-y-6">
       {!suggestions?.length ? (
         <div className="ovds-panel p-10 text-center">
-          <CheckCircleIcon className="mx-auto text-emerald-400 mb-3" size={32} />
-          <p className="text-sm font-semibold text-emerald-700">All items are above reorder levels</p>
+          <CheckCircleIcon className="mx-auto text-[var(--pro-azure-light)] mb-3" size={32} />
+          <p className="text-sm font-semibold text-[var(--pro-azure-dark)]">All items are above reorder levels</p>
           <p className="text-xs text-slate-400 mt-1">No reorder actions needed at this time.</p>
         </div>
       ) : (
@@ -397,7 +398,7 @@ const ReorderTab: React.FC<{ suggestions: any[] }> = ({ suggestions }) => {
                           s.urgency === 'CRITICAL' ? 'bg-rose-50 text-rose-600' :
                           s.urgency === 'HIGH' ? 'bg-amber-50 text-amber-600' :
                           s.urgency === 'MEDIUM' ? 'bg-sky-50 text-sky-600' :
-                          'bg-emerald-50 text-emerald-600'
+                          'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]'
                         }`}>{s.urgency}</span>
                       </td>
                       <td className="px-4 py-2.5 font-semibold text-slate-800 dark:text-slate-100">{s.itemName}</td>
@@ -405,7 +406,7 @@ const ReorderTab: React.FC<{ suggestions: any[] }> = ({ suggestions }) => {
                       <td className="px-4 py-2.5 text-slate-600">{s.warehouseName}</td>
                       <td className="px-4 py-2.5 tabular-nums font-bold text-rose-600">{s.currentStock}</td>
                       <td className="px-4 py-2.5 tabular-nums text-slate-500">{s.reorderLevel}</td>
-                      <td className="px-4 py-2.5 tabular-nums font-bold text-emerald-600">{s.suggestedQty}</td>
+                      <td className="px-4 py-2.5 tabular-nums font-bold text-[var(--pro-azure)]">{s.suggestedQty}</td>
                       <td className="px-4 py-2.5 tabular-nums text-slate-600">{fmtCurrency(s.unitCost)}</td>
                       <td className="px-4 py-2.5 tabular-nums font-black text-slate-800">{fmtCurrency(s.estimatedCost)}</td>
                     </tr>
@@ -434,13 +435,13 @@ const ForecastTab: React.FC<{ forecast: any[] }> = ({ forecast }) => {
   const healthyItems = forecast?.filter(f => f.daysOfStock > 30) ?? [];
 
   const trendColor = (trend: string) => {
-    if (trend === 'UP') return 'text-emerald-600 bg-emerald-50';
+    if (trend === 'UP') return 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]';
     if (trend === 'DOWN') return 'text-rose-600 bg-rose-50';
     return 'text-slate-600 bg-slate-100';
   };
 
   const confidenceColor = (c: string) => {
-    if (c === 'HIGH') return 'bg-emerald-50 text-emerald-600';
+    if (c === 'HIGH') return 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]';
     if (c === 'MEDIUM') return 'bg-amber-50 text-amber-600';
     return 'bg-slate-100 text-slate-500';
   };
@@ -457,8 +458,8 @@ const ForecastTab: React.FC<{ forecast: any[] }> = ({ forecast }) => {
           <p className="text-[28px] font-black text-amber-600 tabular-nums">{warningItems.length}</p>
         </div>
         <div className="ovds-panel p-4 text-center">
-          <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-1">Healthy (&gt;30 days)</p>
-          <p className="text-[28px] font-black text-emerald-600 tabular-nums">{healthyItems.length}</p>
+          <p className="text-[10px] font-bold text-[var(--pro-azure)] uppercase tracking-widest mb-1">Healthy (&gt;30 days)</p>
+          <p className="text-[28px] font-black text-[var(--pro-azure)] tabular-nums">{healthyItems.length}</p>
         </div>
       </div>
 
@@ -487,12 +488,12 @@ const ForecastTab: React.FC<{ forecast: any[] }> = ({ forecast }) => {
                     <td className="px-4 py-2.5 tabular-nums font-bold">{f.currentStock}</td>
                     <td className="px-4 py-2.5 tabular-nums text-slate-600">{f.avgDailySales}</td>
                     <td className="px-4 py-2.5 tabular-nums font-bold">
-                      <span className={`${f.daysOfStock <= 7 ? 'text-rose-600' : f.daysOfStock <= 30 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                      <span className={`${f.daysOfStock <= 7 ? 'text-rose-600' : f.daysOfStock <= 30 ? 'text-amber-600' : 'text-[var(--pro-azure)]'}`}>
                         {f.daysOfStock === 999 ? '—' : `${f.daysOfStock}d`}
                       </span>
                     </td>
                     <td className="px-4 py-2.5 tabular-nums text-slate-600">{f.projectedStock}</td>
-                    <td className="px-4 py-2.5 tabular-nums font-bold text-emerald-600">{f.recommendedOrder > 0 ? f.recommendedOrder : '—'}</td>
+                    <td className="px-4 py-2.5 tabular-nums font-bold text-[var(--pro-azure)]">{f.recommendedOrder > 0 ? f.recommendedOrder : '—'}</td>
                     <td className="px-4 py-2.5">
                       <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${trendColor(f.trend)}`}>{f.trend}</span>
                     </td>
@@ -515,7 +516,7 @@ export default InventoryDashboard;
 // -- Suppliers Tab ------------------------------------------------------------
 const SuppliersTab: React.FC<{ suppliers: any[] }> = ({ suppliers }) => {
   const ratingColor = (rating: string) => {
-    if (rating === 'EXCELLENT') return 'bg-emerald-50 text-emerald-600';
+    if (rating === 'EXCELLENT') return 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]';
     if (rating === 'GOOD') return 'bg-sky-50 text-sky-600';
     if (rating === 'FAIR') return 'bg-amber-50 text-amber-600';
     return 'bg-rose-50 text-rose-600';
@@ -548,15 +549,15 @@ const SuppliersTab: React.FC<{ suppliers: any[] }> = ({ suppliers }) => {
                   </td>
                   <td className="px-4 py-2.5 tabular-nums text-slate-600">{s.billCount}</td>
                   <td className="px-4 py-2.5 tabular-nums font-bold text-slate-800">{fmtCurrency(s.totalBilled)}</td>
-                  <td className="px-4 py-2.5 tabular-nums text-emerald-600">{fmtCurrency(s.totalPaid)}</td>
+                  <td className="px-4 py-2.5 tabular-nums text-[var(--pro-azure)]">{fmtCurrency(s.totalPaid)}</td>
                   <td className="px-4 py-2.5 tabular-nums font-bold text-amber-600">{fmtCurrency(s.outstanding)}</td>
                   <td className="px-4 py-2.5 tabular-nums">
-                    <span className={`font-bold ${s.overdueCount > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>{s.overdueCount}</span>
+                    <span className={`font-bold ${s.overdueCount > 0 ? 'text-rose-600' : 'text-[var(--pro-azure)]'}`}>{s.overdueCount}</span>
                   </td>
                   <td className="px-4 py-2.5 tabular-nums">
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${s.paymentReliability >= 70 ? 'bg-emerald-500' : s.paymentReliability >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`} style={{ width: `${s.paymentReliability}%` }} />
+                        <div className={`h-full rounded-full ${s.paymentReliability >= 70 ? 'bg-[var(--pro-azure-50)]0' : s.paymentReliability >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`} style={{ width: `${s.paymentReliability}%` }} />
                       </div>
                       <span className="text-[10px] font-bold tabular-nums">{s.paymentReliability}%</span>
                     </div>

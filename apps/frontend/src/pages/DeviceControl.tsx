@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
-import { PageShell, Btn } from '@ovds/ui';
-import { ShieldAlert, Plus } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
 import {
   type DeviceControlCategory,
   type DeviceControlChangeRequestDTO as DeviceControlChangeRequest,
   type DeviceControlSettings,
 } from '@ovds/shared';
-import { useAuth } from '../rbac/AuthContext';
+import { PageShell, Btn } from '@ovds/ui';
+import { useQueryClient } from '@tanstack/react-query';
+import { ShieldAlert, Plus } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { ChangeRequestDialog } from '../components/device-control/ChangeRequestDialog';
+import { ChangeRequestQueue } from '../components/device-control/ChangeRequestQueue';
+import { DeviceControlCenter } from '../components/device-control/DeviceControlCenter';
+import { ReviewDialog } from '../components/device-control/ReviewDialog';
 import { useWebSocket } from '../hooks/useWebSocket';
+import { useAuth } from '../rbac/AuthContext';
 import {
   useDeviceControlChangeRequests,
   useDeviceControlPolicies,
 } from '../services/deviceControlApi';
-import { DeviceControlCenter } from '../components/device-control/DeviceControlCenter';
-import { ChangeRequestQueue } from '../components/device-control/ChangeRequestQueue';
-import { ChangeRequestDialog } from '../components/device-control/ChangeRequestDialog';
-import { ReviewDialog } from '../components/device-control/ReviewDialog';
 
 export default function DeviceControl() {
   const { can, user } = useAuth();
@@ -32,7 +33,7 @@ export default function DeviceControl() {
 
   const { data: policies = [], isLoading: policiesLoading } =
     useDeviceControlPolicies();
-  const { data: requests = [] } = useDeviceControlChangeRequests();
+  const { data: requests = [] as DeviceControlChangeRequest[] } = useDeviceControlChangeRequests();
   const pendingCount = requests.filter((r) => r.status === 'PENDING').length;
 
   useWebSocket({

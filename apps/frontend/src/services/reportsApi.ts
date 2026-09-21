@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Reports API Service
  * Covers:
  *   - IAS 12  Deferred Tax
@@ -10,11 +10,25 @@
  *   - Configurable Approval Workflow
  *   - GRN (Goods Received Notes) + 3-Way Matching
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useFetchQuery } from '../hooks/useFetchQuery';
+
 import api from './api';
 
 // -- Types re-exported from @ovds/features/reporting ----------------------------
 // New code should import types from '@ovds/features/reporting' directly.
+
+// -- Helpers ------------------------------------------------------------------
+
+function qs(params: Record<string, string | undefined>): string {
+  const p = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== undefined) p.set(k, v);
+  }
+  const s = p.toString();
+  return s ? `?${s}` : '';
+}
+
+const toArray = <T>(d: unknown): T[] => (Array.isArray(d) ? (d as T[]) : []);
 
 // -- IAS 12 — Deferred Tax -----------------------------------------------------
 
@@ -56,27 +70,10 @@ export interface DeferredTaxSummary {
 }
 
 export function useDeferredTax(companyId?: string, date?: string) {
-  const [data, setData] = useState<DeferredTaxSummary | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const q = new URLSearchParams();
-      if (companyId) q.set('companyId', companyId);
-      if (date) q.set('date', date);
-      const res = await api.get(
-        `/ovds/reports/deferred-tax${q.toString() ? `?${q}` : ''}`,
-        { headers: { 'x-background': '1' } } as any,
-      ).catch(() => ({ data: null }));
-      setData(res.data?.data ?? res.data ?? null);
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId, date]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, refetch: fetch };
+  return useFetchQuery<DeferredTaxSummary>(
+    `/ovds/reports/deferred-tax${qs({ companyId, date })}`,
+    { deps: [companyId, date] },
+  );
 }
 
 export async function postDeferredTaxEntry(companyId?: string, date?: string) {
@@ -87,15 +84,15 @@ export async function postDeferredTaxEntry(companyId?: string, date?: string) {
 // -- IAS 1 — Statement of Changes in Equity -----------------------------------
 
 export interface EquityMovementRow {
-  accountId:           string;
-  accountCode:         string;
-  accountName:         string;
-  openingBalance:      number;
-  netProfitForPeriod:  number;
-  otherMovements:      number;
-  dividendsPaid:       number;
+  accountId:                string;
+  accountCode:              string;
+  accountName:              string;
+  openingBalance:           number;
+  netProfitForPeriod:       number;
+  otherMovements:           number;
+  dividendsPaid:            number;
   otherComprehensiveIncome: number;
-  closingBalance:      number;
+  closingBalance:           number;
 }
 
 export interface EquityMovementStatement {
@@ -105,43 +102,21 @@ export interface EquityMovementStatement {
   iasReference: string;
   accounts:     EquityMovementRow[];
   totals: {
-    openingBalance:      number;
-    netProfitForPeriod:  number;
-    otherMovements:      number;
-    dividendsPaid:       number;
+    openingBalance:           number;
+    netProfitForPeriod:       number;
+    otherMovements:           number;
+    dividendsPaid:            number;
     otherComprehensiveIncome: number;
-    closingBalance:      number;
+    closingBalance:           number;
   };
   generatedAt:  string;
 }
 
-export function useEquityMovements(
-  companyId?: string,
-  startDate?: string,
-  endDate?: string,
-) {
-  const [data, setData] = useState<EquityMovementStatement | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const q = new URLSearchParams();
-      if (companyId) q.set('companyId', companyId);
-      if (startDate) q.set('startDate', startDate);
-      if (endDate)   q.set('endDate',   endDate);
-      const res = await api.get(
-        `/ovds/reports/changes-in-equity${q.toString() ? `?${q}` : ''}`,
-        { headers: { 'x-background': '1' } } as any,
-      ).catch(() => ({ data: null }));
-      setData(res.data?.data ?? res.data ?? null);
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId, startDate, endDate]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, refetch: fetch };
+export function useEquityMovements(companyId?: string, startDate?: string, endDate?: string) {
+  return useFetchQuery<EquityMovementStatement>(
+    `/ovds/reports/changes-in-equity${qs({ companyId, startDate, endDate })}`,
+    { deps: [companyId, startDate, endDate] },
+  );
 }
 
 // -- IFRS 9 — Expected Credit Loss --------------------------------------------
@@ -169,10 +144,10 @@ export interface EclSummary {
     invoiceCount: number;
   }>;
   totals: {
-    grossReceivables: number;
-    totalEclProvision:number;
-    netCarryingAmount:number;
-    effectiveLossRate:string;
+    grossReceivables:  number;
+    totalEclProvision: number;
+    netCarryingAmount: number;
+    effectiveLossRate: string;
   };
   journalEntry: {
     description: string;
@@ -183,27 +158,10 @@ export interface EclSummary {
 }
 
 export function useIfrs9Ecl(companyId?: string, date?: string) {
-  const [data, setData] = useState<EclSummary | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const q = new URLSearchParams();
-      if (companyId) q.set('companyId', companyId);
-      if (date) q.set('date', date);
-      const res = await api.get(
-        `/ovds/reports/ecl${q.toString() ? `?${q}` : ''}`,
-        { headers: { 'x-background': '1' } } as any,
-      ).catch(() => ({ data: null }));
-      setData(res.data?.data ?? res.data ?? null);
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId, date]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, refetch: fetch };
+  return useFetchQuery<EclSummary>(
+    `/ovds/reports/ecl${qs({ companyId, date })}`,
+    { deps: [companyId, date] },
+  );
 }
 
 // -- IFRS 15 — Revenue Recognition --------------------------------------------
@@ -227,12 +185,35 @@ export interface ContractAnalysis {
   recommendations: string[];
 }
 
+export interface ScheduleMonthEntry {
+  month: string;
+  amount: number;
+  invoices: number;
+}
+
 export interface RevenueSchedule {
   period: string;
   revenue: number;
   costs: number;
   margin: number;
   cumulativeRevenue: number;
+  totalContractRevenue: number;
+  recognisedToDate: number;
+  deferredRevenue: number;
+  contractLiabilities: number;
+  overduePerformance: number;
+  scheduleByMonth: ScheduleMonthEntry[];
+  ifrsReference: string;
+}
+
+export interface Ifrs15ComplianceIssue {
+  contractId?: string;
+  invoiceId?: string;
+  invoiceNumber?: string;
+  criterion: string;
+  severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+  detail: string;
+  issues?: string[];
 }
 
 export interface Ifrs15ComplianceCheck {
@@ -243,59 +224,43 @@ export interface Ifrs15ComplianceCheck {
     status: 'PASS' | 'FAIL' | 'WARN';
     detail: string;
   }>;
+  overallCompliant: boolean;
+  compliant: number;
+  total: number;
+  issues: Ifrs15ComplianceIssue[];
+  nonCompliant: number;
 }
 
 export function useIfrs15Schedule(companyId?: string, date?: string) {
-  const [data, setData] = useState<RevenueSchedule[] | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const q = new URLSearchParams();
-      if (companyId) q.set('companyId', companyId);
-      if (date) q.set('date', date);
-      const res = await api.get(
-        `/ovds/reports/ifrs15-schedule${q.toString() ? `?${q}` : ''}`,
-        { headers: { 'x-background': '1' } } as any,
-      ).catch(() => ({ data: null }));
-      setData(res.data?.data ?? res.data ?? null);
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId, date]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, refetch: fetch };
+  return useFetchQuery<RevenueSchedule[] & {
+    totalContractRevenue: number;
+    recognisedToDate: number;
+    deferredRevenue: number;
+    contractLiabilities: number;
+    overduePerformance: number;
+    scheduleByMonth: ScheduleMonthEntry[];
+    ifrsReference: string;
+  }>(
+    `/ovds/reports/ifrs15-schedule${qs({ companyId, date })}`,
+    { deps: [companyId, date] },
+  );
 }
 
 export function useIfrs15ComplianceCheck(companyId?: string) {
-  const [data, setData] = useState<Ifrs15ComplianceCheck[] | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const q = new URLSearchParams();
-      if (companyId) q.set('companyId', companyId);
-      const res = await api.get(
-        `/ovds/reports/ifrs15-compliance${q.toString() ? `?${q}` : ''}`,
-        { headers: { 'x-background': '1' } } as any,
-      ).catch(() => ({ data: null }));
-      setData(res.data?.data ?? res.data ?? null);
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, refetch: fetch };
+  return useFetchQuery<Ifrs15ComplianceCheck[] & {
+    overallCompliant: boolean;
+    compliant: number;
+    total: number;
+    issues: Ifrs15ComplianceIssue[];
+    nonCompliant: number;
+  }>(
+    `/ovds/reports/ifrs15-compliance${qs({ companyId })}`,
+    { deps: [companyId] },
+  );
 }
 
 export async function getIfrs15Contract(invoiceId: string, companyId?: string): Promise<ContractAnalysis> {
-  const q = new URLSearchParams();
-  if (companyId) q.set('companyId', companyId);
-  const { data } = await api.get(`/ovds/reports/ifrs15/contract/${invoiceId}${q.toString() ? `?${q}` : ''}`);
+  const { data } = await api.get(`/ovds/reports/ifrs15/contract/${invoiceId}${qs({ companyId })}`);
   return data?.data ?? data;
 }
 
@@ -326,6 +291,10 @@ export interface AgingBucket {
   maxDays: number | null;
   amount: number;
   count: number;
+  stage: 'CURRENT' | 'OVERDUE';
+  grossAmount: number;
+  eclRate: number;
+  eclProvision: number;
 }
 
 export interface AgingReport {
@@ -343,6 +312,11 @@ export interface AgingReport {
     over120: number;
     total: number;
   };
+  collectionRate: number;
+  totalGross: number;
+  totalEcl: number;
+  netCarrying: number;
+  ifrsReference: string;
 }
 
 export interface DunningAction {
@@ -356,58 +330,23 @@ export interface DunningResult {
   processed: number;
   skipped: number;
   errors: string[];
-  actions: Array<{
-    invoiceId: string;
-    action: DunningAction;
-  }>;
+  actions: Array<{ invoiceId: string; action: DunningAction }>;
+  emailed: number;
+  escalated: number;
 }
 
 export function useArAgingFull(companyId?: string, date?: string) {
-  const [data, setData] = useState<AgingReport | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const q = new URLSearchParams();
-      if (companyId) q.set('companyId', companyId);
-      if (date) q.set('date', date);
-      const res = await api.get(
-        `/ovds/reports/ar-aging${q.toString() ? `?${q}` : ''}`,
-        { headers: { 'x-background': '1' } } as any,
-      ).catch(() => ({ data: null }));
-      setData(res.data?.data ?? res.data ?? null);
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId, date]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, refetch: fetch };
+  return useFetchQuery<AgingReport>(
+    `/ovds/reports/ar-aging${qs({ companyId, date })}`,
+    { deps: [companyId, date] },
+  );
 }
 
 export function useApAgingFull(companyId?: string, date?: string) {
-  const [data, setData] = useState<AgingReport | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const q = new URLSearchParams();
-      if (companyId) q.set('companyId', companyId);
-      if (date) q.set('date', date);
-      const res = await api.get(
-        `/ovds/reports/ap-aging${q.toString() ? `?${q}` : ''}`,
-        { headers: { 'x-background': '1' } } as any,
-      ).catch(() => ({ data: null }));
-      setData(res.data?.data ?? res.data ?? null);
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId, date]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, refetch: fetch };
+  return useFetchQuery<AgingReport>(
+    `/ovds/reports/ap-aging${qs({ companyId, date })}`,
+    { deps: [companyId, date] },
+  );
 }
 
 export async function runDunning(companyId?: string, dryRun = true): Promise<DunningResult> {
@@ -422,63 +361,71 @@ export async function postEclProvision(companyId?: string, date?: string) {
 
 // -- Approval Workflow ---------------------------------------------------------
 
+export interface WorkflowLevel {
+  level: number;
+  approverRole: string;
+  approvalType: 'REQUIRED' | 'OPTIONAL';
+  requiredRole?: string;
+  label?: string;
+  timeoutHours?: number;
+  minAmount?: number;
+}
+
 export interface WorkflowRule {
   id?: string;
   name: string;
   entity: string;
+  resourceType?: string;
   condition: string;
   approverRole: string;
   escalationHours?: number;
   isActive: boolean;
+  minAmount?: number;
+  maxAmount?: number;
+  rejectionPolicy?: 'REJECT' | 'RETURN' | 'NOTIFY' | 'STOP';
+  levels: WorkflowLevel[];
+}
+
+export interface ApprovalLevel {
+  level: number;
+  approverId: string;
+  approverRole?: string;
+  requiredRole?: string;
+  label?: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
 }
 
 export interface ApprovalRequest {
   id: string;
   entityType: string;
   entityId: string;
+  resourceId?: string;
+  resourceType?: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'ESCALATED';
   requestedBy: string;
   approvedBy?: string;
   comments?: string;
   createdAt: string;
+  amount?: number;
+  notes?: string;
+  levels: ApprovalLevel[];
+  currentLevel: number;
 }
 
 export function useApprovalRules(companyId?: string) {
-  const [rules, setRules] = useState<WorkflowRule[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const fetch = useCallback(async () => {
-    if (!companyId) return;
-    setLoading(true);
-    try {
-      const { data } = await api.get(`/ovds/reports/approval-rules?companyId=${companyId}`);
-      setRules(data?.data ?? data ?? []);
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { rules, loading, refetch: fetch };
+  const result = useFetchQuery<WorkflowRule[]>(
+    companyId ? `/ovds/reports/approval-rules?companyId=${companyId}` : '',
+    { enabled: !!companyId, deps: [companyId], select: toArray },
+  );
+  return { ...result, rules: result.data ?? [] };
 }
 
 export function usePendingApprovals(companyId?: string) {
-  const [requests, setRequests] = useState<ApprovalRequest[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const fetch = useCallback(async () => {
-    if (!companyId) return;
-    setLoading(true);
-    try {
-      const { data } = await api.get(`/ovds/reports/approvals/pending?companyId=${companyId}`);
-      setRequests(data?.data ?? data ?? []);
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { requests, loading, refetch: fetch };
+  const result = useFetchQuery<ApprovalRequest[]>(
+    companyId ? `/ovds/reports/approvals/pending?companyId=${companyId}` : '',
+    { enabled: !!companyId, deps: [companyId], select: toArray },
+  );
+  return { ...result, requests: result.data ?? [] };
 }
 
 export async function approveRequest(requestId: string, companyId?: string, comments?: string) {
@@ -506,8 +453,12 @@ export async function upsertApprovalRule(rule: Partial<WorkflowRule>, companyId?
 export interface SubsidiaryEntry {
   entityId: string;
   entityName: string;
+  companyId?: string;
+  companyName?: string;
   ownershipPct: number;
+  nciPct?: number;
   currency: string;
+  fxRate?: number;
   assets: number;
   liabilities: number;
   revenue: number;
@@ -520,6 +471,9 @@ export interface EliminationEntry {
   debit: number;
   credit: number;
   description: string;
+  amount?: number;
+  debitAccount?: string;
+  creditAccount?: string;
 }
 
 export interface ConsolidatedLineItem {
@@ -527,16 +481,52 @@ export interface ConsolidatedLineItem {
   accountName: string;
   parentAmount: number;
   subsidiaryAmount: number;
-  eliminationAmount: number;
+  totalBeforeElim: number;
+  eliminations: number;
+  nciAllocation: number;
   consolidatedAmount: number;
+}
+
+interface ConsolidatedStatementSection {
+  assets: ConsolidatedLineItem[];
+  liabilities: ConsolidatedLineItem[];
+  equity: ConsolidatedLineItem[];
+  totalAssets: number;
+  totalLiabAndEquity: number;
+  nci: number;
+  isBalanced: boolean;
+}
+
+interface ConsolidatedIncomeStatementSection {
+  revenue: ConsolidatedLineItem[];
+  expenses: ConsolidatedLineItem[];
+  totalRevenue: number;
+  totalExpenses: number;
+  groupNetProfit: number;
+  nciShareOfProfit: number;
+  parentShareOfProfit: number;
 }
 
 export interface ConsolidatedStatements {
   asOf: string;
   companyId: string;
+  companyName?: string;
+  parentCompanyName?: string;
+  period?: string;
   subsidiaries: SubsidiaryEntry[];
   eliminations: EliminationEntry[];
+  eliminationSummary?: {
+    gains: number;
+    losses: number;
+    totalIntercoSales: number;
+    totalIntercoLoans: number;
+    totalDividendsEliminated: number;
+  };
   lines: ConsolidatedLineItem[];
+  balanceSheet: ConsolidatedStatementSection;
+  incomeStatement: ConsolidatedIncomeStatementSection;
+  disclosures?: Array<Record<string, unknown>>;
+  ifrsReference?: string;
   totals: {
     assets: number;
     liabilities: number;
@@ -547,31 +537,11 @@ export interface ConsolidatedStatements {
   };
 }
 
-export function useConsolidation(
-  companyId?: string,
-  asOf?: string,
-) {
-  const [data, setData] = useState<ConsolidatedStatements | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const q = new URLSearchParams();
-      if (companyId) q.set('companyId', companyId);
-      if (asOf) q.set('asOf', asOf);
-      const res = await api.get(
-        `/ovds/reports/consolidation${q.toString() ? `?${q}` : ''}`,
-        { headers: { 'x-background': '1' } } as any,
-      ).catch(() => ({ data: null }));
-      setData(res.data?.data ?? res.data ?? null);
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId, asOf]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, refetch: fetch };
+export function useConsolidation(companyId?: string, asOf?: string, startDate?: string, endDate?: string) {
+  return useFetchQuery<ConsolidatedStatements>(
+    `/ovds/reports/consolidation${qs({ companyId, asOf, startDate, endDate })}`,
+    { deps: [companyId, asOf, startDate, endDate] },
+  );
 }
 
 // -- GRN + 3-Way Match ---------------------------------------------------------
@@ -620,52 +590,25 @@ export interface GrnStats {
 }
 
 export function useGrns(params: { companyId?: string; status?: string } = {}) {
-  const [items, setItems] = useState<Grn[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const q = new URLSearchParams();
-      if (params.companyId) q.set('companyId', params.companyId);
-      if (params.status) q.set('status', params.status);
-      const { data } = await api.get(`/ovds/reports/grns${q.toString() ? `?${q}` : ''}`);
-      setItems(data?.data ?? data ?? []);
-    } finally {
-      setLoading(false);
-    }
-  }, [JSON.stringify(params)]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { items, loading, refetch: fetch };
+  return useFetchQuery<Grn[]>(
+    `/ovds/reports/grns${qs({ companyId: params.companyId, status: params.status })}`,
+    {
+      // Stringify params so the URL updates when object identity changes
+      deps: [params.companyId, params.status],
+      select: toArray,
+    },
+  );
 }
 
 export function useGrnStats(companyId?: string) {
-  const [stats, setStats] = useState<GrnStats | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const fetch = useCallback(async () => {
-    if (!companyId) return;
-    setLoading(true);
-    try {
-      const { data } = await api.get(`/ovds/reports/grns/stats?companyId=${companyId}`);
-      setStats(data?.data ?? data ?? null);
-    } finally {
-      setLoading(false);
-    }
-  }, [companyId]);
-
-  useEffect(() => { fetch(); }, [fetch]);
-  return { stats, loading, refetch: fetch };
+  return useFetchQuery<GrnStats>(
+    companyId ? `/ovds/reports/grns/stats?companyId=${companyId}` : '',
+    { enabled: !!companyId, deps: [companyId] },
+  );
 }
 
 export async function confirmGrn(id: string): Promise<Grn> {
   const { data } = await api.post(`/ovds/reports/grns/${id}/confirm`);
-  return data?.data ?? data;
-}
-
-export async function createGrn(dto: Partial<Grn> & { items: Omit<GrnItem, 'id'>[] }, companyId?: string): Promise<Grn> {
-  const { data } = await api.post('/ovds/reports/grns', { ...dto, companyId });
   return data?.data ?? data;
 }
 

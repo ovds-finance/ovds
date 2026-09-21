@@ -1,4 +1,5 @@
 import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
+
 import { validatePassword, DEFAULT_PASSWORD_POLICY } from './password-policy';
 
 @Injectable()

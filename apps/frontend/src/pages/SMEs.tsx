@@ -5,15 +5,7 @@
  * IFRS for SMEs tier guidance, and ERCA compliance checklist.
  * Inspired by ovds's clean, actionable SME-first design.
  */
-import React, { useState, useEffect } from 'react';
 import { Skeleton, AppPage } from '@ovds/ui';
-import { usePageTitle, useInterval } from '../hooks';
-import { useBusiness } from '../context/businessContext';
-import { useAuth } from '../rbac/AuthContext';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import { fmtCurrency } from '../utils/fmt';
-import { Link } from 'react-router-dom';
 import {
   Store, TrendingUp, TrendingDown, DollarSign, FileText,
   Users2, ShieldCheck, AlertTriangle, CheckCircle2, Clock,
@@ -21,6 +13,15 @@ import {
   Zap, BookOpen, RefreshCw, ExternalLink, Info, Calendar,
   CreditCard, Package, PiggyBank,
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle, useInterval } from '../hooks';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { fmtCurrency } from '../utils/fmt';
+
 
 // -- Types ---------------------------------------------------------------------
 interface SMESnapshot {
@@ -58,8 +59,8 @@ const IFRS_TIERS = [
   {
     tier: 'Tier 2 — IFRS for SMEs',
     desc: 'Turnover ETB 500K–50M. Accrual accounting, full financial statements required.',
-    color: 'text-emerald-700 dark:text-emerald-400',
-    bg:   'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800',
+    color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
+    bg:   'bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-[var(--pro-azure-100)] dark:border-green-800',
   },
   {
     tier: 'Tier 1 — Full IFRS',
@@ -71,12 +72,12 @@ const IFRS_TIERS = [
 
 // -- Quick actions -------------------------------------------------------------
 const QUICK_ACTIONS = [
-  { label: 'New Invoice',    icon: <FileText size={16} />,   to: '/sales/invoices',    color: 'bg-emerald-500 hover:bg-emerald-600 text-white' },
-  { label: 'Record Expense', icon: <CreditCard size={16} />, to: '/purchases/expenses',    color: 'bg-emerald-500 hover:bg-emerald-600 text-white' },
-  { label: 'Add Customer',   icon: <Users2 size={16} />,     to: '/customers',   color: 'bg-emerald-500 hover:bg-emerald-600 text-white' },
+  { label: 'New Invoice',    icon: <FileText size={16} />,   to: '/sales/invoices',    color: 'bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white' },
+  { label: 'Record Expense', icon: <CreditCard size={16} />, to: '/purchases/expenses',    color: 'bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white' },
+  { label: 'Add Customer',   icon: <Users2 size={16} />,     to: '/customers',   color: 'bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white' },
   { label: 'VAT Filing',     icon: <ShieldCheck size={16} />,to: '/tax/vat',         color: 'bg-amber-600 hover:bg-amber-700 text-white' },
   { label: 'View Reports',   icon: <BarChart3 size={16} />,  to: '/reports',     color: 'bg-slate-700 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white' },
-  { label: 'Payroll',        icon: <Banknote size={16} />,   to: '/hr/payroll',     color: 'bg-emerald-500 hover:bg-emerald-600 text-white' },
+  { label: 'Payroll',        icon: <Banknote size={16} />,   to: '/hr/payroll',     color: 'bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white' },
 ];
 
 // -- Component -----------------------------------------------------------------
@@ -128,6 +129,7 @@ const SMEs: React.FC = () => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { loadData(); }, [selectedCompanyId, canRead]);
   useInterval(loadData, 60_000);
 
@@ -148,7 +150,7 @@ const SMEs: React.FC = () => {
       title="SME Dashboard"
       subtitle="Simplified financial overview for small and medium enterprises — Ethiopia-focused · Retail & E-commerce · Accounting & ovds Software · Market Segmentation · Growth"
       icon={<Store size={16} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       crumbs={[{ label: 'System Administration' }, { label: 'SME Profiles' }]}
       actions={
         <button onClick={() => { setLoading(true); loadData(); }}
@@ -182,16 +184,16 @@ const SMEs: React.FC = () => {
               value: fmt(snap.cashBalance),
               sub:   'Available cash',
               icon:  <PiggyBank size={18} />,
-              color: snap.cashBalance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400',
-              bg:    snap.cashBalance >= 0 ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-rose-50 dark:bg-rose-950/30',
+              color: snap.cashBalance >= 0 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-rose-600 dark:text-rose-400',
+              bg:    snap.cashBalance >= 0 ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30' : 'bg-rose-50 dark:bg-rose-950/30',
             },
             {
               label: 'This Month Revenue',
               value: fmt(snap.monthRevenue),
               sub:   snap.netProfit >= 0 ? `+${fmt(snap.netProfit)} net` : `${fmt(snap.netProfit)} net`,
               icon:  <TrendingUp size={18} />,
-              color: 'text-emerald-600 dark:text-emerald-400',
-              bg:    'bg-emerald-50 dark:bg-emerald-950/30',
+              color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+              bg:    'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
             },
             {
               label: 'Unpaid Invoices',
@@ -229,13 +231,13 @@ const SMEs: React.FC = () => {
           <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Setup Checklist</h3>
-              <span className={`text-xs font-bold tabular-nums ${setupPct === 100 ? 'text-emerald-600 dark:text-emerald-400' : setupPct >= 60 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-500 dark:text-rose-400'}`}>
+              <span className={`text-xs font-bold tabular-nums ${setupPct === 100 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : setupPct >= 60 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-500 dark:text-rose-400'}`}>
                 {setupPct}%
               </span>
             </div>
             <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all duration-700 ${setupPct === 100 ? 'bg-emerald-500' : setupPct >= 60 ? 'bg-amber-500' : 'bg-rose-400'}`}
+                className={`h-full rounded-full transition-all duration-700 ${setupPct === 100 ? 'bg-[var(--pro-azure-50)]0' : setupPct >= 60 ? 'bg-amber-500' : 'bg-rose-400'}`}
                 style={{ width: `${setupPct}%` }}
               />
             </div>
@@ -244,7 +246,7 @@ const SMEs: React.FC = () => {
             {compliance.map((item, i) => (
               <div key={i} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                 {item.done
-                  ? <CheckCircle2 size={15} className="text-emerald-500 shrink-0" />
+                  ? <CheckCircle2 size={15} className="text-[var(--pro-azure)] shrink-0" />
                   : item.urgent
                     ? <AlertTriangle size={15} className="text-amber-500 shrink-0" />
                     : <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-300 dark:border-slate-600 shrink-0" />}
@@ -252,7 +254,7 @@ const SMEs: React.FC = () => {
                   {item.label}
                 </span>
                 {!item.done && item.link && (
-                  <Link to={item.link} className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline shrink-0">
+                  <Link to={item.link} className="text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline shrink-0">
                     Fix →
                   </Link>
                 )}
@@ -275,7 +277,7 @@ const SMEs: React.FC = () => {
               </div>
             ))}
             <Link to="/ifrs"
-              className="flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline mt-1">
+              className="flex items-center gap-2 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline mt-1">
               <ExternalLink size={12} /> View IFRS Standards Dashboard
             </Link>
           </div>
@@ -294,8 +296,8 @@ const SMEs: React.FC = () => {
               icon:    <ShieldCheck size={18} />,
               link:    '/tax/vat',
               linkLabel: 'File VAT',
-              color:   snap.vatDue > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400',
-              bg:      snap.vatDue > 0 ? 'bg-amber-50 dark:bg-amber-950/30' : 'bg-emerald-50 dark:bg-emerald-950/30',
+              color:   snap.vatDue > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+              bg:      snap.vatDue > 0 ? 'bg-amber-50 dark:bg-amber-950/30' : 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
             },
             {
               label:   'Payroll Due',
@@ -314,8 +316,8 @@ const SMEs: React.FC = () => {
               icon:    <Users2 size={18} />,
               link:    '/hr/employees',
               linkLabel: 'Manage',
-              color:   'text-emerald-600 dark:text-emerald-400',
-              bg:      'bg-emerald-50 dark:bg-emerald-950/30',
+              color:   'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+              bg:      'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
             },
           ].map(c => (
             <div key={c.label} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex items-center gap-4">
@@ -326,7 +328,7 @@ const SMEs: React.FC = () => {
                 <p className="ovds-caption">{c.sub}</p>
               </div>
               <Link to={c.link}
-                className="shrink-0 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                className="shrink-0 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
                 {c.linkLabel} →
               </Link>
             </div>
@@ -347,10 +349,10 @@ const SMEs: React.FC = () => {
             { label: 'MoR Business Registry', href: 'https://www.mor.gov.et',         desc: 'Ministry of Revenues — business registration' },
           ].map(r => (
             <a key={r.label} href={r.href} target="_blank" rel="noopener noreferrer"
-              className="flex items-start gap-2 p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-500/40 dark:hover:border-emerald-500/60 transition-colors group">
-              <ExternalLink size={13} className="text-emerald-500 shrink-0 mt-0.5 group-hover:text-emerald-600" />
+              className="flex items-start gap-2 p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-[var(--pro-azure)]/40 dark:hover:border-[var(--pro-azure)]/60 transition-colors group">
+              <ExternalLink size={13} className="text-[var(--pro-azure)] shrink-0 mt-0.5 group-hover:text-[var(--pro-azure)]" />
               <div>
-                <p className="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{r.label}</p>
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-[var(--pro-azure)] dark:group-hover:text-[var(--pro-azure-light)] transition-colors">{r.label}</p>
                 <p className="ovds-caption mt-0.5">{r.desc}</p>
               </div>
             </a>

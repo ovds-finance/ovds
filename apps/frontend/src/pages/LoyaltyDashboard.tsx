@@ -2,21 +2,22 @@
  * LoyaltyDashboard — ovds-style customer loyalty program
  * AppPage · AppKpi · AppTable · useApiCrud
  */
-import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Gift, Star, TrendingUp, Users2, RefreshCw, Award,
   Crown, Zap, ArrowRight,
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { fmtETB } from '../utils/ethiopianTax';
+
 import {
   AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, SearchBar, EmptyState, Card, IconBox,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { fmtETB } from '../utils/ethiopianTax';
 
 interface LoyaltyMember {
   id: string;
@@ -63,6 +64,7 @@ const LoyaltyDashboard: React.FC = () => {
     staleTime: 60_000,
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const members: LoyaltyMember[] = Array.isArray(raw) ? raw : [];
 
   const filtered = useMemo(() => {
@@ -75,7 +77,7 @@ const LoyaltyDashboard: React.FC = () => {
     const totalPoints = members.reduce((s, m) => s + (m.points ?? 0), 0);
     const totalSpend  = members.reduce((s, m) => s + (m.totalSpend ?? 0), 0);
     return [
-      { label: 'Members',      value: members.length,                                                    color: 'emerald' as const },
+      { label: 'Members',      value: members.length,                                                    color: 'green' as const },
       { label: 'Gold+',        value: members.filter(m => ['GOLD', 'PLATINUM'].includes(m.tier?.toUpperCase())).length, color: 'amber' as const },
       { label: 'Total Points', value: totalPoints.toLocaleString(),                                      color: 'violet' as const },
       { label: 'Total Spend',  value: fmtETB(totalSpend),                                                color: 'sky' as const },
@@ -112,7 +114,7 @@ const LoyaltyDashboard: React.FC = () => {
               <div className="mt-2 space-y-0.5">
                 {tier.benefits.slice(0, 2).map(b => (
                   <p key={b} className="text-[9px] text-slate-500 flex items-center gap-1">
-                    <span className="w-1 h-1 rounded-full bg-emerald-400 shrink-0" />{b}
+                    <span className="w-1 h-1 rounded-full bg-[var(--pro-azure-light)] shrink-0" />{b}
                   </p>
                 ))}
               </div>
@@ -163,7 +165,7 @@ const LoyaltyDashboard: React.FC = () => {
                   <span className="text-[11px] font-bold text-violet-600 tabular-nums">{(m.points ?? 0).toLocaleString()}</span>
                 </AppTd>
                 <AppTd align="right">
-                  {m.totalSpend ? <span className="text-[11px] font-bold text-emerald-600 tabular-nums">{fmtETB(m.totalSpend)}</span> : <span className="text-[10px] text-slate-300">—</span>}
+                  {m.totalSpend ? <span className="text-[11px] font-bold text-[var(--pro-azure)] tabular-nums">{fmtETB(m.totalSpend)}</span> : <span className="text-[10px] text-slate-300">—</span>}
                 </AppTd>
                 <AppTd>
                   {m.lastActivity
@@ -175,7 +177,7 @@ const LoyaltyDashboard: React.FC = () => {
                   <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => navigate(`/customer-summary/${m.customerId}`)}
-                      className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                      className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all"
                       title="View customer"
                     >
                       <ArrowRight size={11} />

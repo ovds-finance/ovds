@@ -5,9 +5,9 @@ vi.mock('../services/api', () => ({
   default: { get: vi.fn() },
 }));
 
-import api from '../services/api';
 import { fetchReport, exportReportBlob, defaultPeriod } from '../features/reports/services/reportsService';
 import type { ReportConfig } from '../features/reports/types';
+import api from '../services/api';
 
 const mockedGet = () => vi.mocked(api.get);
 

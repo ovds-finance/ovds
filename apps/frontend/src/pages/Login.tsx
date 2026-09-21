@@ -1,19 +1,20 @@
-import React, { useState, useEffect, useRef } from "react";
-import api from "../services/api";
 import {
   Lock, User, AlertCircle, CheckCircle2, Loader2,
   Eye, EyeOff, Shield, ArrowRight,
   ChevronLeft, RefreshCw, Smartphone,
   Mail, Zap, Landmark,
 } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, Link, Navigate } from "react-router-dom";
-import { useAuth } from "../rbac/AuthContext";
-import { rbac, type AppRole } from "../rbac";
-import type { AuthUser } from "../rbac/AuthContext";
-import { Auth0LoginButton } from "../rbac/auth0LoginButton";
-import { useAuth0Session } from "../hooks/useAuth0Session";
+
 import LanguageSwitcher from "../components/languageSwitcher";
+import { useAuth0Session } from "../hooks/useAuth0Session";
+import { rbac, type AppRole } from "../rbac";
+import { Auth0LoginButton } from "../rbac/auth0LoginButton";
+import type { AuthUser } from "../rbac/AuthContext";
+import { useAuth } from "../rbac/AuthContext";
+import api from "../services/api";
 import { isHttpOnlyAuth, setCsrfToken } from "../utils/authMode";
 
 /* ─── types ──────────────────────────────────────────────────────────── */
@@ -23,10 +24,12 @@ type AuthMethod = "email";
 const AUTH0_ENABLED = import.meta.env.VITE_AUTH0_ENABLED === "true";
 const Auth0SessionHandler: React.FC = () => { useAuth0Session(); return null; };
 
-/* ── Global CSS (Akaunting-style) ───────────────────────────────────── */
+/* ── Global CSS (Professional GUI) ─────────────────────────────────── */
 const LOGIN_CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 .lp-login {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 .lp-login *, .lp-login *::before, .lp-login *::after { box-sizing: border-box; }
 
@@ -66,15 +69,15 @@ const LOGIN_CSS = `
 /* input base */
 .lp-input {
   width:100%; padding:.625rem .875rem .625rem 2.5rem;
-  border:1.5px solid var(--border); border-radius:.75rem;
+  border:1.5px solid #e2e8f0; border-radius:.75rem;
   font-size:.875rem; color: var(--ink); background:#fff;
   outline:none; transition:border-color .15s, box-shadow .15s;
   font-family: inherit;
 }
-.lp-input::placeholder { color: oklch(0.65 0.01 258); }
-.lp-input:hover { border-color: oklch(0.80 0.04 278); }
-.lp-input:focus { border-color: var(--lv); box-shadow: 0 0 0 3px oklch(0.55 0.22 278 / .12); }
-.lp-input.error { border-color: oklch(0.60 0.20 25); box-shadow: 0 0 0 3px oklch(0.60 0.20 25 / .10); background: oklch(0.98 0.01 25); }
+.lp-input::placeholder { color: #94a3b8; }
+.lp-input:hover { border-color: #c7d2fe; }
+.lp-input:focus { border-color: var(--lv); box-shadow: 0 0 0 3px oklch(0.59 0.19 145 / .12); }
+.lp-input.error { border-color: #f87171; box-shadow: 0 0 0 3px rgba(239,68,68,.10); background: #fff; }
 .lp-input.pr { padding-right:2.75rem; }
 .lp-input.mono { font-family: ui-monospace, monospace; letter-spacing:.08em; }
 
@@ -97,34 +100,34 @@ const LOGIN_CSS = `
 /* secondary button */
 .lp-btn-secondary {
   padding:.625rem 1rem; border-radius:.75rem;
-  border: 1.5px solid var(--border); background:#fff;
+  border: 1.5px solid #e2e8f0; background:#fff;
   font-size:.8125rem; font-weight:600; color: var(--ink-2);
   cursor:pointer; display:flex; align-items:center; justify-content:center; gap:.5rem;
   transition: all .15s;
   font-family: inherit;
 }
-.lp-btn-secondary:hover { border-color: oklch(0.78 0.08 278); background: var(--lv-dim); color: var(--lv-deep); }
+.lp-btn-secondary:hover { border-color: #c7d2fe; background: var(--lv-dim); color: var(--lv-deep); }
 
 /* otp cell */
 .lp-otp-cell {
   width:48px; height:56px; text-align:center; font-size:1.25rem; font-weight:800;
-  border:2px solid var(--border); border-radius:.75rem; background:#fff; outline:none;
+  border:2px solid #e2e8f0; border-radius:.75rem; background:#fff; outline:none;
   color: var(--ink); transition: border-color .15s, box-shadow .15s, background .15s;
   font-family: ui-monospace, monospace;
 }
-.lp-otp-cell:focus { border-color: var(--lv); box-shadow: 0 0 0 3px oklch(0.55 0.22 278 / .12); }
-.lp-otp-cell.filled { border-color: var(--lv); background: var(--lv-dim); color: var(--lv-deep); }
+.lp-otp-cell:focus { border-color: var(--lv); box-shadow: 0 0 0 3px oklch(0.59 0.19 145 / .12); }
+.lp-otp-cell.filled { border-color: var(--lv); background: #fff; color: var(--lv-deep); }
 
 /* social btn */
 .lp-social {
   flex:1; padding:.625rem .875rem; border-radius:.75rem;
-  border: 1.5px solid var(--border); background:#fff;
+  border: 1.5px solid #e2e8f0; background:#fff;
   font-size:.8125rem; font-weight:600; color: var(--ink-2);
   cursor:pointer; display:flex; align-items:center; justify-content:center; gap:.5rem;
   transition: all .15s; white-space:nowrap;
   font-family: inherit;
 }
-.lp-social:hover { border-color: oklch(0.78 0.08 278); background: var(--lv-dim); color: var(--lv-deep); box-shadow: 0 2px 8px oklch(0.55 0.22 278 / .10); }
+.lp-social:hover { border-color: #c7d2fe; background: #fff; color: var(--lv-deep); box-shadow: 0 2px 8px oklch(0.59 0.19 145 / .10); }
 
 /* method tab */
 .lp-tab {
@@ -144,7 +147,7 @@ const LOGIN_CSS = `
 /* ss-shadow */
 .lp-ss-shadow {
   box-shadow:
-    0 0 0 1px oklch(0.88 0.02 258),
+    0 0 0 1px #e2e8f0,
     0 24px 64px -12px oklch(0.55 0.22 278 / .18),
     0 8px 24px -4px rgba(0,0,0,.10);
 }
@@ -159,8 +162,8 @@ function getPasswordStrength(pw: string) {
   if (/[A-Z]/.test(pw)) s++;
   if (/[0-9]/.test(pw))  s++;
   if (/[^A-Za-z0-9]/.test(pw)) s++;
-  if (s <= 1) return { score: s, label: "Weak",   color: "oklch(0.55 0.20 25)" };
-  if (s <= 2) return { score: s, label: "Fair",   color: "oklch(0.72 0.16 50)" };
+  if (s <= 1) return { score: s, label: "Weak",   color: "#ef4444" };
+  if (s <= 2) return { score: s, label: "Fair",   color: "#f59e0b" };
   if (s <= 3) return { score: s, label: "Good",   color: "var(--lv-light)" };
   return              { score: s, label: "Strong", color: "var(--lg)" };
 }
@@ -174,7 +177,7 @@ const StrengthBar: React.FC<{ password: string }> = ({ password }) => {
         {[1,2,3,4].map(i => (
           <div key={i} style={{
             height:4, flex:1, borderRadius:4,
-            background: i <= score ? color : "var(--border)",
+            background: i <= score ? color : "#e2e8f0",
             transition: "background .3s",
           }} />
         ))}
@@ -226,151 +229,21 @@ const OtpInput: React.FC<{ value: string; onChange: (v: string) => void; onCompl
 
 
 
-/* ─── Left Brand Panel — clean visual, no text ───────────────────────── */
-const BrandPanel: React.FC = () => {
-  const [vis, setVis] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setVis(true), 80); return () => clearTimeout(t); }, []);
-
-  return (
-    <div style={{
-      display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
-      height:"100%", position:"relative", overflow:"hidden", userSelect:"none",
-      background:"oklch(0.975 0.006 258)",
-      borderRight:"1px solid var(--border)",
-    }}>
-
-      {/* subtle dot grid — same pattern as Landing hero */}
-      <div aria-hidden style={{
-        position:"absolute", inset:0, pointerEvents:"none",
-        backgroundImage:"radial-gradient(circle, oklch(0.78 0.04 278) 1px, transparent 1px)",
-        backgroundSize:"28px 28px", opacity:0.45,
-      }}/>
-
-      {/* top-right violet glow blob */}
-      <div aria-hidden style={{
-        position:"absolute", top:"-15%", right:"-20%",
-        width:500, height:500, borderRadius:"50%",
-        background:"radial-gradient(circle, oklch(0.55 0.22 278 / .12) 0%, transparent 65%)",
-        animation:"lp-blob 14s ease-in-out infinite", pointerEvents:"none",
-      }}/>
-      {/* bottom-left green glow blob */}
-      <div aria-hidden style={{
-        position:"absolute", bottom:"-12%", left:"-18%",
-        width:420, height:420, borderRadius:"50%",
-        background:"radial-gradient(circle, oklch(0.59 0.19 155 / .08) 0%, transparent 65%)",
-        animation:"lp-blob 17s 3s ease-in-out infinite", pointerEvents:"none",
-      }}/>
-
-      {/* centre logo mark */}
-      <div style={{
-        position:"relative", zIndex:1,
-        opacity: vis ? 1 : 0,
-        transform: vis ? "scale(1) translateY(0)" : "scale(0.92) translateY(12px)",
-        transition:"all .7s cubic-bezier(.16,1,.3,1)",
-        display:"flex", flexDirection:"column", alignItems:"center", gap:28,
-      }}>
-
-        {/* logo mark — large, geometric */}
-        <div style={{ position:"relative" }}>
-          {/* outer ring */}
-          <div style={{
-            width:96, height:96, borderRadius:"50%",
-            border:"2px solid oklch(0.55 0.22 278 / .18)",
-            display:"flex", alignItems:"center", justifyContent:"center",
-            animation:"lp-float-a 7s ease-in-out infinite",
-          }}>
-            {/* inner ring */}
-            <div style={{
-              width:72, height:72, borderRadius:"50%",
-              border:"1.5px solid oklch(0.55 0.22 278 / .25)",
-              display:"flex", alignItems:"center", justifyContent:"center",
-            }}>
-              {/* icon container */}
-              <div style={{
-                width:56, height:56, borderRadius:18,
-                background:"var(--lv)",
-                display:"flex", alignItems:"center", justifyContent:"center",
-                boxShadow:"0 8px 32px oklch(0.55 0.22 278 / .35), 0 2px 8px oklch(0.55 0.22 278 / .20)",
-              }}>
-                <Landmark size={24} style={{ color:"#fff" }} />
-              </div>
-            </div>
-          </div>
-
-          {/* orbiting accent dots */}
-          <div style={{
-            position:"absolute", top:-6, right:-6,
-            width:14, height:14, borderRadius:"50%",
-            background:"oklch(0.59 0.19 155)",
-            boxShadow:"0 2px 8px oklch(0.59 0.19 155 / .4)",
-            animation:"lp-float-b 5s ease-in-out infinite",
-          }}/>
-          <div style={{
-            position:"absolute", bottom:-4, left:-8,
-            width:10, height:10, borderRadius:"50%",
-            background:"oklch(0.72 0.16 50)",
-            boxShadow:"0 2px 6px oklch(0.72 0.16 50 / .4)",
-            animation:"lp-float-a 8s 1s ease-in-out infinite",
-          }}/>
-        </div>
-
-        {/* wordmark — no tagline, just the brand */}
-        <div style={{ textAlign:"center" }}>
-          <div style={{
-            fontSize:"2rem", fontWeight:800, letterSpacing:"-0.04em", lineHeight:1,
-            color:"var(--ink)",
-          }}>OVDS</div>
-          <div style={{
-            width:32, height:3, borderRadius:99,
-            background:"var(--lv)",
-            margin:"10px auto 0",
-          }}/>
-        </div>
-
-        {/* abstract floating module tiles — purely visual, Akaunting-style */}
-        <div style={{ display:"flex", gap:10, opacity:.7, animation:"lp-float-b 9s 0.5s ease-in-out infinite" }}>
-          {[
-            { bg:"oklch(0.94 0.04 278)", border:"oklch(0.82 0.08 278)", icon:"oklch(0.55 0.22 278)" },
-            { bg:"oklch(0.94 0.04 155)", border:"oklch(0.80 0.08 155)", icon:"oklch(0.55 0.18 155)" },
-            { bg:"oklch(0.95 0.03 50)",  border:"oklch(0.82 0.07 50)",  icon:"oklch(0.60 0.15 50)"  },
-          ].map((c, i) => (
-            <div key={i} style={{
-              width:44, height:44, borderRadius:13,
-              background:c.bg, border:`1.5px solid ${c.border}`,
-              display:"flex", alignItems:"center", justifyContent:"center",
-            }}>
-              {/* abstract geometric fill */}
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
-                {i === 0 && <>
-                  <rect x="2" y="9" width="3" height="7" rx="1" fill={c.icon}/>
-                  <rect x="7" y="5" width="3" height="11" rx="1" fill={c.icon} opacity=".7"/>
-                  <rect x="12" y="2" width="3" height="14" rx="1" fill={c.icon} opacity=".45"/>
-                </>}
-                {i === 1 && <>
-                  <circle cx="9" cy="9" r="6" stroke={c.icon} strokeWidth="1.5" fill="none"/>
-                  <path d="M9 5v4l3 2" stroke={c.icon} strokeWidth="1.5" strokeLinecap="round"/>
-                </>}
-                {i === 2 && <>
-                  <rect x="2" y="4" width="14" height="2.5" rx="1.25" fill={c.icon}/>
-                  <rect x="2" y="7.75" width="10" height="2.5" rx="1.25" fill={c.icon} opacity=".65"/>
-                  <rect x="2" y="11.5" width="7" height="2.5" rx="1.25" fill={c.icon} opacity=".4"/>
-                </>}
-              </svg>
-            </div>
-          ))}
-        </div>
+/* ─── Left Brand Panel — name only, clean white ───────────────── */
+const BrandPanel: React.FC = () => (
+  <div style={{
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    height: '100%', background: '#ffffff',
+    borderRight: '1px solid #f1f5f9',
+  }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+      {/* Name */}
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontWeight: 900, fontSize: '2rem', color: '#0f172a', letterSpacing: '-.04em', lineHeight: 1 }}>OVDS FINCLOUD</div>
       </div>
-
-      {/* bottom – slim compliance badge strip, no text */}
-      <div style={{
-        position:"absolute", bottom:0, left:0, right:0,
-        height:4,
-        background:"linear-gradient(90deg, var(--lv) 0%, oklch(0.59 0.19 155) 50%, oklch(0.72 0.16 50) 100%)",
-        opacity:.6,
-      }}/>
     </div>
-  );
-};
+  </div>
+);
 
 
 /* ─── Field wrapper ──────────────────────────────────────────────────── */
@@ -395,17 +268,19 @@ const Field: React.FC<{
 const Alert: React.FC<{ type: "success" | "error"; text: string; onDismiss: () => void }> = ({ type, text, onDismiss }) => (
   <div role="alert" aria-live={type === "error" ? "assertive" : "polite"} aria-atomic style={{
     display:"flex", alignItems:"flex-start", gap:10, padding:".875rem 1rem",
-    borderRadius:12, border:`1.5px solid ${type === "success" ? "oklch(0.80 0.10 155)" : "oklch(0.80 0.10 25)"}`,
-    background: type === "success" ? "oklch(0.96 0.03 155)" : "oklch(0.97 0.02 25)",
+    borderRadius:12,
+    border:`1.5px solid ${type === "success" ? "#bbf7d0" : "#fecaca"}`,
+    background:"#fff",
+    boxShadow: type === "success" ? "0 1px 6px rgba(16,185,129,.08)" : "0 1px 6px rgba(239,68,68,.08)",
     animation:"lp-slide-up .3s cubic-bezier(.16,1,.3,1) both",
     marginBottom:"1.25rem",
   }}>
     {type === "success"
-      ? <CheckCircle2 size={15} style={{ flexShrink:0, marginTop:1, color:"oklch(0.55 0.18 155)" }} />
-      : <AlertCircle  size={15} style={{ flexShrink:0, marginTop:1, color:"oklch(0.55 0.20 25)" }} />}
-    <span style={{ flex:1, fontSize:".8125rem", fontWeight:600, color: type === "success" ? "oklch(0.35 0.14 155)" : "oklch(0.35 0.16 25)" }}>{text}</span>
+      ? <CheckCircle2 size={15} style={{ flexShrink:0, marginTop:1, color:"#10b981" }} />
+      : <AlertCircle  size={15} style={{ flexShrink:0, marginTop:1, color:"#ef4444" }} />}
+    <span style={{ flex:1, fontSize:".8125rem", fontWeight:600, color: type === "success" ? "#065f46" : "#b91c1c" }}>{text}</span>
     <button type="button" onClick={onDismiss} aria-label="Dismiss"
-      style={{ flexShrink:0, padding:2, borderRadius:6, border:"none", background:"transparent", cursor:"pointer", color:"var(--ink-3)", display:"flex", alignItems:"center" }}>
+      style={{ flexShrink:0, padding:2, borderRadius:6, border:"none", background:"transparent", cursor:"pointer", color:"#94a3b8", display:"flex", alignItems:"center" }}>
       <AlertCircle size={12} />
     </button>
   </div>
@@ -431,7 +306,7 @@ const OtpBtn: React.FC<{
 }> = ({ loading, disabled, onClick, label, loadingLabel = "Sending…", icon, color }) => (
   <button type="button" disabled={loading || disabled} onClick={onClick}
     className="lp-btn-primary"
-    style={{ background: color ?? "var(--lv)", boxShadow: `0 4px 16px ${color ?? "oklch(0.55 0.22 278)"} / .3)` }}>
+    style={{ background: color ?? "var(--lv)", boxShadow: `0 4px 16px ${color ?? "oklch(0.59 0.19 145)"} / .3)` }}>
     {loading ? <><Loader2 size={15} className="lp-spin" /> {loadingLabel}</> : <>{icon} {label}</>}
   </button>
 );
@@ -450,6 +325,7 @@ const ResendRow: React.FC<{ cd: number; onResend: () => void }> = ({ cd, onResen
   );
 
 /* ─── Back button ────────────────────────────────────────────────────── */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BackBtn: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   <button type="button" onClick={onClick}
     style={{ display:"flex", alignItems:"center", gap:4, fontSize:".75rem", fontWeight:600, color:"var(--ink-3)", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>
@@ -585,7 +461,7 @@ const Login: React.FC = () => {
       <style>{LOGIN_CSS}</style>
       {AUTH0_ENABLED && <Auth0SessionHandler />}
 
-      <div className="lp-login" style={{ minHeight:"100vh", display:"flex", background:"#fff", opacity: mounted?1:0, transition:"opacity .4s ease" }}>
+      <div className="lp-login" style={{ minHeight:"100vh", display:"flex", background:"#fff", opacity: mounted?1:0, transition:"opacity .4s ease", fontFamily:"'Inter', ui-sans-serif, system-ui, sans-serif" }}>
 
         {/* ── Left brand panel (sticky) ── */}
         <div style={{ width:"43%", maxWidth:520, flexShrink:0, position:"sticky", top:0, height:"100vh", overflow:"hidden" }} className="hidden lg:block">
@@ -596,24 +472,20 @@ const Login: React.FC = () => {
         <div style={{ flex:1, display:"flex", flexDirection:"column", minHeight:"100vh", background:"#fff", overflowY:"auto" }}>
 
           {/* header */}
-          <header style={{ position:"sticky", top:0, zIndex:10, display:"flex", alignItems:"center", justifyContent:"space-between", padding:".875rem 2.5rem", borderBottom:"1px solid var(--border)", background:"rgba(255,255,255,.95)", backdropFilter:"blur(12px)" }}>
-            {/* logo (mobile only) */}
+          <header style={{ position:"sticky", top:0, zIndex:10, display:"flex", alignItems:"center", justifyContent:"space-between", padding:".875rem 2.5rem", borderBottom:"1px solid #f1f5f9", background:"#fff", backdropFilter:"blur(16px)" }}>
+            {/* name (mobile only) */}
             <div className="lg:hidden" style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <div style={{ width:34, height:34, borderRadius:10, background:"var(--lv)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 12px oklch(0.55 0.22 278 / .3)" }}>
-                <Landmark size={16} style={{ color:"#fff" }} />
-              </div>
               <div>
-                <div style={{ fontWeight:800, fontSize:".9375rem", color:"var(--ink)", letterSpacing:"-0.025em", lineHeight:1.1 }}>OVDS</div>
-                <div style={{ fontSize:".5625rem", fontWeight:700, color:"var(--lv)", letterSpacing:".06em", textTransform:"uppercase" }}>finCloud</div>
+                <div style={{ fontWeight:800, fontSize:".9375rem", color:"var(--ink)", letterSpacing:"-0.025em", lineHeight:1.1 }}>OVDS FINCLOUD</div>
               </div>
             </div>
             <div className="hidden lg:block" />
             <div style={{ display:"flex", alignItems:"center", gap:12 }}>
               <LanguageSwitcher variant="select" />
               <Link to="/register"
-                style={{ display:"inline-flex", alignItems:"center", gap:6, fontSize:".8125rem", fontWeight:700, color:"var(--ink-2)", border:"1.5px solid var(--border)", borderRadius:10, padding:".4rem .875rem", textDecoration:"none", transition:"all .15s", background:"#fff" }}
-                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor="oklch(0.78 0.08 278)"; (e.currentTarget as HTMLAnchorElement).style.color="var(--lv-deep)"; (e.currentTarget as HTMLAnchorElement).style.background="var(--lv-dim)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor="var(--border)"; (e.currentTarget as HTMLAnchorElement).style.color="var(--ink-2)"; (e.currentTarget as HTMLAnchorElement).style.background="#fff"; }}>
+                style={{ display:"inline-flex", alignItems:"center", gap:6, fontSize:".8125rem", fontWeight:700, color:"var(--lv)", border:"1.5px solid #c7d2fe", borderRadius:999, padding:".375rem .875rem", textDecoration:"none", transition:"all .15s", background:"#fff" }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background="#eff6ff"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background="#fff"; }}>
                 Create account <ArrowRight size={12} />
               </Link>
             </div>
@@ -621,18 +493,18 @@ const Login: React.FC = () => {
 
           {/* progress bar */}
           {loading && (
-            <div style={{ position:"fixed", top:0, left:0, right:0, height:3, background:"var(--lv-dim)", zIndex:50 }}>
+            <div style={{ position:"fixed", top:0, left:0, right:0, height:3, background:"#e0e7ff", zIndex:50 }}>
               <div style={{ position:"absolute", top:0, left:0, bottom:0, width:"40%", background:"var(--lv)", animation:"lp-bar 1.4s ease-in-out infinite", borderRadius:3 }} />
             </div>
           )}
 
           {/* main */}
-          <main style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", padding:"2.5rem 1.25rem" }}>
+          <main style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", padding:"2.5rem 1.25rem", background:"#fff" }}>
             <div style={{ width:"100%", maxWidth:420 }}>
 
               {/* ── Page heading ── */}
               <div className="lp-su1" style={{ marginBottom:"2rem" }}>
-                <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"4px 12px", borderRadius:999, background:"var(--lv-dim)", border:"1px solid oklch(0.82 0.08 278)", fontSize:".6875rem", fontWeight:700, color:"var(--lv-deep)", marginBottom:".875rem" }}>
+                <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"4px 12px", borderRadius:999, background:"#f8fafc", border:"1px solid #e2e8f0", fontSize:".6875rem", fontWeight:700, color:"var(--lv-deep)", marginBottom:".875rem" }}>
                   <span style={{ width:6, height:6, borderRadius:"50%", background:"var(--lv)", display:"inline-block", animation:"lp-pulse-dot 2s infinite" }}/>
                   Secure sign in
                 </div>
@@ -647,9 +519,9 @@ const Login: React.FC = () => {
 
               {/* ── Too many failures ── */}
               {fails >= 3 && (
-                <div role="alert" style={{ display:"flex", alignItems:"flex-start", gap:10, padding:".875rem 1rem", borderRadius:12, border:"1.5px solid oklch(0.82 0.12 50)", background:"oklch(0.97 0.02 50)", marginBottom:"1rem", animation:"lp-slide-up .3s both" }}>
-                  <AlertCircle size={14} style={{ flexShrink:0, marginTop:2, color:"oklch(0.60 0.18 50)" }} />
-                  <span style={{ fontSize:".8125rem", fontWeight:600, color:"oklch(0.42 0.14 50)" }}>
+                <div role="alert" style={{ display:"flex", alignItems:"flex-start", gap:10, padding:".875rem 1rem", borderRadius:12, border:"1.5px solid #fed7aa", background:"#fff", boxShadow:"0 1px 6px rgba(234,88,12,.08)", marginBottom:"1rem", animation:"lp-slide-up .3s both" }}>
+                  <AlertCircle size={14} style={{ flexShrink:0, marginTop:2, color:"#ea580c" }} />
+                  <span style={{ fontSize:".8125rem", fontWeight:600, color:"#9a3412" }}>
                     {fails} failed attempts. <Link to="/settings?tab=profile" style={{ textDecoration:"underline", fontWeight:700, color:"inherit" }}>Reset password</Link>
                   </span>
                 </div>
@@ -658,7 +530,7 @@ const Login: React.FC = () => {
               {/* ══ 2FA challenge ══ */}
               {mfaChallenge ? (
                 <div className={shake ? "lp-shake" : ""} style={{ display:"flex", flexDirection:"column", gap:"1rem", animation:"lp-slide-up .35s cubic-bezier(.16,1,.3,1) both" }}>
-                  <div style={{ display:"flex", alignItems:"flex-start", gap:14, padding:"1rem 1.125rem", borderRadius:14, border:"1.5px solid oklch(0.80 0.10 278)", background:"oklch(0.97 0.02 278)" }}>
+                  <div style={{ display:"flex", alignItems:"flex-start", gap:14, padding:"1rem 1.125rem", borderRadius:14, border:"1.5px solid #e0e7ff", background:"#fff", boxShadow:"0 1px 6px rgba(79,186,111,.08)" }}>
                     <div style={{ width:44, height:44, borderRadius:12, background:"var(--lv)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, boxShadow:"0 4px 14px oklch(0.55 0.22 278 / .3)" }}>
                       <Shield size={18} style={{ color:"#fff" }} />
                     </div>
@@ -668,7 +540,7 @@ const Login: React.FC = () => {
                         Code sent to <strong style={{ fontWeight:700, color:"var(--ink-2)" }}>{mfaChallenge.sentTo}</strong>
                       </p>
                       {mfaChallenge.dev_code && (
-                        <span style={{ display:"inline-block", marginTop:6, fontSize:".6875rem", fontWeight:700, color:"var(--lv-deep)", background:"var(--lv-dim)", border:"1px solid oklch(0.82 0.08 278)", padding:"2px 10px", borderRadius:6 }}>
+                        <span style={{ display:"inline-block", marginTop:6, fontSize:".6875rem", fontWeight:700, color:"var(--lv-deep)", background:"#f8fafc", border:"1px solid #e2e8f0", padding:"2px 10px", borderRadius:6 }}>
                           Dev code: {mfaChallenge.dev_code}
                         </span>
                       )}
@@ -689,19 +561,6 @@ const Login: React.FC = () => {
                 </div>
               ) : (
                 <>
-                  {/* ── Auth0 SSO (enterprise only) ── */}
-                  {AUTH0_ENABLED && (
-                    <div className="lp-su2" style={{ marginBottom:"1.5rem" }}>
-                      <Auth0LoginButton
-                        className="!py-2.5 !rounded-xl !border-gray-200 !bg-white !text-gray-700 !text-[13px] !font-semibold hover:!border-indigo-300 hover:!bg-indigo-50 !shadow-none transition-all" />
-                      <div style={{ display:"flex", alignItems:"center", gap:12, margin:"1rem 0" }}>
-                        <div style={{ flex:1, height:1, background:"var(--border)" }} />
-                        <span style={{ fontSize:".6875rem", fontWeight:700, color:"var(--ink-3)", textTransform:"uppercase", letterSpacing:".06em" }}>or</span>
-                        <div style={{ flex:1, height:1, background:"var(--border)" }} />
-                      </div>
-                    </div>
-                  )}
-
                   {/* ══ EMAIL form ══ */}
                   {method === "email" && (
                     <form ref={formRef} onSubmit={handleEmailSubmit} noValidate
@@ -751,7 +610,7 @@ const Login: React.FC = () => {
                         </button>
                         {showStr && <StrengthBar password={formData.password} />}
                         {capsLock && (
-                          <p id="l-pw-caps" style={{ display:"flex", alignItems:"center", gap:6, fontSize:".6875rem", fontWeight:700, color:"oklch(0.60 0.18 50)", marginTop:4 }}>
+                          <p id="l-pw-caps" style={{ display:"flex", alignItems:"center", gap:6, fontSize:".6875rem", fontWeight:700, color:"#ea580c", marginTop:4 }}>
                             <AlertCircle size={11}/> Caps Lock is on
                           </p>
                         )}
@@ -765,7 +624,7 @@ const Login: React.FC = () => {
                             aria-label="Remember me"
                             style={{ position:"absolute", opacity:0, width:0, height:0 }} />
                           <div style={{
-                            width:18, height:18, borderRadius:5, border:`2px solid ${remember ? "var(--lv)" : "var(--border)"}`,
+                            width:18, height:18, borderRadius:5, border:`2px solid ${remember ? "var(--lv)" : "#e2e8f0"}`,
                             background: remember ? "var(--lv)" : "#fff",
                             display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0,
                             transition:"all .15s",
@@ -778,41 +637,11 @@ const Login: React.FC = () => {
                           </div>
                           <span style={{ fontSize:".8125rem", fontWeight:500, color:"var(--ink-3)", userSelect:"none" }}>Remember me</span>
                         </label>
-                        <kbd style={{ display:"inline-flex", alignItems:"center", gap:4, fontSize:".6875rem", color:"var(--ink-3)", background:"var(--surface-2)", border:"1px solid var(--border)", padding:"2px 8px", borderRadius:6, fontFamily:"ui-monospace,monospace" }}>⏎ Enter</kbd>
+                        <kbd style={{ display:"inline-flex", alignItems:"center", gap:4, fontSize:".6875rem", color:"#94a3b8", background:"#f8fafc", border:"1px solid #e2e8f0", padding:"2px 8px", borderRadius:6, fontFamily:"ui-monospace,monospace" }}>⏎ Enter</kbd>
                       </div>
 
                       <SubmitBtn loading={loading} success={msg?.type === "success"} />
                     </form>
-                  )}
-
-                  {/* ── QR scan card (email method only) ── */}
-                  {method === "email" && !mfaChallenge && (
-                    <div className="lp-su5" style={{ display:"flex", alignItems:"center", gap:14, marginTop:"1.25rem", padding:".875rem 1rem", borderRadius:14, border:"1.5px solid var(--border)", background:"var(--surface-2)" }}>
-                      <div style={{ flexShrink:0, width:52, height:52, borderRadius:12, background:"#fff", border:"1px solid var(--border)", boxShadow:"0 2px 8px rgba(0,0,0,.06)", display:"flex", alignItems:"center", justifyContent:"center", padding:6 }}>
-                        <svg viewBox="0 0 21 21" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <rect x="1" y="1" width="7" height="7" rx="1" stroke="oklch(0.30 0.12 278)" strokeWidth="1.2"/>
-                          <rect x="2.5" y="2.5" width="4" height="4" rx="0.5" fill="oklch(0.30 0.12 278)"/>
-                          <rect x="13" y="1" width="7" height="7" rx="1" stroke="oklch(0.30 0.12 278)" strokeWidth="1.2"/>
-                          <rect x="14.5" y="2.5" width="4" height="4" rx="0.5" fill="oklch(0.30 0.12 278)"/>
-                          <rect x="1" y="13" width="7" height="7" rx="1" stroke="oklch(0.30 0.12 278)" strokeWidth="1.2"/>
-                          <rect x="2.5" y="14.5" width="4" height="4" rx="0.5" fill="oklch(0.30 0.12 278)"/>
-                          <rect x="10" y="10" width="2" height="2" rx="0.3" fill="var(--lv)"/>
-                          <rect x="13" y="10" width="2" height="2" rx="0.3" fill="var(--lv)"/>
-                          <rect x="16" y="10" width="2" height="2" rx="0.3" fill="oklch(0.30 0.12 278)"/>
-                          <rect x="10" y="13" width="2" height="2" rx="0.3" fill="oklch(0.30 0.12 278)"/>
-                          <rect x="13" y="13" width="2" height="2" rx="0.3" fill="var(--lv)"/>
-                          <rect x="16" y="16" width="2" height="2" rx="0.3" fill="var(--lv)"/>
-                          <rect x="10" y="16" width="5" height="2" rx="0.3" fill="oklch(0.30 0.12 278)"/>
-                          <rect x="17" y="19" width="4" height="2" rx="0.3" fill="var(--lv)"/>
-                          <rect x="10" y="19" width="5" height="2" rx="0.3" fill="oklch(0.30 0.12 278)"/>
-                        </svg>
-                      </div>
-                      <div style={{ flex:1, minWidth:0 }}>
-                        <p style={{ fontSize:".8125rem", fontWeight:700, color:"var(--ink)", marginBottom:3 }}>Scan to link account</p>
-                        <p style={{ fontSize:".6875rem", color:"var(--ink-3)", lineHeight:1.5 }}>Open the OVDS mobile app and scan to sign in — no password needed.</p>
-                      </div>
-                      <Smartphone size={16} style={{ color:"var(--lv)", flexShrink:0 }} />
-                    </div>
                   )}
 
                   {/* ── Sign up link ── */}
@@ -828,17 +657,21 @@ const Login: React.FC = () => {
                     </p>
                   </div>
 
-                  {/* ── Trust badges ── */}
-                  <div className="lp-fade" style={{ marginTop:"1.5rem", paddingTop:"1.25rem", borderTop:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"center", gap:"2rem" }}>
+                  {/* ── Trust badges — pill style ── */}
+                  <div className="lp-fade" style={{ marginTop:"1.5rem", paddingTop:"1.25rem", borderTop:"1px solid #f1f5f9", display:"flex", alignItems:"center", justifyContent:"center", gap:".625rem", flexWrap:"wrap" }}>
                     {[
-                      { Icon: Shield,       tip: "256-bit TLS" },
-                      { Icon: CheckCircle2, tip: "ISO 27001 Ready" },
-                      { Icon: Zap,          tip: "99.9% Uptime" },
-                    ].map(({ Icon, tip }) => (
-                      <div key={tip} title={tip} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4, cursor:"default" }}>
-                        <Icon size={15} style={{ color:"var(--lv)" }} />
-                        <span style={{ fontSize:".5625rem", fontWeight:600, color:"var(--ink-3)", letterSpacing:".03em" }}>{tip}</span>
-                      </div>
+                      { Icon: Shield,       label: "256-bit TLS"       },
+                      { Icon: CheckCircle2, label: "ISO 27001 Ready"   },
+                      { Icon: Zap,          label: "99.9% Uptime"      },
+                    ].map(({ Icon, label }) => (
+                      <span key={label} style={{
+                        display:"inline-flex", alignItems:"center", gap:5,
+                        fontSize:".6875rem", fontWeight:600, color:"#64748b",
+                        padding:".3125rem .625rem", borderRadius:999,
+                        background:"#f8fafc", border:"1px solid #e2e8f0",
+                      }}>
+                        <Icon size={11} style={{ color:"var(--lv)" }} /> {label}
+                      </span>
                     ))}
                   </div>
                 </>
@@ -848,7 +681,7 @@ const Login: React.FC = () => {
           </main>
 
           {/* footer */}
-          <footer style={{ padding:".875rem 2.5rem", borderTop:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"space-between", background:"#fff" }}>
+          <footer style={{ padding:".875rem 2.5rem", borderTop:"1px solid #f1f5f9", display:"flex", alignItems:"center", justifyContent:"space-between", background:"#fff" }}>
             <p style={{ fontSize:".6875rem", color:"var(--ink-3)" }}>© {new Date().getFullYear()} OVDS AI ERP · Ethiopia 🇪🇹</p>
             <div style={{ display:"flex", alignItems:"center", gap:12, fontSize:".6875rem", color:"var(--ink-3)" }}>
               <Link to="/privacy" style={{ color:"inherit", textDecoration:"none", transition:"color .15s" }}

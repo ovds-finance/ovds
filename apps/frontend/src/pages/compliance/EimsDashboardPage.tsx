@@ -1,24 +1,24 @@
-import React, { useState, useMemo } from 'react';
 import {
   useEimsReadiness,
   useEimsDashboard,
   useEimsRegistrations,
-  useRegisterInvoiceEims,
 } from '@ovds/features/eims';
-import toast from 'react-hot-toast';
-import { useBusiness } from '../../context/businessContext';
 import {
   Shield, CheckCircle2, Circle, FileText, Layers, ArrowRight, RefreshCw, AlertTriangle,
 } from 'lucide-react';
+import React, {  } from 'react';
+
+import { useBusiness } from '../../context/businessContext';
+
 
 const STATUS_COLORS: Record<string, string> = {
-  APPROVED: 'text-emerald-600 bg-emerald-50',
+  APPROVED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   PENDING: 'text-amber-600 bg-amber-50',
-  ISSUED: 'text-emerald-600 bg-emerald-50',
+  ISSUED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   EXPIRING: 'text-orange-600 bg-orange-50',
   FAILED: 'text-rose-600 bg-rose-50',
-  REGISTERED: 'text-emerald-600 bg-emerald-50',
-  COMPLETED: 'text-emerald-600 bg-emerald-50',
+  REGISTERED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
+  COMPLETED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   EXPIRED: 'text-rose-600 bg-rose-50',
 };
 
@@ -32,8 +32,7 @@ const EimsDashboardPage: React.FC = () => {
   const { selectedCompanyId } = useBusiness();
   const { data: readiness, isLoading: loadingReadiness } = useEimsReadiness();
   const { data: dashboard } = useEimsDashboard();
-  const { data: registrations = [], refetch: refetchRegs } = useEimsRegistrations();
-  const registerInvoice = useRegisterInvoiceEims();
+  const { data: registrations = [], refetch: _refetchRegs } = useEimsRegistrations();
 
   const recentRegs = registrations.slice(0, 8);
 
@@ -58,7 +57,7 @@ const EimsDashboardPage: React.FC = () => {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Registered', value: dashboard?.summary?.registered ?? 0, color: 'text-emerald-600' },
+          { label: 'Registered', value: dashboard?.summary?.registered ?? 0, color: 'text-[var(--pro-azure)]' },
           { label: 'Pending', value: dashboard?.summary?.pending ?? 0, color: 'text-amber-600' },
           { label: 'Failed', value: dashboard?.summary?.failed ?? 0, color: 'text-rose-600' },
           { label: 'Receipts', value: dashboard?.summary?.receipts ?? 0, color: 'text-teal-600' },
@@ -93,7 +92,7 @@ const EimsDashboardPage: React.FC = () => {
               <p className="text-sm font-medium">Integration Readiness</p>
               <p className="text-xs text-slate-500">{readiness.progress}% complete</p>
             </div>
-            <div className={`px-3 py-1 rounded-full text-xs font-semibold ${readiness.ready ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+            <div className={`px-3 py-1 rounded-full text-xs font-semibold ${readiness.ready ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : 'bg-amber-100 text-amber-700'}`}>
               {readiness.ready ? 'Ready' : 'Not Ready'}
             </div>
           </div>
@@ -101,7 +100,7 @@ const EimsDashboardPage: React.FC = () => {
             {readiness.steps?.map((step: any) => (
               <div key={step.step} className="flex items-start gap-3 p-2 rounded-lg">
                 {step.complete
-                  ? <CheckCircle2 size={16} className="text-emerald-500 mt-0.5 shrink-0" />
+                  ? <CheckCircle2 size={16} className="text-[var(--pro-azure)] mt-0.5 shrink-0" />
                   : <Circle size={16} className="text-slate-300 mt-0.5 shrink-0" />}
                 <div>
                   <p className="text-xs font-medium">{step.title}</p>

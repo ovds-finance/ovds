@@ -14,6 +14,7 @@ export interface MonetizationProduct {
   name: string;
   slug: string;
   type: MonetizationProductType;
+  billingCycle?: BillingCycle;
   /** JSON-encoded string[] of feature keys */
   featureKeys: string;
   priceMonthly: number;

@@ -1,66 +1,124 @@
 # @ovds/dto
 
-Shared **Data Transfer Object** library for the OVDS Nx monorepo.
+Shared Data Transfer Objects for the OVDS platform. Provides Zod schemas, class-validator DTOs, and serialization utilities shared between React (frontend) and NestJS (backend).
 
-Use this package for `class-validator` / `class-transformer` DTO classes consumed by:
-
-- **NestJS** (`ValidationPipe`, controllers, services)
-- **React** (form payloads, API client typing)
-- **Prisma** workflows (request/response shapes aligned with DB models)
-
-## Import rules
-
-| Need | Import from |
-|------|-------------|
-| DTO classes (`CreateInvoiceDto`, `PaginationQueryDto`, …) | `@ovds/dto` |
-| Enums, interfaces, RBAC, constants | `@ovds/shared` |
-| Prisma client & DB types | `@ovds/database` (backend only) |
-
-```typescript
-// Full barrel
-import { CreateInvoiceDto, PaginationQueryDto } from '@ovds/dto';
-
-// Domain subpath (smaller bundles)
-import { CreateShiftDto } from '@ovds/dto/hr';
-import { CreateCompanyDto } from '@ovds/dto/ovds';
-```
-
-## Path aliases
-
-Configured in `tsconfig.base.json` for all TypeScript projects:
-
-- `@ovds/dto` → `packages/shared/dto/src/index.ts`
-- `@ovds/dto/*` → `packages/shared/dto/src/*`
-
-Vite (`apps/frontend/vite.config.ts`) and NestJS (`apps/backend/tsconfig.json`) inherit these via `extends`.
-
-## Layout
+## Structure
 
 ```
-packages/shared/dto/src/
-  common/       # PaginationQueryDto
-  auth/
-  ovds/
-  hr/
-  projects/
-  trade/
-  loyalty/
-  modules/      # DTOs co-located with non-DTO code in @ovds/shared
+packages/shared/dto/
+├── src/
+│   ├── common/
+│   │   ├── zod-bridge.ts       # Shared Zod schemas (Login, Register, etc.)
+│   │   ├── serializer.ts       # Entity → DTO serialization
+│   │   └── pagination.dto.ts   # Pagination DTO classes
+│   ├── auth/zod-bridge.ts      # Auth domain schemas
+│   ├── hr/zod-bridge.ts        # HR domain schemas
+│   ├── ovds/zod-bridge.ts      # Invoice/Bill/Customer/Vendor schemas
+│   ├── trade/zod-bridge.ts     # Trade/Shipping schemas
+│   ├── loyalty/zod-bridge.ts   # Loyalty schemas
+│   ├── settings/zod-bridge.ts  # Settings/RBAC schemas
+│   ├── banking/zod-bridge.ts   # Banking schemas
+│   ├── crm/zod-bridge.ts       # CRM schemas
+│   ├── inventory/zod-bridge.ts # Inventory schemas
+│   ├── purchases/zod-bridge.ts # Purchase orders, GRNs
+│   ├── tax/zod-bridge.ts       # VAT, WHT, TOT schemas
+│   ├── accounting/zod-bridge.ts # Journal entries, accounts
+│   ├── compliance/zod-bridge.ts # Compliance schemas
+│   └── projects/zod-bridge.ts  # Project management schemas
+└── package.json
 ```
 
-## Build
+## Usage
 
-```bash
-npm run build:libs          # builds shared → dto → …
-npx nx build dto
-npx nx typecheck dto
+### React (Frontend)
+
+```tsx
+import { useZodForm } from '@ovds/ui';
+import { LoginSchema, CreateInvoiceSchema } from '@ovds/dto';
+
+function LoginForm() {
+  const { register, handleSubmit } = useZodForm({
+    schema: LoginSchema,
+    defaultValues: { username: '', password: '' }
+  });
+  
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input {...register('username')} />
+      <input type="password" {...register('password')} />
+      <button type="submit">Sign in</button>
+    </form>
+  );
+}
 ```
 
-`dto` depends on `@ovds/shared` (enums in `types.ts`). Build order: **shared first**, then **dto**.
+### NestJS (Backend)
 
-## Adding a new DTO
+```ts
+import { ZodValidationPipe } from '@ovds/contracts';
+import { LoginSchema, CreateInvoiceSchema } from '@ovds/dto';
 
-1. Create `packages/shared/dto/src/<domain>/<name>.dto.ts`
-2. Import enums from `@ovds/shared/types`
-3. Export from `packages/shared/dto/src/<domain>/index.ts`
-4. Import in apps via `@ovds/dto` — do **not** add DTOs back into `@ovds/shared`
+@Post('login')
+login(@Body(new ZodValidationPipe(LoginSchema)) dto: z.infer<typeof LoginSchema>) {
+  return this.authService.validate(dto);
+}
+```
+
+## Serialization
+
+Convert Prisma entities to clean DTOs before sending to frontend:
+
+```ts
+import { serializeEntity, serializePaginated, stripSensitive } from '@ovds/dto';
+
+// Single entity
+const clean = serializeEntity(rawEntity, {
+  omit: ['internalNotes'],
+  datesToIso: true,
+  decimalsToString: true,
+});
+
+// Paginated response
+const page = serializePaginated(
+  entities.map(serializeEntity),
+  total,
+  page,
+  limit,
+);
+```
+
+## Schema Naming Convention
+
+| Pattern | Example | Usage |
+|---------|---------|-------|
+| `XxxSchema` | `InvoiceSchema` | Validation schema |
+| `CreateXxxSchema` | `CreateInvoiceSchema` | Create form |
+| `UpdateXxxSchema` | `UpdateInvoiceSchema` | Update form |
+| `Xxx` | `Invoice` | TypeScript type |
+
+## Domain Coverage
+
+| Domain | Schemas | Status |
+|--------|---------|--------|
+| auth | Login, Register, User, Role | ✅ Complete |
+| hr | Employee, Department, Leave, Payroll | ✅ Complete |
+| ovds | Invoice, Bill, Customer, Vendor | ✅ Complete |
+| trade | Shipment, Forex, Proforma | ✅ Complete |
+| loyalty | Transaction, Tier, Reward | ✅ Complete |
+| settings | Categories, RBAC, Wizard | ✅ Complete |
+| banking | Accounts, Transactions, Reconciliation | ✅ Complete |
+| crm | Leads, Opportunities, Activities | ✅ Complete |
+| inventory | Items, Warehouses, Stock | ✅ Complete |
+| purchases | PO, GRN, Debit Note, Payment | ✅ Complete |
+| tax | VAT, WHT, TOT, BIT, Compliance | ✅ Complete |
+| accounting | Journal, Accounts, Fiscal Year | ✅ Complete |
+| compliance | Frameworks, Controls, Risks | ✅ Complete |
+| projects | Projects, Tasks, Timers | ✅ Complete |
+
+## Best Practices
+
+1. **Shared schemas** — Define in `@ovds/contracts/schemas`, mirror in `@ovds/dto`
+2. **Frontend validation** — Use `useZodForm` with schemas from `@ovds/dto`
+3. **Backend validation** — Use `ZodValidationPipe` with schemas from `@ovds/dto`
+4. **Serialization** — Always use `serializeEntity` before returning Prisma entities
+5. **No hardcoded values** — Use design tokens for colors, spacing, typography

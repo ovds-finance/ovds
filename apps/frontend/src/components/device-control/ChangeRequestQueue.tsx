@@ -1,6 +1,3 @@
-import React, { useState } from 'react';
-import { BaseTable, Btn, Select, StatusBadge } from '@ovds/ui';
-import { Send, XCircle, Eye } from 'lucide-react';
 import {
   DEVICE_CONTROL_CATEGORY_META,
   DEVICE_CONTROL_CATEGORIES,
@@ -8,6 +5,10 @@ import {
   type DeviceControlCategory,
   type DeviceControlChangeRequestDTO as DeviceControlChangeRequest,
 } from '@ovds/shared';
+import { BaseTable, Btn, Select, StatusBadge } from '@ovds/ui';
+import { Send, XCircle, Eye } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { useAuth } from '../../rbac/AuthContext';
 import {
   useCancelChangeRequest,

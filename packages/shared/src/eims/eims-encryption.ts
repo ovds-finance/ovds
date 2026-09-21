@@ -3,25 +3,37 @@
  *
  * After authentication, non-auth requests may be wrapped as { data: "ciphertext" }
  * using the session encryptionKey from the auth response.
+ *
+ * NOTE: This module requires Node.js crypto and is intended for backend use only.
+ * It is included in @ovds/shared for type-sharing but should not be called in
+ * browser contexts (the functions will throw if Node.js crypto is unavailable).
  */
 
-import * as crypto from 'crypto';
+async function getCrypto(): Promise<typeof import('crypto')> {
+  try {
+    return await import('crypto');
+  } catch {
+    throw new Error('eims-encryption: Node.js crypto module is required (backend only)');
+  }
+}
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 12;
 const TAG_LENGTH = 16;
 
 /** Derive a 32-byte AES key from the UUID encryptionKey returned at login */
-export function deriveEncryptionKey(encryptionKey: string): Buffer {
+export async function deriveEncryptionKey(encryptionKey: string): Promise<Buffer> {
+  const crypto = await getCrypto();
   return crypto.createHash('sha256').update(encryptionKey, 'utf8').digest();
 }
 
 /** Encrypt a JSON payload for EIMS transmission */
-export function encryptEimsPayload(
+export async function encryptEimsPayload(
   payload: unknown,
   encryptionKey: string,
-): string {
-  const key = deriveEncryptionKey(encryptionKey);
+): Promise<string> {
+  const crypto = await getCrypto();
+  const key = await deriveEncryptionKey(encryptionKey);
   const iv = crypto.randomBytes(IV_LENGTH);
   const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
 
@@ -37,11 +49,12 @@ export function encryptEimsPayload(
 }
 
 /** Decrypt an EIMS response payload */
-export function decryptEimsPayload<T = unknown>(
+export async function decryptEimsPayload<T = unknown>(
   ciphertext: string,
   encryptionKey: string,
-): T {
-  const key = deriveEncryptionKey(encryptionKey);
+): Promise<T> {
+  const crypto = await getCrypto();
+  const key = await deriveEncryptionKey(encryptionKey);
   const buf = Buffer.from(ciphertext, 'base64');
 
   const iv = buf.subarray(0, IV_LENGTH);
@@ -59,20 +72,20 @@ export function decryptEimsPayload<T = unknown>(
 }
 
 /** Wrap payload in { data: ciphertext } envelope if encryption is enabled */
-export function wrapEncryptedBody(
+export async function wrapEncryptedBody(
   payload: unknown,
   encryptionKey: string | null,
   useEncryption: boolean,
-): { data: string } | unknown {
+): Promise<{ data: string } | unknown> {
   if (!useEncryption || !encryptionKey) return payload;
-  return { data: encryptEimsPayload(payload, encryptionKey) };
+  return { data: await encryptEimsPayload(payload, encryptionKey) };
 }
 
 /** Unwrap { data: ciphertext } response */
-export function unwrapEncryptedBody<T = unknown>(
+export async function unwrapEncryptedBody<T = unknown>(
   body: unknown,
   encryptionKey: string | null,
-): T {
+): Promise<T> {
   if (
     body &&
     typeof body === 'object' &&

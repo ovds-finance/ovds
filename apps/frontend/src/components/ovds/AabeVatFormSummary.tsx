@@ -1,5 +1,6 @@
-import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import React from 'react';
+
 import api from '../../services/api';
 
 interface VatFormSummary {
@@ -120,20 +121,20 @@ export function AabeVatFormSummary({ companyId, period }: { companyId: string; p
           </div>
         </div>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h4 className="text-sm font-semibold text-blue-800 mb-3">Part 3: Net Tax Calculation</h4>
+        <div className="bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-lg p-4">
+          <h4 className="text-sm font-semibold text-[var(--pro-azure-dark)] mb-3">Part 3: Net Tax Calculation</h4>
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-blue-600">Output VAT - Input VAT (Box 04 - Box 08):</span>
+              <span className="text-[var(--pro-azure)]">Output VAT - Input VAT (Box 04 - Box 08):</span>
               <span className="font-medium">{fmt(summary.part3NetTax.outputVatMinusInputVat)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-blue-600">Withholding Tax Credit Available (Box 14):</span>
+              <span className="text-[var(--pro-azure)]">Withholding Tax Credit Available (Box 14):</span>
               <span className="font-medium">{fmt(summary.part3NetTax.whtCreditAvailable)}</span>
             </div>
-            <div className="flex justify-between font-bold border-t border-blue-200 pt-2 mt-2">
+            <div className="flex justify-between font-bold border-t border-[var(--pro-azure-100)] pt-2 mt-2">
               <span>Final Payable Bank Settlement:</span>
-              <span className="text-blue-900">{fmt(summary.part3NetTax.finalPayable)}</span>
+              <span className="text-[var(--pro-azure-dark)]">{fmt(summary.part3NetTax.finalPayable)}</span>
             </div>
           </div>
         </div>

@@ -15,6 +15,7 @@
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { io, type Socket } from 'socket.io-client';
+
 import api from '../services/api';
 
 export interface AppNotification {
@@ -32,7 +33,11 @@ interface NotificationsState {
   unread: number;
 }
 
-const WS_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace('/api', '') || '';
+// Use a relative URL so the connection goes through the Vite dev proxy
+// (or nginx in production) instead of hitting the backend port directly.
+// An absolute URL derived from VITE_API_BASE_URL bypasses the proxy and
+// causes Firefox to attempt ws://127.0.0.1:3000 which fails in dev.
+const WS_URL = '';
 
 export function useNotifications(enabled = true) {
   const [state, setState] = useState<NotificationsState>({
@@ -65,8 +70,11 @@ export function useNotifications(enabled = true) {
       localStorage.getItem('access_token') ?? '';
 
     const socket = io(`${WS_URL}/notifications`, {
+      path: '/socket.io',
       auth: { token },
-      transports: ['websocket'],
+      // Start with polling so the Vite proxy (or nginx) can upgrade to WS.
+      // websocket-only fails in dev when the proxy hasn't yet established the tunnel.
+      transports: ['polling', 'websocket'],
       reconnectionAttempts: 5,
       reconnectionDelay: 2000,
     });

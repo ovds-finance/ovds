@@ -3,10 +3,12 @@
  * the WebSocket gateway so the React client receives it in real time.
  */
 import { Injectable, Logger } from '@nestjs/common';
+
 import { PrismaService } from '../../common/prisma.service';
 import { NotificationGateway } from '../notification.gateway';
-import type { INotificationChannel } from './notification-channel.interface';
 import type { InAppJobData } from '../notification.jobs';
+
+import type { INotificationChannel } from './notification-channel.interface';
 
 @Injectable()
 export class InAppChannel implements INotificationChannel<InAppJobData> {

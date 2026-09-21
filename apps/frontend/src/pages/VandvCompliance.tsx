@@ -1,9 +1,3 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import { useRbac } from '../rbac';
-import { useBusiness } from '../context/businessContext';
-import { usePageTitle } from '../hooks/usePageTitle';
 import { Skeleton, AppPage, VVProcessScreen, type VVField, type VVValues } from '@ovds/ui';
 import {
   Activity,
@@ -21,9 +15,16 @@ import {
   ShieldCheck,
   Zap,
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import toast from 'react-hot-toast';
+
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useRbac } from '../rbac';
+import api from '../services/api';
 
 // -- Types ---------------------------------------------------------------------
-interface VandvReport {
+interface _VandvReport {
   companyId: string;
   period: string;
   generatedAt: string;
@@ -49,7 +50,7 @@ interface VandvReport {
   overallStatus: string;
 }
 
-interface QuickCheck {
+interface _QuickCheck {
   pass: boolean;
   message: string;
 }
@@ -63,7 +64,7 @@ interface VandvDraft {
 // -- Helpers -------------------------------------------------------------------
 const STATUS_COLOR: Record<string, string> = {
   COMPLIANT:
-    'text-emerald-600 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800',
+    'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800',
   WARNING:
     'text-amber-600 bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800',
   NON_COMPLIANT:
@@ -150,6 +151,7 @@ export default function VandvCompliance() {
 
   useEffect(() => {
     loadReport();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCompanyId]);
 
   const handleRunChecks = () => {
@@ -332,13 +334,13 @@ export default function VandvCompliance() {
                     <div
                       className={`rounded-lg border p-3 text-xs ${
                         quickChecks.vat.pass
-                          ? 'border-emerald-200 bg-emerald-50/50 dark:bg-emerald-950/20'
+                          ? 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/20'
                           : 'border-rose-200 bg-rose-50/50 dark:bg-rose-950/20'
                       }`}
                     >
                       <div className="flex items-center gap-1.5 mb-1">
                         {quickChecks.vat.pass ? (
-                          <CheckCircle2 size={12} className="text-emerald-600" />
+                          <CheckCircle2 size={12} className="text-[var(--pro-azure)]" />
                         ) : (
                           <AlertTriangle size={12} className="text-rose-600" />
                         )}
@@ -349,13 +351,13 @@ export default function VandvCompliance() {
                     <div
                       className={`rounded-lg border p-3 text-xs ${
                         quickChecks.reconciliation.pass
-                          ? 'border-emerald-200 bg-emerald-50/50 dark:bg-emerald-950/20'
+                          ? 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/20'
                           : 'border-rose-200 bg-rose-50/50 dark:bg-rose-950/20'
                       }`}
                     >
                       <div className="flex items-center gap-1.5 mb-1">
                         {quickChecks.reconciliation.pass ? (
-                          <CheckCircle2 size={12} className="text-emerald-600" />
+                          <CheckCircle2 size={12} className="text-[var(--pro-azure)]" />
                         ) : (
                           <AlertTriangle size={12} className="text-rose-600" />
                         )}
@@ -366,13 +368,13 @@ export default function VandvCompliance() {
                     <div
                       className={`rounded-lg border p-3 text-xs ${
                         quickChecks.periodLock.pass
-                          ? 'border-emerald-200 bg-emerald-50/50 dark:bg-emerald-950/20'
+                          ? 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/20'
                           : 'border-rose-200 bg-rose-50/50 dark:bg-rose-950/20'
                       }`}
                     >
                       <div className="flex items-center gap-1.5 mb-1">
                         {quickChecks.periodLock.pass ? (
-                          <CheckCircle2 size={12} className="text-emerald-600" />
+                          <CheckCircle2 size={12} className="text-[var(--pro-azure)]" />
                         ) : (
                           <AlertTriangle size={12} className="text-rose-600" />
                         )}
@@ -394,7 +396,7 @@ export default function VandvCompliance() {
                         report.taxpayerCategory.category === 'A'
                           ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300'
                           : report.taxpayerCategory.category === 'B'
-                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+                            ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] dark:bg-[var(--pro-azure-50)]/10 dark:text-[var(--pro-azure-light)]'
                             : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
                       }`}
                     >
@@ -562,13 +564,13 @@ export default function VandvCompliance() {
                 <div
                   className={`rounded-xl border p-4 shadow-sm ${
                     report.periodLocked
-                      ? 'border-emerald-200 bg-emerald-50/50 dark:bg-emerald-950/20'
+                      ? 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/50 dark:bg-green-950/20'
                       : 'border-amber-200 bg-amber-50/50 dark:bg-amber-950/20'
                   }`}
                 >
                   <div className="flex items-center gap-2">
                     {report.periodLocked ? (
-                      <CheckCircle2 size={16} className="text-emerald-600" />
+                      <CheckCircle2 size={16} className="text-[var(--pro-azure)]" />
                     ) : (
                       <AlertTriangle size={16} className="text-amber-600" />
                     )}
@@ -578,7 +580,7 @@ export default function VandvCompliance() {
                     <span
                       className={`text-xs px-2 py-0.5 rounded-full ${
                         report.periodLocked
-                          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+                          ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300'
                           : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
                       }`}
                     >
@@ -649,7 +651,7 @@ function CheckRow({ label, pass, detail }: { label: string; pass: boolean; detai
       <div className="flex items-center gap-2">
         <span className="text-[10px] text-slate-400 max-w-[200px] text-right truncate">{detail}</span>
         {pass ? (
-          <CheckCircle2 size={12} className="text-emerald-600 shrink-0" />
+          <CheckCircle2 size={12} className="text-[var(--pro-azure)] shrink-0" />
         ) : (
           <AlertTriangle size={12} className="text-rose-600 shrink-0" />
         )}

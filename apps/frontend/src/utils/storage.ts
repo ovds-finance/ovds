@@ -42,6 +42,13 @@ export function clearSession(): void {
   localStorage.removeItem('ovds_user');
   localStorage.removeItem('auth0_token');
   try { sessionStorage.removeItem('ovds_csrf'); } catch { /* ignore */ }
+  // Company / business context
+  localStorage.removeItem('selectedCompanyId');
+  localStorage.removeItem('selectedBusinessType');
+  // Navigation / UI caches
+  localStorage.removeItem('nav_tree_cache');
+  localStorage.removeItem('dashboards_config');
+  localStorage.removeItem('sidebar_collapsed');
   // Sidebar state
   localStorage.removeItem('sidebar_groups');
   localStorage.removeItem('sidebar_groups_v4');
@@ -240,3 +247,43 @@ export async function hardResetUiState(): Promise<SanitizeResult> {
 
 
 
+
+// -- Company context helpers --------------------------------------------------
+
+/**
+ * The localStorage key used to track which company is currently active.
+ *
+ * Previously this string was hard-coded in at least four separate files
+ * (api.ts, businessContext.tsx, RolePermissions.tsx, main.tsx). Using this
+ * constant as the single source of truth means a key rename never requires
+ * a multi-file search-and-replace.
+ */
+export const SELECTED_COMPANY_ID_KEY = 'selectedCompanyId';
+
+/**
+ * Read the currently selected company ID from localStorage.
+ * Returns `null` when no company has been selected yet.
+ */
+export function getSelectedCompanyId(): string | null {
+  return localStorage.getItem(SELECTED_COMPANY_ID_KEY);
+}
+
+/**
+ * Persist the selected company ID.
+ * Use this instead of calling `localStorage.setItem('selectedCompanyId', …)`
+ * directly so refactors stay in one place.
+ */
+export function setSelectedCompanyId(id: string): void {
+  try {
+    localStorage.setItem(SELECTED_COMPANY_ID_KEY, id);
+  } catch {
+    /* storage full */
+  }
+}
+
+/**
+ * Remove the selected company ID (e.g. on logout or company deselection).
+ */
+export function clearSelectedCompanyId(): void {
+  localStorage.removeItem(SELECTED_COMPANY_ID_KEY);
+}

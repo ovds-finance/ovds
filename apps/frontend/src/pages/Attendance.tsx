@@ -3,20 +3,21 @@
  * AppPage · AppKpi · AppTable · useApiCrud
  * Ethiopian labour law · Biometric integration
  */
-import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Clock, RefreshCw, Download, Calendar, CheckCircle2,
   XCircle, AlertTriangle, User, Fingerprint,
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import api from '../services/api';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, SearchBar, EmptyState, Pagination,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
 
 interface AttendanceRecord {
   id: string;
@@ -70,7 +71,7 @@ const Attendance: React.FC = () => {
   }, [rows, tab, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total',    value: rows.length,                                                    color: 'emerald' as const },
+    { label: 'Total',    value: rows.length,                                                    color: 'green' as const },
     { label: 'Present',  value: rows.filter(r => r.status === 'PRESENT').length,               color: 'sky' as const },
     { label: 'Late',     value: rows.filter(r => r.status === 'LATE').length,                  color: 'amber' as const },
     { label: 'Absent',   value: rows.filter(r => r.status === 'ABSENT').length,                color: 'rose' as const },
@@ -94,7 +95,7 @@ const Attendance: React.FC = () => {
     BIOMETRIC: 'bg-violet-50 text-violet-700 border-violet-100',
     MANUAL:    'bg-white text-slate-600 border-slate-200',
     QR_CODE:   'bg-sky-50 text-sky-700 border-sky-100',
-    MOBILE:    'bg-emerald-50 text-emerald-700 border-emerald-100',
+    MOBILE:    'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
   };
 
   const formatTime = (dt: string) => {
@@ -164,7 +165,7 @@ const Attendance: React.FC = () => {
             <AppTr key={r.id}>
               <AppTd>
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-[10px] font-bold shrink-0">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[var(--pro-azure)] to-[var(--pro-azure-dark)] flex items-center justify-center text-white text-[10px] font-bold shrink-0">
                     {String(r.employeeName ?? r.employeeId ?? '?').charAt(0).toUpperCase()}
                   </div>
                   <span className="text-[12px] font-semibold text-slate-800">{r.employeeName ?? r.employeeId}</span>
@@ -191,7 +192,7 @@ const Attendance: React.FC = () => {
               </AppTd>
               <AppTd>
                 {r.verified
-                  ? <CheckCircle2 size={13} className="text-emerald-500" />
+                  ? <CheckCircle2 size={13} className="text-[var(--pro-azure)]" />
                   : <XCircle size={13} className="text-slate-300" />
                 }
               </AppTd>

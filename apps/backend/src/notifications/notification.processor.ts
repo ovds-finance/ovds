@@ -8,16 +8,18 @@
  * Increase per channel in production according to Twilio / FCM rate limits.
  */
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { Job } from 'bullmq';
-import { Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
+import { Logger } from '@nestjs/common';
+import { Job } from 'bullmq';
 import { Queue } from 'bullmq';
+
 import { PrismaService } from '../common/prisma.service';
+
 import { EmailChannel }   from './channels/email.channel';
-import { WhatsAppChannel } from './channels/whatsapp.channel';
-import { SmsChannel }     from './channels/sms.channel';
-import { PushChannel }    from './channels/push.channel';
 import { InAppChannel }   from './channels/in-app.channel';
+import { PushChannel }    from './channels/push.channel';
+import { SmsChannel }     from './channels/sms.channel';
+import { WhatsAppChannel } from './channels/whatsapp.channel';
 import {
   NOTIFICATION_QUEUE,
   NOTIFICATION_JOB,
@@ -207,7 +209,7 @@ export class NotificationProcessor extends WorkerHost {
           <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:12px;padding:32px;border:1px solid #e5e7eb">
             <h2 style="margin:0 0 12px;color:#1f2937">${title}</h2>
             <p style="color:#4b5563;line-height:1.6">${message}</p>
-            ${link ? `<a href="${link}" style="display:inline-block;margin-top:20px;padding:10px 20px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none">View details</a>` : ''}
+            ${link ? `<a href="${link}" style="display:inline-block;margin-top:20px;padding:10px 20px;background:#4FBA6F;color:#fff;border-radius:8px;text-decoration:none">View details</a>` : ''}
             <p style="margin-top:32px;font-size:12px;color:#9ca3af">OVDS · Ethiopia 🇪🇹</p>
           </div>
         </body>

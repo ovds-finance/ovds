@@ -4,12 +4,13 @@
  *
  * Variants:
  *  - Default: "SSO" badge (indigo)
- *  - With MFA: shows step-up level (Full MFA = emerald, Password only = amber)
+ *  - With MFA: shows step-up level (Full MFA = indigo, Password only = amber)
  *
  * Used in profile dropdowns, settings, and the header user menu.
  */
-import React from 'react';
 import { ShieldCheck, ShieldAlert, Shield } from 'lucide-react';
+import React from 'react';
+
 import { useAuth } from '../rbac/AuthContext';
 
 interface Auth0BadgeProps {
@@ -30,7 +31,7 @@ export const Auth0Badge: React.FC<Auth0BadgeProps> = ({
       ? {
           icon: <ShieldCheck size={10} />,
           text: 'MFA',
-          color: 'bg-emerald-50 border-emerald-100 text-emerald-700',
+          color: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
           title: 'Multi-factor authentication completed',
         }
       : mfaEnrolled
@@ -45,7 +46,7 @@ export const Auth0Badge: React.FC<Auth0BadgeProps> = ({
   return (
     <span className={`inline-flex items-center gap-1.5 ${className}`}>
       <span
-        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-[10px] font-medium uppercase tracking-wider"
+        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] text-[var(--pro-azure)] text-[10px] font-medium uppercase tracking-wider"
         title="Signed in via Auth0 SSO"
       >
         <Shield size={10} />

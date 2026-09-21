@@ -1,0 +1,52 @@
+{
+  "jsc": {
+    "target": "es2022",
+    "parser": {
+      "syntax": "typescript",
+      "tsx": false,
+      "decorators": true,
+      "dynamicImport": true
+    },
+    "transform": {
+      "legacyDecorator": true,
+      "decoratorMetadata": true
+    },
+    "keepClassNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@common/*": ["src/common/*"],
+      "@common/dto/*": ["src/common/dto/*"],
+      "@common/interfaces/*": ["src/common/interfaces/*"],
+
+      "@ovds/shared":                    ["node_modules/@ovds/shared/dist/index.js"],
+      "@ovds/shared/*":                  ["node_modules/@ovds/shared/dist/*.js"],
+      "@ovds/core":                      ["node_modules/@ovds/core/dist/index.js"],
+      "@ovds/core/vat":                  ["node_modules/@ovds/core/dist/vat/index.js"],
+      "@ovds/core/vat/report":           ["node_modules/@ovds/core/dist/vat/report/index.js"],
+      "@ovds/contracts":                 ["node_modules/@ovds/contracts/dist-cjs/index.js"],
+      "@ovds/contracts/router":          ["node_modules/@ovds/contracts/dist-cjs/router/index.js"],
+      "@ovds/contracts/schemas":         ["node_modules/@ovds/contracts/dist-cjs/schemas/index.js"],
+      "@ovds/contracts/prisma-zod":      ["node_modules/@ovds/contracts/dist-cjs/prisma-zod/index.js"],
+      "@ovds/contracts/schemas/*":       ["node_modules/@ovds/contracts/dist-cjs/schemas/*.js"],
+      "@ovds/database":                  ["node_modules/@ovds/database/dist/index.js"],
+      "@ovds/dto":                       ["node_modules/@ovds/dto/dist/index.js"],
+      "@ovds/domains-accounting":        ["node_modules/@ovds/domains-accounting/dist/index.js"],
+      "@ovds/domains-double-entry":      ["node_modules/@ovds/domains-double-entry/dist/index.js"],
+      "@ovds/domains-infrastructure":    ["node_modules/@ovds/domains-infrastructure/dist/index.js"],
+      "@ovds/domains-invoice":           ["node_modules/@ovds/domains-invoice/dist/index.js"],
+      "@ovds/domains-vat":               ["node_modules/@ovds/domains-vat/dist/index.js"],
+
+      "@ovds/modules/tax":               ["node_modules/@ovds/modules-tax/dist/index.cjs.js"],
+      "@ovds/modules/tax/*":             ["node_modules/@ovds/modules-tax/dist/*.js"],
+      "@ovds/modules/tax/countries/*":   ["node_modules/@ovds/modules-tax/dist/countries/*.js"]
+    }
+  },
+  "module": {
+    "type": "commonjs",
+    "strictMode": false,
+    "lazy": false,
+    "noInterop": false
+  },
+  "sourceMaps": false,
+  "minify": false
+}

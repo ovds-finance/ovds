@@ -3,24 +3,25 @@
  * AppPage · AppKpi · AppTable · useApiCrud
  * Ethiopian VAT · WHT · ERCA compliance
  */
-import React, { useState, useMemo, useCallback } from 'react';
+import { evalMath } from '@ovds/ui';
 import {
   ClipboardList, Plus, Edit2, Trash2, Download, RefreshCw,
   Send, CheckCircle2, XCircle, Building2, Calendar,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import { fmtETB } from '../utils/ethiopianTax';
-import { evalMath } from '@ovds/ui';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Textarea,
   SearchBar, Amount, EmptyState, Pagination,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
+import { fmtETB } from '../utils/ethiopianTax';
 
 interface PurchaseOrderLine {
   description: string;
@@ -201,7 +202,7 @@ const PurchaseOrders: React.FC = () => {
   }, [rows, tab, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total POs',  value: rows.length,                                                       color: 'emerald' as const },
+    { label: 'Total POs',  value: rows.length,                                                       color: 'green' as const },
     { label: 'Draft',      value: rows.filter(p => p.status === 'DRAFT').length,                     color: 'slate' as const },
     { label: 'Approved',   value: rows.filter(p => p.status === 'APPROVED').length,                  color: 'sky' as const },
     { label: 'Total Value',value: fmtETB(rows.reduce((s, p) => s + Number(p.totalAmount ?? 0), 0)), color: 'violet' as const },
@@ -357,10 +358,10 @@ const PurchaseOrders: React.FC = () => {
               <AppTd align="right">
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {po.status === 'DRAFT' && <button onClick={() => handleSend(po.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-sky-50 hover:text-sky-600 transition-all" title="Send to vendor"><Send size={11} /></button>}
-                  {po.status === 'SENT' && <button onClick={() => handleApprove(po.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Approve"><CheckCircle2 size={11} /></button>}
+                  {po.status === 'SENT' && <button onClick={() => handleApprove(po.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Approve"><CheckCircle2 size={11} /></button>}
                   {po.status === 'SENT' && <button onClick={() => handleReject(po.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Reject"><XCircle size={11} /></button>}
                   {po.status === 'APPROVED' && <button onClick={() => handleConvertToBill(po.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-violet-50 hover:text-violet-600 transition-all" title="Convert to Bill"><ClipboardList size={11} /></button>}
-                  <button onClick={() => setModal({ open: true, data: { ...po } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Edit"><Edit2 size={11} /></button>
+                  <button onClick={() => setModal({ open: true, data: { ...po } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Edit"><Edit2 size={11} /></button>
                   <button onClick={async () => { if (await confirm({ title: `Delete "${po.poNumber}"?`, variant: 'danger' })) remove(po.id); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Delete"><Trash2 size={11} /></button>
                 </div>
               </AppTd>

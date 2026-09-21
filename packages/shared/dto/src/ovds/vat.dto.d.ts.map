@@ -1,0 +1,1 @@
+{"version":3,"file":"vat.dto.d.ts","sourceRoot":"","sources":["vat.dto.ts"],"names":[],"mappings":"AAGA,qBAAa,kBAAkB;IAG7B,aAAa,EAAE,MAAM,CAAC;IAItB,cAAc,EAAE,MAAM,CAAC;CACxB;AAED,qBAAa,aAAa;IAGxB,WAAW,EAAE,MAAM,CAAC;IAIpB,iBAAiB,EAAE,MAAM,CAAC;IAK1B,UAAU,EAAE,kBAAkB,EAAE,CAAC;IAKjC,aAAa,EAAE,kBAAkB,EAAE,CAAC;CACrC"}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+
 import {
   AppPage, Btn, Icon,
 } from '../components/ui';
@@ -82,7 +83,7 @@ const NotesToFinancials: React.FC = () => {
         </p>
         <Link
           to="/settings"
-          className="text-xs text-emerald-600 underline mt-1 inline-block"
+          className="text-xs text-[var(--pro-azure)] underline mt-1 inline-block"
         >
           Configure accounting policies in Settings →
         </Link>

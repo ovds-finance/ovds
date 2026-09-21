@@ -118,7 +118,7 @@ export function FinancialTable<T>({
 
               {/* Expansion panel - secondary details */}
               {expandable && isExpanded && renderExpansion && (
-                <div className="ovds-table-expansion bg-blue-50/30 dark:bg-slate-800/30 px-8 py-4">
+                <div className="ovds-table-expansion bg-[var(--sys-bg-accent)]/30 dark:bg-slate-800/30 px-8 py-4">
                   {renderExpansion(row)}
                 </div>
               )}

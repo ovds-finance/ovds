@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { collectionsApi } from '../services/collectionsApi';
 import { StatsCard, Skeleton } from '@ovds/ui';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   RefreshCw, AlertTriangle, Clock, Users, TrendingDown,
   CheckSquare, Square, Calendar, ChevronDown, X, Loader2,
   CheckCircle2, ArrowUpRight, ShieldAlert, MoreHorizontal, Eye,
 } from 'lucide-react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+
+import { collectionsApi } from '../services/collectionsApi';
 
 interface CollectionsTableProps {
   onCaseSelect?: (caseId: string) => void;
@@ -15,13 +16,13 @@ interface CollectionsTableProps {
 }
 
 const STAGE_COLORS: Record<string, string> = {
-  CLOSED:          'bg-emerald-200/10 text-slate-800 border-emerald-200/20',
+  CLOSED:          'bg-[var(--pro-azure-200)]/10 text-slate-800 border-[var(--pro-azure-100)]/20',
   ASSIGNED:        'bg-amber-50 text-amber-600 border-amber-200',
   PROMISE_TO_PAY:  'bg-sky-50 text-sky-600 border-sky-200',
   LEGAL:           'bg-rose-50 text-rose-600 border-rose-200',
-  PARTIAL_PAYMENT: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 border-indigo-200/20',
+  PARTIAL_PAYMENT: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300 border-[var(--pro-azure-100)]/20',
   NEW:             'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-200/20',
-  CONTACTED:       'bg-emerald-200/10 text-slate-800 border-emerald-200/20',
+  CONTACTED:       'bg-[var(--pro-azure-200)]/10 text-slate-800 border-[var(--pro-azure-100)]/20',
   WRITTEN_OFF:     'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border-slate-200/20',
 };
 
@@ -135,7 +136,7 @@ const CollectionsRowMenu: React.FC<{
             {caseRow.stage !== 'CLOSED' && (
               <button type="button" onClick={() => { setOpen(false); onClose(); }}
                 className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                <CheckCircle2 size={13} className="text-emerald-600" /> Close
+                <CheckCircle2 size={13} className="text-[var(--pro-azure)]" /> Close
               </button>
             )}
           </div>
@@ -313,7 +314,7 @@ export const CollectionsTable: React.FC<CollectionsTableProps> = ({
                 <th className="px-4 py-2.5 w-8">
                   <button onClick={toggleAll} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
                     {selected.size === cases.length && cases.length > 0
-                      ? <CheckSquare size={14} className="text-emerald-600 dark:text-emerald-400" />
+                      ? <CheckSquare size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                       : <Square size={14} />}
                   </button>
                 </th>
@@ -338,11 +339,11 @@ export const CollectionsTable: React.FC<CollectionsTableProps> = ({
                 const isSelected = selected.has(c.id);
                 const isOverduePromise = c.promiseDate && new Date(c.promiseDate) < new Date() && c.stage === 'PROMISE_TO_PAY';
                 return (
-                  <tr key={c.id} className={`hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${isSelected ? 'bg-blue-50/40 dark:bg-blue-950/10' : ''}`}>
+                  <tr key={c.id} className={`hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${isSelected ? 'bg-[var(--sys-bg-accent)] dark:bg-[var(--pro-azure-50)]/5' : ''}`}>
                     <td className="px-4 py-2.5">
                       <button onClick={() => setSelected(s => { const n = new Set(s); if (n.has(c.id)) { n.delete(c.id); } else { n.add(c.id); } return n; })}
-                        className="text-slate-400 hover:text-emerald-600 dark:text-emerald-400">
-                        {isSelected ? <CheckSquare size={14} className="text-emerald-600 dark:text-emerald-400" /> : <Square size={14} />}
+                        className="text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
+                        {isSelected ? <CheckSquare size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" /> : <Square size={14} />}
                       </button>
                     </td>
                     <td className="px-4 py-2.5 font-mono font-bold text-slate-700 dark:text-slate-200 text-xs">
@@ -361,7 +362,7 @@ export const CollectionsTable: React.FC<CollectionsTableProps> = ({
                       ETB {Number(inv.balanceDue ?? inv.totalAmount ?? 0).toLocaleString()}
                     </td>
                     <td className="px-4 py-2.5">
-                      <span className={`font-semibold text-xs px-2 py-0.5 rounded-lg ${agingDays > 90 ? 'bg-rose-100 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400' : agingDays > 60 ? 'bg-orange-100 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400' : agingDays > 30 ? 'bg-yellow-100 dark:bg-yellow-950/30 text-yellow-700 dark:text-yellow-400' : 'bg-emerald-100 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400'}`}>
+                      <span className={`font-semibold text-xs px-2 py-0.5 rounded-lg ${agingDays > 90 ? 'bg-rose-100 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400' : agingDays > 60 ? 'bg-orange-100 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400' : agingDays > 30 ? 'bg-yellow-100 dark:bg-yellow-950/30 text-yellow-700 dark:text-yellow-400' : 'bg-[var(--pro-azure-100)] dark:bg-green-950/30 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'}`}>
                         {agingDays}d
                       </span>
                     </td>

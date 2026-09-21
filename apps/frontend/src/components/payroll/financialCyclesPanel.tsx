@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
 import { Calendar, Plus, Edit2, Trash2, XCircle, RefreshCw } from 'lucide-react';
-import api from '../../services/api';
+import React, { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
+
 import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
 
 interface FinancialCycle {
   id: string;
@@ -109,14 +110,14 @@ const CycleModal: React.FC<{ cycle?: FinancialCycle | null; onClose: () => void;
           </div>
           <label className="flex items-center gap-3 cursor-pointer">
             <input type="checkbox" checked={form.isActive} onChange={e => setForm(f => ({ ...f, isActive: e.target.checked }))}
-              className="w-4 h-4 rounded accent-emerald-600" />
+              className="w-4 h-4 rounded accent-indigo-600" />
             <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Set as active cycle</span>
           </label>
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose}
               className="flex-1 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-bold hover:bg-slate-200 transition-colors">Cancel</button>
             <button type="submit" disabled={saving}
-              className="flex-1 px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors disabled:opacity-50">
+              className="flex-1 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-colors disabled:opacity-50">
               {saving ? 'Saving…' : cycle ? 'Update' : 'Create Cycle'}
             </button>
           </div>
@@ -168,7 +169,7 @@ const FinancialCyclesPanel: React.FC = () => {
           </button>
           {canWrite && (
             <button onClick={() => { setEditCycle(null); setShowModal(true); }}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors">
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-colors">
               <Plus size={14} /> Add Cycle
             </button>
           )}
@@ -187,7 +188,7 @@ const FinancialCyclesPanel: React.FC = () => {
           <p className="text-sm font-bold text-slate-500">No financial cycles configured</p>
           {canWrite && (
             <button onClick={() => { setEditCycle(null); setShowModal(true); }}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-colors">
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-colors">
               <Plus size={13} /> Create First Cycle
             </button>
           )}
@@ -195,13 +196,13 @@ const FinancialCyclesPanel: React.FC = () => {
       ) : (
         <div className="ovds-grid-layout cols-2">
           {cycles.map(c => (
-            <div key={c.id} className={`bg-white dark:bg-slate-800 border rounded-xl p-5 ${c.isActive ? 'border-emerald-600 ring-1 ring-emerald-500/20' : 'border-slate-200 dark:border-slate-700'}`}>
+            <div key={c.id} className={`bg-white dark:bg-slate-800 border rounded-xl p-5 ${c.isActive ? 'border-[var(--pro-azure)] ring-1 ring-[var(--pro-azure)]/20' : 'border-slate-200 dark:border-slate-700'}`}>
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="font-semibold text-slate-800 dark:text-white">{c.name}</p>
                     {c.isActive && (
-                      <span className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold rounded-full border border-emerald-200 dark:border-emerald-800">ACTIVE</span>
+                      <span className="px-2 py-0.5 bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] text-[10px] font-semibold rounded-full border border-[var(--pro-azure-100)] dark:border-green-800">ACTIVE</span>
                     )}
                   </div>
                   <p className="text-xs text-slate-400 mt-0.5">
@@ -211,7 +212,7 @@ const FinancialCyclesPanel: React.FC = () => {
                 {canWrite && (
                   <div className="flex items-center gap-1">
                     <button onClick={() => { setEditCycle(c); setShowModal(true); }}
-                      className="p-1.5 text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors"><Edit2 size={13} /></button>
+                      className="p-1.5 text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors"><Edit2 size={13} /></button>
                     <button onClick={() => handleDelete(c.id)}
                       className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={13} /></button>
                   </div>

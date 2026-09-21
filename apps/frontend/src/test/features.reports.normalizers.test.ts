@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { normalizeReport, fmtMoney, fmtNumber } from '../features/reports/normalizers';
 
 describe('normalizers', () => {

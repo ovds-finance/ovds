@@ -2,24 +2,25 @@
  * Refunds — ovds-style credit notes & refunds
  * AppPage · AppKpi · AppTable · useApiCrud
  */
-import React, { useState, useMemo, useCallback } from 'react';
+import { evalMath } from '@ovds/ui';
 import {
   RotateCcw, Plus, Edit2, Trash2, RefreshCw, Download,
   CheckCircle2,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import { fmtETB } from '../utils/ethiopianTax';
-import { evalMath } from '@ovds/ui';
+
 import {
    AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
    StatusBadge, Btn, Modal, FormField, Input, Select,
    SearchBar, EmptyState, Pagination, Amount,
  } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
+import { fmtETB } from '../utils/ethiopianTax';
 
 interface Refund {
   id: string;
@@ -97,7 +98,7 @@ const Refunds: React.FC = () => {
   }, [rows, tab, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total',     value: rows.length,                                                    color: 'emerald' as const },
+    { label: 'Total',     value: rows.length,                                                    color: 'green' as const },
     { label: 'Pending',   value: rows.filter(r => r.status === 'PENDING').length,               color: 'amber' as const },
     { label: 'Processed', value: rows.filter(r => r.status === 'PROCESSED').length,             color: 'sky' as const },
     { label: 'Total ETB', value: fmtETB(rows.reduce((s, r) => s + Number(r.amount ?? 0), 0)),   color: 'rose' as const },
@@ -214,12 +215,12 @@ const Refunds: React.FC = () => {
               <AppTd align="right">
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {r.status === 'PENDING' && can('invoices:write') && (
-                    <button onClick={() => handleApprove(r.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Approve"><CheckCircle2 size={11} /></button>
+                    <button onClick={() => handleApprove(r.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Approve"><CheckCircle2 size={11} /></button>
                   )}
                   {r.status === 'APPROVED' && can('invoices:write') && (
                     <button onClick={() => handleProcess(r.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-sky-50 hover:text-sky-600 transition-all" title="Process"><RotateCcw size={11} /></button>
                   )}
-                  <button onClick={() => setModal({ open: true, data: { ...r } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Edit"><Edit2 size={11} /></button>
+                  <button onClick={() => setModal({ open: true, data: { ...r } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Edit"><Edit2 size={11} /></button>
                   <button onClick={async () => { if (await confirm({ title: 'Delete refund?', variant: 'danger' })) remove(r.id); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Delete"><Trash2 size={11} /></button>
                 </div>
               </AppTd>

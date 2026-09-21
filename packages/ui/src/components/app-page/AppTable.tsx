@@ -11,21 +11,40 @@ export interface AppTableProps {
 export const AppTable: React.FC<AppTableProps> = ({ children, className, loading, stickyFirst }) => (
   <div
     className={[
-      'bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden',
-      'shadow-[0_1px_3px_0_rgb(0_0_0/0.05)] dark:shadow-[0_1px_3px_0_rgb(0_0_0/0.12)] relative',
+      'border rounded-lg overflow-hidden relative',
+      'shadow-[var(--card-shadow)]',
       className ?? '',
     ].join(' ')}
+    style={{
+      background: 'var(--surface)',
+      borderColor: 'var(--border)',
+    }}
   >
     {loading && (
-      <div className="absolute inset-0 bg-white/70 dark:bg-slate-950/70 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-2xl animate-aki-fade-in">
-        <div className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg">
-          <RefreshCw size={16} className="animate-spin text-emerald-500 dark:text-emerald-400" />
-          <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">Loading...</span>
+      <div
+        className="absolute inset-0 z-10 flex items-center justify-center rounded-lg animate-[aki-fade-in_160ms_ease_both]"
+        style={{ background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(1px)' }}
+      >
+        <div
+          className="flex items-center gap-2 px-3 py-2 rounded-lg"
+          style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            boxShadow: 'var(--card-shadow-raised)',
+          }}
+        >
+          <RefreshCw size={14} className="animate-spin" style={{ color: 'var(--pro-azure)' }} />
+          <span className="text-[11px] font-semibold" style={{ color: 'var(--text-3)' }}>
+            Loading…
+          </span>
         </div>
       </div>
     )}
     <div
-      className={`overflow-x-auto ${stickyFirst ? '[&_td:first-child]:sticky [&_td:first-child]:left-0 [&_td:first-child]:bg-white dark:[&_td:first-child]:bg-slate-950 [&_th:first-child]:sticky [&_th:first-child]:left-0 [&_th:first-child]:bg-slate-50/80 dark:[&_th:first-child]:bg-slate-900/80 [&_th:first-child]:z-10' : ''}`}
+      className={`overflow-x-auto ${stickyFirst ? '[&_td:first-child]:sticky [&_td:first-child]:left-0 [&_th:first-child]:sticky [&_th:first-child]:left-0 [&_th:first-child]:z-10' : ''}`}
+      style={stickyFirst ? {
+        ['--tw-bg-opacity' as string]: '1',
+      } : undefined}
     >
       <table className="w-full border-collapse">{children}</table>
     </div>
@@ -45,17 +64,31 @@ export const AppTh: React.FC<AppThProps> = ({ children, align = 'left', width, s
   <th
     onClick={sortable ? onSort : undefined}
     className={[
-      'px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider',
-      'text-slate-400 dark:text-slate-500 bg-slate-50/80 dark:bg-slate-900/80 border-b border-slate-100 dark:border-slate-800 whitespace-nowrap',
-      sortable ? 'cursor-pointer hover:text-slate-600 dark:hover:text-slate-300 select-none' : '',
+      'px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap',
+      sortable ? 'cursor-pointer select-none' : '',
     ].join(' ')}
-    style={{ textAlign: align, width }}
+    style={{
+      textAlign: align,
+      width,
+      color: 'var(--text-4)',
+      background: 'var(--sys-bg-subtle)',
+      borderBottom: '1px solid var(--border)',
+    }}
     aria-sort={sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : undefined}
   >
-    <span className="inline-flex items-center gap-1">
+    <span
+      className="inline-flex items-center gap-1 transition-colors duration-100"
+      style={sortable ? { color: sorted ? 'var(--text-2)' : 'var(--text-4)' } : undefined}
+      onMouseEnter={sortable ? (e) => {
+        if (!sorted) (e.currentTarget as HTMLSpanElement).style.color = 'var(--text-2)';
+      } : undefined}
+      onMouseLeave={sortable ? (e) => {
+        if (!sorted) (e.currentTarget as HTMLSpanElement).style.color = 'var(--text-4)';
+      } : undefined}
+    >
       {children}
       {sortable && (
-        <span className={`transition-colors ${sorted ? 'text-emerald-500 dark:text-emerald-400' : 'text-slate-300 dark:text-slate-600'}`}>
+        <span style={{ color: sorted ? 'var(--pro-azure)' : 'var(--text-5)', fontSize: 10 }}>
           {sorted === 'asc' ? '↑' : sorted === 'desc' ? '↓' : '↕'}
         </span>
       )}
@@ -74,12 +107,15 @@ export interface AppTdProps {
 export const AppTd: React.FC<AppTdProps> = ({ children, align = 'left', className, onClick, muted }) => (
   <td
     className={[
-      'px-4 py-3 text-[12px] border-b border-slate-50 dark:border-slate-900/50 transition-colors duration-150',
-      muted ? 'text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-300',
+      'px-4 py-3 text-[12px] transition-colors duration-100',
       onClick ? 'cursor-pointer' : '',
       className ?? '',
     ].join(' ')}
-    style={{ textAlign: align }}
+    style={{
+      textAlign: align,
+      color: muted ? 'var(--text-4)' : 'var(--text-2)',
+      borderBottom: '1px solid var(--border-alt)',
+    }}
     onClick={onClick}
   >
     {children}
@@ -99,13 +135,29 @@ export const AppTr: React.FC<AppTrProps> = ({ children, onClick, className, sele
   <tr
     onClick={onClick}
     className={[
-      'group transition-all duration-150',
-      onClick ? 'cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-900/60 active:bg-slate-100 dark:active:bg-slate-900' : '',
-      selected ? 'bg-emerald-50/50 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/30' : '',
-      highlighted ? 'bg-amber-50/40 dark:bg-amber-950/20 hover:bg-amber-50/60 dark:hover:bg-amber-950/30' : '',
-      danger ? 'bg-rose-50/30 dark:bg-rose-950/20 hover:bg-rose-50/50 dark:hover:bg-rose-950/30' : '',
+      'group transition-colors duration-100',
+      onClick ? 'cursor-pointer' : '',
       className ?? '',
     ].join(' ')}
+    style={{
+      background:
+        selected    ? 'var(--pro-azure-50)'
+        : highlighted ? '#FFFBEB'
+        : danger      ? '#FEF2F2'
+        : 'transparent',
+    }}
+    onMouseEnter={onClick ? (e) => {
+      if (!selected && !highlighted && !danger) {
+        (e.currentTarget as HTMLTableRowElement).style.background = 'var(--sys-bg-subtle)';
+      }
+    } : undefined}
+    onMouseLeave={onClick ? (e) => {
+      (e.currentTarget as HTMLTableRowElement).style.background =
+        selected    ? 'var(--pro-azure-50)'
+        : highlighted ? '#FFFBEB'
+        : danger      ? '#FEF2F2'
+        : 'transparent';
+    } : undefined}
   >
     {children}
   </tr>

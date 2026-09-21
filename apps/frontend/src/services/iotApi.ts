@@ -1,8 +1,9 @@
 /**
  * IoT API service — typed wrappers around all /api/iot/* endpoints
  */
-import api from './api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import api from './api';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -141,7 +142,7 @@ function unwrap<T>(res: { data: T | { data: T } }): T {
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 
-export function useIotDashboard() {
+export function useIotDashboard(_params?: Record<string, unknown>) {
   return useQuery<IotDashboardSummary>({
     queryKey: ['iot', 'dashboard'],
     queryFn: () => api.get('/iot/dashboard').then(unwrap),

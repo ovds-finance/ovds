@@ -1,4 +1,4 @@
-<!-- 📌 CORE CONFIG: [docs/CORE-CONFIG.md](../CORE-CONFIG.md)`n     📌 FILING LIFECYCLE: [../FILING-LIFECYCLE.md](../FILING-LIFECYCLE.md)`n     📌 SUBSCRIPTION: [docs/subscription and monitaizetion.md](../subscription%20and%20monitaizetion.md)`n     📌 UBIQUITOUS LANGUAGE: [docs/UBIQUITOUS-LANGUAGE.md](../UBIQUITOUS-LANGUAGE.md)`n     🔄 Last synced: 2026-08-27 -->
+﻿<!-- 📌 CORE CONFIG: [docs/CORE-CONFIG.md](../CORE-CONFIG.md)`n     📌 FILING LIFECYCLE: [../FILING-LIFECYCLE.md](../FILING-LIFECYCLE.md)`n     📌 SUBSCRIPTION: [docs/subscription and monitaizetion.md](../subscription%20and%20monitaizetion.md)`n     📌 UBIQUITOUS LANGUAGE: [docs/UBIQUITOUS-LANGUAGE.md](../UBIQUITOUS-LANGUAGE.md)`n     🔄 Last synced: 2026-08-27 -->
 
 # OVDS Modern UX & Enterprise Architecture Blueprint
 
@@ -15,7 +15,7 @@
 | # | Section | Title |
 |---|---------|-------|
 | 1 | [Executive Summary](#1-executive-summary) | Overview & vision |
-| 2 | [UI/UX Transformation](#2-uiux-transformation-the-akaunting-facelift) | Akaunting-inspired design overhaul |
+| 2 | [UI/UX Transformation](#2-uiux-transformation-the-ovds-saas-facelift) | Ovds SaaS design overhaul |
 | 3 | [Enterprise UX Principles](#3-enterprise-ux-principles-dense-powerful-beautiful) | Consumer vs. enterprise, golden rules |
 | 4 | [Nx Monorepo Code Organization](#4-nx-monorepo-code-organization) | Repository layout & package contracts |
 | 5 | [Accounting Logic Engine](#5-accounting-logic-engine-double-entry-with-prisma) | Double-entry Prisma schema & invariants |
@@ -23,7 +23,7 @@
 | 7 | [Multi-Entity & Multi-Currency Hierarchy](#7-multi-entity--multi-currency-hierarchy) | Company hierarchy, FX conversion |
 | 8 | [Ethiopian Compliance Engine](#8-ethiopian-compliance-engine-mor--erca--aabe) | MoR/ERCA/AABE adapters & e-Tax XML |
 | 9 | [Offline-First & Resilience Architecture](#9-offline-first--resilience-architecture) | SQLite sync, queue reconciliation |
-| 10 | [Akaunting-Inspired Interactions](#10-akaunting-inspired-interactions) | Dashboard slider, inline math, command palette |
+| 10 | [Ovds SaaS Interactions](#10-ovds-saas-interactions) | Dashboard slider, inline math, command palette |
 | 11 | [Hybrid Deployment Engine](#11-hybrid-deployment-engine) | Cloud SaaS + on-premise from one codebase |
 | 12 | [Integration Layer](#12-integration-layer-api-gateway-events--iot) | API gateway, event broker, IoT ingestion |
 | 13 | [Identity, Access & Control Center](#13-identity-access--control-center) | RBAC, SSO, MFA, audit logs |
@@ -32,7 +32,7 @@
 | 16 | [Performance & Scalability Targets](#16-performance--scalability-targets) | Latency, throughput, concurrency goals |
 | 17 | [Implementation Summary](#17-implementation-summary) | Status matrix across all areas |
 | 18 | [Developer Workflow](#18-developer-workflow) | Commands for install, serve, test, build |
-| 19 | [References](#19-references) | Akaunting, MoR, IFRS, Peachtree |
+| 19 | [References](#19-references) | Ovds SaaS, MoR, IFRS, Peachtree |
 | 20 | [Frontend Architecture & Page Shell](#20-frontend-architecture--page-shell) | React SPA routing, layout, shell |
 | 21 | [State Management & Data Flow](#21-state-management--data-flow) | TanStack Query, context, optimistic updates |
 | 22 | [API & oRPC Client Layer](#22-api--orpc-client-layer) | Type-safe API consumption |
@@ -59,17 +59,17 @@ The platform ships as **one codebase** with **two deployment topologies**. The d
 
 ---
 
-## 2. UI/UX Transformation: The "Akaunting" Facelift
+## 2. UI/UX Transformation: The Ovds SaaS Design Overhaul
 
 ### 2.1 Design Philosophy
 
-Akaunting 3.2.1 UI/UX principles prioritize **breathing room**, **clear context**, and **minimalist data tables**. The current OVDS interface has an overwhelming sidebar, a raw localhost aesthetic, and an intrusive onboarding block. The transformation replaces these with:
+Ovds SaaS 3.2.1 UI/UX principles prioritize **breathing room**, **clear context**, and **minimalist data tables**. The current OVDS interface has an overwhelming sidebar, a raw localhost aesthetic, and an intrusive onboarding block. The transformation replaces these with:
 
 - **Top-level, high-utility widgets** on the Dashboard (e.g., Customer Summary Card with Paid / Open / Overdue totals).  
 - **Dashboard Slider** to glide between overall corporate, branch-specific, or tax-focused insights.  
 - **Smart inline math** on invoice lines (e.g., typing `2*3` or `120+15` auto-calculates on blur).  
 - **Command Palette** (`Ctrl+K`) for global search and actions.  
-- **11 core functional verticals** matching Akaunting's taxonomy.
+- **11 core functional verticals** matching Ovds SaaS taxonomy.
 
 ### 2.2 Dashboard Layout
 
@@ -405,7 +405,7 @@ enum TaxType {
 
 ## 6. NestJS "Smart" Accounting Services
 
-To implement Akaunting's robust automation patterns, OVDS handles critical operations inside NestJS services utilizing **Prisma Transactions**. Every financial event automatically creates balanced journal entries without manual human intervention.
+To implement Ovds SaaS robust automation patterns, OVDS handles critical operations inside NestJS services utilizing **Prisma Transactions**. Every financial event automatically creates balanced journal entries without manual human intervention.
 
 ### 6.1 Invoice Payment Auto-Journal
 
@@ -576,7 +576,7 @@ OVDS is engineered for **mandatory offline capability** because 26 regulated Eth
 
 ---
 
-## 10. Akaunting-Inspired Interactions
+## 10. Ovds SaaS Interactions
 
 ### 10.1 Dashboard Slider
 
@@ -825,7 +825,7 @@ Automated background queue runners handle:
 
 | Area | Requirement | Status |
 |---|---|---|
-| **UI/UX** | Akaunting-inspired dashboard, sidebar collapse, inline math | Design |
+| **UI/UX** | Ovds SaaS dashboard, sidebar collapse, inline math | Design |
 | **Nx Monorepo** | Isolated financial logic from UI layers | In Progress |
 | **Accounting Engine** | Double-entry Prisma schema with balanced invariants | Schema defined |
 | **NestJS Services** | Prisma transactions for payments, tax, journals | Design |
@@ -876,8 +876,8 @@ npx nx run-many --target=build --configuration=production
 
 ## 19. References
 
-- [Akaunting 3.0 UI/UX](https://akaunting.com/blog/akaunting-3-0-better-ui-ux-small-business-bookkeeping-made-easy)  
-- [Akaunting Updates: Dashboard Sliders & In-line Math](https://akaunting.com/blog/akaunting-updates-3-1-13-3-1-17-dashboard-sliders-document-stacks-and-more)  
+- [Ovds SaaS 3.0 UI/UX](https://akaunting.com/blog/akaunting-3-0-better-ui-ux-small-business-bookkeeping-made-easy)  
+- [Ovds SaaS Updates: Dashboard Sliders & In-line Math](https://akaunting.com/blog/akaunting-updates-3-1-13-3-1-17-dashboard-sliders-document-stacks-and-more)  
 - Ethiopian MoR e-Tax Portal: https://tass.mor.gov.et  
 - AABE Proclamation 847/2014  
 - IFRS 15, IFRS 16 in Ethiopian Public Sector context  
@@ -1490,7 +1490,7 @@ All documentation in the `docs/` directory follows a consistent structure:
 | **Primitives** | Input, Button, Badge, Dialog | \Button\, \Input\, \Badge\ | \@ovds/ui\ |
 | **Composites** | ovds-specific grouped UI | \TaxRow\, \StatusBadge\, \StatsCard\ | \@ovds/ui\ |
 | **Layout** | Page shell, wrappers, grids | \AppPage\, \PageWrapper\, \BentoGrid\ | \@ovds/ui\ |
-| **Enterprise** | Akaunting-grade domain widgets | \DashboardSlider\, \DocStackLayout\, \CommandPalette\ | \@ovds/ui\ |
+| **Enterprise** | Ovds SaaS-grade domain widgets | \DashboardSlider\, \DocStackLayout\, \CommandPalette\ | \@ovds/ui\ |
 | **V&V** | Verification & Validation flow | \VVWizardHeader\, \VVSummaryCard\ | \@ovds/ui\ |
 
 ### 27.2 Design Token System
@@ -1940,7 +1940,7 @@ AI features must be **opt-in, explainable, and auditable**.
 
 This blueprint closes every gap in the original OVDS specification by replacing fragmented placeholders with a complete, implementable architecture:
 
-- **UI/UX**: Akaunting-inspired dashboard, 11 verticals, inline math, command palette, document stack, density modes.  
+- **UI/UX**: Ovds SaaS dashboard, 11 verticals, inline math, command palette, document stack, density modes.  
 - **Modern UX Patterns**: Mobile-first responsive design, micro-interactions, motion design, progressive onboarding, notification taxonomy, search/filter UX, data visualization, collaboration context, AI-assisted UX.  
 - **Nx Monorepo**: Clear separation between \pps/\ and \packages/\ with strict import boundaries.  
 - **Accounting Engine**: Full double-entry Prisma schema, balanced invariants, auto-journaling services.  

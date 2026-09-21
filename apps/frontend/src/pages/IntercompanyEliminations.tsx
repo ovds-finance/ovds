@@ -3,12 +3,13 @@
  * Detect, create and post intragroup elimination entries for consolidation.
  * Eliminates: Receivables/Payables, Revenue/Expenses, Dividends, Investments.
  */
-import React, { useState, useEffect, useCallback } from 'react';
-import { GitMerge, RefreshCw, Zap, Play, RotateCcw, Plus, XCircle } from 'lucide-react';
 import { AppPage, AppKpi } from '@ovds/ui';
+import { GitMerge, RefreshCw, Zap, Play, RotateCcw, Plus } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
 import { useBusiness } from '../context/businessContext';
 import api from '../services/api';
-import toast from 'react-hot-toast';
 
 type EliminationType = 'RECEIVABLE' | 'PAYABLE' | 'REVENUE' | 'EXPENSE' | 'DIVIDEND' | 'INVESTMENT';
 type EliminationStatus = 'PENDING' | 'POSTED' | 'REVERSED';
@@ -43,7 +44,7 @@ interface Suggestion {
 const TYPE_COLOR: Record<EliminationType, string> = {
   RECEIVABLE:  'bg-sky-100 text-sky-700',
   PAYABLE:     'bg-amber-100 text-amber-700',
-  REVENUE:     'bg-emerald-100 text-emerald-700',
+  REVENUE:     'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   EXPENSE:     'bg-rose-100 text-rose-700',
   DIVIDEND:    'bg-violet-100 text-violet-700',
   INVESTMENT:  'bg-slate-100 text-slate-600',
@@ -51,7 +52,7 @@ const TYPE_COLOR: Record<EliminationType, string> = {
 
 const STATUS_COLOR: Record<EliminationStatus, string> = {
   PENDING:  'bg-amber-100 text-amber-700',
-  POSTED:   'bg-emerald-100 text-emerald-700',
+  POSTED:   'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   REVERSED: 'bg-slate-100 text-slate-500',
 };
 
@@ -145,7 +146,7 @@ const IntercompanyEliminations: React.FC = () => {
   const kpiCells = [
     { label: 'Total Entries', value: items.length.toString(),                                          accentCls: 'bg-violet-500' },
     { label: 'Pending',       value: items.filter(i => i.status === 'PENDING').length.toString(),     accentCls: 'bg-amber-500' },
-    { label: 'Posted',        value: items.filter(i => i.status === 'POSTED').length.toString(),      accentCls: 'bg-emerald-500' },
+    { label: 'Posted',        value: items.filter(i => i.status === 'POSTED').length.toString(),      accentCls: 'bg-[var(--pro-azure-50)]0' },
     { label: 'Total Amount',  value: `ETB ${(items.reduce((s, i) => s + Number(i.amount), 0) / 1000).toFixed(0)}K`, accentCls: 'bg-sky-500' },
   ];
 
@@ -167,7 +168,7 @@ const IntercompanyEliminations: React.FC = () => {
           <input type="month" value={period} onChange={e => setPeriod(e.target.value)}
             className="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800" />
           <button onClick={load} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
-            <RefreshCw size={16} className={loading ? 'animate-spin text-emerald-500' : 'text-slate-500'} />
+            <RefreshCw size={16} className={loading ? 'animate-spin text-[var(--pro-azure)]' : 'text-slate-500'} />
           </button>
         </div>
       }
@@ -227,7 +228,7 @@ const IntercompanyEliminations: React.FC = () => {
                         <div className="flex items-center gap-1">
                           {item.status === 'PENDING' && (
                             <button onClick={() => postElimination(item.id)} disabled={actionId === item.id}
-                              title="Post elimination" className="p-1.5 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-lg text-emerald-600 transition-colors disabled:opacity-40">
+                              title="Post elimination" className="p-1.5 hover:bg-[var(--pro-azure-100)] dark:hover:bg-green-900/30 rounded-lg text-[var(--pro-azure)] transition-colors disabled:opacity-40">
                               {actionId === item.id ? <RefreshCw size={13} className="animate-spin" /> : <Play size={13} />}
                             </button>
                           )}
@@ -328,7 +329,7 @@ const IntercompanyEliminations: React.FC = () => {
                   </div>
                   <div className="text-center">
                     <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Posted</p>
-                    <p className="ovds-value text-emerald-600 dark:text-emerald-400 mt-1">ETB {fmt(summary.posted)}</p>
+                    <p className="ovds-value text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] mt-1">ETB {fmt(summary.posted)}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Pending</p>

@@ -1,11 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+
 import { Icon } from '../ui';
 
+type IconName = React.ComponentProps<typeof Icon>['name'];
+
 interface OvdsSummaryProps {
-  revenue: number;
-  expenses: number;
-  profit: number;
+  revenue?: number;
+  expenses?: number;
+  profit?: number;
   currency?: string;
   loading?: boolean;
 }
@@ -22,15 +24,15 @@ const OvdsSummary: React.FC<OvdsSummaryProps> = ({
 
   const profitMargin = revenue > 0 ? Math.round((profit / revenue) * 100) : 0;
 
-  const cards = [
+  const cards: { label: string; value: string; icon: IconName; color: string; bg: string; border: string; text: string; sub?: string }[] = [
     {
       label: 'Revenue',
       value: fmt(revenue),
       icon: 'TRENDING_UP',
-      color: 'emerald',
-      bg: 'bg-emerald-50 dark:bg-emerald-950/20',
-      border: 'border-emerald-100 dark:border-emerald-900/30',
-      text: 'text-emerald-700 dark:text-emerald-400',
+      color: 'green',
+      bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20',
+      border: 'border-[var(--pro-azure-100)] dark:border-green-900/30',
+      text: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
     },
     {
       label: 'Expenses',

@@ -7,7 +7,6 @@
  * Place this in the Settings area of the frontend.
  */
 
-import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck,
   RefreshCw,
@@ -21,7 +20,9 @@ import {
   Copy,
   Check,
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+
 import {
   getEntitlementStatus,
   startTrial,
@@ -96,6 +97,7 @@ const LicenseManager: React.FC<LicenseManagerProps> = ({ onNavigate }) => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchData(); }, []);
 
   const handleRefresh = async () => {
@@ -123,7 +125,7 @@ const LicenseManager: React.FC<LicenseManagerProps> = ({ onNavigate }) => {
     if (!selectedProductId) return;
     try {
       const product = await getProduct(selectedProductId);
-      const sub = await createSubscription({
+      const _sub = await createSubscription({
         productId: selectedProductId,
         billingCycle: 'ANNUAL',
       });
@@ -215,7 +217,7 @@ const LicenseManager: React.FC<LicenseManagerProps> = ({ onNavigate }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-emerald-500 border-t-transparent" />
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-[var(--pro-azure)] border-t-transparent" />
       </div>
     );
   }
@@ -253,7 +255,7 @@ const LicenseManager: React.FC<LicenseManagerProps> = ({ onNavigate }) => {
         className={`rounded-2xl border p-6 transition-colors ${
           isExpired
             ? 'border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/20'
-            : 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/20'
+            : 'border-[var(--pro-azure-100)] dark:border-green-800 bg-[var(--pro-azure-50)] dark:bg-green-950/20'
         }`}
       >
         <div className="flex items-center justify-between flex-wrap gap-4">
@@ -262,13 +264,13 @@ const LicenseManager: React.FC<LicenseManagerProps> = ({ onNavigate }) => {
               className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
                 isExpired
                   ? 'bg-rose-100 dark:bg-rose-900/40'
-                  : 'bg-emerald-100 dark:bg-emerald-900/40'
+                  : 'bg-[var(--pro-azure-100)] dark:bg-green-900/40'
               }`}
             >
               {isExpired ? (
                 <AlertTriangle className="text-rose-500" size={24} />
               ) : (
-                <ShieldCheck className="text-emerald-600" size={24} />
+                <ShieldCheck className="text-[var(--pro-azure)]" size={24} />
               )}
             </div>
             <div>
@@ -290,7 +292,7 @@ const LicenseManager: React.FC<LicenseManagerProps> = ({ onNavigate }) => {
             {onNavigate && (
               <button
                 onClick={() => onNavigate('/plans')}
-                className="px-4 py-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 rounded-xl transition-colors flex items-center gap-1.5"
+                className="px-4 py-2 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:bg-[var(--pro-azure-100)] dark:hover:bg-green-900/40 rounded-xl transition-colors flex items-center gap-1.5"
               >
                 <ExternalLink size={12} />
                 View Plans
@@ -339,7 +341,7 @@ const LicenseManager: React.FC<LicenseManagerProps> = ({ onNavigate }) => {
             label="Status"
             value={isExpired ? 'Updates Locked' : 'Updates Allowed'}
             icon={isExpired ? <XCircle size={14} /> : <CheckCircle size={14} />}
-            valueColor={isExpired ? 'text-rose-600' : 'text-emerald-600'}
+            valueColor={isExpired ? 'text-rose-600' : 'text-[var(--pro-azure)]'}
           />
         </div>
       </div>
@@ -363,7 +365,7 @@ const LicenseManager: React.FC<LicenseManagerProps> = ({ onNavigate }) => {
               title="Copy subscription reference"
             >
               {copied ? (
-                <Check size={14} className="text-emerald-500" />
+                <Check size={14} className="text-[var(--pro-azure)]" />
               ) : (
                 <Copy size={14} className="text-slate-400" />
               )}
@@ -373,7 +375,7 @@ const LicenseManager: React.FC<LicenseManagerProps> = ({ onNavigate }) => {
       )}
 
       {/* ── Plan Management ───────────────────────────────────────────────────── */}
-      {(hasActiveSub || activeSubscription?.status === 'PAUSED') && (
+      {(activeSubscription !== null && (activeSubscription.status === 'ACTIVE' || activeSubscription.status === 'PAUSED')) && (
         <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/40 p-6 space-y-4">
           <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200">
             Manage Subscription
@@ -400,7 +402,7 @@ const LicenseManager: React.FC<LicenseManagerProps> = ({ onNavigate }) => {
               <button
                 onClick={handleResume}
                 disabled={managingSub}
-                className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-4 py-2.5 rounded-xl bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {managingSub ? (
                   <>
@@ -420,7 +422,7 @@ const LicenseManager: React.FC<LicenseManagerProps> = ({ onNavigate }) => {
               <select
                 value={switchPlanId}
                 onChange={(e) => setSwitchPlanId(e.target.value)}
-                className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-sm focus:ring-2 focus:ring-[var(--pro-azure)] focus:border-[var(--pro-azure)] outline-none"
               >
                 <option value="">Select a plan...</option>
                 {products
@@ -460,14 +462,14 @@ const LicenseManager: React.FC<LicenseManagerProps> = ({ onNavigate }) => {
                 value={licenseKey}
                 onChange={(e) => setLicenseKey(e.target.value)}
                 placeholder="Paste your license key (e.g. AKA-2026-XXXX-XXXX)"
-                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-sm font-mono focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-sm font-mono focus:ring-2 focus:ring-[var(--pro-azure)] focus:border-[var(--pro-azure)] outline-none"
                 disabled={activating}
               />
             </div>
             <button
               type="submit"
               disabled={activating || !licenseKey.trim()}
-              className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {activating ? (
                 <>
@@ -486,7 +488,7 @@ const LicenseManager: React.FC<LicenseManagerProps> = ({ onNavigate }) => {
               <select
                 value={selectedProductId}
                 onChange={(e) => setSelectedProductId(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-sm focus:ring-2 focus:ring-[var(--pro-azure)] focus:border-[var(--pro-azure)] outline-none"
               >
                 {products.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -503,7 +505,7 @@ const LicenseManager: React.FC<LicenseManagerProps> = ({ onNavigate }) => {
               </button>
               <button
                 onClick={handleSubscribe}
-                className="shrink-0 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-colors"
+                className="shrink-0 px-4 py-2.5 rounded-xl bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-xs font-bold transition-colors"
               >
                 Subscribe
               </button>
@@ -522,9 +524,9 @@ const LicenseManager: React.FC<LicenseManagerProps> = ({ onNavigate }) => {
             {status.entitledFeatures.map((key) => (
               <div
                 key={key}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40"
+                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900/40"
               >
-                <CheckCircle size={14} className="text-emerald-500 shrink-0" />
+                <CheckCircle size={14} className="text-[var(--pro-azure)] shrink-0" />
                 <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
                   {FEATURE_LABELS[key] ?? key}
                 </span>

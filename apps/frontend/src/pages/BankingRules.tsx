@@ -22,24 +22,25 @@
  *   POST   /banking/rules/test         — test pattern
  *   POST   /banking/rules/apply        — apply all rules
  */
-import React, { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Zap, Plus, Trash2, RefreshCw, Play, Edit2,
   FlaskConical, ArrowUp, ArrowDown, CheckCircle2,
   XCircle, Info,
 } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import api from '../services/api';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useAuth } from '../rbac/AuthContext';
-import { confirm } from '../utils/confirm';
+
 import {
   AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, Modal, FormField, Input, Select,
   EmptyState, Card,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { confirm } from '../utils/confirm';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -63,7 +64,7 @@ const DEFAULT_FORM = { pattern: '', categoryId: '', categoryName: '', type: 'ANY
 
 const TypeBadge: React.FC<{ type: string }> = ({ type }) => (
   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-    type === 'INCOME'  ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800' :
+    type === 'INCOME'  ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/20 dark:text-[var(--pro-azure-light)] dark:border-green-800' :
     type === 'EXPENSE' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-800' :
     'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400'
   }`}>{type}</span>
@@ -118,7 +119,7 @@ const RuleForm: React.FC<RuleFormProps> = ({ form, onChange, categories, onTest,
       {testResult !== null && (
         <div className={`flex items-start gap-3 p-3 rounded-xl border text-[11px] ${
           testResult.matched > 0
-            ? 'bg-emerald-50 dark:bg-emerald-950/10 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400'
+            ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/10 border-[var(--pro-azure-100)] dark:border-green-800 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
             : 'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500'
         }`}>
           {testResult.matched > 0 ? <CheckCircle2 size={13} className="shrink-0 mt-0.5" /> : <Info size={13} className="shrink-0 mt-0.5" />}
@@ -185,7 +186,7 @@ const RuleForm: React.FC<RuleFormProps> = ({ form, onChange, categories, onTest,
           <button
             type="button"
             onClick={() => set('isActive', !form.isActive)}
-            className={`relative w-10 h-5 rounded-full transition-colors ${form.isActive ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`}
+            className={`relative w-10 h-5 rounded-full transition-colors ${form.isActive ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-300 dark:bg-slate-600'}`}
           >
             <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${form.isActive ? 'left-5' : 'left-0.5'}`} />
           </button>
@@ -237,7 +238,7 @@ const BankingRules: React.FC = () => {
 
   const kpi = [
     { label: 'Total Rules',   value: rules.length,                                                              color: 'slate'   as const },
-    { label: 'Active',        value: rules.filter((r: AutoMatchRule) => r.isActive).length,                     color: 'emerald' as const },
+    { label: 'Active',        value: rules.filter((r: AutoMatchRule) => r.isActive).length,                     color: 'green' as const },
     { label: 'Income Rules',  value: rules.filter((r: AutoMatchRule) => r.type === 'INCOME').length,            color: 'sky'     as const },
     { label: 'Expense Rules', value: rules.filter((r: AutoMatchRule) => r.type === 'EXPENSE').length,           color: 'rose'    as const },
     { label: 'Total Hits',    value: rules.reduce((s: number, r: AutoMatchRule) => s + (r.hits ?? 0), 0),       color: 'violet'  as const },
@@ -479,7 +480,7 @@ const BankingRules: React.FC = () => {
                     onClick={() => handleToggleActive(rule)}
                     className={`flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all ${
                       rule.isActive
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800'
+                        ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/20 dark:text-[var(--pro-azure-light)] dark:border-green-800'
                         : 'bg-slate-50 text-slate-400 border-slate-200 dark:bg-slate-800 dark:border-slate-700'
                     }`}
                     title={rule.isActive ? 'Click to pause' : 'Click to activate'}
@@ -488,7 +489,7 @@ const BankingRules: React.FC = () => {
                     {rule.isActive ? 'Active' : 'Paused'}
                   </button>
                 ) : (
-                  <span className={`text-[10px] font-bold ${rule.isActive ? 'text-emerald-600' : 'text-slate-400'}`}>
+                  <span className={`text-[10px] font-bold ${rule.isActive ? 'text-[var(--pro-azure)]' : 'text-slate-400'}`}>
                     {rule.isActive ? 'Active' : 'Paused'}
                   </span>
                 )}

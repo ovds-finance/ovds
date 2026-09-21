@@ -55,9 +55,9 @@ export const SortableHeader: React.FC<SortableHeaderProps> = ({
         <span>{label}</span>
         <span className="shrink-0">
           {sortState === 'asc' ? (
-            <ChevronUp size={11} className="text-emerald-600 dark:text-emerald-400" />
+            <ChevronUp size={11} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           ) : sortState === 'desc' ? (
-            <ChevronDown size={11} className="text-emerald-600 dark:text-emerald-400" />
+            <ChevronDown size={11} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           ) : (
             <ChevronsUpDown size={11} className="text-slate-300 dark:text-slate-600" />
           )}

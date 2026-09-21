@@ -1,4 +1,4 @@
-import React, {
+﻿import React, {
   createContext,
   useContext,
   useState,
@@ -6,14 +6,20 @@ import React, {
   useCallback,
   ReactNode,
 } from 'react';
-import api from '../services/api';
 import toast from 'react-hot-toast';
+
 import {
   prefixedRole,
   type BaseRole,
   type BusinessRole,
   type RoleBusinessType as BusinessType,
 } from '../rbac/businessRoles';
+import api from '../services/api';
+import {
+  SELECTED_COMPANY_ID_KEY,
+  setSelectedCompanyId as setStoredCompanyId,
+  clearSelectedCompanyId,
+} from '../utils/storage';
 
 interface Company {
   id: string;
@@ -91,7 +97,7 @@ export const BusinessProvider: React.FC<{ children: ReactNode }> = ({
   const [companies, setCompanies] = useState<Company[]>([]);
   const [selectedCompanyId, setSelectedCompanyIdLocal] = useState<
     string | null
-  >(() => localStorage.getItem('selectedCompanyId') || null);
+  >(() => localStorage.getItem(SELECTED_COMPANY_ID_KEY) || null);
   const [loading, setLoading] = useState(true);
 
   const fetchCompanies = useCallback(async () => {
@@ -112,12 +118,12 @@ export const BusinessProvider: React.FC<{ children: ReactNode }> = ({
       // to read current state without adding it to deps (avoids re-fetch loop)
       setSelectedCompanyIdLocal((current) => {
         if (!current && data.length > 0) {
-          localStorage.setItem('selectedCompanyId', data[0].id);
+          setStoredCompanyId(data[0].id);
           return data[0].id;
         }
         // Validate: if current selection no longer exists, reset to first
         if (current && data.length > 0 && !data.find((c: Company) => c.id === current)) {
-          localStorage.setItem('selectedCompanyId', data[0].id);
+          setStoredCompanyId(data[0].id);
           return data[0].id;
         }
         return current;
@@ -131,7 +137,8 @@ export const BusinessProvider: React.FC<{ children: ReactNode }> = ({
 
   const setSelectedCompanyId = useCallback((id: string | null) => {
     setSelectedCompanyIdLocal(id);
-    localStorage.setItem('selectedCompanyId', id || '');
+    if (id) setStoredCompanyId(id);
+    else clearSelectedCompanyId();
   }, []);
 
   const refreshCompanies = useCallback(async () => {
@@ -144,14 +151,14 @@ export const BusinessProvider: React.FC<{ children: ReactNode }> = ({
     } else {
       setCompanies([]);
       // Clear stale company selection on logout
-      localStorage.removeItem('selectedCompanyId');
+      clearSelectedCompanyId();
       setSelectedCompanyIdLocal(null);
       setLoading(false);
     }
 
     // Listen for storage changes from other tabs
     const handleStorage = (e: StorageEvent) => {
-      if (e.key === 'selectedCompanyId') {
+      if (e.key === SELECTED_COMPANY_ID_KEY) {
         setSelectedCompanyIdLocal(e.newValue || null);
       }
     };
@@ -159,7 +166,7 @@ export const BusinessProvider: React.FC<{ children: ReactNode }> = ({
     // Listen for same-tab session clear (dispatched by AuthContext.logout)
     const handleSessionCleared = () => {
       setCompanies([]);
-      localStorage.removeItem('selectedCompanyId');
+      clearSelectedCompanyId();
       setSelectedCompanyIdLocal(null);
       setLoading(false);
     };
@@ -199,6 +206,7 @@ export const BusinessProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useBusiness = () => {
   const context = useContext(BusinessContext);
   if (!context) {

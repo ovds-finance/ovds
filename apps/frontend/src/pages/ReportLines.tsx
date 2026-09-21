@@ -3,17 +3,18 @@
  *
  * Backend: ReportLineController @Controller('ovds/reports/lines')
  */
-import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, RefreshCw, List } from 'lucide-react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { confirm } from '../utils/confirm';
-import { reportLinesApi, reportDefinitionsApi } from '../services/ovdsApi';
+
 import {
   AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, Modal, FormField, Input, Select, EmptyState, SearchBar,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { reportLinesApi, reportDefinitionsApi } from '../services/ovdsApi';
+import { confirm } from '../utils/confirm';
 
 interface ReportLine {
   id: string;
@@ -66,7 +67,9 @@ const ReportLines: React.FC = () => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(() => { loadDefinitions(); }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(() => { loadLines(); }, [selectedDef]);
 
   const handleSave = async () => {
@@ -76,10 +79,10 @@ const ReportLines: React.FC = () => {
     setSaving(true);
     try {
       if (modal.data.id) {
-        await reportLinesApi.update(modal.data.id, { amount: modal.data.amount, description: modal.data.description, lineOrder: modal.data.lineOrder });
+        await reportLinesApi.update(modal.data.reportDefinitionId!, modal.data.id, { amount: modal.data.amount, description: modal.data.description, lineOrder: modal.data.lineOrder });
         toast.success('Report line updated');
       } else {
-        await reportLinesApi.create({
+        await reportLinesApi.create(modal.data.reportDefinitionId!, {
           companyId: selectedCompanyId ?? '',
           reportDefinitionId: modal.data.reportDefinitionId,
           lineOrder: modal.data.lineOrder,
@@ -102,7 +105,7 @@ const ReportLines: React.FC = () => {
   const handleDelete = async (l: ReportLine) => {
     if (!await confirm({ title: `Delete line "${l.description}"?`, message: 'This cannot be undone.', variant: 'danger' })) return;
     try {
-      await reportLinesApi.remove(l.id);
+      await reportLinesApi.remove(selectedDef, l.id);
       toast.success('Report line deleted');
       await loadLines();
     } catch (err: any) {
@@ -117,7 +120,7 @@ const ReportLines: React.FC = () => {
       title="Report Lines"
       subtitle="Manage individual lines within report definitions"
       icon={<List size={18} />}
-      iconBg="bg-indigo-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       crumbs={[{ label: 'Reports' }, { label: 'Report Lines' }]}
       actions={
         <div className="flex items-center gap-2">
@@ -133,7 +136,7 @@ const ReportLines: React.FC = () => {
         <select
           value={selectedDef}
           onChange={e => setSelectedDef(e.target.value)}
-          className="w-full max-w-md px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:border-indigo-400 bg-white"
+          className="w-full max-w-md px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:border-[var(--pro-azure)] bg-white"
         >
           <option value="">— Select a report —</option>
           {definitions.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
@@ -145,7 +148,7 @@ const ReportLines: React.FC = () => {
           <AppKpi cells={[
             { label: 'Report', value: selectedDefName, color: 'violet' as const },
             { label: 'Total Lines', value: lines.length, color: 'sky' as const },
-            { label: 'Total Amount', value: `ETB ${lines.reduce((s, l) => s + Number(l.amount), 0).toLocaleString('en-ET', { minimumFractionDigits: 2 })}`, color: 'emerald' as const },
+            { label: 'Total Amount', value: `ETB ${lines.reduce((s, l) => s + Number(l.amount), 0).toLocaleString('en-ET', { minimumFractionDigits: 2 })}`, color: 'green' as const },
           ]} />
 
           <div className="flex items-center gap-2 mb-3">

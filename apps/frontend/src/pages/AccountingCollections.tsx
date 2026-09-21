@@ -1,10 +1,5 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Skeleton, AppPage } from '@ovds/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { collectionsApi } from '../services/collectionsApi';
-import { CollectionsTable } from '../components/collectionsTable';
-import { DeductionResolver } from '../components/deductionResolver';
-import { Skeleton, Pagination, EmptyState, AppPage } from '@ovds/ui';
 import {
   Activity,
   AlertTriangle,
@@ -21,17 +16,24 @@ import {
   TrendingDown,
   X,
 } from 'lucide-react';
-import { downloadCSV } from '../utils/download';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+
+import { CollectionsTable } from '../components/collectionsTable';
+import { DeductionResolver } from '../components/deductionResolver';
 import { ALL_INTEGRATION_TYPES } from '../components/invoice/constants';
 import { usePageTitle } from '../hooks/usePageTitle';
-import toast from 'react-hot-toast';
+import { collectionsApi } from '../services/collectionsApi';
+import { downloadCSV } from '../utils/download';
+
 
 // -- Types ---------------------------------------------------------------------
 type MainTab = 'cases' | 'disputes' | 'archive' | 'integration' | 'compliance' | 'vat_filing' | 'analytics';
 const DISPUTE_STATUS_COLORS: Record<string, string> = {
   OPEN: 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300',
   UNDER_REVIEW: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
-  RESOLVED: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+  RESOLVED: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/40 dark:text-green-300',
   REJECTED: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
 };
 
@@ -136,7 +138,7 @@ return (
             <button
               onClick={() => mutation.mutate()}
               disabled={mutation.isPending}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] disabled:opacity-50"
             >
               {mutation.isPending ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -292,7 +294,7 @@ return (
                   <td className="px-4 py-3">
                     <button
                       onClick={() => setSelected(d)}
-                      className="px-3 py-1 bg-emerald-500 text-white text-[10px] font-semibold rounded-lg hover:bg-emerald-600 transition-colors"
+                      className="px-3 py-1 bg-[var(--pro-azure)] text-white text-[10px] font-semibold rounded-lg hover:bg-[var(--pro-azure-dark)] transition-colors"
                     >
                       Resolve
                     </button>
@@ -433,7 +435,7 @@ return (
                         {r.method}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                    <td className="px-4 py-3 text-xs font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
                       ETB {Number(r.amount).toLocaleString()}
                     </td>
                     <td className="px-4 py-3 text-xs text-slate-500 dark:text-slate-400 font-mono">
@@ -453,7 +455,7 @@ return (
                         <span
                           className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
                             r.qrType === 'DYNAMIC'
-                              ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 dark:text-emerald-400'
+                              ? 'bg-[var(--pro-azure-100)] dark:bg-green-950/40 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
                               : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                           }`}
                         >
@@ -466,7 +468,7 @@ return (
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1.5">
                         {r.tinValidated && (
-                          <span className="flex items-center gap-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                          <span className="flex items-center gap-0.5 text-[10px] font-medium text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                             <ShieldCheck size={10} /> TIN
                           </span>
                         )}
@@ -527,20 +529,20 @@ const stats = data ?? {};
 const categories = [
     { key: 'NBE Payment Flow', label: 'NBE Payment Flows', color: 'amber' },
     { key: 'Architecture', label: 'Architecture Patterns', color: 'violet' },
-    { key: 'Business Process', label: 'Business Processes', color: 'emerald' },
+    { key: 'Business Process', label: 'Business Processes', color: 'green' },
   ] as const;
 const colorMap: Record<string, string> = {
     amber:
       'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400',
     violet:
       'bg-violet-50 dark:bg-violet-950/30 border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-400',
-    emerald:
-      'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400',
+    indigo:
+      'bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)] dark:border-green-800 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
   };
 const barColor: Record<string, string> = {
     amber: 'bg-amber-400',
     violet: 'bg-teal-500',
-    emerald: 'bg-emerald-500',
+    indigo: 'bg-[var(--pro-azure-50)]0',
   };
 return (
     <div className="space-y-5">
@@ -661,7 +663,7 @@ toast.success('Compliance summary exported');
   };
 const metrics = [
     { key: 'totalPayments', label: 'Total Payments', icon: '💳', color: 'blue' },
-    { key: 'tinValidatedCount', label: 'TIN Validated', icon: '🛡️', color: 'emerald' },
+    { key: 'tinValidatedCount', label: 'TIN Validated', icon: '🛡️', color: 'green' },
     { key: 'duplicateCount', label: 'Duplicates Detected', icon: '⚠️', color: 'red' },
     { key: 'qrPayments', label: 'QR Payments', icon: '📱', color: 'violet' },
     { key: 'dynamicQrCount', label: 'Dynamic QR', icon: '⚡', color: 'amber' },
@@ -670,13 +672,13 @@ const metrics = [
     { key: 'bankQrPayments', label: 'Bank QR Payments', icon: '🏦', color: 'blue' },
     { key: 'manualPayments', label: 'Manual Payments', icon: '✍️', color: 'slate' },
     { key: 'disputeCount', label: 'Active Disputes', icon: '⚖️', color: 'red' },
-    { key: 'resolvedDisputes', label: 'Resolved Disputes', icon: '✅', color: 'emerald' },
-    { key: 'totalAmount', label: 'Total Amount (ETB)', icon: '💰', color: 'emerald' },
+    { key: 'resolvedDisputes', label: 'Resolved Disputes', icon: '✅', color: 'green' },
+    { key: 'totalAmount', label: 'Total Amount (ETB)', icon: '💰', color: 'green' },
   ];
 const colorClasses: Record<string, string> = {
-    blue: 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 dark:text-emerald-400',
-    emerald:
-      'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400',
+    blue: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)] dark:border-green-800 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+    indigo:
+      'bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)] dark:border-green-800 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
     red: 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400',
     violet:
       'bg-violet-50 dark:bg-violet-950/30 border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-400',
@@ -711,20 +713,20 @@ return (
         </button>
         <button
           onClick={handleExport}
-          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500 text-white rounded-lg text-sm font-medium hover:bg-emerald-600 ml-auto"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[var(--pro-azure)] text-white rounded-lg text-sm font-medium hover:bg-[var(--pro-azure-dark)] ml-auto"
         >
           <Download size={13} /> Export ERCA Report
         </button>
       </div>
 
       {/* NBE + ERCA directive badge */}
-      <div className="flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-2xl">
-        <ShieldCheck size={20} className="text-emerald-600 dark:text-emerald-400 dark:text-emerald-400 shrink-0" />
+      <div className="flex items-center gap-3 p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/30 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-2xl">
+        <ShieldCheck size={20} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0" />
         <div>
-          <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 dark:text-emerald-400">
+          <p className="text-sm font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
             NBE Directive SB/IoT/001/2021 · ERCA Compliance
           </p>
-          <p className="text-xs text-emerald-500 dark:text-emerald-400 dark:text-emerald-400/70 mt-0.5">
+          <p className="text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] dark:text-[var(--pro-azure-light)]/70 mt-0.5">
             All QR payments, TIN validations, duplicate checks, and MoR interactions are tracked per
             NBE interoperability and ERCA reporting standards.
           </p>
@@ -763,7 +765,7 @@ return (
               label: 'TIN Validated',
               count: s.tinValidatedCount ?? 0,
               total: s.totalPayments,
-              color: 'bg-emerald-500',
+              color: 'bg-[var(--pro-azure-50)]0',
             },
             {
               label: 'QR Payments',
@@ -775,7 +777,7 @@ return (
               label: 'Duplicate-Free',
               count: (s.totalPayments ?? 0) - (s.duplicateCount ?? 0),
               total: s.totalPayments,
-              color: 'bg-emerald-500',
+              color: 'bg-[var(--pro-azure-50)]0',
             },
             {
               label: 'Dispute-Free',
@@ -885,7 +887,7 @@ const vatBoxes = [
       label: 'Net VAT Payable',
       value: outputVat - wht,
       note: 'Box 3 − Box 4',
-      color: 'emerald',
+      color: 'green',
     },
   ];
 return (
@@ -922,7 +924,7 @@ return (
         </button>
         <button
           onClick={handleExportVatReturn}
-          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500 text-white rounded-lg text-sm font-medium hover:bg-emerald-600 ml-auto"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[var(--pro-azure)] text-white rounded-lg text-sm font-medium hover:bg-[var(--pro-azure-dark)] ml-auto"
         >
           <Download size={13} /> Export VAT Return
         </button>
@@ -1022,7 +1024,7 @@ const kpis = [
       label: 'Collection Rate',
       value: d.collectionRate != null ? `${d.collectionRate}%` : '—',
       icon: <ShieldCheck size={18} />,
-      color: 'emerald',
+      color: 'green',
     },
     {
       label: 'Recovery Rate',
@@ -1033,15 +1035,16 @@ const kpis = [
   ];
 const colorMap: Record<string, string> = {
     amber: 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400',
-    blue: 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 dark:text-emerald-400',
-    emerald: 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400',
+    blue: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)] dark:border-green-800 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+    indigo:
+      'bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)] dark:border-green-800 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
     violet: 'bg-violet-50 dark:bg-violet-950/30 border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-400',
   };
 const agingBuckets: Array<{ label: string; count: number; color: string }> = d.agingSummary
     ? Object.entries(d.agingSummary).map(([stage, count]) => ({
         label: stage.replace(/_/g, ' '),
         count: Number(count),
-        color: 'bg-emerald-500',
+        color: 'bg-[var(--pro-azure-50)]0',
       }))
     : [];
 const maxBucket = Math.max(1, ...agingBuckets.map(b => b.count));
@@ -1096,7 +1099,7 @@ return (
                   </div>
                   <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-emerald-500 transition-all"
+                       className="h-full rounded-full bg-[var(--pro-azure-50)]0 transition-all"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -1115,7 +1118,7 @@ return (
           </p>
           <div className="ovds-grid-layout cols-3 text-center">
             <div>
-              <p className="text-3xl font-semibold text-emerald-600 dark:text-emerald-400">{d.dsoDays}</p>
+              <p className="text-3xl font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{d.dsoDays}</p>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">
                 Current DSO
               </p>
@@ -1129,7 +1132,7 @@ return (
               </p>
             </div>
             <div>
-              <p className="text-3xl font-semibold text-emerald-600 dark:text-emerald-400">
+              <p className="text-3xl font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                 {d.openCases ?? 0}
               </p>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">
@@ -1171,7 +1174,7 @@ return (
       title="Collections & Compliance"
       subtitle="NBE payment flows · ERCA compliance · Dispute resolution · Transaction archive"
       icon={<TrendingDown size={16} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
     >
 
       {/* Tab bar */}

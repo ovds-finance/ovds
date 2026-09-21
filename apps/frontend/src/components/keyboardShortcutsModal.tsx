@@ -3,6 +3,7 @@
  * Triggered by pressing `?` anywhere in the app (outside inputs).
  */
 import React, { useEffect } from 'react';
+
 import { Icon } from './ui';
 
 interface ShortcutGroup {

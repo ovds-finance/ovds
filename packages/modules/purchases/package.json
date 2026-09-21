@@ -2,9 +2,9 @@
   "name": "@ovds/modules-purchases",
   "version": "1.0.0",
   "private": true,
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
   "source": "./src/index.ts",
   "exports": {
     ".": {
@@ -35,10 +35,10 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@ovds/domains/purchases": "*",
-    "@ovds/features-purchases": "*",
-    "@ovds/core": "*",
-    "@ovds/shared": "*"
+    "@ovds/domains-purchases": "workspace:*",
+    "@ovds/features-purchases": "workspace:*",
+    "@ovds/core": "workspace:*",
+    "@ovds/shared": "workspace:*"
   },
   "devDependencies": {}
 }

@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
 import { Button } from '@ovds/ui';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
 import { X, Upload, Download, Trash2, Eye } from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+
+import api from '../../services/api';
+
 
 interface Attachment {
   id: string;
@@ -111,7 +113,7 @@ const AttachmentModal: React.FC<AttachmentModalProps> = ({
               <input
                 type="file"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="w-full px-3 py-2 border border-dashed border-slate-300 dark:border-slate-600 rounded-lg dark:bg-slate-800 dark:text-slate-100 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-600 dark:text-emerald-400 hover:file:bg-emerald-100 dark:file:bg-slate-700 dark:file:text-slate-100"
+                className="w-full px-3 py-2 border border-dashed border-slate-300 dark:border-slate-600 rounded-lg dark:bg-slate-800 dark:text-slate-100 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[var(--pro-azure-50)] file:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:file:bg-[var(--pro-azure-100)] dark:file:bg-slate-700 dark:file:text-slate-100"
               />
               <input
                 type="text"
@@ -140,7 +142,7 @@ const AttachmentModal: React.FC<AttachmentModalProps> = ({
                 attachments.map((attachment) => (
                   <div key={attachment.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center">
+                      <div className="w-10 h-10 bg-gradient-to-br from-[var(--pro-azure)] to-[var(--pro-azure-dark)] rounded-lg flex items-center justify-center">
                         <Eye size={16} className="text-white" />
                       </div>
                       <div>

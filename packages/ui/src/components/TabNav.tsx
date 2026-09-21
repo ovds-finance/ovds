@@ -1,48 +1,38 @@
-/**
- * TabNav — reusable tab navigation component.
- *
- * Replaces the many ad-hoc tab implementations scattered across pages with
- * a single, accessible, keyboard-navigable component.
+﻿/**
+ * TabNav — Ovds SaaS tab navigation.
  *
  * Variants:
- *   - 'underline' (default) — bottom border indicator (ovds style)
- *   - 'pills'               — filled pill background
- *   - 'boxed'               — segmented control style
+ *   'underline' — bottom border indicator, green active (Ovds SaaS default)
+ *   'pills'     — filled round pill, green active
+ *   'boxed'     — segmented control, white active card
  *
- * Usage:
- *   <TabNav
- *     tabs={[
- *       { key: 'overview', label: 'Overview', icon: <LayoutDashboard size={14} /> },
- *       { key: 'invoices', label: 'Invoices', count: 24 },
- *       { key: 'settings', label: 'Settings', disabled: true },
- *     ]}
- *     active="overview"
- *     onChange={setActiveTab}
- *   />
+ * All variants use var(--pro-azure) as the single active-state colour.
+ * Focus ring: 2px var(--pro-azure) on all tab buttons.
  */
 import React, { useCallback } from 'react';
 
 export interface TabItem {
-  key:       string;
-  label:     React.ReactNode;
-  icon?:     React.ReactNode;
-  count?:    number;
-  badge?:    React.ReactNode;
+  key: string;
+  label: React.ReactNode;
+  icon?: React.ReactNode;
+  count?: number;
+  badge?: React.ReactNode;
   disabled?: boolean;
 }
 
 export type TabNavVariant = 'underline' | 'pills' | 'boxed';
 
 export interface TabNavProps {
-  tabs:       TabItem[];
-  active:     string;
-  onChange:   (key: string) => void;
-  variant?:   TabNavVariant;
-  size?:      'sm' | 'md';
+  tabs: TabItem[];
+  active: string;
+  onChange: (key: string) => void;
+  variant?: TabNavVariant;
+  size?: 'sm' | 'md';
   className?: string;
-  /** Stretch tabs to fill available width */
-  stretch?:   boolean;
+  stretch?: boolean;
 }
+
+const FOCUS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pro-azure)] focus-visible:ring-offset-1';
 
 export const TabNav: React.FC<TabNavProps> = ({
   tabs,
@@ -55,24 +45,22 @@ export const TabNav: React.FC<TabNavProps> = ({
 }) => {
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLButtonElement>, key: string) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        onChange(key);
-      }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onChange(key); }
     },
     [onChange],
   );
 
-  // -- Underline variant ------------------------------------------------------
+  /* ── Underline ─────────────────────────────────────────────────── */
   if (variant === 'underline') {
     return (
       <div
         role="tablist"
-        className={`flex items-center gap-0 border-b border-slate-200 dark:border-slate-800 overflow-x-auto scrollbar-none ${className}`}
+        className={`flex items-center gap-0 overflow-x-auto scrollbar-none ${className}`}
+        style={{ borderBottom: '1px solid var(--border)' }}
       >
         {tabs.map(tab => {
           const isActive = tab.key === active;
-          const textSize = size === 'sm' ? 'text-[10px]' : 'text-[11px]';
+          const textSz   = size === 'sm' ? 'text-[10px]' : 'text-[11px]';
           const pad      = size === 'sm' ? 'px-2.5 py-2'  : 'px-3 py-2.5';
           return (
             <button
@@ -86,26 +74,29 @@ export const TabNav: React.FC<TabNavProps> = ({
               onKeyDown={e => handleKeyDown(e, tab.key)}
               className={[
                 'flex items-center gap-1.5 whitespace-nowrap border-b-2 font-semibold transition-all -mb-px',
-                textSize, pad,
+                textSz, pad, FOCUS,
                 isActive
-                  ? 'border-emerald-500 text-gray-900 dark:text-slate-100'
-                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-700',
+                  ? 'border-[var(--pro-azure)] text-[var(--text)]'
+                  : 'border-transparent text-[var(--text-4)] hover:text-[var(--text-2)] hover:border-[var(--border)]',
                 tab.disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : '',
                 stretch ? 'flex-1 justify-center' : '',
               ].filter(Boolean).join(' ')}
             >
               {tab.icon && (
-                <span className={isActive ? 'text-emerald-500' : 'text-slate-400 dark:text-slate-500'}>
+                <span style={{ color: isActive ? 'var(--pro-azure)' : 'var(--text-4)' }}>
                   {tab.icon}
                 </span>
               )}
               {tab.label}
               {tab.count !== undefined && (
-                <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
-                  isActive
-                    ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                }`}>
+                <span
+                  className="px-1.5 py-0.5 rounded-full text-[9px] font-bold"
+                  style={
+                    isActive
+                      ? { background: 'var(--pro-azure-50)', color: 'var(--pro-azure-dark)' }
+                      : { background: 'var(--surface-alt)', color: 'var(--text-4)' }
+                  }
+                >
                   {tab.count}
                 </span>
               )}
@@ -117,16 +108,13 @@ export const TabNav: React.FC<TabNavProps> = ({
     );
   }
 
-  // -- Pills variant ----------------------------------------------------------
+  /* ── Pills ─────────────────────────────────────────────────────── */
   if (variant === 'pills') {
     return (
-      <div
-        role="tablist"
-        className={`flex items-center gap-1 flex-wrap ${className}`}
-      >
+      <div role="tablist" className={`flex items-center gap-1 flex-wrap ${className}`}>
         {tabs.map(tab => {
           const isActive = tab.key === active;
-          const textSize = size === 'sm' ? 'text-[10px]' : 'text-[11px]';
+          const textSz   = size === 'sm' ? 'text-[10px]' : 'text-[11px]';
           const pad      = size === 'sm' ? 'px-2.5 py-1'  : 'px-3 py-1.5';
           return (
             <button
@@ -139,21 +127,28 @@ export const TabNav: React.FC<TabNavProps> = ({
               onClick={() => !tab.disabled && onChange(tab.key)}
               onKeyDown={e => handleKeyDown(e, tab.key)}
               className={[
-                'flex items-center gap-1.5 rounded-full font-semibold transition-all',
-                textSize, pad,
+                'flex items-center gap-1.5 rounded-full font-semibold transition-all duration-150',
+                textSz, pad, FOCUS,
+                'active:scale-[0.97]',
                 isActive
-                  ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/20'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-200',
+                  ? 'bg-[var(--pro-azure)] text-white shadow-sm shadow-[var(--pro-azure)]/25'
+                  : 'text-[var(--text-4)] hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)]',
                 tab.disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : '',
                 stretch ? 'flex-1 justify-center' : '',
               ].filter(Boolean).join(' ')}
+              style={!isActive ? { background: 'var(--surface-alt)', border: '1px solid var(--border)' } : undefined}
             >
               {tab.icon && <span>{tab.icon}</span>}
               {tab.label}
               {tab.count !== undefined && (
-                <span className={`px-1.5 rounded-full text-[9px] font-bold ${
-                  isActive ? 'bg-white/20 text-white' : 'bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-                }`}>
+                <span
+                  className="px-1.5 rounded-full text-[9px] font-bold"
+                  style={
+                    isActive
+                      ? { background: 'rgba(255,255,255,0.25)', color: '#fff' }
+                      : { background: 'var(--surface)', color: 'var(--text-4)' }
+                  }
+                >
                   {tab.count}
                 </span>
               )}
@@ -164,15 +159,16 @@ export const TabNav: React.FC<TabNavProps> = ({
     );
   }
 
-  // -- Boxed / segmented variant ---------------------------------------------
+  /* ── Boxed / segmented ─────────────────────────────────────────── */
   return (
     <div
       role="tablist"
-      className={`inline-flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-1 gap-0.5 ${className}`}
+      className={`inline-flex items-center rounded-xl p-1 gap-0.5 ${className}`}
+      style={{ background: 'var(--surface-alt)', border: '1px solid var(--border-alt)' }}
     >
       {tabs.map(tab => {
         const isActive = tab.key === active;
-        const textSize = size === 'sm' ? 'text-[10px]' : 'text-[11px]';
+        const textSz   = size === 'sm' ? 'text-[10px]' : 'text-[11px]';
         const pad      = size === 'sm' ? 'px-2.5 py-1'  : 'px-3 py-1.5';
         return (
           <button
@@ -185,19 +181,28 @@ export const TabNav: React.FC<TabNavProps> = ({
             onClick={() => !tab.disabled && onChange(tab.key)}
             onKeyDown={e => handleKeyDown(e, tab.key)}
             className={[
-              'flex items-center gap-1.5 rounded-lg font-semibold transition-all',
-              textSize, pad,
+              'flex items-center gap-1.5 rounded-lg font-semibold transition-all duration-150',
+              textSz, pad, FOCUS,
+              'active:scale-[0.97]',
               isActive
-                ? 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 shadow-sm'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200',
+                ? 'shadow-sm'
+                : 'hover:bg-[var(--surface)]',
               tab.disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : '',
               stretch ? 'flex-1 justify-center' : '',
             ].filter(Boolean).join(' ')}
+            style={
+              isActive
+                ? { background: 'var(--surface)', color: 'var(--pro-azure)', border: '1px solid var(--pro-azure-100)' }
+                : { background: 'transparent', color: 'var(--text-4)' }
+            }
           >
             {tab.icon && <span>{tab.icon}</span>}
             {tab.label}
             {tab.count !== undefined && (
-              <span className="px-1.5 rounded-full text-[9px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
+              <span
+                className="px-1.5 rounded-full text-[9px] font-bold"
+                style={{ background: 'var(--border)', color: 'var(--text-4)' }}
+              >
                 {tab.count}
               </span>
             )}

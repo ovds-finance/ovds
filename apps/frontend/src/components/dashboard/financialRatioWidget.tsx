@@ -4,10 +4,11 @@
  * Fetches from GET /ovds/reports/ratios and renders a compact ratio dashboard
  * with trend indicators and Ethiopian SMB benchmarks.
  */
-import React, { useState } from 'react';
-import { useApiQuery } from '../../hooks/useApiQuery';
-import { useBusiness } from '../../context/businessContext';
 import { RefreshCw, Info } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { useBusiness } from '../../context/businessContext';
+import { useApiQuery } from '../../hooks/useApiQuery';
 
 interface Ratio {
   label: string;
@@ -25,7 +26,7 @@ interface RatioGroup {
 }
 
 const GRADE_COLOR: Record<string, string> = {
-  Good:    'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30',
+  Good:    'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/30',
   Fair:    'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30',
   Poor:    'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30',
   'N/A':   'text-slate-400 bg-slate-100 dark:bg-slate-800',
@@ -88,7 +89,7 @@ const RatioRow: React.FC<{ ratio: Ratio }> = ({ ratio }) => {
         </div>
         <div className="mt-1 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all ${grade === 'Good' ? 'bg-emerald-500' : grade === 'Fair' ? 'bg-amber-400' : 'bg-rose-500'}`}
+            className={`h-full rounded-full transition-all ${grade === 'Good' ? 'bg-[var(--pro-azure-50)]0' : grade === 'Fair' ? 'bg-amber-400' : 'bg-rose-500'}`}
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -124,7 +125,7 @@ const FinancialRatioWidget: React.FC = () => {
           <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm">Financial Ratios</p>
           <p className="ovds-caption mt-0.5">vs. Ethiopian SMB benchmarks</p>
         </div>
-        <button onClick={() => refetch()} className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all">
+        <button onClick={() => refetch()} className="p-1.5 rounded-lg text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-950/30 transition-all">
           <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
         </button>
       </div>
@@ -138,7 +139,7 @@ const FinancialRatioWidget: React.FC = () => {
               onClick={() => setActiveGroup(i)}
               className={`px-4 py-2.5 text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap transition-all border-b-2 ${
                 activeGroup === i
-                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
+                  ? 'border-[var(--pro-azure)] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'
                   : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
               }`}
             >
@@ -170,7 +171,7 @@ const FinancialRatioWidget: React.FC = () => {
 
       <div className="px-5 py-3 bg-white dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-3 text-[9px] font-bold text-slate-400">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />Good (≥ benchmark)</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[var(--pro-azure-50)]0 inline-block" />Good (≥ benchmark)</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />Fair (70–99%)</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-500 inline-block" />Poor (&lt; 70%)</span>
         </div>

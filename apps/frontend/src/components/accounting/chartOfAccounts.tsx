@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useAuth } from '../../rbac/AuthContext';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
+import { Skeleton } from '@ovds/ui';
+import { Button } from '@ovds/ui';
+import { Badge } from '@ovds/ui';
 import {
   Plus,
   Edit3,
@@ -12,9 +10,12 @@ import {
   Folder,
   DollarSign,
 } from 'lucide-react';
-import { Skeleton } from '@ovds/ui';
-import { Button } from '@ovds/ui';
-import { Badge } from '@ovds/ui';
+import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+
+import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
 
 interface Account {
   id: string;
@@ -161,10 +162,10 @@ const ChartOfAccounts: React.FC<Props> = ({
     const hasChildren = account.children && account.children.length > 0;
     const isExpanded = expanded.has(account.id);
     const typeColor: Record<string, string> = {
-      ASSET: 'bg-emerald-100 text-emerald-700',
+      ASSET: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
       LIABILITY: 'bg-sky-100 text-sky-700',
       EQUITY: 'bg-purple-100 text-purple-700',
-      INCOME: 'bg-emerald-100 text-emerald-700',
+      INCOME: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
       EXPENSE: 'bg-orange-100 text-orange-700',
     };
 
@@ -215,7 +216,7 @@ const ChartOfAccounts: React.FC<Props> = ({
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all ml-2">
             <button
               onClick={(e) => { e.stopPropagation(); setEditingAccount(account); }}
-              className="p-1.5 hover:bg-emerald-100 rounded-lg text-emerald-600 dark:text-emerald-400 hover:text-emerald-600 dark:text-emerald-400 transition-all"
+              className="p-1.5 hover:bg-[var(--pro-azure-100)] rounded-lg text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:text-[var(--pro-azure-dark)] transition-all"
               title={t('common.edit')}
             >
               <Edit3 size={14} />

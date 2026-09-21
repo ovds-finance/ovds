@@ -1,8 +1,8 @@
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
+import fs from 'fs';
 import path from 'path';
 
-import fs from 'fs';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vitest/config';
 
 import { buildWorkspaceAliases } from './vite.config';
 
@@ -43,19 +43,19 @@ export default defineConfig({
     },
   },
 
+  pool: 'forks',
+  poolOptions: {
+    forks: {
+      // jsdom can't share memory across threads so forks is correct here.
+      // Cap at 4 to avoid 16 Node processes on high-core-count machines.
+      maxForks: 4,
+      minForks: 1,
+    },
+  },
   test: {
     name: 'frontend:unit',
     globals: true,
     environment: 'jsdom',
-    pool: 'forks',
-    poolOptions: {
-      forks: {
-        // jsdom can't share memory across threads so forks is correct here.
-        // Cap at 4 to avoid 16 Node processes on high-core-count machines.
-        maxForks: 4,
-        minForks: 1,
-      },
-    },
     setupFiles: ['./src/test/setup.ts'],
     css: false,
 

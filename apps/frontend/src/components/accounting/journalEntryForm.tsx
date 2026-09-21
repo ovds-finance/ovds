@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useAuth } from '../../rbac/AuthContext';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
+import { evalMath } from '@ovds/ui';
+import { format } from 'date-fns';
 import {
   Plus,
   Save,
@@ -14,8 +12,11 @@ import {
   BookOpen,
   ChevronDown,
 } from 'lucide-react';
-import { format } from 'date-fns';
-import { evalMath } from '@ovds/ui';
+import React, { useState, useEffect, useMemo } from 'react';
+import toast from 'react-hot-toast';
+
+import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
 
 interface JournalLine {
   id?: string;
@@ -221,8 +222,8 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
   }) => {
     const selected = accounts.find(a => a.id === value);
     const typeColor: Record<string, string> = {
-      ASSET: 'text-emerald-600', LIABILITY: 'text-rose-600',
-      EQUITY: 'text-violet-600', INCOME: 'text-emerald-600', EXPENSE: 'text-amber-600',
+      ASSET: 'text-[var(--pro-azure)]', LIABILITY: 'text-rose-600',
+      EQUITY: 'text-violet-600', INCOME: 'text-[var(--pro-azure)]', EXPENSE: 'text-amber-600',
     };
     return (
       <div className="flex-1 relative">
@@ -251,13 +252,13 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
     <div className="flex flex-wrap gap-1.5 text-xs mb-2">
       <button
         onClick={() => updateLine(0, 'accountId', accounts.find(a => a.code === '1010')?.id || '')}
-        className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-md hover:bg-emerald-200 transition-colors font-mono"
+        className="px-2 py-1 bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] rounded-md hover:bg-[var(--pro-azure-200)] transition-colors font-mono"
       >
         1010 Cash
       </button>
       <button
         onClick={() => updateLine(0, 'accountId', accounts.find(a => a.code === '4010')?.id || '')}
-        className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-md hover:bg-green-200 transition-colors font-mono"
+        className="px-2 py-1 bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] rounded-md hover:bg-green-200 transition-colors font-mono"
       >
         4010 Sales
       </button>
@@ -276,7 +277,7 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
         {/* IFRS reference + template picker */}
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded-full uppercase tracking-wider">Full IFRS · IAS 1</span>
+            <span className="text-[10px] font-medium text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 px-2 py-0.5 rounded-full uppercase tracking-wider">Full IFRS · IAS 1</span>
             <span className="ovds-caption">Double-entry · Debits = Credits</span>
           </div>
           <div className="relative">
@@ -303,7 +304,7 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
                       <p className="text-xs font-bold text-slate-700 dark:text-slate-200">{tpl.label}</p>
                       <p className="text-[10px] text-slate-400 truncate">{tpl.description}</p>
                     </div>
-                    <span className="text-[8px] font-semibold text-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 px-1.5 py-0.5 rounded-full shrink-0 mt-0.5">{tpl.iasRef}</span>
+                    <span className="text-[8px] font-semibold text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 px-1.5 py-0.5 rounded-full shrink-0 mt-0.5">{tpl.iasRef}</span>
                   </button>
                 ))}
               </div>
@@ -370,12 +371,12 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
 
           {/* Balance Preview */}
           <div className="lg:w-80 space-y-4 mt-4 lg:mt-0 lg:pt-2">
-            <div className="p-6 bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl border-2 border-emerald-200/50">
+            <div className="p-6 bg-gradient-to-br from-[var(--pro-azure-50)] to-[var(--pro-azure-50)] rounded-2xl border-2 border-[var(--pro-azure-100)]/50">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-semibold text-emerald-700 uppercase tracking-wide">Trial Balance Preview</span>
+                <span className="text-sm font-semibold text-[var(--pro-azure-dark)] uppercase tracking-wide">Trial Balance Preview</span>
                 <div className={`px-2 py-1 rounded-full text-xs font-semibold ${
                   isBalanced 
-                    ? 'bg-emerald-100 text-emerald-700' 
+                    ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' 
                     : 'bg-rose-100 text-rose-700 animate-pulse'
                 }`}>
                   {isBalanced ? '✅ Balanced' : `⚠️ Off by ${fmt(Math.abs(balance))}`}
@@ -384,16 +385,16 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-600 font-mono">Total Debit</span>
-                  <span className="font-semibold text-emerald-700 text-lg">{fmt(totalDebit)}</span>
+                  <span className="font-semibold text-[var(--pro-azure-dark)] text-lg">{fmt(totalDebit)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-600 font-mono">Total Credit</span>
                   <span className="font-semibold text-sky-700 text-lg">{fmt(totalCredit)}</span>
                 </div>
-                <div className="h-px bg-gradient-to-r from-emerald-200 to-sky-200" />
+                <div className="h-px bg-gradient-to-r from-[var(--pro-azure-200)] to-sky-200" />
                 <div className="flex justify-between text-lg font-semibold">
                   <span>{balance >= 0 ? 'Excess Debit' : 'Excess Credit'}</span>
-                  <span className={balance >= 0 ? 'text-emerald-700' : 'text-sky-700'}>
+                  <span className={balance >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-sky-700'}>
                     {fmt(Math.abs(balance))}
                   </span>
                 </div>
@@ -427,7 +428,7 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
             <div className="grid grid-cols-[1fr_1fr_70px_70px_32px] gap-2 px-4 pb-1 border-b border-slate-200 dark:border-slate-700">
               <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Account</span>
               <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Description</span>
-              <span className="text-[10px] font-medium text-emerald-600 uppercase tracking-wider text-right">Debit (Dr)</span>
+              <span className="text-[10px] font-medium text-[var(--pro-azure)] uppercase tracking-wider text-right">Debit (Dr)</span>
               <span className="text-[10px] font-medium text-sky-600 uppercase tracking-wider text-right">Credit (Cr)</span>
               <span />
             </div>
@@ -453,7 +454,7 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
                       onChange={(e) => updateLine(index, 'debit', e.target.value)}
                       onBlur={(e) => updateLine(index, 'debit', Number((evalMath(e.target.value) ?? parseFloat(e.target.value)) || 0))}
                        placeholder="0.00"
-                       className="px-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all text-right font-mono text-sm bg-emerald-50 hover:bg-emerald-50/50"
+                       className="px-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition-all text-right font-mono text-sm bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-50)]/50"
                      />
                      <input
                        type="text"

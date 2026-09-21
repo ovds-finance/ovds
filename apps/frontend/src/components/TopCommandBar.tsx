@@ -1,15 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
 import { useAuth } from '../rbac/AuthContext';
+
 import { Icon } from './ui';
+
+type IconName = React.ComponentProps<typeof Icon>['name'];
 
 interface TopCommandBarProps {
   onOpenSearch?: () => void;
 }
 
-const QUICK_ACTIONS = [
-  { label: 'Invoice',  icon: 'INVOICE',   to: '/sales/invoices',        shortcut: 'N', color: 'bg-emerald-600' },
+const QUICK_ACTIONS: { label: string; icon: IconName; to: string; shortcut: string; color: string }[] = [
+  { label: 'Invoice',  icon: 'INVOICE',   to: '/sales/invoices',        shortcut: 'N', color: 'bg-[var(--pro-azure)]' },
   { label: 'Bill',     icon: 'VENDOR',    to: '/purchases/bills',        shortcut: 'B', color: 'bg-sky-600' },
   { label: 'Expense',  icon: 'MONEY',     to: '/purchases/expenses',     shortcut: 'E', color: 'bg-amber-600' },
   { label: 'Customer', icon: 'CUSTOMER',  to: '/crm/contacts',           shortcut: 'C', color: 'bg-violet-600' },
@@ -56,7 +60,7 @@ const TopCommandBar: React.FC<TopCommandBarProps> = ({ onOpenSearch }) => {
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {/* Brand */}
           <div className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--pro-azure)] to-[var(--pro-azure-dark)] flex items-center justify-center shadow-sm">
               <span className="text-white font-bold text-sm">O</span>
             </div>
             <span className="hidden sm:block text-lg font-bold text-slate-800 dark:text-slate-100 tracking-tight">
@@ -83,7 +87,7 @@ const TopCommandBar: React.FC<TopCommandBarProps> = ({ onOpenSearch }) => {
           <div className="relative" ref={quickRef}>
             <button
               onClick={() => setShowQuickAdd(v => !v)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 active:scale-[0.98] transition-all shadow-sm shadow-emerald-200 dark:shadow-emerald-900/30"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--pro-azure)] text-white text-xs font-bold hover:bg-[var(--pro-azure-dark)] active:scale-[0.98] transition-all shadow-sm shadow-green-200 dark:shadow-green-900/30"
             >
               <Icon name="PLUS" size={13} />
               <span className="hidden sm:inline">Quick Add</span>
@@ -126,7 +130,7 @@ const TopCommandBar: React.FC<TopCommandBarProps> = ({ onOpenSearch }) => {
               onClick={() => setShowProfile(v => !v)}
               className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[var(--pro-azure)] to-[var(--pro-azure-dark)] flex items-center justify-center text-white text-xs font-bold">
                 {(user?.username?.[0] ?? 'U').toUpperCase()}
               </div>
               <span className="hidden lg:block text-xs font-semibold text-slate-600 dark:text-slate-300 max-w-[100px] truncate">

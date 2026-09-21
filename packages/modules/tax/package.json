@@ -2,16 +2,16 @@
   "name": "@ovds/modules-tax",
   "version": "1.0.0",
   "private": true,
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.cjs.js",
+  "types": "./dist/index.cjs.d.ts",
   "source": "./src/index.ts",
   "exports": {
     ".": {
       "source": "./src/index.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/index.cjs.js",
+      "require": "./dist/index.cjs.js",
+      "types": "./dist/index.cjs.d.ts"
     },
     "./web": {
       "source": "./src/web/index.ts",
@@ -31,14 +31,14 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.cjs.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@ovds/domains/tax": "*",
-    "@ovds/features-tax": "*",
-    "@ovds/core": "*",
-    "@ovds/shared": "*"
+    "@ovds/domains-tax": "workspace:*",
+    "@ovds/features-tax": "workspace:*",
+    "@ovds/core": "workspace:*",
+    "@ovds/shared": "workspace:*"
   },
   "devDependencies": {}
 }

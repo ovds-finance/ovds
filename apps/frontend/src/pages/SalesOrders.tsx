@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { evalMath } from '@ovds/ui';
+import DOMPurify from 'dompurify';
 import {
   ShoppingCart, Plus, Edit2, RefreshCw,
   CheckCircle2, XCircle, Package, Printer, ArrowUpRight,
@@ -7,25 +8,25 @@ import {
   ChevronRight, AlertCircle, CalendarDays, Hash,
   SlidersHorizontal, X,
 } from 'lucide-react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import DOMPurify from 'dompurify';
+
+import {
+  PipelineBadge, PipelineViewToggle, PipelineStageHeader, PipelineCard,
+  KanbanBoard, ColumnToggle, AppEmpty, PipelineFunnel,
+  type PipelineView,
+} from '../components';
 import {
   AppPage, AppTabs,
   Btn, Modal, FormField, Input, Textarea,
   Pagination, Skeleton, MetricCard,
   downloadCSV, fmtNum, fmtDate, cn,
 } from '../components/ui';
-import { evalMath } from '@ovds/ui';
-import {
-  PipelineBadge, PipelineViewToggle, PipelineStageHeader, PipelineCard,
-  KanbanBoard, ColumnToggle, AppEmpty, PipelineFunnel,
-  type PipelineView,
-} from '../components';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
 
 interface SalesOrderLine {
   LineNo: number;
@@ -64,9 +65,9 @@ interface SalesOrder {
 }
 
 type FilterTab = 'ALL' | 'DRAFT' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
-type ViewMode = PipelineView; // alias kept for readability in status checks
+type _ViewMode = PipelineView; // alias kept for readability in status checks
 
-const STATUS_STAGES: Array<{ key: FilterTab; label: string; color: string; icon: React.ReactNode }> = [
+const _STATUS_STAGES: Array<{ key: FilterTab; label: string; color: string; icon: React.ReactNode }> = [
   { key: 'DRAFT', label: 'Draft', color: '#94a3b8', icon: <Hash size={10} /> },
   { key: 'CONFIRMED', label: 'Confirmed', color: '#38bdf8', icon: <CheckCircle2 size={10} /> },
   { key: 'SHIPPED', label: 'Shipped', color: '#818cf8', icon: <Package size={10} /> },
@@ -80,7 +81,7 @@ const STATUS_META: Record<string, { bg: string; text: string; ring: string; dot:
   DRAFT:     { bg: 'bg-slate-100 dark:bg-slate-800',   text: 'text-slate-600 dark:text-slate-300', ring: 'ring-slate-200 dark:ring-slate-700', dot: 'bg-slate-400' },
   CONFIRMED: { bg: 'bg-sky-50 dark:bg-sky-900/20',     text: 'text-sky-700 dark:text-sky-300',     ring: 'ring-sky-200 dark:ring-sky-800',     dot: 'bg-sky-400' },
   SHIPPED:   { bg: 'bg-violet-50 dark:bg-violet-900/20', text: 'text-violet-700 dark:text-violet-300', ring: 'ring-violet-200 dark:ring-violet-800', dot: 'bg-violet-400' },
-  DELIVERED: { bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: 'text-emerald-700 dark:text-emerald-300', ring: 'ring-emerald-200 dark:ring-emerald-800', dot: 'bg-emerald-400' },
+  DELIVERED: { bg: 'bg-[var(--pro-azure-50)] dark:bg-green-900/20', text: 'text-[var(--pro-azure-dark)] dark:text-green-300', ring: 'ring-indigo-200 dark:ring-indigo-800', dot: 'bg-[var(--pro-azure-light)]' },
   CANCELLED: { bg: 'bg-rose-50 dark:bg-rose-900/20',   text: 'text-rose-700 dark:text-rose-300',   ring: 'ring-rose-200 dark:ring-rose-800',   dot: 'bg-rose-400' },
 };
 
@@ -105,13 +106,13 @@ const OrderStatusStepper: React.FC<{ status: string }> = ({ status }) => {
           <React.Fragment key={s}>
             <div className={cn(
               'flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-wider transition-all',
-              active ? `${meta.bg} ${meta.text} ring-1 ${meta.ring}` : done ? 'text-emerald-600' : 'text-slate-300 dark:text-slate-600',
+              active ? `${meta.bg} ${meta.text} ring-1 ${meta.ring}` : done ? 'text-[var(--pro-azure)]' : 'text-slate-300 dark:text-slate-600',
             )}>
-              {done ? <CheckCircle2 size={9} className="text-emerald-500" /> : active ? <span className={cn('w-1.5 h-1.5 rounded-full', meta.dot)} /> : <span className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700" />}
+              {done ? <CheckCircle2 size={9} className="text-[var(--pro-azure)]" /> : active ? <span className={cn('w-1.5 h-1.5 rounded-full', meta.dot)} /> : <span className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700" />}
               <span className={active ? '' : done ? '' : 'hidden sm:inline'}>{s.charAt(0) + s.slice(1).toLowerCase()}</span>
             </div>
             {i < STATUS_SEQUENCE.length - 1 && (
-              <ChevronRight size={10} className={cn('shrink-0', i < idx ? 'text-emerald-400' : 'text-slate-200 dark:text-slate-700')} />
+              <ChevronRight size={10} className={cn('shrink-0', i < idx ? 'text-[var(--pro-azure-light)]' : 'text-slate-200 dark:text-slate-700')} />
             )}
           </React.Fragment>
         );
@@ -127,7 +128,7 @@ const DifotBadge: React.FC<{ inFull: boolean; onTime: boolean }> = ({ inFull, on
   return (
     <div className={cn(
       'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ring-1',
-      both ? 'bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:ring-emerald-800'
+      both ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] ring-indigo-200 dark:bg-green-900/20 dark:text-green-300 dark:ring-indigo-800'
            : neither ? 'bg-rose-50 text-rose-700 ring-rose-200 dark:bg-rose-900/20 dark:text-rose-300 dark:ring-rose-800'
            : 'bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:ring-amber-800',
     )}>
@@ -163,7 +164,7 @@ const SalesOrderForm: React.FC<{ data: Partial<SalesOrder>; onChange: (d: Partia
             <Input value={data.OrderNumber ?? ''} onChange={e => set('OrderNumber', e.target.value)} placeholder="SO-2026-001" />
           </FormField>
           <FormField label="Sales Type">
-            <select value={data.SalesType ?? ''} onChange={e => set('SalesType', e.target.value)} className="w-full h-9 px-3 text-[13px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+            <select value={data.SalesType ?? ''} onChange={e => set('SalesType', e.target.value)} className="w-full h-9 px-3 text-[13px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)]">
               <option value="">— Select type —</option>
               <option value="CASH">Cash</option>
               <option value="CREDIT">Credit</option>
@@ -503,7 +504,7 @@ const SalesOrders: React.FC = () => {
           <MetricCard title="Total Orders" amount={stats.total.toString()} percentage={0} isPositive={true} variant="highlight-indigo" />
           <MetricCard title="Pending" amount={stats.pending.toString()} percentage={0} isPositive={stats.pending === 0} variant="highlight-amber" />
           <MetricCard title="In Transit" amount={stats.shipped.toString()} percentage={0} isPositive={true} variant="highlight-purple" />
-          <MetricCard title="Fulfilled" amount={stats.delivered.toString()} percentage={0} isPositive={true} variant="highlight-emerald" />
+          <MetricCard title="Fulfilled" amount={stats.delivered.toString()} percentage={0} isPositive={true} variant="highlight-indigo" />
           <MetricCard title="Pipeline Value" amount={fmtNum(stats.totalVal)} percentage={0} isPositive={true} variant="highlight-success" />
         </div>
       )}
@@ -512,18 +513,18 @@ const SalesOrders: React.FC = () => {
       {!loading && rows.length > 0 && (
         <div className="mt-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 px-5 py-3 flex items-center gap-4">
           <div className="flex items-center gap-2 shrink-0">
-            <TrendingUp size={14} className="text-emerald-500" />
+            <TrendingUp size={14} className="text-[var(--pro-azure)]" />
             <span className="text-[11px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-wider">Fulfilment Rate</span>
           </div>
           <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-500" style={{ width: `${stats.fulfilmentRate}%` }} />
+            <div className="h-full bg-gradient-to-r from-[var(--pro-azure)] to-[var(--pro-azure-dark)] rounded-full transition-all duration-500" style={{ width: `${stats.fulfilmentRate}%` }} />
           </div>
           <span className="text-[11px] font-black text-slate-700 dark:text-slate-200 shrink-0 tabular-nums">{stats.fulfilmentRate}%</span>
           <div className="hidden sm:flex items-center gap-3 text-[10px] text-slate-400 font-mono shrink-0">
             <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-300" />{stats.draft}d</span>
             <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-sky-400" />{stats.confirmed}c</span>
             <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-violet-400" />{stats.shipped}s</span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400" />{stats.delivered}✓</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[var(--pro-azure-light)]" />{stats.delivered}✓</span>
           </div>
         </div>
       )}
@@ -533,7 +534,7 @@ const SalesOrders: React.FC = () => {
         <div className="flex items-center gap-3 flex-wrap">
           {/* Search */}
           <div className="relative group">
-            <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors pointer-events-none" />
+            <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--pro-azure)] transition-colors pointer-events-none" />
             <input
               ref={searchRef}
               value={search}
@@ -631,7 +632,7 @@ const SalesOrders: React.FC = () => {
             { key: 'DRAFT', label: 'Draft', color: 'text-slate-500', headerBg: 'bg-slate-50', accentColor: '#94a3b8', dotColor: 'bg-slate-400', items: filtered.filter(r => r.status === 'DRAFT'), totalAmount: fmtNum(filtered.filter(r => r.status === 'DRAFT').reduce((s, r) => s + orderTotal(r), 0)) },
             { key: 'CONFIRMED', label: 'Confirmed', color: 'text-sky-600', headerBg: 'bg-sky-50/50', accentColor: '#38bdf8', dotColor: 'bg-sky-400', items: filtered.filter(r => r.status === 'CONFIRMED'), totalAmount: fmtNum(filtered.filter(r => r.status === 'CONFIRMED').reduce((s, r) => s + orderTotal(r), 0)) },
             { key: 'SHIPPED', label: 'Shipped', color: 'text-violet-600', headerBg: 'bg-violet-50/50', accentColor: '#818cf8', dotColor: 'bg-violet-400', items: filtered.filter(r => r.status === 'SHIPPED'), totalAmount: fmtNum(filtered.filter(r => r.status === 'SHIPPED').reduce((s, r) => s + orderTotal(r), 0)) },
-            { key: 'DELIVERED', label: 'Delivered', color: 'text-emerald-600', headerBg: 'bg-emerald-50/50', accentColor: '#00E784', dotColor: 'bg-emerald-400', items: filtered.filter(r => r.status === 'DELIVERED'), totalAmount: fmtNum(filtered.filter(r => r.status === 'DELIVERED').reduce((s, r) => s + orderTotal(r), 0)) },
+            { key: 'DELIVERED', label: 'Delivered', color: 'text-[var(--pro-azure)]', headerBg: 'bg-[var(--pro-azure-50)]/50', accentColor: '#00E784', dotColor: 'bg-[var(--pro-azure-light)]', items: filtered.filter(r => r.status === 'DELIVERED'), totalAmount: fmtNum(filtered.filter(r => r.status === 'DELIVERED').reduce((s, r) => s + orderTotal(r), 0)) },
             { key: 'CANCELLED', label: 'Cancelled', color: 'text-rose-600', headerBg: 'bg-rose-50/50', accentColor: '#f43f5e', dotColor: 'bg-rose-400', items: filtered.filter(r => r.status === 'CANCELLED'), totalAmount: fmtNum(filtered.filter(r => r.status === 'CANCELLED').reduce((s, r) => s + orderTotal(r), 0)) },
           ].filter(col => col.items.length > 0 || tab !== 'ALL')}
           renderCard={(so) => {
@@ -648,7 +649,7 @@ const SalesOrders: React.FC = () => {
                   <div className="flex items-center gap-0.5">
                     {so.status === 'DRAFT' && <button onClick={e => { e.stopPropagation(); handleStatusUpdate(so.id, 'CONFIRMED'); }} className="w-7 h-7 rounded flex items-center justify-center text-slate-400 hover:bg-sky-50 hover:text-sky-600 transition-all" title="Confirm"><CheckCircle2 size={13} /></button>}
                     {so.status === 'CONFIRMED' && <button onClick={e => { e.stopPropagation(); handleStatusUpdate(so.id, 'SHIPPED'); }} className="w-7 h-7 rounded flex items-center justify-center text-slate-400 hover:bg-violet-50 hover:text-violet-600 transition-all" title="Ship"><Package size={13} /></button>}
-                    {so.status === 'SHIPPED' && <button onClick={e => { e.stopPropagation(); handleStatusUpdate(so.id, 'DELIVERED'); }} className="w-7 h-7 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Deliver"><Truck size={13} /></button>}
+                    {so.status === 'SHIPPED' && <button onClick={e => { e.stopPropagation(); handleStatusUpdate(so.id, 'DELIVERED'); }} className="w-7 h-7 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Deliver"><Truck size={13} /></button>}
                     <button onClick={e => { e.stopPropagation(); handleViewOrder(so); }} className="w-7 h-7 rounded flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-all" title="View"><Eye size={13} /></button>
                   </div>
                 }
@@ -689,7 +690,7 @@ const SalesOrders: React.FC = () => {
             <thead className="sticky top-0 z-10">
               <tr className="border-b border-slate-100 dark:border-slate-700 bg-slate-50/90 dark:bg-slate-800/90 backdrop-blur-sm">
                 <th className="w-10 px-3 py-3 text-center">
-                  <input type="checkbox" checked={selectAll && filtered.length > 0} onChange={toggleSelectAll} className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+                  <input type="checkbox" checked={selectAll && filtered.length > 0} onChange={toggleSelectAll} className="rounded border-slate-300 text-[var(--pro-azure)] focus:ring-[var(--pro-azure)]" />
                 </th>
                 {visibleColumns.has('OrderNumber') && <th className="text-left px-4 py-3 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Order</th>}
                 {visibleColumns.has('CustomerName') && <th className="text-left px-4 py-3 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Customer</th>}
@@ -719,11 +720,11 @@ const SalesOrders: React.FC = () => {
                   <tr
                     key={so.id}
                     className={cn('border-b border-slate-50 dark:border-slate-700/50 transition-colors group cursor-pointer',
-                      isSelected ? 'bg-emerald-50/60 dark:bg-emerald-900/10' : 'hover:bg-slate-50/80 dark:hover:bg-slate-800/40')}
+                      isSelected ? 'bg-[var(--pro-azure-50)]/60 dark:bg-green-900/10' : 'hover:bg-slate-50/80 dark:hover:bg-slate-800/40')}
                     onClick={() => handleViewOrder(so)}
                   >
                     <td className="px-3 py-3.5 text-center" onClick={e => { e.stopPropagation(); toggleSelect(so.id); }}>
-                      <input type="checkbox" checked={isSelected} onChange={() => toggleSelect(so.id)} className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+                      <input type="checkbox" checked={isSelected} onChange={() => toggleSelect(so.id)} className="rounded border-slate-300 text-[var(--pro-azure)] focus:ring-[var(--pro-azure)]" />
                     </td>
                     {visibleColumns.has('OrderNumber') && (
                       <td className="px-4 py-3.5">
@@ -736,7 +737,7 @@ const SalesOrders: React.FC = () => {
                     {visibleColumns.has('CustomerName') && (
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-[9px] font-black shrink-0 ring-1 ring-emerald-200/50 dark:ring-emerald-700/30">
+                          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[var(--pro-azure-100)] to-teal-100 dark:from-green-900/40 dark:to-teal-900/40 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] flex items-center justify-center text-[9px] font-black shrink-0 ring-1 ring-[var(--pro-azure-200)]/50 dark:ring-green-700/30">
                             {customerInitials(so.CustomerName)}
                           </div>
                           <div className="min-w-0">
@@ -774,11 +775,11 @@ const SalesOrders: React.FC = () => {
                       <div className="flex items-center justify-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                         {so.status === 'DRAFT' && <button onClick={() => handleStatusUpdate(so.id, 'CONFIRMED')} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-sky-50 hover:text-sky-600 dark:hover:bg-sky-900/30 transition-all" title="Confirm"><CheckCircle2 size={13} /></button>}
                         {so.status === 'CONFIRMED' && <button onClick={() => handleStatusUpdate(so.id, 'SHIPPED')} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-violet-50 hover:text-violet-600 dark:hover:bg-violet-900/30 transition-all" title="Ship"><Package size={13} /></button>}
-                        {so.status === 'SHIPPED' && <button onClick={() => handleStatusUpdate(so.id, 'DELIVERED')} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/30 transition-all" title="Deliver"><Truck size={13} /></button>}
+                        {so.status === 'SHIPPED' && <button onClick={() => handleStatusUpdate(so.id, 'DELIVERED')} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] dark:hover:bg-green-900/30 transition-all" title="Deliver"><Truck size={13} /></button>}
                         {(so.status === 'DRAFT' || so.status === 'CONFIRMED') && can('inventory:write' as any) && <button onClick={e => { e.stopPropagation(); setModal({ open: true, data: { ...so } }); }} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 transition-all" title="Edit"><Edit2 size={13} /></button>}
                         <button onClick={() => handleEmailOrder(so)} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-sky-50 hover:text-sky-600 dark:hover:bg-sky-900/30 transition-all" title="Email"><Mail size={13} /></button>
                         <button onClick={() => handleDuplicateOrder(so)} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 transition-all" title="Duplicate"><Copy size={13} /></button>
-                        {(so.status === 'CONFIRMED' || so.status === 'SHIPPED' || so.status === 'DELIVERED') && <button onClick={() => handleConvertToInvoice(so)} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/30 transition-all" title="Convert to Invoice"><FileText size={13} /></button>}
+                        {(so.status === 'CONFIRMED' || so.status === 'SHIPPED' || so.status === 'DELIVERED') && <button onClick={() => handleConvertToInvoice(so)} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] dark:hover:bg-green-900/30 transition-all" title="Convert to Invoice"><FileText size={13} /></button>}
                         {so.status === 'DRAFT' && <button onClick={async () => { if (await confirm({ title: `Cancel "${so.OrderNumber}"?` })) handleStatusUpdate(so.id, 'CANCELLED'); }} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30 transition-all" title="Cancel"><XCircle size={13} /></button>}
                         {so.status === 'DRAFT' && <button onClick={async e => { e.stopPropagation(); if (await confirm({ title: `Delete "${so.OrderNumber}"?` })) { try { const api = (await import('../services/api')).default; await api.delete(`/ovds/sales-orders/${so.id}`); toast.success(`Deleted`); refetch(); } catch { toast.error('Failed to delete'); } } }} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30 transition-all" title="Delete"><Trash2 size={13} /></button>}
                       </div>
@@ -979,7 +980,7 @@ const SalesOrders: React.FC = () => {
                           {d.dispatches.map((disp: any) => (
                             <div key={disp.id} className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 rounded-xl px-4 py-3 ring-1 ring-slate-100 dark:ring-slate-700">
                               <div className="flex items-center gap-3">
-                                <TruckIcon size={13} className="text-violet-500 shrink-0" />
+                                <Truck size={13} className="text-violet-500 shrink-0" />
                                 <div>
                                   <p className="text-[11px] font-bold text-slate-800 dark:text-white">{disp.DispatchNumber ?? disp.id}</p>
                                   <p className="text-[10px] text-slate-400 font-mono">{disp.DispatchDate ? fmtDate(disp.DispatchDate) : '—'}</p>
@@ -1021,7 +1022,7 @@ const SalesOrders: React.FC = () => {
                                 <p className="text-[11px] font-bold text-slate-800 dark:text-white">{cn.CreditNoteNo ?? cn.id}</p>
                                 <p className="text-[10px] text-slate-400 mt-0.5">{cn.reason ?? '—'}</p>
                               </div>
-                              <span className={cn(`text-[10px] font-black`, cn.status === 'POSTED' ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400')}>{cn.status}</span>
+                              <span className={cn(`text-[10px] font-black`, cn.status === 'POSTED' ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-amber-600 dark:text-amber-400')}>{cn.status}</span>
                             </div>
                           ))}
                         </div>

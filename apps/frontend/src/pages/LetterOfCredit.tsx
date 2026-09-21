@@ -1,22 +1,22 @@
+import {
+  FileText, Plus, Edit2, Trash2, Download, RefreshCw,
+  Send, CheckCircle2, XCircle, Clock,
+ } from 'lucide-react';
 import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import { fmtDate } from '../utils/fmt';
-import { fmtETB } from '../utils/ethiopianTax';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Textarea, Select,
   SearchBar, Amount, Pagination, Icon, EmptyState,
 } from '../components/ui';
-import { OvdsEmptyState } from '../components/ovds';
-import {
-  FileText, Plus, Edit2, Trash2, Download, RefreshCw,
-  Send, CheckCircle2, XCircle, Clock,
- } from 'lucide-react';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
+import { fmtETB } from '../utils/ethiopianTax';
+import { fmtDate } from '../utils/fmt';
 
  const toCsv = (rows: any[], filename: string) => {
    if (!rows.length) { toast.error('No data to export'); return; }
@@ -60,11 +60,11 @@ interface LetterOfCredit {
 
 const LC_TABS: LcStatus[] = ['ALL', 'DRAFT', 'ISSUED', 'AMENDED', 'UTILISED', 'EXPIRED', 'CANCELLED'];
 
-const STATUS_COLORS: Record<string, string> = {
+const _STATUS_COLORS: Record<string, string> = {
   DRAFT: 'bg-slate-100 text-slate-600',
   ISSUED: 'bg-sky-100 text-sky-700',
   AMENDED: 'bg-amber-100 text-amber-700',
-  UTILISED: 'bg-emerald-100 text-emerald-700',
+  UTILISED: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   EXPIRED: 'bg-rose-100 text-rose-700',
   CANCELLED: 'bg-orange-100 text-orange-700',
 };
@@ -140,11 +140,11 @@ const LC_FORM: React.FC<{ data: Partial<LetterOfCredit>; onChange: (d: Partial<L
       </div>
       <div className="flex items-center gap-4">
         <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" checked={data.partialShipments ?? false} onChange={e => set('partialShipments', e.target.checked)} className="accent-emerald-600" />
+          <input type="checkbox" checked={data.partialShipments ?? false} onChange={e => set('partialShipments', e.target.checked)} className="accent-indigo-600" />
           <span className="text-xs font-semibold text-slate-700">Partial Shipments Allowed</span>
         </label>
         <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" checked={data.transshipmentAllowed ?? false} onChange={e => set('transshipmentAllowed', e.target.checked)} className="accent-emerald-600" />
+          <input type="checkbox" checked={data.transshipmentAllowed ?? false} onChange={e => set('transshipmentAllowed', e.target.checked)} className="accent-indigo-600" />
           <span className="text-xs font-semibold text-slate-700">Transshipment Allowed</span>
         </label>
       </div>
@@ -180,7 +180,7 @@ const LetterOfCredit: React.FC = () => {
   }, [rows, tab, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total L/Cs', value: rows.length, color: 'emerald' as const },
+    { label: 'Total L/Cs', value: rows.length, color: 'green' as const },
     { label: 'Issued', value: rows.filter(lc => lc.status === 'ISSUED').length, color: 'sky' as const },
     { label: 'Utilised', value: rows.filter(lc => lc.status === 'UTILISED').length, color: 'violet' as const },
     { label: 'Total Value', value: fmtETB(rows.reduce((s, lc) => s + Number(lc.amount || 0), 0)), color: 'amber' as const },
@@ -301,9 +301,9 @@ const LetterOfCredit: React.FC = () => {
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {lc.status === 'DRAFT' && <button onClick={() => handleIssue(lc.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-sky-50 hover:text-sky-600 transition-all" title="Issue"><Send size={11} /></button>}
                   {(lc.status === 'ISSUED' || lc.status === 'AMENDED') && <button onClick={() => handleAmend(lc.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-amber-50 hover:text-amber-600 transition-all" title="Amend"><Edit2 size={11} /></button>}
-                  {(lc.status === 'ISSUED' || lc.status === 'AMENDED') && <button onClick={() => handleUtilise(lc.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Utilise"><CheckCircle2 size={11} /></button>}
+                  {(lc.status === 'ISSUED' || lc.status === 'AMENDED') && <button onClick={() => handleUtilise(lc.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Utilise"><CheckCircle2 size={11} /></button>}
                   {(lc.status === 'ISSUED' || lc.status === 'AMENDED') && <button onClick={() => handleCancel(lc.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Cancel"><XCircle size={11} /></button>}
-                  <button onClick={() => setModal({ open: true, data: { ...lc } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Edit"><Edit2 size={11} /></button>
+                  <button onClick={() => setModal({ open: true, data: { ...lc } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Edit"><Edit2 size={11} /></button>
                   <button onClick={async () => { if (await confirm({ title: `Delete "${lc.lcNumber}"?`, variant: 'danger' })) remove(lc.id); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Delete"><Trash2 size={11} /></button>
                 </div>
               </AppTd>

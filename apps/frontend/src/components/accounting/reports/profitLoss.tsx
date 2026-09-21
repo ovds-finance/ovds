@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../../rbac/AuthContext';
-import api from '../../../services/api';
-import toast from 'react-hot-toast';
+import { Button } from '@ovds/ui';
+import { Badge } from '@ovds/ui';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import {
   Download,
   Printer,
@@ -11,9 +10,11 @@ import {
   TrendingUp,
   BarChart3,
 } from 'lucide-react';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth } from 'date-fns';
-import { Button } from '@ovds/ui';
-import { Badge } from '@ovds/ui';
+import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+
+import { useAuth } from '../../../rbac/AuthContext';
+import api from '../../../services/api';
 import { fmtCurrencyDecimal } from '../../../utils/fmt';
 
 const fmt = (n: number) => fmtCurrencyDecimal(Math.abs(n), 'ETB');
@@ -148,13 +149,13 @@ const ProfitLossReport: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-50">
+    <div className="min-h-screen bg-gradient-to-br from-[var(--pro-azure-50)] via-white to-[var(--pro-azure-50)]">
       <div className="max-w-6xl mx-auto px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/50 mb-12 p-10 print:shadow-none print:mb-6">
           <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-12">
             <div>
-              <h1 className="text-5xl font-semibold bg-gradient-to-r from-emerald-900 to-green-900 bg-clip-text text-transparent mb-4">
+              <h1 className="text-5xl font-semibold bg-gradient-to-r from-[var(--pro-azure-dark)] to-[var(--pro-azure)] bg-clip-text text-transparent mb-4">
                 Profit & Loss Statement
               </h1>
               <p className="text-2xl font-bold text-slate-800">
@@ -163,7 +164,7 @@ const ProfitLossReport: React.FC = () => {
               <div className="mt-4 flex items-center gap-6 text-sm text-slate-600 bg-slate-50/50 px-6 py-3 rounded-2xl">
                 <span>{data.companyName}</span>
                 <span>{data.currency}</span>
-                <Badge variant="emerald" className="!px-4 !py-2 !font-semibold text-sm">
+                <Badge variant="indigo" className="!px-4 !py-2 !font-semibold text-sm">
                   {data.profitMargin >= 0 ? `+${data.profitMargin.toFixed(1)}%` : `${data.profitMargin.toFixed(1)}%`} Margin
                 </Badge>
               </div>
@@ -210,13 +211,13 @@ const ProfitLossReport: React.FC = () => {
         <div className="space-y-8">
           {/* Revenue & Gross Profit */}
           <div className="grid lg:grid-cols-2 gap-5">
-            <div className="bg-white rounded-xl shadow-xl p-8 border border-emerald-200/50">
+            <div className="bg-white rounded-xl shadow-xl p-8 border border-[var(--pro-azure-100)]/50">
               <PLSection 
                 title="Revenue" 
                 type="revenue" 
                 amount={data.totalRevenue} 
                 sections={data.sections.filter(s => s.type === 'revenue')} 
-                color="emerald"
+                color="indigo"
               />
               <PLSection 
                 title="Gross Profit" 
@@ -240,11 +241,11 @@ const ProfitLossReport: React.FC = () => {
               />
               
               <div className="lg:col-span-2">
-                <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl p-8 border-4 border-emerald-200/50 shadow-2xl">
+                <div className="bg-gradient-to-r from-[var(--pro-azure-50)] to-[var(--pro-azure-100)] rounded-2xl p-8 border-4 border-[var(--pro-azure-100)]/50 shadow-2xl">
                   <div className="flex flex-col lg:flex-row lg:items-end gap-8 text-center lg:text-left">
                     <div className="flex-1">
                       <h3 className="text-2xl font-semibold text-slate-800 dark:text-slate-100 mb-4">Net Profit</h3>
-                      <div className={`text-5xl lg:text-6xl font-semibold ${data.netProfit >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                      <div className={`text-5xl lg:text-6xl font-semibold ${data.netProfit >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-700'}`}>
                         {fmt(data.netProfit)}
                       </div>
                       <div className="text-2xl font-bold mt-2 text-slate-600">
@@ -253,12 +254,12 @@ const ProfitLossReport: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-4 text-sm text-slate-600 lg:ml-auto">
                       <div className="text-center">
-                        <div className="text-2xl font-semibold text-emerald-700">{fmt(data.totalRevenue)}</div>
+                        <div className="text-2xl font-semibold text-[var(--pro-azure-dark)]">{fmt(data.totalRevenue)}</div>
                         <div className="text-xs uppercase tracking-wider">Revenue</div>
                       </div>
                       <div className="w-24 h-px bg-gradient-to-r from-slate-200 to-slate-300"></div>
                       <div className="text-center">
-                        <div className={`text-2xl font-semibold ${data.netProfit >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>{fmt(data.operatingExpenses)}</div>
+                        <div className={`text-2xl font-semibold ${data.netProfit >= 0 ? 'text-[var(--pro-azure-dark)]' : 'text-rose-700'}`}>{fmt(data.operatingExpenses)}</div>
                         <div className="text-xs uppercase tracking-wider">Expenses</div>
                       </div>
                     </div>
@@ -283,14 +284,14 @@ const ProfitLossReport: React.FC = () => {
                       <div className="space-y-2 mb-4">
                         <div className="flex items-baseline justify-between text-sm">
                           <span>Revenue</span>
-                          <span className="font-semibold text-emerald-700">{fmt(month.revenue)}</span>
+                          <span className="font-semibold text-[var(--pro-azure-dark)]">{fmt(month.revenue)}</span>
                         </div>
                         <div className="flex items-baseline justify-between text-sm">
                           <span>Expenses</span>
                           <span className="font-semibold text-rose-600">{fmt(month.expenses)}</span>
                         </div>
                       </div>
-                      <div className={`text-xl font-semibold px-4 py-2 rounded-xl text-center w-full ${month.netProfit >= 0 ? 'bg-emerald-100 text-emerald-800 border-2 border-emerald-300' : 'bg-rose-100 text-rose-800 border-2 border-rose-300'}`}>
+                      <div className={`text-xl font-semibold px-4 py-2 rounded-xl text-center w-full ${month.netProfit >= 0 ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] border-2 border-[var(--pro-azure-light)]' : 'bg-rose-100 text-rose-800 border-2 border-rose-300'}`}>
                         {fmt(month.netProfit)}
                       </div>
                     </div>
@@ -316,7 +317,7 @@ interface PLSectionProps {
   title: string;
   amount: number;
   sections: ProfitLossData['sections'];
-  color: 'emerald' | 'green' | 'orange' | 'rose';
+  color: 'rose' | 'orange' | 'green' | 'indigo';
   subtitle?: string;
   type?: string;
 }
@@ -332,10 +333,10 @@ const PLSection: React.FC<PLSectionProps> = ({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className={`rounded-2xl p-8 border-4 ${color === 'emerald' ? 'border-emerald-200 bg-emerald-50/50' : color === 'green' ? 'border-green-200 bg-green-50/50' : color === 'orange' ? 'border-orange-200 bg-orange-50/50' : 'border-rose-200 bg-rose-50/50'} shadow-lg group hover:shadow-xl transition-all`}>
+    <div className={`rounded-2xl p-8 border-4 ${color === 'indigo' ? 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/50' : color === 'green' ? 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/50' : color === 'orange' ? 'border-orange-200 bg-orange-50/50' : 'border-rose-200 bg-rose-50/50'} shadow-lg group hover:shadow-xl transition-all`}>
       <div className="flex items-start justify-between mb-6 cursor-pointer" onClick={() => setExpanded(!expanded)}>
         <div className="flex items-baseline gap-4">
-          <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-semibold text-xl ${color === 'emerald' ? 'bg-emerald-500 text-white' : color === 'green' ? 'bg-green-500 text-white' : color === 'orange' ? 'bg-orange-500 text-white' : 'bg-rose-500 text-white'}`}>
+          <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-semibold text-xl ${color === 'indigo' ? 'bg-[var(--pro-azure)] text-white' : color === 'green' ? 'bg-[var(--pro-azure)] text-white' : color === 'orange' ? 'bg-orange-500 text-white' : 'bg-rose-500 text-white'}`}>
             {type?.slice(0, 3).toUpperCase()}
           </div>
           <div>
@@ -354,7 +355,7 @@ const PLSection: React.FC<PLSectionProps> = ({
           {sections.map(section => (
             <div key={section.title} className="flex items-baseline justify-between py-3 px-4 bg-white/60 rounded-xl backdrop-blur-sm hover:bg-white/80 transition-all">
               <div className="flex items-center gap-3">
-                <span className="w-8 font-mono font-bold text-emerald-700">{section.title}</span>
+                  <span className="w-8 font-mono font-bold text-[var(--pro-azure-dark)]">{section.title}</span>
                 {section.items.map(item => (
                   <span key={item.id} className="text-sm truncate max-w-xs">{item.name}</span>
                 ))}

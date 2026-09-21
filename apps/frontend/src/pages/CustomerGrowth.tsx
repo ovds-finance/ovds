@@ -2,17 +2,19 @@
  * CustomerGrowth — Customer acquisition, revenue growth, and retention trends.
  * ovds-inspired analytics with monthly breakdown and top-customer ranking.
  */
-import React, { useState, useEffect } from 'react';
 import { AppPage, AppKpi, AppSection, Skeleton } from '@ovds/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useAuth } from '../rbac/AuthContext';
-import api from '../services/api';
-import { fmtCurrency } from '../utils/fmt';
 import {
   TrendingUp, Users2, DollarSign,
   BarChart3, Award, ArrowUpRight, ArrowDownRight,
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { fmtCurrency } from '../utils/fmt';
+
 
 // -- Types ---------------------------------------------------------------------
 interface MonthRow {
@@ -73,14 +75,14 @@ const CustomerGrowth: React.FC = () => {
       value: totals.newCustomers.toString(),
       sub:   `FY ${year}`,
       icon:  <Users2 size={16} />,
-      accentCls: 'bg-emerald-500',
+      accentCls: 'bg-[var(--pro-azure-50)]0',
     },
     {
       label: 'Total Revenue',
       value: fmt(totals.totalRevenue),
       sub:   'From new customers',
       icon:  <DollarSign size={16} />,
-      accentCls: 'bg-emerald-500',
+      accentCls: 'bg-[var(--pro-azure-50)]0',
     },
     {
       label: 'Avg / Month',
@@ -103,7 +105,7 @@ const CustomerGrowth: React.FC = () => {
       title="Customer Growth & Trends"
       subtitle="New customers acquired, revenue growth, and retention trends over time"
       icon={<TrendingUp size={16} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       actions={
         <select
           value={year}
@@ -136,7 +138,7 @@ const CustomerGrowth: React.FC = () => {
                   <div key={i} className="flex-1 flex flex-col items-center gap-1 group">
                     <div className="relative w-full flex items-end justify-center" style={{ height: '120px' }}>
                       <div
-                        className="w-full bg-emerald-500 rounded-t-lg transition-all duration-700 hover:bg-emerald-400 cursor-pointer"
+                        className="w-full bg-[var(--pro-azure-50)]0 rounded-t-lg transition-all duration-700 hover:bg-[var(--pro-azure-light)] cursor-pointer"
                         style={{ height: `${Math.max(4, pct)}%` }}
                         title={`${r.month}: ${r.newCustomers} new customers · ${fmt(r.totalRevenue)}`}
                       />
@@ -186,14 +188,14 @@ const CustomerGrowth: React.FC = () => {
                   return (
                     <tr key={i} className="border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                       <td className="px-4 py-3 font-bold text-slate-700 dark:text-slate-300">{r.month}</td>
-                      <td className="px-4 py-3 font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">{r.newCustomers}</td>
-                      <td className="px-4 py-3 font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">{fmt(r.totalRevenue)}</td>
+                      <td className="px-4 py-3 font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] tabular-nums">{r.newCustomers}</td>
+                      <td className="px-4 py-3 font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] tabular-nums">{fmt(r.totalRevenue)}</td>
                       <td className="px-4 py-3 text-slate-600 dark:text-slate-400 tabular-nums">
                         {r.avgOrderValue ? fmt(r.avgOrderValue) : '—'}
                       </td>
                       <td className="px-4 py-3">
                         {growth !== null ? (
-                          <span className={`flex items-center gap-1 text-[11px] font-bold ${growth >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                          <span className={`flex items-center gap-1 text-[11px] font-bold ${growth >= 0 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-rose-600 dark:text-rose-400'}`}>
                             {growth >= 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                             {Math.abs(growth)}%
                           </span>
@@ -206,8 +208,8 @@ const CustomerGrowth: React.FC = () => {
                 {!loading && (
                   <tr className="bg-white dark:bg-slate-800/50 border-t-2 border-slate-200 dark:border-slate-700">
                     <td className="px-4 py-3 font-bold text-slate-700 dark:text-slate-200 text-xs uppercase tracking-wider">Total</td>
-                    <td className="px-4 py-3 font-bold text-emerald-600 dark:text-emerald-400 tabular-nums text-xs">{totals.newCustomers}</td>
-                    <td className="px-4 py-3 font-bold text-emerald-600 dark:text-emerald-400 tabular-nums text-xs">{fmt(totals.totalRevenue)}</td>
+                    <td className="px-4 py-3 font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] tabular-nums text-xs">{totals.newCustomers}</td>
+                    <td className="px-4 py-3 font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] tabular-nums text-xs">{fmt(totals.totalRevenue)}</td>
                     <td colSpan={2} />
                   </tr>
                 )}
@@ -234,7 +236,7 @@ const CustomerGrowth: React.FC = () => {
                     <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{c.customerName}</p>
                     <p className="ovds-caption">{c.invoiceCount} invoice{c.invoiceCount !== 1 ? 's' : ''}</p>
                   </div>
-                  <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 tabular-nums shrink-0">{fmt(c.totalRevenue)}</p>
+                  <p className="text-sm font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] tabular-nums shrink-0">{fmt(c.totalRevenue)}</p>
                 </div>
               ))}
             </div>

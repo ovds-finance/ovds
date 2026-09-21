@@ -1,6 +1,7 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, ForbiddenException, Scope } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+
 import { PrismaService } from './prisma.service';
 
 export const TENANT_SCOPING = 'TENANT_SCOPING_INTERCEPTOR';

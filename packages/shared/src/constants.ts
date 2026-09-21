@@ -5,7 +5,8 @@
 
 // -- App Identity --------------------------------------------------------------
 export const APP_NAME    = 'OVDS';
-export const APP_VERSION = '1.0.0';
+export const APP_VERSION = '2.1.0';
+export const APP_BUILD   = '2026.09.01';
 export const API_VERSION = 'v1';
 export const API_PREFIX  = '/api';
 

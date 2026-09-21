@@ -23,7 +23,8 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
 }) => (
   <div
     className={[
-      'min-h-full bg-white rounded-xl overflow-hidden',
+      'min-h-full rounded-xl overflow-hidden',
+      'bg-[var(--surface)]',
       grid ? 'ovds-grid-layout cols-auto' : '',
       className,
     ].filter(Boolean).join(' ')}

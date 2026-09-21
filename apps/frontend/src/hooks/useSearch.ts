@@ -19,9 +19,9 @@
  *     { enabled: !!companyId, deps: [search.debouncedValue] }
  *   );
  */
+import { useDebounce } from '@ovds/ui';
 import { useState, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useDebounce } from '@ovds/ui';
 
 interface UseSearchOptions {
   /** Debounce delay in ms (default: 350) */

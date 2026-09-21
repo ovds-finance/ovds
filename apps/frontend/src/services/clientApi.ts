@@ -4,48 +4,23 @@
  * Frontend service for the hybrid Client module.
  * Covers: installer manifest, node registration, node listing/revocation,
  * and sync-token issuance.
+ *
+ * All requests go through the central `api` Axios instance so they
+ * automatically benefit from:
+ *   - JWT attach (bearer + HttpOnly cookie modes)
+ *   - 401 token-refresh queue
+ *   - 429 and 5xx retry logic
+ *   - HMAC request signing
+ *   - x-company-id tenant header
  */
-import axios from 'axios';
-import { BEARER_PREFIX } from '../utils/constants';
 import { isHttpOnlyAuth } from '../utils/authMode';
 
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
-const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT_MS || '10000', 10);
+import api, { API_BASE } from './api';
+
 const USE_HTTPONLY = isHttpOnlyAuth();
 
-const clientAxios: any = axios.create({
-  baseURL: `${API_BASE}/client`,
-  timeout: API_TIMEOUT,
-  withCredentials: USE_HTTPONLY,
-  headers: { 'Content-Type': 'application/json' },
-});
-
-// Attach JWT from storage (same pattern as the rest of the app)
-clientAxios.interceptors.request.use((config: any) => {
-  if (!USE_HTTPONLY) {
-    const token =
-      localStorage.getItem('ovds_token') ||
-      localStorage.getItem('auth0_token') ||
-      localStorage.getItem('token');
-    if (token) config.headers.Authorization = `${BEARER_PREFIX}${token}`;
-  }
-  return config;
-});
-
-// Unwrap the TransformInterceptor envelope { statusCode, message, data, success }
-// so every caller receives the inner `data` directly instead of the envelope.
-clientAxios.interceptors.response.use((response: any) => {
-  const body = response.data;
-  if (
-    body &&
-    typeof body === 'object' &&
-    'success' in body &&
-    'data' in body
-  ) {
-    response.data = body.data;
-  }
-  return response;
-});
+// Prefix for all client routes — matches the backend controller path.
+const BASE = '/client';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -91,7 +66,7 @@ export interface SyncToken {
 
 /** Fetch the current installer manifest (Enterprise plan check server-side). */
 export async function getClientManifest(): Promise<ClientManifest> {
-  const { data } = await clientAxios.get('/manifest');
+  const { data } = await api.get<ClientManifest>(`${BASE}/manifest`);
   return data;
 }
 
@@ -100,7 +75,7 @@ export async function getClientManifest(): Promise<ClientManifest> {
  * Uses the /invoice-module/manifest endpoint which has no plan check.
  */
 export async function getInvoiceModuleManifest(): Promise<ClientManifest> {
-  const { data } = await clientAxios.get('/invoice-module/manifest');
+  const { data } = await api.get<ClientManifest>(`${BASE}/invoice-module/manifest`);
   return data;
 }
 
@@ -112,24 +87,19 @@ export async function registerNode(
   friendlyName: string,
   role: 'REMOTE_TERMINAL' | 'PRIVATE_NODE' = 'REMOTE_TERMINAL',
 ): Promise<NewNodeResult> {
-  const { data } = await clientAxios.post('/nodes', {
-    friendlyName,
-    role,
-  });
+  const { data } = await api.post<NewNodeResult>(`${BASE}/nodes`, { friendlyName, role });
   return data;
 }
 
 /** List all registered nodes for the current company. */
 export async function listNodes(): Promise<EnterpriseNode[]> {
-  const { data } = await clientAxios.get('/nodes');
+  const { data } = await api.get<EnterpriseNode[]>(`${BASE}/nodes`);
   return data;
 }
 
 /** Revoke a node — its local token becomes invalid immediately. */
 export async function revokeNode(nodeId: string): Promise<{ revoked: true }> {
-  const { data } = await clientAxios.delete(
-    `/nodes/${nodeId}`,
-  );
+  const { data } = await api.delete<{ revoked: true }>(`${BASE}/nodes/${nodeId}`);
   return data;
 }
 
@@ -141,14 +111,15 @@ export async function issueSyncToken(
   nodeId: string,
   nodeToken: string,
 ): Promise<SyncToken> {
-  const { data } = await clientAxios.post('/sync-token', {
-    nodeId,
-    nodeToken,
-  });
+  const { data } = await api.post<SyncToken>(`${BASE}/sync-token`, { nodeId, nodeToken });
   return data;
 }
 
-/** Trigger a download — returns a path; cookies carry auth when USE_HTTPONLY is on. */
+/**
+ * Build a download URL for the desktop installer.
+ * When HttpOnly cookie auth is active, cookies carry auth so no token in URL.
+ * Otherwise appends the bearer token as a query param for the download handler.
+ */
 export function getDownloadUrl(
   platform: 'windows' | 'linux-deb' | 'linux-appimage' | 'docker',
 ): string {

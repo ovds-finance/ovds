@@ -160,25 +160,29 @@ export function useRecordBspResult() {
 }
 
 export function useCyberAuditList() {
-  return useQuery({ queryKey: ['eims', 'cyber-audit-list'], queryFn: () => eimsApi.cyberAuditList?.() ?? Promise.resolve([]) });
+  return useQuery({ queryKey: ['eims', 'cyber-audit-list'], queryFn: () => eimsApi.cyberAuditList() });
 }
 
-export function useCyberAudit() {
-  return useQuery({ queryKey: ['eims', 'cyber-audit'], queryFn: () => eimsApi.cyberAudit?.() ?? Promise.resolve({}) });
+export function useCyberAudit(auditId?: string) {
+  return useQuery({
+    queryKey: ['eims', 'cyber-audit', auditId],
+    queryFn: () => eimsApi.cyberAudit(auditId),
+    enabled: !!auditId,
+  });
 }
 
 export function useCreateCyberAudit() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => eimsApi.createCyberAudit?.(data) ?? Promise.resolve(data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'cyber-audit'] }),
+    mutationFn: (data: any) => eimsApi.createCyberAudit(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'cyber-audit-list'] }),
   });
 }
 
 export function useUpdateCyberAudit() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => eimsApi.updateCyberAudit?.(id, data) ?? Promise.resolve(data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => eimsApi.updateCyberAudit(id, data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'cyber-audit'] }),
   });
 }
@@ -186,15 +190,15 @@ export function useUpdateCyberAudit() {
 export function useDeleteCyberAudit() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => eimsApi.deleteCyberAudit?.(id) ?? Promise.resolve(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'cyber-audit'] }),
+    mutationFn: (id: string) => eimsApi.deleteCyberAudit(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'cyber-audit-list'] }),
   });
 }
 
 export function useStartCyberAudit() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => eimsApi.startCyberAudit?.(id) ?? Promise.resolve(id),
+    mutationFn: (id: string) => eimsApi.startCyberAudit(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'cyber-audit'] }),
   });
 }
@@ -202,79 +206,100 @@ export function useStartCyberAudit() {
 export function useCompleteCyberAudit() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => eimsApi.completeCyberAudit?.(id) ?? Promise.resolve(id),
+    mutationFn: (id: string) => eimsApi.completeCyberAudit(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'cyber-audit'] }),
   });
 }
 
-export function useCyberAuditMetrics() {
-  return useQuery({ queryKey: ['eims', 'cyber-audit-metrics'], queryFn: () => eimsApi.cyberAuditMetrics?.() ?? Promise.resolve([]) });
+export function useCyberAuditMetrics(auditId?: string) {
+  return useQuery({
+    queryKey: ['eims', 'cyber-audit-metrics', auditId],
+    queryFn: () => eimsApi.cyberAuditMetrics(auditId),
+    enabled: !!auditId,
+  });
 }
 
 export function useUpdateCyberAuditMetric() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => eimsApi.updateCyberAuditMetric?.(id, data) ?? Promise.resolve(data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'cyber-audit-metrics'] }),
+    mutationFn: ({ auditId, metricId, data }: { auditId: string; metricId: string; data: any }) =>
+      eimsApi.updateCyberAuditMetric(auditId, metricId, data),
+    onSuccess: (_r, { auditId }) => qc.invalidateQueries({ queryKey: ['eims', 'cyber-audit-metrics', auditId] }),
   });
 }
 
-export function useCyberAuditFindings() {
-  return useQuery({ queryKey: ['eims', 'cyber-audit-findings'], queryFn: () => eimsApi.cyberAuditFindings?.() ?? Promise.resolve([]) });
+export function useCyberAuditFindings(params?: { auditId?: string; severity?: string; status?: string }) {
+  const { auditId, severity, status } = params ?? {};
+  return useQuery({
+    queryKey: ['eims', 'cyber-audit-findings', auditId, severity, status],
+    queryFn: () => eimsApi.cyberAuditFindings(auditId),
+    enabled: !!auditId,
+  });
 }
 
 export function useCreateCyberAuditFinding() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => eimsApi.createCyberAuditFinding?.(data) ?? Promise.resolve(data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'cyber-audit-findings'] }),
+    mutationFn: ({ auditId, ...rest }: { auditId: string; [k: string]: any }) =>
+      eimsApi.createCyberAuditFinding(auditId, rest),
+    onSuccess: (_r, { auditId }) => qc.invalidateQueries({ queryKey: ['eims', 'cyber-audit-findings', auditId] }),
   });
 }
 
 export function useUpdateCyberAuditFinding() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => eimsApi.updateCyberAuditFinding?.(id, data) ?? Promise.resolve(data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'cyber-audit-findings'] }),
+    mutationFn: ({ auditId, findingId, data }: { auditId: string; findingId: string; data: any }) =>
+      eimsApi.updateCyberAuditFinding(auditId, findingId, data),
+    onSuccess: (_r, { auditId }) => qc.invalidateQueries({ queryKey: ['eims', 'cyber-audit-findings', auditId] }),
   });
 }
 
 export function useDeleteCyberAuditFinding() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => eimsApi.deleteCyberAuditFinding?.(id) ?? Promise.resolve(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'cyber-audit-findings'] }),
+    mutationFn: ({ auditId, findingId }: { auditId: string; findingId: string }) =>
+      eimsApi.deleteCyberAuditFinding(auditId, findingId),
+    onSuccess: (_r, { auditId }) => qc.invalidateQueries({ queryKey: ['eims', 'cyber-audit-findings', auditId] }),
   });
 }
 
 export function useCyberAuditChecklist() {
-  return useQuery({ queryKey: ['eims', 'cyber-audit-checklist'], queryFn: () => eimsApi.cyberAuditChecklist?.() ?? Promise.resolve([]) });
+  return useQuery({ queryKey: ['eims', 'cyber-audit-checklist'], queryFn: () => eimsApi.cyberAuditChecklist() });
 }
 
-export function useCyberAuditSummary() {
-  return useQuery({ queryKey: ['eims', 'cyber-audit-summary'], queryFn: () => eimsApi.cyberAuditSummary?.() ?? Promise.resolve({}) });
+export function useCyberAuditSummary(auditId?: string) {
+  return useQuery({
+    queryKey: ['eims', 'cyber-audit-summary', auditId],
+    queryFn: () => eimsApi.cyberAuditSummary(auditId),
+    enabled: !!auditId,
+  });
 }
 
 export function useMasterComplianceList() {
-  return useQuery({ queryKey: ['eims', 'master-compliance-list'], queryFn: () => eimsApi.masterComplianceList?.() ?? Promise.resolve([]) });
+  return useQuery({ queryKey: ['eims', 'master-compliance-list'], queryFn: () => eimsApi.masterComplianceList() });
 }
 
-export function useMasterCompliance() {
-  return useQuery({ queryKey: ['eims', 'master-compliance'], queryFn: () => eimsApi.masterCompliance?.() ?? Promise.resolve({}) });
+export function useMasterCompliance(id?: string) {
+  return useQuery({
+    queryKey: ['eims', 'master-compliance', id],
+    queryFn: () => eimsApi.masterCompliance(id),
+    enabled: !!id,
+  });
 }
 
 export function useCreateMasterCompliance() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => eimsApi.createMasterCompliance?.(data) ?? Promise.resolve(data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'master-compliance'] }),
+    mutationFn: (data: any) => eimsApi.createMasterCompliance(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'master-compliance-list'] }),
   });
 }
 
 export function useUpdateMasterCompliance() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => eimsApi.updateMasterCompliance?.(id, data) ?? Promise.resolve(data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => eimsApi.updateMasterCompliance(id, data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'master-compliance'] }),
   });
 }
@@ -282,51 +307,61 @@ export function useUpdateMasterCompliance() {
 export function useDeleteMasterCompliance() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => eimsApi.deleteMasterCompliance?.(id) ?? Promise.resolve(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'master-compliance'] }),
+    mutationFn: (id: string) => eimsApi.deleteMasterCompliance(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'master-compliance-list'] }),
   });
 }
 
-export function useMasterComplianceItems() {
-  return useQuery({ queryKey: ['eims', 'master-compliance-items'], queryFn: () => eimsApi.masterComplianceItems?.() ?? Promise.resolve([]) });
+export function useMasterComplianceItems(id?: string) {
+  return useQuery({
+    queryKey: ['eims', 'master-compliance-items', id],
+    queryFn: () => eimsApi.masterComplianceItems(id),
+    enabled: !!id,
+  });
 }
 
 export function useUpdateMasterComplianceItem() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => eimsApi.updateMasterComplianceItem?.(id, data) ?? Promise.resolve(data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'master-compliance-items'] }),
+    mutationFn: ({ checklistId, itemId, data }: { checklistId: string; itemId: string; data: any }) =>
+      eimsApi.updateMasterComplianceItem(checklistId, itemId, data),
+    onSuccess: (_r, { checklistId }) =>
+      qc.invalidateQueries({ queryKey: ['eims', 'master-compliance-items', checklistId] }),
   });
 }
 
 export function useMasterComplianceTemplate() {
-  return useQuery({ queryKey: ['eims', 'master-compliance-template'], queryFn: () => eimsApi.masterComplianceTemplate?.() ?? Promise.resolve({}) });
+  return useQuery({ queryKey: ['eims', 'master-compliance-template'], queryFn: () => eimsApi.masterComplianceTemplate() });
 }
 
 export function useMasterComplianceSummary() {
-  return useQuery({ queryKey: ['eims', 'master-compliance-summary'], queryFn: () => eimsApi.masterComplianceSummary?.() ?? Promise.resolve({}) });
+  return useQuery({ queryKey: ['eims', 'master-compliance-summary'], queryFn: () => eimsApi.masterComplianceSummary() });
 }
 
 export function useAccreditationList() {
-  return useQuery({ queryKey: ['eims', 'accreditation-list'], queryFn: () => eimsApi.accreditationList?.() ?? Promise.resolve([]) });
+  return useQuery({ queryKey: ['eims', 'accreditation-list'], queryFn: () => eimsApi.accreditationList() });
 }
 
-export function useAccreditation() {
-  return useQuery({ queryKey: ['eims', 'accreditation'], queryFn: () => eimsApi.accreditation?.() ?? Promise.resolve({}) });
+export function useAccreditation(id?: string) {
+  return useQuery({
+    queryKey: ['eims', 'accreditation', id],
+    queryFn: () => eimsApi.accreditation(id),
+    enabled: !!id,
+  });
 }
 
 export function useCreateAccreditation() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => eimsApi.createAccreditation?.(data) ?? Promise.resolve(data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'accreditation'] }),
+    mutationFn: (data: any) => eimsApi.createAccreditation(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'accreditation-list'] }),
   });
 }
 
 export function useUpdateAccreditation() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => eimsApi.updateAccreditation?.(id, data) ?? Promise.resolve(data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => eimsApi.updateAccreditation(id, data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'accreditation'] }),
   });
 }
@@ -334,23 +369,29 @@ export function useUpdateAccreditation() {
 export function useDeleteAccreditation() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => eimsApi.deleteAccreditation?.(id) ?? Promise.resolve(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'accreditation'] }),
+    mutationFn: (id: string) => eimsApi.deleteAccreditation(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'accreditation-list'] }),
   });
 }
 
-export function useAccreditationItems() {
-  return useQuery({ queryKey: ['eims', 'accreditation-items'], queryFn: () => eimsApi.accreditationItems?.() ?? Promise.resolve([]) });
+export function useAccreditationItems(id?: string) {
+  return useQuery({
+    queryKey: ['eims', 'accreditation-items', id],
+    queryFn: () => eimsApi.accreditationItems(id),
+    enabled: !!id,
+  });
 }
 
 export function useUpdateAccreditationItem() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => eimsApi.updateAccreditationItem?.(id, data) ?? Promise.resolve(data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['eims', 'accreditation-items'] }),
+    mutationFn: ({ checklistId, itemId, data }: { checklistId: string; itemId: string; data: any }) =>
+      eimsApi.updateAccreditationItem(checklistId, itemId, data),
+    onSuccess: (_r, { checklistId }) =>
+      qc.invalidateQueries({ queryKey: ['eims', 'accreditation-items', checklistId] }),
   });
 }
 
 export function useAccreditationSummary() {
-  return useQuery({ queryKey: ['eims', 'accreditation-summary'], queryFn: () => eimsApi.accreditationSummary?.() ?? Promise.resolve({}) });
+  return useQuery({ queryKey: ['eims', 'accreditation-summary'], queryFn: () => eimsApi.accreditationSummary() });
 }

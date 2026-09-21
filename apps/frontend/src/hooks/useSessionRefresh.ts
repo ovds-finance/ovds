@@ -11,10 +11,11 @@
  *   useSessionRefresh();
  */
 import { useEffect, useRef, useCallback } from 'react';
-import { useAuth } from '../rbac/AuthContext';
+
 import { getAuth0Token } from '../rbac/auth0Client';
-import { BEARER_PREFIX } from '../utils/constants';
+import { useAuth } from '../rbac/AuthContext';
 import type { AuthUser } from '../rbac/AuthContext';
+import { BEARER_PREFIX } from '../utils/constants';
 
 const AUTH0_ENABLED = import.meta.env.VITE_AUTH0_ENABLED === 'true';
 /** Refresh when this many minutes remain */

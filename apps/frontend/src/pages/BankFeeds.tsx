@@ -14,22 +14,23 @@
  *   DELETE /banking/feeds/:id
  *   POST   /banking/feeds/:id/reauthenticate
  */
-import React, { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Rss, Plus, RefreshCw, Unlink, AlertTriangle,
   CheckCircle2, Clock, Upload, ShieldAlert,
 } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import api from '../services/api';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useAuth } from '../rbac/AuthContext';
+
 import {
   AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Select,
   EmptyState, Card,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
 
 interface BankFeed {
   id: string; bankAccountId: string; provider: string; status: string;
@@ -45,7 +46,7 @@ const PROVIDER_INFO: Record<string, { label: string; desc: string; color: string
 };
 
 const STATUS_STYLE: Record<string, { icon: React.ReactNode; cls: string }> = {
-  CONNECTED:    { icon: <CheckCircle2 size={11} />, cls: 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/20 dark:border-emerald-800' },
+  CONNECTED:    { icon: <CheckCircle2 size={11} />, cls: 'text-[var(--pro-azure-dark)] bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] dark:text-[var(--pro-azure-light)] dark:bg-green-950/20 dark:border-green-800' },
   DISCONNECTED: { icon: <Unlink size={11} />,       cls: 'text-slate-500 bg-slate-50 border-slate-200 dark:text-slate-400 dark:bg-slate-800 dark:border-slate-700' },
   ERROR:        { icon: <AlertTriangle size={11} />,cls: 'text-rose-600 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/20 dark:border-rose-800' },
   PENDING_AUTH: { icon: <Clock size={11} />,        cls: 'text-amber-700 bg-amber-50 border-amber-200 dark:text-amber-400 dark:bg-amber-950/20 dark:border-amber-800' },
@@ -55,7 +56,7 @@ const BankFeeds: React.FC = () => {
   usePageTitle('Bank Feeds');
   const { can }               = useAuth();
   const { selectedCompanyId } = useBusiness();
-  const qc                    = useQueryClient();
+  const _qc                    = useQueryClient();
   const cq = selectedCompanyId ? `?companyId=${selectedCompanyId}` : '';
 
   const [connectModal, setConnectModal] = useState(false);
@@ -78,7 +79,7 @@ const BankFeeds: React.FC = () => {
 
   const kpi = [
     { label: 'Total Feeds',  value: feeds.length,                                              color: 'slate'   as const },
-    { label: 'Connected',    value: feeds.filter(f => f.status === 'CONNECTED').length,        color: 'emerald' as const },
+    { label: 'Connected',    value: feeds.filter(f => f.status === 'CONNECTED').length,        color: 'green' as const },
     { label: 'Errors',       value: feeds.filter(f => f.status === 'ERROR').length,            color: 'rose'    as const },
     { label: 'Pending Auth', value: feeds.filter(f => f.status === 'PENDING_AUTH').length,     color: 'amber'   as const },
   ];
@@ -143,8 +144,8 @@ const BankFeeds: React.FC = () => {
       title="Bank Feeds"
       subtitle="Automated bank connections via Plaid · GoCardless · Manual MT940/OFX upload"
       icon={<Rss size={18} />}
-      iconBg="bg-indigo-500"
-      crumbs={[{ label: 'Banking', href: '/banking' }, { label: 'Bank Feeds' }]}
+      iconBg="bg-[var(--pro-azure-50)]0"
+      crumbs={[{ label: 'Banking', to: '/banking' }, { label: 'Bank Feeds' }]}
       actions={
         <div className="flex items-center gap-2">
           <Btn variant="ghost" size="sm" icon={<RefreshCw size={11} />} onClick={() => refetch()}>Refresh</Btn>
@@ -183,7 +184,7 @@ const BankFeeds: React.FC = () => {
         </div>
       ) : feeds.length === 0 ? (
         <EmptyState
-          icon={<Rss size={20} className="text-indigo-400" />}
+          icon={<Rss size={20} className="text-[var(--pro-azure-light)]" />}
           title="No bank feeds connected"
           desc="Connect Plaid or GoCardless for automated syncing, or use the MT940/OFX importer for manual uploads."
           action={can('banking:write') ? { label: 'Connect Feed', onClick: () => setConnectModal(true) } : undefined}

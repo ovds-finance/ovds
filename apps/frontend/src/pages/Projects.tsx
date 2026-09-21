@@ -2,27 +2,28 @@
  * Projects — full project management with tasks, milestones, timesheets
  * Ovds style: AppPage · AppKpi · AppTable · tabs · modals
  */
-import React, { useState, useMemo, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ClipboardList, Plus, Edit2, Trash2, RefreshCw,
   Calendar, CheckSquare, Flag, Clock, ChevronRight,
   BarChart2, Users, Target, MessageSquare, Paperclip,
   Play, Square, Activity, Link2, TrendingUp,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import { fmtETB } from '../utils/ethiopianTax';
-import api from '../services/api';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select, Textarea,
   SearchBar, EmptyState, Pagination, Amount,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { confirm } from '../utils/confirm';
+import { fmtETB } from '../utils/ethiopianTax';
 
 // -- Types ---------------------------------------------------------------------
 interface Project {
@@ -33,7 +34,7 @@ interface Project {
   _count?: { tasks: number; milestones: number; timesheets: number };
 }
 interface ProjectTask {
-  id: string; projectId: string; title: string; description?: string;
+  id: string; projectId: string; milestoneId?: string; title: string; description?: string;
   status: string; priority: string; assignedTo?: string;
   dueDate?: string; estimatedHours?: number; actualHours?: number;
   completedAt?: string; createdAt: string;
@@ -42,6 +43,7 @@ interface ProjectTask {
 interface ProjectMilestone {
   id: string; projectId: string; name: string; description?: string;
   status: string; dueDate?: string; completedAt?: string; createdAt: string;
+  progress?: number; budget?: number; spent?: number;
 }
 interface ProjectTimesheet {
   id: string; projectId: string; taskId?: string; employeeName?: string;
@@ -62,6 +64,7 @@ interface ProjectTimer {
   id: string; projectId: string; taskId: string;
   employeeName?: string; userId?: string;
   startedAt: string; stoppedAt?: string; hours?: number; notes?: string;
+  task?: { id: string; title: string };
 }
 interface ProjectActivity {
   id: string; projectId: string; taskId?: string; milestoneId?: string;
@@ -98,7 +101,7 @@ const PRIORITY_COLOR: Record<string, string> = {
 };
 const TASK_STATUS_COLOR: Record<string, string> = {
   TODO: 'bg-slate-100 text-slate-600', IN_PROGRESS: 'bg-sky-100 text-sky-700',
-  REVIEW: 'bg-amber-100 text-amber-700', DONE: 'bg-emerald-100 text-emerald-700',
+  REVIEW: 'bg-amber-100 text-amber-700', DONE: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   CANCELLED: 'bg-rose-100 text-rose-600',
 };
 
@@ -147,10 +150,10 @@ const ProjectForm: React.FC<{ data: Partial<Project>; onChange: (d: Partial<Proj
         <div className="p-3 bg-white rounded-xl border border-slate-100">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-[10px] font-semibold text-slate-500">Budget Used</span>
-            <span className={`text-[10px] font-bold ${pct > 90 ? 'text-rose-600' : pct > 70 ? 'text-amber-600' : 'text-emerald-600'}`}>{pct.toFixed(1)}%</span>
+            <span className={`text-[10px] font-bold ${pct > 90 ? 'text-rose-600' : pct > 70 ? 'text-amber-600' : 'text-[var(--pro-azure)]'}`}>{pct.toFixed(1)}%</span>
           </div>
           <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-            <div className={`h-full rounded-full ${pct > 90 ? 'bg-rose-500' : pct > 70 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${pct}%` }} />
+            <div className={`h-full rounded-full ${pct > 90 ? 'bg-rose-500' : pct > 70 ? 'bg-amber-500' : 'bg-[var(--pro-azure-50)]0'}`} style={{ width: `${pct}%` }} />
           </div>
         </div>
       )}
@@ -436,7 +439,7 @@ const ProjectDetail: React.FC<{
   const [timerModal, setTimerModal] = useState<{ open: boolean; data: Partial<ProjectTimer> }>({ open: false, data: {} });
   const [activityModal, setActivityModal] = useState<{ open: boolean; data: Partial<ProjectActivity> }>({ open: false, data: {} });
   const [linkModal, setLinkModal] = useState<{ open: boolean; data: Partial<ProjectFinancialLink> }>({ open: false, data: {} });
-  const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
+  const [activeTaskId, _setActiveTaskId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const { data: tasks = [], refetch: refetchTasks } = useQuery<ProjectTask[]>({
@@ -482,7 +485,7 @@ const ProjectDetail: React.FC<{
     enabled: detailTab === 'financials',
     queryFn: () => api.get(`/projects/${project.id}/financial-links`).then((r: any) => r.data),
   });
-  const { data: taskFinancialLinks = [], refetch: refetchTaskFinancials } = useQuery<ProjectFinancialLink[]>({
+  const { data: taskFinancialLinks = [], refetch: _refetchTaskFinancials } = useQuery<ProjectFinancialLink[]>({
     queryKey: ['project-task-financial-links', project.id, currentTaskId],
     enabled: detailTab === 'financials' && !!currentTaskId,
     queryFn: () => api.get(`/projects/tasks/${currentTaskId}/financial-links`).then((r: any) => r.data),
@@ -744,7 +747,7 @@ const ProjectDetail: React.FC<{
           { label: 'Tasks', value: `${doneTasks}/${tasks.length}`, icon: <CheckSquare size={13} className="text-sky-500" /> },
           { label: 'Milestones', value: `${completedMs}/${milestones.length}`, icon: <Target size={13} className="text-violet-500" /> },
           { label: 'Hours', value: `${(tsSummary?.totalHours ?? 0).toFixed(1)}h`, icon: <Clock size={13} className="text-amber-500" /> },
-          { label: 'Billable', value: fmtETB(totalBillable), icon: <BarChart2 size={13} className="text-emerald-500" /> },
+          { label: 'Billable', value: fmtETB(totalBillable), icon: <BarChart2 size={13} className="text-[var(--pro-azure)]" /> },
         ].map(k => (
           <div key={k.label} className="bg-white rounded-xl p-3 border border-slate-100">
             <div className="flex items-center gap-1.5 mb-1">{k.icon}<span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide">{k.label}</span></div>
@@ -758,10 +761,10 @@ const ProjectDetail: React.FC<{
         <div className="px-4 py-2 border-b border-slate-100">
           <div className="flex items-center justify-between mb-1">
             <span className="ovds-caption">Budget: <span className="font-semibold text-slate-600">{fmtETB(project.budget)}</span></span>
-            <span className={`text-[10px] font-bold ${pct > 90 ? 'text-rose-600' : pct > 70 ? 'text-amber-600' : 'text-emerald-600'}`}>{pct.toFixed(1)}% used</span>
+            <span className={`text-[10px] font-bold ${pct > 90 ? 'text-rose-600' : pct > 70 ? 'text-amber-600' : 'text-[var(--pro-azure)]'}`}>{pct.toFixed(1)}% used</span>
           </div>
           <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-            <div className={`h-full rounded-full transition-all ${pct > 90 ? 'bg-rose-500' : pct > 70 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${pct}%` }} />
+            <div className={`h-full rounded-full transition-all ${pct > 90 ? 'bg-rose-500' : pct > 70 ? 'bg-amber-500' : 'bg-[var(--pro-azure-50)]0'}`} style={{ width: `${pct}%` }} />
           </div>
         </div>
       )}
@@ -780,7 +783,7 @@ const ProjectDetail: React.FC<{
           { key: 'profitability', label: 'Profit', count: 0 },
         ] as { key: DetailTab; label: string; count: number }[]).map(t => (
           <button key={t.key} onClick={() => setDetailTab(t.key)}
-            className={`px-3 py-1.5 text-[11px] font-semibold rounded-lg capitalize transition-all ${detailTab === t.key ? 'bg-emerald-50 text-emerald-700' : 'text-slate-500 hover:bg-slate-50'}`}>
+            className={`px-3 py-1.5 text-[11px] font-semibold rounded-lg capitalize transition-all ${detailTab === t.key ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]' : 'text-slate-500 hover:bg-slate-50'}`}>
             {t.label} {t.count > 0 && `(${t.count})`}
           </button>
         ))}
@@ -821,14 +824,14 @@ const ProjectDetail: React.FC<{
                     {task.estimatedHours && <span className="ovds-caption">{task.estimatedHours}h est.</span>}
                     {task.actualHours && <span className="ovds-caption">{Number(task.actualHours).toFixed(1)}h actual</span>}
                     <span className="text-[10px] font-semibold text-slate-500">Billing: {task.billingStyle ?? 'HOURLY'}</span>
-                    {task.fixedRate && <span className="text-[10px] font-semibold text-emerald-600">{fmtETB(Number(task.fixedRate))}</span>}
+                    {task.fixedRate && <span className="text-[10px] font-semibold text-[var(--pro-azure)]">{fmtETB(Number(task.fixedRate))}</span>}
                     {ms && <span className="text-[9px] font-semibold text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded">{ms.name}</span>}
                   </div>
                 </div>
                 {canWrite && (
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => startTimer(task.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600" title="Start timer"><Play size={10} /></button>
-                    <button onClick={() => setTaskModal({ open: true, data: { ...task } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"><Edit2 size={10} /></button>
+                    <button onClick={() => startTimer(task.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)]" title="Start timer"><Play size={10} /></button>
+                    <button onClick={() => setTaskModal({ open: true, data: { ...task } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)]"><Edit2 size={10} /></button>
                     <button onClick={() => deleteTask(task.id, task.title)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600"><Trash2 size={10} /></button>
                   </div>
                 )}
@@ -847,7 +850,7 @@ const ProjectDetail: React.FC<{
                 const msProgress = msTasks.length > 0 ? Math.round((doneMsTasks / msTasks.length) * 100) : (ms.progress ?? 0);
                 return (
                 <div key={ms.id} className="flex items-start gap-3 p-3 bg-white border border-slate-100 rounded-xl hover:border-slate-200 transition-all group">
-                  <Flag size={14} className={ms.status === 'COMPLETED' ? 'text-emerald-500' : ms.status === 'MISSED' ? 'text-rose-500' : 'text-amber-500'} />
+                  <Flag size={14} className={ms.status === 'COMPLETED' ? 'text-[var(--pro-azure)]' : ms.status === 'MISSED' ? 'text-rose-500' : 'text-amber-500'} />
                   <div className="flex-1 min-w-0">
                     <p className="text-[12px] font-semibold text-slate-800 truncate">{ms.name}</p>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
@@ -861,13 +864,13 @@ const ProjectDetail: React.FC<{
                         <span className="text-[9px] font-bold text-slate-500">{msProgress}%</span>
                       </div>
                       <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full transition-all ${msProgress >= 100 ? 'bg-emerald-500' : msProgress > 50 ? 'bg-sky-500' : 'bg-amber-500'}`} style={{ width: `${Math.min(100, msProgress)}%` }} />
+                        <div className={`h-full rounded-full transition-all ${msProgress >= 100 ? 'bg-[var(--pro-azure-50)]0' : msProgress > 50 ? 'bg-sky-500' : 'bg-amber-500'}`} style={{ width: `${Math.min(100, msProgress)}%` }} />
                       </div>
                     </div>
                   </div>
                   {canWrite && (
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => setMsModal({ open: true, data: { ...ms } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"><Edit2 size={10} /></button>
+                      <button onClick={() => setMsModal({ open: true, data: { ...ms } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)]"><Edit2 size={10} /></button>
                       <button onClick={() => deleteMilestone(ms.id, ms.name)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600"><Trash2 size={10} /></button>
                     </div>
                   )}
@@ -890,13 +893,13 @@ const ProjectDetail: React.FC<{
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="ovds-caption">{new Date(ts.date).toLocaleDateString()}</span>
                     {ts.employeeName && <span className="ovds-caption">{ts.employeeName}</span>}
-                    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${ts.billable ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>{ts.billable ? 'Billable' : 'Non-billable'}</span>
-                    {ts.billableAmount != null && ts.billableAmount > 0 && <span className="text-[10px] font-semibold text-emerald-600">{fmtETB(ts.billableAmount)}</span>}
+                    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${ts.billable ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' : 'bg-slate-100 text-slate-500'}`}>{ts.billable ? 'Billable' : 'Non-billable'}</span>
+                    {ts.billableAmount != null && ts.billableAmount > 0 && <span className="text-[10px] font-semibold text-[var(--pro-azure)]">{fmtETB(ts.billableAmount)}</span>}
                   </div>
                 </div>
                 {canWrite && (
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => setTsModal({ open: true, data: { ...ts } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"><Edit2 size={10} /></button>
+                    <button onClick={() => setTsModal({ open: true, data: { ...ts } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)]"><Edit2 size={10} /></button>
                     <button onClick={() => deleteTimesheet(ts.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600"><Trash2 size={10} /></button>
                   </div>
                 )}
@@ -919,7 +922,7 @@ const ProjectDetail: React.FC<{
                       </div>
                       {canWrite && (
                         <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => setCommentModal({ open: true, data: { ...c } })} className="text-[10px] text-slate-400 hover:text-emerald-600"><Edit2 size={10} /></button>
+                          <button onClick={() => setCommentModal({ open: true, data: { ...c } })} className="text-[10px] text-slate-400 hover:text-[var(--pro-azure)]"><Edit2 size={10} /></button>
                           <button onClick={() => deleteComment(c.id)} className="text-[10px] text-slate-400 hover:text-rose-600"><Trash2 size={10} /></button>
                         </div>
                       )}
@@ -943,10 +946,10 @@ const ProjectDetail: React.FC<{
                         <p className="text-[12px] font-semibold text-slate-800 truncate">{a.filename}</p>
                         <span className="text-[10px] text-slate-400">{a.mimeType || 'File'} · {new Date(a.createdAt).toLocaleDateString()}</span>
                       </div>
-                      <a href={a.url} target="_blank" rel="noreferrer" className="text-[10px] text-emerald-600 hover:underline">Open</a>
+                      <a href={a.url} target="_blank" rel="noreferrer" className="text-[10px] text-[var(--pro-azure)] hover:underline">Open</a>
                       {canWrite && (
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => setAttachModal({ open: true, data: { ...a } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"><Edit2 size={10} /></button>
+                          <button onClick={() => setAttachModal({ open: true, data: { ...a } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)]"><Edit2 size={10} /></button>
                           <button onClick={() => deleteAttachment(a.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600"><Trash2 size={10} /></button>
                         </div>
                       )}
@@ -962,8 +965,8 @@ const ProjectDetail: React.FC<{
               : <div className="space-y-2">
                   {timers.map(t => (
                     <div key={t.id} className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${t.stoppedAt ? 'bg-slate-100 border border-slate-200' : 'bg-emerald-50 border border-emerald-100'}`}>
-                        {t.stoppedAt ? <Square size={14} className="text-slate-400" /> : <Play size={14} className="text-emerald-500" />}
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${t.stoppedAt ? 'bg-slate-100 border border-slate-200' : 'bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)]'}`}>
+                        {t.stoppedAt ? <Square size={14} className="text-slate-400" /> : <Play size={14} className="text-[var(--pro-azure)]" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[12px] font-semibold text-slate-800">{t.task?.title || 'Timer'}</p>
@@ -971,7 +974,7 @@ const ProjectDetail: React.FC<{
                         {t.hours && <span className="text-[10px] font-semibold text-slate-600 ml-2">{t.hours}h</span>}
                       </div>
                       {!t.stoppedAt && canWrite && (
-                        <button onClick={() => stopTimer(t.id)} className="px-2 py-1 text-[10px] font-bold text-white bg-emerald-500 rounded-lg hover:bg-emerald-600">Stop</button>
+                        <button onClick={() => stopTimer(t.id)} className="px-2 py-1 text-[10px] font-bold text-white bg-[var(--pro-azure-50)]0 rounded-lg hover:bg-[var(--pro-azure-dark)]">Stop</button>
                       )}
                       {canWrite && (
                         <button onClick={() => deleteTimer(t.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600"><Trash2 size={10} /></button>
@@ -988,7 +991,7 @@ const ProjectDetail: React.FC<{
               : <div className="space-y-4">
                   {(() => {
                     const grouped: Record<string, ProjectActivity[]> = {};
-                    const noMilestone: ProjectActivity[] = [];
+                    const _noMilestone: ProjectActivity[] = [];
                     activities.forEach(a => {
                       const msId = a.milestoneId || '__no_milestone__';
                       if (!grouped[msId]) grouped[msId] = [];
@@ -1045,17 +1048,17 @@ const ProjectDetail: React.FC<{
                   <div className="space-y-2">
                     {taskFinancialLinks.map(l => (
                       <div key={l.id} className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${l.direction === 'IN' ? 'bg-emerald-50 border border-emerald-100' : 'bg-rose-50 border border-rose-100'}`}>
-                          <TrendingUp size={14} className={l.direction === 'IN' ? 'text-emerald-500' : 'text-rose-500'} />
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${l.direction === 'IN' ? 'bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)]' : 'bg-rose-50 border border-rose-100'}`}>
+                          <TrendingUp size={14} className={l.direction === 'IN' ? 'text-[var(--pro-azure)]' : 'text-rose-500'} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[12px] font-semibold text-slate-800">{l.linkType} {l.linkNumber ? `· ${l.linkNumber}` : ''}</p>
                           <span className="text-[10px] text-slate-400">{l.linkId} · {l.direction}</span>
                         </div>
-                        <span className={`text-[12px] font-bold ${l.direction === 'IN' ? 'text-emerald-600' : 'text-rose-600'}`}>{fmtETB(Number(l.amount))}</span>
+                        <span className={`text-[12px] font-bold ${l.direction === 'IN' ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>{fmtETB(Number(l.amount))}</span>
                         {canWrite && (
                           <div className="flex items-center gap-1">
-                            <button onClick={() => setLinkModal({ open: true, data: { ...l } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"><Edit2 size={10} /></button>
+                            <button onClick={() => setLinkModal({ open: true, data: { ...l } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)]"><Edit2 size={10} /></button>
                             <button onClick={() => deleteFinancialLink(l.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600"><Trash2 size={10} /></button>
                           </div>
                         )}
@@ -1071,17 +1074,17 @@ const ProjectDetail: React.FC<{
                   : <div className="space-y-2">
                       {financialLinks.map(l => (
                         <div key={l.id} className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${l.direction === 'IN' ? 'bg-emerald-50 border border-emerald-100' : 'bg-rose-50 border border-rose-100'}`}>
-                            <TrendingUp size={14} className={l.direction === 'IN' ? 'text-emerald-500' : 'text-rose-500'} />
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${l.direction === 'IN' ? 'bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)]' : 'bg-rose-50 border border-rose-100'}`}>
+                            <TrendingUp size={14} className={l.direction === 'IN' ? 'text-[var(--pro-azure)]' : 'text-rose-500'} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-[12px] font-semibold text-slate-800">{l.linkType} {l.linkNumber ? `· ${l.linkNumber}` : ''}</p>
                             <span className="text-[10px] text-slate-400">{l.linkId} · {l.direction}</span>
                           </div>
-                          <span className={`text-[12px] font-bold ${l.direction === 'IN' ? 'text-emerald-600' : 'text-rose-600'}`}>{fmtETB(Number(l.amount))}</span>
+                          <span className={`text-[12px] font-bold ${l.direction === 'IN' ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>{fmtETB(Number(l.amount))}</span>
                           {canWrite && (
                             <div className="flex items-center gap-1">
-                              <button onClick={() => setLinkModal({ open: true, data: { ...l } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"><Edit2 size={10} /></button>
+                              <button onClick={() => setLinkModal({ open: true, data: { ...l } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)]"><Edit2 size={10} /></button>
                               <button onClick={() => deleteFinancialLink(l.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600"><Trash2 size={10} /></button>
                             </div>
                           )}
@@ -1104,7 +1107,7 @@ const ProjectDetail: React.FC<{
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Task Revenue</p>
-                        <p className="text-sm font-bold text-emerald-600">{fmtETB(Number(taskProfitability.taskRevenue || 0))}</p>
+                        <p className="text-sm font-bold text-[var(--pro-azure)]">{fmtETB(Number(taskProfitability.taskRevenue || 0))}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Task Cost</p>
@@ -1112,11 +1115,11 @@ const ProjectDetail: React.FC<{
                       </div>
                       <div>
                         <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Task Profit</p>
-                        <p className={`text-sm font-bold ${Number(taskProfitability.taskProfit || 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{fmtETB(Number(taskProfitability.taskProfit || 0))}</p>
+                        <p className={`text-sm font-bold ${Number(taskProfitability.taskProfit || 0) >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>{fmtETB(Number(taskProfitability.taskProfit || 0))}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Task Margin</p>
-                        <p className={`text-sm font-bold ${Number(taskProfitability.taskMargin || 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{Number(taskProfitability.taskMargin || 0).toFixed(1)}%</p>
+                        <p className={`text-sm font-bold ${Number(taskProfitability.taskMargin || 0) >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>{Number(taskProfitability.taskMargin || 0).toFixed(1)}%</p>
                       </div>
                     </div>
                   </div>
@@ -1127,7 +1130,7 @@ const ProjectDetail: React.FC<{
                   <div className="grid grid-cols-2 gap-3">
                     <div className="p-4 bg-white border border-slate-100 rounded-xl">
                       <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Income</p>
-                      <p className="text-lg font-bold text-emerald-600">{fmtETB(profitability.totalIncome)}</p>
+                      <p className="text-lg font-bold text-[var(--pro-azure)]">{fmtETB(profitability.totalIncome)}</p>
                     </div>
                     <div className="p-4 bg-white border border-slate-100 rounded-xl">
                       <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Expenses</p>
@@ -1135,11 +1138,11 @@ const ProjectDetail: React.FC<{
                     </div>
                     <div className="p-4 bg-white border border-slate-100 rounded-xl">
                       <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Net Profit</p>
-                      <p className={`text-lg font-bold ${profitability.netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{fmtETB(profitability.netProfit)}</p>
+                      <p className={`text-lg font-bold ${profitability.netProfit >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>{fmtETB(profitability.netProfit)}</p>
                     </div>
                     <div className="p-4 bg-white border border-slate-100 rounded-xl">
                       <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Margin</p>
-                      <p className={`text-lg font-bold ${profitability.margin >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{profitability.margin.toFixed(1)}%</p>
+                      <p className={`text-lg font-bold ${profitability.margin >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>{profitability.margin.toFixed(1)}%</p>
                     </div>
                   </div>
                   <div className="p-4 bg-white border border-slate-100 rounded-xl">
@@ -1251,7 +1254,7 @@ const Projects: React.FC = () => {
     const totalBudget = rows.reduce((s, p) => s + (p.budget ?? 0), 0);
     const totalSpent  = rows.reduce((s, p) => s + (p.spent ?? 0), 0);
     return [
-      { label: 'Total',     value: rows.length,                                       color: 'emerald' as const },
+      { label: 'Total',     value: rows.length,                                       color: 'green' as const },
       { label: 'Active',    value: rows.filter(p => p.status === 'ACTIVE').length,    color: 'sky' as const },
       { label: 'Completed', value: rows.filter(p => p.status === 'COMPLETED').length, color: 'violet' as const },
       { label: 'Budget',    value: fmtETB(totalBudget),                               color: 'amber' as const },
@@ -1330,12 +1333,12 @@ const Projects: React.FC = () => {
                 const pct = p.budget && p.spent ? Math.min(100, (p.spent / p.budget) * 100) : 0;
                 const isSelected = selected?.id === p.id;
                 return (
-                  <AppTr key={p.id} className={isSelected ? 'bg-emerald-50/50' : ''}>
+                  <AppTr key={p.id} className={isSelected ? 'bg-[var(--pro-azure-50)]/50' : ''}>
                     <AppTd>
                       <button onClick={() => setSelected(isSelected ? null : p)} className="text-left group/name">
-                        <p className="text-[12px] font-semibold text-slate-800 group-hover/name:text-emerald-600 flex items-center gap-1">
+                        <p className="text-[12px] font-semibold text-slate-800 group-hover/name:text-[var(--pro-azure)] flex items-center gap-1">
                           {p.name}
-                          <ChevronRight size={10} className={`transition-transform ${isSelected ? 'rotate-90 text-emerald-500' : 'text-slate-300'}`} />
+                          <ChevronRight size={10} className={`transition-transform ${isSelected ? 'rotate-90 text-[var(--pro-azure)]' : 'text-slate-300'}`} />
                         </p>
                         {p.description && <p className="text-[10px] text-slate-400 truncate max-w-[160px]">{p.description}</p>}
                       </button>
@@ -1353,7 +1356,7 @@ const Projects: React.FC = () => {
                             <span className="ovds-caption">{pct.toFixed(0)}%</span>
                           </div>
                           <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                            <div className={`h-full rounded-full ${pct > 90 ? 'bg-rose-500' : pct > 70 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${pct}%` }} />
+                            <div className={`h-full rounded-full ${pct > 90 ? 'bg-rose-500' : pct > 70 ? 'bg-amber-500' : 'bg-[var(--pro-azure-50)]0'}`} style={{ width: `${pct}%` }} />
                           </div>
                         </div>
                       ) : <span className="text-[10px] text-slate-300">—</span>}
@@ -1371,7 +1374,7 @@ const Projects: React.FC = () => {
                       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         {can('projects:write') && (
                           <>
-                            <button onClick={() => setModal({ open: true, data: { ...p } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all"><Edit2 size={11} /></button>
+                            <button onClick={() => setModal({ open: true, data: { ...p } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all"><Edit2 size={11} /></button>
                             <button onClick={async () => { if (await confirm({ title: `Delete "${p.name}"?`, variant: 'danger' })) { remove(p.id); if (selected?.id === p.id) setSelected(null); } }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all"><Trash2 size={11} /></button>
                           </>
                         )}

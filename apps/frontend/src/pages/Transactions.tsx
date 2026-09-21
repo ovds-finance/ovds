@@ -1,26 +1,27 @@
 /**
  * Transactions — ovds-style unified transaction ledger
- * White background · Emerald text · White-blue icons
+ * White background · indigo text · White-blue icons
  * Shows all bank transactions with reconciliation status
  */
-import React, { useState, useMemo, useEffect } from 'react';
+import {
+  AppPage, AppTabs, AppKpi,
+  StatusBadge, Btn, Toolbar, IconBox, Amount, DataTable, DataTableColumn,
+} from '@ovds/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSearchParams } from 'react-router-dom';
 import {
   ArrowUpRight, ArrowDownRight, RefreshCw, Download,
   CheckCircle2, Clock, AlertCircle, Landmark,
   ArrowLeftRight, Plus,
 } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import api from '../services/api';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { fmtETB } from '../utils/ethiopianTax';
-import {
-  AppPage, AppTabs, AppKpi,
-  StatusBadge, Btn, Toolbar, IconBox, Amount, DataTable, DataTableColumn,
-} from '@ovds/ui';
+import { useSearchParams } from 'react-router-dom';
+
 import { Modal, FormField, Input, Textarea } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { fmtETB } from '../utils/ethiopianTax';
 
 type TxType = 'ALL' | 'CREDIT' | 'DEBIT';
 type TxStatus = 'ALL' | 'PENDING' | 'RECONCILED' | 'UNRECONCILED';
@@ -94,6 +95,7 @@ const Transactions: React.FC = () => {
     staleTime: 30_000,
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const rows: any[]   = Array.isArray(raw) ? raw : (raw?.data ?? raw?.transactions ?? []);
   const total: number = raw?.pagination?.total ?? raw?.total ?? rows.length;
 
@@ -120,11 +122,11 @@ const Transactions: React.FC = () => {
     const pending  = rows.filter((r: any) => r.status === 'PENDING').length;
     const recon    = rows.filter((r: any) => r.status === 'RECONCILED').length;
     return [
-      { label: 'Total In',    value: fmtETB(totalIn),  icon: <ArrowUpRight size={13} />,   iconCls: 'bg-emerald-50 text-emerald-600', color: 'emerald' as const },
+      { label: 'Total In',    value: fmtETB(totalIn),  icon: <ArrowUpRight size={13} />,   iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]', color: 'green' as const },
       { label: 'Total Out',   value: fmtETB(totalOut), icon: <ArrowDownRight size={13} />, iconCls: 'bg-rose-50 text-rose-600',       color: 'rose' as const },
       { label: 'Net',         value: fmtETB(totalIn - totalOut), icon: <ArrowLeftRight size={13} />, iconCls: 'bg-sky-50 text-sky-600', color: 'sky' as const },
       { label: 'Pending',     value: pending,           icon: <Clock size={13} />,          iconCls: 'bg-amber-50 text-amber-600',     color: 'amber' as const },
-      { label: 'Reconciled',  value: recon,             icon: <CheckCircle2 size={13} />,   iconCls: 'bg-emerald-50 text-emerald-600', color: 'emerald' as const },
+      { label: 'Reconciled',  value: recon,             icon: <CheckCircle2 size={13} />,   iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]', color: 'green' as const },
     ];
   }, [rows]);
 
@@ -169,7 +171,7 @@ const Transactions: React.FC = () => {
         return (
           <div className="flex items-center justify-end gap-1 font-mono tabular-nums">
             {isCredit
-              ? <ArrowUpRight size={11} className="text-emerald-500" />
+              ? <ArrowUpRight size={11} className="text-[var(--pro-azure)]" />
               : <ArrowDownRight size={11} className="text-rose-500" />}
             <Amount value={Math.abs(amt)} positive={isCredit} negative={!isCredit} />
           </div>
@@ -186,7 +188,7 @@ const Transactions: React.FC = () => {
     r.status !== 'RECONCILED' ? (
       <button
         onClick={() => reconcileMutation.mutate(r.id)}
-        className="flex items-center gap-1 px-2 py-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 rounded border border-emerald-100 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900 transition-all"
+        className="flex items-center gap-1 px-2 py-1 text-[10px] font-semibold text-[var(--pro-azure-dark)] bg-[var(--pro-azure-50)] rounded border border-[var(--pro-azure-100)] hover:bg-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-900 transition-all"
         title="Mark reconciled"
       >
         <CheckCircle2 size={10} /> Reconcile
@@ -305,7 +307,7 @@ const Transactions: React.FC = () => {
             {/* colour band */}
             <div className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-semibold ${
               txModal === 'income'
-                ? 'bg-emerald-50 text-emerald-700'
+                ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]'
                 : 'bg-rose-50 text-rose-700'
             }`}>
               {txModal === 'income'

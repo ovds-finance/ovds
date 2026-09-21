@@ -19,11 +19,14 @@
  *   entityId, feature, companyId, values: customValues
  * })
  */
-import React, { useEffect, useCallback, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { orpcUtils } from '../lib/orpc';
-import { FormField, Input, Textarea, Select } from './ui';
 import type { CustomFieldFeature } from '@ovds/contracts/schemas';
+import { useQuery } from '@tanstack/react-query';
+import React, { useEffect, useCallback, useMemo } from 'react';
+
+import { orpcUtils } from '../lib/orpc';
+
+import { FormField, Input, Textarea, Select } from './ui';
+
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -172,7 +175,7 @@ const FieldInput: React.FC<FieldInputProps> = ({ field, value, onChange }) => {
             type="checkbox"
             checked={value === 'true'}
             onChange={(e) => onChange(e.target.checked ? 'true' : 'false')}
-            className="accent-emerald-600 w-4 h-4"
+            className="accent-indigo-600 w-4 h-4"
           />
           <span className="text-[12px] text-slate-600 dark:text-slate-400">
             {field.label}
@@ -190,7 +193,7 @@ const FieldInput: React.FC<FieldInputProps> = ({ field, value, onChange }) => {
               onChange={(e) => onChange(e.target.checked ? 'true' : 'false')}
               className="sr-only peer"
             />
-            <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300 dark:peer-focus:ring-emerald-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-emerald-600"></div>
+            <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[var(--pro-azure-light)] dark:peer-focus:ring-green-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-[var(--pro-azure)]"></div>
           </div>
           <span className="text-[12px] text-slate-600 dark:text-slate-400">
             {field.label}
@@ -229,8 +232,8 @@ const FieldInput: React.FC<FieldInputProps> = ({ field, value, onChange }) => {
                 onClick={() => toggle(o.value)}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all ${
                   active
-                    ? 'bg-emerald-500 text-white border-emerald-500'
-                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-emerald-300'
+                    ? 'bg-[var(--pro-azure)] text-white border-[var(--pro-azure)]'
+                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-[var(--pro-azure-light)]'
                 }`}
               >
                 {o.label}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+
 import api from '../services/api';
 
 // -- In-memory cache: url → { data, ts } -------------------------------------
@@ -101,7 +102,7 @@ interface UseApiQueryOptions<T> {
   keepPreviousData?: boolean;
 }
 
-interface UseApiQueryResult<T> {
+export interface UseApiQueryResult<T> {
   data: T | null;
   loading: boolean;
   /** Structured error with status code, fields, and type flags */

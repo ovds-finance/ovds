@@ -1,13 +1,16 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
+import { Controller, Get, Post, Put, Patch, Delete, Body, Param, Query, UseGuards, Request, HttpCode, HttpStatus } from '@nestjs/common';
 import { ValidationPipe } from '@nestjs/common';
-import { SalesService } from './sales.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { PermissionsGuard } from '../auth/guards/permissions.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
+import { ApiTags, ApiOperation, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
+
+
 import { Permissions } from '../auth/decorators/permissions.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../auth/guards/permissions.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+
 import { CreateInvoiceDto, UpdateInvoiceDto, QueryInvoicesDto, RecordPaymentDto } from './dto/invoice.dto';
+import { SalesService } from './sales.service';
 
 @ApiTags('sales')
 @Controller('sales')
@@ -27,8 +30,12 @@ export class SalesController {
   @Permissions('invoices:read')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get next invoice number' })
-  nextNumber(@Request() req: any) {
-    return this.salesService.getNextNumber(req.user?.companyId);
+  // GAP-4 FIX: accept companyId as an optional query param so that users who
+  // manage multiple companies (e.g. SysAdmin switching context in the UI) get
+  // the sequence for the selected company, not their auth-token company.
+  // Falls back to req.user?.companyId for single-company setups.
+  nextNumber(@Query('companyId') companyId: string, @Request() req: any) {
+    return this.salesService.getNextNumber(companyId || req.user?.companyId);
   }
 
   @Get('invoices/stats')
@@ -66,9 +73,17 @@ export class SalesController {
   @Put('invoices/:id')
   @Permissions('invoices:write')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Update invoice' })
+  @ApiOperation({ summary: 'Full replace of an invoice (PUT)' })
   update(@Param('id') id: string, @Body(ValidationPipe) data: UpdateInvoiceDto, @Request() req: any) {
     return this.salesService.update(id, data, req.user?.userId);
+  }
+
+  @Patch('invoices/:id')
+  @Permissions('invoices:write')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Partial update of an invoice (PATCH) — only provided fields are changed' })
+  patch(@Param('id') id: string, @Body(ValidationPipe) data: Partial<UpdateInvoiceDto>, @Request() req: any) {
+    return this.salesService.update(id, data as UpdateInvoiceDto, req.user?.userId);
   }
 
   @Delete('invoices/:id')

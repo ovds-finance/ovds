@@ -4,6 +4,7 @@
  */
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
+
 import { NotificationDispatchService } from './notification-dispatch.service';
 import { NotificationEvent, NOTIFICATION_EVENTS } from './notification.events';
 

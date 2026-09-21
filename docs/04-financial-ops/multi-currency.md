@@ -7,7 +7,7 @@
 >
 > **Navigate to:** **Settings → Currencies** (`/fx-rates`) · **Accounting → FX Rates**
 
-OVDS supports multi-currency invoice, billing, and bank accounts. All foreign-currency transactions are automatically converted to ETB for financial statements, with exchange gains and losses calculated per **IAS 21** and posted to the GL.
+Ovds supports multi-currency invoice, billing, and bank accounts. All foreign-currency transactions are automatically converted to ETB for financial statements, with exchange gains and losses calculated per **IAS 21** and posted to the GL.
 
 ---
 
@@ -31,7 +31,7 @@ Once added, the currency is available as a selection on invoices, bills, bank ac
 | NBE live feed | Set `NBE_RATES_API_URL` in `.env` | Updates daily from National Bank of Ethiopia |
 | Automatic fallback | If live feed fails, uses last known rate | Rate shown in UI for transparency |
 
-> For BIT and VAT reporting, use the NBE rate on the **transaction date** — OVDS records and uses this rate automatically.
+> For BIT and VAT reporting, use the NBE rate on the **transaction date** — Ovds records and uses this rate automatically.
 
 ---
 
@@ -43,7 +43,7 @@ Once added, the currency is available as a selection on invoices, bills, bank ac
 2. In the **Billing** section, select or create the customer — set their **Payment Currency** to USD, EUR, etc.
 3. When you return to the invoice, the **Currency** field will show the customer's currency.
 4. Enter line item prices in the foreign currency.
-5. OVDS automatically shows:
+5. Ovds automatically shows:
    - The foreign currency amount on the invoice PDF
    - The **ETB equivalent** at today's exchange rate
    - Both amounts are included on the invoice for IAS 21 compliance
@@ -57,7 +57,7 @@ When the customer pays:
 1. Open the invoice → click **Add Payment**.
 2. Select the bank account the payment was received into (a foreign-currency account if you hold USD/EUR).
 3. Enter the **amount received in the foreign currency**.
-4. OVDS converts to ETB using the exchange rate on the payment date.
+4. Ovds converts to ETB using the exchange rate on the payment date.
 5. If the rate has changed since the invoice date, an **exchange gain or loss** is calculated automatically:
 
 ```
@@ -88,7 +88,7 @@ When a foreign vendor bills you in USD or EUR:
 1. Open **Purchases → Bills → New Bill**.
 2. Select the vendor — set their **Payment Currency** in the vendor profile.
 3. Enter the bill amount in the foreign currency.
-4. OVDS records the ETB equivalent at the rate on the bill date.
+4. Ovds records the ETB equivalent at the rate on the bill date.
 5. On payment, if the rate has changed, an exchange difference is posted to **Exchange Gain/Loss**.
 
 ---
@@ -112,7 +112,7 @@ Dr / Cr  Foreign Currency Bank Account  (at closing rate)
 
 ## IAS 21 Compliance
 
-OVDS follows **IAS 21 — The Effects of Changes in Foreign Exchange Rates** for all foreign currency transactions.
+Ovds follows **IAS 21 — The Effects of Changes in Foreign Exchange Rates** for all foreign currency transactions.
 
 ### Key Principles Applied
 
@@ -127,11 +127,11 @@ OVDS follows **IAS 21 — The Effects of Changes in Foreign Exchange Rates** for
 
 ### Year-End Revaluation
 
-At year-end, OVDS automatically revalues all foreign currency monetary items (receivables, payables, bank balances) to the closing rate:
+At year-end, Ovds automatically revalues all foreign currency monetary items (receivables, payables, bank balances) to the closing rate:
 
 1. Go to **Accounting → FX Revaluation** at period end.
 2. Confirm the **closing rates** for each foreign currency.
-3. Click **Run Revaluation** — OVDS posts the revaluation entries.
+3. Click **Run Revaluation** — Ovds posts the revaluation entries.
 4. The exchange differences appear in the P&L under **ovds Costs** or **Other Income**.
 
 ---
@@ -154,11 +154,11 @@ The **Notes to Financial Statements** (`/reports?type=notes`) includes a require
 1. Create the invoice in USD (customer's preferred currency).
 2. When payment arrives in your USD bank account, record it there.
 3. Transfer the USD to ETB using **Banking → Fund Transfers** — select **Forex Conversion** as the transfer type.
-4. OVDS posts the conversion at the rate you specify and records any gain/loss.
+4. Ovds posts the conversion at the rate you specify and records any gain/loss.
 
 ### Vendor Pays You in ETB for a USD-Denominated Contract
 
-Record the bill in USD (the contract currency). When paying in ETB, enter the ETB amount paid — OVDS calculates the effective exchange rate and posts the difference.
+Record the bill in USD (the contract currency). When paying in ETB, enter the ETB amount paid — Ovds calculates the effective exchange rate and posts the difference.
 
 ### Tracking Multiple Currencies on the Dashboard
 

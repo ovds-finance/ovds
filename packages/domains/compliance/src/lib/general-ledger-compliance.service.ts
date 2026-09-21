@@ -2,7 +2,7 @@
  * GeneralLedgerComplianceService — domain lib
  *
  * Migrated from apps/backend/src/general-ledger-compliance/ into the
- * @ovds/domains/general-ledger-compliance library.
+ * @ovds/domains-general-ledger-compliance library.
  *
  * Acts as the single "control tower" for the AABE/IFRS compliance sidebar section.
  * Aggregates data from accounting, tax, and reporting domains into:
@@ -16,7 +16,7 @@ import {
   BaseService,
   IAuditLogger,
   IPrismaClient,
-} from '@ovds/domains/infrastructure';
+} from '@ovds/domains-infrastructure';
 
 // ── Dependency interfaces ─────────────────────────────────────────────────────
 

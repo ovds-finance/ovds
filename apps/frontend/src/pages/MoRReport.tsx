@@ -10,12 +10,14 @@
  *   Accounting Cycle · Compliance Dashboard
  */
 import React, { useState, useCallback, useEffect } from 'react';
+import toast from 'react-hot-toast';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable,
   AppTh, AppTd, AppTr, Btn, Icon,
 } from '../components/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
 import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
 import {
   getMoRPackage,
   getMoRCompliance,
@@ -25,7 +27,6 @@ import {
   getMoRNotes,
   getMoRExportUrl,
 } from '../services/ifrsApi';
-import toast from 'react-hot-toast';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const fmt = (n: number | undefined | null, dec = 2): string =>
@@ -79,7 +80,7 @@ function AR({
         <div className="text-sm">{en}</div>
         {am && <div className="text-xs text-gray-400">{am}</div>}
       </AppTd>
-      <td className="px-4 py-2 text-xs text-indigo-500 hidden md:table-cell">{ifrsRef ?? ''}</td>
+      <td className="px-4 py-2 text-xs text-[var(--pro-azure)] hidden md:table-cell">{ifrsRef ?? ''}</td>
       <AppTd align="right">
         <span className={`tabular-nums ${(amount ?? 0) < 0 ? 'text-red-600' : ''}`}>{val}</span>
       </AppTd>
@@ -90,7 +91,7 @@ function AR({
 /** Bold total row with double-top border */
 function TR({ en, am, amount }: { en: string; am?: string; amount?: number | null }) {
   return (
-    <tr className="border-t-2 border-gray-300 dark:border-gray-600 font-bold bg-indigo-50 dark:bg-indigo-900/20">
+    <tr className="border-t-2 border-gray-300 dark:border-gray-600 font-bold bg-[var(--pro-azure-50)] dark:bg-green-900/20">
       <td colSpan={3} className="px-4 py-2 text-sm">
         {en}{am && <span className="text-xs font-normal text-gray-500 ml-1">/ {am}</span>}
       </td>
@@ -102,9 +103,9 @@ function TR({ en, am, amount }: { en: string; am?: string; amount?: number | nul
 /** Coloured section label spanning all columns */
 function SEC({ title, am, color = 'indigo' }: { title: string; am?: string; color?: string }) {
   const cls: Record<string, string> = {
-    indigo: 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300',
+    indigo: 'bg-[var(--pro-azure-50)] dark:bg-green-900/20 text-[var(--pro-azure-dark)] dark:text-green-300',
     orange: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300',
-    blue:   'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300',
+    blue:   'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
     purple: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300',
     red:    'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300',
     teal:   'bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-300',
@@ -339,13 +340,13 @@ function OverviewTab({ pkg, comp, loading }: { pkg: any; comp: any; loading: boo
         ].map((l) => (
           l.ext
             ? <a key={l.href} href={l.href} target="_blank" rel="noreferrer"
-                className="flex flex-col items-center justify-center p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors text-center cursor-pointer">
-                <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">{l.label}</span>
+                className="flex flex-col items-center justify-center p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-[var(--pro-azure-light)] dark:hover:border-[var(--pro-azure-light)] transition-colors text-center cursor-pointer">
+                <span className="text-xs font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{l.label}</span>
                 <span className="text-xs text-gray-400 mt-0.5">{l.sub}</span>
               </a>
             : <a key={l.href} href={l.href}
-                className="flex flex-col items-center justify-center p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors text-center cursor-pointer">
-                <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">{l.label}</span>
+                className="flex flex-col items-center justify-center p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-[var(--pro-azure-light)] dark:hover:border-[var(--pro-azure-light)] transition-colors text-center cursor-pointer">
+                <span className="text-xs font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{l.label}</span>
                 <span className="text-xs text-gray-400 mt-0.5">{l.sub}</span>
               </a>
         ))}
@@ -479,7 +480,7 @@ function CashFlowTab({ s }: { s: any }) {
   const CfRow = ({ item }: { item: any }) => !item ? null : (
     <tr className="border-b border-gray-100 dark:border-gray-700">
       <AppTd><div className="text-sm">{item.label?.en}</div><div className="text-xs text-gray-400">{item.label?.am}</div></AppTd>
-      <td className="px-4 py-2 text-xs text-indigo-500 hidden md:table-cell">{item.ifrsRef ?? ''}</td>
+      <td className="px-4 py-2 text-xs text-[var(--pro-azure)] hidden md:table-cell">{item.ifrsRef ?? ''}</td>
       <AppTd align="right"><span className={`tabular-nums text-sm ${(item.amount ?? 0) < 0 ? 'text-red-600' : ''}`}>{fmt(item.amount)}</span></AppTd>
     </tr>
   );
@@ -496,7 +497,7 @@ function CashFlowTab({ s }: { s: any }) {
           <SEC title="Operating Activities" am="ከሥራ ጥሬ ገንዘብ" />
           <tr className="border-b dark:border-gray-700">
             <AppTd><div className="text-sm font-medium">Profit Before Tax / ቀረጥ በፊት ትርፍ</div></AppTd>
-            <td className="px-4 py-2 text-xs text-indigo-500 hidden md:table-cell">IAS 7.18</td>
+            <td className="px-4 py-2 text-xs text-[var(--pro-azure)] hidden md:table-cell">IAS 7.18</td>
             <AppTd align="right"><span className="tabular-nums">{fmt(s.profitBeforeTax)}</span></AppTd>
           </tr>
           <tr><td colSpan={3} className="px-4 py-1 text-xs text-gray-400 italic">Non-cash adjustments / ጥሬ ያልሆኑ ማስተካከያዎች:</td></tr>
@@ -517,7 +518,7 @@ function CashFlowTab({ s }: { s: any }) {
           <SEC title="Net Change in Cash" color="gray" />
           <tr className="border-b dark:border-gray-700 font-semibold">
             <AppTd><div className="text-sm">Net Change in Cash / ጥሬ ገንዘብ ለውጥ</div></AppTd>
-            <td className="px-4 py-2 text-xs text-indigo-500 hidden md:table-cell">IAS 7.45</td>
+            <td className="px-4 py-2 text-xs text-[var(--pro-azure)] hidden md:table-cell">IAS 7.45</td>
             <AppTd align="right"><span className={`tabular-nums ${(s.netChangeInCash ?? 0) < 0 ? 'text-red-600' : 'text-green-700'}`}>{fmt(s.netChangeInCash)}</span></AppTd>
           </tr>
           <AR en="Opening Cash" am="የመክፈቻ ጥሬ ገንዘብ" amount={s.openingCash} />
@@ -543,7 +544,7 @@ function EquityTab({ s }: { s: any }) {
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm border-collapse">
           <thead>
-            <tr className="bg-indigo-50 dark:bg-indigo-900/20">
+            <tr className="bg-[var(--pro-azure-50)] dark:bg-green-900/20">
               <th className="text-left px-3 py-2 font-semibold border-b dark:border-gray-600 min-w-48">Movement</th>
               {cols.map((c: any, i: number) => (
                 <th key={i} className="text-right px-3 py-2 font-semibold border-b dark:border-gray-600 whitespace-nowrap">
@@ -778,7 +779,7 @@ function CycleTab({ steps }: { steps: any[] }) {
           'border-gray-200 bg-white dark:bg-gray-800/50 dark:border-gray-700'}`}>
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 flex-1">
-              <span className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs font-bold flex items-center justify-center flex-shrink-0">
+              <span className="w-6 h-6 rounded-full bg-[var(--pro-azure-100)] dark:bg-green-900/40 text-[var(--pro-azure-dark)] dark:text-green-300 text-xs font-bold flex items-center justify-center flex-shrink-0">
                 {step.step}
               </span>
               <div>
@@ -795,9 +796,9 @@ function CycleTab({ steps }: { steps: any[] }) {
           </div>
         </div>
       ))}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3 text-xs text-blue-700 dark:text-blue-300">
+      <div className="bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-lg p-3 text-xs text-[var(--pro-azure-dark)]">
         <strong>Submit at:</strong>{' '}
-        <a href="https://etax.mor.gov.et" target="_blank" rel="noreferrer" className="underline hover:text-blue-900">etax.mor.gov.et</a>
+        <a href="https://etax.mor.gov.et" target="_blank" rel="noreferrer" className="underline hover:text-[var(--pro-azure-dark)]">etax.mor.gov.et</a>
         {' '}— VAT (30th next month) · PAYE (monthly) · Pension (30th, PFSA) · BIT/CIT (Nov 7 / 4 months after EFY)
       </div>
     </div>
@@ -860,7 +861,7 @@ function ComplianceTab({ c }: { c: any }) {
         </div>
         <p className="mt-2 text-xs text-gray-400">
           Portal:{' '}
-          <a href="https://etax.mor.gov.et" className="text-indigo-500 hover:underline" target="_blank" rel="noreferrer">
+          <a href="https://etax.mor.gov.et" className="text-[var(--pro-azure)] hover:underline" target="_blank" rel="noreferrer">
             etax.mor.gov.et
           </a>
         </p>
@@ -902,12 +903,12 @@ function NotesTab({ s }: { s: any }) {
             <button
               className={`w-full flex items-start justify-between gap-3 px-4 py-3 text-left transition-colors
                 ${isOpen
-                  ? 'bg-indigo-50 dark:bg-indigo-900/20'
+                  ? 'bg-[var(--pro-azure-50)] dark:bg-green-900/20'
                   : 'bg-white dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700/50'}`}
               onClick={() => setOpen(isOpen ? null : note.noteNumber)}
             >
               <div className="flex items-start gap-3 min-w-0">
-                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-xs font-bold flex items-center justify-center">
+                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-[var(--pro-azure-100)] dark:bg-green-900/50 text-[var(--pro-azure-dark)] dark:text-green-300 text-xs font-bold flex items-center justify-center">
                   {note.noteNumber}
                 </span>
                 <div className="min-w-0">
@@ -919,7 +920,7 @@ function NotesTab({ s }: { s: any }) {
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 {note.ifrsRef && (
-                  <span className="text-xs text-indigo-500 hidden sm:block">{note.ifrsRef}</span>
+                  <span className="text-xs text-[var(--pro-azure)] hidden sm:block">{note.ifrsRef}</span>
                 )}
                 <Icon
                   name={isOpen ? 'CHEVRON_UP' : 'CHEVRON_DOWN'}

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Hooks barrel export.
  *
  * Pure utility hooks are centralized in @ovds/ui — re-exported here for
@@ -137,6 +137,7 @@ export {
 export { useRbac, useRBAC } from './useRbac';
 export { usePermissionGuard } from './usePermissionGuard';
 export { useRouteGuard } from './useRouteGuard';
+export { useModuleGuard } from './useModuleGuard';
 export { useAuditLog } from './useAuditLog';
 export { useSessionRefresh } from './useSessionRefresh';
 
@@ -181,7 +182,7 @@ export { usePrefetch } from './usePrefetch';
 export { useRecentItems, type RecentItem, type UseRecentItemsResult } from './useRecentItems';
 export { useKeyboardNav, type UseKeyboardNavResult, type UseKeyboardNavOptions } from '@ovds/ui';
 
-// -- Blade state (Akaunting-style deterministic UI states) ----------------------
+// -- Blade state (Ovds SaaS style deterministic UI states) ----------------------
 export {
   useBladeState,
   type BladeState,

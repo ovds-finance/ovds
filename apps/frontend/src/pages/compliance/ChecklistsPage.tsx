@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
   useEimsBspChecklist,
   useEimsBspReport,
@@ -6,18 +5,21 @@ import {
   useEimsChecklist,
   useRecordBspResult,
 } from '@ovds/features/eims';
-import toast from 'react-hot-toast';
-import { useBusiness } from '../../context/businessContext';
 import {
   ClipboardList, BookOpen, Shield, CheckCircle2, Circle, Download,
 } from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+
+import { useBusiness } from '../../context/businessContext';
+
 
 const STATUS_COLORS: Record<string, string> = {
-  PASS: 'text-emerald-600 bg-emerald-50',
+  PASS: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   FAIL: 'text-rose-600 bg-rose-50',
   PENDING: 'text-amber-600 bg-amber-50',
-  COMPLETED: 'text-emerald-600 bg-emerald-50',
-  REGISTERED: 'text-emerald-600 bg-emerald-50',
+  COMPLETED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
+  REGISTERED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
 };
 
 const Badge: React.FC<{ status: string }> = ({ status }) => (
@@ -123,7 +125,7 @@ const ChecklistsPage: React.FC = () => {
                     <p className="text-sm font-medium">{tc.title}</p>
                     <p className="text-xs text-slate-500 mt-1">{tc.description}</p>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 ${tc.passed ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 ${tc.passed ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]' : 'bg-slate-100 text-slate-500'}`}>
                     {tc.passed ? 'PASS' : tc.automated ? 'Pending' : 'Manual'}
                   </span>
                 </div>
@@ -204,7 +206,7 @@ const ChecklistsPage: React.FC = () => {
             insaData?.checklist?.map((item: any) => (
               <div key={item.id} className="p-3 bg-white dark:bg-slate-900 rounded-xl border flex items-start gap-3">
                 {item.implemented
-                  ? <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+                  ? <CheckCircle2 size={16} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
                   : <Circle size={16} className="text-slate-300 shrink-0 mt-0.5" />}
                 <div>
                   <p className="text-xs font-mono text-slate-400">{item.id} · {item.area}</p>

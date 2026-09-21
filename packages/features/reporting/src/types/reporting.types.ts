@@ -3,6 +3,7 @@
  *
  * Shared TypeScript interfaces for the reporting domain.
  */
+import type React from 'react';
 
 // -- Reconciliation Projections (Peachtree / SigTax / IFRS) --------------------
 
@@ -401,6 +402,12 @@ export interface KpiCell {
   label: string;
   value: string | number;
   color?: string;
+  icon?: React.ReactNode;
+  sub?: string;
+  tooltip?: string;
+  onClick?: () => void;
+  trend?: number;
+  progress?: number;
 }
 
 export interface ReportColumn {

@@ -1,14 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../common/prisma.service';
+﻿import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PAGINATION_DEFAULT_LIMIT } from '@ovds/shared';
+
+import { PrismaService } from '../../common/prisma.service';
 
 @Injectable()
 export class BiometricsService {
+  private readonly logger = new Logger(BiometricsService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(query: { page?: number; limit?: number; employeeId?: string }) {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? PAGINATION_DEFAULT_LIMIT;
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || PAGINATION_DEFAULT_LIMIT;
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
@@ -55,7 +58,7 @@ export class BiometricsService {
         },
       });
     } catch (e) {
-      console.error(`[BIOMETRICS] Failed to update biometric record ${id}:`, e);
+      this.logger.warn(`Failed to update biometric record ${id}: ${e instanceof Error ? e.message : String(e)}`);
       throw new NotFoundException('Biometric record not found');
     }
   }
@@ -64,7 +67,7 @@ export class BiometricsService {
     try {
       return await this.prisma.biometricData.delete({ where: { id } });
     } catch (e) {
-      console.error(`[BIOMETRICS] Failed to delete biometric record ${id}:`, e);
+      this.logger.warn(`Failed to delete biometric record ${id}: ${e instanceof Error ? e.message : String(e)}`);
       throw new NotFoundException('Biometric record not found');
     }
   }

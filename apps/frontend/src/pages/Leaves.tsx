@@ -3,24 +3,25 @@
  * AppPage · AppKpi · AppTable · useApiCrud
  * Ethiopian labour law compliance
  */
-import React, { useState, useMemo, useCallback } from 'react';
 import {
   CalendarDays, Plus, Edit2, Trash2, RefreshCw, Download,
   CheckCircle2, XCircle, WifiOff,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { useOfflineQueue } from '../hooks/useOfflineQueue';
-import { confirm } from '../utils/confirm';
-import api from '../services/api';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select, Textarea,
   SearchBar, EmptyState, Pagination,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { useOfflineQueue } from '../hooks/useOfflineQueue';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { confirm } from '../utils/confirm';
 
 interface Leave {
   id: string;
@@ -62,7 +63,7 @@ const LeaveForm: React.FC<{ data: Partial<Leave>; onChange: (d: Partial<Leave>) 
         </FormField>
       </div>
       {days > 0 && (
-        <div className="flex items-center gap-2 p-2.5 bg-emerald-50 rounded-lg border border-emerald-100 text-[11px] font-semibold text-emerald-700">
+        <div className="flex items-center gap-2 p-2.5 bg-[var(--pro-azure-50)] rounded-lg border border-[var(--pro-azure-100)] text-[11px] font-semibold text-[var(--pro-azure-dark)]">
           <CalendarDays size={12} /> {days} working day{days !== 1 ? 's' : ''}
         </div>
       )}
@@ -100,6 +101,7 @@ const Leaves: React.FC = () => {
   }));
 
   // Map frontend Leave shape → backend ApplyLeaveDto / UpdateLeaveDto
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const save = async (payload: Partial<Leave> & { id?: string }) => {
     // Strip fields the backend DTOs don't accept
     const { leaveType, companyId: _cid, employeeId: _eid, employeeName: _en, days: _d, ...rest } = payload as any;
@@ -124,7 +126,7 @@ const Leaves: React.FC = () => {
   }, [rows, tab, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total',    value: rows.length,                                                    color: 'emerald' as const },
+    { label: 'Total',    value: rows.length,                                                    color: 'green' as const },
     { label: 'Pending',  value: rows.filter(l => l.status === 'PENDING').length,               color: 'amber' as const },
     { label: 'Approved', value: rows.filter(l => l.status === 'APPROVED').length,              color: 'sky' as const },
     { label: 'Days Out', value: rows.filter(l => l.status === 'APPROVED').reduce((s, l) => s + (l.days ?? 1), 0), color: 'violet' as const },
@@ -194,7 +196,7 @@ const Leaves: React.FC = () => {
   };
 
   const LEAVE_TYPE_CLS: Record<string, string> = {
-    ANNUAL:    'bg-emerald-50 text-emerald-700 border-emerald-100',
+    ANNUAL:    'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
     SICK:      'bg-rose-50 text-rose-700 border-rose-100',
     MATERNITY: 'bg-pink-50 text-pink-700 border-pink-100',
     PATERNITY: 'bg-sky-50 text-sky-700 border-sky-100',
@@ -256,7 +258,7 @@ const Leaves: React.FC = () => {
             <AppTr key={l.id}>
               <AppTd>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-[9px] font-bold shrink-0">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[var(--pro-azure)] to-teal-500 flex items-center justify-center text-white text-[9px] font-bold shrink-0">
                     {String(l.employeeName ?? l.employeeId ?? '?').charAt(0).toUpperCase()}
                   </div>
                   <span className="text-[12px] font-semibold text-slate-800">{l.employeeName ?? l.employeeId}</span>
@@ -275,7 +277,7 @@ const Leaves: React.FC = () => {
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {l.status === 'PENDING' && can('leaves:approve') && (
                     <>
-                      <button onClick={() => handleApprove(l.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Approve"><CheckCircle2 size={11} /></button>
+                      <button onClick={() => handleApprove(l.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Approve"><CheckCircle2 size={11} /></button>
                       <button onClick={() => handleReject(l.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Reject"><XCircle size={11} /></button>
                     </>
                   )}

@@ -1,6 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import toast from 'react-hot-toast';
-import {
+﻿import {
   ShieldAlert, Plus, Send, CheckCircle2, Clock, AlertTriangle,
   Printer, Search, Info, Trash2, RefreshCw, Banknote, X,
   Calculator, FileText, BarChart3, TrendingUp, Download, Zap,
@@ -8,8 +6,20 @@ import {
   CalendarClock, ArrowRight, Link2, Users, Receipt as ReceiptIcon,
   Building2, Fuel, Cigarette, Landmark, Ticket,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import toast from 'react-hot-toast';
+
 import api from '../../services/api';
 import { fmtDecimal } from '../../utils/fmt';
+
+/** Escape a value for safe HTML interpolation in document.write print windows. */
+const esc = (v: unknown): string =>
+  String(v ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
 
 // -- Types ---------------------------------------------------------------------
 type LevyCategory =
@@ -51,17 +61,17 @@ interface MonthlyRemittance {
 const LEVY_RULES: Record<LevyCategory, {
   label: string; rate: number; isFlat: boolean; flatAmount?: number; desc: string; color: string;
 }> = {
-  LOAN_VALUE:           { label: 'Loan Value',           rate: 0.01,   isFlat: false, desc: '1% of loan value disbursed',                    color: '#00E784' }, // emerald-500
+  LOAN_VALUE:           { label: 'Loan Value',           rate: 0.01,   isFlat: false, desc: '1% of loan value disbursed',                    color: '#4FBA6F' }, // brand green
   INSURANCE_PREMIUM:    { label: 'Insurance Premium',    rate: 0.01,   isFlat: false, desc: '1% of insurance premium collected',             color: '#7c3aed' }, // ovds-secondary
   SERVICE_FEES:         { label: 'Service Fees',         rate: 0.05,   isFlat: false, desc: '5% of service fees charged',                    color: '#f59e0b' }, // ovds-warning
   AIRTIME_SALES:        { label: 'Airtime Sales',        rate: 0.05,   isFlat: false, desc: '5% of airtime sold',                            color: '#0ea5e9' }, // sky-500
   TICKET_SALES:         { label: 'Ticket Sales',         rate: 0,      isFlat: true,  flatAmount: 100, desc: 'ETB 100 flat per ticket sold',  color: '#e11d48' }, // ovds-danger
-  ANNUAL_SALES_REVENUE: { label: 'Annual Sales Revenue', rate: 0.05,   isFlat: false, desc: '5% of annual sales revenue',                    color: '#00E784' }, // emerald-500
+  ANNUAL_SALES_REVENUE: { label: 'Annual Sales Revenue', rate: 0.05,   isFlat: false, desc: '5% of annual sales revenue',                    color: '#2ED47A' }, // brand vibrant green
   FUEL_SALES:           { label: 'Fuel Sales',           rate: 0,      isFlat: true,  flatAmount: 200, desc: 'ETB 200 flat per fuel issuance',color: '#f59e0b' }, // ovds-warning
   TOBACCO_ALCOHOL:      { label: 'Tobacco & Alcohol',    rate: 0.05,   isFlat: false, desc: '5% levy on tobacco & alcohol sales',            color: '#e11d48' }, // ovds-danger
   GOVERNMENT_SERVICES:  { label: 'Government Services',  rate: 0,      isFlat: true,  flatAmount: 200, desc: 'ETB 200 surcharge per service', color: '#64748b' }, // slate
   GOVERNMENT_BUDGET:    { label: 'Government Budget',    rate: 0.0025, isFlat: false, desc: '0.25% of annual budget allocation',             color: '#7c3aed' }, // ovds-secondary
-  SALARY_CONTRIBUTION:  { label: 'Salary Contribution',  rate: 0.01,   isFlat: false, desc: '1% of net salary paid',                         color: '#00E784' }, // emerald-500
+  SALARY_CONTRIBUTION:  { label: 'Salary Contribution',  rate: 0.01,   isFlat: false, desc: '1% of net salary paid',                         color: '#4FBA6F' }, // brand green
   DIVIDEND:             { label: 'Dividends',            rate: 0.01,   isFlat: false, desc: '1% of dividend distributions',                  color: '#7c3aed' }, // ovds-secondary
   OTHER:                { label: 'Other',                rate: 0.01,   isFlat: false, desc: '1% of sales or import value',                   color: '#94a3b8' }, // slate
 };
@@ -105,7 +115,7 @@ const forecastNextPeriod = (byPeriod: Record<string, { levy: number }>) => {
 
 const STATUS_CLS: Record<LevyStatus, string> = {
   COLLECTED: 'bg-amber-50 text-amber-600 border-amber-200',
-  REMITTED:  'bg-emerald-200/10 text-slate-800 border-emerald-200/20',
+  REMITTED:  'bg-[var(--pro-azure-200)]/10 text-slate-800 border-[var(--pro-azure-100)]/20',
   OVERDUE:   'bg-rose-50 text-rose-600 border-rose-200',
 };
 
@@ -122,10 +132,10 @@ const TrendBars: React.FC<{ data: { period: string; levy: number; remitted: numb
           <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-slate-700 border border-slate-600 text-slate-900 dark:text-white text-[10px] px-2.5 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none z-10 shadow-xl">
             <p className="font-semibold mb-0.5">{d.period}</p>
             <p className="text-amber-600">Collected: ETB {fmt(d.levy)}</p>
-            <p className="text-emerald-400">Remitted: ETB {fmt(d.remitted)}</p>
+            <p className="text-[var(--pro-azure-light)]">Remitted: ETB {fmt(d.remitted)}</p>
           </div>
           <div className="w-full rounded-t-sm bg-slate-700/40 relative overflow-hidden" style={{ height: `${(d.levy / max) * 100}%`, minHeight: 4 }}>
-            <div className="absolute bottom-0 left-0 right-0 bg-emerald-500/60 rounded-t-sm" style={{ height: `${(d.remitted / Math.max(d.levy, 1)) * 100}%` }} />
+            <div className="absolute bottom-0 left-0 right-0 bg-[var(--pro-azure-50)]0/60 rounded-t-sm" style={{ height: `${(d.remitted / Math.max(d.levy, 1)) * 100}%` }} />
           </div>
           <span className="text-[8px] text-slate-400 dark:text-slate-600 truncate w-full text-center">{d.period.slice(5)}</span>
         </div>
@@ -137,7 +147,7 @@ const TrendBars: React.FC<{ data: { period: string; levy: number; remitted: numb
 // -- Compliance ring -----------------------------------------------------------
 const ComplianceRing: React.FC<{ rate: number; label: string }> = ({ rate, label }) => {
   const r = 34; const circ = 2 * Math.PI * r;
-  const color = rate >= 90 ? '#00E784' : rate >= 70 ? '#f59e0b' : '#e11d48';
+  const color = rate >= 90 ? '#4FBA6F' : rate >= 70 ? '#f59e0b' : '#e11d48';
   const grade = rate >= 90 ? 'A' : rate >= 75 ? 'B' : rate >= 60 ? 'C' : 'D';
   return (
     <div className="flex flex-col items-center gap-1">
@@ -216,7 +226,7 @@ const EditLevyModal: React.FC<{
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-2"><Edit2 size={15} className="text-emerald-400" /><h3 className="text-sm font-semibold text-slate-900 dark:text-white">Edit Entry</h3></div>
+          <div className="flex items-center gap-2"><Edit2 size={15} className="text-[var(--pro-azure-light)]" /><h3 className="text-sm font-semibold text-slate-900 dark:text-white">Edit Entry</h3></div>
           <button onClick={onClose} className="text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:text-white"><X size={16} /></button>
         </div>
         <form onSubmit={submit} className="p-5 space-y-4">
@@ -252,7 +262,7 @@ const EditLevyModal: React.FC<{
           </div>
           <div className="flex gap-2 pt-1">
             <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 bg-slate-700 text-slate-400 dark:text-slate-600 dark:text-slate-300 rounded-xl text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Cancel</button>
-            <button type="submit" className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-500 transition-colors">
+            <button type="submit" className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-colors">
               <CheckCircle2 size={14} /> Save Changes
             </button>
           </div>
@@ -296,7 +306,7 @@ const PeriodDrawer: React.FC<{
           <div className="grid grid-cols-3 gap-2">
             {[
               { label: 'Total Levy', value: `ETB ${fmt(total)}`, color: 'text-slate-900 dark:text-white' },
-              { label: 'Remitted',   value: `ETB ${fmt(remittedAmt)}`, color: 'text-emerald-400' },
+              { label: 'Remitted',   value: `ETB ${fmt(remittedAmt)}`, color: 'text-[var(--pro-azure-light)]' },
               { label: 'Pending',    value: `ETB ${fmt(pending)}`, color: pending > 0 ? 'text-amber-400' : 'text-slate-400 dark:text-slate-500' },
             ].map((s) => (
               <div key={s.label} className="bg-slate-100/60 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800/40 rounded-xl p-3 text-center">
@@ -323,10 +333,10 @@ const PeriodDrawer: React.FC<{
 
           {/* Remittance record */}
           {remittance ? (
-            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 space-y-1.5">
+            <div className="bg-[var(--pro-azure-50)]0/10 border border-[var(--pro-azure)]/20 rounded-xl p-3 space-y-1.5">
               <div className="flex items-center gap-2 mb-2">
-                <CheckCircle2 size={14} className="text-emerald-400" />
-                <p className="text-xs font-semibold text-emerald-300">Remittance Recorded</p>
+                <CheckCircle2 size={14} className="text-[var(--pro-azure-light)]" />
+                <p className="text-xs font-semibold text-green-300">Remittance Recorded</p>
               </div>
               {[
                 ['Bank', remittance.bankName],
@@ -340,14 +350,14 @@ const PeriodDrawer: React.FC<{
                 </div>
               ))}
               {remittance.penaltyAmount > 0 && (
-                <div className="flex justify-between text-[11px] pt-1 border-t border-emerald-500/20">
+                <div className="flex justify-between text-[11px] pt-1 border-t border-[var(--pro-azure)]/20">
                   <span className="text-rose-400">Penalty paid</span>
                   <span className="text-rose-300 font-semibold">ETB {fmt(remittance.penaltyAmount)}</span>
                 </div>
               )}
             </div>
           ) : pending > 0 ? (
-            <button onClick={onRemit} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-500 text-slate-900 dark:text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors">
+            <button onClick={onRemit} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[var(--pro-azure-50)]0 text-slate-900 dark:text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-colors">
               <Send size={14} /> Record Remittance for {period}
             </button>
           ) : null}
@@ -378,7 +388,7 @@ const PeriodDrawer: React.FC<{
                   </div>
                   <div className="text-right">
                     <p className="text-xs font-semibold text-orange-400">ETB {fmt(e.levyAmount)}</p>
-                    <span className={`text-[10px] font-medium ${e.status === 'REMITTED' ? 'text-emerald-400' : e.status === 'OVERDUE' ? 'text-rose-400' : 'text-amber-400'}`}>{e.status}</span>
+                    <span className={`text-[10px] font-medium ${e.status === 'REMITTED' ? 'text-[var(--pro-azure-light)]' : e.status === 'OVERDUE' ? 'text-rose-400' : 'text-amber-400'}`}>{e.status}</span>
                   </div>
                 </div>
               ))}
@@ -414,15 +424,15 @@ const printReceipt = (entry: LevyEntry) => {
         <p style="font-size:10px;opacity:.5;margin:4px 0 0">Ethiopian DRRF Regulation — Nov 11, 2025</p>
       </div>
       <div class="body">
-        <div class="row"><span class="label">Receipt No.</span><span class="value">${entry.id.slice(0, 8).toUpperCase()}</span></div>
-        <div class="row"><span class="label">Date</span><span class="value">${entry.transactionDate}</span></div>
-        <div class="row"><span class="label">Period</span><span class="value">${entry.period}</span></div>
-        <div class="row"><span class="label">Customer</span><span class="value">${entry.customerName}</span></div>
-        <div class="row"><span class="label">Category</span><span class="value">${rule.label}</span></div>
-        <div class="row"><span class="label">Description</span><span class="value">${entry.description || '—'}</span></div>
+        <div class="row"><span class="label">Receipt No.</span><span class="value">${esc(entry.id.slice(0, 8).toUpperCase())}</span></div>
+        <div class="row"><span class="label">Date</span><span class="value">${esc(entry.transactionDate)}</span></div>
+        <div class="row"><span class="label">Period</span><span class="value">${esc(entry.period)}</span></div>
+        <div class="row"><span class="label">Customer</span><span class="value">${esc(entry.customerName)}</span></div>
+        <div class="row"><span class="label">Category</span><span class="value">${esc(rule.label)}</span></div>
+        <div class="row"><span class="label">Description</span><span class="value">${esc(entry.description || '—')}</span></div>
         <div class="row"><span class="label">Sale Amount</span><span class="value">ETB ${fmt(entry.saleAmount)}</span></div>
         <div class="row"><span class="label">Levy Rate</span><span class="value">${rule.isFlat ? `ETB ${rule.flatAmount} flat` : `${(rule.rate * 100).toFixed(2)}%`}</span></div>
-        <div class="row"><span class="label">Status</span><span class="value" style="color:${entry.status === 'REMITTED' ? '#00E784' : '#f59e0b'}">${entry.status}</span></div>
+        <div class="row"><span class="label">Status</span><span class="value" style="color:${entry.status === 'REMITTED' ? '#4FBA6F' : '#f59e0b'}">${entry.status}</span></div>
         ${entry.referenceNo ? `<div class="row"><span class="label">Ref No.</span><span class="value">${entry.referenceNo}</span></div>` : ''}
       </div>
       <div class="total">
@@ -436,11 +446,11 @@ const printReceipt = (entry: LevyEntry) => {
 };
 
 const SOURCE_META: Record<string, { label: string; icon: React.ReactNode; desc: string; color: string }> = {
-  SALARY_CONTRIBUTION:  { label: 'Payroll',          icon: <Users size={14} />,     desc: '1% of approved net pay',              color: '#00E784' },
-  ANNUAL_SALES_REVENUE: { label: 'Sales Invoices',   icon: <ReceiptIcon size={14} />,desc: '5% of paid invoice subtotals',        color: '#00E784' },
+  SALARY_CONTRIBUTION:  { label: 'Payroll',          icon: <Users size={14} />,     desc: '1% of approved net pay',              color: '#4FBA6F' },
+  ANNUAL_SALES_REVENUE: { label: 'Sales Invoices',   icon: <ReceiptIcon size={14} />,desc: '5% of paid invoice subtotals',        color: '#2ED47A' },
   SERVICE_FEES:         { label: 'Service Invoices', icon: <Link2 size={14} />,     desc: '5% of mobile/bank payment invoices',  color: '#f59e0b' },
   TICKET_SALES:         { label: 'Ticket Invoices',  icon: <Ticket size={14} />,    desc: 'ETB 100 flat per ticket invoice',     color: '#e11d48' },
-  LOAN_VALUE:           { label: 'Business Loans',   icon: <Building2 size={14} />, desc: '1% of disbursed loan amounts',        color: '#00E784' },
+  LOAN_VALUE:           { label: 'Business Loans',   icon: <Building2 size={14} />, desc: '1% of disbursed loan amounts',        color: '#4FBA6F' },
   INSURANCE_PREMIUM:    { label: 'Insurance Bills',  icon: <ShieldAlert size={14} />,desc: '1% of paid insurance bills',         color: '#7c3aed' },
   AIRTIME_SALES:        { label: 'Airtime Bills',    icon: <Zap size={14} />,       desc: '5% of paid airtime bills',            color: '#0ea5e9' },
   FUEL_SALES:           { label: 'Fuel Bills',       icon: <Fuel size={14} />,      desc: 'ETB 200 flat per fuel bill',          color: '#f59e0b' },
@@ -672,9 +682,9 @@ const RulesModal: React.FC<{ onClose: () => void }> = ({ onClose }) => (
           </tbody>
         </table>
         <div className="grid grid-cols-2 gap-3">
-          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl flex gap-2">
-            <Info size={14} className="text-emerald-400 shrink-0 mt-0.5" />
-            <p className="text-[11px] text-emerald-300">Remittance deadline: 10th of the following month. Late remittance attracts a 5% penalty per month.</p>
+          <div className="p-3 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl flex gap-2">
+            <Info size={14} className="text-[var(--pro-azure-light)] shrink-0 mt-0.5" />
+            <p className="text-[11px] text-green-300">Remittance deadline: 10th of the following month. Late remittance attracts a 5% penalty per month.</p>
           </div>
           <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex gap-2">
             <AlertTriangle size={14} className="text-amber-400 shrink-0 mt-0.5" />
@@ -810,7 +820,7 @@ const RemittanceModal: React.FC<{
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-2"><Send size={16} className="text-emerald-400" /><h3 className="text-sm font-semibold text-slate-900 dark:text-white">Record Monthly Remittance</h3></div>
+          <div className="flex items-center gap-2"><Send size={16} className="text-[var(--pro-azure-light)]" /><h3 className="text-sm font-semibold text-slate-900 dark:text-white">Record Monthly Remittance</h3></div>
           <button onClick={onClose} className="text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:text-white"><X size={16} /></button>
         </div>
         <form onSubmit={submit} className="p-5 space-y-4">
@@ -865,7 +875,7 @@ const RemittanceModal: React.FC<{
           </div>
           <div className="flex gap-2 pt-1">
             <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 bg-slate-700 text-slate-400 dark:text-slate-600 dark:text-slate-300 rounded-xl text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Cancel</button>
-            <button type="submit" disabled={busy} className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-500 disabled:opacity-50 transition-colors">
+            <button type="submit" disabled={busy} className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 transition-colors">
               {busy ? <RefreshCw size={14} className="animate-spin" /> : <Send size={14} />}
               {busy ? 'Recording...' : 'Record Remittance'}
             </button>
@@ -1043,7 +1053,6 @@ const LevyCollectionPanel: React.FC = () => {
   };
 
    
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _filteredRemittances = useMemo(() => {
     if (!remittanceSearch.trim()) return remittances;
     const q = remittanceSearch.toLowerCase();
@@ -1189,16 +1198,16 @@ const LevyCollectionPanel: React.FC = () => {
     const w = window.open('', '_blank'); if (!w) return;
     const rows = pe.map((e) => `
       <tr>
-        <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0">${e.transactionDate}</td>
-        <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0">${e.customerName}</td>
-        <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0">${LEVY_RULES[e.category].label}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0">${esc(e.transactionDate)}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0">${esc(e.customerName)}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0">${esc(LEVY_RULES[e.category].label)}</td>
         <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;text-align:right">ETB ${fmt(e.saleAmount)}</td>
         <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;text-align:right;font-weight:900;color:#ea580c">ETB ${fmt(e.levyAmount)}</td>
         <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;text-align:center">
-          <span style="padding:2px 8px;border-radius:999px;font-size:10px;font-weight:900;background:${e.status === 'REMITTED' ? '#99ffd4' : '#fef3c7'};color:${e.status === 'REMITTED' ? '#444444' : '#92400e'}">${e.status}</span>
+          <span style="padding:2px 8px;border-radius:999px;font-size:10px;font-weight:900;background:${e.status === 'REMITTED' ? '#99ffd4' : '#fef3c7'};color:${e.status === 'REMITTED' ? '#444444' : '#92400e'}">${esc(e.status)}</span>
         </td>
       </tr>`).join('');
-    w.document.write(`<html><head><title>DRRF Levy Report — ${period}</title>
+    w.document.write(`<html><head><title>DRRF Levy Report — ${esc(period)}</title>
       <style>body{font-family:Arial,sans-serif;padding:40px;color:#1e293b}table{width:100%;border-collapse:collapse}th{background:#f8fafc;padding:10px 12px;text-align:left;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#64748b;border-bottom:2px solid #e2e8f0}</style>
       </head><body>
       <div style="display:flex;justify-content:space-between;margin-bottom:32px">
@@ -1247,7 +1256,7 @@ const LevyCollectionPanel: React.FC = () => {
           <button onClick={exportCsv} className="flex items-center gap-1.5 px-3 py-2 bg-slate-700 text-slate-400 dark:text-slate-600 dark:text-slate-300 rounded-xl text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
             <Download size={13} /> Export CSV
           </button>
-          <button onClick={() => setShowSync(true)} className="flex items-center gap-1.5 px-3 py-2 bg-emerald-500 text-slate-900 dark:text-white rounded-xl text-xs font-bold hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30">
+          <button onClick={() => setShowSync(true)} className="flex items-center gap-1.5 px-3 py-2 bg-[var(--pro-azure-50)]0 text-slate-900 dark:text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-colors shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30">
             <Link2 size={13} /> Sync from System
           </button>
           <button onClick={() => setShowAdd(true)} className="flex items-center gap-1.5 px-3 py-2 bg-rose-600 text-slate-900 dark:text-white rounded-xl text-xs font-bold hover:bg-rose-500 transition-colors shadow-lg shadow-rose-600/20">
@@ -1261,9 +1270,9 @@ const LevyCollectionPanel: React.FC = () => {
         {[
           { label: 'Total Collected',    value: `ETB ${fmt(stats.totalAll)}`,   color: 'text-slate-900 dark:text-white',        icon: <Banknote size={15} className="text-rose-400" /> },
           { label: 'Pending Remittance', value: `ETB ${fmt(stats.collected)}`,  color: 'text-amber-400',    icon: <Clock size={15} className="text-amber-400" /> },
-          { label: 'Total Remitted',     value: `ETB ${fmt(stats.remitted)}`,   color: 'text-emerald-400',  icon: <CheckCircle2 size={15} className="text-emerald-400" /> },
+          { label: 'Total Remitted',     value: `ETB ${fmt(stats.remitted)}`,   color: 'text-[var(--pro-azure-light)]',  icon: <CheckCircle2 size={15} className="text-[var(--pro-azure-light)]" /> },
           { label: 'Overdue',            value: `ETB ${fmt(stats.overdue)}`,    color: stats.overdue > 0 ? 'text-rose-400' : 'text-slate-400 dark:text-slate-500', icon: <AlertTriangle size={15} className={stats.overdue > 0 ? 'text-rose-400' : 'text-slate-400 dark:text-slate-600'} /> },
-          { label: 'Compliance Rate',    value: `${stats.complianceRate.toFixed(1)}%`, color: stats.complianceRate >= 80 ? 'text-emerald-400' : 'text-amber-400', icon: <TrendingUp size={15} className="text-emerald-400" /> },
+          { label: 'Compliance Rate',    value: `${stats.complianceRate.toFixed(1)}%`, color: stats.complianceRate >= 80 ? 'text-[var(--pro-azure-light)]' : 'text-amber-400', icon: <TrendingUp size={15} className="text-[var(--pro-azure-light)]" /> },
         ].map((s) => (
           <div key={s.label} className="bg-slate-100/60 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800/60 rounded-xl p-3.5">
             <div className="flex items-center gap-1.5 mb-1.5">{s.icon}<p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider">{s.label}</p></div>
@@ -1296,8 +1305,8 @@ const LevyCollectionPanel: React.FC = () => {
 
         {/* Forecast */}
         <div className="bg-slate-100/40 dark:bg-slate-100/40 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 rounded-xl p-4 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-            <TrendingUp size={20} className="text-emerald-400" />
+          <div className="w-12 h-12 rounded-xl bg-[var(--pro-azure-100)] dark:bg-green-900/30 flex items-center justify-center shrink-0">
+            <TrendingUp size={20} className="text-[var(--pro-azure-light)]" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">Forecast — Next Period</p>
@@ -1308,7 +1317,7 @@ const LevyCollectionPanel: React.FC = () => {
           </div>
           <div className="text-right shrink-0">
             <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Est. Levy</p>
-            <p className="text-base font-semibold text-emerald-400">ETB {fmt(forecastLevy)}</p>
+            <p className="text-base font-semibold text-[var(--pro-azure-light)]">ETB {fmt(forecastLevy)}</p>
           </div>
         </div>
       </div>
@@ -1336,7 +1345,7 @@ const LevyCollectionPanel: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold text-orange-400">ETB {fmt(p.amount)}</p>
-                  <button onClick={() => setRemitPeriod(p.period)} className="flex items-center gap-1 text-[10px] font-semibold text-emerald-400 hover:text-emerald-300 mt-0.5 transition-colors">
+                  <button onClick={() => setRemitPeriod(p.period)} className="flex items-center gap-1 text-[10px] font-semibold text-[var(--pro-azure-light)] hover:text-green-300 mt-0.5 transition-colors">
                     <Send size={10} /> Remit Now
                   </button>
                 </div>
@@ -1354,7 +1363,7 @@ const LevyCollectionPanel: React.FC = () => {
           { key: 'remittances', label: `Remittances (${remittances.length})`, icon: <Send size={12} /> },
         ] as const).map((t) => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.key ? (t.key === 'collections' ? 'bg-rose-600 text-slate-900 dark:text-white' : t.key === 'analytics' ? 'bg-emerald-500 text-slate-900 dark:text-white' : 'bg-emerald-500 text-slate-900 dark:text-white') : 'text-slate-400 dark:text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200'}`}>
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.key ? (t.key === 'collections' ? 'bg-rose-600 text-slate-900 dark:text-white' : t.key === 'analytics' ? 'bg-[var(--pro-azure-50)]0 text-slate-900 dark:text-white' : 'bg-[var(--pro-azure-50)]0 text-slate-900 dark:text-white') : 'text-slate-400 dark:text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200'}`}>
             {t.icon}{t.label}
           </button>
         ))}
@@ -1392,7 +1401,7 @@ const LevyCollectionPanel: React.FC = () => {
           {selected.size > 0 && (
             <div className="px-4 py-2.5 bg-rose-600/10 border-b border-rose-500/20 flex items-center gap-3">
               <span className="text-xs font-bold text-rose-300">{selected.size} selected</span>
-              <button onClick={handleBulkRemit} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 text-emerald-400 rounded-lg text-xs font-bold hover:bg-emerald-100 transition-colors">
+              <button onClick={handleBulkRemit} className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-100)] text-[var(--pro-azure-light)] rounded-lg text-xs font-bold hover:bg-[var(--pro-azure-100)] transition-colors">
                 <CheckCircle2 size={12} /> Mark Remitted
               </button>
               <button onClick={() => { [...selected].forEach(handleDelete); }} className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-500/10 text-rose-400 rounded-lg text-xs font-bold hover:bg-rose-500/20 transition-colors">
@@ -1471,7 +1480,7 @@ const LevyCollectionPanel: React.FC = () => {
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-1.5">
                         <button onClick={() => printReceipt(e)} title="Print receipt"
-                          className="text-slate-400 dark:text-slate-600 hover:text-emerald-400 transition-colors"><Receipt size={13} /></button>
+                          className="text-slate-400 dark:text-slate-600 hover:text-[var(--pro-azure-light)] transition-colors"><Receipt size={13} /></button>
                         <button onClick={() => setEditEntry(e)} title="Edit"
                           className="text-slate-400 dark:text-slate-600 hover:text-amber-400 transition-colors"><Edit2 size={13} /></button>
                         <button onClick={() => handleDelete(e.id)} title="Delete"
@@ -1504,7 +1513,7 @@ const LevyCollectionPanel: React.FC = () => {
             {/* Compliance rings */}
             <div className="bg-slate-100/40 dark:bg-slate-100/40 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800/60 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-4">
-                <TrendingUp size={15} className="text-emerald-400" />
+                <TrendingUp size={15} className="text-[var(--pro-azure-light)]" />
                 <p className="text-xs font-semibold text-slate-400 dark:text-slate-600 dark:text-slate-300 uppercase tracking-wider">Compliance Overview</p>
               </div>
               <div className="flex justify-around">
@@ -1553,11 +1562,11 @@ const LevyCollectionPanel: React.FC = () => {
           {/* Monthly trend */}
           <div className="bg-slate-100/40 dark:bg-slate-100/40 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800/60 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
-              <TrendingUp size={15} className="text-emerald-400" />
+              <TrendingUp size={15} className="text-[var(--pro-azure-light)]" />
               <p className="text-xs font-semibold text-slate-400 dark:text-slate-600 dark:text-slate-300 uppercase tracking-wider">Monthly Levy Trend</p>
               <div className="ml-auto flex items-center gap-3 text-[10px] text-slate-400 dark:text-slate-500">
                 <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-slate-600 inline-block" /> Collected</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-emerald-500/60 inline-block" /> Remitted</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[var(--pro-azure-50)]0/60 inline-block" /> Remitted</span>
               </div>
             </div>
             <TrendBars data={trendData} />
@@ -1641,7 +1650,7 @@ const LevyCollectionPanel: React.FC = () => {
                     <td className="px-4 py-3 text-slate-400 dark:text-slate-500 dark:text-slate-400">{r.remittedAt}</td>
                     <td className="px-4 py-3 text-slate-400 dark:text-slate-600 dark:text-slate-300">{r.bankName}</td>
                     <td className="px-4 py-3 font-mono text-slate-400 dark:text-slate-600 dark:text-slate-300">{r.referenceNo}</td>
-                    <td className="px-4 py-3 font-semibold text-emerald-400 font-mono">ETB {fmt(r.totalLevy)}</td>
+                    <td className="px-4 py-3 font-semibold text-[var(--pro-azure-light)] font-mono">ETB {fmt(r.totalLevy)}</td>
                     <td className="px-4 py-3">
                       {r.penaltyAmount > 0
                         ? <span className="text-rose-400 font-semibold">ETB {fmt(r.penaltyAmount)}</span>
@@ -1649,7 +1658,7 @@ const LevyCollectionPanel: React.FC = () => {
                     </td>
                     <td className="px-4 py-3">
                       {r.onTime
-                        ? <span className="flex items-center gap-1 text-emerald-400 font-semibold"><CheckCircle2 size={12} /> Yes</span>
+                        ? <span className="flex items-center gap-1 text-[var(--pro-azure-light)] font-semibold"><CheckCircle2 size={12} /> Yes</span>
                         : <span className="flex items-center gap-1 text-rose-400 font-semibold"><AlertTriangle size={12} /> Late</span>}
                     </td>
                     <td className="px-4 py-3 text-slate-400 dark:text-slate-500 dark:text-slate-400">{r.remittedBy}</td>
@@ -1659,7 +1668,7 @@ const LevyCollectionPanel: React.FC = () => {
               <tfoot>
                 <tr className="border-t border-slate-200 dark:border-slate-800/60 bg-slate-100/40 dark:bg-slate-800/40">
                   <td colSpan={4} className="px-4 py-3 text-xs font-semibold text-slate-400 dark:text-slate-500 dark:text-slate-400">{remittances.length} remittances</td>
-                  <td className="px-4 py-3 font-semibold text-emerald-400 font-mono">ETB {fmt(remittances.reduce((s, r) => s + r.totalLevy, 0))}</td>
+                  <td className="px-4 py-3 font-semibold text-[var(--pro-azure-light)] font-mono">ETB {fmt(remittances.reduce((s, r) => s + r.totalLevy, 0))}</td>
                   <td className="px-4 py-3 font-semibold text-rose-400 font-mono">
                     {remittances.some((r) => r.penaltyAmount > 0) ? `ETB ${fmt(remittances.reduce((s, r) => s + r.penaltyAmount, 0))}` : '—'}
                   </td>

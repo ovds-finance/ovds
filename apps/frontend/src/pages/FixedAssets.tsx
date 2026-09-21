@@ -4,26 +4,27 @@
  * IAS 16 (cost + revaluation + disposal model) · IAS 36 (impairment) · Ethiopian depreciation rules
  * New: Depreciation Schedule modal · Asset Disposal workflow (IAS 16.67)
  */
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   Building2, Plus, Edit2, Trash2, Download, RefreshCw,
   TrendingDown, Zap, Scale, AlertTriangle, BarChart3, PackageX,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
-import { fmtETB } from '../utils/ethiopianTax';
-import { revalueFixedAsset, testAssetImpairment } from '../services/ifrsApi';
-import api from '../services/api';
-import { fixedAssetDisposalsApi } from '../services/ovdsApi';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select, Textarea,
   SearchBar, Amount, EmptyState, Pagination, IFRSBadge,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { revalueFixedAsset, testAssetImpairment } from '../services/ifrsApi';
+import { fixedAssetDisposalsApi } from '../services/ovdsApi';
+import { confirm } from '../utils/confirm';
+import { fmtETB } from '../utils/ethiopianTax';
 
 interface FixedAsset {
   id: string;
@@ -113,9 +114,9 @@ const AssetForm: React.FC<{ data: Partial<FixedAsset>; onChange: (d: Partial<Fix
         </Select>
       </FormField>
       {annualDep > 0 && (
-        <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-xl border border-indigo-100 text-[11px]">
-          <span className="text-indigo-700 font-semibold">IAS 16 Annual Depreciation (SL estimate):</span>
-          <span className="font-bold text-indigo-800">{fmtETB(annualDep)}/year</span>
+        <div className="flex items-center justify-between p-3 bg-[var(--pro-azure-50)] rounded-xl border border-[var(--pro-azure-100)] text-[11px]">
+          <span className="text-[var(--pro-azure-dark)] font-semibold">IAS 16 Annual Depreciation (SL estimate):</span>
+          <span className="font-bold text-[var(--pro-azure-dark)]">{fmtETB(annualDep)}/year</span>
         </div>
       )}
       <div className="grid grid-cols-2 gap-3">
@@ -184,7 +185,7 @@ const FixedAssets: React.FC = () => {
     const totalNbv    = rows.reduce((s, a) => s + Number(a.netBookValue ?? a.purchaseCost ?? 0), 0);
     const totalAccDep = rows.reduce((s, a) => s + Number(a.accumulatedDepreciation ?? 0), 0);
     return [
-      { label: 'Total Assets',     value: rows.length,                                   color: 'emerald' as const },
+      { label: 'Total Assets',     value: rows.length,                                   color: 'green' as const },
       { label: 'Active',           value: rows.filter(a => a.status === 'ACTIVE').length, color: 'sky'     as const },
       { label: 'Total Cost',       value: fmtETB(totalCost),                              color: 'violet'  as const },
       { label: 'Net Book Value',   value: fmtETB(totalNbv),                               color: 'amber'   as const },
@@ -396,7 +397,7 @@ const FixedAssets: React.FC = () => {
               <AppTd><span className="text-[10px] font-semibold text-slate-500 bg-white dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-100 dark:border-slate-700">{a.category.replace(/_/g, ' ')}</span></AppTd>
               <AppTd align="right"><Amount value={Number(a.purchaseCost)} size="sm" /></AppTd>
               <AppTd align="right"><span className="text-[11px] font-bold text-amber-600 tabular-nums">{fmtETB(Number(a.accumulatedDepreciation ?? 0))}</span></AppTd>
-              <AppTd align="right"><span className="text-[11px] font-bold text-emerald-700 tabular-nums">{fmtETB(Number(a.netBookValue ?? a.purchaseCost))}</span></AppTd>
+              <AppTd align="right"><span className="text-[11px] font-bold text-[var(--pro-azure-dark)] tabular-nums">{fmtETB(Number(a.netBookValue ?? a.purchaseCost))}</span></AppTd>
               <AppTd><span className="text-[10px] text-slate-500">{a.depreciationMethod.replace(/_/g, ' ').split(' ')[0]}</span></AppTd>
               <AppTd><span className="text-[11px] font-semibold text-slate-600">{a.usefulLifeYears}y</span></AppTd>
               <AppTd><StatusBadge status={a.status} /></AppTd>
@@ -413,7 +414,7 @@ const FixedAssets: React.FC = () => {
                       {/* Dispose */}
                       <button title="Dispose Asset (IAS 16.67)" onClick={() => { setDisposeForm({ disposalDate: new Date().toISOString().slice(0, 10), proceedsAmount: '', disposalMethod: 'SALE', notes: '' }); setDisposeAsset(a); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all"><PackageX size={11} /></button>
                       {/* Edit */}
-                      <button title="Edit" onClick={() => setModal({ open: true, data: { ...a } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all"><Edit2 size={11} /></button>
+                      <button title="Edit" onClick={() => setModal({ open: true, data: { ...a } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all"><Edit2 size={11} /></button>
                     </>
                   )}
                   {/* Delete */}
@@ -443,7 +444,7 @@ const FixedAssets: React.FC = () => {
           <FormField label="Fair Value (ETB)" required hint="Determined by independent valuer or active market price">
             <Input type="number" step="0.01" value={revalForm.fairValue} onChange={e => setRevalForm(f => ({ ...f, fairValue: e.target.value }))} placeholder="0.00" autoFocus />
           </FormField>
-          {revalForm.fairValue && (() => { const diff = parseFloat(revalForm.fairValue) - Number(revalAsset?.netBookValue ?? revalAsset?.purchaseCost ?? 0); return <div className={`flex items-center justify-between p-3 rounded-xl border text-[11px] font-bold ${diff >= 0 ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-rose-50 border-rose-200 text-rose-700'}`}><span>{diff >= 0 ? '▲ Increase → Cr Revaluation Surplus (OCI)' : '▼ Decrease → Dr P&L'}</span><span>{fmtETB(Math.abs(diff))}</span></div>; })()}
+          {revalForm.fairValue && (() => { const diff = parseFloat(revalForm.fairValue) - Number(revalAsset?.netBookValue ?? revalAsset?.purchaseCost ?? 0); return <div className={`flex items-center justify-between p-3 rounded-xl border text-[11px] font-bold ${diff >= 0 ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : 'bg-rose-50 border-rose-200 text-rose-700'}`}><span>{diff >= 0 ? '▲ Increase → Cr Revaluation Surplus (OCI)' : '▼ Decrease → Dr P&L'}</span><span>{fmtETB(Math.abs(diff))}</span></div>; })()}
           <div className="grid grid-cols-2 gap-3">
             <FormField label="Valuation Date"><Input type="date" value={revalForm.valuationDate} onChange={e => setRevalForm(f => ({ ...f, valuationDate: e.target.value }))} /></FormField>
             <FormField label="Basis"><Select value={revalForm.valuationBasis} onChange={e => setRevalForm(f => ({ ...f, valuationBasis: e }))}><option value="MARKET_VALUE">Market Value</option><option value="DEPRECIATED_REPLACEMENT_COST">Depreciated Replacement Cost</option><option value="INDEPENDENT_VALUATION">Independent Valuation</option></Select></FormField>
@@ -462,7 +463,7 @@ const FixedAssets: React.FC = () => {
           <FormField label="Recoverable Amount (ETB)" required hint="Higher of Value in Use and Fair Value less Costs of Disposal (IAS 36.18)">
             <Input type="number" step="0.01" value={impairForm.recoverableAmount} onChange={e => setImpairForm(f => ({ ...f, recoverableAmount: e.target.value }))} placeholder="0.00" autoFocus />
           </FormField>
-          {impairForm.recoverableAmount && (() => { const loss = Math.max(0, Number(impairAsset?.netBookValue ?? impairAsset?.purchaseCost ?? 0) - parseFloat(impairForm.recoverableAmount)); return <div className={`flex items-center justify-between p-3 rounded-xl border text-[11px] font-bold ${loss > 0 ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}><span>{loss > 0 ? '▼ Impairment Loss → Dr P&L' : '✓ No impairment required'}</span>{loss > 0 && <span>{fmtETB(loss)}</span>}</div>; })()}
+          {impairForm.recoverableAmount && (() => { const loss = Math.max(0, Number(impairAsset?.netBookValue ?? impairAsset?.purchaseCost ?? 0) - parseFloat(impairForm.recoverableAmount)); return <div className={`flex items-center justify-between p-3 rounded-xl border text-[11px] font-bold ${loss > 0 ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'}`}><span>{loss > 0 ? '▼ Impairment Loss → Dr P&L' : '✓ No impairment required'}</span>{loss > 0 && <span>{fmtETB(loss)}</span>}</div>; })()}
           <div className="grid grid-cols-2 gap-3">
             <FormField label="Test Date"><Input type="date" value={impairForm.testDate} onChange={e => setImpairForm(f => ({ ...f, testDate: e.target.value }))} /></FormField>
             <FormField label="Basis"><Select value={impairForm.basis} onChange={e => setImpairForm(f => ({ ...f, basis: e as any }))}><option value="VALUE_IN_USE">Value in Use (DCF)</option><option value="FAIR_VALUE_LESS_COSTS_OF_DISPOSAL">Fair Value less Costs of Disposal</option></Select></FormField>
@@ -491,7 +492,7 @@ const FixedAssets: React.FC = () => {
           <div className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 text-[11px] grid grid-cols-3 gap-3">
             <div><p className="text-slate-400">Cost</p><p className="font-bold">{fmtETB(Number(disposeAsset?.purchaseCost ?? 0))}</p></div>
             <div><p className="text-slate-400">Acc. Dep.</p><p className="font-bold text-amber-600">{fmtETB(Number(disposeAsset?.accumulatedDepreciation ?? 0))}</p></div>
-            <div><p className="text-slate-400">Net Book Value</p><p className="font-bold text-emerald-700">{fmtETB(disposeNBV)}</p></div>
+            <div><p className="text-slate-400">Net Book Value</p><p className="font-bold text-[var(--pro-azure-dark)]">{fmtETB(disposeNBV)}</p></div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -521,7 +522,7 @@ const FixedAssets: React.FC = () => {
           {disposeForm.proceedsAmount !== '' && (
             <div className={`flex items-center justify-between p-3 rounded-xl border text-[11px] font-bold ${
               disposeGainLoss >= 0
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/20 dark:border-emerald-800 dark:text-emerald-400'
+                ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/20 dark:border-green-800 dark:text-[var(--pro-azure-light)]'
                 : 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/20 dark:border-rose-800 dark:text-rose-400'
             }`}>
               <span>
@@ -567,7 +568,7 @@ const FixedAssets: React.FC = () => {
         <div className="flex gap-1 border-b border-slate-100 dark:border-slate-800 mb-4 -mt-1">
           <button
             onClick={() => setScheduleTab('preview')}
-            className={`px-4 py-2 text-xs font-semibold border-b-2 transition-colors ${scheduleTab === 'preview' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+            className={`px-4 py-2 text-xs font-semibold border-b-2 transition-colors ${scheduleTab === 'preview' ? 'border-[var(--pro-azure)] text-[var(--pro-azure)]' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
           >
             Projected Schedule
           </button>
@@ -595,7 +596,7 @@ const FixedAssets: React.FC = () => {
                 {[
                   { label: 'Purchase Cost',    value: fmtETB(scheduleData.purchaseCost),          accent: 'bg-slate-500' },
                   { label: 'Salvage Value',    value: fmtETB(scheduleData.salvageValue),            accent: 'bg-amber-400' },
-                  { label: 'Current NBV',      value: fmtETB(scheduleData.currentNBV),              accent: 'bg-emerald-500' },
+                  { label: 'Current NBV',      value: fmtETB(scheduleData.currentNBV),              accent: 'bg-[var(--pro-azure-50)]0' },
                   { label: 'Acc. Depreciation',value: fmtETB(scheduleData.accumulatedDepreciation), accent: 'bg-rose-400' },
                 ].map(k => (
                   <div key={k.label} className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
@@ -622,7 +623,7 @@ const FixedAssets: React.FC = () => {
                         <td className="px-4 py-2 tabular-nums text-slate-600 dark:text-slate-300">{fmtETB(row.openingNBV)}</td>
                         <td className="px-4 py-2 tabular-nums text-amber-600 font-semibold">{fmtETB(row.annualDepreciation)}</td>
                         <td className="px-4 py-2 tabular-nums text-rose-500">{fmtETB(row.accumulatedDepreciation)}</td>
-                        <td className="px-4 py-2 tabular-nums font-bold text-emerald-700 dark:text-emerald-400">{fmtETB(row.closingNBV)}</td>
+                        <td className="px-4 py-2 tabular-nums font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">{fmtETB(row.closingNBV)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -654,7 +655,7 @@ const FixedAssets: React.FC = () => {
                 </div>
                 <div className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
                   <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Current NBV</p>
-                  <p className="text-[13px] font-black tabular-nums text-emerald-700 mt-0.5">{fmtETB(postedSchedule.summary?.currentNBV ?? 0)}</p>
+                  <p className="text-[13px] font-black tabular-nums text-[var(--pro-azure-dark)] mt-0.5">{fmtETB(postedSchedule.summary?.currentNBV ?? 0)}</p>
                 </div>
               </div>
               {postedSchedule.schedules?.length > 0 ? (
@@ -673,11 +674,11 @@ const FixedAssets: React.FC = () => {
                           <td className="px-3 py-2 font-bold text-slate-700 dark:text-slate-200 font-mono">{row.period}</td>
                           <td className="px-3 py-2 tabular-nums text-slate-600">{fmtETB(row.openingCarrying)}</td>
                           <td className="px-3 py-2 tabular-nums text-amber-600 font-semibold">{fmtETB(row.depreciationAmt)}</td>
-                          <td className="px-3 py-2 tabular-nums font-bold text-emerald-700">{fmtETB(row.closingCarrying)}</td>
+                          <td className="px-3 py-2 tabular-nums font-bold text-[var(--pro-azure-dark)]">{fmtETB(row.closingCarrying)}</td>
                           <td className="px-3 py-2 tabular-nums text-rose-500">{fmtETB(row.accumulatedDepr)}</td>
                           <td className="px-3 py-2">
                             <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
-                              row.status === 'POSTED'    ? 'bg-emerald-100 text-emerald-700' :
+                              row.status === 'POSTED'    ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' :
                               row.status === 'SKIPPED'   ? 'bg-slate-100 text-slate-500' :
                               'bg-amber-100 text-amber-700'
                             }`}>{row.status}</span>

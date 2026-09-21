@@ -1,5 +1,3 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft, Edit2, Trash2, CheckCircle2, Clock,
   AlertTriangle, Download, Copy, Archive,
@@ -8,18 +6,21 @@ import {
   ChevronRight, Receipt, Split, History,
   ArrowUpRight, AlertCircle,
 } from 'lucide-react';
-import api from '../services/api';
+import React, { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
-import { confirm } from '../utils/confirm';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../rbac/AuthContext';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+
 import { useBusiness } from '../context/businessContext';
 import { useAuditLog } from '../hooks';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { confirm } from '../utils/confirm';
 import { fmtCurrency, fmtDate } from '../utils/fmt';
 
 const fmt = (n: number, ccy = 'ETB') => fmtCurrency(n, ccy);
 
-const CATEGORIES = [
+const _CATEGORIES = [
   'UTILITIES', 'RENT', 'SUPPLIES', 'MAINTENANCE',
   'TRANSPORT', 'PROFESSIONAL_FEES', 'INSURANCE',
   'ADVERTISING', 'REPAIRS', 'SALARIES',
@@ -28,26 +29,26 @@ const CATEGORIES = [
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
-  UTILITIES:              'bg-emerald-100 text-emerald-700',
+  UTILITIES:              'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   RENT:                   'bg-violet-100 text-violet-700',
   SUPPLIES:               'bg-amber-100 text-amber-700',
   MAINTENANCE:            'bg-orange-100 text-orange-700',
   TRANSPORT:              'bg-teal-100 text-teal-700',
-  PROFESSIONAL_FEES:      'bg-indigo-100 text-indigo-700',
-  INSURANCE:              'bg-emerald-100 text-emerald-700',
+  PROFESSIONAL_FEES:      'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
+  INSURANCE:              'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   ADVERTISING:            'bg-pink-100 text-pink-700',
   REPAIRS:                'bg-rose-100 text-rose-700',
   SALARIES:               'bg-cyan-100 text-cyan-700',
   RECRUITMENT_AGENCY_FEE: 'bg-purple-100 text-purple-700',
-  OTHER:                  'bg-emerald-50 text-emerald-600',
+  OTHER:                  'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]',
 };
 
 const STATUS_BADGE: Record<string, string> = {
-  PAID:    'bg-emerald-50 text-emerald-700 border border-emerald-200',
+  PAID:    'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)]',
   OVERDUE: 'bg-rose-50 text-rose-700 border border-rose-200',
   PENDING: 'bg-amber-50 text-amber-700 border border-amber-200',
-  DRAFT:   'bg-emerald-50/50 text-emerald-500 border border-emerald-100',
-  PARTIAL: 'bg-blue-50 text-blue-700 border border-blue-200',
+  DRAFT:   'bg-[var(--pro-azure-50)]/50 text-[var(--pro-azure)] border border-[var(--pro-azure-100)]',
+  PARTIAL: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)]',
   CANCELLED: 'bg-slate-50 text-slate-500 border border-slate-200',
 };
 
@@ -76,7 +77,7 @@ const BillDetail: React.FC = () => {
     paidAt: new Date().toISOString().slice(0, 10),
   });
 
-  const billsUrl = selectedCompanyId
+  const _billsUrl = selectedCompanyId
     ? `/ovds/bills?companyId=${selectedCompanyId}`
     : '/ovds/bills';
 
@@ -97,6 +98,7 @@ const BillDetail: React.FC = () => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchData(); }, [id]);
 
   const totalPaid = useMemo(
@@ -199,7 +201,7 @@ const BillDetail: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[var(--pro-azure)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -209,7 +211,7 @@ const BillDetail: React.FC = () => {
       <div className="flex flex-col items-center justify-center h-[60vh] gap-3">
         <AlertCircle size={32} className="text-slate-300" />
         <p className="text-sm text-slate-500">Bill not found</p>
-        <Link to="/purchases/bills" className="text-emerald-600 text-sm font-semibold hover:underline">Back to Bills</Link>
+        <Link to="/purchases/bills" className="text-[var(--pro-azure)] text-sm font-semibold hover:underline">Back to Bills</Link>
       </div>
     );
   }
@@ -255,7 +257,7 @@ const BillDetail: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             {canWrite && bill.status !== 'PAID' && (
-              <button onClick={handleMarkPaid} className="flex items-center gap-1.5 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-colors">
+              <button onClick={handleMarkPaid} className="flex items-center gap-1.5 px-3 py-2 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-xl text-xs font-bold transition-colors">
                 <CheckCircle2 size={13} /> Mark Paid
               </button>
             )}
@@ -296,15 +298,15 @@ const BillDetail: React.FC = () => {
           </div>
           <div className="bg-white border border-slate-200 rounded-2xl p-4">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Paid</p>
-            <p className="text-xl font-bold text-emerald-700 font-mono mt-1">{fmt(totalPaid)}</p>
+            <p className="text-xl font-bold text-[var(--pro-azure-dark)] font-mono mt-1">{fmt(totalPaid)}</p>
             <p className="text-[10px] text-slate-400 mt-0.5">{payments.length} payment(s)</p>
           </div>
           <div className="bg-white border border-slate-200 rounded-2xl p-4">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Balance Due</p>
-            <p className={`text-xl font-bold font-mono mt-1 ${remaining > 0 ? 'text-amber-700' : 'text-emerald-700'}`}>
+            <p className={`text-xl font-bold font-mono mt-1 ${remaining > 0 ? 'text-amber-700' : 'text-[var(--pro-azure-dark)]'}`}>
               {fmt(remaining)}
             </p>
-            {remaining <= 0 && <p className="text-[10px] text-emerald-500 mt-0.5">Fully paid</p>}
+            {remaining <= 0 && <p className="text-[10px] text-[var(--pro-azure)] mt-0.5">Fully paid</p>}
           </div>
           <div className="bg-white border border-slate-200 rounded-2xl p-4">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Due Date</p>
@@ -482,19 +484,19 @@ const BillDetail: React.FC = () => {
                   <span className="font-bold text-slate-900 font-mono">{fmt(Number(bill.total))}</span>
                 </div>
                 <div className="border-t border-slate-100 pt-2 flex items-center justify-between text-xs">
-                  <span className="text-emerald-600">Paid</span>
-                  <span className="font-semibold text-emerald-600 font-mono">{fmt(totalPaid)}</span>
+                  <span className="text-[var(--pro-azure)]">Paid</span>
+                  <span className="font-semibold text-[var(--pro-azure)] font-mono">{fmt(totalPaid)}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-amber-600">Balance Due</span>
-                  <span className={`font-bold font-mono ${remaining > 0 ? 'text-amber-700' : 'text-emerald-700'}`}>{fmt(remaining)}</span>
+                  <span className={`font-bold font-mono ${remaining > 0 ? 'text-amber-700' : 'text-[var(--pro-azure-dark)]'}`}>{fmt(remaining)}</span>
                 </div>
                 {bill.currencyCode !== 'ETB' && (
-                  <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 mt-2">
-                    <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wide">Multi-Currency</p>
-                    <p className="text-xs text-blue-600 mt-1">Original: {bill.currencyCode} {fmt(Number(bill.total), bill.currencyCode)}</p>
-                    <p className="text-xs text-blue-600">Rate: {bill.currencyRate} {bill.currencyCode} = 1 ETB</p>
-                    <p className="text-xs text-blue-600">Converted: ETB {fmt(Number(bill.total))}</p>
+                  <div className="bg-[var(--pro-azure-50)] border border-[var(--pro-azure-50)] rounded-xl p-3 mt-2">
+                    <p className="text-[10px] font-bold text-[var(--pro-azure-dark)] uppercase tracking-wide">Multi-Currency</p>
+                    <p className="text-xs text-[var(--pro-azure)] mt-1">Original: {bill.currencyCode} {fmt(Number(bill.total), bill.currencyCode)}</p>
+                    <p className="text-xs text-[var(--pro-azure)]">Rate: {bill.currencyRate} {bill.currencyCode} = 1 ETB</p>
+                    <p className="text-xs text-[var(--pro-azure)]">Converted: ETB {fmt(Number(bill.total))}</p>
                   </div>
                 )}
               </div>

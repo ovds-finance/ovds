@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Components barrel export.
  * Import shared UI components from here:
  *   import { Skeleton, EmptyState, Pagination, StatsCard, PageHeader } from '../components';
@@ -76,7 +76,7 @@ export { default as AdvancedFilterBuilder } from './advancedFilterBuilder';
 export { default as KPIWidgetPreview } from './kpiWidgetPreview';
 export { default as WhiteLabelSettings } from './whiteLabelSettings';
 
-// -- Blade (Akaunting-style async state machine) ---------------------------------
+// -- Blade (Ovds SaaS style async state machine) ---------------------------------
 export {
   Blade,
   BladeLoading,

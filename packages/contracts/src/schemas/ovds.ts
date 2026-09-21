@@ -82,7 +82,19 @@ export type UpdateVendor = z.infer<typeof UpdateVendorSchema>;
 
 // ── Invoice ──────────────────────────────────────────────────────────────────
 
-export const InvoiceStatusSchema = z.enum(['DRAFT', 'PENDING', 'PAID', 'OVERDUE', 'CANCELLED', 'SENT', 'PARTIAL']);
+export const InvoiceStatusSchema = z.enum([
+  'DRAFT',
+  'PENDING',
+  'PAID',
+  'OVERDUE',
+  'CANCELLED',
+  'SENT',
+  'PARTIAL',
+  // Extended statuses — match Prisma InvoiceStatus enum and @ovds/shared InvoiceStatus type
+  'VOID',
+  'POSTED',
+  'ARCHIVED',
+]);
 export type InvoiceStatus = z.infer<typeof InvoiceStatusSchema>;
 
 export const InvoiceItemSchema = z.object({
@@ -276,3 +288,84 @@ export const AccountSchema = z.object({
 });
 
 export type Account = z.infer<typeof AccountSchema>;
+
+// ── Company ───────────────────────────────────────────────────────────────────
+
+export const CompanySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.string().optional(),
+  tin: z.string().nullable().optional(),
+  vatNumber: z.string().nullable().optional(),
+  phone: z.string().nullable().optional(),
+  email: z.string().email().nullable().optional(),
+  address: z.string().nullable().optional(),
+  currency: z.string().optional(),
+  country: z.string().optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+});
+export type Company = z.infer<typeof CompanySchema>;
+
+export const CreateCompanySchema = CompanySchema.omit({ id: true });
+export type CreateCompany = z.infer<typeof CreateCompanySchema>;
+
+export const UpdateCompanySchema = CreateCompanySchema.partial();
+export type UpdateCompany = z.infer<typeof UpdateCompanySchema>;
+
+// ── TaxRate ───────────────────────────────────────────────────────────────────
+
+export const TaxRateSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  rate: z.number(),
+  type: z.string().optional(),
+  isActive: z.boolean().optional(),
+  companyId: z.string().nullable().optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+});
+export type TaxRate = z.infer<typeof TaxRateSchema>;
+
+export const CreateTaxRateSchema = TaxRateSchema.omit({ id: true });
+export type CreateTaxRate = z.infer<typeof CreateTaxRateSchema>;
+
+export const UpdateTaxRateSchema = CreateTaxRateSchema.partial();
+export type UpdateTaxRate = z.infer<typeof UpdateTaxRateSchema>;
+
+// ── Partnership ───────────────────────────────────────────────────────────────
+
+export const PartnershipSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.string().optional(),
+  status: z.string().optional(),
+  companyId: z.string().nullable().optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+});
+export type Partnership = z.infer<typeof PartnershipSchema>;
+
+export const CreatePartnershipSchema = PartnershipSchema.omit({ id: true });
+export type CreatePartnership = z.infer<typeof CreatePartnershipSchema>;
+
+export const UpdatePartnershipSchema = CreatePartnershipSchema.partial();
+export type UpdatePartnership = z.infer<typeof UpdatePartnershipSchema>;
+
+// ── Integration (App) ─────────────────────────────────────────────────────────
+
+export const IntegrationSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  status: z.string().optional(),
+  category: z.string().optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+});
+export type Integration = z.infer<typeof IntegrationSchema>;
+
+export const CreateIntegrationSchema = IntegrationSchema.omit({ id: true });
+export type CreateIntegration = z.infer<typeof CreateIntegrationSchema>;
+
+export const UpdateIntegrationSchema = CreateIntegrationSchema.partial();
+export type UpdateIntegration = z.infer<typeof UpdateIntegrationSchema>;

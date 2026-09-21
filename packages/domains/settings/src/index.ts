@@ -1,4 +1,4 @@
-// @ovds/domains/settings - public API
+// @ovds/domains-settings - public API
 
 export * from './entities';
 export * from './constants';

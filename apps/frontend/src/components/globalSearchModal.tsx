@@ -1,16 +1,18 @@
-﻿/**
+/**
  * GlobalSearchModal — enhanced Ctrl+K command palette.
  * Searches nav pages, recent documents (invoices, bills, employees),
  * and quick actions. Replaces the basic palette in Header.tsx.
  */
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import Fuse from 'fuse.js';
-import api from '../services/api';
-import { useAuth } from '../rbac/AuthContext';
-import { useNavTree } from '../hooks/useNavTree';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 import { useLocalStorage } from '../hooks';
+import { useNavTree } from '../hooks/useNavTree';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+
 import { Icon } from './ui';
 
 // -- Types ---------------------------------------------------------------------
@@ -52,16 +54,16 @@ const ResultRow: React.FC<{
     onClick={onSelect}
     onMouseEnter={onHover}
     className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
-      active ? 'bg-emerald-50 dark:bg-emerald-900/20' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
+      active ? 'bg-[var(--pro-azure-50)] dark:bg-green-900/20' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
     }`}
   >
     <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
-      active ? 'bg-emerald-50 dark:bg-emerald-900/30' : 'bg-slate-100 dark:bg-slate-800'
+      active ? 'bg-[var(--pro-azure-50)] dark:bg-green-900/30' : 'bg-slate-100 dark:bg-slate-800'
     }`}>
       {result.icon}
     </div>
     <div className="flex-1 min-w-0">
-      <p className={`text-sm font-semibold truncate ${active ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-200'}`}>
+      <p className={`text-sm font-semibold truncate ${active ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-slate-800 dark:text-slate-200'}`}>
         {result.label}
       </p>
       {result.sublabel && (
@@ -73,7 +75,7 @@ const ResultRow: React.FC<{
         {result.badge}
       </span>
     )}
-    {active && <Icon name="CHEVRON_RIGHT" size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />}
+    {active && <Icon name="CHEVRON_RIGHT" size={13} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0" />}
   </button>
 );
 
@@ -105,10 +107,10 @@ const GlobalSearchModal: React.FC<Props> = ({ open, onClose }) => {
     { id: 'qa-estimate', type: 'action' as const, label: 'New Estimate',      sublabel: 'Create a new quote or estimate',         icon: <Icon name="CLIPBOARD_LIST" size={14} className="text-sky-500" />,          to: '/sales/estimates?action=new',       badge: 'New', badgeColor: 'bg-sky-100 text-sky-700' },
     { id: 'qa-bill',    type: 'action' as const, label: 'New Bill',           sublabel: 'Record a purchase bill',                 icon: <Icon name="VENDOR"       size={14} className="text-rose-500" />,             to: '/purchases/bills?action=new',           badge: 'New', badgeColor: 'bg-rose-100 text-rose-700' },
     { id: 'qa-po',      type: 'action' as const, label: 'New Purchase Order', sublabel: 'Create a new PO',                        icon: <Icon name="SHOPPING_CART" size={14} className="text-amber-500" />,         to: '/purchases/orders?action=new',      badge: 'New', badgeColor: 'bg-amber-100 text-amber-700' },
-    { id: 'qa-emp',     type: 'action' as const, label: 'Add Employee',       sublabel: 'Register a new employee',                icon: <Icon name="EMPLOYEE"     size={14} className="text-emerald-600" />,         to: '/hr/employees?action=add',       badge: 'New', badgeColor: 'bg-emerald-100 text-emerald-700' },
-    { id: 'qa-payroll', type: 'action' as const, label: 'Generate Payroll',   sublabel: 'Run payroll for this month',             icon: <Icon name="BANKNOTE"     size={14} className="text-emerald-500" />,         to: '/hr/payroll?action=generate' },
+    { id: 'qa-emp',     type: 'action' as const, label: 'Add Employee',       sublabel: 'Register a new employee',                icon: <Icon name="EMPLOYEE"     size={14} className="text-[var(--pro-azure)]" />,         to: '/hr/employees?action=add',       badge: 'New', badgeColor: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' },
+    { id: 'qa-payroll', type: 'action' as const, label: 'Generate Payroll',   sublabel: 'Run payroll for this month',             icon: <Icon name="BANKNOTE"     size={14} className="text-[var(--pro-azure)]" />,         to: '/hr/payroll?action=generate' },
     { id: 'qa-vat',     type: 'action' as const, label: 'File VAT Return',    sublabel: 'Submit monthly VAT to ERCA',             icon: <Icon name="SHIELD_CHECK" size={14} className="text-violet-500" />,         to: '/tax/filing?action=file' },
-    { id: 'qa-report',  type: 'action' as const, label: 'P&L Report',         sublabel: 'View profit & loss statement',           icon: <Icon name="BAR_CHART_2"  size={14} className="text-indigo-500" />,         to: '/reports/financial-statements?tab=pl' },
+    { id: 'qa-report',  type: 'action' as const, label: 'P&L Report',         sublabel: 'View profit & loss statement',           icon: <Icon name="BAR_CHART_2"  size={14} className="text-[var(--pro-azure)]" />,         to: '/reports/financial-statements?tab=pl' },
     { id: 'qa-coa',     type: 'action' as const, label: 'Chart of Accounts',  sublabel: 'Manage GL accounts',                     icon: <Icon name="BOOK_OPEN"    size={14} className="text-slate-500" />,          to: '/ovds/accounts' },
   ] as SearchResult[]).filter(a => a.to ? canAccessRoute(a.to.split('?')[0]) : true), [canAccessRoute]);
 
@@ -158,7 +160,7 @@ const GlobalSearchModal: React.FC<Props> = ({ open, onClose }) => {
               icon: <Icon name="INVOICE" size={14} className="text-teal-500" />,
               to: '/sales/invoices',
               badge: inv.status,
-              badgeColor: inv.status === 'PAID' ? 'bg-emerald-100 text-emerald-700' : inv.status === 'OVERDUE' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700',
+              badgeColor: inv.status === 'PAID' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : inv.status === 'OVERDUE' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700',
             });
           });
         }
@@ -174,7 +176,7 @@ const GlobalSearchModal: React.FC<Props> = ({ open, onClose }) => {
               icon: <Icon name="VENDOR" size={14} className="text-rose-500" />,
               to: '/purchases/bills',
               badge: bill.status,
-              badgeColor: bill.status === 'PAID' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700',
+              badgeColor: bill.status === 'PAID' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : 'bg-amber-100 text-amber-700',
             });
           });
         }
@@ -187,7 +189,7 @@ const GlobalSearchModal: React.FC<Props> = ({ open, onClose }) => {
               type: 'employee',
               label: `${emp.firstName} ${emp.lastName}`,
               sublabel: `${emp.employeeId} · ${emp.department?.name ?? emp.designation ?? ''}`,
-              icon: <Icon name="EMPLOYEE" size={14} className="text-emerald-600" />,
+              icon: <Icon name="EMPLOYEE" size={14} className="text-[var(--pro-azure)]" />,
               to: '/hr/employees',
             });
           });
@@ -236,7 +238,7 @@ const GlobalSearchModal: React.FC<Props> = ({ open, onClose }) => {
               icon: <Icon name="ITEM" size={14} className="text-amber-500" />,
                to: '/items',
               badge: item.stock != null ? (item.stock <= 0 ? 'Out of stock' : `${item.stock} in stock`) : undefined,
-              badgeColor: item.stock <= 0 ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700',
+              badgeColor: item.stock <= 0 ? 'bg-rose-100 text-rose-700' : 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
             });
           });
         }
@@ -271,7 +273,7 @@ const GlobalSearchModal: React.FC<Props> = ({ open, onClose }) => {
         icon: (r.item.icon as any) ?? <Icon name="SEARCH" size={14} className="text-slate-400" />,
         to: r.item.to,
         badge: location.pathname === r.item.to ? 'Current' : undefined,
-        badgeColor: 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400',
+        badgeColor: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
       }));
   }, [query, navItems, location.pathname, t]);
 
@@ -336,7 +338,7 @@ const GlobalSearchModal: React.FC<Props> = ({ open, onClose }) => {
             className="flex-1 text-sm font-medium text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none bg-transparent"
           />
           {docLoading && (
-            <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin shrink-0" />
+            <div className="w-4 h-4 border-2 border-[var(--pro-azure)] border-t-transparent rounded-full animate-spin shrink-0" />
           )}
           {query && (
             <button onClick={() => { setQuery(''); setActiveIdx(0); }} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 transition-colors">
@@ -418,7 +420,7 @@ const GlobalSearchModal: React.FC<Props> = ({ open, onClose }) => {
               <div className="mt-4 flex flex-wrap justify-center gap-2">
                 {['invoices', 'payroll', 'vat', 'employees', 'reports'].map(tip => (
                   <button key={tip} onClick={() => setQuery(tip)}
-                    className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg text-xs font-semibold hover:bg-emerald-50 dark:bg-emerald-950/20 hover:text-emerald-600 dark:text-emerald-400 transition-colors">
+                    className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg text-xs font-semibold hover:bg-[var(--pro-azure-50)] dark:bg-green-950/20 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">
                     {tip}
                   </button>
                 ))}

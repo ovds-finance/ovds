@@ -1,14 +1,14 @@
-# Project Accounting
+﻿# Project Accounting
 
 Canonical OVDS module (`packages/modules/projects`).
 
-Akaunting-inspired, DDD-aligned module layout:
+Ovds SaaS DDD-aligned module layout:
 
 ```
 modules/projects/
   src/
     index.ts        # public barrel (domain types + namespaced web)
-    domain/         # centralized domain types & rules  (@ovds/domains/projects)
+    domain/         # centralized domain types & rules  (@ovds/domains-projects)
     dto/            # zod / class-validator contracts
     web/            # React pages & components           (@ovds/features/projects)
 ```

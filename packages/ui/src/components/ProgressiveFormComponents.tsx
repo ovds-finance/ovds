@@ -67,7 +67,7 @@ export const ProgressWizard: React.FC<ProgressWizardProps> = ({
         {(draftSaved !== undefined) && (
           <div className={cn(
             'flex items-center gap-1.5 text-[10px] font-semibold mb-4 px-1',
-            draftSaved ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400',
+            draftSaved ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-slate-400',
           )}>
             {draftSaved ? (
               <>
@@ -102,9 +102,9 @@ export const ProgressWizard: React.FC<ProgressWizardProps> = ({
                   className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold border-2 transition-all',
                     status === 'done'
-                      ? 'bg-emerald-500 border-emerald-500 text-white'
+                      ? 'bg-[var(--pro-azure)] border-[var(--pro-azure)] text-white'
                       : status === 'active'
-                        ? 'bg-white dark:bg-slate-900 border-aki-blue text-aki-blue shadow-sm'
+                        ? 'bg-white dark:bg-slate-900 border-[var(--pro-azure)] text-[var(--pro-azure)] shadow-sm'
                         : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-400',
                     clickable && 'cursor-pointer',
                     step.error && status === 'active' && 'border-rose-500 text-rose-600',
@@ -119,7 +119,7 @@ export const ProgressWizard: React.FC<ProgressWizardProps> = ({
                 {i < steps.length - 1 && (
                   <div className={cn(
                     'w-0.5 flex-1 my-1 rounded-full transition-colors',
-                    status === 'done' ? 'bg-emerald-400' : 'bg-slate-200 dark:bg-slate-700',
+                    status === 'done' ? 'bg-[var(--pro-azure)]' : 'bg-slate-200 dark:bg-slate-700',
                   )} />
                 )}
               </div>
@@ -129,12 +129,12 @@ export const ProgressWizard: React.FC<ProgressWizardProps> = ({
                 <p className={cn(
                   'text-[11px] font-bold uppercase tracking-wider leading-tight',
                   status === 'active'
-                    ? step.error ? 'text-rose-600' : 'text-aki-blue dark:text-blue-400'
-                    : status === 'done' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400',
+                    ? step.error ? 'text-rose-600' : 'text-[var(--pro-azure)] dark:text-blue-400'
+                    : status === 'done' ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-slate-400',
                 )}>
                   {step.title}
                   {step.saved && status === 'done' && (
-                    <span className="ml-1 text-emerald-500 text-[9px]">✓</span>
+                    <span className="ml-1 text-[var(--pro-azure)] text-[9px]">✓</span>
                   )}
                 </p>
                 {status === 'active' && step.description && (
@@ -159,7 +159,7 @@ export const ProgressWizard: React.FC<ProgressWizardProps> = ({
       {draftSaved !== undefined && (
         <div className={cn(
           'flex items-center justify-end gap-1.5 text-[10px] font-semibold mb-3',
-          draftSaved ? 'text-emerald-600' : 'text-slate-400',
+          draftSaved ? 'text-[var(--pro-azure-dark)]' : 'text-slate-400',
         )}>
           {draftSaved ? '✓ Draft saved' : 'Saving…'}
           {lastSavedAt && draftSaved && <span className="opacity-60">· {new Date(lastSavedAt).toLocaleTimeString()}</span>}
@@ -182,8 +182,8 @@ export const ProgressWizard: React.FC<ProgressWizardProps> = ({
                   title={step.title}
                   className={cn(
                     'w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold border-2 transition-all',
-                    status === 'done' ? 'bg-emerald-500 border-emerald-500 text-white' + (clickable ? ' cursor-pointer hover:scale-110' : '') : '',
-                    status === 'active' ? 'bg-white dark:bg-slate-900 border-aki-blue text-aki-blue scale-110 shadow-sm' : '',
+                    status === 'done' ? 'bg-[var(--pro-azure)] border-[var(--pro-azure)] text-white' + (clickable ? ' cursor-pointer hover:scale-110' : '') : '',
+                    status === 'active' ? 'bg-white dark:bg-slate-900 border-[var(--pro-azure)] text-[var(--pro-azure)] scale-110 shadow-sm' : '',
                     status === 'future' ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-400' : '',
                     step.error && status === 'active' ? 'border-rose-500 text-rose-600' : '',
                   )}
@@ -196,7 +196,7 @@ export const ProgressWizard: React.FC<ProgressWizardProps> = ({
                 </button>
                 <span className={cn(
                   'text-[9px] font-bold uppercase tracking-wide whitespace-nowrap hidden sm:block',
-                  status === 'active' ? 'text-aki-blue dark:text-blue-400' : 'text-slate-400',
+                  status === 'active' ? 'text-[var(--pro-azure)] dark:text-blue-400' : 'text-slate-400',
                 )}>
                   {step.title}
                 </span>
@@ -204,7 +204,7 @@ export const ProgressWizard: React.FC<ProgressWizardProps> = ({
               {!isLast && (
                 <div className={cn(
                   'h-0.5 flex-1 mx-1 rounded-full transition-colors duration-500 mb-4',
-                  status === 'done' ? 'bg-emerald-400' : 'bg-slate-200 dark:bg-slate-700',
+                  status === 'done' ? 'bg-[var(--pro-azure)]' : 'bg-slate-200 dark:bg-slate-700',
                 )} />
               )}
             </React.Fragment>
@@ -371,7 +371,7 @@ export interface ValidatedFieldProps {
 
 const STATE_CLS: Record<ValidationState, string> = {
   idle:    '',
-  valid:   'text-emerald-600 dark:text-emerald-400',
+  valid:   'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
   invalid: 'text-rose-600 dark:text-rose-400',
   warning: 'text-amber-600 dark:text-amber-400',
 };
@@ -468,7 +468,7 @@ export const InlineValidation: React.FC<InlineValidationProps> = ({
         ? 'bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800'
         : warnings > 0
           ? 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800'
-          : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800',
+          : 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:border-green-800',
       className,
     )}>
       <div className="flex items-center gap-2 mb-2 font-bold">
@@ -477,7 +477,7 @@ export const InlineValidation: React.FC<InlineValidationProps> = ({
         ) : warnings > 0 ? (
           <span className="text-amber-600">{warnings} warning{warnings > 1 ? 's' : ''}</span>
         ) : (
-          <span className="text-emerald-600">All checks passed</span>
+          <span className="text-[var(--pro-azure-dark)]">All checks passed</span>
         )}
       </div>
       <ul className="space-y-1">

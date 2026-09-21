@@ -2,19 +2,20 @@
  * Shifts — ovds-style shift management
  * AppPage · AppKpi · AppTable · useApiCrud
  */
-import React, { useState, useMemo, useCallback } from 'react';
 import { Timer, Plus, Edit2, Trash2, RefreshCw, Clock } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
+
 import {
   AppPage, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select,
   SearchBar, EmptyState, Pagination,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
 
 interface Shift {
   id: string;
@@ -65,7 +66,7 @@ const ShiftForm: React.FC<{ data: Partial<Shift>; onChange: (d: Partial<Shift>) 
         </div>
       )}
       <div className="flex items-center gap-2">
-        <input type="checkbox" id="shiftActive" checked={data.isActive !== false} onChange={e => set('isActive', e.target.checked)} className="accent-emerald-600" />
+        <input type="checkbox" id="shiftActive" checked={data.isActive !== false} onChange={e => set('isActive', e.target.checked)} className="accent-indigo-600" />
         <label htmlFor="shiftActive" className="text-[12px] font-semibold text-slate-700 cursor-pointer">Active shift</label>
       </div>
     </div>
@@ -92,7 +93,7 @@ const Shifts: React.FC = () => {
   }, [rows, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total',   value: rows.length,                                          color: 'emerald' as const },
+    { label: 'Total',   value: rows.length,                                          color: 'green' as const },
     { label: 'Active',  value: rows.filter(s => s.isActive !== false).length,        color: 'sky' as const },
     { label: 'Morning', value: rows.filter(s => s.type === 'MORNING').length,        color: 'amber' as const },
     { label: 'Night',   value: rows.filter(s => s.type === 'NIGHT').length,          color: 'violet' as const },
@@ -170,7 +171,7 @@ const Shifts: React.FC = () => {
                   <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     {can('shifts:write') && (
                       <>
-                        <button onClick={() => setModal({ open: true, data: { ...s } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all"><Edit2 size={11} /></button>
+                        <button onClick={() => setModal({ open: true, data: { ...s } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all"><Edit2 size={11} /></button>
                         <button onClick={async () => { if (await confirm({ title: `Delete "${s.name}"?`, variant: 'danger' })) remove(s.id); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all"><Trash2 size={11} /></button>
                       </>
                     )}

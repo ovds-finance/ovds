@@ -1,19 +1,20 @@
-import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Receipt, FileText, Users, Package,
   ShoppingCart, Plus, ArrowUpRight, RefreshCw, ClipboardList,
   AlertTriangle, PiggyBank, ChevronRight,
 } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
+
 import {
   AppPage, Btn, Pagination, StatusBadge, MetricCard, Skeleton, cn, fmtCurrency,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
 import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { useAuth } from '../rbac/AuthContext';
 
 interface Invoice {
@@ -135,9 +136,9 @@ const Sales: React.FC = () => {
   const getTotal = (est: Estimate) => Number(est.totalAmount ?? est.total ?? 0);
 
   const quickActions = [
-    { title: 'Invoicing', desc: 'Create, customize, and email professional invoices', to: '/sales/invoices', icon: <Receipt size={18} />, color: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' },
+    { title: 'Invoicing', desc: 'Create, customize, and email professional invoices', to: '/sales/invoices', icon: <Receipt size={18} />, color: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:bg-green-900/30 dark:text-[var(--pro-azure-light)]' },
     { title: 'Estimates', desc: 'Create quotes and convert to invoices', to: '/sales/estimates', icon: <FileText size={18} />, color: 'bg-sky-50 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400' },
-    { title: 'Sales Orders', desc: 'Track orders, delivery, and fulfillment', to: '/sales/orders', icon: <ShoppingCart size={18} />, color: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400' },
+    { title: 'Sales Orders', desc: 'Track orders, delivery, and fulfillment', to: '/sales/orders', icon: <ShoppingCart size={18} />, color: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:bg-green-900/30 dark:text-[var(--pro-azure-light)]' },
     { title: 'Customers', desc: 'Build client profiles and track histories', to: '/customers', icon: <Users size={18} />, color: 'bg-teal-50 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400' },
     { title: 'Recurring Invoices', desc: 'Schedule automatic weekly, monthly, or yearly invoices', to: '/sales/invoices?tab=recurring', icon: <RefreshCw size={18} />, color: 'bg-violet-50 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400' },
     { title: 'Collections', desc: 'Track overdue invoices and send reminders', to: '/sales/collections', icon: <AlertTriangle size={18} />, color: 'bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400' },
@@ -169,8 +170,8 @@ const Sales: React.FC = () => {
         <Skeleton.StatsRow count={5} />
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          <MetricCard title="Revenue" amount={fmtCurrency(stats.totalRevenue)} percentage={0} isPositive={true} variant="highlight-emerald" />
-          <MetricCard title="Invoices Sent" amount={stats.invoicesSent.toString()} percentage={0} isPositive={true} variant="highlight-blue" />
+          <MetricCard title="Revenue" amount={fmtCurrency(stats.totalRevenue)} percentage={0} isPositive={true} variant="highlight-indigo" />
+          <MetricCard title="Invoices Sent" amount={stats.invoicesSent.toString()} percentage={0} isPositive={true} variant="highlight-indigo" />
           <MetricCard title="Paid" amount={stats.invoicesPaid.toString()} percentage={0} isPositive={true} variant="highlight-purple" />
           <MetricCard title="Outstanding" amount={fmtCurrency(stats.outstandingAmount)} percentage={0} isPositive={false} variant="highlight-amber" />
           <MetricCard title="Avg Terms" amount={`${stats.avgPaymentTerms} days`} percentage={0} isPositive={stats.avgPaymentTerms <= 30} variant="highlight-sky" />
@@ -219,7 +220,7 @@ const Sales: React.FC = () => {
                   labelStyle={{ color: '#94a3b8', fontWeight: 600 }}
                   itemStyle={{ color: '#0056D2' }}
                   cursor={{ stroke: '#0056D2', strokeWidth: 1, strokeDasharray: '4 2' }}
-                  formatter={(value: number) => [fmt(value), 'Revenue']}
+                  formatter={(value) => [fmt(Number(value ?? 0)), 'Revenue']}
                 />
                 <Area
                   type="monotone"
@@ -325,7 +326,7 @@ const Sales: React.FC = () => {
               <ClipboardList size={16} className="text-slate-500" />
               <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Recent Estimates</h3>
             </div>
-            <button onClick={() => navigate('/sales/estimates')} className="text-[11px] font-bold text-[#0056D2] dark:text-blue-400 hover:underline flex items-center gap-0.5">
+            <button onClick={() => navigate('/sales/estimates')} className="text-[11px] font-bold text-[var(--pro-azure)] hover:underline flex items-center gap-0.5">
               View all <ChevronRight size={12} />
             </button>
           </div>
@@ -377,7 +378,7 @@ const Sales: React.FC = () => {
               <FileText size={16} className="text-slate-500" />
               <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Recent Invoices</h3>
             </div>
-            <button onClick={() => navigate('/sales/invoices')} className="text-[11px] font-bold text-[#0056D2] dark:text-blue-400 hover:underline flex items-center gap-0.5">
+            <button onClick={() => navigate('/sales/invoices')} className="text-[11px] font-bold text-[var(--pro-azure)] hover:underline flex items-center gap-0.5">
               View all <ChevronRight size={12} />
             </button>
           </div>

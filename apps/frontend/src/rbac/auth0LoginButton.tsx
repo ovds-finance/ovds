@@ -12,9 +12,10 @@
  *  - Supports `prompt="login"` to force re-authentication
  *  - Accessible: disabled state + aria-label
  */
-import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Shield, Loader2, Building2 } from 'lucide-react';
+import React from 'react';
+
 import { useAuth0Status } from '../hooks/useAuth0Status';
 
 const AUTH0_ENABLED = import.meta.env.VITE_AUTH0_ENABLED === 'true';
@@ -58,10 +59,10 @@ const Auth0LoginButtonInner: React.FC<Auth0LoginButtonProps> = ({
       disabled={isLoading}
       onClick={handleLogin}
       aria-label={label}
-      className={`w-full py-3.5 bg-ovds-surface dark:bg-ovds-surface-dark border-2 border-ovds-border dark:border-ovds-muted-dark text-ovds-text-main dark:text-ovds-surface rounded-xl text-sm font-semibold hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-600 transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 ${className}`}
+      className={`w-full py-3.5 bg-ovds-surface dark:bg-ovds-surface-dark border-2 border-ovds-border dark:border-ovds-muted-dark text-ovds-text-main dark:text-ovds-surface rounded-xl text-sm font-semibold hover:border-[var(--pro-azure)] hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 ${className}`}
     >
       {isLoading ? (
-        <Loader2 size={18} className="animate-spin text-emerald-600" />
+        <Loader2 size={18} className="animate-spin text-[var(--pro-azure)]" />
       ) : isEnterprise ? (
         <Building2 size={18} />
       ) : (

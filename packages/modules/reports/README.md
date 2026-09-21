@@ -1,14 +1,14 @@
-# Reports & Analytics
+﻿# Reports & Analytics
 
 Canonical OVDS module (`packages/modules/reports`).
 
-Akaunting-inspired, DDD-aligned module layout:
+Ovds SaaS DDD-aligned module layout:
 
 ```
 modules/reports/
   src/
     index.ts        # public barrel (domain types + namespaced web)
-    domain/         # centralized domain types & rules  (@ovds/domains/reporting)
+    domain/         # centralized domain types & rules  (@ovds/domains-reporting)
     dto/            # zod / class-validator contracts
     web/            # React pages & components           (@ovds/features/reporting)
 ```

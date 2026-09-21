@@ -1,14 +1,14 @@
-# Compliance, Audit & Governance
+﻿# Compliance, Audit & Governance
 
 Canonical OVDS module (`packages/modules/compliance`).
 
-Akaunting-inspired, DDD-aligned module layout:
+Ovds SaaS DDD-aligned module layout:
 
 ```
 modules/compliance/
   src/
     index.ts        # public barrel (domain types + namespaced web)
-    domain/         # centralized domain types & rules  (@ovds/domains/compliance)
+    domain/         # centralized domain types & rules  (@ovds/domains-compliance)
     dto/            # zod / class-validator contracts
     web/            # React pages & components           (@ovds/features/compliance)
 ```

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Banking — OVDS Banking Hub
  *
  * Full banking user flow in one page using internal tabs:
@@ -12,8 +12,7 @@
  *   GET /banking/feeds
  *   GET /banking/reconciliation/stats
  */
-import React, { useState, useCallback, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { evalMath } from '@ovds/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Landmark, Plus, RefreshCw, ArrowLeftRight, ShieldCheck,
@@ -22,24 +21,28 @@ import {
   Layers, CircleDollarSign, ChevronDown, SlidersHorizontal,
   DollarSign, Globe,
 } from 'lucide-react';
+import React, { useState, useCallback, useMemo } from 'react';
 import toast from 'react-hot-toast';
-import api from '../services/api';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useAuth } from '../rbac/AuthContext';
-import { fmtETB, fmtCurrency } from '../utils/ethiopianTax';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select,
   Textarea, SearchBar, Amount, EmptyState, Pagination, Card,
 } from '../components/ui';
-import { evalMath } from '@ovds/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { fmtETB, fmtCurrency } from '../utils/ethiopianTax';
+
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
 interface BankAccount {
   id: string; name: string; accountNumber: string; bankName: string;
   currencyCode: string; openingBalance: number; computedBalance: number;
+  balance: number; accountType: string;
   unreconciledCount: number; isActive: boolean;
 }
 interface BankTx {
@@ -73,7 +76,7 @@ interface Dashboard {
 
 const ACCOUNT_TYPE_BADGE: Record<string, { label: string; color: string }> = {
   BANK:        { label: 'Checking',     color: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/30 dark:text-sky-400 dark:border-sky-800' },
-  SAVINGS:     { label: 'Savings',      color: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800' },
+  SAVINGS:     { label: 'Savings',      color: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-800' },
   CREDIT_CARD: { label: 'Credit Card',  color: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-400 dark:border-violet-800' },
   CASH:        { label: 'Petty Cash',   color: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800' },
   LOAN:        { label: 'Loan',         color: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-800' },
@@ -195,41 +198,41 @@ const OverviewTab: React.FC<{
   const hasDiscrepancy = unreconciled > 0;
 
   const metrics: {
-    key: string; label: string; value: string; accent: 'emerald'|'sky'|'amber'|'rose'|'violet';
+    key: string; label: string; value: string; accent: 'green'|'sky'|'amber'|'rose'|'violet';
     iconBg: string; icon: React.ReactNode; sub?: string; valueCls?: string;
   }[] = [
     { key: 'netWorth', label: 'Net Worth', value: d ? fmtCurrency(d.netWorth, 'ETB') : '—',
-      accent: 'emerald', iconBg: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400', icon: <Wallet size={14} />,
+      accent: 'green', iconBg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/40 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', icon: <Wallet size={14} />,
       sub: 'assets - liabilities' },
     { key: 'liquid', label: 'Liquid Cash', value: d ? fmtCurrency(d.liquidBalance, 'ETB') : '—',
       accent: 'sky', iconBg: 'bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400', icon: <DollarSign size={14} />,
       sub: 'excl. credit cards' },
     { key: 'in', label: 'Cash In', value: d ? fmtCurrency(totalIn, 'ETB') : '—',
-      accent: 'emerald', iconBg: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400', icon: <ArrowDownRight size={14} />,
-      valueCls: 'text-emerald-700 dark:text-emerald-400' },
+      accent: 'green', iconBg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/40 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', icon: <ArrowDownRight size={14} />,
+      valueCls: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' },
     { key: 'out', label: 'Cash Out', value: d ? fmtCurrency(totalOut, 'ETB') : '—',
       accent: 'rose', iconBg: 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400', icon: <ArrowUpRight size={14} />,
       valueCls: 'text-rose-700 dark:text-rose-400' },
     { key: 'fx', label: 'FX Gain/Loss', value: d ? `${fxGainLoss >= 0 ? '+' : ''}${fmtCurrency(fxGainLoss, 'ETB')}` : '—',
-      accent: fxGainLoss >= 0 ? 'emerald' : 'rose',
-      iconBg: fxGainLoss >= 0 ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400',
+      accent: fxGainLoss >= 0 ? 'green' : 'rose',
+      iconBg: fxGainLoss >= 0 ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/40 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400',
       icon: fxGainLoss >= 0 ? <TrendingUp size={14} /> : <ArrowUpRight size={14} />,
-      valueCls: fxGainLoss >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400' },
+      valueCls: fxGainLoss >= 0 ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-700 dark:text-rose-400' },
     { key: 'pending', label: 'Unreconciled', value: String(unreconciled),
-      accent: unreconciled > 0 ? 'amber' : 'emerald',
-      iconBg: unreconciled > 0 ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400' : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400',
+      accent: unreconciled > 0 ? 'amber' : 'green',
+      iconBg: unreconciled > 0 ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400' : 'bg-[var(--pro-azure-50)] dark:bg-green-950/40 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
       icon: unreconciled > 0 ? <AlertCircle size={14} /> : <CheckCircle2 size={14} />,
-      valueCls: unreconciled > 0 ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400',
+      valueCls: unreconciled > 0 ? 'text-amber-700 dark:text-amber-400' : 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
       sub: 'error-prevention' },
   ];
 
   const quickLinks = [
-    { label: 'New Income',       icon: <ArrowDownRight size={14} />, color: 'bg-emerald-500', path: '/banking/transactions?action=income' },
+    { label: 'New Income',       icon: <ArrowDownRight size={14} />, color: 'bg-[var(--pro-azure-50)]0', path: '/banking/transactions?action=income' },
     { label: 'New Expense',      icon: <ArrowUpRight   size={14} />, color: 'bg-rose-500',    path: '/banking/transactions?action=expense' },
     { label: 'New Transfer',     icon: <ArrowLeftRight size={14} />, color: 'bg-sky-500',     path: '/banking/transfers?action=new' },
     { label: 'Import Statement', icon: <Upload         size={14} />, color: 'bg-violet-500',  path: '/banking/statement-import' },
     { label: 'Reconcile',        icon: <ShieldCheck    size={14} />, color: 'bg-teal-500',    path: '/banking/reconciliation' },
-    { label: 'Bank Feeds',       icon: <Rss            size={14} />, color: 'bg-indigo-500',  path: '/banking/feeds' },
+    { label: 'Bank Feeds',       icon: <Rss            size={14} />, color: 'bg-[var(--pro-azure-50)]0',  path: '/banking/feeds' },
     { label: 'FX Rates',         icon: <Globe          size={14} />, color: 'bg-cyan-500',    path: '/banking/fx-rates' },
   ];
 
@@ -245,7 +248,7 @@ const OverviewTab: React.FC<{
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {metrics.map(m => (
-            <Card key={m.key} padding="md" className={`cursor-default border-l-4 ${['emerald','sky','amber','violet'].includes(m.accent as string) ? `border-${m.accent}-400` : 'border-slate-200'}`}>
+            <Card key={m.key} padding="md" className={`cursor-default border-l-4 ${['indigo','sky','amber','violet'].includes(m.accent as string) ? `border-${m.accent}-400` : 'border-slate-200'}`}>
               <div className="flex items-center justify-between mb-2.5">
                 <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${m.iconBg}`}>{m.icon}</span>
               {m.sub && <span className="text-[8px] font-bold uppercase tracking-wider text-slate-300 dark:text-slate-600">{m.sub}</span>}
@@ -261,8 +264,8 @@ const OverviewTab: React.FC<{
       <Card padding="md">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
-              <ArrowLeftRight size={15} className="text-emerald-600 dark:text-emerald-400" />
+            <div className="w-8 h-8 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/40 flex items-center justify-center">
+              <ArrowLeftRight size={15} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
             </div>
             <div>
               <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Double-Entry Validation</p>
@@ -278,9 +281,9 @@ const OverviewTab: React.FC<{
 
         {/* Credits / Debits / Net — double-entry contrast tints */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden mt-3">
-          <div className="bg-emerald-50/60 dark:bg-emerald-950/20 p-3.5">
-            <div className="flex items-center gap-1.5 mb-1"><ArrowDownRight size={12} className="text-emerald-600" /><span className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Credits (Inflow)</span></div>
-            <p className="text-[18px] font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">{fmtETB(totalIn)}</p>
+          <div className="bg-[var(--pro-azure-50)]/60 dark:bg-green-950/20 p-3.5">
+            <div className="flex items-center gap-1.5 mb-1"><ArrowDownRight size={12} className="text-[var(--pro-azure)]" /><span className="text-[9px] font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] uppercase tracking-widest">Credits (Inflow)</span></div>
+            <p className="text-[18px] font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] tabular-nums">{fmtETB(totalIn)}</p>
           </div>
           <div className="bg-rose-50/60 dark:bg-rose-950/20 p-3.5">
             <div className="flex items-center gap-1.5 mb-1"><ArrowUpRight size={12} className="text-rose-600" /><span className="text-[9px] font-bold text-rose-700 dark:text-rose-400 uppercase tracking-widest">Debits (Outflow)</span></div>
@@ -288,7 +291,7 @@ const OverviewTab: React.FC<{
           </div>
           <div className="bg-white dark:bg-slate-950 p-3.5">
             <div className="flex items-center gap-1.5 mb-1"><Layers size={12} className="text-slate-500" /><span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Net Movement</span></div>
-            <p className={`text-[18px] font-bold tabular-nums ${net >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>{net >= 0 ? '+' : '-'}{fmtETB(Math.abs(net))}</p>
+            <p className={`text-[18px] font-bold tabular-nums ${net >= 0 ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-700 dark:text-rose-400'}`}>{net >= 0 ? '+' : '-'}{fmtETB(Math.abs(net))}</p>
           </div>
         </div>
 
@@ -301,9 +304,9 @@ const OverviewTab: React.FC<{
             </p>
           </div>
         ) : (
-          <div className="flex items-center gap-2.5 mt-3 px-3 py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50">
-            <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
-            <p className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">All accounts reconciled — entries are balanced and clear.</p>
+          <div className="flex items-center gap-2.5 mt-3 px-3 py-2.5 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900/50">
+            <CheckCircle2 size={15} className="text-[var(--pro-azure)] shrink-0" />
+            <p className="text-[11px] font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">All accounts reconciled — entries are balanced and clear.</p>
           </div>
         )}
 
@@ -409,8 +412,8 @@ const OverviewTab: React.FC<{
               return (
                 <div key={t.id} className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700 transition-all">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${isCredit ? 'bg-emerald-50 dark:bg-emerald-950/20' : 'bg-rose-50 dark:bg-rose-950/20'}`}>
-                      {isCredit ? <ArrowDownRight size={12} className="text-emerald-600" /> : <ArrowUpRight size={12} className="text-rose-500" />}
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${isCredit ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20' : 'bg-rose-50 dark:bg-rose-950/20'}`}>
+                      {isCredit ? <ArrowDownRight size={12} className="text-[var(--pro-azure)]" /> : <ArrowUpRight size={12} className="text-rose-500" />}
                     </div>
                     <div className="min-w-0">
                       <p className="text-[12px] font-semibold text-slate-700 dark:text-slate-200 truncate">{t.description}</p>
@@ -418,7 +421,7 @@ const OverviewTab: React.FC<{
                     </div>
                   </div>
                   <div className="text-right shrink-0 ml-3">
-                    <p className={`text-[12px] font-bold tabular-nums ${isCredit ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                    <p className={`text-[12px] font-bold tabular-nums ${isCredit ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-600 dark:text-rose-400'}`}>
                       {isCredit ? '+' : '-'}{fmtETB(Math.abs(Number(t.amount)))}
                     </p>
                     <StatusBadge status={t.status} />
@@ -478,7 +481,7 @@ const AccountsTab: React.FC<{
             <AppTd>
               {a.unreconciledCount > 0
                 ? <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400">{a.unreconciledCount} pending</span>
-                : <span className="text-[10px] text-emerald-600 flex items-center gap-1"><CheckCircle2 size={10} />Clear</span>}
+                : <span className="text-[10px] text-[var(--pro-azure)] flex items-center gap-1"><CheckCircle2 size={10} />Clear</span>}
             </AppTd>
             <AppTd align="right">
               {can('banking:write') && (
@@ -522,7 +525,7 @@ const TransactionsTab: React.FC<{
         <option value="RECONCILED">Reconciled</option>
       </select>
       <div className="flex-1" />
-      <Btn variant="ghost" size="sm" icon={<ArrowDownRight size={11} />} className="text-emerald-600 border-emerald-100 hover:bg-emerald-50" onClick={() => onNavigateNew('income')}>New Income</Btn>
+      <Btn variant="ghost" size="sm" icon={<ArrowDownRight size={11} />} className="text-[var(--pro-azure)] border-[var(--pro-azure-100)] hover:bg-[var(--pro-azure-50)]" onClick={() => onNavigateNew('income')}>New Income</Btn>
       <Btn variant="ghost" size="sm" icon={<ArrowUpRight size={11} />} className="text-rose-600 border-rose-100 hover:bg-rose-50" onClick={() => onNavigateNew('expense')}>New Expense</Btn>
     </div>
     <AppTable loading={loading}>
@@ -544,7 +547,7 @@ const TransactionsTab: React.FC<{
               </AppTd>
               <AppTd><span className="text-[11px] text-slate-500">{t.bankAccountName ?? t.bankName ?? '—'}</span></AppTd>
               <AppTd align="right">
-                <span className={`text-[12px] font-bold tabular-nums ${isCredit ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                <span className={`text-[12px] font-bold tabular-nums ${isCredit ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-600 dark:text-rose-400'}`}>
                   {isCredit ? '+' : '-'}<Amount value={Math.abs(Number(t.amount))} size="sm" />
                 </span>
               </AppTd>
@@ -552,7 +555,7 @@ const TransactionsTab: React.FC<{
               <AppTd align="right">
                 {t.status !== 'RECONCILED' && (
                   <button onClick={() => onReconcile(t.id)}
-                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 rounded border border-emerald-100 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900 transition-all">
+                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-semibold text-[var(--pro-azure-dark)] bg-[var(--pro-azure-50)] rounded border border-[var(--pro-azure-100)] hover:bg-[var(--pro-azure-100)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)] dark:border-green-900 transition-all">
                     <CheckCircle2 size={10} /> Reconcile
                   </button>
                 )}
@@ -603,7 +606,7 @@ const TransfersTab: React.FC<{
               </AppTd>
               <AppTd>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-6 h-6 rounded bg-emerald-50 flex items-center justify-center"><Landmark size={10} className="text-emerald-600" /></div>
+                  <div className="w-6 h-6 rounded bg-[var(--pro-azure-50)] flex items-center justify-center"><Landmark size={10} className="text-[var(--pro-azure)]" /></div>
                   <span className="text-[11px] text-slate-700 truncate max-w-[120px]">{t.toAccountName ?? getAccountName(t.toAccountId)}</span>
                 </div>
               </AppTd>
@@ -616,7 +619,7 @@ const TransfersTab: React.FC<{
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {t.status === 'PENDING' && can('fund_transfers:approve') && (
                     <>
-                      <button onClick={() => onApprove(t.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Approve"><CheckCircle2 size={11} /></button>
+                      <button onClick={() => onApprove(t.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Approve"><CheckCircle2 size={11} /></button>
                       <button onClick={() => onReject(t.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Reject"><AlertCircle size={11} /></button>
                     </>
                   )}
@@ -634,7 +637,7 @@ const TransfersTab: React.FC<{
 // ── Bank Feeds tab ────────────────────────────────────────────────────────────
 
 const FEED_STATUS_STYLE: Record<string, string> = {
-  CONNECTED:     'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800',
+  CONNECTED:     'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)] dark:bg-green-950/20 dark:text-[var(--pro-azure-light)] dark:border-green-800',
   DISCONNECTED:  'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
   ERROR:         'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-800',
   PENDING_AUTH:  'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800',
@@ -755,9 +758,9 @@ const ReconciliationTab: React.FC<{
     ) : stats ? (
       <AppKpi cells={[
         { label: 'Total',    value: stats.total,                                 color: 'slate'   as const },
-        { label: 'Reconciled', value: stats.reconciled,                          color: 'emerald' as const },
-        { label: 'Pending',  value: stats.pending,                               color: stats.pending > 0 ? 'amber' as const : 'emerald' as const },
-        { label: 'Rate',     value: `${stats.reconciliationRate}%`,              color: stats.reconciliationRate >= 80 ? 'emerald' as const : 'amber' as const },
+        { label: 'Reconciled', value: stats.reconciled,                          color: 'green' as const },
+        { label: 'Pending',  value: stats.pending,                               color: stats.pending > 0 ? 'amber' as const : 'indigo' as const },
+        { label: 'Rate',     value: `${stats.reconciliationRate}%`,              color: stats.reconciliationRate >= 80 ? 'indigo' as const : 'amber' as const },
       ]} />
     ) : null}
 
@@ -774,7 +777,7 @@ const ReconciliationTab: React.FC<{
               </div>
               {acc.bankName && <p className="text-[10px] text-slate-400 mb-2">{acc.bankName}</p>}
               <div className="flex items-center justify-between">
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${acc.pendingCount > 0 ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'}`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${acc.pendingCount > 0 ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400' : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)]'}`}>
                   {acc.pendingCount > 0 ? `${acc.pendingCount} pending` : 'Clear'}
                 </span>
                 {acc.pendingAmount > 0 && <span className="text-[10px] font-mono text-slate-400">{fmtETB(acc.pendingAmount)}</span>}

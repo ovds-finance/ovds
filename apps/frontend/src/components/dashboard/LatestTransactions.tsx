@@ -1,5 +1,6 @@
-import React, { useCallback } from 'react';
+import React, {  } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { Icon } from '../ui';
 
 export interface Transaction {
@@ -33,7 +34,7 @@ const LatestTransactions: React.FC<LatestTransactionsProps> = ({
   const statusBadge = (status?: string) => {
     if (!status) return null;
     const cfg: Record<string, { cls: string; label: string }> = {
-      PAID: { cls: 'bg-emerald-100 text-emerald-700', label: 'Paid' },
+      PAID: { cls: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]', label: 'Paid' },
       PENDING: { cls: 'bg-amber-100 text-amber-700', label: 'Pending' },
       OVERDUE: { cls: 'bg-rose-100 text-rose-700', label: 'Overdue' },
       PARTIAL: { cls: 'bg-sky-100 text-sky-700', label: 'Partial' },
@@ -57,7 +58,7 @@ const LatestTransactions: React.FC<LatestTransactionsProps> = ({
         {onViewAll && (
           <button
             onClick={onViewAll}
-            className="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 transition-colors"
+            className="text-[11px] font-bold text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] transition-colors"
           >
             View all
           </button>
@@ -100,7 +101,7 @@ const LatestTransactions: React.FC<LatestTransactionsProps> = ({
                     <div className="flex items-center gap-2">
                       <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
                         tx.type === 'in'
-                          ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600'
+                          ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure)]'
                           : 'bg-rose-50 dark:bg-rose-950/30 text-rose-600'
                       }`}>
                         <Icon name={tx.type === 'in' ? 'ARROW_DOWN' : 'ARROW_UP'} size={14} />
@@ -117,7 +118,7 @@ const LatestTransactions: React.FC<LatestTransactionsProps> = ({
                   </td>
                   <td className="py-2.5 pr-2 text-right">
                     <span className={`text-xs font-bold tabular-nums ${
-                      tx.type === 'in' ? 'text-emerald-600' : 'text-rose-600'
+                      tx.type === 'in' ? 'text-[var(--pro-azure)]' : 'text-rose-600'
                     }`}>
                       {tx.type === 'in' ? '+' : '-'}{fmt(tx.amount)}
                     </span>

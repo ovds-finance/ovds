@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
 import { X, Sparkles, AlertCircle } from 'lucide-react';
-import { useAuth } from '../../rbac/AuthContext';
+import React, { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
 import { useEscapeKey } from '../../hooks';
+import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
 
 interface BankTransactionModalProps {
   bankAccountId: string;
@@ -221,15 +222,15 @@ const BankTransactionModal: React.FC<BankTransactionModalProps> = ({
 
         {/* Detected badge */}
         {detected && !showPastePanel && (
-          <div className="px-6 py-2 bg-emerald-50 dark:bg-emerald-500/10 border-b border-emerald-100 dark:border-emerald-500/20 flex items-center gap-2">
-            <Sparkles size={12} className="text-emerald-600 dark:text-emerald-400" />
-            <p className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold">
+          <div className="px-6 py-2 bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]0/10 border-b border-[var(--pro-azure-100)] dark:border-[var(--pro-azure)]/20 flex items-center gap-2">
+            <Sparkles size={12} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
+            <p className="text-xs text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] font-semibold">
               Auto-detected {Object.keys(detected).length} field(s) — review below
             </p>
             <button
               type="button"
               onClick={() => setDetected(null)}
-              className="ml-auto text-emerald-500 hover:text-emerald-700 transition-colors"
+              className="ml-auto text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] transition-colors"
             >
               <X size={12} />
             </button>
@@ -242,7 +243,7 @@ const BankTransactionModal: React.FC<BankTransactionModalProps> = ({
             <button
               type="button"
               onClick={() => setForm({ ...form, type: 'CREDIT' })}
-              className={`py-3 rounded-lg text-sm font-medium transition-all ${form.type === 'CREDIT' ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+              className={`py-3 rounded-lg text-sm font-medium transition-all ${form.type === 'CREDIT' ? 'bg-[var(--pro-azure)] text-white shadow-md shadow-green-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
             >
               + Credit (In)
             </button>
@@ -275,7 +276,7 @@ const BankTransactionModal: React.FC<BankTransactionModalProps> = ({
                 step={type === 'number' ? '0.01' : undefined}
                 className={`w-full px-4 py-3 bg-white dark:bg-slate-800 border rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-teal-400/10 dark:text-white transition-colors ${
                   detected && detected[field as keyof typeof detected]
-                    ? 'border-emerald-300 dark:border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-500/5'
+                    ? 'border-[var(--pro-azure-light)] dark:border-[var(--pro-azure)]/40 bg-[var(--pro-azure-50)]/50 dark:bg-[var(--pro-azure-50)]0/5'
                     : 'border-slate-200 dark:border-slate-700'
                 }`}
               />

@@ -115,7 +115,7 @@ export function ChartOfAccountsBrowser({
           className={cn(
             'flex items-center gap-1 px-2 py-1.5 rounded-lg cursor-pointer transition-all group',
             isSelected
-              ? 'bg-aki-blue-50 dark:bg-aki-blue-950/30 text-aki-blue dark:text-blue-400'
+              ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]-950/30 text-[var(--pro-azure)] dark:text-blue-400'
               : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800',
           )}
           style={{ paddingLeft: indent + 8 }}
@@ -134,7 +134,7 @@ export function ChartOfAccountsBrowser({
           <span
             className={cn(
               'text-[11px] font-mono font-bold shrink-0',
-              isSelected && 'text-aki-blue dark:text-blue-400',
+              isSelected && 'text-[var(--pro-azure)] dark:text-blue-400',
             )}
           >
             {account.code}
@@ -145,7 +145,7 @@ export function ChartOfAccountsBrowser({
           <NatureBadge nature={account.nature} />
 
           {mapped && (
-            <span className="px-1.5 py-0.5 rounded-full text-[8px] font-bold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+            <span className="px-1.5 py-0.5 rounded-full text-[8px] font-bold bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border border-[var(--pro-azure-100)] dark:border-green-800">
               Mapped
             </span>
           )}
@@ -201,7 +201,7 @@ export function ChartOfAccountsBrowser({
               className={cn(
                 'px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all',
                 filter === f
-                  ? 'bg-aki-blue text-white'
+                  ? 'bg-[var(--pro-azure)] text-white'
                   : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800',
               )}
             >
@@ -213,7 +213,7 @@ export function ChartOfAccountsBrowser({
         {onCreateAccount && (
           <button
             onClick={onCreateAccount}
-            className="w-8 h-8 rounded-xl bg-aki-blue text-white flex items-center justify-center hover:bg-aki-blue-dark transition-all shrink-0"
+            className="w-8 h-8 rounded-xl bg-[var(--pro-azure)] text-white flex items-center justify-center hover:bg-[var(--pro-azure-dark)] transition-all shrink-0"
             title="Add account"
           >
             <Plus size={14} />
@@ -262,7 +262,7 @@ export function ChartOfAccountsBrowser({
               <p className="text-slate-400">Status</p>
               <p className={cn(
                 'font-semibold',
-                selectedAccount.isActive ? 'text-emerald-600' : 'text-slate-400',
+                selectedAccount.isActive ? 'text-[var(--pro-azure-dark)]' : 'text-slate-400',
               )}>
                 {selectedAccount.isActive ? 'Active' : 'Inactive'}
               </p>

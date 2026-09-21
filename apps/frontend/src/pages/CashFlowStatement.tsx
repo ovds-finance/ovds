@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
+
 import {
   AppPage, Btn, Icon, FormField, Input,
 } from '../components/ui';
 import { useBusiness } from '../context/businessContext';
 import api from '../services/api';
 import { downloadBlob } from '../utils/download';
-import toast from 'react-hot-toast';
 
 interface CashFlowLine {
   id?: string;
@@ -140,7 +141,7 @@ const CashFlowStatement: React.FC = () => {
                 {l.label}
                 {l.basis === 'keyword' && <span className="text-[9px] text-amber-500 ml-1">(est.)</span>}
               </span>
-              <span className="tabular-nums text-[12px] font-medium text-emerald-700 min-w-[100px] text-right">
+              <span className="tabular-nums text-[12px] font-medium text-[var(--pro-azure-dark)] min-w-[100px] text-right">
                 {fmt(l.amount)}
               </span>
             </div>
@@ -201,10 +202,10 @@ const CashFlowStatement: React.FC = () => {
       {data && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           {[
-            { label: 'Operating', value: operatingNet, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200' },
-            { label: 'Investing', value: investingNet, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' },
+            { label: 'Operating', value: operatingNet, color: 'text-[var(--pro-azure)]', bg: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' },
+            { label: 'Investing', value: investingNet, color: 'text-[var(--pro-azure)]', bg: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' },
             { label: 'Financing', value: financingNet, color: 'text-violet-600', bg: 'bg-violet-50 border-violet-200' },
-            { label: 'Net Change', value: netCashFlow, color: netCashFlow >= 0 ? 'text-emerald-600' : 'text-rose-600', bg: netCashFlow >= 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200' },
+            { label: 'Net Change', value: netCashFlow, color: netCashFlow >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600', bg: netCashFlow >= 0 ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' : 'bg-rose-50 border-rose-200' },
           ].map((k, i) => (
             <div key={i} className={`rounded-xl border p-4 ${k.bg}`}>
               <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">{k.label}</p>
@@ -225,16 +226,16 @@ const CashFlowStatement: React.FC = () => {
           {renderFlowSection(
             'Operating Activities',
             data?.operating || { inflows: [], outflows: [], net: 0 },
-            'bg-emerald-50 border border-emerald-100',
-            'bg-emerald-600',
+            'bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)]',
+            'bg-[var(--pro-azure)]',
           )}
         </div>
         <div>
           {renderFlowSection(
             'Investing Activities',
             data?.investing || { inflows: [], outflows: [], net: 0 },
-            'bg-blue-50 border border-blue-100',
-            'bg-blue-600',
+            'bg-[var(--pro-azure-50)] border border-[var(--pro-azure-50)]',
+            'bg-[var(--pro-azure)]',
           )}
         </div>
         <div>
@@ -251,7 +252,7 @@ const CashFlowStatement: React.FC = () => {
         <div className="mt-6 p-4 rounded-xl border bg-slate-50 dark:bg-slate-800 flex items-center justify-between">
           <div>
             <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Net Cash Flow</p>
-            <p className={`text-2xl font-black tabular-nums ${netCashFlow >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+            <p className={`text-2xl font-black tabular-nums ${netCashFlow >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>
               ETB {fmt(netCashFlow)}
             </p>
           </div>

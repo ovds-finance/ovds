@@ -1,0 +1,32 @@
+# Normalize line endings to LF for all text files.
+# This repo stores LF; without this file, git's global autocrlf=true
+# rewrites every file to CRLF on checkout, producing 1300+ phantom
+# "modified" entries. eol=lf forces a consistent working tree.
+* text=auto eol=lf
+
+# Binary assets: never apply text conversions.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.svg   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+*.otf   binary
+*.pdf   binary
+*.zip   binary
+*.gz    binary
+*.tar   binary
+*.tgz   binary
+*.bz2   binary
+*.7z    binary
+*.db    binary
+*.sqlite binary
+*.sqlite3 binary
+*.prisma binary
+
+# Shell scripts keep Unix LF on every platform.
+*.sh text eol=lf

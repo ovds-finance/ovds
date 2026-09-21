@@ -1,7 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { LoginDto, RegisterDto, ChangePasswordDto } from '../../../packages/shared/dto/src/auth/auth.dto';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
+
+import { LoginDto, RegisterDto, ChangePasswordDto } from '../../../packages/shared/dto/src/auth/auth.dto';
 import { AppModule } from '../src/app.module';
 
 describe('Password Complexity (E2E)', () => {

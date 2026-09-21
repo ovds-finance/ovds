@@ -1,35 +1,38 @@
-﻿import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import Sidebar from './sidebar';
-import Header from './header';
-import Footer from './footer';
-import SessionExpiryBanner from './sessionExpiryBanner';
-import TrialBanner from './trialBanner';
-import KeyboardShortcutsModal from './keyboardShortcutsModal';
-import ActivityFeedDrawer from './activityFeedDrawer';
-import DashboardManager from './dashboard/dashboardManager';
-import { TabBar, TabManagerProvider } from './tabManager/TabManager';
-import CompanySetupWizard from './companySetupWizard';
-import MandatoryReleaseBarrier from './mandatoryReleaseBarrier';
-import OfflineSyncBanner from './offlineSyncBanner';
-import SetupWizardBanner from './setupWizardBanner';
-import { Icon } from './ui';
-import { zIndex } from '@ovds/ui';
+﻿import { zIndex } from '@ovds/ui';
 import { CommandPalette, useCommandPalette } from '@ovds/ui';
 import type { CommandPaletteAction } from '@ovds/ui';
-import { useAuth } from '../rbac/AuthContext';
-import { useSessionRefresh } from '../hooks/useSessionRefresh';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 import { useBusiness } from '../context/businessContext';
-import { useHealth } from '../services/health.service';
-import { useNetworkStatus } from '../hooks/useNetworkStatus';
-import MobileBottomNav from './mobileBottomNav';
-import ComplianceStatusBar from './complianceStatusBar';
 import { useFocusTrap } from '../hooks';
 import { useLangSync } from '../hooks/useLangSync';
-import { useOfflineResilience } from '../hooks/useOfflineResilience';
 import { useNavTree } from '../hooks/useNavTree';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
+import { useOfflineResilience } from '../hooks/useOfflineResilience';
+import { useSessionRefresh } from '../hooks/useSessionRefresh';
+import { useAuth } from '../rbac/AuthContext';
+import { useRouteUI } from '../router';
 import api from '../services/api';
+import { useHealth } from '../services/health.service';
+
+import ActivityFeedDrawer from './activityFeedDrawer';
+import CompanySetupWizard from './companySetupWizard';
+import ComplianceStatusBar from './complianceStatusBar';
+import DashboardManager from './dashboard/dashboardManager';
+import Footer from './footer';
+import Header from './header';
+import KeyboardShortcutsModal from './keyboardShortcutsModal';
+import MandatoryReleaseBarrier from './mandatoryReleaseBarrier';
+import MobileBottomNav from './mobileBottomNav';
+import OfflineSyncBanner from './offlineSyncBanner';
+import SessionExpiryBanner from './sessionExpiryBanner';
+import SetupWizardBanner from './setupWizardBanner';
+import Sidebar from './sidebar';
+import { TabBar, TabManagerProvider } from './tabManager/TabManager';
+import TrialBanner from './trialBanner';
+import { Icon } from './ui';
 
 
 // Expose navigate globally for G-chord keyboard shortcuts
@@ -129,7 +132,6 @@ const routeTitleMap: Record<string, string> = {
   '/accounting/fixed-assets':           'nav.items.fixed_assets',
   '/banking/transfers':         'nav.items.fund_transfers',
   '/settings/roles':       'nav.items.role_permissions',
-  '/settings/advanced-access-controls': 'nav.items.advanced_access',
   '/banking/statement-import':  'nav.items.bank_statement_import',
   '/accounting/period-close':           'nav.items.period_close',
   '/compliance/audit-outsourcing':      'nav.items.audit_outsourcing',
@@ -287,7 +289,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [showActivityFeed, setShowActivityFeed] = useState(false);
   const [showDashboardManager, setShowDashboardManager] = useState(false);
   const [showSetupWizard, setShowSetupWizard] = useState(false);
-  const [showGlobalSearch, setShowGlobalSearch] = useState(false);
+  const [_showGlobalSearch, setShowGlobalSearch] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showProgress, setShowProgress] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -313,7 +315,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       { id: 'qa-expense', label: 'New Expense', category: 'Quick Actions', icon: <Icon name="RECEIPT" size={14} className="text-amber-500" />, action: () => navigate('/purchases/expenses?action=new') },
       { id: 'qa-customer', label: 'New Customer', category: 'Quick Actions', icon: <Icon name="CUSTOMER" size={14} className="text-sky-500" />, action: () => navigate('/accounting/hub?tab=CUSTOMERS') },
       { id: 'qa-vendor', label: 'New Vendor', category: 'Quick Actions', icon: <Icon name="COMPANY" size={14} className="text-slate-500" />, action: () => navigate('/accounting/hub?tab=VENDORS') },
-      { id: 'qa-transfer', label: 'New Transfer', category: 'Quick Actions', icon: <Icon name="REFRESH" size={14} className="text-indigo-500" />, action: () => navigate('/banking/transfers?action=new') },
+      { id: 'qa-transfer', label: 'New Transfer', category: 'Quick Actions', icon: <Icon name="REFRESH" size={14} className="text-[var(--pro-azure)]" />, action: () => navigate('/banking/transfers?action=new') },
     ];
     const routes = ['/sales/invoices', '/purchases/bills', '/purchases/expenses', '/accounting/hub', '/banking/transfers'];
     return actions.filter((_, i) => canAccessRoute(routes[i] ?? '/'));
@@ -441,8 +443,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       const next = !prev;
       localStorage.setItem('sidebar_collapsed', String(next));
       document.documentElement.setAttribute('data-sidebar', next ? 'collapsed' : 'expanded');
-      // collapsed = rail only (56px); expanded = rail (56px) + nav panel (240px) = 296px
-      document.documentElement.style.setProperty('--sidebar-w', next ? '56px' : '296px');
+      // collapsed = rail only (56px); expanded = full sidebar (276px)
+      document.documentElement.style.setProperty('--sidebar-w', next ? '56px' : '276px');
       return next;
     });
   }, []);
@@ -453,8 +455,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       'data-sidebar',
       collapsed ? 'collapsed' : 'expanded',
     );
-    // collapsed = rail only (56px); expanded = rail (56px) + nav panel (240px) = 296px
-    document.documentElement.style.setProperty('--sidebar-w', collapsed ? '56px' : '296px');
+    // collapsed = rail only (56px); expanded = full sidebar (276px)
+    document.documentElement.style.setProperty('--sidebar-w', collapsed ? '56px' : '276px');
   }, [collapsed]);
 
   const titleKey = routeTitleMap[location.pathname + location.search]
@@ -462,10 +464,52 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     ?? 'admin.title';
   const pageTitle = t(titleKey) || 'Dashboard';
 
+  // -- Route-driven UI state ------------------------------------------------
+  // useRouteUI() reads the RouteHandle resolved by RouteLayoutDispatcher.
+  // We use it here to:
+  //   1. Override the header title with the handle's declared title.
+  //   2. Suppress the tab bar and footer for wizard / slider / modal routes
+  //      (they own their own chrome).
+  //   3. Prevent the page-content key-remount animation for sliders and
+  //      modals (background page must stay mounted and stable while the
+  //      overlay is open).
+  const routeUI = useRouteUI();
+  const handleTitle =
+    routeUI.handle.wizard?.title ??
+    routeUI.handle.slider?.title ??
+    routeUI.handle.modal?.title ??
+    routeUI.handle.inline?.title ??
+    routeUI.handle.table?.title ??      // backward-compat: 'table' alias routes
+    null;
+  const activePageTitle = handleTitle ? t(handleTitle, { defaultValue: handleTitle }) : pageTitle;
+  // Wizard, slider, and modal supply their own headers/chrome — suppress Layout chrome.
+  const suppressTabBar = routeUI.isWizard || routeUI.isSlider || routeUI.isModal;
+  const suppressFooter  = routeUI.isWizard || routeUI.isSlider || routeUI.isModal;
+  // Sliders and modals both overlay the background page — keep it mounted &
+  // visually stable so no CSS remount animation fires underneath the overlay.
+  const pageContentKey  = (routeUI.isSlider || routeUI.isModal) ? 'overlay-stable' : location.pathname;
+
+  // -- useRouteUITitle override -------------------------------------------
+  // Page components may broadcast an 'ovds:route-title' event to override the
+  // header title dynamically (e.g. "Invoice #INV-1042" after data loads).
+  // We reset the override on every route change so stale titles never bleed.
+  const [imperativeTitle, setImperativeTitle] = useState<string | null>(null);
+  useEffect(() => { setImperativeTitle(null); }, [location.pathname]);
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ title: string }>).detail;
+      if (detail?.title) setImperativeTitle(detail.title);
+    };
+    window.addEventListener('ovds:route-title', handler);
+    return () => window.removeEventListener('ovds:route-title', handler);
+  }, []);
+  // imperativeTitle (from page component) > handleTitle (from route handle) > routeTitleMap
+  const resolvedPageTitle = imperativeTitle ?? activePageTitle;
+
   // Update document title
   useEffect(() => {
-    document.title = `${pageTitle} · ${t('brand.name', 'OVDS')}`;
-  }, [pageTitle, t]);
+    document.title = `${resolvedPageTitle} · ${t('brand.name', 'OVDS')}`;
+  }, [resolvedPageTitle, t]);
 
   // Route-change progress bar — fast, minimal fake-load illusion
   useEffect(() => {
@@ -620,12 +664,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <TabManagerProvider>
-    <div className="flex bg-white text-slate-800 min-h-screen w-full relative font-sans selection:bg-blue-100 selection:text-blue-900 transition-colors duration-200">
+    {/* ── Ovds SaaS GUI Shell ──────────────────────────────────── */}
+    <div
+      className="flex min-h-screen w-full overflow-x-hidden relative"
+      style={{
+        fontFamily: "'Inter', ui-sans-serif, system-ui, sans-serif",
+        background: 'var(--bg-main)',
+        color: 'var(--text)',
+      }}
+    >
       <MandatoryReleaseBarrier />
-      {/* Skip to main content — keyboard / screen reader shortcut */}
+
+      {/* Skip to main content */}
       <a
         href="#main-scroll"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-emerald-500 focus:text-white focus:rounded-xl focus:text-sm focus:font-bold focus:shadow-lg"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[9999] focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm focus:font-semibold focus:shadow-lg"
+        style={{ background: 'var(--pro-azure)', color: '#fff' }}
       >
         Skip to main content
       </a>
@@ -634,30 +688,40 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
-          className="lg:hidden fixed inset-0 bg-slate-900/50 backdrop-blur-[2px] z-[90] animate-aki-fade-in"
+          className="lg:hidden fixed inset-0 z-[90] animate-aki-fade-in"
+          style={{ background: 'rgba(17,24,39,0.45)', backdropFilter: 'blur(3px)' }}
           aria-hidden="true"
         />
       )}
 
-      {/* Sidebar */}
+      {/* ── Sidebar ─────────────────────────────────────────────────────── */}
+      {/*
+          The sidebar is always `fixed` so it stays anchored to the viewport.
+          On desktop (lg+) it's always visible (translate-x-0).
+          On mobile (<lg) it slides off-screen and is toggled by the hamburger.
+          The <main> column compensates with a left margin equal to --sidebar-w
+          on desktop, so content is never hidden behind the fixed panel.
+      */}
       <div
         ref={sidebarRef}
         data-sidebar-nav
-        className={`fixed lg:sticky top-0 z-[110] h-screen shrink-0 ${
-          collapsed ? 'lg:w-[56px]' : 'lg:w-[296px]'
-        } ${
+        className={[
+          'fixed top-0 z-[110] h-screen shrink-0',
+          collapsed ? 'w-[56px]' : 'w-[276px]',
           sidebarOpen
-            ? 'translate-x-0 shadow-xl shadow-slate-900/20'
-            : '-translate-x-full lg:translate-x-0'
-        }`}
-        style={{ transition: 'transform 240ms cubic-bezier(0.4, 0, 0.2, 1), width 200ms cubic-bezier(0.4, 0, 0.2, 1)' }}
+            ? 'translate-x-0 shadow-2xl'
+            : '-translate-x-full lg:translate-x-0',
+        ].join(' ')}
+        style={{
+          transition: 'transform 240ms cubic-bezier(0.4,0,0.2,1), width 200ms cubic-bezier(0.4,0,0.2,1)',
+        }}
       >
         <nav aria-label={t('a11y.main_nav')} className="h-full focus:outline-none">
           <Sidebar
             collapsed={collapsed}
             onToggle={handleToggleCollapse}
             onNavClick={() => setSidebarOpen(false)}
-            onOpenSearch={() => setShowGlobalSearch(true)}
+            onOpenSearch={() => commandPalette.open()}
             onAction={(action) => {
               if (action === '#create-dashboard') {
                 setShowDashboardManager(true);
@@ -668,38 +732,68 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </nav>
       </div>
 
-      {/* Main */}
+      {/* ── Main column ─────────────────────────────────────────────────── */}
+      {/*
+          The sidebar is `fixed`, so this main element would normally sit at x=0
+          and be hidden behind it on desktop. We compensate by applying
+          `padding-left` equal to the sidebar width — but ONLY on large screens.
+          On mobile the sidebar is an overlay so no offset is needed.
+          We use a Tailwind responsive class to keep this in CSS (no JS).
+      */}
       <main
         id="main-scroll"
         tabIndex={-1}
-        className="flex-1 min-h-screen overflow-y-auto flex flex-col focus:outline-none bg-white dark:bg-slate-950"
+        className={`flex-1 min-h-screen overflow-y-auto flex flex-col focus:outline-none ${
+          collapsed ? 'lg:pl-[56px]' : 'lg:pl-[276px]'
+        }`}
+        style={{
+          background: 'var(--bg-main)',
+          minWidth: 0,
+          transition: 'padding-left 200ms cubic-bezier(0.4,0,0.2,1)',
+        }}
       >
-        {/* Route progress bar */}
+
+        {/* Route progress bar — thin green line at the very top (Ovds SaaS style).
+            zIndex.dropdown (100) keeps it below modals/overlays so it never
+            bleeds over full-screen panels. pointer-events: none means it never
+            intercepts clicks regardless of stacking position. */}
         {showProgress && (
-          <div 
-            style={{ zIndex: zIndex.tooltip }}
-            className="fixed top-0 left-0 right-0 h-0.5 bg-transparent pointer-events-none"
+          <div
+            className="fixed top-0 left-0 right-0 pointer-events-none"
+            style={{ zIndex: zIndex.dropdown, height: 2 }}
           >
             <div
-              className="h-full bg-[#0056D2] shadow-[0_0_10px_rgba(0,86,210,0.5)]"
-              style={{ width: `${progress}%`, opacity: progress === 100 ? 0 : 1, transition: progress === 100 ? 'opacity 0.3s ease 0.1s, width 0.3s ease' : 'width 0.3s ease' }}
+              style={{
+                height: '100%',
+                background: 'var(--pro-azure)',
+                boxShadow: '0 0 8px rgba(79,186,111,0.55)',
+                width: `${progress}%`,
+                opacity: progress === 100 ? 0 : 1,
+                transition: progress === 100
+                  ? 'opacity 0.25s ease 0.08s, width 0.25s ease'
+                  : 'width 0.25s ease',
+                borderRadius: '0 2px 2px 0',
+              }}
             />
           </div>
         )}
 
-        {/* Offline banner */}
+        {/* ── Status banners ────────────────────────────────────────────── */}
+
+        {/* Offline */}
         {!isOnline && !offlineDismissed && (
-          <div 
-            style={{ zIndex: zIndex.sticky }}
-            className="sticky top-0 bg-rose-500 text-white px-3 py-1.5 flex items-center justify-between gap-2 shadow-md animate-aki-drop-in"
+          <div
+            className="sticky top-0 flex items-center justify-between gap-2 px-4 py-2 animate-aki-drop-in"
+            style={{ zIndex: zIndex.sticky, background: '#BE123C', color: '#fff', borderBottom: '1px solid rgba(255,255,255,0.15)' }}
           >
             <div className="flex items-center gap-2">
-              <Icon name="WARNING" size={12} className="shrink-0" />
-              <span className="text-[10px] font-bold">{t('layout.offline')}</span>
+              <Icon name="WARNING" size={12} className="shrink-0 opacity-90" />
+              <span className="text-[11px] font-semibold tracking-wide">{t('layout.offline')}</span>
             </div>
             <button
               onClick={() => setOfflineDismissed(true)}
-              className="shrink-0 text-white/70 hover:text-white text-[10px] font-bold px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors"
+              className="shrink-0 text-white/70 hover:text-white text-[10px] font-semibold px-2 py-0.5 rounded-md transition-colors"
+              style={{ background: 'rgba(255,255,255,0.12)' }}
               aria-label={t('a11y.dismiss')}
             >
               {t('a11y.dismiss')}
@@ -707,19 +801,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         )}
 
-        {/* Slow connection banner */}
+        {/* Slow connection */}
         {isOnline && quality === 'slow' && !slowDismissed && (
-          <div 
-            style={{ zIndex: zIndex.sticky - 1 }}
-            className="sticky top-0 bg-amber-500 text-white px-3 py-1 flex items-center justify-between gap-2 shadow-sm animate-aki-drop-in"
+          <div
+            className="sticky top-0 flex items-center justify-between gap-2 px-4 py-1.5 animate-aki-drop-in"
+            style={{ zIndex: zIndex.sticky - 1, background: '#B45309', color: '#fff', borderBottom: '1px solid rgba(255,255,255,0.12)' }}
           >
             <div className="flex items-center gap-2">
-              <Icon name="CLOCK" size={11} className="shrink-0" />
-              <span className="text-[10px] font-bold">{t('layout.slow_connection')}</span>
+              <Icon name="CLOCK" size={11} className="shrink-0 opacity-90" />
+              <span className="text-[10px] font-semibold">{t('layout.slow_connection')}</span>
             </div>
             <button
               onClick={() => setSlowDismissed(true)}
-              className="shrink-0 text-white/70 hover:text-white text-[10px] font-bold px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors"
+              className="shrink-0 text-white/70 hover:text-white text-[10px] font-semibold px-2 py-0.5 rounded-md transition-colors"
+              style={{ background: 'rgba(255,255,255,0.10)' }}
               aria-label={t('a11y.dismiss')}
             >
               {t('a11y.dismiss')}
@@ -727,21 +822,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         )}
 
-        {/* Mandatory offline resilience banner for regulated sectors (MoR Regulation No. 570/2025) */}
+        {/* Offline resilience (MoR regulated) */}
         {offlineCaps?.requiresResilience && (
           <div
-            style={{ zIndex: zIndex.sticky - 1 }}
-            className="sticky top-0 bg-indigo-600 text-white px-3 py-1.5 flex items-center justify-between gap-2 shadow-md animate-aki-drop-in"
+            className="sticky top-0 flex items-center justify-between gap-2 px-4 py-1.5 animate-aki-drop-in"
             role="alert"
             aria-live="assertive"
+            style={{ zIndex: zIndex.sticky - 1, background: 'var(--pro-azure-dark)', color: '#fff', borderBottom: '1px solid rgba(255,255,255,0.12)' }}
           >
             <div className="flex items-center gap-2">
-              <Icon name="WARNING" size={12} className="shrink-0" />
-              <span className="text-[10px] font-bold">
+              <Icon name="WARNING" size={12} className="shrink-0 opacity-90" />
+              <span className="text-[10px] font-semibold">
                 Offline mode REQUIRED — MoR Regulated Sector (Directive 1142/2026)
               </span>
             </div>
-            <span className="text-[9px] text-indigo-100 hidden sm:inline">
+            <span className="text-[9px] text-green-200 hidden sm:inline font-medium">
               {offlineCaps.pendingSyncCount > 0
                 ? `${offlineCaps.pendingSyncCount} pending sync`
                 : 'All sales must continue offline during internet interruptions'}
@@ -749,84 +844,110 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         )}
 
-        {/* Setup wizard banner — shown when System Administration setup is incomplete */}
         <SetupWizardBanner />
-
-        {/* Offline sync queue banner — shows when queued offline actions await sync */}
         <OfflineSyncBanner zIndex={zIndex.sticky - 2} />
-
-        {/* Compliance status bar — shown to ovds/admin roles near deadlines */}
         {['SPURADMIN', 'ADMIN', 'ovds', 'ACCOUNTING'].includes(user?.role ?? '') && (
           <ComplianceStatusBar onlyWhenUrgent />
         )}
 
+        {/* ── Header + content ──────────────────────────────────────────── */}
         <div className="flex-1 flex flex-col">
-          {/* Trial / upgrade banner — shown above header when on free trial */}
           <TrialBanner />
 
-          {/* Header — full width, sticky */}
+          {/* Professional sticky header */}
           <Header
-            title={pageTitle}
+            title={resolvedPageTitle}
             onMobileMenuToggle={() => setSidebarOpen((o) => !o)}
             sidebarOpen={sidebarOpen}
             onOpenSearch={() => commandPalette.open()}
           />
 
-          {/* Multi-tab bar — browser-like persistent tabs */}
-          <TabBar />
+          {/* Tab bar — hidden for wizard and slider routes */}
+          {!suppressTabBar && <TabBar />}
 
-          {/* Page content */}
-          <div className="flex-1 pb-16 lg:pb-4 bg-white dark:bg-slate-950">
-            <div key={location.pathname} className="page-transition min-h-[calc(100vh-120px)] ovds-content">
+          {/* Page content area */}
+          <div
+            className="flex-1 pb-16 lg:pb-6"
+            style={{ background: 'var(--bg-main)' }}
+          >
+            <div
+              key={pageContentKey}
+              className="page-transition min-h-[calc(100vh-120px)]"
+            >
               {children}
             </div>
           </div>
-          <div className="px-3 sm:px-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
-            <div className="max-w-[1440px] mx-auto">
-              <Footer />
+
+          {/* Footer — hidden for wizard and slider routes */}
+          {!suppressFooter && (
+            <div
+              className="px-4 sm:px-6"
+              style={{
+                background: 'var(--surface)',
+                borderTop: '1px solid var(--border)',
+              }}
+            >
+              <div className="max-w-[1440px] mx-auto">
+                <Footer />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
 
-      {/* Scroll to top — with scroll progress ring */}
+      {/* ── Scroll-to-top FAB with progress ring ──────────────────────── */}
       {showScrollTop && (
         <button
           onClick={scrollToTop}
           style={{ zIndex: zIndex.docked + 40 }}
-          className="fixed bottom-16 lg:bottom-4 right-4 w-8 h-8 flex items-center justify-center hover:scale-110 transition-all animate-aki-fade-in group"
+          className="fixed bottom-16 lg:bottom-5 right-5 w-9 h-9 flex items-center justify-center hover:scale-105 transition-transform animate-aki-fade-in group"
           title={t('a11y.scroll_to_top')}
           aria-label={t('a11y.scroll_to_top')}
         >
-          {/* SVG progress ring */}
-          <svg className="absolute inset-0 w-8 h-8 -rotate-90" viewBox="0 0 32 32">
-            <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-200 dark:text-slate-700" />
+          <svg className="absolute inset-0 w-9 h-9 -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="2"
+              style={{ color: 'var(--border)' }} />
             <circle
-              cx="16" cy="16" r="13" fill="none" stroke="currentColor" strokeWidth="2"
-              strokeDasharray={`${2 * Math.PI * 13}`}
-              strokeDashoffset={`${2 * Math.PI * 13 * (1 - scrollPct)}`}
+              cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="2"
+              strokeDasharray={`${2 * Math.PI * 15}`}
+              strokeDashoffset={`${2 * Math.PI * 15 * (1 - scrollPct)}`}
               strokeLinecap="round"
-              className="text-emerald-600 transition-all duration-150"
+              className="transition-all duration-150"
+              style={{ color: 'var(--pro-azure)' }}
             />
           </svg>
-          <div className="w-5 h-5 bg-slate-700 dark:bg-slate-800 text-white rounded-full flex items-center justify-center group-hover:bg-[#0056D2] transition-colors">
-            <Icon name="CHEVRON_UP" size={11} className="group-hover:-translate-y-0.5 transition-transform" />
+          <div
+            className="w-6 h-6 rounded-full flex items-center justify-center shadow-sm transition-all"
+            style={{
+              background: 'var(--pro-azure)',
+              color: '#fff',
+            }}
+          >
+            <Icon name="CHEVRON_UP" size={12} className="group-hover:-translate-y-0.5 transition-transform" />
           </div>
         </button>
       )}
 
-      {/* Activity feed button */}
+      {/* Activity feed FAB */}
       <button
         onClick={() => setShowActivityFeed(v => !v)}
-        style={{ zIndex: zIndex.docked + 40 }}
-        className={`fixed bottom-28 lg:bottom-4 ${showScrollTop ? 'right-14' : 'right-4'} w-8 h-8 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 animate-aki-fade-in ${showActivityFeed ? 'bg-[#0056D2] text-white' : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+        className={`fixed bottom-28 lg:bottom-5 ${showScrollTop ? 'right-16' : 'right-5'} w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-105 animate-aki-fade-in`}
+        style={{
+          zIndex: zIndex.docked + 40,
+          background: showActivityFeed ? 'var(--pro-azure)' : 'var(--surface)',
+          color: showActivityFeed ? '#fff' : 'var(--text-4)',
+          border: '1px solid var(--border)',
+          boxShadow: showActivityFeed
+            ? '0 4px 16px rgba(79,186,111,0.35)'
+            : '0 2px 8px rgba(0,0,0,0.06)',
+        }}
         title={t('a11y.activity_feed')}
         aria-label={t('a11y.activity_feed')}
       >
         <Icon name="ACTIVITY" size={14} />
       </button>
 
-      {/* Mobile bottom nav — only on small screens */}
+      {/* Mobile bottom nav */}
       <MobileBottomNav />
 
       {/* Session expiry warning */}
@@ -837,12 +958,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <KeyboardShortcutsModal onClose={() => setShowShortcuts(false)} />
       )}
 
-      {/* Dashboard Manager modal */}
+      {/* Dashboard Manager */}
       {showDashboardManager && (
         <DashboardManager onClose={() => setShowDashboardManager(false)} />
       )}
 
-      {/* Command Palette (Enterprise) */}
+      {/* Command Palette */}
       <CommandPalette
         isOpen={commandPalette.isOpen}
         query={commandPalette.query}
@@ -875,34 +996,45 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         onClose={() => setShowActivityFeed(false)}
       />
 
-      {/* -- Global service-down overlay -------------------------------------
-           Shown when the health check reports the API is unreachable (502/503/504).
-           Blocks interaction so users don't see broken data. -- */}
+      {/* Service-down overlay */}
       {isServiceDown && (
         <div
           role="alertdialog"
           aria-modal="true"
           aria-label="Service unavailable"
-          style={{ zIndex: zIndex.modal + 10 }}
-          className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-6 animate-aki-fade-in"
+          style={{ zIndex: zIndex.modal + 10, background: 'rgba(5,10,20,0.72)', backdropFilter: 'blur(6px)' }}
+          className="fixed inset-0 flex items-center justify-center p-6 animate-aki-fade-in"
         >
-          <div className="max-w-xs w-full bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xl p-6 text-center space-y-4 animate-aki-scale-in">
+          <div
+            className="max-w-xs w-full rounded-2xl p-7 text-center space-y-5 animate-aki-scale-in"
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              boxShadow: '0 32px 80px rgba(0,0,0,0.25), 0 8px 24px rgba(0,0,0,0.12)',
+            }}
+          >
             <div className="flex justify-center">
-              <div className="p-3 bg-rose-50 text-rose-600 rounded-xl border border-rose-200">
-                <Icon name="SERVER_CRASH" size={24} />
+              <div
+                className="p-3.5 rounded-2xl"
+                style={{ background: '#FFF1F2', border: '1px solid #FECDD3', color: '#BE123C' }}
+              >
+                <Icon name="SERVER_CRASH" size={26} />
               </div>
             </div>
             <div>
-              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{t('layout.service_unavailable')}</p>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+              <p className="text-sm font-bold" style={{ color: 'var(--text)' }}>
+                {t('layout.service_unavailable')}
+              </p>
+              <p className="text-[12px] mt-1.5 leading-relaxed" style={{ color: 'var(--text-3)' }}>
                 {t('layout.service_unavailable_desc')}
               </p>
             </div>
             <button
               onClick={() => checkHealth()}
-              className="flex items-center justify-center gap-1.5 w-full py-2 bg-[#0056D2] text-white rounded-lg text-[12px] font-bold hover:bg-[#0044A8] transition-all"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-[13px] font-bold transition-all hover:opacity-90"
+              style={{ background: 'var(--pro-azure)', color: '#fff', boxShadow: '0 2px 12px rgba(79,186,111,0.30)' }}
             >
-              <Icon name="REFRESH" size={12} /> {t('layout.check_again')}
+              <Icon name="REFRESH" size={13} /> {t('layout.check_again')}
             </button>
           </div>
         </div>

@@ -8,18 +8,19 @@
  * API:
  *   GET /banking/reports/cash-flow?companyId=&months=6
  */
-import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { ArrowLeftRight, RefreshCw } from 'lucide-react';
+import React, { useMemo } from 'react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, BarChart, Bar, Legend,
 } from 'recharts';
-import { TrendingUp, TrendingDown, ArrowLeftRight, RefreshCw } from 'lucide-react';
-import api from '../services/api';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { fmtETB } from '../utils/ethiopianTax';
+
 import { AppPage, AppKpi, Card, Btn } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { fmtETB } from '../utils/ethiopianTax';
 
 interface CashFlowMonth {
   month: string; totalIn: number; totalOut: number; net: number;
@@ -57,6 +58,7 @@ const BankingCashFlow: React.FC = () => {
     staleTime: 60_000,
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const months = data?.months ?? [];
 
   const chartData = useMemo(() => months.map(m => ({
@@ -67,9 +69,9 @@ const BankingCashFlow: React.FC = () => {
   })), [months]);
 
   const kpi = [
-    { label: 'Total In (6mo)',  value: data ? fmtETB(data.totals.totalIn)  : '—', color: 'emerald' as const },
+    { label: 'Total In (6mo)',  value: data ? fmtETB(data.totals.totalIn)  : '—', color: "indigo" as const },
     { label: 'Total Out (6mo)', value: data ? fmtETB(data.totals.totalOut) : '—', color: 'rose'    as const },
-    { label: 'Net Flow',        value: data ? fmtETB(data.totals.net)      : '—', color: (data?.totals.net ?? 0) >= 0 ? 'emerald' as const : 'rose' as const },
+    { label: 'Net Flow',        value: data ? fmtETB(data.totals.net)      : '—', color: (data?.totals.net ?? 0) >= 0 ? 'indigo' as const : 'rose' as const },
     { label: 'Months Analysed', value: months.length, color: 'sky' as const },
   ];
 
@@ -79,7 +81,7 @@ const BankingCashFlow: React.FC = () => {
       subtitle="Monthly inflows vs outflows · Liquidity trend analysis"
       icon={<ArrowLeftRight size={18} />}
       iconBg="bg-sky-500"
-      crumbs={[{ label: 'Banking', href: '/banking' }, { label: 'Cash Flow' }]}
+      crumbs={[{ label: 'Banking', to: '/banking' }, { label: 'Cash Flow' }]}
       actions={<Btn variant="ghost" size="sm" icon={<RefreshCw size={11} className={isLoading ? 'animate-spin' : ''} />} onClick={() => refetch()}>Refresh</Btn>}
     >
       <AppKpi cells={kpi} loading={isLoading} />
@@ -135,7 +137,7 @@ const BankingCashFlow: React.FC = () => {
             <thead>
               <tr className="border-b border-slate-100 dark:border-slate-800">
                 <th className="text-left px-4 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Month</th>
-                <th className="text-right px-4 py-2.5 text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Cash In</th>
+                <th className="text-right px-4 py-2.5 text-[10px] font-bold text-[var(--pro-azure)] uppercase tracking-widest">Cash In</th>
                 <th className="text-right px-4 py-2.5 text-[10px] font-bold text-rose-500 uppercase tracking-widest">Cash Out</th>
                 <th className="text-right px-4 py-2.5 text-[10px] font-bold text-sky-500 uppercase tracking-widest">Net</th>
                 <th className="text-right px-4 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Reconciled In</th>
@@ -145,7 +147,7 @@ const BankingCashFlow: React.FC = () => {
               {months.map((m, i) => (
                 <tr key={m.month} className={`border-b border-slate-50 dark:border-slate-800/50 ${i % 2 === 0 ? '' : 'bg-slate-50/40 dark:bg-slate-900/30'}`}>
                   <td className="px-4 py-2.5 font-mono text-slate-600 dark:text-slate-400">{m.month}</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-emerald-700 dark:text-emerald-400 font-semibold">{fmtETB(m.totalIn)}</td>
+                  <td className="px-4 py-2.5 text-right tabular-nums text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] font-semibold">{fmtETB(m.totalIn)}</td>
                   <td className="px-4 py-2.5 text-right tabular-nums text-rose-600 dark:text-rose-400 font-semibold">{fmtETB(m.totalOut)}</td>
                   <td className={`px-4 py-2.5 text-right tabular-nums font-bold ${m.net >= 0 ? 'text-sky-600 dark:text-sky-400' : 'text-rose-600 dark:text-rose-400'}`}>
                     {m.net >= 0 ? '+' : ''}{fmtETB(m.net)}
@@ -157,7 +159,7 @@ const BankingCashFlow: React.FC = () => {
             <tfoot>
               <tr className="border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
                 <td className="px-4 py-2.5 font-bold text-slate-700 dark:text-slate-200">Total</td>
-                <td className="px-4 py-2.5 text-right tabular-nums text-emerald-700 dark:text-emerald-400 font-bold">{fmtETB(data?.totals.totalIn ?? 0)}</td>
+                <td className="px-4 py-2.5 text-right tabular-nums text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] font-bold">{fmtETB(data?.totals.totalIn ?? 0)}</td>
                 <td className="px-4 py-2.5 text-right tabular-nums text-rose-600 dark:text-rose-400 font-bold">{fmtETB(data?.totals.totalOut ?? 0)}</td>
                 <td className={`px-4 py-2.5 text-right tabular-nums font-bold ${(data?.totals.net ?? 0) >= 0 ? 'text-sky-600 dark:text-sky-400' : 'text-rose-600 dark:text-rose-400'}`}>
                   {(data?.totals.net ?? 0) >= 0 ? '+' : ''}{fmtETB(data?.totals.net ?? 0)}

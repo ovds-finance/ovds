@@ -3,27 +3,28 @@
  * AppPage · AppKpi · AppTable · useApiCrud
  * Ethiopian bank accounts · ETB currency
  */
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { evalMath } from '@ovds/ui';
 import { useQuery } from '@tanstack/react-query';
-import { useSearchParams } from 'react-router-dom';
 import {
   ArrowLeftRight, Plus, RefreshCw,
   Landmark, CheckCircle2, XCircle,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { fmtETB } from '../utils/ethiopianTax';
-import api from '../services/api';
+import { useSearchParams } from 'react-router-dom';
+
+import CustomFieldRenderer, { type CustomFieldValuesMap } from '../components/CustomFieldRenderer';
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select, Textarea,
   SearchBar, Amount, EmptyState, Pagination,
 } from '../components/ui';
-import { evalMath } from '@ovds/ui';
-import CustomFieldRenderer, { type CustomFieldValuesMap } from '../components/CustomFieldRenderer';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { fmtETB } from '../utils/ethiopianTax';
 
 interface FundTransfer {
   id: string;
@@ -136,7 +137,7 @@ const FundTransfers: React.FC = () => {
   }, [rows, tab, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total',     value: rows.length,                                                       color: 'emerald' as const },
+    { label: 'Total',     value: rows.length,                                                       color: 'green' as const },
     { label: 'Pending',   value: rows.filter(t => t.status === 'PENDING').length,                   color: 'amber' as const },
     { label: 'Completed', value: rows.filter(t => t.status === 'COMPLETED').length,                 color: 'sky' as const },
     { label: 'Volume',    value: fmtETB(rows.reduce((s, t) => s + Number(t.amount ?? 0), 0)),       color: 'violet' as const },
@@ -236,7 +237,7 @@ const FundTransfers: React.FC = () => {
               </AppTd>
               <AppTd>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-6 h-6 rounded bg-emerald-50 flex items-center justify-center"><Landmark size={10} className="text-emerald-600" /></div>
+                  <div className="w-6 h-6 rounded bg-[var(--pro-azure-50)] flex items-center justify-center"><Landmark size={10} className="text-[var(--pro-azure)]" /></div>
                   <span className="text-[11px] text-slate-700 truncate max-w-[120px]">{getAccountName(t.toAccountId)}</span>
                 </div>
               </AppTd>
@@ -254,7 +255,7 @@ const FundTransfers: React.FC = () => {
               <AppTd align="right">
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {t.status === 'PENDING' && can('fund_transfers:approve') && (
-                    <button onClick={() => handleApprove(t.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Approve transfer">
+                    <button onClick={() => handleApprove(t.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Approve transfer">
                       <CheckCircle2 size={11} />
                     </button>
                   )}

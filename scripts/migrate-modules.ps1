@@ -1,5 +1,5 @@
-# OVDS Module Migration Script
-# Akaunting-inspired canonical module structure
+﻿# OVDS Module Migration Script
+# Ovds SaaS canonical module structure
 
 param(
     [switch]$DryRun = $false
@@ -37,7 +37,7 @@ function Create-Shim($oldPath, $newPath, $type) {
         New-Item -ItemType Directory -Path $shimDir -Force | Out-Null
     }
 
-    $newAlias = $newPath.Replace("packages/domains/", "@ovds/domains/").Replace("packages/features/", "@ovds/features/")
+    $newAlias = $newPath.Replace("packages/domains/", "@ovds/domains-").Replace("packages/features/", "@ovds/features/")
 
     $indexContent = @"
 /**

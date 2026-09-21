@@ -2,21 +2,22 @@
  * PayCalendars — ovds-style pay calendar management
  * Configure payout frequencies (weekly, bi-weekly, monthly, quarterly)
  */
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { payCalendarsApi } from '@ovds/features/hr';
 import {
   Calendar, Plus, Edit2, Trash2, RefreshCw, Clock, CheckCircle2,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { payCalendarsApi } from '@ovds/features/hr';
-import { confirm } from '../utils/confirm';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select,
   SearchBar, EmptyState, Pagination,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
 
 interface PayCalendar {
   id: string;
@@ -41,7 +42,7 @@ const FREQUENCIES = [
 ] as const;
 
 const FREQUENCY_COLORS: Record<string, string> = {
-  WEEKLY:    'bg-emerald-50 text-emerald-700 border-emerald-100',
+  WEEKLY:    'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
   BI_WEEKLY: 'bg-sky-50 text-sky-700 border-sky-100',
   MONTHLY:   'bg-violet-50 text-violet-700 border-violet-100',
   QUARTERLY: 'bg-amber-50 text-amber-700 border-amber-100',
@@ -76,8 +77,7 @@ const CalendarForm: React.FC<{
       )}
       {(freq === 'WEEKLY' || freq === 'BI_WEEKLY') && (
         <FormField label="Day of Week" hint="Which day of the week to run payroll">
-          <Select value={data.dayOfWeek ?? '0'} onChange={e => set('dayOfWeek', parseInt(e))}>
-            <option value="0">Sunday</option>
+          <Select value={String(data.dayOfWeek ?? '0')} onChange={e => set('dayOfWeek', parseInt(e))}>            <option value="0">Sunday</option>
             <option value="1">Monday</option>
             <option value="2">Tuesday</option>
             <option value="3">Wednesday</option>
@@ -132,7 +132,7 @@ const PayCalendars: React.FC = () => {
     const active = rows.filter(c => c.isActive).length;
     const monthly = rows.filter(c => c.frequency === 'MONTHLY').length;
     return [
-      { label: 'Total', value: rows.length, color: 'emerald' as const },
+      { label: 'Total', value: rows.length, color: 'green' as const },
       { label: 'Active', value: active, color: 'sky' as const },
       { label: 'Monthly', value: monthly, color: 'violet' as const },
       { label: 'Inactive', value: rows.length - active, color: 'amber' as const },
@@ -248,7 +248,7 @@ const PayCalendars: React.FC = () => {
                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {can('pay_calendars:edit') && (
                     <>
-                      <button onClick={() => setModal({ open: true, data: { ...c } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all"><Edit2 size={11} /></button>
+                      <button onClick={() => setModal({ open: true, data: { ...c } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all"><Edit2 size={11} /></button>
                       <button onClick={() => handleDelete(c.id)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all"><Trash2 size={11} /></button>
                     </>
                   )}

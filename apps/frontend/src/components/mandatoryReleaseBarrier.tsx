@@ -1,9 +1,10 @@
+import { ArrowRight, RefreshCw, ShieldAlert } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowRight, RefreshCw, ShieldAlert } from 'lucide-react';
-import { CompanyRelease } from '../services/releaseApi';
+
 import { useAuth } from '../rbac/AuthContext';
 import api from '../services/api';
+import { CompanyRelease } from '../services/releaseApi';
 
 const MandatoryReleaseBarrier: React.FC = () => {
   const [pendingRelease, setPendingRelease] = useState<CompanyRelease | null>(null);
@@ -45,6 +46,7 @@ const MandatoryReleaseBarrier: React.FC = () => {
     }
 
     checkMandatory();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, isAuthenticated, user]);
 
   // Guard: only show barrier when the nested release object is present
@@ -80,7 +82,7 @@ const MandatoryReleaseBarrier: React.FC = () => {
         <div className="grid grid-cols-1 gap-3">
           <button
             onClick={() => navigate('/settings/releases')}
-            className="flex items-center justify-center gap-2 px-6 py-4 bg-emerald-500 text-white rounded-2xl font-bold hover:bg-emerald-600 transition-all shadow-xl shadow-emerald-500/20 group"
+            className="flex items-center justify-center gap-2 px-6 py-4 bg-[var(--pro-azure)] text-white rounded-2xl font-bold hover:bg-[var(--pro-azure-dark)] transition-all shadow-xl shadow-green-500/20 group"
           >
             Go to Update Center <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </button>

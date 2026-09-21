@@ -1,4 +1,5 @@
 import React from 'react';
+
 import TaxRatesTable from '../../components/accounting/taxRatesTable';
 import { usePageTitle } from '../../hooks/usePageTitle';
 

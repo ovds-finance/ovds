@@ -39,12 +39,13 @@
     "i18next": "23.16.8",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "react-hook-form": "7.66.0",
     "react-i18next": "13.5.0",
     "react-router-dom": "7.18.2"
   },
   "dependencies": {
-    "@ovds/design-system": "*",
-    "@ovds/shared": "*",
+    "@ovds/design-system": "workspace:*",
+    "@ovds/shared": "workspace:*",
     "@radix-ui/react-accordion": "1.2.20",
     "@radix-ui/react-checkbox": "1.3.11",
     "@radix-ui/react-dialog": "1.1.23",
@@ -95,11 +96,12 @@
     "@types/recharts": "2.0.1",
     "i18next": "23.16.8",
     "react": "19.2.8",
+    "react-hook-form": "7.66.0",
     "react-i18next": "13.5.0",
     "tailwindcss": "3.4.19",
     "tailwindcss-animate": "1.0.7",
     "typescript": "5.9.3",
-    "vitest": "3.2.7"
+    "vitest": "^4.1.11"
   },
   "overrides": {
     "@types/react": "^19.2.18",

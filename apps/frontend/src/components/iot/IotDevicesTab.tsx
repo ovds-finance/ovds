@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+
+import { STATUS_COLOR } from '../../pages/IotHub';
+import { useAuth } from '../../rbac/AuthContext';
 import {
   useIotDevices, useCreateDevice, useUpdateDevice, useDeleteDevice,
   type IotDevice, type DeviceType, type DeviceStatus,
 } from '../../services/iotApi';
-import { AppTable, AppTh, AppTd, AppTr, Btn, Icon, Modal, FormField, Input } from '../ui';
-import toast from 'react-hot-toast';
-import { useAuth } from '../../rbac/AuthContext';
 import { fmtDate } from '../../utils/fmt';
-import { STATUS_COLOR } from '../../pages/IotHub';
+import { AppTable, AppTh, AppTd, AppTr, Btn, Icon, Modal, FormField, Input } from '../ui';
 
 const DEVICE_TYPES: DeviceType[] = [
   'SMART_METER', 'ROUTER', 'SENSOR', 'CONTROLLER', 'CAMERA', 'POS_TERMINAL', 'OTHER',
@@ -196,7 +197,7 @@ const IotDevicesTab: React.FC = () => {
                           className={`h-full rounded-full ${
                             d.batteryLevel < 20 ? 'bg-rose-500' :
                             d.batteryLevel < 50 ? 'bg-amber-500' :
-                            'bg-emerald-500'
+                            'bg-[var(--pro-azure-50)]0'
                           }`}
                           style={{ width: `${d.batteryLevel}%` }}
                         />
@@ -215,14 +216,14 @@ const IotDevicesTab: React.FC = () => {
                     <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700">
                       {d._count?.alerts}
                     </span>
-                  ) : <Icon name="CHECK" size={13} className="text-emerald-500" />}
+                  ) : <Icon name="CHECK" size={13} className="text-[var(--pro-azure)]" />}
                 </AppTd>
                 {canWrite && (
                   <AppTd>
                     <div className="flex gap-2">
                       <button
                         onClick={() => openEdit(d)}
-                        className="text-slate-400 hover:text-emerald-600 transition-colors"
+                        className="text-slate-400 hover:text-[var(--pro-azure)] transition-colors"
                         title="Edit device"
                       >
                         <Icon name="EDIT" size={13} />

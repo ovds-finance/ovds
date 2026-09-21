@@ -4,11 +4,13 @@ import {
   HttpCode, HttpStatus, BadRequestException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+
+import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { NotificationService } from './notification.service';
+
 import { NotificationAdminService } from './notification-admin.service';
+import { NotificationService } from './notification.service';
 
 @ApiTags('notifications')
 @ApiBearerAuth()

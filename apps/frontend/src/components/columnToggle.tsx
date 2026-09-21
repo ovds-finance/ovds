@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
 import { Columns, Eye, EyeOff, RotateCcw, X } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+
 import { useClickOutside } from '../hooks';
 import { useLocalStorage } from '../hooks';
 
@@ -56,7 +57,7 @@ const ColumnToggle: React.FC<ColumnToggleProps> = ({ columns, storageKey, onChan
         onClick={() => setOpen(v => !v)}
         className={`aki-btn sm ${
           hiddenCount > 0
-            ? 'aki-btn-soft-emerald'
+            ? 'aki-btn-soft-indigo'
             : 'aki-btn-secondary'
         }`}
         title="Toggle columns"

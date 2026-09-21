@@ -10,54 +10,12 @@
  * The original file at apps/frontend/src/services/ovdsApi.ts should become
  * a re-export shim: export * from '@ovds/features/accounting';
  */
-import type { Customer, Vendor, BankAccount, Item } from '@ovds/contracts/schemas';
+import type {
+  Customer, Vendor, BankAccount, Item,
+  Company, TaxRate, Partnership, Integration,
+} from '@ovds/contracts/schemas';
 
-// ── Types not yet in @ovds/contracts — defined inline until migrated ─────────
-
-export interface TaxRate {
-  id: string;
-  name: string;
-  rate: number;
-  type?: string;
-  isActive?: boolean;
-  companyId?: string | null;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface Company {
-  id: string;
-  name: string;
-  type?: string;
-  tin?: string | null;
-  vatNumber?: string | null;
-  phone?: string | null;
-  email?: string | null;
-  address?: string | null;
-  currency?: string;
-  country?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface Partnership {
-  id: string;
-  name: string;
-  type?: string;
-  status?: string;
-  companyId?: string | null;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface Integration {
-  id: string;
-  name: string;
-  status?: string;
-  category?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+export type { Company, TaxRate, Partnership, Integration };
 
 // ── HTTP primitives ──────────────────────────────────────────────────────────
 
@@ -328,12 +286,35 @@ export const invoicesApi = {
     post<any>(`/ovds/invoices/${id}/debit-note`, { amount }),
   void:   (id: string, reason?: string, category?: string) =>
     post<any>(`/ovds/invoices/${id}/void`, { reason, category }),
-  flagOverdue: (companyId?: string | null) => get<any>(`/ovds/invoices/overdue${buildQuery({ companyId })}`),
+  flagOverdue: (companyId?: string | null) => post<any>(`/ovds/invoices/flag-overdue`, { companyId }),
   getActivity: (id: string) => get<any[]>(`/ovds/invoices/${id}/activity`),
   share:  (id: string) => post<any>(`/ovds/invoices/${id}/share`, {}),
   recordPayment: (id: string, data: any) => post<any>(`/ovds/invoices/${id}/payments`, data),
   deletePayment: (paymentId: string) => del<void>(`/ovds/payments/${paymentId}`),
   validateCompliance: (id: string) => post<any>(`/ovds/invoices/${id}/validate-compliance`, {}),
+  /** Download invoice as a PDF blob — use for programmatic save/attach, not browser print */
+  downloadPdf: async (id: string): Promise<Blob> => {
+    const token = localStorage.getItem('ovds_token') || localStorage.getItem('auth0_token') || '';
+    const res = await fetch(`/api/ovds/invoices/${id}/pdf`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!res.ok) throw new Error(`PDF download failed: ${res.status}`);
+    return res.blob();
+  },
+  /** Trigger PDF download for multiple invoices as a zip archive */
+  bulkDownloadPdf: async (ids: string[]): Promise<Blob> => {
+    const token = localStorage.getItem('ovds_token') || localStorage.getItem('auth0_token') || '';
+    const res = await fetch('/api/ovds/invoices/bulk-pdf', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ ids }),
+    });
+    if (!res.ok) throw new Error(`Bulk PDF failed: ${res.status}`);
+    return res.blob();
+  },
 };
 
 export const estimatesApi = {
@@ -347,6 +328,9 @@ export const estimatesApi = {
   remove: (id: string) => del<void>(`/ovds/estimates/${id}`),
   send:   (id: string) => post<any>(`/ovds/estimates/${id}/send`, {}),
   convertToInvoice: (id: string) => post<any>(`/ovds/estimates/${id}/convert`, {}),
+  // Aliases — EstimatesPanel in Invoices.tsx calls these names
+  delete:  (id: string) => del<void>(`/ovds/estimates/${id}`),
+  convert: (id: string) => post<any>(`/ovds/estimates/${id}/convert`, {}),
 };
 
 // ── Fixed Asset Disposals ────────────────────────────────────────────────────

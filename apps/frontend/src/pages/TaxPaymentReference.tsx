@@ -6,14 +6,16 @@
  *
  * Covers: VAT · TOT · BIT · WHT · DRRF · Pension
  */
-import React, { useState, useCallback, useEffect } from 'react';
-import { Banknote, RefreshCw, Download, Plus, Info, CheckCircle2, Clock, AlertTriangle } from 'lucide-react';
 import { AppPage, Btn } from '@ovds/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { fmtCurrency } from '../utils/fmt';
-import api from '../services/api';
+import { Banknote, RefreshCw, Download, Plus, Info, CheckCircle2, Clock, AlertTriangle } from 'lucide-react';
+import React, { useState, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
+
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { fmtCurrency } from '../utils/fmt';
+
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
@@ -43,7 +45,7 @@ const TAX_TYPE_LABELS: Record<string, string> = {
 
 const STATUS_CFG = {
   PENDING: { label: 'Pending', cls: 'bg-amber-50 text-amber-700 border border-amber-200',     icon: Clock },
-  PAID:    { label: 'Paid',    cls: 'bg-emerald-50 text-emerald-700 border border-emerald-200', icon: CheckCircle2 },
+  PAID:    { label: 'Paid',    cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)]', icon: CheckCircle2 },
   OVERDUE: { label: 'Overdue', cls: 'bg-rose-50 text-rose-700 border border-rose-200',          icon: AlertTriangle },
 };
 
@@ -148,7 +150,7 @@ const TaxPaymentReferencePage: React.FC = () => {
         <div className="ovds-stat-row">
           {[
             { label: 'Total Pending',      value: fmt(totalPending), accent: 'bg-amber-500' },
-            { label: 'Total Paid (YTD)',   value: fmt(totalPaid),    accent: 'bg-emerald-500' },
+            { label: 'Total Paid (YTD)',   value: fmt(totalPaid),    accent: 'bg-[var(--pro-azure-50)]0' },
             { label: 'Vouchers',           value: String(vouchers.length), accent: 'bg-sky-500' },
             { label: 'Overdue',            value: String(vouchers.filter(v => v.status === 'OVERDUE').length), accent: 'bg-rose-500' },
           ].map(kpi => (
@@ -256,7 +258,7 @@ const TaxPaymentReferencePage: React.FC = () => {
                       <td className="px-4 py-3 text-xs font-medium text-slate-700">{TAX_TYPE_LABELS[v.taxType] ?? v.taxType}</td>
                       <td className="px-4 py-3 text-xs font-mono text-slate-600">{v.period}</td>
                       <td className="px-4 py-3 text-xs tabular-nums text-right">{fmt(v.grossLiability)}</td>
-                      <td className="px-4 py-3 text-xs tabular-nums text-right text-emerald-600">{fmt(v.creditsApplied)}</td>
+                      <td className="px-4 py-3 text-xs tabular-nums text-right text-[var(--pro-azure)]">{fmt(v.creditsApplied)}</td>
                       <td className="px-4 py-3 text-xs tabular-nums text-right font-bold text-amber-600">{fmt(v.netAmountDue)}</td>
                       <td className="px-4 py-3 text-xs text-slate-500">{v.paymentDeadline ?? '—'}</td>
                       <td className="px-4 py-3">
@@ -274,12 +276,12 @@ const TaxPaymentReferencePage: React.FC = () => {
                               placeholder="Bank ref"
                               value={bankRef}
                               onChange={e => setBankRefs(prev => ({ ...prev, [v.id]: e.target.value }))}
-                              className="w-24 px-2 py-1 text-xs border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                              className="w-24 px-2 py-1 text-xs border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)]"
                             />
                             <button
                               onClick={() => markPaid(v.id, bankRef)}
                               disabled={!bankRef.trim()}
-                              className="px-2 py-1 text-[10px] font-medium bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded transition-colors disabled:opacity-40"
+                              className="px-2 py-1 text-[10px] font-medium bg-[var(--pro-azure-50)] text-[var(--pro-azure)] hover:bg-[var(--pro-azure-100)] rounded transition-colors disabled:opacity-40"
                             >
                               Paid
                             </button>

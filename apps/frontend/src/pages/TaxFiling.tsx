@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import type { AxiosResponse } from 'axios';
+import { recordTaxFiling } from '@ovds/features/tax';
 import { AppPage, Btn } from '@ovds/ui';
-import { Link, useNavigate } from 'react-router-dom';
+import type { AxiosResponse } from 'axios';
 import {
   FileText,
   Send,
@@ -23,35 +22,37 @@ import {
   Download,
   Code2,
 } from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+import { Link, useNavigate } from 'react-router-dom';
+
+import { PipelineStageHeader } from '../components/pipelineComponents';
 import { Icon } from '../components/ui';
-import {
-  useTaxReports,
-  useTaxDashboard,
-  useTaxAutomationStatus,
-} from '../services/taxApi';
-import { recordTaxFiling } from '@ovds/features/tax';
+import { useBusiness } from '../context/businessContext';
+import { useAuditLog } from '../hooks/useAuditLog';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
 import {
   buildMonthlyDeclaration,
   buildAnnualBitDeclaration,
   getETaxExportUrl,
   type ETaxDeclarationResult,
 } from '../services/newTaxApi';
+import {
+  useTaxReports,
+  useTaxDashboard,
+  useTaxAutomationStatus,
+} from '../services/taxApi';
 import { TaxType } from '../types/tax';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useAuditLog } from '../hooks/useAuditLog';
-import { fmtCurrency, fmtCompact } from '../utils/fmt';
-import { useBusiness } from '../context/businessContext';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import { PipelineStageHeader } from '../components/pipelineComponents';
 import { isValidEthiopianTin } from '../utils/authMode';
+import { fmtCurrency, fmtCompact } from '../utils/fmt';
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 const fmtK = (n: number) => fmtCompact(n, 'ETB');
 
 type ApiResponse<T> = { data?: T | { data?: T } };
 
-type ZeroDeclarationResponse = { message?: string; created?: boolean };
+type _ZeroDeclarationResponse = { message?: string; created?: boolean };
 
 function unwrapApiResponse<T>(
   res: AxiosResponse<ApiResponse<T>>,
@@ -156,10 +157,10 @@ const IAS12_TREATMENT: Record<string, { label: string; color: string }> = {
   WHT:         { label: 'IAS 12: Not payer\'s income tax — reduces AP', color: 'text-amber-700 dark:text-amber-300' },
   EXCISE_TAX:  { label: 'IAS 12: Not income tax — production/import levy', color: 'text-rose-700 dark:text-rose-300' },
   STAMP_DUTY:  { label: 'IAS 12: Not income tax — contract levy', color: 'text-teal-700 dark:text-teal-300' },
-  PENSION:     { label: 'IAS 19: Defined contribution — not IAS 12', color: 'text-emerald-700 dark:text-emerald-300' },
+  PENSION:     { label: 'IAS 19: Defined contribution — not IAS 12', color: 'text-[var(--pro-azure-dark)] dark:text-green-300' },
   IMPORT_SURTAX:{ label: 'IAS 2: Capitalised into inventory cost', color: 'text-amber-700 dark:text-amber-300' },
   CAPITAL_GAINS:{ label: 'IAS 12: Current tax (Schedule D disposal)', color: 'text-violet-700 dark:text-violet-300' },
-  DIVIDEND:    { label: 'IAS 12: Withheld from equity — not expense', color: 'text-emerald-700 dark:text-emerald-300' },
+  DIVIDEND:    { label: 'IAS 12: Withheld from equity — not expense', color: 'text-[var(--pro-azure-dark)] dark:text-green-300' },
 };
 
 const TAX_TYPES = [
@@ -168,9 +169,9 @@ const TAX_TYPES = [
     label: 'VAT Return',
     sub: 'Monthly · 15%',
     rate: '15%',
-    color: 'text-emerald-700 dark:text-emerald-300',
-    bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-    border: 'border-emerald-200 dark:border-emerald-800',
+    color: 'text-[var(--pro-azure-dark)] dark:text-green-300',
+    bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
+    border: 'border-[var(--pro-azure-100)] dark:border-green-800',
     deadline: '30th of following month',
     legal: 'Proclamation 1341/2024',
     link: '/tax/vat',
@@ -253,9 +254,9 @@ const TAX_TYPES = [
     label: 'Dividend Income Tax',
     sub: 'At distribution · 15%',
     rate: '15%',
-    color: 'text-emerald-700 dark:text-emerald-300',
-    bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-    border: 'border-emerald-200 dark:border-emerald-800',
+    color: 'text-[var(--pro-azure-dark)] dark:text-green-300',
+    bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
+    border: 'border-[var(--pro-azure-100)] dark:border-green-800',
     deadline: 'Monthly WHT remittance',
     legal: 'Proc. 1395/2025 Art. 52',
     link: '/tax/schedule-d',
@@ -289,9 +290,9 @@ const TAX_TYPES = [
     label: 'Rental Income Tax (Corporate)',
     sub: 'Annual · 30%',
     rate: '30%',
-    color: 'text-indigo-700 dark:text-indigo-300',
-    bg: 'bg-indigo-50 dark:bg-indigo-950/30',
-    border: 'border-indigo-200 dark:border-indigo-800',
+    color: 'text-[var(--pro-azure-dark)] dark:text-green-300',
+    bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
+    border: 'border-[var(--pro-azure-100)] dark:border-green-800',
     deadline: 'Annual — Nov 7',
     legal: 'Proc. 1395/2025 Art. 41',
     link: '/tax/schedule-d',
@@ -398,9 +399,9 @@ const TAX_TYPES = [
     label: 'Pension Remittance',
     sub: 'Monthly · 7% Emp + 11% Er',
     rate: '7% + 11%',
-    color: 'text-emerald-700 dark:text-emerald-300',
-    bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-    border: 'border-emerald-200 dark:border-emerald-800',
+    color: 'text-[var(--pro-azure-dark)] dark:text-green-300',
+    bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
+    border: 'border-[var(--pro-azure-100)] dark:border-green-800',
     deadline: '30th of following month — to PFSA',
     legal: 'Proclamation 1268/2023',
     link: '/hr/payroll',
@@ -426,13 +427,13 @@ const STATUS_CFG: Record<
 > = {
   FILED: {
     label: 'Filed',
-    cls: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800',
-    dot: 'bg-emerald-500',
+    cls: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-green-300 border border-[var(--pro-azure-100)] dark:border-green-800',
+    dot: 'bg-[var(--pro-azure-50)]0',
   },
   PAID: {
     label: 'Paid',
-    cls: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800',
-    dot: 'bg-emerald-500',
+    cls: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-green-300 border border-[var(--pro-azure-100)] dark:border-green-800',
+    dot: 'bg-[var(--pro-azure-50)]0',
   },
   SUBMITTED: {
     label: 'Submitted',
@@ -452,7 +453,7 @@ const STATUS_CFG: Record<
 };
 
 const inp =
-  'w-full px-3 py-2.5 bg-white border border-emerald-200 rounded-lg text-sm text-emerald-900 outline-none focus:ring-2 focus:ring-teal-400/20 focus:border-teal-400 transition-colors placeholder:text-emerald-300';
+  'w-full px-3 py-2.5 bg-white border border-[var(--pro-azure-100)] rounded-lg text-sm text-[var(--pro-azure-dark)] outline-none focus:ring-2 focus:ring-teal-400/20 focus:border-teal-400 transition-colors placeholder:text-green-300';
 
 const Field: React.FC<{
   label: string;
@@ -461,7 +462,7 @@ const Field: React.FC<{
   children: React.ReactNode;
 }> = ({ label, hint, required, children }) => (
   <div>
-    <label className="block text-xs font-medium text-emerald-700 mb-1.5">
+    <label className="block text-xs font-medium text-[var(--pro-azure-dark)] mb-1.5">
       {label}
       {required && <span className="text-rose-500 ml-0.5">*</span>}
     </label>
@@ -592,9 +593,9 @@ const NewFilingModal: React.FC<{
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
       <div className="ovds-widget-card shadow-2xl w-full max-w-lg overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-emerald-100">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--pro-azure-100)]">
           <div>
-            <h3 className="font-semibold text-emerald-900">
+            <h3 className="font-semibold text-[var(--pro-azure-dark)]">
               Record Tax Filing
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
@@ -742,7 +743,7 @@ const NewFilingModal: React.FC<{
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-lg text-sm font-medium disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
             >
               {saving ? (
                 <Icon name="REFRESH" size={14} className="animate-spin" />
@@ -882,7 +883,7 @@ const TaxFiling: React.FC = () => {
       title="Tax Filing"
       subtitle="Ethiopian tax compliance — VAT, TOT, DRRF, Withholding · Banking & ovds · Retail & E-commerce · IT & Software · Challenges Analysis · Competitive Landscape"
       icon={<Send size={18} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       crumbs={[{ label: 'ovds' }, { label: 'Tax Filing' }]}
       actions={
         <Btn
@@ -973,7 +974,7 @@ const TaxFiling: React.FC = () => {
                     ? 'bg-white border-slate-200 text-slate-600'
                     : autoStatus.vatFilingStatus === 'OVERDUE'
                       ? 'bg-rose-50 border-rose-200 text-rose-700'
-                      : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                      : 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'
               }`}
             >
               <div
@@ -984,7 +985,7 @@ const TaxFiling: React.FC = () => {
                       ? 'bg-rose-500'
                       : autoStatus.vatFilingStatus === 'ZERO_DECLARATION'
                         ? 'bg-amber-500'
-                        : 'bg-emerald-500'
+                        : 'bg-[var(--pro-azure-50)]0'
                 }`}
               />
               <div className="min-w-0">
@@ -1029,7 +1030,7 @@ const TaxFiling: React.FC = () => {
               className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-xs ${
                 autoStatus.overdueCount > 0
                   ? 'bg-rose-50 border-rose-200 text-rose-700'
-                  : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                  : 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'
               }`}
             >
               {autoStatus.overdueCount > 0 ? (
@@ -1080,7 +1081,7 @@ const TaxFiling: React.FC = () => {
         <div className="ovds-widget-card overflow-hidden">
           <div className="flex h-1.5">
             <div
-              className={`transition-all duration-700 ${complianceScore >= 80 ? 'bg-emerald-500' : complianceScore >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
+              className={`transition-all duration-700 ${complianceScore >= 80 ? 'bg-[var(--pro-azure-50)]0' : complianceScore >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
               style={{ width: `${complianceScore}%` }}
             />
             <div className="bg-slate-100 dark:bg-slate-800 flex-1" />
@@ -1088,10 +1089,10 @@ const TaxFiling: React.FC = () => {
           <div className="p-5 flex flex-wrap items-center gap-5">
             <ScoreRing score={complianceScore} />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-emerald-900">
+              <p className="text-sm font-semibold text-[var(--pro-azure-dark)]">
                 Compliance Score
               </p>
-              <p className="text-xs text-emerald-700 mt-0.5">
+              <p className="text-xs text-[var(--pro-azure-dark)] mt-0.5">
                 {complianceScore >= 80
                   ? 'All filings up to date'
                   : complianceScore >= 50
@@ -1106,7 +1107,7 @@ const TaxFiling: React.FC = () => {
                     color:
                       vatDue > 0
                         ? 'text-amber-600 dark:text-amber-400'
-                        : 'text-emerald-600 dark:text-emerald-400',
+                        : 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
                   },
                   {
                     label: 'DRRF Due',
@@ -1114,7 +1115,7 @@ const TaxFiling: React.FC = () => {
                     color:
                       drrfDue > 0
                         ? 'text-orange-600 dark:text-orange-400'
-                        : 'text-emerald-600 dark:text-emerald-400',
+                        : 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
                   },
                   {
                     label: 'WHT Due',
@@ -1122,7 +1123,7 @@ const TaxFiling: React.FC = () => {
                     color:
                       whtDue > 0
                         ? 'text-teal-600 dark:text-teal-400'
-                        : 'text-emerald-600 dark:text-emerald-400',
+                        : 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
                   },
                 ].map((k) => (
                   <div key={k.label} className="text-center">
@@ -1139,7 +1140,7 @@ const TaxFiling: React.FC = () => {
             <div className="flex flex-col gap-2 shrink-0">
               <button
                 onClick={() => navigate('/tax/vat')}
-                className="flex items-center gap-2 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-medium transition-colors"
+                className="flex items-center gap-2 px-3 py-2 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-lg text-xs font-medium transition-colors"
               >
                 <Send size={12} /> File VAT Return
               </button>
@@ -1158,7 +1159,7 @@ const TaxFiling: React.FC = () => {
           {TAX_TYPES.map((t) => (
             <div
               key={t.value}
-              className={`bg-white border rounded-xl p-4 cursor-pointer transition-all hover:shadow-md ${selectedType === t.value ? `${t.border} shadow-sm` : 'border-emerald-100'}`}
+              className={`bg-white border rounded-xl p-4 cursor-pointer transition-all hover:shadow-md ${selectedType === t.value ? `${t.border} shadow-sm` : 'border-[var(--pro-azure-100)]'}`}
               onClick={() =>
                 setSelectedType(selectedType === t.value ? null : t.value)
               }
@@ -1172,25 +1173,25 @@ const TaxFiling: React.FC = () => {
                 <Link
                   to={t.link}
                   onClick={(e) => e.stopPropagation()}
-                  className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                  className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors"
                 >
                   <ExternalLink size={11} />
                 </Link>
               </div>
-              <p className="text-sm font-semibold text-emerald-900">
+              <p className="text-sm font-semibold text-[var(--pro-azure-dark)]">
                 {t.label}
               </p>
               <p className="ovds-caption mt-0.5">{t.sub}</p>
               <div className="mt-3 pt-3 border-t border-slate-50 dark:border-slate-800 space-y-1">
                 <div className="flex items-center justify-between text-[10px]">
                   <span className="text-slate-400">Deadline</span>
-                  <span className="font-medium text-emerald-800">
+                  <span className="font-medium text-[var(--pro-azure-dark)]">
                     {t.deadline}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-[10px]">
                   <span className="text-slate-400">Legal basis</span>
-                  <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                  <span className="font-medium text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                     {t.legal}
                   </span>
                 </div>
@@ -1201,8 +1202,8 @@ const TaxFiling: React.FC = () => {
 
         {/* -- Filing History ---------------------------------------------------- */}
         <div className="ovds-widget-card overflow-hidden shadow-sm">
-          <div className="px-5 py-4 border-b border-emerald-100 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-emerald-800 flex items-center gap-2">
+          <div className="px-5 py-4 border-b border-[var(--pro-azure-100)] flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-[var(--pro-azure-dark)] flex items-center gap-2">
               <Icon name="CHART" size={15} className="text-slate-400" /> Filing
               History
             </h3>
@@ -1219,7 +1220,7 @@ const TaxFiling: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-sm ovds-table">
               <thead>
-                <tr className="bg-emerald-50 border-b border-emerald-100">
+                <tr className="bg-[var(--pro-azure-50)] border-b border-[var(--pro-azure-100)]">
                   {[
                     'Tax Type',
                     'Period',
@@ -1230,7 +1231,7 @@ const TaxFiling: React.FC = () => {
                   ].map((h) => (
                     <th
                       key={h}
-                      className="px-4 py-3 text-left text-xs font-semibold text-emerald-600 uppercase tracking-wider"
+                      className="px-4 py-3 text-left text-xs font-semibold text-[var(--pro-azure)] uppercase tracking-wider"
                     >
                       {h}
                     </th>
@@ -1268,7 +1269,7 @@ const TaxFiling: React.FC = () => {
                       </p>
                       <button
                         onClick={() => setShowNewModal(true)}
-                        className="mt-3 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-medium transition-colors"
+                        className="mt-3 px-4 py-2 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-lg text-xs font-medium transition-colors"
                       >
                         Record First Filing
                       </button>
@@ -1318,7 +1319,7 @@ const TaxFiling: React.FC = () => {
                         <td className="px-4 py-3 text-xs text-slate-500 dark:text-slate-400 font-mono">
                           {r.period}
                         </td>
-                        <td className="px-4 py-3 text-xs text-semibold text-emerald-900 tabular-nums whitespace-nowrap">
+                        <td className="px-4 py-3 text-xs text-semibold text-[var(--pro-azure-dark)] tabular-nums whitespace-nowrap">
                           {fmt(amount)}
                         </td>
                         <td className="px-4 py-3">
@@ -1354,7 +1355,7 @@ const TaxFiling: React.FC = () => {
                                 )
                               }
                               disabled={submitting}
-                              className="flex items-center gap-1 px-2 py-1 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 rounded text-[10px] font-medium hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors disabled:opacity-50"
+                              className="flex items-center gap-1 px-2 py-1 bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] rounded text-[10px] font-medium hover:bg-[var(--pro-azure-100)] dark:hover:bg-green-900/40 transition-colors disabled:opacity-50"
                               title="Submit to eTax portal"
                             >
                               <Send size={10} /> Submit
@@ -1378,7 +1379,7 @@ const TaxFiling: React.FC = () => {
                 href="https://etax.erca.gov.et"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-medium"
+                className="flex items-center gap-1.5 text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline font-medium"
               >
                 Open eTax Portal <ExternalLink size={10} />
               </a>
@@ -1390,8 +1391,8 @@ const TaxFiling: React.FC = () => {
         <div className="ovds-grid-layout cols-2">
           {/* Tax Calendar */}
           <div className="ovds-widget-card p-5">
-            <h4 className="text-sm font-semibold text-emerald-800 flex items-center gap-2 mb-4">
-              <Icon name="CALENDAR" size={14} className="text-emerald-400" />{' '}
+            <h4 className="text-sm font-semibold text-[var(--pro-azure-dark)] flex items-center gap-2 mb-4">
+              <Icon name="CALENDAR" size={14} className="text-[var(--pro-azure-light)]" />{' '}
               Filing Calendar
             </h4>
             <div className="space-y-2.5">
@@ -1399,7 +1400,7 @@ const TaxFiling: React.FC = () => {
                 {
                   label: 'VAT Return',
                   deadline: '30th of following month',
-                  color: 'bg-emerald-500',
+                  color: 'bg-[var(--pro-azure-50)]0',
                   legal: 'Proc. 1341/2024',
                 },
                 {
@@ -1438,12 +1439,12 @@ const TaxFiling: React.FC = () => {
                     className={`w-2 h-2 rounded-full ${item.color} shrink-0`}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-emerald-800 truncate">
+                    <p className="text-xs font-medium text-[var(--pro-azure-dark)] truncate">
                       {item.label}
                     </p>
                     <p className="ovds-caption">{item.deadline}</p>
                   </div>
-                  <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-medium shrink-0">
+                  <span className="text-[9px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-medium shrink-0">
                     {item.legal}
                   </span>
                 </div>
@@ -1453,7 +1454,7 @@ const TaxFiling: React.FC = () => {
 
           {/* Penalties Reference */}
           <div className="ovds-widget-card p-5">
-            <h4 className="text-sm font-semibold text-emerald-800 flex items-center gap-2 mb-4">
+            <h4 className="text-sm font-semibold text-[var(--pro-azure-dark)] flex items-center gap-2 mb-4">
               <Icon name="WARNING" size={14} className="text-amber-500" />{' '}
               Penalty Reference
             </h4>
@@ -1494,7 +1495,7 @@ const TaxFiling: React.FC = () => {
                   key={item.label}
                   className="flex items-center justify-between gap-2"
                 >
-                  <p className="text-xs text-emerald-800 truncate">
+                  <p className="text-xs text-[var(--pro-azure-dark)] truncate">
                     {item.label}
                   </p>
                   <p
@@ -1547,16 +1548,16 @@ const TaxFiling: React.FC = () => {
 
         {/* -- E-Tax Portal Guide ------------------------------------------------ */}
         <div className="ovds-widget-card overflow-hidden">
-          <div className="px-5 py-4 border-b border-emerald-100 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-emerald-800 flex items-center gap-2">
-              <Globe size={14} className="text-emerald-500" /> How to File
+          <div className="px-5 py-4 border-b border-[var(--pro-azure-100)] flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-[var(--pro-azure-dark)] flex items-center gap-2">
+              <Globe size={14} className="text-[var(--pro-azure)]" /> How to File
               Online — MoR E-Tax Portal
             </h3>
             <a
               href="https://etax.erca.gov.et"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-medium transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-lg text-xs font-medium transition-colors"
             >
               Open E-Tax Portal <ExternalLink size={10} />
             </a>
@@ -1571,7 +1572,7 @@ const TaxFiling: React.FC = () => {
                   icon: <Icon name="GLOBE" size={14} />,
                   title: 'Access the Portal',
                   desc: 'Go to etax.erca.gov.et — the official Ministry of Revenue E-Tax site.',
-                  color: 'bg-emerald-50 border-emerald-200 text-emerald-700',
+                  color: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
                 },
                 {
                   step: 2,
@@ -1634,12 +1635,12 @@ const TaxFiling: React.FC = () => {
             {/* Net VAT formula */}
             <div className="bg-white border border-slate-200 rounded-xl p-4">
               <p className="text-xs font-semibold text-slate-700 flex items-center gap-2 mb-2">
-                <Calculator size={13} className="text-emerald-500" /> Net VAT
+                <Calculator size={13} className="text-[var(--pro-azure)]" /> Net VAT
                 Formula
               </p>
               <div className="font-mono text-xs text-slate-600 space-y-1">
                 <p>
-                  <span className="text-emerald-700 font-semibold">
+                  <span className="text-[var(--pro-azure-dark)] font-semibold">
                     Net VAT Payable
                   </span>{' '}
                   = Output VAT − Input VAT
@@ -1654,8 +1655,8 @@ const TaxFiling: React.FC = () => {
             {/* Documents needed + Payment methods */}
             <div className="ovds-grid-layout cols-2">
               <div>
-                <p className="text-xs font-semibold text-emerald-800 flex items-center gap-1.5 mb-2">
-                  <BookOpen size={12} className="text-emerald-500" /> Documents
+                <p className="text-xs font-semibold text-[var(--pro-azure-dark)] flex items-center gap-1.5 mb-2">
+                  <BookOpen size={12} className="text-[var(--pro-azure)]" /> Documents
                   to Prepare
                 </p>
                 <ul className="space-y-1.5">
@@ -1671,7 +1672,7 @@ const TaxFiling: React.FC = () => {
                     >
                       <CheckCircle2
                         size={11}
-                        className="text-emerald-500 shrink-0 mt-0.5"
+                        className="text-[var(--pro-azure)] shrink-0 mt-0.5"
                       />
                       {d}
                     </li>
@@ -1679,8 +1680,8 @@ const TaxFiling: React.FC = () => {
                 </ul>
               </div>
               <div>
-                <p className="text-xs font-semibold text-emerald-800 flex items-center gap-1.5 mb-2">
-                  <Building2 size={12} className="text-emerald-500" /> Payment
+                <p className="text-xs font-semibold text-[var(--pro-azure-dark)] flex items-center gap-1.5 mb-2">
+                  <Building2 size={12} className="text-[var(--pro-azure)]" /> Payment
                   Methods After Filing
                 </p>
                 <ul className="space-y-1.5">
@@ -1696,7 +1697,7 @@ const TaxFiling: React.FC = () => {
                     >
                       <CheckCircle2
                         size={11}
-                        className="text-emerald-500 shrink-0 mt-0.5"
+                        className="text-[var(--pro-azure)] shrink-0 mt-0.5"
                       />
                       {d}
                     </li>
@@ -1712,25 +1713,25 @@ const TaxFiling: React.FC = () => {
               </p>
               <a
                 href="tel:+251116629800"
-                className="flex items-center gap-1.5 text-[11px] text-slate-600 hover:text-emerald-700 transition-colors"
+                className="flex items-center gap-1.5 text-[11px] text-slate-600 hover:text-[var(--pro-azure-dark)] transition-colors"
               >
-                <Phone size={11} className="text-emerald-500" /> +251 11 662 98
+                <Phone size={11} className="text-[var(--pro-azure)]" /> +251 11 662 98
                 00
               </a>
               <a
                 href="mailto:info.mor@mor.gov.et"
-                className="flex items-center gap-1.5 text-[11px] text-slate-600 hover:text-emerald-700 transition-colors"
+                className="flex items-center gap-1.5 text-[11px] text-slate-600 hover:text-[var(--pro-azure-dark)] transition-colors"
               >
-                <Mail size={11} className="text-emerald-500" />{' '}
+                <Mail size={11} className="text-[var(--pro-azure)]" />{' '}
                 info.mor@mor.gov.et
               </a>
               <a
                 href="https://mor.gov.et"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-[11px] text-slate-600 hover:text-emerald-700 transition-colors"
+                className="flex items-center gap-1.5 text-[11px] text-slate-600 hover:text-[var(--pro-azure-dark)] transition-colors"
               >
-                <Globe size={11} className="text-emerald-500" /> mor.gov.et{' '}
+                <Globe size={11} className="text-[var(--pro-azure)]" /> mor.gov.et{' '}
                 <ExternalLink size={9} />
               </a>
               <p className="text-[10px] text-slate-400 w-full mt-1">
@@ -1794,9 +1795,9 @@ const TaxFiling: React.FC = () => {
                 ))}
               </div>
             ) : declarationResult ? (
-              <div className="flex items-center gap-2 p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg">
-                <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
-                <p className="text-[11px] text-emerald-700 font-semibold">
+              <div className="flex items-center gap-2 p-2.5 bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-lg">
+                <CheckCircle2 size={13} className="text-[var(--pro-azure)] shrink-0" />
+                <p className="text-[11px] text-[var(--pro-azure-dark)] font-semibold">
                   Payload valid — signed with SHA-256. Period: {declarationResult.declaration.Header.FilingPeriodCode}
                 </p>
               </div>
@@ -1814,7 +1815,7 @@ const TaxFiling: React.FC = () => {
                     Copy
                   </button>
                 </div>
-                <pre className="p-4 bg-slate-900 text-[10px] text-emerald-400 font-mono overflow-x-auto max-h-64 leading-relaxed">
+                <pre className="p-4 bg-slate-900 text-[10px] text-[var(--pro-azure-light)] font-mono overflow-x-auto max-h-64 leading-relaxed">
                   {JSON.stringify(declarationResult.declaration, null, 2)}
                 </pre>
               </div>

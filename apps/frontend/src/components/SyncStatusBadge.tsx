@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SyncStatusBadge — Offline resilience indicator
  *
  * Shows the current sync queue state and connectivity status.
@@ -11,19 +11,21 @@
  *   conflict — sync conflicts detected
  *   offline  — browser is offline (navigator.onLine = false)
  */
-import React, { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { WifiOff, RefreshCw, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+
 import { orpc } from '../lib/orpc';
-import { Wifi, WifiOff, RefreshCw, AlertTriangle, CheckCircle2 } from 'lucide-react';
+
 
 type SyncState = 'online' | 'pending' | 'conflict' | 'offline' | 'syncing';
 
 const STATE_CONFIG: Record<SyncState, { label: string; color: string; icon: React.ReactNode }> = {
-  online:   { label: 'Synced',    color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200', icon: <CheckCircle2 size={11} /> },
+  online:   { label: 'Synced',    color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-100)]', icon: <CheckCircle2 size={11} /> },
   pending:  { label: 'Pending',   color: 'text-amber-600  bg-amber-50  dark:bg-amber-950/30  border-amber-200',  icon: <RefreshCw size={11} className="animate-spin" /> },
   conflict: { label: 'Conflict',  color: 'text-rose-600   bg-rose-50   dark:bg-rose-950/30   border-rose-200',   icon: <AlertTriangle size={11} /> },
   offline:  { label: 'Offline',   color: 'text-slate-500  bg-slate-100 dark:bg-slate-800      border-slate-200',  icon: <WifiOff size={11} /> },
-  syncing:  { label: 'Syncing…',  color: 'text-blue-600   bg-blue-50   dark:bg-blue-950/30   border-blue-200',   icon: <RefreshCw size={11} className="animate-spin" /> },
+  syncing:  { label: 'Syncing…',  color: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]/10 border-[var(--pro-azure-100)]',   icon: <RefreshCw size={11} className="animate-spin" /> },
 };
 
 export const SyncStatusBadge: React.FC = () => {

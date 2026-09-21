@@ -1,10 +1,10 @@
-import React from 'react';
-import { Input, Select, Textarea, FormField } from '@ovds/ui';
 import {
   DEVICE_CONTROL_ENUM_FIELDS,
   type DeviceControlCategory,
   type DeviceControlSettings,
 } from '@ovds/shared';
+import { Input, Select, Textarea, FormField } from '@ovds/ui';
+import React from 'react';
 
 interface Props {
   category: DeviceControlCategory;

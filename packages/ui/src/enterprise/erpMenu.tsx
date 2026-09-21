@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @ovds/ui — ERP Accounting Sidebar Menu
  *
  * Complete ERP/Accounting Software Sidebar Menu structure aligned with:
@@ -7,7 +7,7 @@
  *   - AABE (Accounting and Auditing Board of Ethiopia) regulations
  *
  * Organized as a professional Tree-View (Main Menu + Sub-Menu) designed
- * to match modern accounting applications like Akaunting.
+ * to match modern accounting applications like Ovds SaaS.
  *
  * Usage:
  *   import { erpMenuSections } from '@ovds/ui';

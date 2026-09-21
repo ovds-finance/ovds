@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Btn, Select, Textarea, FormField } from '@ovds/ui';
 import {
   DEVICE_CONTROL_CATEGORIES,
   DEVICE_CONTROL_CATEGORY_META,
   type DeviceControlCategory,
   type DeviceControlSettings,
 } from '@ovds/shared';
-import { PolicySettingsForm } from './PolicySettingsForm';
+import { Modal, Btn, Select, Textarea, FormField } from '@ovds/ui';
+import React, { useEffect, useState } from 'react';
+
 import { defaultSettingsFor, useCreateChangeRequest } from '../../services/deviceControlApi';
+
+import { PolicySettingsForm } from './PolicySettingsForm';
 
 interface Props {
   open: boolean;

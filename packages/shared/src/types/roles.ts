@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Role constants — single authoritative source shared by:
  *   • Prisma schema enum (must stay in sync)
  *   • NestJS backend guards (RolesGuard, PermissionsGuard, JwtStrategy)
@@ -19,7 +19,7 @@ export const Role = {
   ADMIN: 'ADMIN',
   /** Human Resources manager */
   HR: 'HR',
-  /** Core OVDS accounting/finance operator (maps to Akaunting "accounting" role) */
+  /** Core OVDS accounting/finance operator (Ovds SaaS accounting/finance operator) */
   OVDS: 'OVDS',
   /** Dedicated accounting & GL posting role */
   ACCOUNTING: 'ACCOUNTING',

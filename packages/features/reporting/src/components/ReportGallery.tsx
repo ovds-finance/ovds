@@ -33,7 +33,7 @@ const ACCENTS: Record<string, string> = {
   'double-entry-gl': 'bg-violet-50 text-violet-600',
   'inventory-valuation': 'bg-orange-50 text-orange-600',
   'payroll-summary': 'bg-teal-50 text-teal-600',
-  'crm-sales': 'bg-indigo-50 text-indigo-600',
+  'crm-sales': 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]',
 };
 
 export default function ReportGallery({ category, onSelect }: Props) {
@@ -67,7 +67,7 @@ export default function ReportGallery({ category, onSelect }: Props) {
             <span
               className={`text-[10px] font-semibold px-2 py-1 rounded-full ${
                 t.category === 'standard'
-                  ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-300'
+                  ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)]'
                   : 'bg-purple-50 text-purple-700 dark:bg-purple-950/30 dark:text-purple-300'
               }`}
               title={t.category}

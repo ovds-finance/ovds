@@ -3,29 +3,30 @@
  * Extends the existing Budgets page with full variance reporting,
  * trend analysis, and drill-through to underlying transactions.
  */
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, Icon, Amount,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
 import api from '../services/api';
-import toast from 'react-hot-toast';
-import { downloadBlob } from '../utils/download';
+import { useRefreshBudgetActuals } from '../services/missingFeaturesApi';
 import {
   useBudgetVarianceSummary,
   useBudgetVarianceDetail,
   useBudgetVarianceTrend,
 } from '../services/newTaxApi';
-import { useRefreshBudgetActuals } from '../services/missingFeaturesApi';
+import { downloadBlob } from '../utils/download';
 
-const currentYear    = new Date().getFullYear();
+const _currentYear    = new Date().getFullYear();
 const currentPeriod  = new Date().toISOString().slice(0, 7);
 const fmt  = (n: number) => new Intl.NumberFormat('en-ET', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.abs(n));
 const fmtK = (n: number) => Math.abs(n) >= 1_000_000 ? `${(n / 1_000_000).toFixed(2)}M` : Math.abs(n) >= 1_000 ? `${(n / 1_000).toFixed(1)}K` : fmt(n);
@@ -63,7 +64,7 @@ interface BudgetSummary {
 }
 
 const STATUS_CONFIG = {
-  ON_TRACK:       { label: 'On Track',      cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  ON_TRACK:       { label: 'On Track',      cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' },
   AT_RISK:        { label: 'At Risk',        cls: 'bg-amber-50 text-amber-700 border-amber-200' },
   OVER_BUDGET:    { label: 'Over Budget',    cls: 'bg-rose-50 text-rose-700 border-rose-200' },
   UNDER_UTILIZED: { label: 'Under-utilized', cls: 'bg-white text-slate-500 border-slate-200' },
@@ -78,14 +79,14 @@ const VarianceBar: React.FC<{ budget: number; actual: number }> = ({ budget, act
     <div className="flex items-center gap-2">
       <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-visible relative">
         <div
-          className={`h-full rounded-full transition-all ${over ? 'bg-rose-500' : pct > 80 ? 'bg-amber-400' : 'bg-emerald-500'}`}
+          className={`h-full rounded-full transition-all ${over ? 'bg-rose-500' : pct > 80 ? 'bg-amber-400' : 'bg-[var(--pro-azure)]'}`}
           style={{ width: `${Math.min(pct, 100)}%` }}
         />
         {over && (
           <div className="absolute right-0 top-0 w-0.5 h-full bg-rose-700" title="Budget limit" />
         )}
       </div>
-      <span className={`text-[10px] font-bold tabular-nums ${over ? 'text-rose-600' : pct > 80 ? 'text-amber-600' : 'text-emerald-700'}`}>
+      <span className={`text-[10px] font-bold tabular-nums ${over ? 'text-rose-600' : pct > 80 ? 'text-amber-600' : 'text-[var(--pro-azure-dark)]'}`}>
         {pct}%
       </span>
     </div>
@@ -103,10 +104,10 @@ const SummaryTab: React.FC<{ summary: BudgetSummary | null; lines: BudgetLine[];
         <div className="ovds-stat-row">
           {[
             { label: 'Total Budget',        value: fmtK(summary.totalBudget),        accent: 'bg-slate-500' },
-            { label: 'Total Actual',         value: fmtK(summary.totalActual),        accent: summary.totalActual <= summary.totalBudget ? 'bg-emerald-500' : 'bg-rose-500' },
-            { label: 'Variance',             value: fmtK(Math.abs(summary.totalVariance)), accent: summary.totalVariance >= 0 ? 'bg-emerald-500' : 'bg-rose-500' },
+            { label: 'Total Actual',         value: fmtK(summary.totalActual),        accent: summary.totalActual <= summary.totalBudget ? 'bg-[var(--pro-azure)]' : 'bg-rose-500' },
+            { label: 'Variance',             value: fmtK(Math.abs(summary.totalVariance)), accent: summary.totalVariance >= 0 ? 'bg-[var(--pro-azure)]' : 'bg-rose-500' },
             { label: 'Budget Utilization',   value: `${summary.budgetUtilizationPct}%`, accent: summary.budgetUtilizationPct <= 100 ? 'bg-sky-500' : 'bg-rose-500' },
-            { label: 'Forecast EOY',         value: fmtK(summary.forecastEOY),         accent: summary.forecastEOY <= summary.totalBudget ? 'bg-emerald-500' : 'bg-rose-500' },
+            { label: 'Forecast EOY',         value: fmtK(summary.forecastEOY),         accent: summary.forecastEOY <= summary.totalBudget ? 'bg-[var(--pro-azure)]' : 'bg-rose-500' },
           ].map(k => (
             <div key={k.label} className="ovds-kpi-cell">
               <div className={`w-1 h-8 rounded-full shrink-0 ${k.accent}`} />
@@ -123,7 +124,7 @@ const SummaryTab: React.FC<{ summary: BudgetSummary | null; lines: BudgetLine[];
       {summary && (
         <div className="ovds-grid-layout cols-4 gap-sm">
           {[
-            { key: 'ON_TRACK',       count: summary.onTrackCount,    label: 'On Track',      accent: 'bg-emerald-500' },
+            { label: 'ON_TRACK', count: summary.onTrackCount,    label2: 'On Track',      accent: 'bg-[var(--pro-azure)]' },
             { key: 'AT_RISK',        count: summary.atRiskCount,     label: 'At Risk',       accent: 'bg-amber-500' },
             { key: 'OVER_BUDGET',    count: summary.overBudgetCount, label: 'Over Budget',   accent: 'bg-rose-500' },
             { key: 'UNDER_UTILIZED', count: lines.filter(l => l.status === 'UNDER_UTILIZED').length, label: 'Under-utilized', accent: 'bg-slate-400' },
@@ -154,7 +155,7 @@ const SummaryTab: React.FC<{ summary: BudgetSummary | null; lines: BudgetLine[];
             const budget    = catLines.reduce((s, l) => s + l.budgetAmount, 0);
             const actual    = catLines.reduce((s, l) => s + l.actualAmount, 0);
             const variance  = budget - actual;
-            const pct       = budget > 0 ? Math.round(actual / budget * 100) : 0;
+            const _pct       = budget > 0 ? Math.round(actual / budget * 100) : 0;
             const over      = actual > budget;
             return (
               <div key={cat} className="flex items-center gap-4 px-5 py-3">
@@ -169,7 +170,7 @@ const SummaryTab: React.FC<{ summary: BudgetSummary | null; lines: BudgetLine[];
                 <div className="min-w-[120px]">
                   <VarianceBar budget={budget} actual={actual} />
                 </div>
-                <div className={`text-right min-w-[80px] font-bold tabular-nums text-[12px] ${over ? 'text-rose-600' : 'text-emerald-700'}`}>
+                <div className={`text-right min-w-[80px] font-bold tabular-nums text-[12px] ${over ? 'text-rose-600' : 'text-[var(--pro-azure-dark)]'}`}>
                   {over ? '-' : '+'}ETB {fmtK(Math.abs(variance))}
                 </div>
               </div>
@@ -204,7 +205,7 @@ const DetailTab: React.FC<{ lines: BudgetLine[]; loading: boolean; period: strin
         <div className="flex rounded-xl border border-slate-200 overflow-hidden">
           {(['ALL', 'OVER_BUDGET', 'AT_RISK', 'ON_TRACK'] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 text-[11px] font-bold transition-colors ${filter === f ? 'bg-emerald-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-50'}`}>
+              className={`px-3 py-1.5 text-[11px] font-bold transition-colors ${filter === f ? 'bg-[var(--pro-azure)] text-white' : 'bg-white text-slate-500 hover:bg-slate-50'}`}>
               {f === 'ALL' ? 'All' : STATUS_CONFIG[f].label}
             </button>
           ))}
@@ -242,11 +243,11 @@ const DetailTab: React.FC<{ lines: BudgetLine[]; loading: boolean; period: strin
                 <AppTd align="right"><Amount value={l.budgetAmount} size="sm" /></AppTd>
                 <AppTd align="right"><Amount value={l.actualAmount} size="sm" /></AppTd>
                 <AppTd align="right">
-                  <span className={`font-bold tabular-nums text-[12px] ${l.variance < 0 ? 'text-rose-600' : 'text-emerald-700'}`}>
+                  <span className={`font-bold tabular-nums text-[12px] ${l.variance < 0 ? 'text-rose-600' : 'text-[var(--pro-azure-dark)]'}`}>
                     {l.variance < 0 ? `(${fmt(Math.abs(l.variance))})` : fmt(l.variance)}
                   </span>
                   {l.variancePct !== 0 && (
-                    <p className={`text-[9px] ${l.variance < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                    <p className={`text-[9px] ${l.variance < 0 ? 'text-rose-400' : 'text-[var(--pro-azure-light)]'}`}>
                       {l.variance < 0 ? '-' : '+'}{Math.abs(l.variancePct).toFixed(0)}%
                     </p>
                   )}
@@ -274,8 +275,8 @@ const DetailTab: React.FC<{ lines: BudgetLine[]; loading: boolean; period: strin
           <tfoot>
             <tr className="bg-slate-800">
               <td className="px-4 py-3 text-sm font-black text-white" colSpan={2}>TOTALS</td>
-              <td className="px-4 py-3 text-right tabular-nums text-sm font-bold text-emerald-400">{fmt(filtered.reduce((s, l) => s + l.budgetAmount, 0))}</td>
-              <td className="px-4 py-3 text-right tabular-nums text-sm font-bold text-emerald-400">{fmt(filtered.reduce((s, l) => s + l.actualAmount, 0))}</td>
+              <td className="px-4 py-3 text-right tabular-nums text-sm font-bold text-[var(--pro-azure-light)]">{fmt(filtered.reduce((s, l) => s + l.budgetAmount, 0))}</td>
+              <td className="px-4 py-3 text-right tabular-nums text-sm font-bold text-[var(--pro-azure-light)]">{fmt(filtered.reduce((s, l) => s + l.actualAmount, 0))}</td>
               <td className="px-4 py-3 text-right tabular-nums text-sm font-bold text-white">
                 {(() => { const v = filtered.reduce((s, l) => s + l.variance, 0); return `${v < 0 ? '(' : ''}${fmt(Math.abs(v))}${v < 0 ? ')' : ''}`; })()}
               </td>
@@ -387,9 +388,9 @@ const BudgetVariance: React.FC = () => {
                 {[
                   { label: 'Trend Period',   value: `${first.period} – ${last.period}`, accent: 'bg-slate-400' },
                   { label: 'Latest Budget',  value: fmtK(last.totalBudget),             accent: 'bg-violet-500' },
-                  { label: 'Latest Actual',  value: fmtK(last.totalActual),             accent: last.totalActual <= last.totalBudget ? 'bg-emerald-500' : 'bg-rose-500' },
+                  { label: 'Latest Actual',  value: fmtK(last.totalActual),             accent: last.totalActual <= last.totalBudget ? 'bg-[var(--pro-azure)]' : 'bg-rose-500' },
                   { label: 'Avg Utilization',value: `${avgUtil}%`,                      accent: avgUtil <= 100 ? 'bg-sky-500' : 'bg-amber-500' },
-                  { label: 'Trend',          value: improving ? '▲ On Track' : '▼ Over', accent: improving ? 'bg-emerald-500' : 'bg-rose-500' },
+                  { label: 'Trend',          value: improving ? '▲ On Track' : '▼ Over', accent: improving ? 'bg-[var(--pro-azure)]' : 'bg-rose-500' },
                 ].map(k => (
                   <div key={k.label} className="ovds-kpi-cell">
                     <div className={`w-1 h-8 rounded-full shrink-0 ${k.accent}`} />
@@ -418,7 +419,7 @@ const BudgetVariance: React.FC = () => {
                 <div className="flex flex-col items-center justify-center h-full gap-2">
                   <Icon name="CHART" size={28} className="text-slate-200 dark:text-slate-700" />
                   <p className="text-sm text-slate-400">No budget data for this range.</p>
-                  <Link to="/accounting/budgets" className="text-xs text-emerald-600 underline">Set up budgets →</Link>
+                  <Link to="/accounting/budgets" className="text-xs text-[var(--pro-azure)] underline">Set up budgets →</Link>
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
@@ -459,7 +460,7 @@ const BudgetVariance: React.FC = () => {
                       <AppTd align="right"><Amount value={p.totalBudget} size="sm" /></AppTd>
                       <AppTd align="right"><Amount value={p.totalActual} size="sm" /></AppTd>
                       <AppTd align="right">
-                        <span className={`font-bold tabular-nums text-[12px] ${isFav ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-600'}`}>
+                        <span className={`font-bold tabular-nums text-[12px] ${isFav ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-600'}`}>
                           {isFav ? '+' : ''}{fmtK(p.variance)}
                         </span>
                       </AppTd>
@@ -467,7 +468,7 @@ const BudgetVariance: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                             <div
-                              className={`h-full rounded-full ${p.utilizationPct > 100 ? 'bg-rose-500' : p.utilizationPct > 80 ? 'bg-amber-400' : 'bg-emerald-500'}`}
+                              className={`h-full rounded-full ${p.utilizationPct > 100 ? 'bg-rose-500' : p.utilizationPct > 80 ? 'bg-amber-400' : 'bg-[var(--pro-azure)]'}`}
                               style={{ width: `${Math.min(p.utilizationPct, 100)}%` }}
                             />
                           </div>
@@ -512,17 +513,17 @@ const BudgetVariance: React.FC = () => {
                     <AppTd align="right"><Amount value={l.ytdBudget} size="sm" /></AppTd>
                     <AppTd align="right"><Amount value={l.ytdActual} size="sm" /></AppTd>
                     <AppTd align="right">
-                      <span className={`font-bold tabular-nums text-[12px] ${l.forecastEOY > l.ytdBudget ? 'text-rose-600' : 'text-emerald-700'}`}>
+                      <span className={`font-bold tabular-nums text-[12px] ${l.forecastEOY > l.ytdBudget ? 'text-rose-600' : 'text-[var(--pro-azure-dark)]'}`}>
                         {fmtK(l.forecastEOY)}
                       </span>
                     </AppTd>
                     <AppTd align="right">
-                      <span className={`font-bold tabular-nums text-[12px] ${fvb > 0 ? 'text-rose-600' : 'text-emerald-700'}`}>
+                      <span className={`font-bold tabular-nums text-[12px] ${fvb > 0 ? 'text-rose-600' : 'text-[var(--pro-azure-dark)]'}`}>
                         {fvb > 0 ? `+${fmtK(fvb)}` : fmtK(fvb)}
                       </span>
                     </AppTd>
                     <AppTd>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${risk === 'HIGH' ? 'bg-rose-50 text-rose-700 border-rose-200' : risk === 'MEDIUM' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${risk === 'HIGH' ? 'bg-rose-50 text-rose-700 border-rose-200' : risk === 'MEDIUM' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]'}`}>
                         {risk}
                       </span>
                     </AppTd>

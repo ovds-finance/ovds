@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {
+  useRevenueRecognition,
+} from '@ovds/features/sales';
 import {
   RefreshCw, CheckCircle2, ChevronDown, ChevronUp,
   Calendar, DollarSign, FileText, AlertTriangle,
 } from 'lucide-react';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import {
   AppPage, Btn, MetricCard, Skeleton, cn,
 } from '../components/ui';
-import {
-  useRevenueRecognition,
-} from '@ovds/features/sales';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+
 
 interface ScheduleRow {
   period: string;
@@ -49,15 +51,15 @@ const RevenueRecognition: React.FC = () => {
   const [expandedContract, setExpandedContract] = useState<string | null>(null);
 
   const totalDeferred = data?.totalDeferred ?? 0;
-  const totalRecognized = data?.contracts.reduce((sum, c) => {
-    return sum + c.obligations.reduce((obSum, ob) => {
-      return obSum + ob.schedule.reduce((s, row) => s + row.recognised, 0);
+  const totalRecognized = data?.contracts.reduce((sum: number, c: any) => {
+    return sum + c.obligations.reduce((obSum: number, ob: any) => {
+      return obSum + ob.schedule.reduce((s: number, row: any) => s + row.recognised, 0);
     }, 0);
   }, 0) ?? 0;
 
   const obligationStatusColor = (status: string) => {
     switch (status) {
-      case 'SATISFIED': return 'bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:ring-emerald-800';
+      case 'SATISFIED': return 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] ring-indigo-200 dark:bg-green-900/20 dark:text-green-300 dark:ring-indigo-800';
       case 'PARTIALLY_SATISFIED': return 'bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:ring-amber-800';
       case 'NOT_SATISFIED': return 'bg-slate-100 text-slate-600 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700';
       default: return 'bg-slate-100 text-slate-600 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700';
@@ -69,7 +71,7 @@ const RevenueRecognition: React.FC = () => {
       title="Revenue Recognition"
       subtitle="IFRS 15 contract performance obligations and deferred revenue schedules"
       icon={<DollarSign size={18} />}
-      iconBg="bg-emerald-600"
+      iconBg="bg-[var(--pro-azure)]"
       actions={
         <div className="flex items-center gap-2">
           <Btn variant="ghost" icon={<RefreshCw size={11} />} onClick={refetch}>Refresh</Btn>
@@ -85,8 +87,8 @@ const RevenueRecognition: React.FC = () => {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
           <MetricCard title="Total Deferred" amount={fmt(totalDeferred)} percentage={0} isPositive={false} variant="highlight-amber" />
-          <MetricCard title="Total Recognized" amount={fmt(totalRecognized)} percentage={0} isPositive={true} variant="highlight-emerald" />
-          <MetricCard title="Contracts" amount={(data?.contracts?.length ?? 0).toString()} percentage={0} isPositive={true} variant="highlight-blue" />
+          <MetricCard title="Total Recognized" amount={fmt(totalRecognized)} percentage={0} isPositive={true} variant="highlight-indigo" />
+          <MetricCard title="Contracts" amount={(data?.contracts?.length ?? 0).toString()} percentage={0} isPositive={true} variant="highlight-indigo" />
         </div>
       )}
 
@@ -94,7 +96,7 @@ const RevenueRecognition: React.FC = () => {
       <div className="mt-6 space-y-3">
         {loading ? (
           <div className="flex items-center justify-center h-[200px]">
-            <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-[var(--pro-azure)] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : !data?.contracts?.length ? (
           <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-10 text-center">
@@ -119,7 +121,7 @@ const RevenueRecognition: React.FC = () => {
                   className="px-5 py-4 flex items-center gap-4 cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
                   onClick={() => setExpandedContract(isExpanded ? null : contract.id)}
                 >
-                  <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-[var(--pro-azure-50)] text-[var(--pro-azure)] dark:bg-green-900/20 dark:text-[var(--pro-azure-light)] flex items-center justify-center shrink-0">
                     <FileText size={18} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -135,7 +137,7 @@ const RevenueRecognition: React.FC = () => {
                     <p className="text-[10px] text-slate-400">Deferred</p>
                   </div>
                   <div className="text-right shrink-0 hidden sm:block">
-                    <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">{fmt(contractRecognized)}</p>
+                    <p className="text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] tabular-nums">{fmt(contractRecognized)}</p>
                     <p className="text-[10px] text-slate-400">Recognized</p>
                   </div>
                   <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-all shrink-0">
@@ -181,12 +183,12 @@ const RevenueRecognition: React.FC = () => {
                                       </div>
                                     </td>
                                     <td className="px-3 py-2 text-right text-[11px] font-mono text-slate-700 dark:text-slate-300">{fmt(row.scheduled)}</td>
-                                    <td className="px-3 py-2 text-right text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">{fmt(row.recognised)}</td>
+                                    <td className="px-3 py-2 text-right text-[11px] font-mono text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold">{fmt(row.recognised)}</td>
                                     <td className="px-3 py-2 text-right text-[11px] font-mono text-amber-600 dark:text-amber-400">{fmt(row.deferred)}</td>
                                     <td className="px-3 py-2 text-center">
                                       <span className={cn(
                                         'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ring-1',
-                                        row.status === 'RECOGNISED' ? 'bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:ring-emerald-800' :
+                                        row.status === 'RECOGNISED' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] ring-indigo-200 dark:bg-green-900/20 dark:text-green-300 dark:ring-indigo-800' :
                                         row.status === 'DEFERRED' ? 'bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:ring-amber-800' :
                                         'bg-slate-100 text-slate-600 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700'
                                       )}>

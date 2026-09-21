@@ -1,4 +1,5 @@
 import { type AuthProvider, type CheckResponse } from "@refinedev/core";
+
 import { BEARER_PREFIX } from '../utils/constants';
 
 /** Auth-specific localStorage/sessionStorage keys owned by this app. */

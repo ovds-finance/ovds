@@ -1,4 +1,4 @@
-# OVDS Module Architecture — Akaunting-Inspired Target Structure
+﻿# OVDS Module Architecture — Ovds SaaS-Inspired Target Structure
 
 ## Current Issues
 - **Duplicate/overlapping modules**: `accounting` + `double-entry` + `sub-ledger` + `general-ledger-compliance` all cover core accounting
@@ -7,7 +7,7 @@
 - **Scattered APIs**: 30+ frontend services in `apps/frontend/src/services/` with no clear ownership
 - **Inline features**: `apps/frontend/src/features/reports/` and `accounting/` not in feature packages
 
-## Target Architecture (Akaunting-Inspired)
+## Target Architecture (Ovds SaaS-Inspired)
 
 ### Principle
 Each module is a **self-contained business capability** with:
@@ -68,7 +68,7 @@ Each module is a **self-contained business capability** with:
 **Backend App Modules**: kebab-case, matches domain name
 - ✅ Same as domain names
 
-### Internal Module Structure (Akaunting-Inspired)
+### Internal Module Structure (Ovds SaaS-Inspired)
 
 Each module follows this consistent structure:
 
@@ -122,7 +122,7 @@ apps/backend/src/<module>/
 6. Update nx.json tags
 
 **Phase 2: Update Imports**
-1. Update all `@ovds/domains/*` imports
+1. Update all `@ovds/domains-*` imports
 2. Update all `@ovds/features/*` imports
 3. Update all backend controller imports
 4. Update all frontend page imports

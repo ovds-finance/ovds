@@ -3,12 +3,13 @@
  * FIFO and Weighted Average Cost (AVCO) stock valuation.
  * Shows current inventory value, COGS impact, and NRV write-down alerts.
  */
-import React, { useState, useEffect, useCallback } from 'react';
+import { AppPage, AppKpi } from '@ovds/ui';
 import { Package, RefreshCw, AlertTriangle, TrendingDown, BarChart3 } from 'lucide-react';
-import { AppPage, AppKpi, GridStatBar } from '@ovds/ui';
+import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
 import { useBusiness } from '../context/businessContext';
 import api from '../services/api';
-import toast from 'react-hot-toast';
 
 interface ValuationItem {
   itemId: string;
@@ -61,10 +62,10 @@ const InventoryValuation: React.FC = () => {
   const belowReorderItems = (data?.items ?? []).filter(i => i.belowReorder).length;
 
   const kpiCells = data ? [
-    { label: 'Total Inventory Value', value: `ETB ${(data.totalValue / 1000).toFixed(1)}K`, accentCls: 'bg-emerald-500' },
+    { label: 'Total Inventory Value', value: `ETB ${(data.totalValue / 1000).toFixed(1)}K`, accentCls: 'bg-[var(--pro-azure-50)]0' },
     { label: 'Total Items',           value: data.itemCount.toString(),                      accentCls: 'bg-sky-500' },
-    { label: 'NRV Write-Downs',       value: writeDownItems.toString(),   accentCls: writeDownItems > 0 ? 'bg-rose-500' : 'bg-emerald-500' },
-    { label: 'Below Reorder Level',   value: belowReorderItems.toString(), accentCls: belowReorderItems > 0 ? 'bg-amber-500' : 'bg-emerald-500' },
+    { label: 'NRV Write-Downs',       value: writeDownItems.toString(),   accentCls: writeDownItems > 0 ? 'bg-rose-500' : 'bg-[var(--pro-azure-50)]0' },
+    { label: 'Below Reorder Level',   value: belowReorderItems.toString(), accentCls: belowReorderItems > 0 ? 'bg-amber-500' : 'bg-[var(--pro-azure-50)]0' },
   ] : [];
 
   return (
@@ -89,7 +90,7 @@ const InventoryValuation: React.FC = () => {
             <AlertTriangle size={14} className="inline mr-1" />Alerts only
           </button>
           <button onClick={load} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
-            <RefreshCw size={16} className={loading ? 'animate-spin text-emerald-500' : 'text-slate-500'} />
+            <RefreshCw size={16} className={loading ? 'animate-spin text-[var(--pro-azure)]' : 'text-slate-500'} />
           </button>
         </div>
       }
@@ -113,7 +114,7 @@ const InventoryValuation: React.FC = () => {
         </div>
         <div className="ovds-widget-body overflow-x-auto">
           {loading ? (
-            <div className="ovds-empty py-12"><RefreshCw size={20} className="animate-spin text-emerald-500 mb-2" /><span>Calculating…</span></div>
+            <div className="ovds-empty py-12"><RefreshCw size={20} className="animate-spin text-[var(--pro-azure)] mb-2" /><span>Calculating…</span></div>
           ) : filtered.length === 0 ? (
             <div className="ovds-empty py-12"><Package size={32} className="text-slate-300 mb-2" /><span>No items found</span></div>
           ) : (
@@ -136,14 +137,14 @@ const InventoryValuation: React.FC = () => {
                       <td className="py-2.5 px-3 ovds-number text-right">{item.currentQty.toLocaleString('en-ET', { maximumFractionDigits: 4 })}</td>
                       <td className="py-2.5 px-3 ovds-number text-right">{fmt(item.unitCost)}</td>
                       <td className="py-2.5 px-3 ovds-number text-right">{item.salePrice ? fmt(item.salePrice) : '—'}</td>
-                      <td className="py-2.5 px-3 ovds-number text-right font-bold text-emerald-700 dark:text-emerald-400">{fmt(item.currentValue)}</td>
+                      <td className="py-2.5 px-3 ovds-number text-right font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">{fmt(item.currentValue)}</td>
                       <td className="py-2.5 px-3">
                         {item.writeDownRequired ? (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 text-[10px] font-bold uppercase">
                             <TrendingDown size={10} /> Write-Down Required
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase">Cost ≤ NRV ✓</span>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] text-[10px] font-bold uppercase">Cost ≤ NRV ✓</span>
                         )}
                       </td>
                       <td className="py-2.5 px-3">
@@ -161,7 +162,7 @@ const InventoryValuation: React.FC = () => {
                 <tfoot>
                   <tr className="border-t-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/40">
                     <td colSpan={5} className="py-2.5 px-3 font-bold text-right text-slate-700 dark:text-slate-200">Total Inventory Value (ETB)</td>
-                    <td className="py-2.5 px-3 ovds-number text-right font-black text-emerald-700 dark:text-emerald-400">{fmt(data.totalValue)}</td>
+                    <td className="py-2.5 px-3 ovds-number text-right font-black text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">{fmt(data.totalValue)}</td>
                     <td colSpan={2} />
                   </tr>
                 </tfoot>

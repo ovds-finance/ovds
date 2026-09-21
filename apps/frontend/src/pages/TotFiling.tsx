@@ -7,25 +7,26 @@
  *   - Applicable when annual revenue < ETB 2,000,000 (Category B)
  *   - Monthly filing, due by 30th of the following month
  */
-import React, { useState, useCallback } from 'react';
+import { calculateTot, triggerAutoComputeTot } from '@ovds/features/tax';
+import type { TotFiling as TotFilingType, TotCalculation } from '@ovds/features/tax';
+import { AppPage, Btn } from '@ovds/ui';
 import {
   Calculator, Send, RefreshCw, CheckCircle2,
   AlertTriangle, Clock, TrendingUp, FileText,
   ChevronDown, X, Info, Download,
 } from 'lucide-react';
-import { AppPage, Btn } from '@ovds/ui';
-import { useTotFilings, useTaxpayerStatus } from '../services/taxApi';
-import { calculateTot, triggerAutoComputeTot } from '@ovds/features/tax';
-import type { TotFiling as TotFilingType, TotCalculation } from '@ovds/features/tax';
-import { useBusiness } from '../context/businessContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { fmtCurrency } from '../utils/fmt';
-import { Icon } from '../components/ui';
-import api from '../services/api';
+import React, { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { useTotFilings, useTaxpayerStatus } from '../services/taxApi';
+import { fmtCurrency } from '../utils/fmt';
+
+
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
-const currentPeriod = () => new Date().toISOString().slice(0, 7);
+const _currentPeriod = () => new Date().toISOString().slice(0, 7);
 const prevPeriod = () => {
   const d = new Date();
   d.setMonth(d.getMonth() - 1);
@@ -36,8 +37,8 @@ const prevPeriod = () => {
 const STATUS_CFG: Record<string, { label: string; cls: string; dot: string }> = {
   DRAFT:   { label: 'Draft',   cls: 'bg-slate-100 text-slate-600 border border-slate-200',           dot: 'bg-slate-400' },
   PENDING: { label: 'Pending', cls: 'bg-amber-50 text-amber-700 border border-amber-200',             dot: 'bg-amber-500' },
-  FILED:   { label: 'Filed',   cls: 'bg-emerald-50 text-emerald-700 border border-emerald-200',       dot: 'bg-emerald-500' },
-  PAID:    { label: 'Paid',    cls: 'bg-emerald-50 text-emerald-700 border border-emerald-200',       dot: 'bg-emerald-500' },
+  FILED:   { label: 'Filed',   cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)]',       dot: 'bg-[var(--pro-azure-50)]0' },
+  PAID:    { label: 'Paid',    cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)]',       dot: 'bg-[var(--pro-azure-50)]0' },
   OVERDUE: { label: 'Overdue', cls: 'bg-rose-50 text-rose-700 border border-rose-200',               dot: 'bg-rose-500' },
 };
 
@@ -277,7 +278,7 @@ const FilingRow: React.FC<{ filing: TotFilingType; onUpdated: () => void }> = ({
             <button
               onClick={() => updateStatus('FILED')}
               disabled={updating}
-              className="px-2 py-1 text-[10px] font-medium bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded transition-colors"
+              className="px-2 py-1 text-[10px] font-medium bg-[var(--pro-azure-50)] text-[var(--pro-azure)] hover:bg-[var(--pro-azure-100)] rounded transition-colors"
             >
               Mark Filed
             </button>
@@ -286,7 +287,7 @@ const FilingRow: React.FC<{ filing: TotFilingType; onUpdated: () => void }> = ({
             <button
               onClick={() => updateStatus('PAID')}
               disabled={updating}
-              className="px-2 py-1 text-[10px] font-medium bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded transition-colors"
+              className="px-2 py-1 text-[10px] font-medium bg-[var(--pro-azure-50)] text-[var(--pro-azure)] hover:bg-[var(--pro-azure-100)] rounded transition-colors"
             >
               Mark Paid
             </button>
@@ -387,7 +388,7 @@ const TotFilingPage: React.FC = () => {
         <div className="ovds-stat-row">
           {[
             { label: 'Total TOT Payable (YTD)', value: fmt(totalPayable), accent: 'bg-sky-500' },
-            { label: 'Total Paid (YTD)',         value: fmt(totalPaid),    accent: 'bg-emerald-500' },
+            { label: 'Total Paid (YTD)',         value: fmt(totalPaid),    accent: 'bg-[var(--pro-azure-50)]0' },
             { label: 'Pending Filings',          value: String(totalPending), accent: totalPending > 0 ? 'bg-amber-500' : 'bg-slate-300' },
             { label: 'Overdue Filings',          value: String(totalOverdue), accent: totalOverdue > 0 ? 'bg-rose-500' : 'bg-slate-300' },
           ].map(kpi => (

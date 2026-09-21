@@ -1,16 +1,16 @@
-<!-- 📌 CORE CONFIG: [docs/CORE-CONFIG.md](./CORE-CONFIG.md)
+﻿<!-- 📌 CORE CONFIG: [docs/CORE-CONFIG.md](./CORE-CONFIG.md)
      📌 FILING LIFECYCLE: [docs/FILING-LIFECYCLE.md](./FILING-LIFECYCLE.md)
      📌 SUBSCRIPTION: [docs/subscription and monitaizetion.md](./subscription%20and%20monitaizetion.md)
      📌 UBIQUITOUS LANGUAGE: [docs/UBIQUITOUS-LANGUAGE.md](./UBIQUITOUS-LANGUAGE.md)
      🔄 Last synced: 2026-08-27 -->
 
-# OVDS OVDS — Documentation
-**Online VAT Return System (OVDS) — Unified Brand for the Multinational Enterprise**
+# Online VAT Declaretion System (OVDS) — Documentation
+**Online VAT Declaretion System (OVDS) — Unified Brand for the Multinational Enterprise**
 **Intellectual Property Certification No. 04/03/491**
 
-OVDS is a comprehensive, production-ready architectural blueprint for a financial management and VAT Return platform designed for Ethiopian businesses and extended for multinational enterprise operations. It provides essential tools for invoice, expense tracking, inventory, and cash flow management — scaled to support a very large number of accounting users across multiple companies. Users subscribe online, register their company and modules via CRUD operations, and can either use the system directly from the cloud or download it to their own computers after payment. The system handles end-to-end VAT and tax operations with automated report submission to the Ministry of Revenue (MoR) e-Tax portal.
+Online Vat Declaretion System (OVDS) is a comprehensive, production-ready architectural blueprint for a financial management and Online VAT Declaretion System(Ovds) Return platform designed for Ethiopian businesses and extended for multinational enterprise operations. It provides essential tools for invoice, expense tracking, inventory, and cash flow management — scaled to support a very large number of accounting users across multiple companies. Users subscribe online, register their company and modules via website or offline access on-promise full crud operations functioned, and can either use the system directly from the cloud or download it to their own computers after payment. The system handles end-to-end VAT and tax operations with automated report submission to the Ministry of Revenue (MoR) e-Tax portal.
 
-OVDS reconciles three competing financial logic engines, enforces Ethiopian Business Sectors Legally Covered by the Regulation compliance (MoR / ERCA / AABE), and scales to multinational, multi-entity enterprise groups under IFRS. Sectors that require offline functionality (Resiliency) can continue sales/purchase even during internet interruptions.
+OVDS reconciles three competing financial logic engines, enforces Ethiopian Business Sectors Legally Covered by the Regulation compliance (MoR / IFRS / AABE), and scales to multinational, multi-entity enterprise groups under IFRS/AABE. Sectors that require offline functionality (Resiliency) can continue sales/purchase even during internet interruptions.
 
 > **Stack:** Nx 23 · React 19 + Vite 6 · TypeScript 5.9 · NestJS 11 · Prisma 7.9 (MariaDB/MySQL 8) · Tailwind CSS 3.4 · TanStack Query v5 · oRPC v1 + REST + WebSockets · class-validator (`@ovds/dto`) + Zod v4 (`@ovds/contracts`)
 > **Package Manager:** pnpm (pnpm-lock.yaml present; workspace config uses npm-compatible format)
@@ -21,7 +21,7 @@ OVDS reconciles three competing financial logic engines, enforces Ethiopian Busi
 
 ## System Capabilities
 
-OVDS is architected to handle the full lifecycle of an online VAT Return system at scale, supporting a very large number of accounting users across thousands of companies:
+Online VAT Declaretion System (OVDS) is architected to handle the full lifecycle of an online VAT Declaretion System(Ovds)Return system at scale, supporting a very large number of accounting users across thousands of companies:
 
 ### 1. Multi-Tenant User Scaling
 - **Elastic scale:** Cloud tier auto-scales from 50 to 5,000+ concurrent users; On-Premise supports 200–2,000+ per deployment
@@ -179,9 +179,9 @@ OVDS follows Ethiopia's financial compliance cycle directly:
  9. Import Data     → Chart of Accounts → Customers → Vendors → Items → Employees
  10. First Invoice  → Sales → Invoices → New Invoice (docs/04-financial-ops/creating-an-invoice.md)
  11. First Payroll  → HR → Payroll → Run Payroll (docs/08-advanced/hr-and-payroll.md)
-  12. First VAT      → Tax → VAT Administration → Compute (docs/06-tax-compliance/vat-and-tot.md)
-  13. Reports        → Balance Sheet, P&L (docs/07-reports/financial-reports.md)
-  14. MoR Submission → Tax → e-Tax Declaration (docs/06-tax-compliance/vat-and-tot.md#step-4)
+ 12. First VAT      → Tax → VAT Administration → Compute (docs/06-tax-compliance/vat-and-tot.md)
+ 13. Reports        → Balance Sheet, P&L (docs/07-reports/financial-reports.md)
+ 14. MoR Submission → Tax → e-Tax Declaration (docs/06-tax-compliance/vat-and-tot.md#step-4)
   ```
   > **Filing Lifecycle reference:** Steps 12–14 flow through the [Digital Automated Filing Lifecycle](./FILING-LIFECYCLE.md) (Phases 2–6). All tax rates, deadlines, and permissions are defined in [Core Configuration](./CORE-CONFIG.md).
 
@@ -351,7 +351,7 @@ OVDS follows Ethiopia's financial compliance cycle directly:
 | [API.md](09-developers/API.md) | REST endpoint reference, pagination, error codes, WebSocket |
 | [WEBHOOKS.md](09-developers/WEBHOOKS.md) | Webhooks, Telebirr, Chapa, IoT, payment gateway integrations |
 | [STRUCTURE.md](09-developers/STRUCTURE.md) | Structure Map | 68+ backend modules, 222+ frontend pages, 49+ dashboard widgets, adding-feature checklist |
-| [SIDEBAR_UPGRADE_SUMMARY.md](09-developers/SIDEBAR_UPGRADE_SUMMARY.md) | Sidebar Architecture | 12-domain navigation (`AKAUNTING_PARENTS`), keyboard shortcuts, route-to-group mapping |
+| [SIDEBAR_UPGRADE_SUMMARY.md](09-developers/SIDEBAR_UPGRADE_SUMMARY.md) | Sidebar Architecture | 12-domain navigation (`OVDS_NAV_PARENTS`), keyboard shortcuts, route-to-group mapping |
 | [IFRS-Financial-Statements-MoR.md](07-reports/IFRS-Financial-Statements-MoR.md) | 58-section bilingual IFRS + MoR submission guide |
 | [INSTALL.md](01-getting-started/INSTALL.md) | Installation, environment variables, production deployment |
 | [REVIEW.md](REVIEW.md) | System analysis, 51 resolved issues, production readiness checklist |
@@ -364,5 +364,5 @@ OVDS follows Ethiopia's financial compliance cycle directly:
 | [FILING-LIFECYCLE.md](FILING-LIFECYCLE.md) | **Digital Automated Filing Lifecycle** — 6-phase pipeline from transaction capture to compliance scoring with cron schedule and gate checkpoints |
 
 
-https://github.com/ovds-ovds/ovds.git 
+https://github.com/ovds-finance/ovds.git 
 

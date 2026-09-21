@@ -1,7 +1,9 @@
+﻿import { ModuleInterface, ModuleRoute, EventBus } from '@ovds/core';
 import React, { useState, useEffect, Suspense, type ReactNode } from 'react';
-import { ModuleInterface, ModuleRoute, EventBus } from '@ovds/core';
+import { Routes, Route } from 'react-router-dom';
+
 import { useModules } from '../context/ModuleContext';
-import { Routes, Route, Navigate } from 'react-router-dom';
+
 
 interface ModuleRouterProps {
   modules?: ModuleInterface[];
@@ -83,6 +85,7 @@ export const ModuleRouter: React.FC<ModuleRouterProps> = ({ modules: propModules
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useModuleEvents(modules: ModuleInterface[]) {
   const [events, setEvents] = useState<Array<{ name: string; payload: unknown; timestamp: Date }>>([]);
 

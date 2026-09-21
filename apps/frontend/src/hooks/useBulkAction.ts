@@ -18,9 +18,10 @@
  *   // In a table row:
  *   <input type="checkbox" checked={bulk.isSelected(row.id)} onChange={() => bulk.toggle(row.id)} />
  */
-import { useCallback, useState } from 'react';
 import { useMultiSelect } from '@ovds/ui';
 import { useToast } from '@ovds/ui';
+import { useCallback, useState } from 'react';
+
 import { invalidateQueryPrefix } from './useApiQuery';
 
 export interface BulkActionState {

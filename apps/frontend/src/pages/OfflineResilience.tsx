@@ -1,9 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useBusiness } from '../context/businessContext';
-import { useAuth } from '../rbac/AuthContext';
-import api from '../services/api';
-import toast from 'react-hot-toast';
+import { Badge } from '@ovds/ui';
 import {
   WifiOff,
   RefreshCw,
@@ -15,12 +10,19 @@ import {
   Download,
   XCircle,
 } from 'lucide-react';
-import { Badge } from '@ovds/ui';
+import React, { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+
+import { useBusiness } from '../context/businessContext';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
 
 interface OfflineQueueItem {
   id: string;
   companyId: string;
   invoiceData: any;
+  invoiceNumber?: string;
   status: string;
   deviceId: string;
   fiscalYear: string;
@@ -53,7 +55,7 @@ export default function OfflineResilience() {
   const [syncing, setSyncing] = useState(false);
   const [capabilities, setCapabilities] = useState<OfflineCapabilities | null>(null);
   const [queue, setQueue] = useState<OfflineQueueItem[]>([]);
-  const [sectors, setSectors] = useState<{ sectors: string[]; regulation: string; legalNotice: string } | null>(null);
+  const [_sectors, setSectors] = useState<{ sectors: string[]; regulation: string; legalNotice: string } | null>(null);
 
   const loadData = useCallback(async () => {
     if (!selectedCompanyId) return;
@@ -76,6 +78,7 @@ export default function OfflineResilience() {
 
   useEffect(() => {
     loadData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCompanyId]);
 
   const handleSync = async () => {
@@ -127,7 +130,7 @@ export default function OfflineResilience() {
         <button
           onClick={handleSync}
           disabled={syncing || pending.length === 0}
-          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-colors disabled:opacity-60"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-colors disabled:opacity-60"
         >
           <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
           {syncing ? 'Syncing…' : 'Sync Now'}
@@ -150,7 +153,7 @@ export default function OfflineResilience() {
               {capabilities?.companySectors && capabilities.companySectors.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-2">
                   {capabilities.companySectors.map((s: string) => (
-                    <Badge key={s} variant="emerald" size="sm">{s}</Badge>
+                    <Badge key={s} variant="indigo" size="sm">{s}</Badge>
                   ))}
                 </div>
               )}
@@ -199,7 +202,7 @@ export default function OfflineResilience() {
               </h2>
               <div className="flex items-center gap-3">
                 <Badge variant="secondary" size="sm">{pending.length} pending</Badge>
-                <Badge variant="emerald" size="sm">{syncedCount} synced</Badge>
+                <Badge variant="indigo" size="sm">{syncedCount} synced</Badge>
                 {failed.length > 0 && <Badge variant="destructive" size="sm">{failed.length} failed</Badge>}
                 {conflicts.length > 0 && <Badge variant="amber" size="sm">{conflicts.length} conflicts</Badge>}
               </div>
@@ -216,7 +219,7 @@ export default function OfflineResilience() {
                   const statusColors: Record<string, string> = {
                     PENDING: 'bg-amber-100 text-amber-700 border-amber-200',
                     SYNCING: 'bg-sky-100 text-sky-700 border-sky-200',
-                    SYNCED: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                    SYNCED: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
                     FAILED: 'bg-rose-100 text-rose-700 border-rose-200',
                     CONFLICT: 'bg-orange-100 text-orange-700 border-orange-200',
                   };

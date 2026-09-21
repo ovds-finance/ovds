@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
 import { evalMath } from '@ovds/ui';
 import { Skeleton } from '@ovds/ui';
 import { Banknote, Plus, X } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
+import api from '../../services/api';
 import { fmtDecimal } from '../../utils/fmt';
 
 const fmt = fmtDecimal;
@@ -19,10 +20,10 @@ interface OtherPayment {
 }
 
 const STATUS_COLOR: Record<OPStatus, string> = {
-  GENERATED: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
+  GENERATED: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/30 dark:text-green-300',
   VERIFIED:  'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
   FINALIZED: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300',
-  APPROVED:  'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
+  APPROVED:  'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/30 dark:text-green-300',
 };
 
 const INPUT = 'w-full border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-slate-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-400';
@@ -98,7 +99,7 @@ const OtherPaymentPanel: React.FC<{ year: number; month: number }> = ({ year, mo
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-          <Banknote size={18} className="text-emerald-600 dark:text-emerald-400" /> Other Taxable Payments
+          <Banknote size={18} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" /> Other Taxable Payments
         </h3>
         <button onClick={() => setShowHeadForm(v => !v)}
           className="flex items-center gap-2 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">
@@ -121,7 +122,7 @@ const OtherPaymentPanel: React.FC<{ year: number; month: number }> = ({ year, mo
               <label htmlFor="taxable" className="text-sm text-slate-600 dark:text-slate-300">Taxable</label>
             </div>
           </div>
-          <button onClick={saveHead} className="px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold">Add Head</button>
+          <button onClick={saveHead} className="px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold">Add Head</button>
           {heads.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
               {heads.map(h => (
@@ -149,7 +150,7 @@ const OtherPaymentPanel: React.FC<{ year: number; month: number }> = ({ year, mo
         <div className="space-y-3">
           <div className="flex justify-end">
             <button onClick={() => setShowForm(v => !v)}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600">
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)]">
               <Plus size={14} /> Add Single Entry
             </button>
           </div>
@@ -173,7 +174,7 @@ const OtherPaymentPanel: React.FC<{ year: number; month: number }> = ({ year, mo
                 <input value={form.diaryNo} onChange={e => setForm(p => ({ ...p, diaryNo: e.target.value }))}
                   placeholder="Diary No (optional)" className={INPUT} />
               </div>
-              <button onClick={saveEntry} className="px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold">Save Entry</button>
+              <button onClick={saveEntry} className="px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold">Save Entry</button>
             </div>
           )}
           <p className="text-xs text-slate-400 italic">Entries for {month}/{year} — switch to Process tab to advance workflow.</p>
@@ -184,10 +185,10 @@ const OtherPaymentPanel: React.FC<{ year: number; month: number }> = ({ year, mo
       {(subTab === 'process' || subTab === 'approved') && (
         <div className="space-y-3">
           {subTab === 'process' && selected.size > 0 && (
-            <div className="flex items-center gap-2 p-3 bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-200 dark:border-emerald-800 rounded-xl">
-              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{selected.size} selected</span>
+            <div className="flex items-center gap-2 p-3 bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl">
+              <span className="text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{selected.size} selected</span>
               <div className="flex gap-2 ml-auto">
-                {[['Verify','VERIFIED','bg-amber-500'],['Un-Verify','GENERATED','bg-slate-500'],['Finalize','FINALIZED','bg-teal-600'],['Approve','APPROVED','bg-emerald-500']].map(([l,s,c]) => (
+                {[['Verify','VERIFIED','bg-amber-500'],['Un-Verify','GENERATED','bg-slate-500'],['Finalize','FINALIZED','bg-teal-600'],['Approve','APPROVED','bg-[var(--pro-azure-50)]0']].map(([l,s,c]) => (
                   <button key={s} onClick={() => advance(s)} className={`px-3 py-1.5 ${c} text-white rounded-lg text-xs font-bold hover:opacity-90`}>{l}</button>
                 ))}
               </div>

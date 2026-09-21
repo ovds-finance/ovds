@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
   useCyberAuditList,
   useCyberAudit,
@@ -16,30 +15,31 @@ import {
   useCyberAuditChecklist,
   useCyberAuditSummary,
 } from '@ovds/features/eims';
-import toast from 'react-hot-toast';
 import {
   Shield, Plus, Play, CheckCircle2, Trash2, Search, Filter,
   ChevronRight, ChevronLeft, AlertTriangle, FileText, ClipboardList,
   BarChart3, X, Save, RefreshCw,
 } from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
 const STATUS_COLORS: Record<string, string> = {
   SCHEDULED: 'text-slate-600 bg-slate-100',
   IN_PROGRESS: 'text-amber-600 bg-amber-50',
-  COMPLETED: 'text-emerald-600 bg-emerald-50',
+  COMPLETED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   FAILED: 'text-rose-600 bg-rose-50',
   PENDING: 'text-slate-500 bg-slate-100',
-  COMPLIANT: 'text-emerald-600 bg-emerald-50',
+  COMPLIANT: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   NON_COMPLIANT: 'text-rose-600 bg-rose-50',
   NOT_APPLICABLE: 'text-slate-400 bg-slate-50',
   PARTIAL: 'text-amber-600 bg-amber-50',
   OPEN: 'text-rose-600 bg-rose-50',
-  RESOLVED: 'text-emerald-600 bg-emerald-50',
+  RESOLVED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   ACCEPTED_RISK: 'text-purple-600 bg-purple-50',
   CRITICAL: 'text-rose-700 bg-rose-100',
   HIGH: 'text-orange-600 bg-orange-50',
   MEDIUM: 'text-amber-600 bg-amber-50',
-  LOW: 'text-blue-600 bg-blue-50',
+  LOW: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   INFO: 'text-slate-500 bg-slate-100',
 };
 
@@ -72,7 +72,7 @@ const CyberAuditChecklistPage: React.FC = () => {
   const { data: summaryData } = useCyberAuditSummary();
 
   const createAudit = useCreateCyberAudit();
-  const updateAudit = useUpdateCyberAudit();
+  const _updateAudit = useUpdateCyberAudit();
   const deleteAudit = useDeleteCyberAudit();
   const startAudit = useStartCyberAudit();
   const completeAudit = useCompleteCyberAudit();
@@ -98,7 +98,7 @@ const CyberAuditChecklistPage: React.FC = () => {
 
   const handleUpdateMetric = async (metricId: string, status: string) => {
     try {
-      await updateMetric.mutateAsync({ id: metricId, data: { status } });
+      await updateMetric.mutateAsync({ auditId: selectedAuditId ?? '', metricId, data: { status } });
       toast.success('Metric updated');
     } catch (e: any) {
       toast.error(e.message);
@@ -129,7 +129,7 @@ const CyberAuditChecklistPage: React.FC = () => {
     }
   };
 
-  const filteredAudits = (auditsData?.data ?? []).filter((a: any) => {
+  const filteredAudits = ((auditsData as any[]) ?? []).filter((a: any) => {
     if (filterStatus && a.status !== filterStatus) return false;
     if (searchQuery && !a.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return true;
@@ -141,7 +141,7 @@ const CyberAuditChecklistPage: React.FC = () => {
     return true;
   });
 
-  const groupedMetrics = filteredMetrics.reduce<Record<string, any[]>>((acc, m: any) => {
+  const groupedMetrics = (filteredMetrics as any[]).reduce((acc: Record<string, any[]>, m: any) => {
     if (!acc[m.areaNumber]) acc[m.areaNumber] = [];
     acc[m.areaNumber].push(m);
     return acc;
@@ -234,7 +234,7 @@ const CyberAuditChecklistPage: React.FC = () => {
                           </button>
                         )}
                         {audit.status === 'IN_PROGRESS' && (
-                          <button type="button" onClick={() => completeAudit.mutate(audit.id)} className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="Complete">
+                          <button type="button" onClick={() => completeAudit.mutate(audit.id)} className="p-1.5 text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)] rounded-lg" title="Complete">
                             <CheckCircle2 size={14} />
                           </button>
                         )}
@@ -333,7 +333,7 @@ const CyberAuditChecklistPage: React.FC = () => {
                   <AlertTriangle size={14} /> Findings
                 </h3>
                 <div className="space-y-2">
-                  {(findingsData?.data ?? []).map((finding: any) => (
+                  {((findingsData as any[]) ?? []).map((finding: any) => (
                     <div key={finding.id} className="p-3 bg-white dark:bg-slate-900 rounded-xl border flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
@@ -347,7 +347,7 @@ const CyberAuditChecklistPage: React.FC = () => {
                       <div className="flex items-center gap-1 shrink-0">
                         <select
                           value={finding.status}
-                          onChange={(e) => updateFinding.mutate({ id: finding.id, data: { status: e.target.value } })}
+                          onChange={(e) => updateFinding.mutate({ auditId: selectedAuditId ?? '', findingId: finding.id, data: { status: e.target.value } })}
                           className="text-[10px] px-2 py-1 rounded-lg border"
                         >
                           <option value="OPEN">Open</option>
@@ -361,7 +361,7 @@ const CyberAuditChecklistPage: React.FC = () => {
                       </div>
                     </div>
                   ))}
-                  {(findingsData?.data ?? []).length === 0 && (
+                  {((findingsData as any[]) ?? []).length === 0 && (
                     <p className="text-xs text-slate-500 text-center py-4">No findings yet. Add findings from penetration tests or firmware analysis.</p>
                   )}
                 </div>
@@ -454,7 +454,7 @@ const CyberAuditChecklistPage: React.FC = () => {
                 </div>
                 <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border">
                   <p className="text-xs text-slate-500">Compliance Score</p>
-                  <p className="text-2xl font-bold text-emerald-600">{summaryData.complianceScore}%</p>
+                  <p className="text-2xl font-bold text-[var(--pro-azure)]">{summaryData.complianceScore}%</p>
                 </div>
                 <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border">
                   <p className="text-xs text-slate-500">Open Findings</p>
@@ -467,7 +467,7 @@ const CyberAuditChecklistPage: React.FC = () => {
                   <p className="text-xs text-slate-500 mb-2">Metrics Status</p>
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs"><span>Total</span><span className="font-medium">{summaryData.totalMetrics}</span></div>
-                    <div className="flex justify-between text-xs"><span className="text-emerald-600">Compliant</span><span className="font-medium">{summaryData.compliantMetrics}</span></div>
+                    <div className="flex justify-between text-xs"><span className="text-[var(--pro-azure)]">Compliant</span><span className="font-medium">{summaryData.compliantMetrics}</span></div>
                     <div className="flex justify-between text-xs"><span className="text-rose-600">Non-Compliant</span><span className="font-medium">{summaryData.nonCompliantMetrics}</span></div>
                   </div>
                 </div>

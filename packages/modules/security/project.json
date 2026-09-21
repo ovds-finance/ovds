@@ -16,7 +16,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run build",
+        "command": "pnpm run build",
         "cwd": "packages/modules/security"
       },
       "dependsOn": [
@@ -34,7 +34,7 @@
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run typecheck",
+        "command": "pnpm run typecheck",
         "cwd": "packages/modules/security"
       },
       "inputs": [
@@ -45,3 +45,4 @@
     }
   }
 }
+

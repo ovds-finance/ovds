@@ -3,8 +3,9 @@
  * Centralises IFRS/accounting permission checks per role.
  * Used by all IFRS components to gate content and actions.
  */
-import { useAuth } from '../rbac/AuthContext';
 import { Role } from '@ovds/ui';
+
+import { useAuth } from '../rbac/AuthContext';
 
 export interface IFRSAccess {
   /** Can view any IFRS content */

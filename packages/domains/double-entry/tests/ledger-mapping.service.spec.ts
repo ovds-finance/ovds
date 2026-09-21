@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { LedgerMappingService } from '@ovds/domains/double-entry';
+import { LedgerMappingService } from '@ovds/domains-double-entry';
 
 function buildPrismaMock() {
   return {

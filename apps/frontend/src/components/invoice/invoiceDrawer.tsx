@@ -1,4 +1,3 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
 import {
   Repeat2, Edit2, Wifi, Printer, X,
   Calendar, QrCode, ExternalLink, Search, AlertTriangle, Banknote,
@@ -7,15 +6,18 @@ import {
   CalendarRange, TrendingUp, RefreshCw, Link2, Clock3,
   BookOpen, Scale, AlertCircle, Info, Bell,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
-import { PAYMENT_METHODS } from './constants';
-import { computeReceiptConfidence, fmtRelativeTime } from '../../utils/fmt';
-import { downloadCSV } from '../../utils/download';
-import { QR_CODE_SERVICE_URL } from '../../utils/constants';
+
 import api from '../../services/api';
 import { invoicesApi } from '../../services/ovdsApi';
-import InvoiceCaptureModal, { type CapturedInvoiceData } from './invoiceCaptureModal';
+import { QR_CODE_SERVICE_URL } from '../../utils/constants';
+import { downloadCSV } from '../../utils/download';
+import { computeReceiptConfidence, fmtRelativeTime } from '../../utils/fmt';
+
 import EimsInvoicePanel from './eimsInvoicePanel';
+import InvoiceCaptureModal, { type CapturedInvoiceData } from './invoiceCaptureModal';
 
 interface InvoiceDrawerProps {
   invoice: any;
@@ -51,19 +53,19 @@ const InvoiceDrawer: React.FC<InvoiceDrawerProps> = ({
   merchantId,
   onRefresh,
 }) => {
-  const [showQR, setShowQR] = useState(false);
-  const [showIfrs, setShowIfrs] = useState(false);
-  const [showCompliance, setShowCompliance] = useState(false);
-  const [complianceResult, setComplianceResult] = useState<{
+  const [_showQR, _setShowQR] = useState(false);
+  const [_showIfrs, _setShowIfrs] = useState(false);
+  const [_showCompliance, setShowCompliance] = useState(false);
+  const [_complianceResult, setComplianceResult] = useState<{
     compliant: boolean; violations: string[]; warnings: string[]; checks: Record<string, any>;
   } | null>(null);
-  const [complianceLoading, setComplianceLoading] = useState(false);
-  const [itemSearch, setItemSearch] = useState('');
-  const [showPaymentPlan, setShowPaymentPlan] = useState(false);
+  const [_complianceLoading, setComplianceLoading] = useState(false);
+  const [_itemSearch, _setItemSearch] = useState('');
+  const [_showPaymentPlan, _setShowPaymentPlan] = useState(false);
   const [showCapture, setShowCapture] = useState(false);
   const [activityLog, setActivityLog] = useState<any[]>(inv.InvoiceActivity ?? inv.activityLog ?? []);
-  const [paymentPlan, setPaymentPlan] = useState<any[]>(inv.paymentPlan ?? []);
-  const [loadingActivity, setLoadingActivity] = useState(false);
+  const [_paymentPlan, setPaymentPlan] = useState<any[]>(inv.paymentPlan ?? []);
+  const [_loadingActivity, setLoadingActivity] = useState(false);
   const [sendingReminder, setSendingReminder] = useState(false);
   const [copiedShare, setCopiedShare] = useState(false);
   const [quickPayAmount, setQuickPayAmount] = useState('');
@@ -75,7 +77,7 @@ const InvoiceDrawer: React.FC<InvoiceDrawerProps> = ({
   const agingDays = inv.dueDate
     ? Math.floor((Date.now() - new Date(inv.dueDate).getTime()) / 86_400_000)
     : null;
-  const agingBucket =
+  const _agingBucket =
     agingDays === null ? null
     : agingDays <= 0 ? { label: 'Current', color: 'aki-badge sm solid-success' }
     : agingDays <= 30 ? { label: '1–30 days', color: 'aki-badge sm solid-warning' }
@@ -133,7 +135,7 @@ const InvoiceDrawer: React.FC<InvoiceDrawerProps> = ({
     setShowCapture(false);
   }, [inv, onRefresh]);
 
-  const evidenceConfidence = computeReceiptConfidence({
+  const _evidenceConfidence = computeReceiptConfidence({
     telecomRef: inv.telecomReceiptRef,
     telecomParsed: inv.telecomAmount ? { amount: Number(inv.telecomAmount), paidAt: inv.telecomPaidAt } : undefined,
     bankName: inv.bankName,
@@ -147,7 +149,7 @@ const InvoiceDrawer: React.FC<InvoiceDrawerProps> = ({
     bankSlipImageData: inv.bankSlipImageData,
   });
 
-  const handleValidateCompliance = useCallback(async () => {
+  const _handleValidateCompliance = useCallback(async () => {
     setComplianceLoading(true);
     setShowCompliance(true);
     try {
@@ -239,7 +241,7 @@ const InvoiceDrawer: React.FC<InvoiceDrawerProps> = ({
     CANCELLED: '#F9FAFB',
   };
 
-  // Akaunting workflow steps
+  // Ovds SaaS workflow steps
   const workflowSteps = [
     {
       id: 'create',
@@ -296,13 +298,13 @@ const InvoiceDrawer: React.FC<InvoiceDrawerProps> = ({
     },
   ];
 
-  return (
+  return createPortal(
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-50" style={{ background: 'rgba(15,23,42,0.4)', backdropFilter: 'blur(3px)' }} onClick={onClose} />
+      <div className="fixed inset-0 z-[309]" style={{ background: 'rgba(15,23,42,0.4)', backdropFilter: 'blur(3px)' }} onClick={onClose} />
 
       {/* Full-width invoice detail panel */}
-      <div className="fixed inset-0 z-[60] flex flex-col overflow-hidden" style={{ background: 'var(--surface)' }}>
+      <div className="fixed inset-0 z-[310] flex flex-col overflow-hidden" style={{ background: 'var(--surface)' }}>
 
         {/* ── TOP BAR ────────────────────────────────────────────────── */}
         <div className="shrink-0 flex items-center justify-between px-5 gap-3" style={{ height: 52, borderBottom: '1px solid var(--border)', background: 'var(--surface)' }}>
@@ -338,7 +340,7 @@ const InvoiceDrawer: React.FC<InvoiceDrawerProps> = ({
         {/* ── BODY: workflow left + document right ─────────────────── */}
         <div className="flex-1 overflow-hidden flex" style={{ background: '#F8FAFC' }}>
 
-          {/* ── LEFT: Workflow Steps (Akaunting-style) ──────────────── */}
+          {/* ── LEFT: Workflow Steps (Ovds SaaS style) ──────────────── */}
           <div className="w-full max-w-sm shrink-0 flex flex-col overflow-y-auto" style={{ borderRight: '1px solid var(--border)', background: 'var(--surface)' }}>
 
             {/* Draft notice banner */}
@@ -434,7 +436,7 @@ const InvoiceDrawer: React.FC<InvoiceDrawerProps> = ({
             </div>
           </div>
 
-          {/* ── RIGHT: Invoice Document Preview (Akaunting paper style) ─ */}
+          {/* ── RIGHT: Invoice Document Preview (Ovds SaaS paper style) ─ */}
           <div className="flex-1 overflow-y-auto p-6 flex justify-center">
             <div className="w-full max-w-2xl">
               {/* Paper card */}
@@ -611,19 +613,20 @@ const InvoiceDrawer: React.FC<InvoiceDrawerProps> = ({
           onApply={handleCaptureApply}
         />
       )}
-    </>
+    </>,
+    document.body,
   );
 };
 
 // ── Workflow Step sub-component ─────────────────────────────────────────────
-const WorkflowStep: React.FC<{ step: any; isLast: boolean }> = ({ step, isLast }) => {
-  const [open, setOpen] = useState(!step.done || step.actions);
+const WorkflowStep: React.FC<{ step: { done: boolean; icon?: React.ReactNode; label: string; summary?: string; actions?: any }; isLast: boolean }> = ({ step, isLast }) => {
+  const [open, setOpen] = useState(!step.done || !!step.actions);
 
   return (
     <div>
       <button
         type="button"
-        onClick={() => setOpen(o => !o)}
+        onClick={() => setOpen(!open)}
         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-colors"
         style={{ background: open ? 'var(--surface-alt)' : 'transparent' }}
         onMouseEnter={e => { if (!open) (e.currentTarget as HTMLElement).style.background = 'var(--surface-alt)'; }}

@@ -97,7 +97,6 @@ function classifyChunk(name) {
   if (name.startsWith('vendor-auth'))    return 'vendor/auth';
   if (name.startsWith('vendor-dates'))   return 'vendor/dates';
   if (name.startsWith('vendor-parsers')) return 'vendor/parsers';
-  if (name.startsWith('vendor-firebase'))return 'vendor/firebase';
   if (name.startsWith('vendor-refine'))  return 'vendor/refine';
   if (name.startsWith('vendor-'))        return 'vendor/other';
   if (name.endsWith('.css'))             return 'style';

@@ -393,17 +393,17 @@ const CATEGORY_DESCS: Record<FundCategory, string> = {
 const FLAT_CATS = ['TICKET_SALES', 'FUEL_SALES', 'GOVERNMENT_SERVICES'];
 const STATUS_CLS: Record<FundStatus, string> = {
   PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
-  REMITTED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  REMITTED: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
   OVERDUE: 'bg-rose-50 text-rose-700 border-rose-200' };
 const SCHED_CLS: Record<string, string> = {
   UPCOMING: 'bg-slate-500/15 text-slate-500 border-slate-200',
   DUE: 'bg-amber-50 text-amber-700 border-amber-200',
-  PAID: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  PAID: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
   MISSED: 'bg-rose-50 text-rose-700 border-rose-200' };
 const ERCA_STATUS_CLS: Record<ErcaStatus, string> = {
   PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
-  SUBMITTED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  ACKNOWLEDGED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  SUBMITTED: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
+  ACKNOWLEDGED: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
   FAILED: 'bg-rose-50 text-rose-700 border-rose-200' };
 const CAT_COLORS = [
   '#f97316',
@@ -413,7 +413,7 @@ const CAT_COLORS = [
   '#ec4899',
   '#14b8a6',
   '#f59e0b',
-  '#6366f1',
+  '#4FBA6F',
   '#ef4444',
   '#84cc16',
   '#06b6d4',
@@ -512,9 +512,9 @@ const SortIcon: React.FC<{
   if (col !== sortCol)
     return <ChevronDownIcon size={10} className="text-slate-400 ml-0.5" />;
 return sortDir === 'asc' ? (
-    <ChevronUp size={10} className="text-emerald-600 ml-0.5" />
+    <ChevronUp size={10} className="text-[var(--pro-azure)] ml-0.5" />
   ) : (
-    <ChevronDownIcon size={10} className="text-emerald-600 ml-0.5" />
+    <ChevronDownIcon size={10} className="text-[var(--pro-azure)] ml-0.5" />
   );}
 
 // -- Mini bar chart ------------------------------------------------------------
@@ -536,7 +536,7 @@ return (
           <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-white border border-slate-200 text-slate-900 shadow-lg text-[10px] px-2.5 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none z-10 shadow-xl">
             <p className="font-bold mb-0.5">{d.period}</p>
             <p>Total: ETB {fmt(d.total)}</p>
-            <p className="text-emerald-600">Remitted: ETB {fmt(d.remitted)}</p>
+            <p className="text-[var(--pro-azure)]">Remitted: ETB {fmt(d.remitted)}</p>
             <p className="text-amber-600">Pending: ETB {fmt(d.pending)}</p>
             {d.overdue > 0 && (
               <p className="text-rose-600">Overdue: ETB {fmt(d.overdue)}</p>
@@ -547,7 +547,7 @@ return (
             style={{ height: `${(d.total / max) * 100}%`, minHeight: 4 }}
           >
             <div
-              className="absolute bottom-0 left-0 right-0 bg-emerald-500 rounded-t-sm"
+              className="absolute bottom-0 left-0 right-0 bg-[var(--pro-azure-50)]0 rounded-t-sm"
               style={{
                 height: `${(d.remitted / Math.max(d.total, 1)) * 100}%` }}
             />
@@ -662,7 +662,7 @@ return (
       <div className="relative w-full max-w-md bg-white border-l border-slate-200 h-full flex flex-col shadow-2xl">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <History size={16} className="text-emerald-600" />
+            <History size={16} className="text-[var(--pro-azure)]" />
             <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
             <span className="text-[10px] text-slate-400 bg-slate-200 px-1.5 py-0.5 rounded">
               {logs.length}
@@ -701,7 +701,7 @@ return (
               <div key={l.id} className="flex gap-3">
                 <div className="flex flex-col items-center">
                   <div
-                    className={`w-2 h-2 rounded-full mt-1 shrink-0 ${l.action === 'CREATED' ? 'bg-emerald-400' : l.action === 'DELETED' ? 'bg-rose-400' : l.action === 'STATUS_CHANGED' ? 'bg-orange-400' : 'bg-slate-500'}`}
+                    className={`w-2 h-2 rounded-full mt-1 shrink-0 ${l.action === 'CREATED' ? 'bg-[var(--pro-azure-light)]' : l.action === 'DELETED' ? 'bg-rose-400' : l.action === 'STATUS_CHANGED' ? 'bg-orange-400' : 'bg-slate-500'}`}
                   />
                   {i < filtered.length - 1 && (
                     <div className="w-px flex-1 bg-slate-200/60 mt-1" />
@@ -779,7 +779,7 @@ return (
       <div className="relative w-full max-w-sm bg-white border-l border-slate-200 h-full flex flex-col shadow-2xl overflow-y-auto">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
-            <Eye size={16} className="text-emerald-600" />
+            <Eye size={16} className="text-[var(--pro-azure)]" />
             <h3 className="text-sm font-semibold text-slate-900">
               Contribution Detail
             </h3>
@@ -845,20 +845,20 @@ toast.success('Copied!', { duration: 800 });
               </p>
             </div>
             <div
-              className="bg-emerald-50 rounded-xl p-3 border border-emerald-200 group cursor-pointer"
+              className="bg-[var(--pro-azure-50)] rounded-xl p-3 border border-[var(--pro-azure-100)] group cursor-pointer"
               onClick={() => {
                 navigator.clipboard?.writeText(String(c.levyAmount));
 toast.success('Copied!', { duration: 800 });
               }}
             >
-              <p className="text-[10px] font-bold text-emerald-600/70 uppercase tracking-wider mb-1">
+              <p className="text-[10px] font-bold text-[var(--pro-azure)]/70 uppercase tracking-wider mb-1">
                 Levy Amount
               </p>
-              <p className="text-sm font-mono font-bold text-emerald-600">
+              <p className="text-sm font-mono font-bold text-[var(--pro-azure)]">
                 ETB {fmt(c.levyAmount)}
               </p>
               {effectiveRate && (
-                <p className="text-[9px] text-emerald-600/50 mt-0.5">
+                <p className="text-[9px] text-[var(--pro-azure)]/50 mt-0.5">
                   {effectiveRate}% effective rate
                 </p>
               )}
@@ -896,7 +896,7 @@ toast.success('Copied!', { duration: 800 });
                   onRemit(c.id);
                   onClose();
                 }}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-sm font-semibold transition-all"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] text-sm font-semibold transition-all"
               >
                 <CheckCircle2 size={14} />
                 Mark as Remitted
@@ -904,7 +904,7 @@ toast.success('Copied!', { duration: 800 });
             )}
             <button
               onClick={() => onRecordRemittance(c)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-sm font-bold transition-all"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure)] text-sm font-bold transition-all"
             >
               <Building2 size={14} />
               Record Bank Remittance
@@ -982,11 +982,11 @@ return (
                 {
                   label: 'Total Levy',
                   value: `ETB ${fmt(data.totalLevy)}`,
-                  color: 'text-emerald-600' },
+                  color: 'text-[var(--pro-azure)]' },
                 {
                   label: 'Remitted',
                   value: `ETB ${fmt(data.totalRemitted)}`,
-                  color: 'text-emerald-600' },
+                  color: 'text-[var(--pro-azure)]' },
                 {
                   label: 'Records',
                   value: String(data.count),
@@ -1012,14 +1012,14 @@ return (
                   Remittance Rate
                 </p>
                 <span
-                  className={`text-sm font-semibold ${remittanceRate >= 80 ? 'text-emerald-600' : remittanceRate >= 50 ? 'text-amber-600' : 'text-rose-600'}`}
+                  className={`text-sm font-semibold ${remittanceRate >= 80 ? 'text-[var(--pro-azure)]' : remittanceRate >= 50 ? 'text-amber-600' : 'text-rose-600'}`}
                 >
                   {remittanceRate.toFixed(1)}%
                 </span>
               </div>
               <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all duration-700 ${remittanceRate >= 80 ? 'bg-emerald-500' : remittanceRate >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                  className={`h-full rounded-full transition-all duration-700 ${remittanceRate >= 80 ? 'bg-[var(--pro-azure-50)]0' : remittanceRate >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
                   style={{ width: `${Math.min(remittanceRate, 100)}%` }}
                 />
               </div>
@@ -1038,12 +1038,12 @@ return (
                       </span>
                       <div className="flex-1 h-4 bg-slate-200 rounded-lg overflow-hidden flex">
                         <div
-                          className="h-full bg-emerald-500/70"
+                          className="h-full bg-[var(--pro-azure-50)]0/70"
                           style={{
                             width: `${(p.remitted / maxPeriod) * 100}%` }}
                         />
                         <div
-                          className="h-full bg-emerald-500/40"
+                          className="h-full bg-[var(--pro-azure-50)]0/40"
                           style={{
                             width: `${((p.total - p.remitted) / maxPeriod) * 100}%` }}
                         />
@@ -1051,7 +1051,7 @@ return (
                       <span className="text-[10px] text-slate-400 w-10 text-right shrink-0">
                         {pRate.toFixed(0)}%
                       </span>
-                      <span className="text-xs font-mono text-emerald-600 w-28 text-right shrink-0">
+                      <span className="text-xs font-mono text-[var(--pro-azure)] w-28 text-right shrink-0">
                         ETB {fmt(p.total)}
                       </span>
                       <span className="text-[10px] text-slate-400 w-12 text-right shrink-0">
@@ -1084,7 +1084,7 @@ return (
                       <span className="text-xs text-slate-500 flex-1 truncate">
                         {r.description || r.period}
                       </span>
-                      <span className="text-xs font-mono text-emerald-600 shrink-0">
+                      <span className="text-xs font-mono text-[var(--pro-azure)] shrink-0">
                         ETB {fmt(r.levyAmount)}
                       </span>
                       <span className="text-[10px] text-slate-400 shrink-0">
@@ -1289,7 +1289,7 @@ return (
       <div className="bg-white border border-slate-200 rounded-xl shadow-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
-            <Zap size={16} className="text-emerald-600" />
+            <Zap size={16} className="text-[var(--pro-azure)]" />
             <h2 className="text-base font-semibold text-slate-900">
               Auto-Generate from Business Activity
             </h2>
@@ -1352,7 +1352,7 @@ return (
                     setSources(AUTO_SOURCES.map((s, i) => s.key));
                     setPreviews(null);
                   }}
-                  className="text-[10px] text-emerald-600 hover:text-emerald-500 font-bold transition-colors"
+                  className="text-[10px] text-[var(--pro-azure)] hover:text-[var(--pro-azure)] font-bold transition-colors"
                 >
                   All
                 </button>
@@ -1376,7 +1376,7 @@ return (
                     toggleSource(s.key);
                     setPreviews(null);
                   }}
-                  className={`flex items-start gap-3 p-3 rounded-xl border text-left transition-all ${sources.includes(s.key) ? 'bg-emerald-50 border-emerald-200 text-slate-900' : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'}`}
+                  className={`flex items-start gap-3 p-3 rounded-xl border text-left transition-all ${sources.includes(s.key) ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-slate-900' : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'}`}
                 >
                   <span className="text-lg leading-none mt-0.5">{s.icon}</span>
                   <div className="min-w-0 flex-1">
@@ -1391,7 +1391,7 @@ return (
                   {sources.includes(s.key) && (
                     <CheckCircle2
                       size={12}
-                      className="text-emerald-600 shrink-0 mt-0.5"
+                      className="text-[var(--pro-azure)] shrink-0 mt-0.5"
                     />
                   )}
                 </button>
@@ -1405,7 +1405,7 @@ return (
                   {previews.length} contributions to create
                 </p>
                 {previews.length > 0 && (
-                  <p className="text-xs font-bold text-emerald-600">
+                  <p className="text-xs font-bold text-[var(--pro-azure)]">
                     Total levy: ETB {fmt(totalLevy)}
                   </p>
                 )}
@@ -1431,7 +1431,7 @@ return (
                         </p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-sm font-semibold text-emerald-600">
+                        <p className="text-sm font-semibold text-[var(--pro-azure)]">
                           ETB {fmt(p.levyAmount)}
                         </p>
                         <p className="ovds-caption">levy</p>
@@ -1455,7 +1455,7 @@ return (
               <button
                 onClick={handleGenerate}
                 disabled={generating}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold transition-all disabled:opacity-50 shadow-lg shadow-emerald-500/20"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-sm font-bold transition-all disabled:opacity-50 shadow-lg shadow-green-500/20"
               >
                 <Zap size={14} />
                 {generating
@@ -1563,12 +1563,12 @@ return (
           {result ? (
             <div className="space-y-3">
               <div
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${result.failed === 0 ? 'bg-emerald-50 border-slate-200' : 'bg-amber-50 border-amber-500/30'}`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${result.failed === 0 ? 'bg-[var(--pro-azure-50)] border-slate-200' : 'bg-amber-50 border-amber-500/30'}`}
               >
                 <CheckCircle2
                   size={16}
                   className={
-                    result.failed === 0 ? 'text-emerald-600' : 'text-amber-600'
+                    result.failed === 0 ? 'text-[var(--pro-azure)]' : 'text-amber-600'
                   }
                 />
                 <p className="text-sm font-bold text-slate-900">
@@ -1587,7 +1587,7 @@ return (
               )}
               <button
                 onClick={onClose}
-                className="w-full px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold transition-all"
+                className="w-full px-4 py-2.5 rounded-xl bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-sm font-bold transition-all"
               >
                 Done
               </button>
@@ -1601,7 +1601,7 @@ return (
                 </p>
                 <button
                   onClick={() => setCsvText(TEMPLATE)}
-                  className="text-xs text-emerald-600 hover:text-emerald-500 font-semibold transition-colors shrink-0"
+                  className="text-xs text-[var(--pro-azure)] hover:text-[var(--pro-azure)] font-semibold transition-colors shrink-0"
                 >
                   Load template
                 </button>
@@ -1614,11 +1614,11 @@ return (
                 }}
                 onDragLeave={() => setDragging(false)}
                 onDrop={handleDrop}
-                className={`relative rounded-xl border-2 border-dashed transition-all ${dragging ? 'border-emerald-400 bg-emerald-50/60' : 'border-slate-200'}`}
+                className={`relative rounded-xl border-2 border-dashed transition-all ${dragging ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)]/60' : 'border-slate-200'}`}
               >
                 {dragging && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-emerald-50 z-10 pointer-events-none">
-                    <p className="text-emerald-600 font-bold text-sm">
+                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-[var(--pro-azure-50)] z-10 pointer-events-none">
+                    <p className="text-[var(--pro-azure)] font-bold text-sm">
                       Drop CSV file here
                     </p>
                   </div>
@@ -1668,7 +1668,7 @@ return (
                             <td className="px-3 py-1.5 text-slate-500 truncate max-w-[120px]">
                               {r.description || '—'}
                             </td>
-                            <td className="px-3 py-1.5 text-emerald-600 font-mono">
+                            <td className="px-3 py-1.5 text-[var(--pro-azure)] font-mono">
                               ETB {fmt(r.baseAmount)}
                             </td>
                             <td className="px-3 py-1.5 text-slate-500">
@@ -1692,7 +1692,7 @@ return (
                 <button
                   onClick={handleImport}
                   disabled={!preview.length || importing}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white text-sm font-semibold transition-all shadow-sm"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 text-white text-sm font-semibold transition-all shadow-sm"
                 >
                   {importing ? 'Importing...' : `Import ${preview.length} rows`}
                 </button>
@@ -1717,7 +1717,7 @@ return (
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold text-slate-900 w-12">{d.year}</span>
             <div className="flex gap-3 text-[10px]">
-              <span className="text-emerald-600">R: ETB {fmt(d.remitted)}</span>
+              <span className="text-[var(--pro-azure)]">R: ETB {fmt(d.remitted)}</span>
               <span className="text-amber-600">P: ETB {fmt(d.pending)}</span>
               {d.overdue > 0 && (
                 <span className="text-rose-600">O: ETB {fmt(d.overdue)}</span>
@@ -1729,7 +1729,7 @@ return (
           </div>
           <div className="w-full h-5 bg-slate-200 rounded-lg overflow-hidden flex">
             <div
-              className="h-full bg-emerald-500/70 transition-all"
+              className="h-full bg-[var(--pro-azure-50)]0/70 transition-all"
               style={{ width: `${(d.remitted / max) * 100}%` }}
               title={`Remitted: ETB ${fmt(d.remitted)}`}
             />
@@ -1746,7 +1746,7 @@ return (
           </div>
           <div className="flex justify-between text-[9px] text-slate-400">
             <span>ETB 0</span>
-            <span className="text-emerald-600 font-mono font-bold">
+            <span className="text-[var(--pro-azure)] font-mono font-bold">
               Total: ETB {fmt(d.total)}
             </span>
             <span>ETB {fmt(max)}</span>
@@ -1755,7 +1755,7 @@ return (
       ))}
       <div className="flex gap-4 pt-1">
         {[
-          ['bg-emerald-500/70', 'Remitted'],
+          ['bg-[var(--pro-azure-50)]0/70', 'Remitted'],
           ['bg-amber-500/70', 'Pending'],
           ['bg-rose-500/70', 'Overdue'],
         ].map(([cls, label]) => (
@@ -1848,7 +1848,7 @@ return (
       <div className="bg-white border border-slate-200 rounded-xl shadow-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
-            <Building2 size={16} className="text-emerald-600" />
+            <Building2 size={16} className="text-[var(--pro-azure)]" />
             <h2 className="text-base font-semibold text-slate-900">
               Record Bank Remittance
             </h2>
@@ -1871,7 +1871,7 @@ return (
               </p>
             </div>
             <div className="text-right">
-              <p className="text-sm font-semibold text-emerald-600">
+              <p className="text-sm font-semibold text-[var(--pro-azure)]">
                 ETB {fmt(c.levyAmount)}
               </p>
               <p className="ovds-caption">levy due</p>
@@ -1888,7 +1888,7 @@ return (
                     <span
                       className={
                         pct >= 100
-                          ? 'text-emerald-600 font-bold'
+                          ? 'text-[var(--pro-azure)] font-bold'
                           : 'text-amber-600'
                       }
                     >
@@ -1897,7 +1897,7 @@ return (
                   </div>
                   <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all ${pct >= 100 ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                      className={`h-full rounded-full transition-all ${pct >= 100 ? 'bg-[var(--pro-azure-50)]0' : 'bg-amber-500'}`}
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -1916,7 +1916,7 @@ return (
                   key={m.key}
 type="button"
                   onClick={() => setPaymentMethod(m.key)}
-                  className={`flex flex-col items-center gap-1 p-2.5 rounded-xl border text-center transition-all ${paymentMethod === m.key ? 'bg-emerald-50 border-emerald-200 text-slate-900' : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'}`}
+                  className={`flex flex-col items-center gap-1 p-2.5 rounded-xl border text-center transition-all ${paymentMethod === m.key ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-slate-900' : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'}`}
                 >
                   <span className="text-xl leading-none">{m.icon}</span>
                   <span className="text-[9px] font-bold leading-tight">
@@ -1926,9 +1926,9 @@ type="button"
               ))}
             </div>
             {paymentMethod === 'TELECOM' && (
-              <div className="mt-2 flex items-start gap-2 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-xl">
-                <span className="text-emerald-600 text-sm">📱</span>
-                <p className="text-[10px] text-emerald-700">
+              <div className="mt-2 flex items-start gap-2 px-3 py-2 bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-xl">
+                <span className="text-[var(--pro-azure)] text-sm">📱</span>
+                <p className="text-[10px] text-[var(--pro-azure-dark)]">
                   Enter the Telebirr/CBE Birr transaction reference number
                   below.
                 </p>
@@ -2047,7 +2047,7 @@ type="button"
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white text-sm font-semibold transition-all shadow-sm"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 text-white text-sm font-semibold transition-all shadow-sm"
             >
               <Send size={13} />
               {saving ? 'Saving...' : 'Record Remittance'}
@@ -2061,7 +2061,7 @@ type="button"
                 Previous Remittances
               </p>
               <div className="text-right">
-                <span className="text-xs font-mono text-emerald-600 font-bold">
+                <span className="text-xs font-mono text-[var(--pro-azure)] font-bold">
                   ETB {fmt(records.reduce((s, r) => s + r.amount, 0))} paid
                 </span>
                 {records.reduce((s, r) => s + r.amount, 0) < c.levyAmount && (
@@ -2082,7 +2082,7 @@ type="button"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono font-bold text-emerald-600">
+                    <span className="text-xs font-mono font-bold text-[var(--pro-azure)]">
                       ETB {fmt(r.amount)}
                     </span>
                     {r.bankName && (
@@ -2121,10 +2121,10 @@ const GradeBadge: React.FC<{ grade: string; score: number }> = ({
   grade,
   score }) => {
   const colors: Record<string, string> = {
-    A: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    B: 'bg-emerald-100 text-emerald-700 border-emerald-500/40',
+    A: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
+    B: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] border-[var(--pro-azure)]/40',
     C: 'bg-amber-500/20 text-amber-700 border-amber-500/40',
-    D: 'bg-emerald-100 text-emerald-500 border-indigo-300',
+    D: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure)] border-[var(--pro-azure-light)]',
     F: 'bg-rose-100 text-rose-700 border-rose-500/40',
     'N/A': 'bg-slate-500/20 text-slate-500 border-slate-300' };
 return (
@@ -2233,7 +2233,7 @@ return (
           <button
             onClick={post}
             disabled={posting || !newNote.trim()}
-            className="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-xs font-bold transition-all disabled:opacity-40"
+            className="px-3 py-2 rounded-xl bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure)] text-xs font-bold transition-all disabled:opacity-40"
           >
             Post
           </button>
@@ -2311,7 +2311,7 @@ return (
       <div className="bg-white border border-slate-200 rounded-xl shadow-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
-            <Globe size={16} className="text-emerald-600" />
+            <Globe size={16} className="text-[var(--pro-azure)]" />
             <div>
               <h2 className="text-base font-semibold text-slate-900">
                 Submit to ERCA
@@ -2328,7 +2328,7 @@ return (
             <X size={18} />
           </button>
         </div>
-        <div className="mx-6 mt-5 bg-emerald-50 border border-emerald-500/20 rounded-xl p-4">
+        <div className="mx-6 mt-5 bg-[var(--pro-azure-50)] border border-[var(--pro-azure)]/20 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
             <div>
               <p className="text-xs font-bold text-slate-500">Period</p>
@@ -2336,7 +2336,7 @@ return (
             </div>
             <div className="text-right">
               <p className="text-xs font-bold text-slate-500">Total Levy Due</p>
-              <p className="text-2xl font-semibold text-emerald-600">
+              <p className="text-2xl font-semibold text-[var(--pro-azure)]">
                 ETB {fmt(sub.totalLevy)}
               </p>
             </div>
@@ -2346,7 +2346,7 @@ return (
               <p className="text-[9px] text-slate-400 font-bold uppercase">
                 Remitted
               </p>
-              <p className="text-xs font-bold text-emerald-600 mt-0.5">
+              <p className="text-xs font-bold text-[var(--pro-azure)] mt-0.5">
                 ETB {fmt(sub.totalRemitted)}
               </p>
             </div>
@@ -2372,14 +2372,14 @@ return (
               <div className="flex justify-between text-[9px] text-slate-400 mb-1">
                 <span>Remittance coverage</span>
                 <span
-                  className={`font-bold ${sub.totalRemitted / sub.totalLevy >= 1 ? 'text-emerald-600' : 'text-amber-600'}`}
+                  className={`font-bold ${sub.totalRemitted / sub.totalLevy >= 1 ? 'text-[var(--pro-azure)]' : 'text-amber-600'}`}
                 >
                   {((sub.totalRemitted / sub.totalLevy) * 100).toFixed(1)}%
                 </span>
               </div>
               <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-orange-500 to-emerald-500 rounded-full transition-all"
+                  className="h-full bg-gradient-to-r from-orange-500 to-indigo-500 rounded-full transition-all"
                   style={{
                     width: `${Math.min((sub.totalRemitted / sub.totalLevy) * 100, 100)}%` }}
                 />
@@ -2398,7 +2398,7 @@ return (
                   key={m.key}
 type="button"
                   onClick={() => setPaymentMethod(m.key)}
-                  className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${paymentMethod === m.key ? 'bg-emerald-50 border-emerald-200 text-slate-900' : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'}`}
+                  className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${paymentMethod === m.key ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-slate-900' : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'}`}
                 >
                   <span className="text-xl">{m.icon}</span>
                   <div>
@@ -2408,7 +2408,7 @@ type="button"
                   {paymentMethod === m.key && (
                     <CheckCircle2
                       size={12}
-                      className="text-emerald-600 ml-auto shrink-0"
+                      className="text-[var(--pro-azure)] ml-auto shrink-0"
                     />
                   )}
                 </button>
@@ -2480,10 +2480,10 @@ type="button"
               placeholder="Additional submission notes..."
             />
           </div>
-          <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-[11px] text-emerald-700">
+          <div className="bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-xl px-4 py-3 text-[11px] text-[var(--pro-azure-dark)]">
             Submitting will mark all {sub.contributionIds.length} included
             contributions as{' '}
-            <span className="font-bold text-emerald-600">REMITTED</span> and
+            <span className="font-bold text-[var(--pro-azure)]">REMITTED</span> and
             record this submission in the audit trail.
           </div>
           <div className="flex gap-3 pt-1">
@@ -2497,7 +2497,7 @@ type="button"
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white text-sm font-semibold transition-all shadow-sm shadow-lg shadow-emerald-500/20"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 text-white text-sm font-semibold transition-all shadow-sm shadow-lg shadow-green-500/20"
             >
               <Send size={13} />
               {submitting
@@ -2525,11 +2525,11 @@ const max = Math.max(...data.map((d, i) => d.total), 1);
 const getIntensity = (val: number) => {
     const pct = val / max;
 if (pct === 0) return 'bg-white border-slate-100';
-if (pct < 0.2) return 'bg-emerald-50 border-emerald-500/20';
-if (pct < 0.4) return 'bg-emerald-100 border-emerald-200';
-if (pct < 0.6) return 'bg-emerald-500/35 border-indigo-300';
-if (pct < 0.8) return 'bg-emerald-50/605 border-emerald-500/50';
-return 'bg-emerald-500/80 border-emerald-500/70';}
+if (pct < 0.2) return 'bg-[var(--pro-azure-50)] border-[var(--pro-azure)]/20';
+if (pct < 0.4) return 'bg-[var(--pro-azure-100)] border-[var(--pro-azure-100)]';
+if (pct < 0.6) return 'bg-[var(--pro-azure-50)]0/35 border-[var(--pro-azure-light)]';
+if (pct < 0.8) return 'bg-[var(--pro-azure-50)]/605 border-[var(--pro-azure)]/50';
+return 'bg-[var(--pro-azure-50)]0/80 border-[var(--pro-azure)]/70';}
 return (
     <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5">
       {data.map((d, i) => (
@@ -2545,10 +2545,10 @@ return (
             <p className="text-xs font-semibold text-slate-900 mb-1">
               {d.label} {year}
             </p>
-            <p className="text-[10px] text-emerald-600">
+            <p className="text-[10px] text-[var(--pro-azure)]">
               Total: ETB {fmt(d.total)}
             </p>
-            <p className="text-[10px] text-emerald-600">
+            <p className="text-[10px] text-[var(--pro-azure)]">
               Remitted: ETB {fmt(d.remitted)}
             </p>
             {d.pending > 0 && (
@@ -2688,7 +2688,7 @@ return (
               val: remRate,
               color:
                 remRate >= 80
-                  ? 'bg-emerald-500'
+                  ? 'bg-[var(--pro-azure-50)]0'
                   : remRate >= 50
                     ? 'bg-amber-500'
                     : 'bg-rose-500' },
@@ -2697,7 +2697,7 @@ return (
               val: ovdRate,
               color:
                 ovdRate === 0
-                  ? 'bg-emerald-500'
+                  ? 'bg-[var(--pro-azure-50)]0'
                   : ovdRate < 10
                     ? 'bg-amber-500'
                     : 'bg-rose-500',
@@ -2710,12 +2710,12 @@ return (
                   className={
                     s.invert
                       ? s.val === 0
-                        ? 'text-emerald-600'
+                        ? 'text-[var(--pro-azure)]'
                         : s.val < 10
                           ? 'text-amber-600'
                           : 'text-rose-600'
                       : s.val >= 80
-                        ? 'text-emerald-600'
+                        ? 'text-[var(--pro-azure)]'
                         : s.val >= 50
                           ? 'text-amber-600'
                           : 'text-rose-600'
@@ -2753,26 +2753,26 @@ return (
           <div className="flex items-center justify-between text-xs">
             <span className="font-semibold text-slate-900 w-12">{d.year}</span>
             <div className="flex gap-3 text-[10px]">
-              <span className="text-emerald-600">
+              <span className="text-[var(--pro-azure)]">
                 Compliance: {d.complianceRate}%
               </span>
-              <span className="text-emerald-600">On-time: {d.onTimeRate}%</span>
+              <span className="text-[var(--pro-azure)]">On-time: {d.onTimeRate}%</span>
               <span className="text-slate-500">
                 {d.submitted}/{d.total} submitted
               </span>
-              <span className="text-emerald-600 font-mono">
+              <span className="text-[var(--pro-azure)] font-mono">
                 ETB {fmt(d.totalLevy)}
               </span>
             </div>
           </div>
           <div className="w-full h-4 bg-slate-200 rounded-lg overflow-hidden flex gap-px">
             <div
-              className="h-full bg-emerald-500/70 rounded-l-lg transition-all"
+              className="h-full bg-[var(--pro-azure-50)]0/70 rounded-l-lg transition-all"
               style={{ width: `${d.complianceRate}%` }}
               title={`Submitted: ${d.complianceRate}%`}
             />
             <div
-              className="h-full bg-emerald-500 transition-all"
+              className="h-full bg-[var(--pro-azure-50)]0 transition-all"
               style={{
                 width: `${Math.max(0, d.onTimeRate - d.complianceRate)}%` }}
               title="On-time bonus"
@@ -2787,8 +2787,8 @@ return (
       ))}
       <div className="flex gap-4 pt-1">
         {[
-          ['bg-emerald-500/70', 'Submitted'],
-          ['bg-emerald-500', 'On-time'],
+          ['bg-[var(--pro-azure-50)]0/70', 'Submitted'],
+          ['bg-[var(--pro-azure-50)]0', 'On-time'],
         ].map(([cls, label]) => (
           <span
             key={label}
@@ -2847,7 +2847,7 @@ return (
               <div
                 className={`w-3 h-3 rounded-full border-2 border-slate-200 z-10 ${
                   d.status === 'SUBMITTED'
-                    ? 'bg-emerald-500'
+                    ? 'bg-[var(--pro-azure-50)]0'
                     : isPast
                       ? 'bg-rose-500'
                       : 'bg-slate-400'
@@ -2875,7 +2875,7 @@ return (
                 <span
                   className={`text-[8px] font-semibold px-2 py-0.5 rounded-full border ${
                     d.status === 'SUBMITTED'
-                      ? 'bg-emerald-50 text-emerald-600 border-emerald-500/20'
+                      ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] border-[var(--pro-azure)]/20'
                       : d.status === 'OVERDUE' || isPast
                         ? 'bg-rose-50 text-rose-700 border-rose-200'
                         : 'bg-white text-slate-400 border-slate-200'
@@ -3846,14 +3846,14 @@ return (
       title="Disaster Risk Reduction Fund (DRRF)"
       subtitle="Tax & Compliance → Reg. 570/2025 · Levy collection, remittance, and ERCA submissions"
       icon={<ShieldAlert size={16} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       actions={
         <div className="flex items-center gap-2">
           <button onClick={load} className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-500">
             <RefreshCw size={14} />
           </button>
           {canWrite && (
-            <button onClick={openAdd} className="flex items-center gap-2 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-colors">
+            <button onClick={openAdd} className="flex items-center gap-2 px-3 py-2 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-xl text-xs font-bold transition-colors">
               <Plus size={13} /> New Contribution
             </button>
           )}
@@ -3873,12 +3873,12 @@ return (
         <aside className="w-56 shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 py-4 px-3 space-y-0.5">
 
           {/* Fund summary pill */}
-          <div className="mb-4 px-2 py-3 rounded-xl bg-emerald-50 border border-emerald-100">
-            <p className="text-[10px] font-medium text-emerald-400 uppercase tracking-wider mb-2">Fund Status</p>
+          <div className="mb-4 px-2 py-3 rounded-xl bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)]">
+            <p className="text-[10px] font-medium text-[var(--pro-azure-light)] uppercase tracking-wider mb-2">Fund Status</p>
             {loading ? (
               <div className="space-y-1.5">
-                <div className="h-3 bg-emerald-100 rounded animate-pulse" />
-                <div className="h-3 bg-emerald-100 rounded animate-pulse w-3/4" />
+                <div className="h-3 bg-[var(--pro-azure-100)] rounded animate-pulse" />
+                <div className="h-3 bg-[var(--pro-azure-100)] rounded animate-pulse w-3/4" />
               </div>
             ) : (
               <div className="space-y-1">
@@ -3887,8 +3887,8 @@ return (
                   <span className="font-bold text-slate-900">ETB {fmt(summary?.totalLevy ?? 0)}</span>
                 </div>
                 <div className="flex justify-between text-[11px]">
-                  <span className="text-emerald-600">Remitted</span>
-                  <span className="font-semibold text-emerald-700">ETB {fmt(summary?.totalRemitted ?? 0)}</span>
+                  <span className="text-[var(--pro-azure)]">Remitted</span>
+                  <span className="font-semibold text-[var(--pro-azure-dark)]">ETB {fmt(summary?.totalRemitted ?? 0)}</span>
                 </div>
                 {(summary?.totalOverdue ?? 0) > 0 && (
                   <div className="flex justify-between text-[11px]">
@@ -3897,13 +3897,13 @@ return (
                   </div>
                 )}
                 {/* Remittance progress bar */}
-                <div className="mt-2 h-1.5 bg-emerald-100 rounded-full overflow-hidden">
+                <div className="mt-2 h-1.5 bg-[var(--pro-azure-100)] rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-emerald-500 rounded-full transition-all duration-700"
+                    className="h-full bg-[var(--pro-azure-50)]0 rounded-full transition-all duration-700"
                     style={{ width: `${Math.min(summary && summary.totalLevy > 0 ? (summary.totalRemitted / summary.totalLevy) * 100 : 0, 100)}%` }}
                   />
                 </div>
-                <p className="text-[9px] text-emerald-400 text-right">
+                <p className="text-[9px] text-[var(--pro-azure-light)] text-right">
                   {summary && summary.totalLevy > 0 ? ((summary.totalRemitted / summary.totalLevy) * 100).toFixed(1) : '0'}% remitted
                 </p>
               </div>
@@ -3970,20 +3970,20 @@ return (
                 className={() =>
                   `group flex items-start gap-2.5 px-2.5 py-2.5 rounded-lg transition-all duration-150 relative
                    ${isActive
-                     ? 'bg-emerald-50 border border-emerald-200'
+                     ? 'bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)]'
                      : 'hover:bg-white border border-transparent'}`
                 }
               >
                 {/* Active left bar */}
                 {isActive && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-emerald-500 rounded-r-full" />
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-[var(--pro-azure-50)]0 rounded-r-full" />
                 )}
-                <span className={`shrink-0 mt-0.5 ${isActive ? 'text-emerald-600' : 'text-slate-400 group-hover:text-slate-600'}`}>
+                <span className={`shrink-0 mt-0.5 ${isActive ? 'text-[var(--pro-azure)]' : 'text-slate-400 group-hover:text-slate-600'}`}>
                   {item.icon}
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1">
-                    <span className={`text-[12px] font-semibold truncate ${isActive ? 'text-indigo-700' : 'text-slate-700'}`}>
+                    <span className={`text-[12px] font-semibold truncate ${isActive ? 'text-[var(--pro-azure-dark)]' : 'text-slate-700'}`}>
                       {item.label}
                     </span>
                     {!!item.badge && item.badge > 0 && (
@@ -3993,7 +3993,7 @@ return (
                       </span>
                     )}
                   </div>
-                  <p className={`text-[10px] truncate mt-0.5 ${isActive ? 'text-emerald-500' : 'text-slate-400'}`}>
+                  <p className={`text-[10px] truncate mt-0.5 ${isActive ? 'text-[var(--pro-azure)]' : 'text-slate-400'}`}>
                     {item.desc}
                   </p>
                 </div>
@@ -4006,8 +4006,8 @@ return (
             <p className="px-2 text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-2">Policy Inheritance</p>
             <div className="space-y-1 px-2">
               {[
-                { label: 'Reg. 570/2025', color: 'bg-emerald-500', desc: 'Levy rates' },
-                { label: 'ERCA Rules', color: 'bg-emerald-500', desc: 'Filing deadlines' },
+                { label: 'Reg. 570/2025', color: 'bg-[var(--pro-azure-50)]0', desc: 'Levy rates' },
+                { label: 'ERCA Rules', color: 'bg-[var(--pro-azure-50)]0', desc: 'Filing deadlines' },
                 { label: 'Company Policy', color: 'bg-amber-500', desc: 'Remittance flow' },
               ].map(p => (
                 <div key={p.label} className="flex items-center gap-2">
@@ -4026,8 +4026,8 @@ return (
             <p className="px-2 text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-2">Related Modules</p>
             <div className="space-y-0.5">
               {[
-                { key: 'financial-reports', label: 'Financial Reports', icon: <BarChart3 size={13} />, color: 'text-emerald-600' },
-                { key: 'tax-vat-reports',   label: 'VAT & Tax',         icon: <ShieldCheck size={13} />, color: 'text-emerald-600' },
+                { key: 'financial-reports', label: 'Financial Reports', icon: <BarChart3 size={13} />, color: 'text-[var(--pro-azure)]' },
+                { key: 'tax-vat-reports',   label: 'VAT & Tax',         icon: <ShieldCheck size={13} />, color: 'text-[var(--pro-azure)]' },
                 { key: 'levy-collection',   label: 'Levy Collection',   icon: <Banknote size={13} />, color: 'text-rose-600' },
                 { key: 'accounting',        label: 'Accounting',        icon: <Landmark size={13} />, color: 'text-violet-600' },
               ].map(m => (
@@ -4067,9 +4067,9 @@ return (
               </div>
               {/* Policy inheritance chain */}
               <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
-                <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 font-semibold border border-emerald-100">Reg. 570/2025</span>
+                <span className="px-1.5 py-0.5 rounded bg-[var(--pro-azure-50)] text-[var(--pro-azure)] font-semibold border border-[var(--pro-azure-100)]">Reg. 570/2025</span>
                 <ChevronRight size={9} />
-                <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 font-semibold border border-emerald-100">ERCA</span>
+                <span className="px-1.5 py-0.5 rounded bg-[var(--pro-azure-50)] text-[var(--pro-azure)] font-semibold border border-[var(--pro-azure-100)]">ERCA</span>
                 <ChevronRight size={9} />
                 <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold border border-slate-200 capitalize">
                   {activeGroup === 'overview' ? 'Dashboard' :
@@ -4085,13 +4085,13 @@ return (
             <div className="flex items-center gap-2">
               {activeGroup === 'contributions' && canWrite && (
                 <button onClick={openAdd}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-all shadow-sm">
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-xs font-semibold transition-all shadow-sm">
                   <Plus size={13} /> Record Levy
                 </button>
               )}
               {activeGroup === 'contributions' && (
                 <button onClick={() => setShowAutoGenerate(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-indigo-300 bg-emerald-50 hover:bg-emerald-100 text-indigo-700 text-xs font-medium transition-all">
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] text-xs font-medium transition-all">
                   <Zap size={13} /> Auto-Generate
                 </button>
               )}
@@ -4103,7 +4103,7 @@ return (
               )}
               {activeGroup === 'erca' && canWrite && (
                 <button onClick={() => { setTab('erca'); navigate('/disaster-fund/erca'); }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-all shadow-sm">
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-xs font-semibold transition-all shadow-sm">
                   <Send size={13} /> Prepare Submission
                 </button>
               )}
@@ -4138,7 +4138,7 @@ return (
               ] as const).map(t => (
                 <button key={t.key} onClick={() => setTab(t.key)}
                   className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap border-b-2 -mb-px
-                    ${tab === t.key ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}>
+                    ${tab === t.key ? 'border-[var(--pro-azure)] text-[var(--pro-azure)]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}>
                   {t.icon}{t.label}
                 </button>
               ))}
@@ -4153,7 +4153,7 @@ return (
               ]).map(t => (
                 <button key={t.key} onClick={() => setTab(t.key)}
                   className={`relative flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap border-b-2 -mb-px
-                    ${tab === t.key ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}>
+                    ${tab === t.key ? 'border-[var(--pro-azure)] text-[var(--pro-azure)]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}>
                   {t.icon}{t.label}
                   {t.badge ? <span className="min-w-[16px] h-4 px-1 bg-rose-500 text-white text-[10px] font-medium rounded-full flex items-center justify-center">{t.badge}</span> : null}
                 </button>
@@ -4169,7 +4169,7 @@ return (
               ]).map(t => (
                 <button key={t.key} onClick={() => setTab(t.key)}
                   className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap border-b-2 -mb-px
-                    ${tab === t.key ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}>
+                    ${tab === t.key ? 'border-[var(--pro-azure)] text-[var(--pro-azure)]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}>
                   {t.icon}{t.label}
                 </button>
               ))}
@@ -4183,7 +4183,7 @@ return (
               ]).map(t => (
                 <button key={t.key} onClick={() => setTab(t.key)}
                   className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap border-b-2 -mb-px
-                    ${tab === t.key ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}>
+                    ${tab === t.key ? 'border-[var(--pro-azure)] text-[var(--pro-azure)]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}>
                   {t.icon}{t.label}
                 </button>
               ))}
@@ -4197,7 +4197,7 @@ return (
               ]).map(t => (
                 <button key={t.key} onClick={() => setTab(t.key)}
                   className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap border-b-2 -mb-px
-                    ${tab === t.key ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}>
+                    ${tab === t.key ? 'border-[var(--pro-azure)] text-[var(--pro-azure)]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}>
                   {t.icon}{t.label}
                 </button>
               ))}
@@ -4211,7 +4211,7 @@ return (
               ]).map(t => (
                 <button key={t.key} onClick={() => setTab(t.key)}
                   className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap border-b-2 -mb-px
-                    ${tab === t.key ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}>
+                    ${tab === t.key ? 'border-[var(--pro-azure)] text-[var(--pro-azure)]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}>
                   {t.icon}{t.label}
                 </button>
               ))}
@@ -4223,7 +4223,7 @@ return (
             <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-4 py-3 bg-white border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl shadow-gray-900/10 backdrop-blur-sm">
               <span className="text-xs font-bold text-slate-600 mr-1">{selected.size} selected</span>
               <button onClick={handleBulkRemit}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition-all">
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] text-xs font-bold transition-all">
                 <CheckCircle2 size={12} /> Remit all
               </button>
               <button onClick={() => handleBulkStatusChange('OVERDUE')}
@@ -4267,8 +4267,8 @@ return (
               <div className="bg-white border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-5 space-y-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center">
-                      <Globe size={16} className="text-emerald-600" />
+                    <div className="w-8 h-8 rounded-xl bg-[var(--pro-azure-100)] flex items-center justify-center">
+                      <Globe size={16} className="text-[var(--pro-azure)]" />
                     </div>
                     <div>
                       <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
@@ -4282,19 +4282,19 @@ return (
                   <div className="flex gap-2">
                     <button
                       onClick={() => setRootTab('financial-reports')}
-                      className="px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-semibold uppercase tracking-wider hover:bg-emerald-100 transition-all"
+                      className="px-3 py-1.5 bg-[var(--pro-azure-50)] text-[var(--pro-azure)] rounded-lg text-[10px] font-semibold uppercase tracking-wider hover:bg-[var(--pro-azure-100)] transition-all"
                     >
                       Reports
                     </button>
                     <button
                       onClick={() => setRootTab('accounting')}
-                      className="px-3 py-1.5 bg-emerald-50 text-emerald-400 rounded-lg text-[10px] font-semibold uppercase tracking-wider hover:bg-emerald-100 transition-all"
+                      className="px-3 py-1.5 bg-[var(--pro-azure-50)] text-[var(--pro-azure-light)] rounded-lg text-[10px] font-semibold uppercase tracking-wider hover:bg-[var(--pro-azure-100)] transition-all"
                     >
                       Accounting
                     </button>
                     <button
                       onClick={() => setRootTab('tax-vat-reports')}
-                      className="px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-semibold uppercase tracking-wider hover:bg-emerald-100 transition-all"
+                      className="px-3 py-1.5 bg-[var(--pro-azure-50)] text-[var(--pro-azure)] rounded-lg text-[10px] font-semibold uppercase tracking-wider hover:bg-[var(--pro-azure-100)] transition-all"
                     >
                       Tax / VAT
                     </button>
@@ -4308,21 +4308,21 @@ return (
                   >
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <TrendingUp size={14} className="text-emerald-600" />
+                        <TrendingUp size={14} className="text-[var(--pro-azure)]" />
                         <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                           Profit & Loss
                         </span>
                       </div>
                       <ArrowUpRight
                         size={12}
-                        className="text-slate-400 group-hover:text-emerald-600 transition-colors"
+                        className="text-slate-400 group-hover:text-[var(--pro-azure)] transition-colors"
                       />
                     </div>
                     <p className="text-lg font-semibold text-slate-900">
                       ETB {fmt(finSummary?.netProfit ?? 0)}
                     </p>
                     <p
-                      className={`text-[9px] mt-1 flex items-center gap-1 ${(finSummary?.netProfit ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}
+                      className={`text-[9px] mt-1 flex items-center gap-1 ${(finSummary?.netProfit ?? 0) >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}
                     >
                       {(finSummary?.netProfit ?? 0) >= 0 ? (
                         <ArrowUpRight size={10} />
@@ -4339,14 +4339,14 @@ return (
                   >
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <ShieldCheck size={14} className="text-emerald-600" />
+                        <ShieldCheck size={14} className="text-[var(--pro-azure)]" />
                         <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                           Aged Withholding
                         </span>
                       </div>
                       <ArrowUpRight
                         size={12}
-                        className="text-slate-400 group-hover:text-emerald-600 transition-colors"
+                        className="text-slate-400 group-hover:text-[var(--pro-azure)] transition-colors"
                       />
                     </div>
                     <p className="text-lg font-semibold text-slate-900">
@@ -4382,24 +4382,24 @@ return (
                   </div>
 
                   <div
-                    className="bg-white/40 border border-slate-100 rounded-xl p-4 hover:border-emerald-200 transition-all cursor-pointer group"
+                    className="bg-white/40 border border-slate-100 rounded-xl p-4 hover:border-[var(--pro-azure-100)] transition-all cursor-pointer group"
                     onClick={() => setRootTab('financial-reports')}
                   >
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <Scale size={14} className="text-emerald-600" />
+                        <Scale size={14} className="text-[var(--pro-azure)]" />
                         <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                           Health Score
                         </span>
                       </div>
                       <ArrowUpRight
                         size={12}
-                        className="text-slate-400 group-hover:text-emerald-600 transition-colors"
+                        className="text-slate-400 group-hover:text-[var(--pro-azure)] transition-colors"
                       />
                     </div>
                     <div className="flex items-center gap-3">
                       <span
-                        className={`text-2xl font-semibold ${healthScore?.grade === 'A' ? 'text-emerald-500' : healthScore?.grade === 'B' ? 'text-emerald-600' : 'text-amber-500'}`}
+                        className={`text-2xl font-semibold ${healthScore?.grade === 'A' ? 'text-[var(--pro-azure)]' : healthScore?.grade === 'B' ? 'text-[var(--pro-azure)]' : 'text-amber-500'}`}
                       >
                         {healthScore?.grade ?? '—'}
                       </span>
@@ -4426,16 +4426,16 @@ return (
                       value: summary?.totalLevy ?? 0,
                       sub: `${summary?.count.total ?? 0} records`,
                       icon: <TrendingUp size={16} />,
-                      color: 'text-emerald-600',
-                      bg: 'bg-emerald-50',
+                      color: 'text-[var(--pro-azure)]',
+                      bg: 'bg-[var(--pro-azure-50)]',
                       filter: '' },
                     {
                       label: 'Remitted',
                       value: summary?.totalRemitted ?? 0,
                       sub: `${summary?.count.remitted ?? 0} records`,
                       icon: <CheckCircle2 size={16} />,
-                      color: 'text-emerald-600',
-                      bg: 'bg-emerald-50',
+                      color: 'text-[var(--pro-azure)]',
+                      bg: 'bg-[var(--pro-azure-50)]',
                       filter: 'REMITTED' },
                     {
                       label: 'Pending',
@@ -4513,7 +4513,7 @@ return (
                         </div>
                         <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
                           <div
-                            className="h-full bg-gradient-to-r from-orange-500 to-emerald-500 rounded-full transition-all duration-700"
+                            className="h-full bg-gradient-to-r from-orange-500 to-indigo-500 rounded-full transition-all duration-700"
                             style={{
                               width: `${Math.min(remittanceRate, 100)}%` }}
                           />
@@ -4532,7 +4532,7 @@ return (
                                     Math.max(summary.totalLevy, 1)) *
                                   100
                                 : 0,
-                              color: 'text-emerald-600' },
+                              color: 'text-[var(--pro-azure)]' },
                             {
                               label: 'Pending',
                               pct: summary
@@ -4580,8 +4580,8 @@ return (
                         <span className="w-2 h-2 rounded-sm bg-slate-100 inline-block" />
                         Total
                       </span>
-                      <span className="flex items-center gap-1 text-[10px] text-emerald-600">
-                        <span className="w-2 h-2 rounded-sm bg-emerald-500/70 inline-block" />
+                      <span className="flex items-center gap-1 text-[10px] text-[var(--pro-azure)]">
+                        <span className="w-2 h-2 rounded-sm bg-[var(--pro-azure-50)]0/70 inline-block" />
                         Remitted
                       </span>
                     </div>
@@ -4610,7 +4610,7 @@ return (
                     </p>
                     <button
                       onClick={() => { setTab('analytics'); navigate('/disaster-fund/analytics'); }}
-                      className="text-xs text-emerald-600 hover:text-emerald-500 font-semibold transition-colors flex items-center gap-1"
+                      className="text-xs text-[var(--pro-azure)] hover:text-[var(--pro-azure)] font-semibold transition-colors flex items-center gap-1"
                     >
                       Full analytics <ArrowUpRight size={10} />
                     </button>
@@ -4632,7 +4632,7 @@ return (
                         title: 'All Recent Activity',
                         logs: auditLogs })
                     }
-                    className="text-xs text-emerald-600 hover:text-emerald-500 font-semibold transition-colors flex items-center gap-1"
+                    className="text-xs text-[var(--pro-azure)] hover:text-[var(--pro-azure)] font-semibold transition-colors flex items-center gap-1"
                   >
                     View all <ExternalLink size={10} />
                   </button>
@@ -4651,7 +4651,7 @@ return (
                         className="flex items-center gap-3 py-2 border-b border-slate-100 last:border-0"
                       >
                         <div
-                          className={`w-1.5 h-1.5 rounded-full shrink-0 ${l.action === 'CREATED' ? 'bg-emerald-400' : l.action === 'DELETED' ? 'bg-rose-400' : 'bg-orange-400'}`}
+                          className={`w-1.5 h-1.5 rounded-full shrink-0 ${l.action === 'CREATED' ? 'bg-[var(--pro-azure-light)]' : l.action === 'DELETED' ? 'bg-rose-400' : 'bg-orange-400'}`}
                         />
                         <span className="text-xs font-semibold text-slate-900">
                           {l.action.replace(/_/g, ' ')}
@@ -4719,7 +4719,7 @@ return (
                               {d.description || CATEGORY_DESCS[d.category]}
                             </p>
                           </div>
-                          <span className="text-xs font-mono text-emerald-600 shrink-0">
+                          <span className="text-xs font-mono text-[var(--pro-azure)] shrink-0">
                             ETB {fmt(d.levyAmount)}
                           </span>
                         </div>
@@ -4744,7 +4744,7 @@ return (
                               ? 'text-rose-600'
                               : nextDue.isUrgent
                                 ? 'text-amber-600'
-                                : 'text-emerald-600'
+                                : 'text-[var(--pro-azure)]'
                           }
                         />
                         <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
@@ -4768,10 +4768,10 @@ return (
                           </p>
                         </div>
                         <div
-                          className={`ml-auto px-4 py-2 rounded-xl text-center ${nextDue.isOverdue ? 'bg-rose-100 border border-rose-500/30' : nextDue.isUrgent ? 'bg-amber-500/20 border border-amber-500/30' : 'bg-emerald-50 border border-emerald-200'}`}
+                          className={`ml-auto px-4 py-2 rounded-xl text-center ${nextDue.isOverdue ? 'bg-rose-100 border border-rose-500/30' : nextDue.isUrgent ? 'bg-amber-500/20 border border-amber-500/30' : 'bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)]'}`}
                         >
                           <p
-                            className={`text-2xl font-semibold ${nextDue.isOverdue ? 'text-rose-600' : nextDue.isUrgent ? 'text-amber-600' : 'text-emerald-600'}`}
+                            className={`text-2xl font-semibold ${nextDue.isOverdue ? 'text-rose-600' : nextDue.isUrgent ? 'text-amber-600' : 'text-[var(--pro-azure)]'}`}
                           >
                             {nextDue.daysLeft}
                           </p>
@@ -4792,7 +4792,7 @@ return (
                       )}
                       <button
                         onClick={() => setTab('erca')}
-                        className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-xs font-bold transition-all"
+                        className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure)] text-xs font-bold transition-all"
                       >
                         <Send size={11} />
                         Go to ERCA Submissions
@@ -4853,7 +4853,7 @@ return (
                   <Info size={12} className="text-slate-400" />
                   <button
                     onClick={() => setTab('calculator')}
-                    className="ml-auto text-xs text-emerald-600 hover:text-emerald-500 font-semibold transition-colors flex items-center gap-1"
+                    className="ml-auto text-xs text-[var(--pro-azure)] hover:text-[var(--pro-azure)] font-semibold transition-colors flex items-center gap-1"
                   >
                     Open Calculator <Calculator size={10} />
                   </button>
@@ -4875,7 +4875,7 @@ return (
                             r.category}
                         </p>
                         {r.isQuarterly && (
-                          <span className="ml-auto text-[9px] bg-emerald-100 text-emerald-600 border border-slate-200 px-1 rounded font-bold shrink-0">
+                          <span className="ml-auto text-[9px] bg-[var(--pro-azure-100)] text-[var(--pro-azure)] border border-slate-200 px-1 rounded font-bold shrink-0">
                             Q
                           </span>
                         )}
@@ -4883,7 +4883,7 @@ return (
                       <p className="text-[11px] text-slate-500">
                         {r.description}
                       </p>
-                      <p className="text-[11px] text-emerald-600 mt-1 font-semibold">
+                      <p className="text-[11px] text-[var(--pro-azure)] mt-1 font-semibold">
                         ETB {fmt(r.exampleBase)} → ETB {fmt(r.exampleLevy)}
                       </p>
                     </div>
@@ -4903,7 +4903,7 @@ return (
                         className={
                           ercaDashStats.counts.overdue > 0
                             ? 'text-rose-600'
-                            : 'text-emerald-600'
+                            : 'text-[var(--pro-azure)]'
                         }
                       />
                       <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
@@ -4917,7 +4917,7 @@ return (
                     </div>
                     <button
                       onClick={() => setTab('erca')}
-                      className="text-xs text-emerald-600 hover:text-emerald-500 font-semibold transition-colors flex items-center gap-1"
+                      className="text-xs text-[var(--pro-azure)] hover:text-[var(--pro-azure)] font-semibold transition-colors flex items-center gap-1"
                     >
                       Manage <ArrowUpRight size={10} />
                     </button>
@@ -4948,13 +4948,13 @@ return (
                       {
                         label: 'Submitted',
                         val: ercaDashStats.counts.submitted,
-                        color: 'text-emerald-600',
-                        bg: 'bg-emerald-50' },
+                        color: 'text-[var(--pro-azure)]',
+                        bg: 'bg-[var(--pro-azure-50)]' },
                       {
                         label: 'Acknowledged',
                         val: ercaDashStats.counts.acknowledged,
-                        color: 'text-emerald-600',
-                        bg: 'bg-emerald-50' },
+                        color: 'text-[var(--pro-azure)]',
+                        bg: 'bg-[var(--pro-azure-50)]' },
                       {
                         label: 'Overdue',
                         val: ercaDashStats.counts.overdue,
@@ -4995,7 +4995,7 @@ return (
                               >
                                 {isOverdue ? 'OVERDUE' : sub.status}
                               </span>
-                              <span className="text-xs font-mono text-emerald-600 flex-1 text-right">
+                              <span className="text-xs font-mono text-[var(--pro-azure)] flex-1 text-right">
                                 ETB {fmt(sub.totalLevy)}
                               </span>
                               {sub.status === 'PENDING' && (
@@ -5004,7 +5004,7 @@ return (
                                     setErcaSubmitModal(sub);
                                     setTab('erca');
                                   }}
-                                  className="text-[10px] text-emerald-600 hover:text-emerald-500 font-bold transition-colors shrink-0"
+                                  className="text-[10px] text-[var(--pro-azure)] hover:text-[var(--pro-azure)] font-bold transition-colors shrink-0"
                                 >
                                   Submit →
                                 </button>
@@ -5104,7 +5104,7 @@ return (
                       onClick={() =>
                         setFilterPeriod(filterPeriod === p ? '' : p)
                       }
-                      className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${filterPeriod === p ? 'bg-emerald-100 text-emerald-600 border border-emerald-200' : 'bg-white text-slate-400 hover:text-slate-600 border border-slate-200'}`}
+                      className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${filterPeriod === p ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure)] border border-[var(--pro-azure-100)]' : 'bg-white text-slate-400 hover:text-slate-600 border border-slate-200'}`}
                     >
                       {p}
                     </button>
@@ -5114,7 +5114,7 @@ return (
                   <div className="flex items-center gap-2 flex-wrap">
                     <button
                       onClick={handleBulkRemit}
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-sm font-bold transition-all"
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] text-sm font-bold transition-all"
                     >
                       <Zap size={13} />
                       Remit {selected.size}
@@ -5169,7 +5169,7 @@ catch (err: any) {
                         onClick={() =>
                           setSelected(new Set(contributions.map((c, i) => c.id)))
                         }
-                        className="text-xs text-emerald-600 hover:text-emerald-500 font-bold transition-colors whitespace-nowrap"
+                        className="text-xs text-[var(--pro-azure)] hover:text-[var(--pro-azure)] font-bold transition-colors whitespace-nowrap"
                       >
                         Select all {contributions.length}
                       </button>
@@ -5182,7 +5182,7 @@ catch (err: any) {
                     filterCategory ||
                     filterPeriod ||
                     search) && (
-                    <span className="ml-1.5 px-1.5 py-0.5 bg-emerald-100 text-emerald-600 rounded text-[10px] font-bold">
+                    <span className="ml-1.5 px-1.5 py-0.5 bg-[var(--pro-azure-100)] text-[var(--pro-azure)] rounded text-[10px] font-bold">
                       {
                         [
                           filterStatus,
@@ -5218,7 +5218,7 @@ catch (err: any) {
                               paged.every((c) => selected.has(c.id))
                             }
                             onChange={toggleAll}
-                            className="rounded border-slate-300 bg-slate-200 text-emerald-600 focus:ring-teal-400/30"
+                            className="rounded border-slate-300 bg-slate-200 text-[var(--pro-azure)] focus:ring-teal-400/30"
                           />
                         </th>
                         <SortTh col="category" label="Category" />
@@ -5265,7 +5265,7 @@ catch (err: any) {
                             </p>
                             <button
                               onClick={openAdd}
-                              className="mt-3 px-4 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-xs font-bold transition-all"
+                              className="mt-3 px-4 py-2 rounded-xl bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure)] text-xs font-bold transition-all"
                             >
                               + Record Contribution
                             </button>
@@ -5275,14 +5275,14 @@ catch (err: any) {
                         paged.map((c, i) => (
                           <React.Fragment key={c.id}>
                             <tr
-                              className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${selected.has(c.id) ? 'bg-emerald-50/60' : ''} ${c.status === 'OVERDUE' ? 'border-l-2 border-l-red-400' : ''}`}
+                              className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${selected.has(c.id) ? 'bg-[var(--pro-azure-50)]/60' : ''} ${c.status === 'OVERDUE' ? 'border-l-2 border-l-red-400' : ''}`}
                             >
                               <td className="px-4 py-3">
                                 <input
                                   type="checkbox"
                                   checked={selected.has(c.id)}
                                   onChange={() => toggleSelect(c.id)}
-                                  className="rounded border-slate-300 bg-slate-200 text-emerald-600 focus:ring-teal-400/30"
+                                  className="rounded border-slate-300 bg-slate-200 text-[var(--pro-azure)] focus:ring-teal-400/30"
                                 />
                               </td>
                               <td
@@ -5317,11 +5317,11 @@ catch (err: any) {
 if (e.key === 'Escape')
                                           setInlineNotes(null);
                                       }}
-                                      className="bg-white border border-emerald-400 rounded px-2 py-0.5 text-xs text-slate-900 w-full focus:outline-none focus:ring-1 focus:ring-teal-400/30"
+                                      className="bg-white border border-[var(--pro-azure)] rounded px-2 py-0.5 text-xs text-slate-900 w-full focus:outline-none focus:ring-1 focus:ring-teal-400/30"
                                     />
                                     <button
                                       onClick={handleInlineNotesSave}
-                                      className="text-emerald-600 hover:text-emerald-600 dark:text-emerald-300 text-[10px] font-bold"
+                                      className="text-[var(--pro-azure)] hover:text-[var(--pro-azure)] dark:text-green-300 text-[10px] font-bold"
                                     >
                                       ✓
                                     </button>
@@ -5354,7 +5354,7 @@ if (e.key === 'Escape')
                                 ETB {fmt(c.baseAmount)}
                               </td>
                               <td
-                                className="px-4 py-3 text-emerald-600 text-xs font-mono font-bold cursor-pointer group/levy relative"
+                                className="px-4 py-3 text-[var(--pro-azure)] text-xs font-mono font-bold cursor-pointer group/levy relative"
                                 onClick={() => {
                                   navigator.clipboard?.writeText(
                                     String(c.levyAmount),
@@ -5364,7 +5364,7 @@ toast.success('Copied!', { duration: 1000 });
                                 title="Click to copy"
                               >
                                 ETB {fmt(c.levyAmount)}
-                                <span className="absolute -top-5 left-1/2 -translate-x-1/2 bg-emerald-500 dark:bg-slate-800 text-white text-[9px] px-1.5 py-0.5 rounded opacity-0 group-hover/levy:opacity-100 pointer-events-none whitespace-nowrap">
+                                <span className="absolute -top-5 left-1/2 -translate-x-1/2 bg-[var(--pro-azure-50)]0 dark:bg-slate-800 text-white text-[9px] px-1.5 py-0.5 rounded opacity-0 group-hover/levy:opacity-100 pointer-events-none whitespace-nowrap">
                                   copy
                                 </span>
                               </td>
@@ -5378,7 +5378,7 @@ toast.success('Period copied!', {
                                 title="Click to copy period"
                               >
                                 {c.period}
-                                <span className="absolute -top-5 left-1/2 -translate-x-1/2 bg-emerald-500 dark:bg-slate-800 text-white text-[9px] px-1.5 py-0.5 rounded opacity-0 group-hover/period:opacity-100 pointer-events-none whitespace-nowrap">
+                                <span className="absolute -top-5 left-1/2 -translate-x-1/2 bg-[var(--pro-azure-50)]0 dark:bg-slate-800 text-white text-[9px] px-1.5 py-0.5 rounded opacity-0 group-hover/period:opacity-100 pointer-events-none whitespace-nowrap">
                                   copy
                                 </span>
                               </td>
@@ -5445,7 +5445,7 @@ return (
                                 <div className="flex items-center gap-1">
                                   <button
                                     onClick={() => setDetailPanel(c)}
-                                    className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-emerald-600 transition-all"
+                                    className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-[var(--pro-azure)] transition-all"
                                     title="View detail"
                                   >
                                     <Eye size={12} />
@@ -5453,14 +5453,14 @@ return (
                                   {c.status === 'PENDING' && (
                                     <button
                                       onClick={() => handleRemit(c.id)}
-                                      className="px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-bold transition-all whitespace-nowrap"
+                                      className="px-2 py-1 rounded-lg bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] text-[10px] font-bold transition-all whitespace-nowrap"
                                     >
                                       Remit
                                     </button>
                                   )}
                                   <button
                                     onClick={() => setRemittanceModal(c)}
-                                    className="p-1.5 rounded-lg hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 transition-all"
+                                    className="p-1.5 rounded-lg hover:bg-[var(--pro-azure-50)] text-slate-400 hover:text-[var(--pro-azure)] transition-all"
                                     title="Record bank remittance"
                                   >
                                     <Building2 size={12} />
@@ -5479,7 +5479,7 @@ return (
                                         CATEGORY_LABELS[c.category],
                                       )
                                     }
-                                    className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-emerald-600 transition-all"
+                                    className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-[var(--pro-azure)] transition-all"
                                     title="Audit trail"
                                   >
                                     <History size={12} />
@@ -5515,7 +5515,7 @@ return (
                                       <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">
                                         Levy Amount
                                       </p>
-                                      <p className="font-mono font-bold text-emerald-600">
+                                      <p className="font-mono font-bold text-[var(--pro-azure)]">
                                         ETB {fmt(c.levyAmount)}
                                       </p>
                                     </div>
@@ -5586,7 +5586,7 @@ return (
                                     {c.status === 'PENDING' && (
                                       <button
                                         onClick={() => handleRemit(c.id)}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition-all"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] text-xs font-bold transition-all"
                                       >
                                         <CheckCircle2 size={11} />
                                         Mark Remitted
@@ -5594,7 +5594,7 @@ return (
                                     )}
                                     <button
                                       onClick={() => setRemittanceModal(c)}
-                                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-xs font-bold transition-all"
+                                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure)] text-xs font-bold transition-all"
                                     >
                                       <Building2 size={11} />
                                       Record Remittance
@@ -5616,7 +5616,7 @@ return (
                           >
                             Page total
                           </td>
-                          <td className="px-4 py-2.5 text-emerald-600 font-mono font-semibold text-xs">
+                          <td className="px-4 py-2.5 text-[var(--pro-azure)] font-mono font-semibold text-xs">
                             ETB{' '}
                             {fmt(paged.reduce((s, c) => s + c.levyAmount, 0))}
                           </td>
@@ -5722,8 +5722,8 @@ if (n >= 1 && n <= totalPages) {
                         </p>
                         <div className="mt-2 space-y-1">
                           <div className="flex justify-between text-[10px]">
-                            <span className="text-emerald-600">Remitted</span>
-                            <span className="text-emerald-600 font-mono">
+                            <span className="text-[var(--pro-azure)]">Remitted</span>
+                            <span className="text-[var(--pro-azure)] font-mono">
                               ETB {fmt(q.remitted)}
                             </span>
                           </div>
@@ -5744,7 +5744,7 @@ if (n >= 1 && n <= totalPages) {
                         </div>
                         <div className="mt-2 w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-emerald-500/70 rounded-full"
+                            className="h-full bg-[var(--pro-azure-50)]0/70 rounded-full"
                             style={{
                               width: `${q.total > 0 ? (q.remitted / q.total) * 100 : 0}%` }}
                           />
@@ -5787,17 +5787,17 @@ return (
                             </span>
                             <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-emerald-500/70 rounded-full"
+                                className="h-full bg-[var(--pro-azure-50)]0/70 rounded-full"
                                 style={{
                                   width: `${trends.length ? (t.total / Math.max(...trends.map((x, i) => x.total), 1)) * 100 : 0}%` }}
                               />
                             </div>
-                            <span className="text-xs font-mono text-emerald-600 w-28 text-right shrink-0">
+                            <span className="text-xs font-mono text-[var(--pro-azure)] w-28 text-right shrink-0">
                               ETB {fmt(t.total)}
                             </span>
                             {change !== null && (
                               <span
-                                className={`text-[10px] font-bold w-14 text-right shrink-0 ${change > 0 ? 'text-emerald-600' : change < 0 ? 'text-rose-600' : 'text-slate-400'}`}
+                                className={`text-[10px] font-bold w-14 text-right shrink-0 ${change > 0 ? 'text-[var(--pro-azure)]' : change < 0 ? 'text-rose-600' : 'text-slate-400'}`}
                               >
                                 {change > 0 ? '+' : ''}
                                 {change.toFixed(1)}%
@@ -5867,7 +5867,7 @@ return (
                           </span>
                           <ChevronRight
                             size={12}
-                            className="text-slate-400 group-hover:text-emerald-600 transition-colors shrink-0"
+                            className="text-slate-400 group-hover:text-[var(--pro-azure)] transition-colors shrink-0"
                           />
                         </div>
                       );
@@ -5903,9 +5903,9 @@ return (
                 <div className="flex items-center gap-3 mt-3 flex-wrap">
                   {[
                     ['bg-white border-slate-100', 'No activity'],
-                    ['bg-emerald-50 border-emerald-500/20', 'Low'],
-                    ['bg-emerald-500/35 border-indigo-300', 'Medium'],
-                    ['bg-emerald-500/80 border-emerald-500/70', 'High'],
+                    ['bg-[var(--pro-azure-50)] border-[var(--pro-azure)]/20', 'Low'],
+                    ['bg-[var(--pro-azure-50)]0/35 border-[var(--pro-azure-light)]', 'Medium'],
+                    ['bg-[var(--pro-azure-50)]0/80 border-[var(--pro-azure)]/70', 'High'],
                   ].map(([cls, label]) => (
                     <span
                       key={label}
@@ -5947,7 +5947,7 @@ return (
                 <button
                   onClick={handleGenerateSchedule}
                   disabled={generatingSchedule}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-100 hover:bg-emerald-500/25 text-emerald-600 text-sm font-bold transition-all disabled:opacity-50"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--pro-azure-100)] hover:bg-[var(--pro-azure-dark)]/25 text-[var(--pro-azure)] text-sm font-bold transition-all disabled:opacity-50"
                 >
                   <CalendarClock size={14} />
                   {generatingSchedule
@@ -6012,7 +6012,7 @@ return (
                   {[
                     ['UPCOMING', 'bg-slate-500/15 text-slate-500'],
                     ['DUE', 'bg-amber-500/15 text-amber-600'],
-                    ['PAID', 'bg-emerald-500/15 text-emerald-600'],
+                    ['PAID', 'bg-[var(--pro-azure-50)]0/15 text-[var(--pro-azure)]'],
                     ['MISSED', 'bg-rose-50 text-rose-600'],
                   ].map(([s, cls]) => (
                     <span
@@ -6041,11 +6041,11 @@ return (
                         {
                           label: 'Remittance Rate',
                           value: `${complianceScore.breakdown.remittanceRate?.toFixed(1) ?? 0}%`,
-                          color: 'text-emerald-600' },
+                          color: 'text-[var(--pro-azure)]' },
                         {
                           label: 'On-Time Rate',
                           value: `${complianceScore.breakdown.onTimeRate?.toFixed(1) ?? 0}%`,
-                          color: 'text-emerald-600' },
+                          color: 'text-[var(--pro-azure)]' },
                         {
                           label: 'Overdue Rate',
                           value: `${complianceScore.breakdown.overdueRate?.toFixed(1) ?? 0}%`,
@@ -6059,11 +6059,11 @@ return (
                           value: String(
                             complianceScore.breakdown.remitted ?? 0,
                           ),
-                          color: 'text-emerald-600' },
+                          color: 'text-[var(--pro-azure)]' },
                         {
                           label: 'On Time',
                           value: String(complianceScore.breakdown.onTime ?? 0),
-                          color: 'text-emerald-600' },
+                          color: 'text-[var(--pro-azure)]' },
                       ].map((s, i) => (
                         <div
                           key={s.label}
@@ -6088,9 +6088,9 @@ return (
                       <div
                         className={`h-full rounded-full transition-all duration-700 ${
                           complianceScore.score >= 90
-                            ? 'bg-emerald-500'
+                            ? 'bg-[var(--pro-azure-50)]0'
                             : complianceScore.score >= 75
-                              ? 'bg-emerald-500'
+                              ? 'bg-[var(--pro-azure-50)]0'
                               : complianceScore.score >= 60
                                 ? 'bg-amber-500'
                                 : 'bg-rose-500'
@@ -6102,9 +6102,9 @@ return (
                 </div>
               )}
 
-              <div className="flex items-start gap-3 px-4 py-3 bg-emerald-50 border border-slate-200 rounded-xl">
-                <Info size={15} className="text-emerald-600 shrink-0 mt-0.5" />
-                <p className="text-xs text-emerald-700">
+              <div className="flex items-start gap-3 px-4 py-3 bg-[var(--pro-azure-50)] border border-slate-200 rounded-xl">
+                <Info size={15} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
+                <p className="text-xs text-[var(--pro-azure-dark)]">
                   Quarterly remittance schedule covers categories mandated to
                   remit every quarter: Government Budget (0.25%), Salary
                   Contribution (1%), Loan Value (1%), Insurance Premium (1%),
@@ -6146,7 +6146,7 @@ return (
                         className={`bg-white border rounded-2xl overflow-hidden ${hasMissed ? 'border-rose-500/30' : allPaid ? 'border-slate-200' : 'border-slate-200'}`}
                       >
                         <div
-                          className={`px-4 py-3 border-b flex items-center justify-between ${hasMissed ? 'border-rose-500/20 bg-rose-500/5' : allPaid ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-slate-200'}`}
+                          className={`px-4 py-3 border-b flex items-center justify-between ${hasMissed ? 'border-rose-500/20 bg-rose-500/5' : allPaid ? 'border-[var(--pro-azure)]/20 bg-[var(--pro-azure-50)]0/5' : 'border-slate-200'}`}
                         >
                           <div>
                             <p className="text-sm font-semibold text-slate-900">
@@ -6160,7 +6160,7 @@ return (
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="text-xs font-mono text-emerald-600 font-bold">
+                            <p className="text-xs font-mono text-[var(--pro-azure)] font-bold">
                               ETB {fmt(qTotal)}
                             </p>
                             <p className="ovds-caption">
@@ -6199,7 +6199,7 @@ return (
                                   onClick={() =>
                                     handleScheduleStatus(entry.id, 'PAID')
                                   }
-                                  className="px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-bold transition-all whitespace-nowrap"
+                                  className="px-2 py-1 rounded-lg bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] text-[10px] font-bold transition-all whitespace-nowrap"
                                 >
                                   Mark Paid
                                 </button>
@@ -6299,11 +6299,11 @@ catch (err: any) {
                         {
                           label: 'Remittance Rate',
                           value: `${complianceScore.breakdown.remittanceRate?.toFixed(1) ?? 0}%`,
-                          color: 'text-emerald-600' },
+                          color: 'text-[var(--pro-azure)]' },
                         {
                           label: 'On-Time Rate',
                           value: `${complianceScore.breakdown.onTimeRate?.toFixed(1) ?? 0}%`,
-                          color: 'text-emerald-600' },
+                          color: 'text-[var(--pro-azure)]' },
                         {
                           label: 'Overdue Rate',
                           value: `${complianceScore.breakdown.overdueRate?.toFixed(1) ?? 0}%`,
@@ -6317,11 +6317,11 @@ catch (err: any) {
                           value: String(
                             complianceScore.breakdown.remitted ?? 0,
                           ),
-                          color: 'text-emerald-600' },
+                          color: 'text-[var(--pro-azure)]' },
                         {
                           label: 'On Time',
                           value: String(complianceScore.breakdown.onTime ?? 0),
-                          color: 'text-emerald-600' },
+                          color: 'text-[var(--pro-azure)]' },
                       ].map((s, i) => (
                         <div
                           key={s.label}
@@ -6346,9 +6346,9 @@ catch (err: any) {
                       <div
                         className={`h-full rounded-full transition-all duration-700 ${
                           complianceScore.score >= 90
-                            ? 'bg-emerald-500'
+                            ? 'bg-[var(--pro-azure-50)]0'
                             : complianceScore.score >= 75
-                              ? 'bg-emerald-500'
+                              ? 'bg-[var(--pro-azure-50)]0'
                               : complianceScore.score >= 60
                                 ? 'bg-amber-500'
                                 : 'bg-rose-500'
@@ -6410,7 +6410,7 @@ const isEditing =
                             editingTarget?.category === row.category;
 const varColor =
                             row.variance >= 0
-                              ? 'text-emerald-600'
+                              ? 'text-[var(--pro-azure)]'
                               : 'text-rose-600';
 return (
                             <tr
@@ -6455,7 +6455,7 @@ return (
 if (e.key === 'Escape')
                                           setEditingTarget(null);
                                       }}
-                                      className="bg-slate-200 border border-emerald-500/50 rounded px-2 py-1 text-xs text-slate-900 w-28 focus:outline-none font-mono"
+                                      className="bg-slate-200 border border-[var(--pro-azure)]/50 rounded px-2 py-1 text-xs text-slate-900 w-28 focus:outline-none font-mono"
                                     />
                                     <button
                                       onClick={() =>
@@ -6465,7 +6465,7 @@ if (e.key === 'Escape')
                                         )
                                       }
                                       disabled={savingTarget}
-                                      className="text-emerald-600 hover:text-emerald-600 dark:text-emerald-300 text-[10px] font-bold disabled:opacity-50"
+                                      className="text-[var(--pro-azure)] hover:text-[var(--pro-azure)] dark:text-green-300 text-[10px] font-bold disabled:opacity-50"
                                     >
                                       ✓
                                     </button>
@@ -6499,10 +6499,10 @@ if (e.key === 'Escape')
                                   </button>
                                 )}
                               </td>
-                              <td className="px-4 py-3 text-xs font-mono text-emerald-600 font-bold">
+                              <td className="px-4 py-3 text-xs font-mono text-[var(--pro-azure)] font-bold">
                                 ETB {fmt(row.actualTotal)}
                               </td>
-                              <td className="px-4 py-3 text-xs font-mono text-emerald-600">
+                              <td className="px-4 py-3 text-xs font-mono text-[var(--pro-azure)]">
                                 ETB {fmt(row.remitted)}
                               </td>
                               <td
@@ -6520,9 +6520,9 @@ if (e.key === 'Escape')
                                     <div
                                       className={`h-full rounded-full transition-all ${
                                         (pct ?? 0) >= 100
-                                          ? 'bg-emerald-500'
+                                          ? 'bg-[var(--pro-azure-50)]0'
                                           : (pct ?? 0) >= 75
-                                            ? 'bg-emerald-500'
+                                            ? 'bg-[var(--pro-azure-50)]0'
                                             : (pct ?? 0) >= 50
                                               ? 'bg-amber-500'
                                               : 'bg-rose-500'
@@ -6570,13 +6570,13 @@ if (e.key === 'Escape')
                               ),
                             )}
                           </td>
-                          <td className="px-4 py-3 text-xs font-mono text-emerald-600 font-bold">
+                          <td className="px-4 py-3 text-xs font-mono text-[var(--pro-azure)] font-bold">
                             ETB{' '}
                             {fmt(
                               targetRows.reduce((s, r) => s + r.actualTotal, 0),
                             )}
                           </td>
-                          <td className="px-4 py-3 text-xs font-mono text-emerald-600 font-bold">
+                          <td className="px-4 py-3 text-xs font-mono text-[var(--pro-azure)] font-bold">
                             ETB{' '}
                             {fmt(
                               targetRows.reduce((s, r) => s + r.remitted, 0),
@@ -6595,12 +6595,12 @@ if (e.key === 'Escape')
           {/* -- CALCULATOR TAB -- */}
           {(activeGroup === 'contributions') && tab === 'calculator' && (
             <div className="space-y-5">
-              <div className="flex items-start gap-3 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+              <div className="flex items-start gap-3 px-4 py-3 bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-xl">
                 <Calculator
                   size={15}
-                  className="text-emerald-600 shrink-0 mt-0.5"
+                  className="text-[var(--pro-azure)] shrink-0 mt-0.5"
                 />
-                <p className="text-xs text-emerald-500">
+                <p className="text-xs text-[var(--pro-azure)]">
                   Use this batch calculator to estimate levy obligations across
                   multiple categories before recording them. Enter base amounts,
                   calculate, then save all to contributions in one click.
@@ -6684,7 +6684,7 @@ if (e.key === 'Escape')
                                 {CATEGORY_DESCS[row.category]}
                               </p>
                               {FLAT_CATS.includes(row.category) && (
-                                <span className="text-[8px] bg-emerald-100 text-emerald-600 px-1 py-0.5 rounded font-bold shrink-0">
+                                <span className="text-[8px] bg-[var(--pro-azure-100)] text-[var(--pro-azure)] px-1 py-0.5 rounded font-bold shrink-0">
                                   FLAT
                                 </span>
                               )}
@@ -6734,7 +6734,7 @@ if (e.key === 'Escape')
                           </td>
                           <td className="px-4 py-2.5">
                             {row.levyAmount !== null ? (
-                              <span className="text-emerald-600 font-mono font-bold text-xs">
+                              <span className="text-[var(--pro-azure)] font-mono font-bold text-xs">
                                 ETB {fmt(row.levyAmount)}
                               </span>
                             ) : (
@@ -6775,7 +6775,7 @@ if (e.key === 'Escape')
                           >
                             Total Levy
                           </td>
-                          <td className="px-4 py-3 text-emerald-600 font-mono font-semibold text-sm">
+                          <td className="px-4 py-3 text-[var(--pro-azure)] font-mono font-semibold text-sm">
                             ETB {fmt(calcTotal)}
                           </td>
                           <td />
@@ -6797,7 +6797,7 @@ if (e.key === 'Escape')
                   <button
                     onClick={runCalculator}
                     disabled={calcRunning}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-sm font-bold transition-all disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure)] text-sm font-bold transition-all disabled:opacity-50"
                   >
                     <Calculator size={13} />
                     {calcRunning ? 'Calculating...' : 'Calculate All'}
@@ -6806,7 +6806,7 @@ if (e.key === 'Escape')
                     <button
                       onClick={saveAllCalcRows}
                       disabled={calcSaving}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-500 text-white text-sm font-bold transition-all disabled:opacity-50 shadow-lg shadow-emerald-500/20"
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-sm font-bold transition-all disabled:opacity-50 shadow-lg shadow-green-500/20"
                     >
                       <CheckCircle2 size={13} />
                       {calcSaving
@@ -6849,7 +6849,7 @@ if (e.key === 'Escape')
                   <button
                     onClick={handleSaveReport}
                     disabled={savingReport}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white text-sm font-bold transition-all shadow-lg shadow-emerald-500/20"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 text-white text-sm font-bold transition-all shadow-lg shadow-green-500/20"
                   >
                     <FileText size={13} />
                     {savingReport ? 'Saving...' : 'Save Snapshot'}
@@ -6933,13 +6933,13 @@ if (e.key === 'Escape')
                           <span className="ovds-caption">
                             Total
                           </span>
-                          <span className="text-[10px] font-mono text-emerald-600">
+                          <span className="text-[10px] font-mono text-[var(--pro-azure)]">
                             ETB {fmt(r.totalLevy)}
                           </span>
                           <span className="ovds-caption">
                             Remitted
                           </span>
-                          <span className="text-[10px] font-mono text-emerald-600">
+                          <span className="text-[10px] font-mono text-[var(--pro-azure)]">
                             ETB {fmt(r.totalRemitted)}
                           </span>
                           {Number(r.totalOverdue) > 0 && (
@@ -6956,7 +6956,7 @@ if (e.key === 'Escape')
                         <div className="flex items-center gap-1 shrink-0">
                           <button
                             onClick={() => loadReport(r)}
-                            className="opacity-0 group-hover:opacity-100 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-[10px] font-bold transition-all"
+                            className="opacity-0 group-hover:opacity-100 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure)] text-[10px] font-bold transition-all"
                           >
                             <ArrowUpRight size={10} />
                             Load
@@ -7049,7 +7049,7 @@ catch (err: any) {
                             </option>
                           ))}
                         </select>
-                        <p className="text-[11px] text-emerald-600 mt-1">
+                        <p className="text-[11px] text-[var(--pro-azure)] mt-1">
                           {CATEGORY_DESCS[form.category]}
                         </p>
                       </div>
@@ -7119,9 +7119,9 @@ catch (err: any) {
                     </>
                   )}
                   {previewLevy !== null && (
-                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center justify-between">
+                    <div className="bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-xl px-4 py-3 flex items-center justify-between">
                       <p className="ovds-caption">Computed Levy</p>
-                      <p className="text-2xl font-semibold text-emerald-600">
+                      <p className="text-2xl font-semibold text-[var(--pro-azure)]">
                         ETB {fmt(previewLevy)}
                       </p>
                     </div>
@@ -7168,7 +7168,7 @@ catch (err: any) {
                     <button
                       type="submit"
                       disabled={saving}
-                      className="flex-1 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white text-sm font-bold transition-all"
+                      className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 text-white text-sm font-bold transition-all"
                     >
                       {saving
                         ? 'Saving...'
@@ -7210,8 +7210,8 @@ catch (err: any) {
                 </div>
               )}
 
-              <div className="flex items-start gap-3 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl">
-                <Globe size={15} className="text-emerald-600 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3 px-4 py-3 bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-xl">
+                <Globe size={15} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
                 <p className="ovds-caption">
                   Disaster fund levy is submitted to{' '}
                   <span className="text-slate-900 font-semibold">ERCA</span> by the
@@ -7236,15 +7236,15 @@ catch (err: any) {
                     {
                       label: 'Submitted',
                       val: ercaDashStats.counts.submitted,
-                      color: 'text-emerald-600',
-                      bg: 'bg-emerald-50',
-                      border: 'border-emerald-500/20' },
+                      color: 'text-[var(--pro-azure)]',
+                      bg: 'bg-[var(--pro-azure-50)]',
+                      border: 'border-[var(--pro-azure)]/20' },
                     {
                       label: 'Acknowledged',
                       val: ercaDashStats.counts.acknowledged,
-                      color: 'text-emerald-600',
-                      bg: 'bg-emerald-50',
-                      border: 'border-emerald-500/20' },
+                      color: 'text-[var(--pro-azure)]',
+                      bg: 'bg-[var(--pro-azure-50)]',
+                      border: 'border-[var(--pro-azure)]/20' },
                     {
                       label: 'Overdue',
                       val: ercaDashStats.counts.overdue,
@@ -7309,7 +7309,7 @@ catch (err: any) {
                       if (!err?.isRateLimited) toast.error('Failed to prepare submission');
                     }
                   }}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg border border-indigo-300 bg-emerald-50 hover:bg-emerald-100 text-indigo-700 text-sm font-medium transition-all"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--pro-azure-light)] bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] text-sm font-medium transition-all"
                 >
                   <Zap size={13} />
                   Prepare Last Month
@@ -7326,7 +7326,7 @@ catch (err: any) {
               {/* One-shot: auto-generate + prepare ERCA */}
               <div className="bg-white border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-5 space-y-4">
                 <div className="flex items-center gap-2">
-                  <Zap size={14} className="text-emerald-600" />
+                  <Zap size={14} className="text-[var(--pro-azure)]" />
                   <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                     One-Shot: Generate Contributions + Prepare ERCA
                   </p>
@@ -7362,7 +7362,7 @@ catch (err: any) {
                   <button
                     onClick={handleOneShotGenerate}
                     disabled={oneShotRunning || !oneShotPeriod.trim()}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white text-sm font-bold transition-all shadow-lg shadow-emerald-500/20"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 text-white text-sm font-bold transition-all shadow-lg shadow-green-500/20"
                   >
                     <Zap size={13} />
                     {oneShotRunning ? 'Running...' : 'Generate & Prepare'}
@@ -7375,7 +7375,7 @@ catch (err: any) {
                         {
                           label: 'Generated',
                           value: String(oneShotResult.generated),
-                          color: 'text-emerald-600' },
+                          color: 'text-[var(--pro-azure)]' },
                         {
                           label: 'Skipped',
                           value: String(oneShotResult.skipped),
@@ -7383,7 +7383,7 @@ catch (err: any) {
                         {
                           label: 'ERCA Levy',
                           value: `ETB ${fmt(oneShotResult.ercaSubmission?.totalLevy ?? 0)}`,
-                          color: 'text-emerald-600' },
+                          color: 'text-[var(--pro-azure)]' },
                       ].map((s, i) => (
                         <div
                           key={s.label}
@@ -7415,14 +7415,14 @@ catch (err: any) {
                             <span className="text-[10px] text-slate-400 truncate max-w-[160px]">
                               {p.description}
                             </span>
-                            <span className="text-xs font-mono text-emerald-600 shrink-0">
+                            <span className="text-xs font-mono text-[var(--pro-azure)] shrink-0">
                               ETB {fmt(p.levyAmount)}
                             </span>
                           </div>
                         ))}
                       </div>
                     )}
-                    <div className="flex items-center gap-2 text-[10px] text-emerald-600">
+                    <div className="flex items-center gap-2 text-[10px] text-[var(--pro-azure)]">
                       <CheckCircle2 size={11} />
                       <span>
                         ERCA submission prepared for{' '}
@@ -7490,7 +7490,7 @@ catch (err: any) {
                           if (!err?.isRateLimited) toast.error('Failed to prepare');
                         }
                       }}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-all shadow-sm"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-sm font-semibold transition-all shadow-sm"
                     >
                       <Send size={13} />
                       Prepare Submission
@@ -7508,11 +7508,11 @@ catch (err: any) {
                         {
                           label: 'Total Levy',
                           value: `ETB ${fmt(ercaPreview.totalLevy)}`,
-                          color: 'text-emerald-600' },
+                          color: 'text-[var(--pro-azure)]' },
                         {
                           label: 'Remitted',
                           value: `ETB ${fmt(ercaPreview.totalRemitted)}`,
-                          color: 'text-emerald-600' },
+                          color: 'text-[var(--pro-azure)]' },
                         {
                           label: 'Pending',
                           value: `ETB ${fmt(ercaPreview.totalPending)}`,
@@ -7546,7 +7546,7 @@ catch (err: any) {
                         </div>
                         <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-gradient-to-r from-orange-500 to-emerald-500 rounded-full transition-all"
+                            className="h-full bg-gradient-to-r from-orange-500 to-indigo-500 rounded-full transition-all"
                             style={{
                               width: `${Math.min((ercaPreview.totalRemitted / ercaPreview.totalLevy) * 100, 100)}%` }}
                           />
@@ -7576,13 +7576,13 @@ return (
                                       {CATEGORY_LABELS[cat as FundCategory] ??
                                         cat}
                                     </span>
-                                    <span className="text-xs font-mono text-emerald-600 shrink-0 ml-2">
+                                    <span className="text-xs font-mono text-[var(--pro-azure)] shrink-0 ml-2">
                                       ETB {fmt(d.levy)}
                                     </span>
                                   </div>
                                   <div className="w-full h-1 bg-slate-200 rounded-full overflow-hidden">
                                     <div
-                                      className="h-full bg-emerald-500/60 rounded-full"
+                                      className="h-full bg-[var(--pro-azure-50)]0/60 rounded-full"
                                       style={{ width: `${pct}%` }}
                                     />
                                   </div>
@@ -7637,7 +7637,7 @@ return (
                       {ercaFilteredSubmissions.length} records
                     </span>
                     {ercaSubmissions.length > 0 && (
-                      <span className="text-xs font-mono text-emerald-600">
+                      <span className="text-xs font-mono text-[var(--pro-azure)]">
                         ETB{' '}
                         {fmt(
                           ercaSubmissions.reduce(
@@ -7706,10 +7706,10 @@ return (
                                 )}
                               </div>
                               <div className="flex items-center gap-4 mt-1 flex-wrap">
-                                <span className="text-sm font-semibold text-emerald-600">
+                                <span className="text-sm font-semibold text-[var(--pro-azure)]">
                                   ETB {fmt(sub.totalLevy)}
                                 </span>
-                                <span className="text-[10px] text-emerald-600">
+                                <span className="text-[10px] text-[var(--pro-azure)]">
                                   ✓ ETB {fmt(sub.totalRemitted)}
                                 </span>
                                 {sub.totalPending > 0 && (
@@ -7751,7 +7751,7 @@ return (
                               {sub.status === 'PENDING' && (
                                 <button
                                   onClick={() => setErcaSubmitModal(sub)}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-all shadow-md shadow-emerald-500/20"
+                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-xs font-bold transition-all shadow-md shadow-green-500/20"
                                 >
                                   <Send size={11} />
                                   Submit to ERCA
@@ -7780,7 +7780,7 @@ catch (err: any) {
                                       if (!err?.isRateLimited) toast.error('Failed to acknowledge');
                                     }
                                   }}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition-all border border-slate-200"
+                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--pro-azure-50)] hover:bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] text-xs font-bold transition-all border border-slate-200"
                                 >
                                   <BadgeCheck size={11} />
                                   Acknowledge
@@ -7815,7 +7815,7 @@ catch (err: any) {
                                 </button>
                               )}
                               {sub.status === 'ACKNOWLEDGED' && (
-                                <span className="flex items-center gap-1 text-xs text-emerald-600 font-semibold px-2">
+                                <span className="flex items-center gap-1 text-xs text-[var(--pro-azure)] font-semibold px-2">
                                   <BadgeCheck size={12} />
                                   Confirmed
                                 </span>
@@ -7923,14 +7923,14 @@ return (
                                         </span>
                                         <div className="w-20 h-1.5 bg-slate-200 rounded-full overflow-hidden shrink-0">
                                           <div
-                                            className="h-full bg-emerald-500/60 rounded-full"
+                                            className="h-full bg-[var(--pro-azure-50)]0/60 rounded-full"
                                             style={{ width: `${pct}%` }}
                                           />
                                         </div>
                                         <span className="text-[10px] text-slate-400 w-8 text-right shrink-0">
                                           {d.count}×
                                         </span>
-                                        <span className="text-xs font-mono text-emerald-600 w-28 text-right shrink-0">
+                                        <span className="text-xs font-mono text-[var(--pro-azure)] w-28 text-right shrink-0">
                                           ETB {fmt(d.levy)}
                                         </span>
                                       </div>
@@ -7952,12 +7952,12 @@ return (
                                 <React.Fragment key={step}>
                                   <div className="flex flex-col items-center gap-1">
                                     <div
-                                      className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium border-2 transition-all ${done ? (active ? 'bg-emerald-500 border-emerald-500 text-slate-900' : 'bg-emerald-500/20 border-emerald-500 text-emerald-600') : 'bg-slate-200 border-slate-300 text-slate-400'}`}
+                                      className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium border-2 transition-all ${done ? (active ? 'bg-[var(--pro-azure-50)]0 border-[var(--pro-azure)] text-slate-900' : 'bg-[var(--pro-azure-50)]0/20 border-[var(--pro-azure)] text-[var(--pro-azure)]') : 'bg-slate-200 border-slate-300 text-slate-400'}`}
                                     >
                                       {done && !active ? '✓' : i + 1}
                                     </div>
                                     <span
-                                      className={`text-[8px] font-bold uppercase tracking-wide ${done ? (active ? 'text-emerald-600' : 'text-emerald-600') : 'text-slate-400'}`}
+                                      className={`text-[8px] font-bold uppercase tracking-wide ${done ? (active ? 'text-[var(--pro-azure)]' : 'text-[var(--pro-azure)]') : 'text-slate-400'}`}
                                     >
                                       {step === 'PENDING'
                                         ? 'Prepared'
@@ -7968,7 +7968,7 @@ return (
                                   </div>
                                   {i < 2 && (
                                     <div
-                                      className={`flex-1 h-0.5 mx-1 mb-4 rounded-full transition-all ${stepIdx > i ? 'bg-emerald-500/60' : 'bg-slate-200'}`}
+                                      className={`flex-1 h-0.5 mx-1 mb-4 rounded-full transition-all ${stepIdx > i ? 'bg-[var(--pro-azure-50)]0/60' : 'bg-slate-200'}`}
                                     />
                                   )}
                                 </React.Fragment>
@@ -7993,10 +7993,10 @@ return (
       {rootTab === 'financial-reports' && (
         <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-500">
           {/* Header */}
-          <div className="bg-gradient-to-r from-emerald-900 to-teal-800 rounded-xl p-5 text-white flex flex-wrap items-center justify-between gap-4">
+          <div className="bg-gradient-to-r from-[var(--pro-azure-dark)] to-teal-800 rounded-xl p-5 text-white flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-emerald-100 border border-emerald-400/30 rounded-xl flex items-center justify-center shrink-0">
-                <BarChart3 size={22} className="text-emerald-700" />
+              <div className="w-12 h-12 bg-[var(--pro-azure-100)] border border-[var(--pro-azure)]/30 rounded-xl flex items-center justify-center shrink-0">
+                <BarChart3 size={22} className="text-[var(--pro-azure-dark)]" />
               </div>
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-900/40 mb-0.5">
@@ -8015,24 +8015,24 @@ return (
                 {
                   label: 'Accounting',
                   to: '/accounting',
-                  color: 'bg-emerald-100 dark:bg-white/10 hover:bg-white/20 text-slate-900' },
+                  color: 'bg-[var(--pro-azure-100)] dark:bg-white/10 hover:bg-white/20 text-slate-900' },
                 {
                   label: 'Invoices',
                   to: '/sales/invoices',
-                  color: 'bg-emerald-100 dark:bg-white/10 hover:bg-white/20 text-slate-900' },
+                  color: 'bg-[var(--pro-azure-100)] dark:bg-white/10 hover:bg-white/20 text-slate-900' },
                 {
                   label: 'Bills',
                   to: '/purchases/bills',
-                  color: 'bg-emerald-100 dark:bg-white/10 hover:bg-white/20 text-slate-900' },
+                  color: 'bg-[var(--pro-azure-100)] dark:bg-white/10 hover:bg-white/20 text-slate-900' },
                 {
                   label: 'VAT Admin',
                   to: '/tax/vat',
-                  color: 'bg-emerald-100 dark:bg-white/10 hover:bg-white/20 text-slate-900' },
+                  color: 'bg-[var(--pro-azure-100)] dark:bg-white/10 hover:bg-white/20 text-slate-900' },
               ].map((l, i) => (
                 <a
                   key={l.label}
                   href={l.to}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border border-emerald-200 dark:border-white/10 transition-all ${l.color}`}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border border-[var(--pro-azure-100)] dark:border-white/10 transition-all ${l.color}`}
                 >
                   {l.label}
                 </a>
@@ -8044,10 +8044,10 @@ return (
             {/* Health score card */}
             {healthScore && (
               <div
-                className={`col-span-2 rounded-xl p-5 border flex items-center gap-5 ${healthScore.grade === 'A' ? 'bg-emerald-50 border-emerald-200' : healthScore.grade === 'B' ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}
+                className={`col-span-2 rounded-xl p-5 border flex items-center gap-5 ${healthScore.grade === 'A' ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' : healthScore.grade === 'B' ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' : 'bg-amber-50 border-amber-200'}`}
               >
                 <div
-                  className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl font-semibold shrink-0 ${healthScore.grade === 'A' ? 'bg-emerald-100 text-emerald-700' : healthScore.grade === 'B' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-700'}`}
+                  className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl font-semibold shrink-0 ${healthScore.grade === 'A' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : healthScore.grade === 'B' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure)]' : 'bg-amber-100 text-amber-700'}`}
                 >
                   {healthScore.grade}
                 </div>
@@ -8056,13 +8056,13 @@ return (
                     Financial Health
                   </p>
                   <p
-                    className={`text-2xl font-semibold mt-0.5 ${healthScore.grade === 'A' ? 'text-emerald-700' : healthScore.grade === 'B' ? 'text-emerald-600' : 'text-amber-700'}`}
+                    className={`text-2xl font-semibold mt-0.5 ${healthScore.grade === 'A' ? 'text-[var(--pro-azure-dark)]' : healthScore.grade === 'B' ? 'text-[var(--pro-azure)]' : 'text-amber-700'}`}
                   >
                     {healthScore.overall ?? 0}%
                   </p>
                   <div className="w-full h-1.5 bg-white/60 rounded-full mt-2 overflow-hidden">
                     <div
-                      className={`h-full rounded-full ${healthScore.grade === 'A' ? 'bg-emerald-500' : healthScore.grade === 'B' ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                      className={`h-full rounded-full ${healthScore.grade === 'A' ? 'bg-[var(--pro-azure-50)]0' : healthScore.grade === 'B' ? 'bg-[var(--pro-azure-50)]0' : 'bg-amber-500'}`}
                       style={{ width: `${healthScore.overall ?? 0}%` }}
                     />
                   </div>
@@ -8076,7 +8076,7 @@ return (
                 sub: 'monthly position',
                 color:
                   (finSummary?.netProfit ?? 0) >= 0
-                    ? 'text-emerald-700'
+                    ? 'text-[var(--pro-azure-dark)]'
                     : 'text-rose-700',
                 bg: 'bg-white dark:bg-white' },
               {
@@ -8085,13 +8085,13 @@ return (
                   ? `ETB ${fmt(accountBalances.totals?.assets ?? 0)}`
                   : '—',
                 sub: 'from GL',
-                color: 'text-emerald-600',
+                color: 'text-[var(--pro-azure)]',
                 bg: 'bg-white dark:bg-white' },
               {
                 label: 'Bank Balance',
                 value: `ETB ${fmt(banks.reduce((s: number, b: any) => s + Number(b.balance), 0))}`,
                 sub: `${banks.length} accounts`,
-                color: 'text-emerald-700',
+                color: 'text-[var(--pro-azure-dark)]',
                 bg: 'bg-white dark:bg-white' },
               {
                 label: 'GL Accounts',
@@ -8123,18 +8123,18 @@ return (
                   key: 'balance-sheet',
                   label: 'Balance Sheet',
                   icon: <Scale size={18} />,
-                  color: 'text-emerald-600',
-                  bg: 'bg-emerald-50',
-                  border: 'border-emerald-200',
-                  activeBg: 'bg-emerald-500' },
+                  color: 'text-[var(--pro-azure)]',
+                  bg: 'bg-[var(--pro-azure-50)]',
+                  border: 'border-[var(--pro-azure-100)]',
+                  activeBg: 'bg-[var(--pro-azure-50)]0' },
                 {
                   key: 'profit-loss',
                   label: 'Profit & Loss',
                   icon: <TrendingUp size={18} />,
-                  color: 'text-emerald-600',
-                  bg: 'bg-emerald-50',
-                  border: 'border-emerald-200',
-                  activeBg: 'bg-emerald-500' },
+                  color: 'text-[var(--pro-azure)]',
+                  bg: 'bg-[var(--pro-azure-50)]',
+                  border: 'border-[var(--pro-azure-100)]',
+                  activeBg: 'bg-[var(--pro-azure-50)]0' },
                 {
                   key: 'trial-balance',
                   label: 'Trial Balance',
@@ -8142,7 +8142,7 @@ return (
                   color: 'text-violet-600',
                   bg: 'bg-violet-50',
                   border: 'border-violet-200',
-                  activeBg: 'bg-emerald-500' },
+                  activeBg: 'bg-[var(--pro-azure-50)]0' },
                 {
                   key: 'ar-aging',
                   label: 'AR Aging',
@@ -8171,8 +8171,8 @@ return (
                   key: 'expense-summary',
                   label: 'Expenses',
                   icon: <FileText size={18} />,
-                  color: 'text-emerald-600',
-                  bg: 'bg-emerald-50',
+                  color: 'text-[var(--pro-azure)]',
+                  bg: 'bg-[var(--pro-azure-50)]',
                   border: 'border-orange-200',
                   activeBg: 'bg-amber-600' },
               ] as const
@@ -8223,10 +8223,10 @@ return (
       {rootTab === 'tax-vat-reports' && (
         <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-500">
           {/* Header */}
-          <div className="bg-gradient-to-r from-emerald-900 to-teal-900 rounded-xl p-5 text-white flex flex-wrap items-center justify-between gap-4">
+          <div className="bg-gradient-to-r from-[var(--pro-azure-dark)] to-teal-900 rounded-xl p-5 text-white flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-400/30 rounded-xl flex items-center justify-center shrink-0">
-                <ShieldCheck size={22} className="text-emerald-600 dark:text-emerald-300" />
+              <div className="w-12 h-12 bg-[var(--pro-azure-100)] dark:bg-[var(--pro-azure-50)]0/20 border border-[var(--pro-azure-100)] dark:border-[var(--pro-azure)]/30 rounded-xl flex items-center justify-center shrink-0">
+                <ShieldCheck size={22} className="text-[var(--pro-azure)] dark:text-green-300" />
               </div>
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-900/40 mb-0.5">
@@ -8243,19 +8243,19 @@ return (
             <div className="flex gap-2 flex-wrap">
               <Link
                 to="/tax/vat"
-                className="px-3 py-1.5 rounded-xl text-xs font-bold border border-emerald-200 dark:border-white/10 bg-emerald-100 dark:bg-white/10 hover:bg-white/20 text-slate-900 transition-all"
+                className="px-3 py-1.5 rounded-xl text-xs font-bold border border-[var(--pro-azure-100)] dark:border-white/10 bg-[var(--pro-azure-100)] dark:bg-white/10 hover:bg-white/20 text-slate-900 transition-all"
               >
                 VAT Admin
               </Link>
               <Link
                 to="/purchases/bills"
-                className="px-3 py-1.5 rounded-xl text-xs font-bold border border-emerald-200 dark:border-white/10 bg-emerald-100 dark:bg-white/10 hover:bg-white/20 text-slate-900 transition-all"
+                className="px-3 py-1.5 rounded-xl text-xs font-bold border border-[var(--pro-azure-100)] dark:border-white/10 bg-[var(--pro-azure-100)] dark:bg-white/10 hover:bg-white/20 text-slate-900 transition-all"
               >
                 Purchase Bills
               </Link>
               <Link
                 to="/sales/invoices"
-                className="px-3 py-1.5 rounded-xl text-xs font-bold border border-emerald-200 dark:border-white/10 bg-emerald-100 dark:bg-white/10 hover:bg-white/20 text-slate-900 transition-all"
+                className="px-3 py-1.5 rounded-xl text-xs font-bold border border-[var(--pro-azure-100)] dark:border-white/10 bg-[var(--pro-azure-100)] dark:bg-white/10 hover:bg-white/20 text-slate-900 transition-all"
               >
                 Sales Invoices
               </Link>
@@ -8264,8 +8264,8 @@ return (
           {/* Government Submission Banner */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center shrink-0">
-                <Globe size={18} className="text-emerald-600" />
+              <div className="w-10 h-10 bg-[var(--pro-azure-50)]0/20 rounded-xl flex items-center justify-center shrink-0">
+                <Globe size={18} className="text-[var(--pro-azure)]" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-slate-900">
@@ -8333,7 +8333,7 @@ if (!w) return;
                   w.print();
                   w.addEventListener('afterprint', () => w.close());
                 }}
-                className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-900 rounded-xl text-xs font-bold transition-all shadow-lg shadow-emerald-500/20"
+                className="flex items-center gap-2 px-4 py-2.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-slate-900 rounded-xl text-xs font-bold transition-all shadow-lg shadow-green-500/20"
               >
                 <Printer size={14} /> Print Submission Report
               </button>
@@ -8343,7 +8343,7 @@ if (!w) return;
                     'Submission package prepared — review and confirm in ERCA portal',
                   )
                 }
-                className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-900 rounded-xl text-xs font-bold transition-all shadow-lg shadow-emerald-500/20"
+                className="flex items-center gap-2 px-4 py-2.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-slate-900 rounded-xl text-xs font-bold transition-all shadow-lg shadow-green-500/20"
               >
                 <Send size={14} /> Submit to ERCA
               </button>
@@ -8368,15 +8368,15 @@ if (!w) return;
               {
                 label: 'VAT Withholding',
                 value: '15% rate',
-                color: 'text-emerald-700',
-                bg: 'bg-emerald-50',
-                border: 'border-emerald-200' },
+                color: 'text-[var(--pro-azure-dark)]',
+                bg: 'bg-[var(--pro-azure-50)]',
+                border: 'border-[var(--pro-azure-100)]' },
               {
                 label: 'Income Tax W/H',
                 value: '2% rate',
-                color: 'text-emerald-600',
-                bg: 'bg-emerald-50',
-                border: 'border-emerald-200' },
+                color: 'text-[var(--pro-azure)]',
+                bg: 'bg-[var(--pro-azure-50)]',
+                border: 'border-[var(--pro-azure-100)]' },
             ].map((k, i) => (
               <div
                 key={k.label}
@@ -8403,9 +8403,9 @@ if (!w) return;
                 title: 'VAT Return',
                 desc: 'Monthly output vs input VAT reconciliation',
                 icon: <BarChart3 size={16} />,
-                color: 'text-emerald-600',
-                bg: 'bg-emerald-50',
-                border: 'border-emerald-200',
+                color: 'text-[var(--pro-azure)]',
+                bg: 'bg-[var(--pro-azure-50)]',
+                border: 'border-[var(--pro-azure-100)]',
                 items: [
                   'Output VAT from sales invoices',
                   'Input VAT from purchase bills',
@@ -8416,9 +8416,9 @@ if (!w) return;
                 title: 'VAT Withholding',
                 desc: '15% withheld from VAT-registered suppliers',
                 icon: <ShieldCheck size={16} />,
-                color: 'text-emerald-600',
-                bg: 'bg-emerald-50',
-                border: 'border-emerald-200',
+                color: 'text-[var(--pro-azure)]',
+                bg: 'bg-[var(--pro-azure-50)]',
+                border: 'border-[var(--pro-azure-100)]',
                 items: [
                   'Supplier TIN verification',
                   'Invoice-level withholding register',
@@ -8473,8 +8473,8 @@ if (!w) return;
           </div>
           <div className="bg-white dark:ovds-widget-card dark:border-slate-100 p-5">
             <div className="flex flex-col items-center gap-4 py-8 text-center">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-50 flex items-center justify-center">
-                <ShieldCheck size={24} className="text-emerald-600" />
+              <div className="w-14 h-14 rounded-2xl bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)] flex items-center justify-center">
+                <ShieldCheck size={24} className="text-[var(--pro-azure)]" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-slate-800 dark:text-slate-900">Full VAT & Withholding Register</p>
@@ -8484,7 +8484,7 @@ if (!w) return;
               </div>
               <Link
                 to="/tax/vat"
-                className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
+                className="flex items-center gap-2 px-5 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-colors shadow-lg shadow-green-500/20"
               >
                 <ExternalLink size={14} /> Open VAT Administration
               </Link>
@@ -8500,10 +8500,10 @@ if (!w) return;
       {rootTab === 'accounting' && (
         <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-500">
           {/* Header */}
-          <div className="bg-emerald-50 dark:bg-gradient-to-r dark:from-emerald-900 dark:to-slate-900 rounded-xl p-5 text-white flex flex-wrap items-center justify-between gap-4">
+          <div className="bg-[var(--pro-azure-50)] dark:bg-gradient-to-r dark:from-green-900 dark:to-slate-900 rounded-xl p-5 text-white flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-400/30 rounded-xl flex items-center justify-center shrink-0">
-                <Landmark size={22} className="text-emerald-600 dark:text-emerald-300" />
+              <div className="w-12 h-12 bg-[var(--pro-azure-100)] dark:bg-[var(--pro-azure-50)]0/20 border border-[var(--pro-azure-100)] dark:border-[var(--pro-azure)]/30 rounded-xl flex items-center justify-center shrink-0">
+                <Landmark size={22} className="text-[var(--pro-azure)] dark:text-green-300" />
               </div>
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-900/40 mb-0.5">
@@ -8519,7 +8519,7 @@ if (!w) return;
             </div>
             <button
               onClick={fetchAccounting}
-              className="p-2.5 rounded-xl hover:bg-emerald-100 dark:bg-white/10 text-slate-900/60 hover:text-slate-900 transition-all"
+              className="p-2.5 rounded-xl hover:bg-[var(--pro-azure-100)] dark:bg-white/10 text-slate-900/60 hover:text-slate-900 transition-all"
               title="Refresh"
             >
               <RefreshCw
@@ -8536,8 +8536,8 @@ if (!w) return;
                   label: 'GL Accounts',
                   value: accounts.length,
                   sub: `${accounts.filter((a: any) => a.isActive).length} active`,
-                  color: 'text-emerald-600',
-                  bg: 'bg-emerald-50',
+                  color: 'text-[var(--pro-azure)]',
+                  bg: 'bg-[var(--pro-azure-50)]',
                   tab: 'accounts' as AccTab },
                 {
                   label: 'Journal Entries',
@@ -8550,8 +8550,8 @@ if (!w) return;
                   label: 'Bank Balance',
                   value: `ETB ${fmt(banks.reduce((s: number, b: any) => s + Number(b.balance), 0))}`,
                   sub: `${banks.length} accounts`,
-                  color: 'text-emerald-700',
-                  bg: 'bg-emerald-50',
+                  color: 'text-[var(--pro-azure-dark)]',
+                  bg: 'bg-[var(--pro-azure-50)]',
                   tab: 'banks' as AccTab },
                 {
                   label: 'Unreconciled',
@@ -8560,11 +8560,11 @@ if (!w) return;
                   color:
                     (reconSummary?.totalPending ?? 0) > 0
                       ? 'text-amber-700'
-                      : 'text-emerald-700',
+                      : 'text-[var(--pro-azure-dark)]',
                   bg:
                     (reconSummary?.totalPending ?? 0) > 0
                       ? 'bg-amber-50'
-                      : 'bg-emerald-50',
+                      : 'bg-[var(--pro-azure-50)]',
                   tab: 'reconcile' as AccTab },
                 {
                   label: 'Total Assets',
@@ -8572,8 +8572,8 @@ if (!w) return;
                     ? `ETB ${fmt(accountBalances.totals?.assets ?? 0)}`
                     : '—',
                   sub: 'from GL',
-                  color: 'text-emerald-600',
-                  bg: 'bg-emerald-50',
+                  color: 'text-[var(--pro-azure)]',
+                  bg: 'bg-[var(--pro-azure-50)]',
                   tab: 'reports' as AccTab },
                 {
                   label: 'Net Worth',
@@ -8583,7 +8583,7 @@ if (!w) return;
                   sub: 'equity + P&L',
                   color:
                     (accountBalances?.totals?.equity ?? 0) >= 0
-                      ? 'text-emerald-700'
+                      ? 'text-[var(--pro-azure-dark)]'
                       : 'text-rose-700',
                   bg: 'bg-white',
                   tab: 'reports' as AccTab },
@@ -8736,7 +8736,7 @@ const link = document.createElement('a');
                         setEditingAccount(null);
                         setShowAccountModal(true);
                       }}
-                      className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-all"
+                      className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
                     >
                       <Plus size={16} /> New Account
                     </button>
@@ -8770,16 +8770,16 @@ const link = document.createElement('a');
                           ]),
                         );
 const TYPE_COLORS: Record<string, string> = {
-                          ASSET: 'text-emerald-600',
+                          ASSET: 'text-[var(--pro-azure)]',
                           LIABILITY: 'text-rose-700',
                           EQUITY: 'text-violet-700',
-                          INCOME: 'text-emerald-700',
+                          INCOME: 'text-[var(--pro-azure-dark)]',
                           EXPENSE: 'text-amber-700' };
 const TYPE_BG: Record<string, string> = {
-                          ASSET: 'bg-emerald-50',
+                          ASSET: 'bg-[var(--pro-azure-50)]',
                           LIABILITY: 'bg-rose-50',
                           EQUITY: 'bg-violet-50',
-                          INCOME: 'bg-emerald-50',
+                          INCOME: 'bg-[var(--pro-azure-50)]',
                           EXPENSE: 'bg-amber-50' };
 const grouped = [
                           'ASSET',
@@ -8903,7 +8903,7 @@ catch (err: any) {
                                     );
                                   }
                                 }}
-                                className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600"
+                                className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)]"
                               >
                                 <Plus size={14} /> Setup Default Chart of
                                 Accounts
@@ -8957,7 +8957,7 @@ catch (err: any) {
                   ))}
                   <button
                     onClick={fetchAccounting}
-                    className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
                   >
                     <RefreshCw size={13} /> Apply
                   </button>
@@ -8995,8 +8995,8 @@ catch (err: any) {
                       {
                         label: 'Total Debits',
                         value: `ETB ${fmt(journals.reduce((s: number, j: any) => s + (j.lines || []).reduce((ls: number, l: any) => ls + Number(l.debit || 0), 0), 0))}`,
-                        color: 'text-emerald-600',
-                        bg: 'bg-emerald-50' },
+                        color: 'text-[var(--pro-azure)]',
+                        bg: 'bg-[var(--pro-azure-50)]' },
                       {
                         label: 'Total Credits',
                         value: `ETB ${fmt(journals.reduce((s: number, j: any) => s + (j.lines || []).reduce((ls: number, l: any) => ls + Number(l.credit || 0), 0), 0))}`,
@@ -9055,7 +9055,7 @@ return (
                           </div>
                           <div className="flex items-center gap-3 shrink-0">
                             <span
-                              className={`px-2.5 py-1 rounded-full text-[10px] font-semibold ${j.status === 'POSTED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}
+                              className={`px-2.5 py-1 rounded-full text-[10px] font-semibold ${j.status === 'POSTED' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : 'bg-amber-100 text-amber-700'}`}
                             >
                               {j.status}
                             </span>
@@ -9089,7 +9089,7 @@ return (
                                     <td className="py-1.5 font-medium text-slate-700">
                                       {l.account?.code} — {l.account?.name}
                                     </td>
-                                    <td className="py-1.5 text-right font-semibold text-emerald-600">
+                                    <td className="py-1.5 text-right font-semibold text-[var(--pro-azure)]">
                                       {l.debit > 0 ? fmt(l.debit) : '—'}
                                     </td>
                                     <td className="py-1.5 text-right font-semibold text-rose-700">
@@ -9101,7 +9101,7 @@ return (
                                   <td className="py-1.5 ovds-label">
                                     Totals
                                   </td>
-                                  <td className="py-1.5 text-right font-semibold text-emerald-600">
+                                  <td className="py-1.5 text-right font-semibold text-[var(--pro-azure)]">
                                     {fmt(totalDebit)}
                                   </td>
                                   <td className="py-1.5 text-right font-semibold text-rose-700">
@@ -9134,24 +9134,24 @@ return (
                       {
                         label: 'Total Balance',
                         value: `ETB ${fmt(banks.reduce((s: number, b: any) => s + Number(b.balance), 0))}`,
-                        color: 'text-emerald-700',
-                        bg: 'bg-emerald-50' },
+                        color: 'text-[var(--pro-azure-dark)]',
+                        bg: 'bg-[var(--pro-azure-50)]' },
                       {
                         label: 'Accounts',
                         value: banks.length,
-                        color: 'text-emerald-600',
-                        bg: 'bg-emerald-50' },
+                        color: 'text-[var(--pro-azure)]',
+                        bg: 'bg-[var(--pro-azure-50)]' },
                       {
                         label: 'Unreconciled',
                         value: reconSummary?.totalPending ?? 0,
                         color:
                           (reconSummary?.totalPending ?? 0) > 0
                             ? 'text-amber-700'
-                            : 'text-emerald-700',
+                            : 'text-[var(--pro-azure-dark)]',
                         bg:
                           (reconSummary?.totalPending ?? 0) > 0
                             ? 'bg-amber-50'
-                            : 'bg-emerald-50' },
+                            : 'bg-[var(--pro-azure-50)]' },
                       {
                         label: 'Last Reconciled',
                         value: reconSummary?.lastReconciledDate
@@ -9179,7 +9179,7 @@ return (
                 <div className="flex justify-end">
                   <button
                     onClick={() => setShowBankModal(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
                   >
                     <Plus size={16} /> Add Bank Account
                   </button>
@@ -9221,7 +9221,7 @@ return (
                       setEditingVendor(null);
                       setShowVendorModal(true);
                     }}
-                    className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
                   >
                     <Plus size={16} /> New Vendor
                   </button>
@@ -9344,7 +9344,7 @@ catch (err: any) {
                       setJournalModalIsTemplate(true);
                       setShowJournalModal(true);
                     }}
-                    className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-all shrink-0"
+                    className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-all shrink-0"
                   >
                     <Plus size={16} /> New Template
                   </button>
@@ -9407,7 +9407,7 @@ catch (err: any) {
                                   );
                                 }
                               }}
-                              className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all"
+                              className="flex items-center gap-1.5 px-4 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
                             >
                               Post Entry
                             </button>
@@ -9447,7 +9447,7 @@ catch (err: any) {
                                 <p
                                   className={
                                     l.debit > 0
-                                      ? 'text-emerald-600'
+                                      ? 'text-[var(--pro-azure)]'
                                       : 'text-rose-600'
                                   }
                                 >
@@ -9480,7 +9480,7 @@ catch (err: any) {
                           setJournalModalIsTemplate(true);
                           setShowJournalModal(true);
                         }}
-                        className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600"
+                        className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)]"
                       >
                         <Plus size={14} /> Create First Template
                       </button>
@@ -9526,8 +9526,8 @@ catch (err: any) {
                     {
                       label: 'Unreconciled Amount',
                       val: `ETB ${fmt(reconSummary?.unreconciledAmount ?? 0)}`,
-                      color: 'text-emerald-600',
-                      bg: 'bg-emerald-50' },
+                      color: 'text-[var(--pro-azure)]',
+                      bg: 'bg-[var(--pro-azure-50)]' },
                     {
                       label: 'Last Reconciled',
                       val: reconSummary?.lastReconciledDate
@@ -9535,18 +9535,18 @@ catch (err: any) {
                             reconSummary.lastReconciledDate,
                           ).toLocaleDateString()
                         : 'Never',
-                      color: 'text-emerald-600',
-                      bg: 'bg-emerald-50' },
+                      color: 'text-[var(--pro-azure)]',
+                      bg: 'bg-[var(--pro-azure-50)]' },
                     {
                       label: 'GL vs Bank Diff',
                       val: `ETB ${fmt(reconSummary?.difference ?? 0)}`,
                       color:
                         (reconSummary?.difference ?? 0) === 0
-                          ? 'text-emerald-600'
+                          ? 'text-[var(--pro-azure)]'
                           : 'text-rose-600',
                       bg:
                         (reconSummary?.difference ?? 0) === 0
-                          ? 'bg-emerald-50'
+                          ? 'bg-[var(--pro-azure-50)]'
                           : 'bg-rose-50' },
                   ].map((s, i) => (
                     <div
@@ -9585,8 +9585,8 @@ return (
                         >
                           <div className="flex items-center justify-between gap-4 flex-wrap">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0">
-                                <Landmark size={16} className="text-emerald-600" />
+                              <div className="w-10 h-10 bg-[var(--pro-azure-100)] rounded-xl flex items-center justify-center shrink-0">
+                                <Landmark size={16} className="text-[var(--pro-azure)]" />
                               </div>
                               <div>
                                 <p className="font-semibold text-slate-800 text-sm">
@@ -9623,7 +9623,7 @@ return (
                                   Difference
                                 </p>
                                 <p
-                                  className="text-sm font-semibold text-emerald-600"
+                                  className="text-sm font-semibold text-[var(--pro-azure)]"
                                   id={`diff-${b.id}`}
                                 >
                                   ETB 0.00
@@ -9643,7 +9643,7 @@ const stmt =
 const diff = Number(b.balance) - stmt;
 if (diffEl) {
                                     diffEl.textContent = `ETB ${fmt(Math.abs(diff))}`;
-                                    diffEl.className = `text-sm font-semibold ${diff === 0 ? 'text-emerald-600' : 'text-rose-600'}`;
+                                    diffEl.className = `text-sm font-semibold ${diff === 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`;
                                   }
 if (diff === 0)
                                     toast.success(
@@ -9654,7 +9654,7 @@ if (diff === 0)
                                       `${b.name}: difference of ETB ${fmt(Math.abs(diff))}`,
                                     );
                                 }}
-                                className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all"
+                                className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
                               >
                                 <CheckCircle2 size={13} /> Reconcile
                               </button>
@@ -9666,9 +9666,9 @@ if (diff === 0)
                   </div>
                 )}
 
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 flex items-start gap-3">
-                  <Info size={16} className="text-emerald-600 shrink-0 mt-0.5" />
-                  <p className="text-sm text-emerald-600">
+                <div className="bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-xl p-5 flex items-start gap-3">
+                  <Info size={16} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
+                  <p className="text-sm text-[var(--pro-azure)]">
                     Enter your bank statement closing balance for each account,
                     then click Reconcile to compare against the GL. Any
                     difference indicates unrecorded transactions or timing

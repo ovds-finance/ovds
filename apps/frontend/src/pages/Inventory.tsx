@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { evalMath } from '@ovds/ui';
 import { 
   Warehouse as WarehouseIcon, ArrowLeftRight, ArrowRight, Activity, 
   TrendingUp, TrendingDown, Plus, Edit2, Trash2,
@@ -6,15 +6,17 @@ import {
   FileText, MapPin,
   User, BarChart3, PieChart, LineChart as LineChartIcon
 } from 'lucide-react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { Skeleton, EmptyState, AppPage, Btn, Select } from '../components/ui';
+
+import { Skeleton, AppPage, Btn } from '../components/ui';
 import { useBusiness } from '../context/businessContext';
-import { useWarehouses, useTransferOrders, useInventoryValuation, useItems, useInventoryHistory, useLowStockAlerts, useInventorySummary, useProductSalesPerformance, useOutOfStockAlerts } from '../services/inventoryApi';
-import { fmtCurrency, fmtDate } from '../utils/fmt';
-import { confirm } from '../utils/confirm';
 import { usePageTitle } from '../hooks/usePageTitle';
 import api from '../services/api';
-import { evalMath } from '@ovds/ui';
+import { useWarehouses, useTransferOrders, useInventoryValuation, useItems, useInventoryHistory, useLowStockAlerts, useInventorySummary, useProductSalesPerformance, useOutOfStockAlerts } from '../services/inventoryApi';
+import { confirm } from '../utils/confirm';
+import { fmtCurrency, fmtDate } from '../utils/fmt';
+
 
 const Inventory: React.FC = () => {
   usePageTitle('Inventory Management');
@@ -71,14 +73,14 @@ const Inventory: React.FC = () => {
       }
     };
 
-    const inp = "w-full px-3 py-2 bg-white border border-emerald-200 rounded-lg text-sm text-emerald-900 outline-none focus:ring-2 focus:ring-teal-400/20 focus:border-teal-400 transition-all";
-    const lbl = "block text-[11px] font-semibold text-emerald-700 uppercase tracking-wider mb-1";
+    const inp = "w-full px-3 py-2 bg-white border border-[var(--pro-azure-100)] rounded-lg text-sm text-[var(--pro-azure-dark)] outline-none focus:ring-2 focus:ring-teal-400/20 focus:border-teal-400 transition-all";
+    const lbl = "block text-[11px] font-semibold text-[var(--pro-azure-dark)] uppercase tracking-wider mb-1";
 
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg border border-emerald-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-emerald-100 flex items-center justify-between">
-            <h3 className="font-bold text-emerald-900">{editingWarehouse ? 'Edit Warehouse' : 'New Warehouse'}</h3>
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg border border-[var(--pro-azure-100)] overflow-hidden">
+          <div className="px-6 py-4 border-b border-[var(--pro-azure-100)] flex items-center justify-between">
+            <h3 className="font-bold text-[var(--pro-azure-dark)]">{editingWarehouse ? 'Edit Warehouse' : 'New Warehouse'}</h3>
             <button onClick={() => setShowWarehouseModal(false)} className="text-slate-400 hover:text-slate-600"><X size={20}/></button>
           </div>
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -114,7 +116,7 @@ const Inventory: React.FC = () => {
             </div>
             <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
               <button type="button" onClick={() => setShowWarehouseModal(false)} className="px-4 py-2 text-sm text-slate-600">Cancel</button>
-              <button type="submit" className="px-6 py-2 bg-emerald-500 text-white rounded-lg text-sm font-bold">Save Warehouse</button>
+              <button type="submit" className="px-6 py-2 bg-[var(--pro-azure)] text-white rounded-lg text-sm font-bold">Save Warehouse</button>
             </div>
           </form>
         </div>
@@ -143,14 +145,14 @@ const Inventory: React.FC = () => {
       }
     };
 
-    const inp = "w-full px-3 py-2 bg-white border border-emerald-200 rounded-lg text-sm text-emerald-900 outline-none focus:ring-2 focus:ring-teal-400/20 focus:border-teal-400 transition-all";
-    const lbl = "block text-[11px] font-semibold text-emerald-700 uppercase tracking-wider mb-1";
+    const inp = "w-full px-3 py-2 bg-white border border-[var(--pro-azure-100)] rounded-lg text-sm text-[var(--pro-azure-dark)] outline-none focus:ring-2 focus:ring-teal-400/20 focus:border-teal-400 transition-all";
+    const lbl = "block text-[11px] font-semibold text-[var(--pro-azure-dark)] uppercase tracking-wider mb-1";
 
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl border border-emerald-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-emerald-100 flex items-center justify-between">
-            <h3 className="font-bold text-emerald-900">Create Transfer Order</h3>
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl border border-[var(--pro-azure-100)] overflow-hidden">
+          <div className="px-6 py-4 border-b border-[var(--pro-azure-100)] flex items-center justify-between">
+            <h3 className="font-bold text-[var(--pro-azure-dark)]">Create Transfer Order</h3>
             <button onClick={() => setShowTransferModal(false)} className="text-slate-400 hover:text-slate-600"><X size={20}/></button>
           </div>
           <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
@@ -195,7 +197,7 @@ const Inventory: React.FC = () => {
                   <button type="button" onClick={() => setForm({...form, items: form.items.filter((_, i) => i !== idx)})} className="p-2.5 text-rose-500 hover:bg-rose-50 rounded-lg"><Trash2 size={16}/></button>
                 </div>
               ))}
-              <button type="button" onClick={() => setForm({...form, items: [...form.items, { itemId: '', quantity: 1 }]})} className="text-xs font-bold text-emerald-600 hover:underline">+ Add Another Item</button>
+              <button type="button" onClick={() => setForm({...form, items: [...form.items, { itemId: '', quantity: 1 }]})} className="text-xs font-bold text-[var(--pro-azure)] hover:underline">+ Add Another Item</button>
             </div>
 
             <div>
@@ -205,7 +207,7 @@ const Inventory: React.FC = () => {
 
             <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
               <button type="button" onClick={() => setShowTransferModal(false)} className="px-4 py-2 text-sm text-slate-600">Cancel</button>
-              <button type="submit" className="px-6 py-2 bg-emerald-500 text-white rounded-lg text-sm font-bold shadow-lg shadow-emerald-500/20">Create Transfer</button>
+              <button type="submit" className="px-6 py-2 bg-[var(--pro-azure)] text-white rounded-lg text-sm font-bold shadow-lg shadow-green-500/20">Create Transfer</button>
             </div>
           </form>
         </div>
@@ -235,14 +237,14 @@ const Inventory: React.FC = () => {
       }
     };
 
-    const inp = "w-full px-3 py-2 bg-white border border-emerald-200 rounded-lg text-sm text-emerald-900 outline-none focus:ring-2 focus:ring-teal-400/20 focus:border-teal-400 transition-all";
-    const lbl = "block text-[11px] font-semibold text-emerald-700 uppercase tracking-wider mb-1";
+    const inp = "w-full px-3 py-2 bg-white border border-[var(--pro-azure-100)] rounded-lg text-sm text-[var(--pro-azure-dark)] outline-none focus:ring-2 focus:ring-teal-400/20 focus:border-teal-400 transition-all";
+    const lbl = "block text-[11px] font-semibold text-[var(--pro-azure-dark)] uppercase tracking-wider mb-1";
 
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md border border-emerald-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-emerald-100 flex items-center justify-between">
-            <h3 className="font-bold text-emerald-900">Inventory Adjustment</h3>
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md border border-[var(--pro-azure-100)] overflow-hidden">
+          <div className="px-6 py-4 border-b border-[var(--pro-azure-100)] flex items-center justify-between">
+            <h3 className="font-bold text-[var(--pro-azure-dark)]">Inventory Adjustment</h3>
             <button onClick={() => setShowAdjustmentModal(false)} className="text-slate-400 hover:text-slate-600"><X size={20}/></button>
           </div>
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -279,7 +281,7 @@ const Inventory: React.FC = () => {
             </div>
             <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
               <button type="button" onClick={() => setShowAdjustmentModal(false)} className="px-4 py-2 text-sm text-slate-600">Cancel</button>
-              <button type="submit" className="px-6 py-2 bg-emerald-500 text-white rounded-lg text-sm font-bold">Apply Adjustment</button>
+              <button type="submit" className="px-6 py-2 bg-[var(--pro-azure)] text-white rounded-lg text-sm font-bold">Apply Adjustment</button>
             </div>
           </form>
         </div>
@@ -291,20 +293,20 @@ const Inventory: React.FC = () => {
     <div className="space-y-6">
       <div className="ovds-grid-layout cols-3 gap-lg">
         {loadingW ? [1,2,3].map(i => <Skeleton.Line key={i} className="h-40 rounded-xl" />) : warehouses.map(w => (
-          <div key={w.id} className={`ovds-panel p-5 transition-all group ${w.isDefault ? 'border-emerald-500 ring-2 ring-emerald-500/10' : 'hover:border-slate-200'}`}>
+          <div key={w.id} className={`ovds-panel p-5 transition-all group ${w.isDefault ? 'border-[var(--pro-azure)] ring-2 ring-[var(--pro-azure)]/10' : 'hover:border-slate-200'}`}>
             <div className="flex justify-between items-start mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-2xl bg-[var(--pro-azure-50)] dark:bg-green-950/30 flex items-center justify-center text-[var(--pro-azure)] group-hover:scale-110 transition-transform">
                 <WarehouseIcon size={24}/>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => { setEditingWarehouse(w); setShowWarehouseModal(true); }} className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"><Edit2 size={18}/></button>
+                <button onClick={() => { setEditingWarehouse(w); setShowWarehouseModal(true); }} className="p-2 text-slate-400 hover:text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)] rounded-xl transition-all"><Edit2 size={18}/></button>
                 {!w.isDefault && <button onClick={() => handleDeleteWarehouse(w.id)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"><Trash2 size={18}/></button>}
               </div>
             </div>
-            <h3 className="font-black text-emerald-900 text-lg mb-1">{w.name}</h3>
+            <h3 className="font-black text-[var(--pro-azure-dark)] text-lg mb-1">{w.name}</h3>
             <div className="flex items-center gap-2 mb-4">
               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{w.code}</span>
-              {w.isDefault && <span className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">Primary</span>}
+              {w.isDefault && <span className="bg-[var(--pro-azure-50)] text-[var(--pro-azure)] text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">Primary</span>}
             </div>
             
             <div className="space-y-2 mt-4 pt-4 border-t border-slate-50 dark:border-slate-800">
@@ -320,8 +322,8 @@ const Inventory: React.FC = () => {
           </div>
         ))}
         {!loadingW && (
-          <button onClick={() => { setEditingWarehouse(null); setShowWarehouseModal(true); }} className="h-40 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-3 text-slate-400 hover:border-emerald-500 hover:text-emerald-500 transition-all group">
-            <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center group-hover:bg-emerald-50 transition-colors">
+          <button onClick={() => { setEditingWarehouse(null); setShowWarehouseModal(true); }} className="h-40 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-3 text-slate-400 hover:border-[var(--pro-azure)] hover:text-[var(--pro-azure)] transition-all group">
+            <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center group-hover:bg-[var(--pro-azure-50)] transition-colors">
               <Plus size={24}/>
             </div>
             <span className="text-sm font-bold uppercase tracking-widest">Add Warehouse</span>
@@ -335,12 +337,12 @@ const Inventory: React.FC = () => {
     <div className="ovds-panel overflow-hidden">
       <table className="ovds-table w-full text-left border-collapse">
         <thead>
-          <tr className="bg-emerald-50/50">
-            <th className="px-6 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-widest">Reference</th>
-            <th className="px-6 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-widest">Movement</th>
-            <th className="px-6 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-widest">Status</th>
-            <th className="px-6 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-widest">Created</th>
-            <th className="px-6 py-5 text-[10px] font-black text-emerald-600 uppercase tracking-widest text-right">Actions</th>
+          <tr className="bg-[var(--pro-azure-50)]/50">
+            <th className="px-6 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-widest">Reference</th>
+            <th className="px-6 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-widest">Movement</th>
+            <th className="px-6 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-widest">Status</th>
+            <th className="px-6 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-widest">Created</th>
+            <th className="px-6 py-5 text-[10px] font-black text-[var(--pro-azure)] uppercase tracking-widest text-right">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
@@ -371,8 +373,8 @@ const Inventory: React.FC = () => {
               </td>
               <td className="px-6 py-4">
                 <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                  t.status === 'RECEIVED' ? 'bg-emerald-50 text-emerald-600' :
-                  t.status === 'SENT' ? 'bg-emerald-50 text-emerald-600' :
+                  t.status === 'RECEIVED' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' :
+                  t.status === 'SENT' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' :
                   t.status === 'CANCELLED' ? 'bg-rose-50 text-rose-600' :
                   'bg-amber-50 text-amber-600'
                 }`}>
@@ -385,12 +387,12 @@ const Inventory: React.FC = () => {
               </td>
               <td className="px-6 py-4 text-right">
                 {t.status === 'DRAFT' && (
-                  <button onClick={() => updateTStatus(t.id, 'SENT')} className="px-4 py-1.5 bg-emerald-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest">Mark as Sent</button>
+                  <button onClick={() => updateTStatus(t.id, 'SENT')} className="px-4 py-1.5 bg-[var(--pro-azure)] text-white rounded-lg text-[10px] font-black uppercase tracking-widest">Mark as Sent</button>
                 )}
                 {t.status === 'SENT' && (
-                  <button onClick={() => updateTStatus(t.id, 'RECEIVED')} className="px-4 py-1.5 bg-emerald-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest">Mark Received</button>
+                  <button onClick={() => updateTStatus(t.id, 'RECEIVED')} className="px-4 py-1.5 bg-[var(--pro-azure)] text-white rounded-lg text-[10px] font-black uppercase tracking-widest">Mark Received</button>
                 )}
-                {t.status === 'RECEIVED' && <CheckCircle2 size={20} className="inline text-emerald-500" />}
+                {t.status === 'RECEIVED' && <CheckCircle2 size={20} className="inline text-[var(--pro-azure)]" />}
               </td>
             </tr>
           ))}
@@ -403,24 +405,24 @@ const Inventory: React.FC = () => {
     <div className="space-y-6">
       <div className="ovds-grid-layout cols-3 gap-lg">
         <div className="ovds-panel p-4 flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600"><TrendingUp size={24}/></div>
+          <div className="w-12 h-12 rounded-2xl bg-[var(--pro-azure-50)] flex items-center justify-center text-[var(--pro-azure)]"><TrendingUp size={24}/></div>
           <div>
             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Total Value</p>
-            <p className="text-2xl font-black text-emerald-900">{fmtCurrency(valuation?.totalValue || 0)}</p>
+            <p className="text-2xl font-black text-[var(--pro-azure-dark)]">{fmtCurrency(valuation?.totalValue || 0)}</p>
           </div>
         </div>
         <div className="ovds-panel p-4 flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600"><BarChart3 size={24}/></div>
+          <div className="w-12 h-12 rounded-2xl bg-[var(--pro-azure-50)] flex items-center justify-center text-[var(--pro-azure)]"><BarChart3 size={24}/></div>
           <div>
             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Method</p>
-            <p className="text-2xl font-black text-emerald-900">{valuation?.method || 'WA'}</p>
+            <p className="text-2xl font-black text-[var(--pro-azure-dark)]">{valuation?.method || 'WA'}</p>
           </div>
         </div>
         <div className="ovds-panel p-4 flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600"><PieChart size={24}/></div>
           <div>
             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Items Tracked</p>
-            <p className="text-2xl font-black text-emerald-900">{valuation?.items?.length || 0}</p>
+            <p className="text-2xl font-black text-[var(--pro-azure-dark)]">{valuation?.items?.length || 0}</p>
           </div>
         </div>
       </div>
@@ -433,17 +435,17 @@ const Inventory: React.FC = () => {
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${idx === 0 ? 'bg-amber-50 text-amber-500' : 'bg-white text-slate-400'}`}>
                 <TrendingUp size={20} />
               </div>
-              <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg uppercase">
+              <span className="text-[10px] font-black text-[var(--pro-azure)] bg-[var(--pro-azure-50)] px-2 py-1 rounded-lg uppercase">
                 Best Performer
               </span>
             </div>
             <div>
               <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Top Item</p>
-              <h4 className="font-bold text-emerald-900 truncate">{item.name}</h4>
+              <h4 className="font-bold text-[var(--pro-azure-dark)] truncate">{item.name}</h4>
             </div>
             <div className="flex items-end justify-between mt-2">
-              <p className="text-lg font-black text-emerald-600">{fmtCurrency(item.totalValue)}</p>
-              <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-500">
+              <p className="text-lg font-black text-[var(--pro-azure)]">{fmtCurrency(item.totalValue)}</p>
+              <div className="flex items-center gap-1 text-[10px] font-bold text-[var(--pro-azure)]">
                 <TrendingUp size={12}/> +{24 - idx * 4}%
               </div>
             </div>
@@ -463,7 +465,7 @@ const Inventory: React.FC = () => {
             </div>
             <div>
               <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{item.code}</p>
-              <h4 className="font-bold text-emerald-900 truncate">{item.name}</h4>
+              <h4 className="font-bold text-[var(--pro-azure-dark)] truncate">{item.name}</h4>
             </div>
             <div className="flex items-end justify-between mt-2">
               <p className="text-lg font-black text-rose-600">{item.stock} {item.unit}</p>
@@ -475,13 +477,13 @@ const Inventory: React.FC = () => {
         ))}
 
         {items.filter(i => i.itemType === 'PRODUCT' && i.stock <= (i.reorderLevel ?? 0)).length === 0 && (
-          <div className="col-span-2 bg-emerald-50/30 dark:bg-emerald-950/10 rounded-xl p-5 border border-dashed border-emerald-200 dark:border-emerald-800 flex items-center justify-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+          <div className="col-span-2 bg-[var(--pro-azure-50)]/30 dark:bg-green-950/10 rounded-xl p-5 border border-dashed border-[var(--pro-azure-100)] dark:border-green-800 flex items-center justify-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-[var(--pro-azure-100)] text-[var(--pro-azure)] flex items-center justify-center">
               <CheckCircle2 size={24} />
             </div>
             <div>
-              <p className="text-sm font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">All Stock Levels Healthy</p>
-              <p className="text-xs text-emerald-600 dark:text-emerald-500/70">No items are currently below reorder levels.</p>
+              <p className="text-sm font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] uppercase tracking-wider">All Stock Levels Healthy</p>
+              <p className="text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure)]/70">No items are currently below reorder levels.</p>
             </div>
           </div>
         )}
@@ -505,10 +507,10 @@ const Inventory: React.FC = () => {
                   <tr key={item.id} className="group hover:bg-slate-50/50 transition-colors">
                     <td className="px-4 py-4 font-bold text-slate-700">{item.name} <span className="text-[10px] text-slate-400 font-normal ml-2">{item.code}</span></td>
                     <td className="px-4 py-4 text-sm font-black text-slate-600">{item.stock} <span className="ovds-caption">{item.unit}</span></td>
-                    <td className="px-4 py-4 text-sm font-black text-emerald-600">{fmtCurrency(item.unitCost)}</td>
+                    <td className="px-4 py-4 text-sm font-black text-[var(--pro-azure)]">{fmtCurrency(item.unitCost)}</td>
                     <td className="px-4 py-4 text-sm font-black text-slate-800">{fmtCurrency(item.totalValue)}</td>
                     <td className="px-4 py-4 text-right">
-                       <span className="flex items-center justify-end gap-1 text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg uppercase tracking-tight">
+                       <span className="flex items-center justify-end gap-1 text-[10px] font-black text-[var(--pro-azure)] bg-[var(--pro-azure-50)] px-2 py-1 rounded-lg uppercase tracking-tight">
                          <TrendingUp size={10}/> 12%
                        </span>
                     </td>
@@ -551,11 +553,11 @@ const Inventory: React.FC = () => {
                 </td>
                 <td className="px-6 py-4">
                   <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
-                    isAdd ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
+                    isAdd ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' : 'bg-rose-50 text-rose-600'
                   }`}>{a.type}</span>
                 </td>
                 <td className="px-6 py-4">
-                  <span className={`text-sm font-black ${isAdd ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  <span className={`text-sm font-black ${isAdd ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>
                     {isAdd ? '+' : '-'}{a.quantity}
                   </span>
                 </td>
@@ -575,7 +577,7 @@ const Inventory: React.FC = () => {
       title="Inventory"
       subtitle="Warehouses, internal transfers, and stock valuation · Supply Chain · Manufacturing & Logistics · Retail & E-commerce · Market Size · Market Segmentation · Revenue"
       icon={<WarehouseIcon size={18} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       crumbs={[{ label: 'Inventory' }]}
       actions={
         <>
@@ -612,7 +614,7 @@ const Inventory: React.FC = () => {
             className={[
               'flex items-center gap-2 px-4 py-2 rounded-xl text-[12px] font-bold uppercase tracking-wide transition-all duration-150',
               activeTab === t.id
-                ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200 dark:border-slate-700'
+                ? 'bg-white dark:bg-slate-900 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shadow-sm border border-slate-200 dark:border-slate-700'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white/60 dark:hover:bg-slate-700/50',
             ].join(' ')}
           >
@@ -695,7 +697,7 @@ const NrvTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
         {[
           { label: 'Write-Down Candidates', value: candidates.length,           accent: 'bg-amber-500' },
           { label: 'Total Exposure (ETB)',   value: fmtCurrency(totalExposure), accent: 'bg-rose-500'  },
-          { label: 'Reviewed',               value: 0,                           accent: 'bg-emerald-500' },
+          { label: 'Reviewed',               value: 0,                           accent: 'bg-[var(--pro-azure-50)]0' },
         ].map(k => (
           <div key={k.label} className="ovds-widget-card p-4">
             <div className={`w-1 h-6 rounded-full ${k.accent} mb-2`} />
@@ -709,14 +711,14 @@ const NrvTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
       <div className="ovds-widget-card overflow-hidden">
         <div className="ovds-widget-header">
           <p className="ovds-card-title">Write-Down Candidates</p>
-          <button onClick={load} className="ml-auto text-[10px] text-slate-400 hover:text-emerald-600">Refresh</button>
+          <button onClick={load} className="ml-auto text-[10px] text-slate-400 hover:text-[var(--pro-azure)]">Refresh</button>
         </div>
         {loading ? (
-          <div className="py-10 text-center"><div className="animate-spin w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full mx-auto" /></div>
+          <div className="py-10 text-center"><div className="animate-spin w-5 h-5 border-2 border-[var(--pro-azure)] border-t-transparent rounded-full mx-auto" /></div>
         ) : candidates.length === 0 ? (
           <div className="py-12 text-center">
-            <CheckCircle2 size={24} className="mx-auto text-emerald-400 mb-2" />
-            <p className="text-sm font-semibold text-emerald-700">All inventory items are at or below cost — no write-downs required.</p>
+            <CheckCircle2 size={24} className="mx-auto text-[var(--pro-azure-light)] mb-2" />
+            <p className="text-sm font-semibold text-[var(--pro-azure-dark)]">All inventory items are at or below cost — no write-downs required.</p>
           </div>
         ) : (
           <table className="w-full text-[11px]">
@@ -841,16 +843,16 @@ const StocktakeTab: React.FC<{ companyId?: string; items: any[]; refetchItems: (
 
       {/* Result summary */}
       {result && (
-        <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl space-y-2">
-          <p className="font-bold text-emerald-800 dark:text-emerald-200 text-[12px]">✓ Stocktake Complete — {result.countDate}</p>
+        <div className="p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl space-y-2">
+          <p className="font-bold text-[var(--pro-azure-dark)] dark:text-green-200 text-[12px]">✓ Stocktake Complete — {result.countDate}</p>
           <div className="grid grid-cols-4 gap-3 text-[11px]">
             {[
               { label: 'Items Counted', value: result.totalItemsCounted },
-              { label: 'Matched',       value: result.matchedCount,   cls: 'text-emerald-700 dark:text-emerald-400' },
+              { label: 'Matched',       value: result.matchedCount,   cls: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' },
               { label: 'Shortages',     value: result.shortageCount,  cls: 'text-rose-600' },
               { label: 'Surplus',       value: result.surplusCount,   cls: 'text-amber-600' },
             ].map(k => (
-              <div key={k.label} className="bg-white dark:bg-slate-800 rounded-lg p-2 border border-emerald-100 dark:border-emerald-900">
+              <div key={k.label} className="bg-white dark:bg-slate-800 rounded-lg p-2 border border-[var(--pro-azure-100)] dark:border-green-900">
                 <p className="text-slate-400">{k.label}</p>
                 <p className={`font-black text-[14px] ${k.cls ?? ''}`}>{k.value}</p>
               </div>
@@ -861,7 +863,7 @@ const StocktakeTab: React.FC<{ companyId?: string; items: any[]; refetchItems: (
               Total variance value: ETB {fmtCurrency(result.totalVarianceValue)}
             </p>
           )}
-          <button onClick={() => setResult(null)} className="text-[10px] text-emerald-600 hover:underline mt-1">Start new count</button>
+          <button onClick={() => setResult(null)} className="text-[10px] text-[var(--pro-azure)] hover:underline mt-1">Start new count</button>
         </div>
       )}
 
@@ -877,7 +879,7 @@ const StocktakeTab: React.FC<{ companyId?: string; items: any[]; refetchItems: (
               <label className="flex items-center gap-1.5 text-[11px] text-slate-600 cursor-pointer select-none">
                 <div
                   onClick={() => setPostAdj(p => !p)}
-                  className={`w-9 h-5 rounded-full transition-all relative cursor-pointer ${postAdj ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}
+                  className={`w-9 h-5 rounded-full transition-all relative cursor-pointer ${postAdj ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-200 dark:bg-slate-700'}`}
                 >
                   <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${postAdj ? 'left-4' : 'left-0.5'}`} />
                 </div>
@@ -886,7 +888,7 @@ const StocktakeTab: React.FC<{ companyId?: string; items: any[]; refetchItems: (
               <button
                 onClick={handleSubmit}
                 disabled={submitting || Object.keys(counts).filter(k => counts[k] !== '').length === 0}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-[11px] font-bold rounded-xl transition-colors"
+                className="px-4 py-2 bg-[var(--pro-azure)] hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 text-white text-[11px] font-bold rounded-xl transition-colors"
               >
                 {submitting ? 'Submitting…' : `Submit Count (${Object.keys(counts).filter(k => counts[k] !== '').length})`}
               </button>
@@ -925,7 +927,7 @@ const StocktakeTab: React.FC<{ companyId?: string; items: any[]; refetchItems: (
                       </td>
                       <td className="px-4 py-2.5">
                         {variance !== null ? (
-                          <span className={`font-bold tabular-nums ${variance > 0 ? 'text-emerald-600' : variance < 0 ? 'text-rose-600' : 'text-slate-400'}`}>
+                          <span className={`font-bold tabular-nums ${variance > 0 ? 'text-[var(--pro-azure)]' : variance < 0 ? 'text-rose-600' : 'text-slate-400'}`}>
                             {variance > 0 ? `+${variance}` : variance}
                           </span>
                         ) : <span className="text-slate-200 dark:text-slate-700">—</span>}
@@ -978,10 +980,10 @@ const ReportsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
     <div className="space-y-6">
       <div className="ovds-grid-layout cols-4 gap-sm">
         {[
-          { label: 'Total Items', value: summary?.items?.length ?? 0, accent: 'bg-emerald-500' },
+          { label: 'Total Items', value: summary?.items?.length ?? 0, accent: 'bg-[var(--pro-azure-50)]0' },
           { label: 'Opening Value', value: summary ? fmtCurrency(summary.totalOpeningValue) : '—', accent: 'bg-sky-500' },
           { label: 'Closing Value', value: summary ? fmtCurrency(summary.totalClosingValue) : '—', accent: 'bg-violet-500' },
-          { label: 'Value Change', value: summary ? `${summary.totalClosingValue >= summary.totalOpeningValue ? '+' : ''}${fmtCurrency(summary.totalClosingValue - summary.totalOpeningValue)}` : '—', accent: summary && summary.totalClosingValue >= summary.totalOpeningValue ? 'bg-emerald-500' : 'bg-rose-500' },
+          { label: 'Value Change', value: summary ? `${summary.totalClosingValue >= summary.totalOpeningValue ? '+' : ''}${fmtCurrency(summary.totalClosingValue - summary.totalOpeningValue)}` : '—', accent: summary && summary.totalClosingValue >= summary.totalOpeningValue ? 'bg-[var(--pro-azure-50)]0' : 'bg-rose-500' },
         ].map(k => (
           <div key={k.label} className="ovds-widget-card p-4">
             <div className={`w-1 h-6 rounded-full ${k.accent} mb-2`} />
@@ -994,7 +996,7 @@ const ReportsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-1 bg-white dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
           {(['SUMMARY', 'SALES'] as const).map(t => (
-            <button key={t} onClick={() => setReportType(t)} className={`px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase transition-all ${reportType === t ? 'bg-emerald-500 text-white shadow' : 'text-slate-500 hover:text-slate-700'}`}>{t === 'SUMMARY' ? 'Inventory Summary' : 'Sales Performance'}</button>
+            <button key={t} onClick={() => setReportType(t)} className={`px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase transition-all ${reportType === t ? 'bg-[var(--pro-azure)] text-white shadow' : 'text-slate-500 hover:text-slate-700'}`}>{t === 'SUMMARY' ? 'Inventory Summary' : 'Sales Performance'}</button>
           ))}
         </div>
         <div className="flex items-center gap-2 ml-auto">
@@ -1002,7 +1004,7 @@ const ReportsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
           <span className="text-[10px] text-slate-400 font-bold">TO</span>
           <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="px-2 py-1.5 text-[11px] border border-slate-200 rounded-lg bg-white dark:bg-slate-800" />
           <button onClick={() => { refetchSummary(); }} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded-lg">Apply</button>
-          <button onClick={handleExportCsv} className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold rounded-lg">Export CSV</button>
+          <button onClick={handleExportCsv} className="px-3 py-1.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white text-[11px] font-bold rounded-lg">Export CSV</button>
         </div>
       </div>
 
@@ -1013,7 +1015,7 @@ const ReportsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
             <span className="text-[10px] text-slate-400">{dateFrom} → {dateTo}</span>
           </div>
           {loadingSummary ? (
-            <div className="py-10 text-center"><div className="animate-spin w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full mx-auto" /></div>
+            <div className="py-10 text-center"><div className="animate-spin w-5 h-5 border-2 border-[var(--pro-azure)] border-t-transparent rounded-full mx-auto" /></div>
           ) : summary?.items?.length === 0 ? (
             <div className="py-10 text-center text-slate-400 text-sm">No inventory data for this period.</div>
           ) : (
@@ -1032,7 +1034,7 @@ const ReportsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
                       <td className="px-4 py-2.5 font-semibold text-slate-800 dark:text-slate-100">{l.itemName}</td>
                       <td className="px-4 py-2.5 font-mono text-slate-400">{l.itemCode}</td>
                       <td className="px-4 py-2.5 tabular-nums">{l.openingQty}</td>
-                      <td className="px-4 py-2.5 tabular-nums text-emerald-600 font-semibold">+{l.receivedQty}</td>
+                      <td className="px-4 py-2.5 tabular-nums text-[var(--pro-azure)] font-semibold">+{l.receivedQty}</td>
                       <td className="px-4 py-2.5 tabular-nums text-rose-600 font-semibold">-{l.soldQty}</td>
                       <td className="px-4 py-2.5 tabular-nums">{l.adjustedQty >= 0 ? '+' : ''}{l.adjustedQty}</td>
                       <td className="px-4 py-2.5 tabular-nums font-black text-slate-800">{l.closingQty}</td>
@@ -1054,7 +1056,7 @@ const ReportsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
             <span className="text-[10px] text-slate-400">{dateFrom} → {dateTo}</span>
           </div>
           {loadingSales ? (
-            <div className="py-10 text-center"><div className="animate-spin w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full mx-auto" /></div>
+            <div className="py-10 text-center"><div className="animate-spin w-5 h-5 border-2 border-[var(--pro-azure)] border-t-transparent rounded-full mx-auto" /></div>
           ) : salesPerf?.length === 0 ? (
             <div className="py-10 text-center text-slate-400 text-sm">No sales data for this period.</div>
           ) : (
@@ -1074,11 +1076,11 @@ const ReportsTab: React.FC<{ companyId?: string }> = ({ companyId }) => {
                       <td className="px-4 py-2.5 font-mono text-slate-400">{p.itemCode}</td>
                       <td className="px-4 py-2.5 text-slate-600">{p.unit}</td>
                       <td className="px-4 py-2.5 tabular-nums font-bold">{p.totalQtySold}</td>
-                      <td className="px-4 py-2.5 tabular-nums text-emerald-600 font-semibold">{fmtCurrency(p.totalRevenue)}</td>
+                      <td className="px-4 py-2.5 tabular-nums text-[var(--pro-azure)] font-semibold">{fmtCurrency(p.totalRevenue)}</td>
                       <td className="px-4 py-2.5 tabular-nums text-slate-500">{fmtCurrency(p.totalCost)}</td>
                       <td className="px-4 py-2.5 tabular-nums font-black text-slate-800">{fmtCurrency(p.grossProfit)}</td>
                       <td className="px-4 py-2.5 tabular-nums">
-                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${p.marginPct >= 30 ? 'bg-emerald-50 text-emerald-600' : p.marginPct >= 10 ? 'bg-amber-50 text-amber-600' : 'bg-rose-50 text-rose-600'}`}>
+                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${p.marginPct >= 30 ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' : p.marginPct >= 10 ? 'bg-amber-50 text-amber-600' : 'bg-rose-50 text-rose-600'}`}>
                           {p.marginPct}%
                         </span>
                       </td>

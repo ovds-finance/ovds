@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { useBusiness } from '../../context/businessContext';
 import { useAgmList, useCreateAgm, useDeleteAgm } from '@ovds/features/compliance';
-import toast from 'react-hot-toast';
 import { Users, FileText, Plus, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+
+import { useBusiness } from '../../context/businessContext';
 
 const AGMPage: React.FC = () => {
   const { selectedCompanyId } = useBusiness();
@@ -20,7 +21,7 @@ const AGMPage: React.FC = () => {
       setNewKey('');
       setNewValue('');
       refetch();
-    } catch (e) {
+    } catch (_e) {
       toast.error('Failed to create AGM record');
     }
   };
@@ -30,7 +31,7 @@ const AGMPage: React.FC = () => {
       await deleteMutation.mutateAsync(key);
       toast.success('AGM record deleted');
       refetch();
-    } catch (e) {
+    } catch (_e) {
       toast.error('Failed to delete AGM record');
     }
   };
@@ -40,8 +41,8 @@ const AGMPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30">
-          <Users className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+        <div className="p-2.5 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/30">
+          <Users className="w-6 h-6 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">
@@ -55,7 +56,7 @@ const AGMPage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-          <FileText className="w-5 h-5 text-blue-500 mb-2" />
+          <FileText className="w-5 h-5 text-[var(--pro-azure)] mb-2" />
           <h3 className="font-semibold text-slate-800 dark:text-slate-100">AGM Notice</h3>
           <p className="text-xs text-slate-500 mt-1">Draft and publish annual meeting notices</p>
         </div>
@@ -78,7 +79,7 @@ const AGMPage: React.FC = () => {
           <p className="text-sm text-slate-500">No AGM records yet.</p>
         )}
         <div className="space-y-2">
-          {records.map((r) => (
+          {records.map((r: { id: string; key: string; value: string }) => (
             <div key={r.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50">
               <div>
                 <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{r.key}</p>
@@ -111,7 +112,7 @@ const AGMPage: React.FC = () => {
           <button
             onClick={handleCreate}
             disabled={createMutation.isPending}
-            className="px-4 py-2 text-sm font-semibold bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:opacity-50 flex items-center gap-1"
+            className="px-4 py-2 text-sm font-semibold bg-[var(--pro-azure)] text-white rounded-lg hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 flex items-center gap-1"
           >
             <Plus className="w-4 h-4" /> Add
           </button>

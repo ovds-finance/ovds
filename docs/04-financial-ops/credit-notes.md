@@ -8,7 +8,7 @@
 >
 > **Navigate to:** **Sales → Credit Notes** (`/credit-notes`)
 
-A credit note is a document that reduces a customer's outstanding balance — used when an invoice has been overcharged, goods were returned, a service was not delivered, or a refund needs to be formally recorded. In OVDS, credit notes are mirrored invoices with negative amounts, prefixed `CN-`, and linked to the original invoice for a full audit trail.
+A credit note is a document that reduces a customer's outstanding balance — used when an invoice has been overcharged, goods were returned, a service was not delivered, or a refund needs to be formally recorded. In Ovds, credit notes are mirrored invoices with negative amounts, prefixed `CN-`, and linked to the original invoice for a full audit trail.
 
 ---
 
@@ -31,7 +31,7 @@ A credit note is a document that reduces a customer's outstanding balance — us
 
 1. Open the original invoice from **Sales → Invoices**.
 2. Click **More Actions (⋯) → Create Credit Note**.
-3. OVDS pre-fills the credit note with the original invoice's customer, items, and amounts.
+3. Ovds pre-fills the credit note with the original invoice's customer, items, and amounts.
 4. Adjust the items or amounts if this is a partial credit (e.g. only some items were returned).
 5. Add a **Reason** — this appears on the credit note PDF for the customer.
 6. Click **Save** — the credit note is created with number prefix `CN-` and linked to the original invoice.
@@ -68,7 +68,7 @@ After creating a credit note, you have two options:
 
 ### Option 2 — Issue a Cash Refund
 
-1. Open the credit note → click **Issue Refund**.
+1. Open the credit note and click **Issue Refund**.
 2. Select the refund method (bank transfer, Telebirr, etc.) and the account.
 3. Click **Confirm** — a refund transaction is recorded and the credit note is marked as settled.
 4. GL entries are posted automatically:
@@ -104,7 +104,7 @@ If only part of an invoice needs to be credited (e.g. 2 of 5 items were returned
 
 ## GL Impact
 
-When a credit note is created and applied or refunded, OVDS posts the following entries:
+When a credit note is created and applied or refunded, Ovds posts the following entries:
 
 **On creation (for an already-paid invoice):**
 ```
@@ -124,7 +124,7 @@ Dr  Accounts Receivable   (reduces the customer's balance)
 
 ## Sending a Credit Note to the Customer
 
-1. Open the credit note → click **Send To**.
+1. Open the credit note and click **Send To**.
 2. Confirm the customer's email address.
 3. Click **Send** — the customer receives the credit note PDF by email.
 4. The credit note PDF includes your company logo, TIN, and an ERCA QR code.

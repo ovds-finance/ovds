@@ -1,7 +1,3 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
-import api from '../../services/api';
-import { fmtDecimal } from '../../utils/fmt';
 import {
   ShieldCheck,
   Globe,
@@ -18,6 +14,11 @@ import {
   History,
   Zap,
 } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
+
+import api from '../../services/api';
+import { fmtDecimal } from '../../utils/fmt';
 
 const fmt = fmtDecimal;
 
@@ -72,7 +73,7 @@ const WithholdingTable: React.FC<WithholdingTableProps> = ({ data, onToggleRemit
                   onClick={() => onToggleRemitted(e.id)}
                   className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border transition-colors ${
                     e.remitted
-                      ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800'
+                      ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)] border-[var(--pro-azure-100)] dark:bg-green-950/30 dark:border-green-800'
                       : 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800'
                   }`}
                 >
@@ -411,7 +412,7 @@ const VatReportsPanel: React.FC = () => {
             {fmt(entries.filter((e) => e.type === 'VAT').reduce((s, e) => s + e.withheldAmount, 0))}
           </p>
         </div>
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4 text-slate-800 dark:text-emerald-400">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4 text-slate-800 dark:text-[var(--pro-azure-light)]">
           <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Tax Withheld</p>
           <p className="text-xl font-semibold">
             ETB{' '}
@@ -423,18 +424,18 @@ const VatReportsPanel: React.FC = () => {
       <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Clock size={18} className="text-slate-800 dark:text-emerald-400" />
+            <Clock size={18} className="text-slate-800 dark:text-[var(--pro-azure-light)]" />
             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Aged Summary of Tax & VAT Withholding</h3>
             <div className="flex gap-2 ml-4">
               <button
                 onClick={() => setShowSubmitModal(true)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-[10px] font-semibold uppercase tracking-wider hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/20"
+                className="flex items-center gap-2 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-[10px] font-semibold uppercase tracking-wider hover:bg-[var(--pro-azure-dark)] transition-all shadow-lg shadow-green-500/20"
               >
                 <Send size={12} /> Submit to ERCA
               </button>
               <button
                 onClick={printAgedSummary}
-                className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 dark:bg-slate-800 text-white rounded-xl text-[10px] font-semibold uppercase tracking-wider hover:bg-emerald-500 dark:hover:bg-slate-700 transition-all"
+                className="flex items-center gap-2 px-3 py-1.5 bg-[var(--pro-azure)] dark:bg-slate-800 text-white rounded-xl text-[10px] font-semibold uppercase tracking-wider hover:bg-[var(--pro-azure-dark)] dark:hover:bg-slate-700 transition-all"
               >
                 <Printer size={12} /> Print Summary
               </button>
@@ -445,7 +446,7 @@ const VatReportsPanel: React.FC = () => {
 
         <div className="grid grid-cols-4 divide-x divide-slate-100">
           {[
-            { label: 'Current (0-30)', val: aging.current, color: 'text-slate-800', bg: 'bg-emerald-200/10' },
+            { label: 'Current (0-30)', val: aging.current, color: 'text-slate-800', bg: 'bg-[var(--pro-azure-200)]/10' },
             { label: '31-60 Days', val: aging.days30, color: 'text-amber-600', bg: 'bg-amber-50' },
             { label: '61-90 Days', val: aging.days60, color: 'text-amber-600', bg: 'bg-amber-50' },
             { label: '90+ Days', val: aging.over90, color: 'text-rose-600', bg: 'bg-rose-50' },
@@ -460,15 +461,15 @@ const VatReportsPanel: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-emerald-200/10">
+          <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-[var(--pro-azure-200)]/10">
             <div className="flex items-center gap-3">
-              <RefreshCw size={18} className={`text-slate-800 dark:text-emerald-400 ${loadingVat ? 'animate-spin' : ''}`} />
+              <RefreshCw size={18} className={`text-slate-800 dark:text-[var(--pro-azure-light)] ${loadingVat ? 'animate-spin' : ''}`} />
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Monthly VAT Return Summary</h3>
             </div>
             <button
               onClick={handleCalculateVat}
               disabled={loadingVat}
-              className="px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-[10px] font-semibold uppercase tracking-wider hover:bg-emerald-500 disabled:opacity-50"
+              className="px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-[10px] font-semibold uppercase tracking-wider hover:bg-[var(--pro-azure-dark)] disabled:opacity-50"
             >
               Calculate & Post
             </button>
@@ -486,7 +487,7 @@ const VatReportsPanel: React.FC = () => {
                   <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Current Period: {vatSummary.period}</p>
                   <span
                     className={`px-2 py-0.5 rounded-full text-[10px] font-medium uppercase ${
-                      vatSummary.netPayable > 0 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-200/10 text-slate-800'
+                      vatSummary.netPayable > 0 ? 'bg-amber-50 text-amber-600' : 'bg-[var(--pro-azure-200)]/10 text-slate-800'
                     }`}
                   >
                     {vatSummary.netPayable > 0 ? 'Payable' : 'Refundable/Carry Forward'}
@@ -547,7 +548,7 @@ const VatReportsPanel: React.FC = () => {
                         <span
                           className={`px-2 py-0.5 rounded-full text-[10px] font-medium uppercase ${
                             f.status === 'POSTED'
-                              ? 'bg-emerald-200/20 text-slate-800'
+                              ? 'bg-[var(--pro-azure-200)]/20 text-slate-800'
                               : 'bg-slate-100 text-slate-600 dark:text-slate-300'
                           }`}
                         >
@@ -604,7 +605,7 @@ const VatReportsPanel: React.FC = () => {
       {/* Registers */}
       <div className="grid grid-cols-1 gap-4">
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-emerald-200/10">
+          <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-[var(--pro-azure-200)]/10">
             <div className="flex items-center gap-3">
               <ShieldCheck size={18} className="text-slate-800" />
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">VAT Withholding Register</h3>
@@ -614,7 +615,7 @@ const VatReportsPanel: React.FC = () => {
                 setForm({ ...form, type: 'VAT' });
                 setShowForm(true);
               }}
-              className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-500 transition-all"
+              className="flex items-center gap-2 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
             >
               <Plus size={14} /> Add VAT Entry
             </button>
@@ -634,9 +635,9 @@ const VatReportsPanel: React.FC = () => {
         </div>
 
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-emerald-200/5">
+          <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-[var(--pro-azure-200)]/5">
             <div className="flex items-center gap-3">
-              <Wallet size={18} className="text-slate-800 dark:text-emerald-400" />
+              <Wallet size={18} className="text-slate-800 dark:text-[var(--pro-azure-light)]" />
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Income Tax Withholding Register (2%)</h3>
             </div>
             <button
@@ -644,7 +645,7 @@ const VatReportsPanel: React.FC = () => {
                 setForm({ ...form, type: 'INCOME_TAX' });
                 setShowForm(true);
               }}
-              className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-500 transition-all"
+              className="flex items-center gap-2 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-all"
             >
               <Plus size={14} /> Add Tax Entry
             </button>
@@ -735,7 +736,7 @@ const VatReportsPanel: React.FC = () => {
               <div className="pt-2">
                 <button
                   onClick={addEntry}
-                  className="w-full py-3 bg-emerald-600 text-white rounded-lg text-sm font-medium uppercase tracking-wider hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/20"
+                  className="w-full py-3 bg-[var(--pro-azure)] text-white rounded-lg text-sm font-medium uppercase tracking-wider hover:bg-[var(--pro-azure-dark)] transition-all shadow-lg shadow-green-500/20"
                 >
                   Save Entry
                 </button>
@@ -750,7 +751,7 @@ const VatReportsPanel: React.FC = () => {
           <div className="bg-white rounded-xl w-full max-w-lg shadow-2xl overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Globe size={18} className="text-slate-800 dark:text-emerald-400" />
+                <Globe size={18} className="text-slate-800 dark:text-[var(--pro-azure-light)]" />
                 <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 uppercase tracking-wider">Submit Withholding Report</h3>
               </div>
               <button onClick={() => setShowSubmitModal(false)} className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-300">
@@ -770,7 +771,7 @@ const VatReportsPanel: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Total Income Tax (2%)</p>
-                    <p className="text-lg font-semibold text-slate-800 dark:text-emerald-400">
+                    <p className="text-lg font-semibold text-slate-800 dark:text-[var(--pro-azure-light)]">
                       ETB {fmt(entries.filter((e) => e.type === 'INCOME_TAX').reduce((s, e) => s + e.withheldAmount, 0))}
                     </p>
                   </div>
@@ -803,7 +804,7 @@ const VatReportsPanel: React.FC = () => {
                 <button
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="flex-2 py-3 bg-emerald-600 text-white rounded-xl text-xs font-semibold uppercase tracking-wider hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+                  className="flex-2 py-3 bg-[var(--pro-azure)] text-white rounded-xl text-xs font-semibold uppercase tracking-wider hover:bg-[var(--pro-azure-dark)] transition-all shadow-lg shadow-green-500/20 flex items-center justify-center gap-2"
                 >
                   {submitting ? (
                     <>

@@ -1,6 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { Icon } from '../ui';
+
 import { MODULE_COLORS } from './constants';
 import type { NavGroup } from './types';
 
@@ -19,7 +21,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({ group }) => {
         <span className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${mc.bg} ${mc.text}`}>
           <Icon name={group.icon as any} size={11} />
         </span>
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.12em]">
+        <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--text-4)' }}>
           {groupLabel}
         </p>
       </div>

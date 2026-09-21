@@ -6,16 +6,17 @@
  * Chronological feed of calls, emails, meetings, tasks, and notes
  * across all CRM contacts. Log new interactions and filter by type/status.
  */
-import React, { useState } from 'react';
+import { AppPage, EmptyState, Skeleton, StatusBadge } from '@ovds/ui';
 import {
   Phone, Mail, Users, MessageSquare, CheckSquare,
   StickyNote, RefreshCw, Clock, Calendar,
   Filter, Search, ChevronDown,
 } from 'lucide-react';
-import { AppPage, EmptyState, Skeleton, StatusBadge } from '@ovds/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
+import React, { useState } from 'react';
+
 import { useBusiness } from '../context/businessContext';
 import { useApiQuery } from '../hooks/useApiQuery';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { fmtDate, fmtRelative } from '../utils/fmt';
 
 type ActivityType = 'CALL' | 'EMAIL' | 'MEETING' | 'TASK' | 'NOTE' | 'FOLLOW_UP';
@@ -44,7 +45,7 @@ const TYPE_ICONS: Record<ActivityType, React.ReactNode> = {
 };
 
 const TYPE_COLORS: Record<ActivityType, string> = {
-  CALL: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+  CALL: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] ',
   EMAIL: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
   MEETING: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300',
   TASK: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',

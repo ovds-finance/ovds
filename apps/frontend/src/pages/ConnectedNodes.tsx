@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
 import {
   AppPage, AppTable, AppTh, AppTd, AppTr,
   Btn, Icon, Modal, FormField, Input, Select,
 } from '../components/ui';
 import { useBusiness } from '../context/businessContext';
 import api from '../services/api';
-import toast from 'react-hot-toast';
 
 interface NodeRecord {
   nodeId: string;
@@ -18,7 +19,7 @@ interface NodeRecord {
 
 const PRIVILEGE_CLS: Record<string, string> = {
   READ_ONLY: 'text-slate-700 bg-slate-100 border-slate-200',
-  STANDARD: 'text-blue-700 bg-blue-50 border-blue-200',
+  STANDARD: 'text-[var(--pro-azure-dark)] bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]',
   ADMIN: 'text-violet-700 bg-violet-50 border-violet-200',
 };
 
@@ -129,7 +130,7 @@ const ConnectedNodes: React.FC = () => {
           {/* Stats */}
           <div className="ovds-grid-layout cols-3 gap-sm">
             {[
-              { label: 'Active Nodes', value: activeNodes.length, color: 'text-emerald-600' },
+              { label: 'Active Nodes', value: activeNodes.length, color: 'text-[var(--pro-azure)]' },
               { label: 'Revoked', value: revokedNodes.length, color: 'text-rose-600' },
               { label: 'Total', value: nodes.length, color: 'text-slate-700' },
             ].map((k, i) => (
@@ -198,7 +199,7 @@ const ConnectedNodes: React.FC = () => {
                       <AppTd align="right">
                         <div className="flex items-center gap-1 justify-end">
                           <Btn variant="ghost" size="sm" onClick={() => handleHeartbeat(n.nodeId)} icon={<Icon name="REFRESH_CW" size={11} />} />
-                          <Btn variant="ghost" size="sm" onClick={() => handleRevoke(n.nodeId)} icon={<Icon name="TRASH" size={11} />} />
+                          <Btn variant="ghost" size="sm" onClick={() => handleRevoke(n.nodeId)} icon={<Icon name="TRASH_2" size={11} />} />
                         </div>
                       </AppTd>
                     </AppTr>
@@ -252,7 +253,7 @@ const ConnectedNodes: React.FC = () => {
       {/* Register Modal */}
       {registerOpen && (
         <Modal
-          isOpen={registerOpen}
+          open={registerOpen}
           onClose={() => setRegisterOpen(false)}
           title="Register New Node"
           footer={

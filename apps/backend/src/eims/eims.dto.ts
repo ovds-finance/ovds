@@ -6,6 +6,7 @@
  * TIN never reaches the MoR client (which would otherwise reject it with a
  * SCHEMA ERROR and abort the whole batch).
  */
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsDecimal,
@@ -18,7 +19,6 @@ import {
   ValidateNested,
   Min,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
 export const TIN_REGEX = /^\d{10}$/;
 export const TIN_MESSAGE = 'TIN must be exactly 10 digits';

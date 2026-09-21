@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
 import { SettingsCard } from '@ovds/features/settings';
-import { Shield, HardDrive, Clock, Users, Database, Server, AlertTriangle, CheckCircle2, Play } from 'lucide-react';
+import { Shield, HardDrive, Clock, Users, Database, Server, AlertTriangle, Play } from 'lucide-react';
+import React, { useState } from 'react';
 
 type Tab = 'overview' | 'backups' | 'patches' | 'access' | 'database' | 'hardware';
 
@@ -64,7 +64,7 @@ function ToggleInput({ value, onChange, label }: { value: string; onChange: (v: 
   const checked = value === 'true';
   return (
     <label className="flex items-center gap-2 cursor-pointer">
-      <button type="button" role="switch" aria-checked={checked} onClick={() => onChange(checked ? 'false' : 'true')} className={`relative inline-flex w-9 h-5 rounded-full transition-colors ${checked ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'}`}>
+      <button type="button" role="switch" aria-checked={checked} onClick={() => onChange(checked ? 'false' : 'true')} className={`relative inline-flex w-9 h-5 rounded-full transition-colors ${checked ? 'bg-[var(--pro-azure-50)]0' : 'bg-slate-300 dark:bg-slate-600'}`}>
         <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${checked ? 'translate-x-4' : 'translate-x-0.5'}`} />
       </button>
       <span className="text-sm text-slate-600 dark:text-slate-400">{label}</span>
@@ -194,7 +194,7 @@ export const MaintainingTechnologyPage: React.FC = () => {
         </div>
       </div>
 
-      {msg && <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg px-4 py-2.5 text-sm text-emerald-700 dark:text-emerald-400">{msg}</div>}
+      {msg && <div className="bg-[var(--pro-azure-50)] dark:bg-green-950/30 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-lg px-4 py-2.5 text-sm text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">{msg}</div>}
 
       <div className="grid gap-5" style={{ gridTemplateColumns: '220px 1fr' }}>
         <div className="ovds-widget-card overflow-hidden">
@@ -206,7 +206,7 @@ export const MaintainingTechnologyPage: React.FC = () => {
               <button key={tab.id} type="button" onClick={() => { setActiveTab(tab.id); setDraft({}); setMsg(null); }}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all text-left ${
                   activeTab === tab.id
-                    ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 font-semibold'
+                    ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] font-semibold'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}>
                 <div className="w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-xs">

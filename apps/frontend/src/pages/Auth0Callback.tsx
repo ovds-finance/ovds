@@ -8,13 +8,15 @@
  *  4. Redirects to the user's default route once authenticated
  *  5. Shows a clear error state if authentication fails
  */
-import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useAuth } from '../rbac/AuthContext';
-import { rbac } from '../rbac';
-import { Navigate, Link } from 'react-router-dom';
-import { useAuth0Session } from '../hooks/useAuth0Session';
 import { Loader2, ShieldAlert, ArrowLeft, Shield } from 'lucide-react';
+import React from 'react';
+import { Navigate, Link } from 'react-router-dom';
+
+import { useAuth0Session } from '../hooks/useAuth0Session';
+import { rbac } from '../rbac';
+import { useAuth } from '../rbac/AuthContext';
+
 
 const AUTH0_ENABLED = import.meta.env.VITE_AUTH0_ENABLED === 'true';
 

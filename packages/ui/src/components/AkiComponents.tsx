@@ -79,12 +79,12 @@ export interface AkiMetricCardProps {
   trend?: number;
   trendLabel?: string;
   icon?: React.ReactNode;
-  /** Tailwind bg class for icon box e.g. 'bg-emerald-50' */
+  /** Tailwind bg class for icon box e.g. 'bg-[var(--pro-azure-50)]' */
   iconBg?: string;
   /** Tailwind text class for icon */
   iconColor?: string;
-  /** Left accent border: 'blue' | 'emerald' | 'amber' | 'rose' | 'violet' */
-  accent?: 'blue' | 'emerald' | 'amber' | 'rose' | 'violet' | 'teal' | 'sky' | 'indigo' | 'orange';
+  /** Left accent border: 'blue' | 'indigo' | 'amber' | 'rose' | 'violet' */
+  accent?: 'blue' | 'indigo' | 'amber' | 'rose' | 'violet' | 'teal' | 'sky' | 'orange' | 'green';
   /** Sparkline data points (simple numbers) */
   sparkData?: number[];
   onClick?: () => void;
@@ -94,8 +94,7 @@ export interface AkiMetricCardProps {
 }
 
 const ACCENT_BORDER: Record<string, string> = {
-  blue:    'border-l-aki-blue',
-  emerald: 'border-l-emerald-500',
+  blue:    'border-l-[var(--pro-azure)]',
   amber:   'border-l-amber-500',
   rose:    'border-l-rose-500',
   violet:  'border-l-violet-500',
@@ -103,18 +102,19 @@ const ACCENT_BORDER: Record<string, string> = {
   sky:     'border-l-sky-500',
   indigo:  'border-l-indigo-500',
   orange:  'border-l-orange-500',
+  green:   'border-l-green-500',
 };
 
 const SPARK_COLOR: Record<string, string> = {
   blue:    '#0056D2',
-  emerald: '#10B981',
   amber:   '#F59E0B',
   rose:    '#F43F5E',
   violet:  '#8B5CF6',
   teal:    '#14B8A6',
   sky:     '#0EA5E9',
-  indigo:  '#6366F1',
+  indigo:  '#4FBA6F',
   orange:  '#F97316',
+  green:   '#10B981',
 };
 
 /** Tiny SVG sparkline — zero runtime deps */
@@ -185,7 +185,7 @@ export const AkiMetricCard: React.FC<AkiMetricCardProps> = ({
         'aki-kpi-card border-l-4',
         ACCENT_BORDER[accent],
         onClick && 'cursor-pointer hover:shadow-raised hover:-translate-y-0.5 transition-all duration-150',
-        onClick && 'focus:outline-none focus:ring-2 focus:ring-aki-blue/25',
+        onClick && 'focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/25',
         className,
       )}
     >
@@ -217,7 +217,7 @@ export const AkiMetricCard: React.FC<AkiMetricCardProps> = ({
             <span className={cn(
               'flex items-center gap-0.5 text-[10px] font-bold shrink-0 ml-auto px-1.5 py-0.5 rounded-full',
               hasUpTrend
-                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'
+                ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)]'
                 : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400',
             )}>
               {hasUpTrend ? <UpArrow /> : <DownArrow />}
@@ -240,7 +240,7 @@ export interface AkiStatCell {
   value: React.ReactNode;
   sub?: string;
   trend?: number;
-  /** Bottom accent line Tailwind class e.g. 'bg-emerald-500' */
+  /** Bottom accent line Tailwind class e.g. 'bg-[var(--pro-azure)]' */
   accentLine?: string;
   onClick?: () => void;
 }
@@ -294,7 +294,7 @@ export const AkiStatStrip: React.FC<AkiStatStripProps> = ({ cells, className, lo
               {cell.trend !== undefined && cell.trend !== 0 && (
                 <span className={cn(
                   'text-[9px] font-bold flex items-center gap-0.5 shrink-0 ml-auto',
-                  cell.trend > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400',
+                  cell.trend > 0 ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-rose-500 dark:text-rose-400',
                 )}>
                   {cell.trend > 0 ? <UpArrow /> : <DownArrow />}
                   {Math.abs(cell.trend).toFixed(1)}%
@@ -509,7 +509,7 @@ export const AkiValidationPanel: React.FC<AkiValidationPanelProps> = ({
             {warnings} warning{warnings > 1 ? 's' : ''}
           </span>
         ) : (
-          <span className="text-emerald-600">All checks passed ✓</span>
+          <span className="text-[var(--pro-azure-dark)]">All checks passed ✓</span>
         )}
         {(errors > 0 || warnings > 0) && !loading && (
           <span className="text-[9px] font-normal text-slate-400">
@@ -541,7 +541,7 @@ export const AkiValidationPanel: React.FC<AkiValidationPanelProps> = ({
               <span className="shrink-0 mt-0.5">
                 {item.type === 'error' && <span className="text-rose-500"><InfoIcon /></span>}
                 {item.type === 'warning' && <span className="text-amber-500"><WarnIcon /></span>}
-                {item.type === 'ok' && <span className="text-emerald-500"><CheckIcon /></span>}
+                {item.type === 'ok' && <span className="text-[var(--pro-azure)]"><CheckIcon /></span>}
               </span>
               <div className="min-w-0 text-left">
                 <p className={cn(
@@ -554,7 +554,7 @@ export const AkiValidationPanel: React.FC<AkiValidationPanelProps> = ({
                   'text-[10px] leading-snug mt-0.5',
                   item.type === 'error' ? 'text-rose-600 dark:text-rose-400' :
                   item.type === 'warning' ? 'text-amber-600 dark:text-amber-400' :
-                  'text-emerald-600 dark:text-emerald-400',
+                  'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
                 )}>
                   {item.message}
                 </p>

@@ -1,14 +1,14 @@
-# Platform, App Store & Releases
+﻿# Platform, App Store & Releases
 
 Canonical OVDS module (`packages/modules/platform`).
 
-Akaunting-inspired, DDD-aligned module layout:
+Ovds SaaS DDD-aligned module layout:
 
 ```
 modules/platform/
   src/
     index.ts        # public barrel (domain types + namespaced web)
-    domain/         # centralized domain types & rules  (@ovds/domains/platform)
+    domain/         # centralized domain types & rules  (@ovds/domains-platform)
     dto/            # zod / class-validator contracts
     web/            # React pages & components           (@ovds/features/platform)
 ```

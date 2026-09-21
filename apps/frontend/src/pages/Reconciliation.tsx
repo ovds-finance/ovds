@@ -8,25 +8,26 @@
  *   POST /ovds/reconciliation/project/:journalEntryId
  */
 
+import {
+  type ProjectionJournalRow,
+  type IfrsReportingBalanceRow,
+} from '@ovds/features/reporting';
 import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, Card, Amount, EmptyState, SearchBar, Modal, Input,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
-import toast from 'react-hot-toast';
 import {
   getPeachtreeProjections,
   getSigtaxProjections,
   getIfrsReportingBalances,
   projectJournalEntry,
 } from '../services/reconciliationApi';
-import {
-  type ProjectionJournalRow,
-  type IfrsReportingBalanceRow,
-} from '@ovds/features/reporting';
 
 type TabKey = 'peachtree' | 'sigtax' | 'ifrs';
 
@@ -45,7 +46,7 @@ const Reconciliation: React.FC = () => {
   const [peachtreeData, setPeachtreeData] = useState<ProjectionJournalRow[]>([]);
   const [sigtaxData, setSigtaxData] = useState<ProjectionJournalRow[]>([]);
   const [ifrsData, setIfrsData] = useState<IfrsReportingBalanceRow[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
 
   const load = useCallback(async () => {

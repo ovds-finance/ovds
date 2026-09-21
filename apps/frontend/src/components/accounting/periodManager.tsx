@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
 import { Scale, X } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
+import api from '../../services/api';
 import { confirm } from '../../utils/confirm';
 
 const PeriodManager: React.FC = () => {

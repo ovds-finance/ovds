@@ -6,12 +6,13 @@
  *   <RoleBadge role="AUDITOR" size="lg" showIcon showCount />
  *   <RoleBadge role="HR" variant="dot" />
  */
-import React from 'react';
 import {
   ShieldAlert, Code2, Settings2, Kanban, Users, User,
   TrendingUp, BookOpen, ClipboardCheck, ShieldCheck,
   Building2, Truck, Scale, Landmark, Search,
 } from 'lucide-react';
+import React from 'react';
+
 import { ROLE_METADATA, type AppRole } from '../rbac/rbac';
 
 // -- Icon map ------------------------------------------------------------------

@@ -11,20 +11,22 @@
  * WHT note: cash payments ≥ ETB 10,000 for services or ≥ ETB 20,000 for goods
  * require WHT deduction per Proclamation No. 1395/2025 — flag these automatically.
  */
-import React, { useState, useCallback, useEffect } from 'react';
+import { AppPage, Btn } from '@ovds/ui';
+import { evalMath } from '@ovds/ui';
 import {
   Plus, RefreshCw, Wallet, TrendingDown,
   TrendingUp, AlertTriangle, X, Info,
   CheckCircle2, ArrowUpCircle,
 } from 'lucide-react';
-import { AppPage, Btn } from '@ovds/ui';
-import { evalMath } from '@ovds/ui';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { fmtCurrency } from '../utils/fmt';
-import { Icon } from '../components/ui';
-import api from '../services/api';
+import React, { useState, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
+
+import { Icon } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
+import { fmtCurrency } from '../utils/fmt';
+
 
 const fmt = (n: number) => fmtCurrency(n, 'ETB');
 
@@ -43,7 +45,7 @@ const inp = 'w-full px-3 py-2 border border-slate-200 rounded-lg text-sm outline
 // -- Transaction type config ---------------------------------------------------
 const TX_TYPE: Record<string, { label: string; cls: string; icon: React.ReactNode }> = {
   EXPENSE:       { label: 'Expense',       cls: 'bg-rose-50 text-rose-700 border-rose-200',     icon: <TrendingDown size={11} /> },
-  REPLENISHMENT: { label: 'Replenishment', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: <ArrowUpCircle size={11} /> },
+  REPLENISHMENT: { label: 'Replenishment', cls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]', icon: <ArrowUpCircle size={11} /> },
   ADJUSTMENT:    { label: 'Adjustment',    cls: 'bg-slate-100 text-slate-600 border-slate-200', icon: <Icon name="REFRESH" size={11} /> },
 };
 
@@ -305,7 +307,7 @@ const PettyCash: React.FC = () => {
         <div className="ovds-stat-row">
           {[
             { label: 'Total Float',       value: fmt(totalFloat),   accent: 'bg-slate-400' },
-            { label: 'Current Balance',   value: fmt(totalBalance), accent: 'bg-emerald-500' },
+            { label: 'Current Balance',   value: fmt(totalBalance), accent: 'bg-[var(--pro-azure-50)]0' },
             { label: 'Total Spent (YTD)', value: fmt(totalSpent),   accent: totalSpent > 0 ? 'bg-amber-500' : 'bg-slate-200' },
             { label: 'Active Funds',      value: String(funds.filter(f => f.status === 'ACTIVE').length), accent: 'bg-sky-500' },
           ].map(k => (
@@ -351,7 +353,7 @@ const PettyCash: React.FC = () => {
                   {/* Balance bar */}
                   <div className="h-1.5 bg-slate-100">
                     <div
-                      className={`h-full rounded-r transition-all duration-500 ${isLow ? 'bg-rose-400' : 'bg-emerald-500'}`}
+                      className={`h-full rounded-r transition-all duration-500 ${isLow ? 'bg-rose-400' : 'bg-[var(--pro-azure-50)]0'}`}
                       style={{ width: `${Math.min(100, pctLeft)}%` }}
                     />
                   </div>
@@ -362,7 +364,7 @@ const PettyCash: React.FC = () => {
                         {fund.custodian && <p className="text-xs text-slate-400 mt-0.5">{fund.custodian}</p>}
                       </div>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
-                        fund.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        fund.status === 'ACTIVE' ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]'
                         : 'bg-slate-100 text-slate-500 border-slate-200'
                       }`}>{fund.status}</span>
                     </div>
@@ -409,7 +411,7 @@ const PettyCash: React.FC = () => {
                                 {txCfg.icon} {txCfg.label}
                               </span>
                               <span className="flex-1 truncate text-slate-600">{tx.description}</span>
-                              <span className={`tabular-nums font-bold shrink-0 ${tx.type === 'EXPENSE' ? 'text-rose-600' : 'text-emerald-600'}`}>
+                              <span className={`tabular-nums font-bold shrink-0 ${tx.type === 'EXPENSE' ? 'text-rose-600' : 'text-[var(--pro-azure)]'}`}>
                                 {tx.type === 'EXPENSE' ? '-' : '+'}{fmt(Number(tx.amount))}
                               </span>
                             </div>

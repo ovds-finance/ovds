@@ -10,7 +10,7 @@ interface StatusPill {
   id: string;
   label: string;
   count?: number;
-  color?: string; // dot color class e.g. "bg-emerald-500"
+  color?: string; // dot color class e.g. "bg-[var(--pro-azure)]"
 }
 
 interface ovdsToolbarProps {
@@ -49,7 +49,7 @@ export const OvdsToolbar: React.FC<ovdsToolbarProps> = ({
           onChange={e => onSearch(e.target.value)}
           placeholder={searchPlaceholder}
           className="w-full pl-8 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-[12px] text-slate-700 placeholder-slate-400
-                     focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 focus:bg-white transition-all"
+                     focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)] focus:bg-white transition-all"
         />
         {search && (
           <button
@@ -71,7 +71,7 @@ export const OvdsToolbar: React.FC<ovdsToolbarProps> = ({
               value={dateFrom ?? ''}
               onChange={e => onDateFrom(e.target.value)}
               className="pl-7 pr-2 py-2 bg-white border border-slate-200 rounded-xl text-[11px] text-slate-600
-                         focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all w-[130px]"
+                         focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)] transition-all w-[130px]"
             />
           </div>
           <span className="text-slate-300 text-[10px]">–</span>
@@ -80,7 +80,7 @@ export const OvdsToolbar: React.FC<ovdsToolbarProps> = ({
             value={dateTo ?? ''}
             onChange={e => onDateTo(e.target.value)}
             className="px-2 py-2 bg-white border border-slate-200 rounded-xl text-[11px] text-slate-600
-                       focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all w-[130px]"
+                       focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/20 focus:border-[var(--pro-azure)] transition-all w-[130px]"
           />
         </div>
       )}
@@ -120,7 +120,7 @@ export const OvdsToolbar: React.FC<ovdsToolbarProps> = ({
             className={[
               'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold transition-all',
               activeStatus === pill.id
-                ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/20'
+                ? 'bg-[var(--pro-azure)] text-white shadow-sm shadow-[var(--pro-azure)]/20'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
             ].join(' ')}
           >

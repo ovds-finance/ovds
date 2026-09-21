@@ -21,8 +21,6 @@
  *   const { data: summary } = useStockSummary({ companyId });
  *   const lowStock = summary?.filter(s => s.isLowStock);
  */
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { orpc } from '../lib/orpc';
 import type {
   ListItemsQuery,
   CreateItem,
@@ -31,6 +29,9 @@ import type {
   CreateItemGroup,
   CreateStockAdjustment,
 } from '@ovds/contracts';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { orpc } from '../lib/orpc';
 
 // ── Query key factories ───────────────────────────────────────────────────────
 // Centralised so invalidation is consistent across all mutations.

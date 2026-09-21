@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+
 import {
   AppPage, AppTable, AppTh, AppTd, AppTr,
   Btn, Icon, StatusBadge, Modal, Input, Select,
 } from '../components/ui';
 import { useBusiness } from '../context/businessContext';
 import api from '../services/api';
-import toast from 'react-hot-toast';
 
 interface JournalLine {
   accountId: string;
@@ -209,7 +210,7 @@ const JournalEntries: React.FC = () => {
                       <span className="text-[11px] text-slate-500">{entry.journalLine?.length ?? 0} lines</span>
                     </AppTd>
                     <AppTd align="right">
-                      <span className="tabular-nums text-[12px] text-emerald-700">{fmt(dr)}</span>
+                      <span className="tabular-nums text-[12px] text-[var(--pro-azure-dark)]">{fmt(dr)}</span>
                     </AppTd>
                     <AppTd align="right">
                       <span className="tabular-nums text-[12px] text-rose-700">{fmt(cr)}</span>
@@ -217,7 +218,7 @@ const JournalEntries: React.FC = () => {
                     <AppTd>
                       <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                         entry.status === 'POSTED'
-                          ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                          ? 'text-[var(--pro-azure-dark)] bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]'
                           : entry.status === 'DRAFT'
                             ? 'text-amber-700 bg-amber-50 border-amber-200'
                             : 'text-slate-600 bg-slate-50 border-slate-200'
@@ -230,7 +231,7 @@ const JournalEntries: React.FC = () => {
                       <div className="flex items-center gap-1 justify-end">
                         <Btn variant="ghost" size="sm" onClick={() => handleView(entry)} icon={<Icon name="EYE" size={11} />} />
                         {entry.status === 'DRAFT' && (
-                          <Btn variant="ghost" size="sm" onClick={() => handleDelete(entry.id)} icon={<Icon name="TRASH" size={11} />} />
+                          <Btn variant="ghost" size="sm" onClick={() => handleDelete(entry.id)} icon={<Icon name="TRASH_2" size={11} />} />
                         )}
                       </div>
                     </AppTd>
@@ -257,7 +258,7 @@ const JournalEntries: React.FC = () => {
       {/* Detail Modal */}
       {modalOpen && selectedEntry && (
         <Modal
-          isOpen={modalOpen}
+          open={modalOpen}
           onClose={() => { setModalOpen(false); setSelectedEntry(null); }}
           title={`Journal Entry ${selectedEntry.reference || selectedEntry.id}`}
           footer={
@@ -316,7 +317,7 @@ const JournalEntries: React.FC = () => {
                         <span className="text-[11px] text-slate-500">{line.description || '—'}</span>
                       </AppTd>
                       <AppTd align="right">
-                        <span className="tabular-nums text-[12px] text-emerald-700">{fmt(Number(line.debit))}</span>
+                        <span className="tabular-nums text-[12px] text-[var(--pro-azure-dark)]">{fmt(Number(line.debit))}</span>
                       </AppTd>
                       <AppTd align="right">
                         <span className="tabular-nums text-[12px] text-rose-700">{fmt(Number(line.credit))}</span>

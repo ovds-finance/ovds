@@ -1,10 +1,8 @@
 /**
  * SinglePageAccounting — Unified ovds-style Accounting Hub
  * Full CRUD: Items, Customers, Vendors, Banks, Tax Types, Companies, Partners, Integrations
- * White bg · Emerald text · White-blue icons · Ethiopian Tax (VAT 15%, WHT 3%) · IFRS
+ * White bg · indigo text · White-blue icons · Ethiopian Tax (VAT 15%, WHT 3%) · IFRS
  */
-import React, { useState, useMemo, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import {
   Package, Users2, Building2, Landmark, Plus, RefreshCw,
   Edit2, Trash2, ChevronRight, Activity, Truck,
@@ -14,18 +12,21 @@ import {
   Receipt, ClipboardList, BarChart3, PieChart, Settings,
   ArrowUpRight, ArrowDownRight, Wallet, Clock,
 } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
-import { useApiCrud } from '../hooks/useApiCrud';
-import api from '../services/api';
+import { useSearchParams } from 'react-router-dom';
+
+import { OvdsPageHeader } from '../components/ovds';
 import {
   AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, Input, Select, FormField, SearchBar, Textarea,
   StatusBadge, Amount, EthTaxBadge, Modal, BlueIcon,
   Banner, Card, Sticker, IFRSBadge, EmptyState, confirm,
 } from '../components/ui';
-import { OvdsPageHeader } from '../components/ovds';
+import { useBusiness } from '../context/businessContext';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
 
 // -----------------------------------------------------------------------------
 // Types
@@ -78,9 +79,9 @@ const PipelineView: React.FC<{ refetch: () => void; companyId?: string | null; o
           <div className="absolute top-3 right-3"><Sticker label="Pending" variant="blue" pulse /></div>
           <div className="flex items-center gap-3 mb-2">
             <BlueIcon icon={<HistoryIcon size={15} />} size="sm" />
-            <h4 className="ovds-card-title text-emerald-900">Bank Reconciliation</h4>
+            <h4 className="ovds-card-title text-[var(--pro-azure-dark)]">Bank Reconciliation</h4>
           </div>
-          <p className="text-[10px] text-emerald-600/70 mb-3 leading-relaxed">
+          <p className="text-[10px] text-[var(--pro-azure)]/70 mb-3 leading-relaxed">
             Unmatched transactions waiting for automated bank statement matching.
           </p>
           <Btn variant="secondary" size="sm" className="w-full" onClick={() => window.location.assign('/banking/accounts')}>
@@ -89,13 +90,13 @@ const PipelineView: React.FC<{ refetch: () => void; companyId?: string | null; o
         </Card>
 
         {/* IFRS Compliance */}
-        <Card hover padding="p-4" className="border-l-4 border-l-emerald-500 relative">
+        <Card hover padding="p-4" className="border-l-4 border-l-indigo-500 relative">
           <div className="absolute top-3 right-3"><IFRSBadge standard="15" /></div>
           <div className="flex items-center gap-3 mb-2">
             <BlueIcon icon={<ShieldCheck size={15} />} size="sm" />
-            <h4 className="ovds-card-title text-emerald-900">IFRS Compliance</h4>
+            <h4 className="ovds-card-title text-[var(--pro-azure-dark)]">IFRS Compliance</h4>
           </div>
-          <p className="text-[10px] text-emerald-600/70 mb-3 leading-relaxed">
+          <p className="text-[10px] text-[var(--pro-azure)]/70 mb-3 leading-relaxed">
             Revenue recognition per IFRS 15 five-step model. All entries auto-posted.
           </p>
           <Btn variant="secondary" size="sm" className="w-full" onClick={() => window.location.assign('/ifrs')}>
@@ -105,12 +106,12 @@ const PipelineView: React.FC<{ refetch: () => void; companyId?: string | null; o
 
         {/* Tax Pipeline */}
         <Card hover padding="p-4" className="border-l-4 border-l-blue-600 relative">
-          <div className="absolute top-3 right-3"><Sticker label="VAT Due" variant="emerald" /></div>
+          <div className="absolute top-3 right-3"><Sticker label="VAT Due" variant="indigo" /></div>
           <div className="flex items-center gap-3 mb-2">
             <BlueIcon icon={<Landmark size={15} />} size="sm" />
-            <h4 className="ovds-card-title text-emerald-900">Tax Pipeline (ERCA)</h4>
+            <h4 className="ovds-card-title text-[var(--pro-azure-dark)]">Tax Pipeline (ERCA)</h4>
           </div>
-          <p className="text-[10px] text-emerald-600/70 mb-3 leading-relaxed">
+          <p className="text-[10px] text-[var(--pro-azure)]/70 mb-3 leading-relaxed">
             VAT/WHT returns per Proclamation No. 1341/2024. Filing deadline: 30th.
           </p>
           <Btn variant="primary" size="sm" className="w-full" onClick={() => window.location.assign('/tax/vat')}>
@@ -122,9 +123,9 @@ const PipelineView: React.FC<{ refetch: () => void; companyId?: string | null; o
         <Card hover padding="p-4" className="border-l-4 border-l-blue-600 relative">
           <div className="flex items-center gap-3 mb-2">
             <BlueIcon icon={<Users2 size={15} />} size="sm" />
-            <h4 className="ovds-card-title text-emerald-900">Customer Pipeline</h4>
+            <h4 className="ovds-card-title text-[var(--pro-azure-dark)]">Customer Pipeline</h4>
           </div>
-          <p className="text-[10px] text-emerald-600/70 mb-3 leading-relaxed">
+          <p className="text-[10px] text-[var(--pro-azure)]/70 mb-3 leading-relaxed">
             Track AR aging, overdue invoices, and collection cases in one view.
           </p>
           <Btn variant="secondary" size="sm" className="w-full" onClick={() => window.location.assign('/accounting/collections')}>
@@ -136,9 +137,9 @@ const PipelineView: React.FC<{ refetch: () => void; companyId?: string | null; o
         <Card hover padding="p-4" className="border-l-4 border-l-blue-600 relative">
           <div className="flex items-center gap-3 mb-2">
             <BlueIcon icon={<Truck size={15} />} size="sm" />
-            <h4 className="ovds-card-title text-emerald-900">Vendor Pipeline</h4>
+            <h4 className="ovds-card-title text-[var(--pro-azure-dark)]">Vendor Pipeline</h4>
           </div>
-          <p className="text-[10px] text-emerald-600/70 mb-3 leading-relaxed">
+          <p className="text-[10px] text-[var(--pro-azure)]/70 mb-3 leading-relaxed">
             AP aging, WHT deductions, and purchase order approvals.
           </p>
           <Btn variant="secondary" size="sm" className="w-full" onClick={() => window.location.assign('/purchases/vendors')}>
@@ -150,9 +151,9 @@ const PipelineView: React.FC<{ refetch: () => void; companyId?: string | null; o
         <Card hover padding="p-4" className="border-l-4 border-l-blue-600 relative">
           <div className="flex items-center gap-3 mb-2">
             <BlueIcon icon={<Cpu size={15} />} size="sm" />
-            <h4 className="ovds-card-title text-emerald-900">Integration Hub</h4>
+            <h4 className="ovds-card-title text-[var(--pro-azure-dark)]">Integration Hub</h4>
           </div>
-          <p className="text-[10px] text-emerald-600/70 mb-3 leading-relaxed">
+          <p className="text-[10px] text-[var(--pro-azure)]/70 mb-3 leading-relaxed">
             Telebirr, CBE, Awash Bank, and third-party app connections.
           </p>
           <Btn variant="secondary" size="sm" className="w-full" onClick={() => window.location.assign('/settings/app-store')}>
@@ -162,12 +163,12 @@ const PipelineView: React.FC<{ refetch: () => void; companyId?: string | null; o
 
         {/* CRM Pipeline */}
         <Card hover padding="p-4" className="border-l-4 border-l-blue-600 relative">
-          <div className="absolute top-3 right-3"><Sticker label="Active" variant="emerald" /></div>
+          <div className="absolute top-3 right-3"><Sticker label="Active" variant="indigo" /></div>
           <div className="flex items-center gap-3 mb-2">
             <BlueIcon icon={<Target size={15} />} size="sm" />
-            <h4 className="ovds-card-title text-emerald-900">CRM & Sales</h4>
+            <h4 className="ovds-card-title text-[var(--pro-azure-dark)]">CRM & Sales</h4>
           </div>
-          <p className="text-[10px] text-emerald-600/70 mb-3 leading-relaxed">
+          <p className="text-[10px] text-[var(--pro-azure)]/70 mb-3 leading-relaxed">
             Lead tracking, deal pipeline, and automated follow-ups.
           </p>
           <Btn variant="primary" size="sm" className="w-full" onClick={() => onTab('CRM_DEALS')}>
@@ -179,9 +180,9 @@ const PipelineView: React.FC<{ refetch: () => void; companyId?: string | null; o
         <Card hover padding="p-4" className="border-l-4 border-l-blue-600 relative">
           <div className="flex items-center gap-3 mb-2">
             <BlueIcon icon={<Receipt size={15} />} size="sm" />
-            <h4 className="ovds-card-title text-emerald-900">Billing & AP</h4>
+            <h4 className="ovds-card-title text-[var(--pro-azure-dark)]">Billing & AP</h4>
           </div>
-          <p className="text-[10px] text-emerald-600/70 mb-3 leading-relaxed">
+          <p className="text-[10px] text-[var(--pro-azure)]/70 mb-3 leading-relaxed">
             Automated bill extraction and recurring invoice generation.
           </p>
           <Btn variant="secondary" size="sm" className="w-full" onClick={() => onTab('BILLS')}>
@@ -191,13 +192,13 @@ const PipelineView: React.FC<{ refetch: () => void; companyId?: string | null; o
       </div>
 
       {/* Ethiopian tax compliance strip */}
-      <div className="bg-emerald-50/60 border border-emerald-100 rounded-xl p-3 flex flex-wrap items-center gap-3">
-        <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Active Tax Rules:</span>
+      <div className="bg-[var(--pro-azure-50)]/60 border border-[var(--pro-azure-100)] rounded-xl p-3 flex flex-wrap items-center gap-3">
+        <span className="text-[10px] font-bold text-[var(--pro-azure-dark)] uppercase tracking-wider">Active Tax Rules:</span>
         <EthTaxBadge type="VAT" />
         <EthTaxBadge type="WHT" />
         <EthTaxBadge type="BIT" />
         <EthTaxBadge type="DRRF" />
-        <span className="ml-auto text-[10px] text-emerald-500">Proclamation No. 1395/2025 · Regulation No. 570/2025</span>
+        <span className="ml-auto text-[10px] text-[var(--pro-azure)]">Proclamation No. 1395/2025 · Regulation No. 570/2025</span>
       </div>
     </div>
   );
@@ -212,21 +213,21 @@ const DashboardView: React.FC = () => {
       <div className="ovds-grid-layout cols-3 gap-lg">
         <Card className="lg:col-span-2">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="ovds-card-title text-emerald-900">Financial Overview (P&L)</h3>
+            <h3 className="ovds-card-title text-[var(--pro-azure-dark)]">Financial Overview (P&L)</h3>
             <div className="flex items-center gap-2">
               <StatusBadge status="REVIEWED" />
               <IFRSBadge standard="15" />
             </div>
           </div>
-          <div className="h-[240px] flex items-end gap-3 pb-6 border-b border-emerald-50">
+          <div className="h-[240px] flex items-end gap-3 pb-6 border-b border-[var(--pro-azure-50)]">
             {[45, 62, 58, 81, 95, 76, 88, 105, 92, 110, 125, 142].map((v, i) => (
               <div key={i} className="flex-1 group relative">
-                <div className="bg-emerald-100 group-hover:bg-emerald-200 transition-colors rounded-t-sm" style={{ height: `${v}%` }}>
-                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-emerald-900 text-white text-[9px] px-1.5 py-0.5 rounded font-mono">
+                <div className="bg-[var(--pro-azure-100)] group-hover:bg-[var(--pro-azure-200)] transition-colors rounded-t-sm" style={{ height: `${v}%` }}>
+                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--pro-azure-dark)] text-white text-[9px] px-1.5 py-0.5 rounded font-mono">
                     {v}k
                   </div>
                 </div>
-                <div className="text-[9px] text-emerald-400 mt-2 text-center font-bold">
+                <div className="text-[9px] text-[var(--pro-azure-light)] mt-2 text-center font-bold">
                   {['J','F','M','A','M','J','J','A','S','O','N','D'][i]}
                 </div>
               </div>
@@ -234,37 +235,37 @@ const DashboardView: React.FC = () => {
           </div>
           <div className="ovds-grid-layout cols-3 pt-4">
             <div>
-              <p className="text-[10px] text-emerald-500 font-bold uppercase">Total Revenue</p>
-              <p className="text-[16px] font-bold text-emerald-900">ETB 2,450,000</p>
+              <p className="text-[10px] text-[var(--pro-azure)] font-bold uppercase">Total Revenue</p>
+              <p className="text-[16px] font-bold text-[var(--pro-azure-dark)]">ETB 2,450,000</p>
             </div>
             <div>
               <p className="text-[10px] text-rose-500 font-bold uppercase">Total Expenses</p>
               <p className="text-[16px] font-bold text-rose-600">ETB 1,120,000</p>
             </div>
             <div>
-              <p className="text-[10px] text-blue-500 font-bold uppercase">Net Profit</p>
-              <p className="text-[16px] font-bold text-blue-600">ETB 1,330,000</p>
+              <p className="text-[10px] text-[var(--pro-azure)] font-bold uppercase">Net Profit</p>
+              <p className="text-[16px] font-bold text-[var(--pro-azure)]">ETB 1,330,000</p>
             </div>
           </div>
         </Card>
 
         <div className="space-y-6">
           <Card>
-            <h4 className="ovds-card-title text-emerald-900 mb-4 flex items-center gap-2">
-              <PieChart size={14} className="text-emerald-500" />
+            <h4 className="ovds-card-title text-[var(--pro-azure-dark)] mb-4 flex items-center gap-2">
+              <PieChart size={14} className="text-[var(--pro-azure)]" />
               Tax Liability Distribution
             </h4>
             <div className="space-y-3">
               {[
-                { label: 'VAT (15%)', val: '450k', pct: 60, col: 'bg-emerald-500' },
-                { label: 'WHT (3%)', val: '120k', pct: 25, col: 'bg-blue-500' },
+                { label: 'VAT (15%)', val: '450k', pct: 60, col: 'bg-[var(--pro-azure-50)]0' },
+                { label: 'WHT (3%)', val: '120k', pct: 25, col: 'bg-[var(--pro-azure)]' },
                 { label: 'DRRF (1%)', val: '30k', pct: 10, col: 'bg-amber-500' },
                 { label: 'Other', val: '15k', pct: 5, col: 'bg-slate-300' },
               ].map(t => (
                 <div key={t.label}>
                   <div className="flex justify-between text-[10px] mb-1">
-                    <span className="font-bold text-emerald-700">{t.label}</span>
-                    <span className="text-emerald-500 font-mono">{t.val}</span>
+                    <span className="font-bold text-[var(--pro-azure-dark)]">{t.label}</span>
+                    <span className="text-[var(--pro-azure)] font-mono">{t.val}</span>
                   </div>
                   <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                     <div className={`${t.col} h-full`} style={{ width: `${t.pct}%` }} />
@@ -274,25 +275,25 @@ const DashboardView: React.FC = () => {
             </div>
           </Card>
 
-          <Card className="bg-emerald-900 border-emerald-900">
-            <h4 className="ovds-card-title text-emerald-50 mb-4">Quick Insights</h4>
+          <Card className="bg-[var(--pro-azure-dark)] border-[var(--pro-azure-dark)]">
+            <h4 className="ovds-card-title text-green-50 mb-4">Quick Insights</h4>
             <div className="space-y-3">
               <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-lg bg-emerald-800 flex items-center justify-center text-emerald-300">
+                <div className="w-8 h-8 rounded-lg bg-[var(--pro-azure)] flex items-center justify-center text-green-300">
                   <ArrowUpRight size={16} />
                 </div>
                 <div>
-                  <p className="text-[11px] font-bold text-emerald-50">+12% growth</p>
-                  <p className="text-[10px] text-emerald-400">Compared to last quarter</p>
+                  <p className="text-[11px] font-bold text-green-50">+12% growth</p>
+                  <p className="text-[10px] text-[var(--pro-azure-light)]">Compared to last quarter</p>
                 </div>
               </div>
               <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-lg bg-emerald-800 flex items-center justify-center text-rose-400">
+                <div className="w-8 h-8 rounded-lg bg-[var(--pro-azure)] flex items-center justify-center text-rose-400">
                   <ArrowDownRight size={16} />
                 </div>
                 <div>
-                  <p className="text-[11px] font-bold text-emerald-50">-5% expenses</p>
-                  <p className="text-[10px] text-emerald-400">Optimized vendor pipeline</p>
+                  <p className="text-[11px] font-bold text-green-50">-5% expenses</p>
+                  <p className="text-[10px] text-[var(--pro-azure-light)]">Optimized vendor pipeline</p>
                 </div>
               </div>
             </div>
@@ -305,7 +306,7 @@ const DashboardView: React.FC = () => {
           <BlueIcon icon={<Wallet size={16} />} />
           <div>
             <p className="text-[10px] text-slate-400 font-bold uppercase">Cash on Hand</p>
-            <p className="text-[14px] font-bold text-emerald-900">ETB 1.2M</p>
+            <p className="text-[14px] font-bold text-[var(--pro-azure-dark)]">ETB 1.2M</p>
           </div>
         </Card>
         <Card hover className="flex items-center gap-3">
@@ -314,7 +315,7 @@ const DashboardView: React.FC = () => {
           </div>
           <div>
             <p className="text-[10px] text-slate-400 font-bold uppercase">Pending AR</p>
-            <p className="text-[14px] font-bold text-emerald-900">ETB 450k</p>
+            <p className="text-[14px] font-bold text-[var(--pro-azure-dark)]">ETB 450k</p>
           </div>
         </Card>
         <Card hover className="flex items-center gap-3">
@@ -323,7 +324,7 @@ const DashboardView: React.FC = () => {
           </div>
           <div>
             <p className="text-[10px] text-slate-400 font-bold uppercase">Pending AP</p>
-            <p className="text-[14px] font-bold text-emerald-900">ETB 210k</p>
+            <p className="text-[14px] font-bold text-[var(--pro-azure-dark)]">ETB 210k</p>
           </div>
         </Card>
         <Card hover className="flex items-center gap-3">
@@ -332,7 +333,7 @@ const DashboardView: React.FC = () => {
           </div>
           <div>
             <p className="text-[10px] text-slate-400 font-bold uppercase">Effective Tax Rate</p>
-            <p className="text-[14px] font-bold text-emerald-900">18.4%</p>
+            <p className="text-[14px] font-bold text-[var(--pro-azure-dark)]">18.4%</p>
           </div>
         </Card>
       </div>
@@ -367,10 +368,10 @@ const ReportsView: React.FC = () => {
         {reports.map(r => (
           <Card key={r.id} hover padding="p-4" className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
-              <BlueIcon icon={React.cloneElement(r.icon as React.ReactElement, { size: 14 })} size="sm" />
-              <h4 className="ovds-card-title text-emerald-900">{r.title}</h4>
+              <BlueIcon icon={React.cloneElement(r.icon as React.ReactElement<{ size?: number }>, { size: 14 })} size="sm" />
+              <h4 className="ovds-card-title text-[var(--pro-azure-dark)]">{r.title}</h4>
             </div>
-            <p className="text-[10px] text-emerald-600/70 mb-4 flex-1 leading-relaxed">
+            <p className="text-[10px] text-[var(--pro-azure)]/70 mb-4 flex-1 leading-relaxed">
               {r.desc}
             </p>
             <div className="flex items-center gap-2 mt-auto">
@@ -400,12 +401,12 @@ const AdministrationView: React.FC<{ onTab: (t: Tab) => void }> = ({ onTab }) =>
       {sections.map(s => (
         <Card key={s.title} padding="p-5">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
-              {React.cloneElement(s.icon as React.ReactElement, { size: 18 })}
+            <div className="w-10 h-10 rounded-xl bg-[var(--pro-azure-50)] text-[var(--pro-azure)] flex items-center justify-center border border-[var(--pro-azure-100)]">
+              {React.cloneElement(s.icon as React.ReactElement<{ size?: number }>, { size: 18 })}
             </div>
             <div>
-              <h3 className="ovds-card-title text-emerald-900">{s.title}</h3>
-              <p className="text-[10px] text-emerald-600/60">{s.desc}</p>
+              <h3 className="ovds-card-title text-[var(--pro-azure-dark)]">{s.title}</h3>
+              <p className="text-[10px] text-[var(--pro-azure)]/60">{s.desc}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -413,10 +414,10 @@ const AdministrationView: React.FC<{ onTab: (t: Tab) => void }> = ({ onTab }) =>
               <button
                 key={t}
                 onClick={() => onTab(t)}
-                className="flex items-center justify-between p-2.5 rounded-lg border border-emerald-50 bg-emerald-50/20 hover:bg-emerald-50 hover:border-emerald-200 transition-all group"
+                className="flex items-center justify-between p-2.5 rounded-lg border border-[var(--pro-azure-50)] bg-[var(--pro-azure-50)]/20 hover:bg-[var(--pro-azure-50)] hover:border-[var(--pro-azure-100)] transition-all group"
               >
-                <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-tight">{t.replace('_', ' ')}</span>
-                <ChevronRight size={12} className="text-emerald-400 group-hover:translate-x-0.5 transition-transform" />
+                <span className="text-[11px] font-bold text-[var(--pro-azure-dark)] uppercase tracking-tight">{t.replace('_', ' ')}</span>
+                <ChevronRight size={12} className="text-[var(--pro-azure-light)] group-hover:translate-x-0.5 transition-transform" />
               </button>
             ))}
           </div>
@@ -449,12 +450,12 @@ const CompanyDetail: React.FC<{ company: any }> = ({ company }) => {
   const [sub, setSub] = useState<'INFO' | 'TAX' | 'BANKS' | 'USERS'>('INFO');
   const tabs = ['INFO', 'TAX', 'BANKS', 'USERS'] as const;
   return (
-    <div className="bg-white rounded-xl border border-emerald-100 overflow-hidden shadow-sm">
-      <div className="flex gap-0 border-b border-emerald-100 bg-emerald-50/40 px-4">
+    <div className="bg-white rounded-xl border border-[var(--pro-azure-100)] overflow-hidden shadow-sm">
+      <div className="flex gap-0 border-b border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/40 px-4">
         {tabs.map(t => (
           <button key={t} onClick={() => setSub(t)}
             className={`px-3 py-2 text-[10px] font-bold uppercase tracking-wider border-b-2 transition-all ${
-              sub === t ? 'border-emerald-600 text-emerald-700' : 'border-transparent text-emerald-400 hover:text-emerald-600'
+              sub === t ? 'border-[var(--pro-azure)] text-[var(--pro-azure-dark)]' : 'border-transparent text-[var(--pro-azure-light)] hover:text-[var(--pro-azure)]'
             }`}>{t}</button>
         ))}
       </div>
@@ -470,15 +471,15 @@ const CompanyDetail: React.FC<{ company: any }> = ({ company }) => {
               { label: 'Departments', value: company._count?.department ?? '—' },
             ].map(f => (
               <div key={f.label}>
-                <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider mb-0.5">{f.label}</p>
-                <p className="text-[12px] font-semibold text-emerald-900">{f.value}</p>
+                <p className="text-[10px] font-bold text-[var(--pro-azure)] uppercase tracking-wider mb-0.5">{f.label}</p>
+                <p className="text-[12px] font-semibold text-[var(--pro-azure-dark)]">{f.value}</p>
               </div>
             ))}
           </div>
         )}
         {sub === 'TAX' && (
           <div className="space-y-3">
-            <p className="text-[11px] text-emerald-600">Ethiopian tax obligations for this entity:</p>
+            <p className="text-[11px] text-[var(--pro-azure)]">Ethiopian tax obligations for this entity:</p>
             <div className="flex flex-wrap gap-2">
               <EthTaxBadge type="VAT" /><EthTaxBadge type="WHT" /><EthTaxBadge type="BIT" /><EthTaxBadge type="DRRF" />
             </div>
@@ -1110,14 +1111,14 @@ const COLUMNS: Record<string, any[]> = {
     { key: 'name',      label: 'Item Name', render: (r: any) => (
       <div className="flex items-center gap-2">
         <BlueIcon icon={<Package size={11} />} size="sm" />
-        <span className="font-semibold text-emerald-900 text-[12px]">{r.name}</span>
+        <span className="font-semibold text-[var(--pro-azure-dark)] text-[12px]">{r.name}</span>
       </div>
     )},
     { key: 'code',      label: 'Code / SKU', render: (r: any) => <span className="font-mono text-[11px] text-slate-500">{r.code || '—'}</span> },
     { key: 'itemType',  label: 'Type',    render: (r: any) => <StatusBadge status={r.itemType || 'PRODUCT'} /> },
     { key: 'salePrice', label: 'Sale Price', align: 'right' as const, render: (r: any) => <Amount value={r.salePrice} /> },
     { key: 'stock',     label: 'Stock',   align: 'right' as const, render: (r: any) => (
-      <span className={`font-bold text-[12px] ${(r.stock ?? 0) <= (r.reorderLevel ?? 5) ? 'text-rose-600' : 'text-emerald-700'}`}>
+      <span className={`font-bold text-[12px] ${(r.stock ?? 0) <= (r.reorderLevel ?? 5) ? 'text-rose-600' : 'text-[var(--pro-azure-dark)]'}`}>
         {r.stock ?? 0}
       </span>
     )},
@@ -1126,7 +1127,7 @@ const COLUMNS: Record<string, any[]> = {
   CUSTOMERS: [
     { key: 'name',  label: 'Customer', render: (r: any) => (
       <div>
-        <p className="font-semibold text-emerald-900 text-[12px]">{r.name}</p>
+        <p className="font-semibold text-[var(--pro-azure-dark)] text-[12px]">{r.name}</p>
         {r.email && <p className="ovds-caption">{r.email}</p>}
       </div>
     )},
@@ -1135,7 +1136,7 @@ const COLUMNS: Record<string, any[]> = {
     { key: 'kycStatus',  label: 'KYC',    render: (r: any) => <StatusBadge status={r.kycStatus || 'PENDING'} /> },
     { key: 'riskLevel',  label: 'Risk',   render: (r: any) => {
       const v = r.riskLevel || 'LOW';
-      const cls = v === 'HIGH' ? 'text-rose-600 bg-rose-50' : v === 'MEDIUM' ? 'text-amber-600 bg-amber-50' : 'text-emerald-600 bg-emerald-50';
+      const cls = v === 'HIGH' ? 'text-rose-600 bg-rose-50' : v === 'MEDIUM' ? 'text-amber-600 bg-amber-50' : 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]';
       return <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${cls}`}>{v}</span>;
     }},
     { key: 'paymentTerms', label: 'Terms', render: (r: any) => <span className="text-[11px] text-slate-500">{r.paymentTerms || '—'}</span> },
@@ -1143,7 +1144,7 @@ const COLUMNS: Record<string, any[]> = {
   VENDORS: [
     { key: 'name',  label: 'Vendor', render: (r: any) => (
       <div>
-        <p className="font-semibold text-emerald-900 text-[12px]">{r.name}</p>
+        <p className="font-semibold text-[var(--pro-azure-dark)] text-[12px]">{r.name}</p>
         {r.email && <p className="ovds-caption">{r.email}</p>}
       </div>
     )},
@@ -1155,30 +1156,30 @@ const COLUMNS: Record<string, any[]> = {
   BANKS: [
     { key: 'name', label: 'Account Name', render: (r: any) => (
       <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+        <div className="w-6 h-6 rounded bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] flex items-center justify-center text-[var(--pro-azure)] shrink-0">
           <Landmark size={11} />
         </div>
         <div>
-          <p className="font-semibold text-emerald-900 text-[12px]">{r.name}</p>
+          <p className="font-semibold text-[var(--pro-azure-dark)] text-[12px]">{r.name}</p>
           <p className="ovds-caption">{r.bankName || '—'}</p>
         </div>
       </div>
     )},
     { key: 'accountNumber', label: 'Account #', render: (r: any) => <span className="font-mono text-[11px] text-slate-500">{r.accountNumber}</span> },
-    { key: 'currency',      label: 'Currency',  render: (r: any) => <span className="text-[11px] font-bold text-emerald-700">{r.currency || r.currencyCode || 'ETB'}</span> },
+    { key: 'currency',      label: 'Currency',  render: (r: any) => <span className="text-[11px] font-bold text-[var(--pro-azure-dark)]">{r.currency || r.currencyCode || 'ETB'}</span> },
     { key: 'balance',       label: 'Balance',   align: 'right' as const, render: (r: any) => <Amount value={r.balance ?? r.computedBalance ?? 0} /> },
   ],
   TAX_TYPES: [
     { key: 'name', label: 'Tax Name', render: (r: any) => (
       <div>
-        <p className="font-semibold text-emerald-900 text-[12px]">{r.name}</p>
+        <p className="font-semibold text-[var(--pro-azure-dark)] text-[12px]">{r.name}</p>
         {r.description && <p className="text-[10px] text-slate-400 truncate max-w-[200px]">{r.description}</p>}
       </div>
     )},
     { key: 'type', label: 'Type', render: (r: any) => <EthTaxBadge type={r.type || 'VAT'} /> },
     { key: 'rate', label: 'Rate', align: 'right' as const, render: (r: any) => {
       const pct = Number(r.rate) <= 1 ? Number(r.rate) * 100 : Number(r.rate);
-      return <span className="font-bold text-emerald-700 text-[12px]">{pct.toFixed(1)}%</span>;
+      return <span className="font-bold text-[var(--pro-azure-dark)] text-[12px]">{pct.toFixed(1)}%</span>;
     }},
     { key: 'appliesTo', label: 'Applies To', render: (r: any) => <span className="text-[11px] text-slate-500">{r.appliesTo || 'ALL'}</span> },
     { key: 'isActive',  label: 'Active',     render: (r: any) => <StatusBadge status={r.isActive !== false ? 'ACTIVE' : 'INACTIVE'} /> },
@@ -1186,13 +1187,13 @@ const COLUMNS: Record<string, any[]> = {
   PARTNERS: [
     { key: 'name', label: 'Partner', render: (r: any) => (
       <div>
-        <p className="font-semibold text-emerald-900 text-[12px]">{r.name}</p>
+        <p className="font-semibold text-[var(--pro-azure-dark)] text-[12px]">{r.name}</p>
         {r.partnershipType && <p className="ovds-caption">{r.partnershipType}</p>}
       </div>
     )},
     { key: 'tinNumber',    label: 'TIN',     render: (r: any) => <span className="font-mono text-[11px] text-slate-500">{r.tinNumber || '—'}</span> },
     { key: 'licenseNumber',label: 'License', render: (r: any) => <span className="text-[11px] text-slate-500">{r.licenseNumber || '—'}</span> },
-    { key: 'revenueSharePct', label: 'Rev Share', align: 'right' as const, render: (r: any) => r.revenueSharePct ? <span className="font-bold text-emerald-700">{r.revenueSharePct}%</span> : <span className="text-slate-400">—</span> },
+    { key: 'revenueSharePct', label: 'Rev Share', align: 'right' as const, render: (r: any) => r.revenueSharePct ? <span className="font-bold text-[var(--pro-azure-dark)]">{r.revenueSharePct}%</span> : <span className="text-slate-400">—</span> },
     { key: 'status', label: 'Status', render: (r: any) => <StatusBadge status={r.status || 'ACTIVE'} /> },
   ],
   INTEGRATIONS: [
@@ -1200,7 +1201,7 @@ const COLUMNS: Record<string, any[]> = {
       <div className="flex items-center gap-2">
         <BlueIcon icon={<Cpu size={11} />} size="sm" />
         <div>
-          <p className="font-semibold text-emerald-900 text-[12px]">{r.name}</p>
+          <p className="font-semibold text-[var(--pro-azure-dark)] text-[12px]">{r.name}</p>
           {r.provider && <p className="ovds-caption">{r.provider}</p>}
         </div>
       </div>
@@ -1208,7 +1209,7 @@ const COLUMNS: Record<string, any[]> = {
     { key: 'provider',   label: 'Provider', render: (r: any) => <span className="text-[11px] text-slate-500">{r.provider || '—'}</span> },
     { key: 'status',     label: 'Status',   render: (r: any) => <StatusBadge status={r.status || 'ACTIVE'} /> },
     { key: 'webhookUrl', label: 'Webhook',  render: (r: any) => r.webhookUrl
-      ? <a href={r.webhookUrl} target="_blank" rel="noreferrer" className="text-[11px] text-blue-600 hover:underline flex items-center gap-1"><ExternalLink size={10} />Configured</a>
+      ? <a href={r.webhookUrl} target="_blank" rel="noreferrer" className="text-[11px] text-[var(--pro-azure)] hover:underline flex items-center gap-1"><ExternalLink size={10} />Configured</a>
       : <span className="text-[11px] text-slate-400">—</span>
     },
   ],
@@ -1219,7 +1220,7 @@ const COLUMNS: Record<string, any[]> = {
           {(r.firstName?.[0] || '') + (r.lastName?.[0] || '')}
         </div>
         <div>
-          <p className="font-semibold text-emerald-900 text-[12px]">{r.firstName} {r.lastName}</p>
+          <p className="font-semibold text-[var(--pro-azure-dark)] text-[12px]">{r.firstName} {r.lastName}</p>
           <p className="ovds-caption">{r.employeeId || '—'}</p>
         </div>
       </div>
@@ -1233,7 +1234,7 @@ const COLUMNS: Record<string, any[]> = {
     { key: 'action', label: 'Action', render: (r: any) => (
       <div className="flex items-center gap-2">
         <BlueIcon icon={<ShieldCheck size={11} />} size="sm" />
-        <span className="font-semibold text-emerald-900 text-[11px] uppercase tracking-tight">{r.action}</span>
+        <span className="font-semibold text-[var(--pro-azure-dark)] text-[11px] uppercase tracking-tight">{r.action}</span>
       </div>
     )},
     { key: 'user', label: 'User', render: (r: any) => <span className="text-[11px]">{r.user?.name || r.userId}</span> },
@@ -1243,11 +1244,11 @@ const COLUMNS: Record<string, any[]> = {
   CRM_CONTACTS: [
     { key: 'name', label: 'Contact', render: (r: any) => (
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-[10px]">
+        <div className="w-8 h-8 rounded-full bg-[var(--pro-azure-50)] flex items-center justify-center text-[var(--pro-azure)] font-bold text-[10px]">
           {r.name?.split(' ').map((n: string) => n[0]).join('')}
         </div>
         <div>
-          <p className="font-semibold text-emerald-900 text-[12px]">{r.name}</p>
+          <p className="font-semibold text-[var(--pro-azure-dark)] text-[12px]">{r.name}</p>
           <p className="ovds-caption">{r.email}</p>
         </div>
       </div>
@@ -1261,7 +1262,7 @@ const COLUMNS: Record<string, any[]> = {
       <div className="flex items-center gap-2">
         <BlueIcon icon={<Target size={12} />} size="sm" />
         <div>
-          <p className="font-semibold text-emerald-900 text-[12px]">{r.title}</p>
+          <p className="font-semibold text-[var(--pro-azure-dark)] text-[12px]">{r.title}</p>
           <p className="ovds-caption">{r.customerName}</p>
         </div>
       </div>
@@ -1276,7 +1277,7 @@ const COLUMNS: Record<string, any[]> = {
         <div className="w-6 h-6 rounded bg-white flex items-center justify-center text-slate-500">
           <ClipboardList size={11} />
         </div>
-        <span className="text-[11px] font-medium text-emerald-900">{r.description || r.summary}</span>
+        <span className="text-[11px] font-medium text-[var(--pro-azure-dark)]">{r.description || r.summary}</span>
       </div>
     )},
     { key: 'type', label: 'Type', render: (r: any) => <span className="text-[10px] font-bold uppercase text-slate-400">{r.type}</span> },
@@ -1288,7 +1289,7 @@ const COLUMNS: Record<string, any[]> = {
       <div className="flex items-center gap-2">
         <BlueIcon icon={<FileText size={12} />} size="sm" />
         <div>
-          <p className="font-bold text-emerald-900 text-[11px]">{r.invoiceNumber}</p>
+          <p className="font-bold text-[var(--pro-azure-dark)] text-[11px]">{r.invoiceNumber}</p>
           <p className="ovds-caption">{r.customerName}</p>
         </div>
       </div>
@@ -1304,7 +1305,7 @@ const COLUMNS: Record<string, any[]> = {
           <Receipt size={12} />
         </div>
         <div>
-          <p className="font-bold text-emerald-900 text-[11px]">{r.billNumber}</p>
+          <p className="font-bold text-[var(--pro-azure-dark)] text-[11px]">{r.billNumber}</p>
           <p className="ovds-caption">{r.vendorName}</p>
         </div>
       </div>
@@ -1432,138 +1433,139 @@ const SinglePageAccounting: React.FC = () => {
     switch (activeTab) {
       case 'DASHBOARD':
         return [
-          { label: 'Total Revenue', value: 'ETB 2.45M', icon: <ArrowUpRight size={12} />, iconCls: 'bg-emerald-50 text-emerald-600', trend: 'up' as any, trendVal: '12%' },
-          { label: 'Net Profit',    value: 'ETB 1.33M', icon: <Wallet size={12} />, iconCls: 'bg-blue-50 text-blue-600', color: 'emerald' as any },
+          { label: 'Total Revenue', value: 'ETB 2.45M', icon: <ArrowUpRight size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]', trend: 'up' as any, trendVal: '12%' },
+          { label: 'Net Profit',    value: 'ETB 1.33M', icon: <Wallet size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]', color: 'green' as any },
           { label: 'Tax Liability', value: 'ETB 615k',  icon: <Percent size={12} />, iconCls: 'bg-amber-50 text-amber-600', color: 'amber' as any },
-          { label: 'Compliance',    value: '100%',      icon: <ShieldCheck size={12} />, iconCls: 'bg-emerald-50 text-emerald-600' },
+          { label: 'Compliance',    value: '100%',      icon: <ShieldCheck size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
         ];
       case 'REPORTS':
         return [
-          { label: 'Available',    value: '8 Reports',  icon: <BarChart3 size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
-          { label: 'Last Export',  value: '2h ago',    icon: <ExternalLink size={12} />, color: 'emerald' as any },
-          { label: 'IFRS Ready',   value: 'Yes',       color: 'emerald' as any },
-          { label: 'Tax Compliant',value: 'Yes',       color: 'emerald' as any },
+          { label: 'Available',    value: '8 Reports',  icon: <BarChart3 size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
+          { label: 'Last Export',  value: '2h ago',    icon: <ExternalLink size={12} />, color: 'green' as any },
+          { label: 'IFRS Ready',   value: 'Yes',       color: 'green' as any },
+          { label: 'Tax Compliant',value: 'Yes',       color: 'green' as any },
         ];
       case 'ADMINISTRATION':
         return [
-          { label: 'Active Apps',  value: integrations.total, icon: <Cpu size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
+          { label: 'Active Apps',  value: integrations.total, icon: <Cpu size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
           { label: 'Audit Alerts', value: auditLogs.total, color: 'rose' as any },
-          { label: 'Companies',    value: companies.total, color: 'emerald' as any },
+          { label: 'Companies',    value: companies.total, color: 'green' as any },
           { label: 'Partners',     value: partnerships.total, color: 'blue' as any },
         ];
       case 'ITEMS':
         return [
-          { label: 'Total Items',    value: items.total,  icon: <Package size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
+          { label: 'Total Items',    value: items.total,  icon: <Package size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
           { label: 'Low Stock',      value: items.rows.filter((r: any) => (r.stock ?? 0) <= (r.reorderLevel ?? 5)).length, color: 'rose' as const, icon: <AlertCircle size={12} />, iconCls: 'bg-rose-50 text-rose-600' },
           { label: 'Services',       value: items.rows.filter((r: any) => r.itemType === 'SERVICE').length, icon: <Tag size={12} />, iconCls: 'bg-violet-50 text-violet-600' },
-          { label: 'Inventory Value',value: fmt(items.rows.reduce((s: number, r: any) => s + (Number(r.salePrice) * (r.stock ?? 0)), 0)), color: 'emerald' as const },
+          { label: 'Inventory Value',value: fmt(items.rows.reduce((s: number, r: any) => s + (Number(r.salePrice) * (r.stock ?? 0)), 0)), color: 'green' as const },
         ];
       case 'CUSTOMERS':
         return [
-          { label: 'Total Customers', value: customers.total, icon: <Users2 size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
-          { label: 'KYC Verified',    value: customers.rows.filter((r: any) => r.kycStatus === 'VERIFIED').length, color: 'emerald' as const },
+          { label: 'Total Customers', value: customers.total, icon: <Users2 size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
+          { label: 'KYC Verified',    value: customers.rows.filter((r: any) => r.kycStatus === 'VERIFIED').length, color: 'green' as const },
           { label: 'High Risk',       value: customers.rows.filter((r: any) => r.riskLevel === 'HIGH').length, color: 'rose' as const },
           { label: 'With TIN',        value: customers.rows.filter((r: any) => r.tin).length },
         ];
       case 'VENDORS':
         return [
-          { label: 'Total Vendors',  value: vendors.total, icon: <Truck size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
-          { label: 'With TIN',       value: vendors.rows.filter((r: any) => r.tin).length, color: 'emerald' as const },
+          { label: 'Total Vendors',  value: vendors.total, icon: <Truck size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
+          { label: 'With TIN',       value: vendors.rows.filter((r: any) => r.tin).length, color: 'green' as const },
           { label: 'Total Billed',   value: fmt(vendors.rows.reduce((s: number, r: any) => s + (Number(r.totalBilled) || 0), 0)), color: 'rose' as const },
           { label: 'WHT Applicable', value: vendors.rows.filter((r: any) => r.whtApplicable).length },
         ];
       case 'BANKS':
         return [
-          { label: 'Accounts',     value: banks.total, icon: <Landmark size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
-          { label: 'Total Balance',value: fmt(banks.rows.reduce((s: number, r: any) => s + (Number(r.balance) || 0), 0)), color: 'emerald' as const },
+          { label: 'Accounts',     value: banks.total, icon: <Landmark size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
+          { label: 'Total Balance',value: fmt(banks.rows.reduce((s: number, r: any) => s + (Number(r.balance) || 0), 0)), color: 'green' as const },
           { label: 'ETB Accounts', value: banks.rows.filter((r: any) => (r.currency || r.currencyCode || 'ETB') === 'ETB').length },
           { label: 'USD Accounts', value: banks.rows.filter((r: any) => (r.currency || r.currencyCode) === 'USD').length },
         ];
       case 'TAX_TYPES':
         return [
-          { label: 'Tax Rules',  value: taxRates.total, icon: <Percent size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
-          { label: 'VAT Rules',  value: taxRates.rows.filter((r: any) => r.type === 'VAT').length, color: 'emerald' as const },
+          { label: 'Tax Rules',  value: taxRates.total, icon: <Percent size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
+          { label: 'VAT Rules',  value: taxRates.rows.filter((r: any) => r.type === 'VAT').length, color: 'green' as const },
           { label: 'WHT Rules',  value: taxRates.rows.filter((r: any) => r.type === 'WHT').length },
-          { label: 'Active',     value: taxRates.rows.filter((r: any) => r.isActive !== false).length, color: 'emerald' as const },
+          { label: 'Active',     value: taxRates.rows.filter((r: any) => r.isActive !== false).length, color: 'green' as const },
         ];
       case 'COMPANIES':
         return [
-          { label: 'Companies',  value: companies.total, icon: <Building2 size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
-          { label: 'Production', value: companies.rows.filter((r: any) => r.environment !== 'SANDBOX').length, color: 'emerald' as const },
+          { label: 'Companies',  value: companies.total, icon: <Building2 size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
+          { label: 'Production', value: companies.rows.filter((r: any) => r.environment !== 'SANDBOX').length, color: 'green' as const },
           { label: 'Sandbox',    value: companies.rows.filter((r: any) => r.environment === 'SANDBOX').length },
           { label: 'Employees',  value: companies.rows.reduce((s: number, r: any) => s + (r._count?.employee ?? 0), 0) },
         ];
       case 'PARTNERS':
         return [
-          { label: 'Partners',  value: partnerships.total, icon: <Handshake size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
-          { label: 'Active',    value: partnerships.rows.filter((r: any) => r.status === 'ACTIVE').length, color: 'emerald' as const },
+          { label: 'Partners',  value: partnerships.total, icon: <Handshake size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
+          { label: 'Active',    value: partnerships.rows.filter((r: any) => r.status === 'ACTIVE').length, color: 'green' as const },
           { label: 'Pending',   value: partnerships.rows.filter((r: any) => r.status === 'PENDING').length, color: 'amber' as const },
           { label: 'With TIN',  value: partnerships.rows.filter((r: any) => r.tinNumber).length },
         ];
       case 'INTEGRATIONS':
         return [
-          { label: 'Apps',       value: integrations.total, icon: <Cpu size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
-          { label: 'Connected',  value: integrations.rows.filter((r: any) => r.status === 'ACTIVE').length, color: 'emerald' as const },
+          { label: 'Apps',       value: integrations.total, icon: <Cpu size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
+          { label: 'Connected',  value: integrations.rows.filter((r: any) => r.status === 'ACTIVE').length, color: 'green' as const },
           { label: 'Errors',     value: integrations.rows.filter((r: any) => r.status === 'ERROR').length, color: 'rose' as const },
           { label: 'Pending',    value: integrations.rows.filter((r: any) => r.status === 'PENDING').length },
         ];
       case 'HR':
         return [
-          { label: 'Employees',  value: employees.total, icon: <Users2 size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
-          { label: 'Active',     value: employees.rows.filter((r: any) => r.status === 'ACTIVE').length, color: 'emerald' as const },
+          { label: 'Employees',  value: employees.total, icon: <Users2 size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
+          { label: 'Active',     value: employees.rows.filter((r: any) => r.status === 'ACTIVE').length, color: 'green' as const },
           { label: 'Departments',value: [...new Set(employees.rows.map((r: any) => r.departmentId))].length },
           { label: 'On Leave',   value: employees.rows.filter((r: any) => r.onLeave).length, color: 'amber' as const },
         ];
       case 'COMPLIANCE':
         return [
-          { label: 'Audit Logs', value: auditLogs.total, icon: <ShieldCheck size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
-          { label: 'Security',   value: auditLogs.rows.filter((r: any) => r.action?.includes('AUTH')).length, color: 'emerald' as const },
+          { label: 'Audit Logs', value: auditLogs.total, icon: <ShieldCheck size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
+          { label: 'Security',   value: auditLogs.rows.filter((r: any) => r.action?.includes('AUTH')).length, color: 'green' as const },
           { label: 'Warnings',   value: auditLogs.rows.filter((r: any) => r.details?.includes('FAIL')).length, color: 'rose' as const },
           { label: 'Last 24h',   value: auditLogs.rows.filter((r: any) => new Date(r.createdAt) > new Date(Date.now() - 86400000)).length },
         ];
       case 'CRM_CONTACTS':
         return [
-          { label: 'Total Contacts', value: crmContacts.total, icon: <Users2 size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
-          { label: 'Verified',       value: crmContacts.rows.filter((r: any) => r.status === 'ACTIVE').length, color: 'emerald' as const },
+          { label: 'Total Contacts', value: crmContacts.total, icon: <Users2 size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
+          { label: 'Verified',       value: crmContacts.rows.filter((r: any) => r.status === 'ACTIVE').length, color: 'green' as const },
           { label: 'High Risk',      value: crmContacts.rows.filter((r: any) => r.riskLevel === 'HIGH').length, color: 'rose' as const },
           { label: 'Recent',         value: crmContacts.rows.filter((r: any) => new Date(r.createdAt) > new Date(Date.now() - 7 * 86400000)).length },
         ];
       case 'CRM_DEALS':
         return [
-          { label: 'Total Deals', value: crmDeals.total, icon: <Target size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
-          { label: 'Pipeline Val',value: fmt(crmDeals.rows.filter((r: any) => !['CLOSED_WON', 'CLOSED_LOST'].includes(r.stage)).reduce((s: number, r: any) => s + (Number(r.value) || 0), 0)), color: 'emerald' as const },
-          { label: 'Won Value',   value: fmt(crmDeals.rows.filter((r: any) => r.stage === 'CLOSED_WON').reduce((s: number, r: any) => s + (Number(r.value) || 0), 0)), color: 'emerald' as const },
+          { label: 'Total Deals', value: crmDeals.total, icon: <Target size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
+          { label: 'Pipeline Val',value: fmt(crmDeals.rows.filter((r: any) => !['CLOSED_WON', 'CLOSED_LOST'].includes(r.stage)).reduce((s: number, r: any) => s + (Number(r.value) || 0), 0)), color: 'green' as const },
+          { label: 'Won Value',   value: fmt(crmDeals.rows.filter((r: any) => r.stage === 'CLOSED_WON').reduce((s: number, r: any) => s + (Number(r.value) || 0), 0)), color: 'green' as const },
           { label: 'Win Rate',    value: `${Math.round((crmDeals.rows.filter((r: any) => r.stage === 'CLOSED_WON').length / (crmDeals.rows.filter((r: any) => ['CLOSED_WON', 'CLOSED_LOST'].includes(r.stage)).length || 1)) * 100)}%` },
         ];
       case 'CRM_ACTIVITIES':
         return [
-          { label: 'Total Activities', value: crmActivities.total, icon: <ClipboardList size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
+          { label: 'Total Activities', value: crmActivities.total, icon: <ClipboardList size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
           { label: 'Pending',         value: crmActivities.rows.filter((r: any) => r.status === 'PENDING').length, color: 'amber' as const },
-          { label: 'Done',            value: crmActivities.rows.filter((r: any) => r.status === 'DONE').length, color: 'emerald' as const },
+          { label: 'Done',            value: crmActivities.rows.filter((r: any) => r.status === 'DONE').length, color: 'green' as const },
           { label: 'Overdue',         value: crmActivities.rows.filter((r: any) => r.status === 'PENDING' && new Date(r.dueDate) < new Date()).length, color: 'rose' as const },
         ];
       case 'INVOICES':
         return [
-          { label: 'Total Invoices', value: invoices.total, icon: <FileText size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
+          { label: 'Total Invoices', value: invoices.total, icon: <FileText size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
           { label: 'Unpaid Amount',  value: fmt(invoices.rows.filter((r: any) => r.status !== 'PAID').reduce((s: number, r: any) => s + (Number(r.totalAmount) || 0), 0)), color: 'amber' as const },
-          { label: 'Paid This Month',value: fmt(invoices.rows.filter((r: any) => r.status === 'PAID' && new Date(r.invoiceDate) > new Date(new Date().getFullYear(), new Date().getMonth(), 1)).reduce((s: number, r: any) => s + (Number(r.totalAmount) || 0), 0)), color: 'emerald' as const },
+          { label: 'Paid This Month',value: fmt(invoices.rows.filter((r: any) => r.status === 'PAID' && new Date(r.invoiceDate) > new Date(new Date().getFullYear(), new Date().getMonth(), 1)).reduce((s: number, r: any) => s + (Number(r.totalAmount) || 0), 0)), color: 'green' as const },
           { label: 'Overdue Count',  value: invoices.rows.filter((r: any) => r.status === 'OVERDUE').length, color: 'rose' as const },
         ];
       case 'BILLS':
         return [
-          { label: 'Total Bills',    value: bills.total, icon: <Receipt size={12} />, iconCls: 'bg-blue-50 text-blue-600' },
+          { label: 'Total Bills',    value: bills.total, icon: <Receipt size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
           { label: 'Accounts Payable',value: fmt(bills.rows.filter((r: any) => r.status !== 'PAID').reduce((s: number, r: any) => s + (Number(r.totalAmount) || 0), 0)), color: 'rose' as const },
-          { label: 'Paid This Month',value: fmt(bills.rows.filter((r: any) => r.status === 'PAID' && new Date(r.billDate) > new Date(new Date().getFullYear(), new Date().getMonth(), 1)).reduce((s: number, r: any) => s + (Number(r.totalAmount) || 0), 0)), color: 'emerald' as const },
+          { label: 'Paid This Month',value: fmt(bills.rows.filter((r: any) => r.status === 'PAID' && new Date(r.billDate) > new Date(new Date().getFullYear(), new Date().getMonth(), 1)).reduce((s: number, r: any) => s + (Number(r.totalAmount) || 0), 0)), color: 'green' as const },
           { label: 'Received',       value: bills.rows.filter((r: any) => r.status === 'RECEIVED').length },
         ];
       default:
         return [
-          { label: 'Items',     value: items.total,        icon: <Package size={12} />,  iconCls: 'bg-blue-50 text-blue-600' },
+          { label: 'Items',     value: items.total,        icon: <Package size={12} />,  iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
           { label: 'Customers', value: customers.total,    icon: <Users2 size={12} />,   iconCls: 'bg-violet-50 text-violet-600' },
           { label: 'Vendors',   value: vendors.total,      icon: <Truck size={12} />,    iconCls: 'bg-rose-50 text-rose-600' },
-          { label: 'Banks',     value: banks.total,        icon: <Landmark size={12} />, iconCls: 'bg-emerald-50 text-emerald-600' },
+          { label: 'Banks',     value: banks.total,        icon: <Landmark size={12} />, iconCls: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]' },
         ];
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, items, customers, vendors, banks, taxRates, companies, partnerships, integrations]);
 
   // -- Tab label for modal title ------------------------------------------------
@@ -1605,7 +1607,7 @@ const SinglePageAccounting: React.FC = () => {
         title="Accounting Hub"
         subtitle="Master data · IFRS & Ethiopian Tax · All business types · ERP · Accounting & ovds Software · Banking & ovds · Healthcare & Pharmaceuticals · Manufacturing & Logistics"
         icon={<Activity size={16} />}
-        iconBg="bg-indigo-600"
+        iconBg="bg-[var(--pro-azure)]"
         badge={<IFRSBadge compliant />}
         onRefresh={refetchAll}
         tabs={[
@@ -1646,7 +1648,7 @@ const SinglePageAccounting: React.FC = () => {
           {[
             { label: 'New Invoice', icon: <FileText size={13} />, color: 'bg-sky-500',     tab: 'INVOICES' as Tab },
             { label: 'New Bill',    icon: <Receipt size={13} />,  color: 'bg-amber-500',   tab: 'BILLS' as Tab },
-            { label: 'New Deal',    icon: <Target size={13} />,   color: 'bg-emerald-500', tab: 'CRM_DEALS' as Tab },
+            { label: 'New Deal',    icon: <Target size={13} />,   color: 'bg-[var(--pro-azure-50)]0', tab: 'CRM_DEALS' as Tab },
             { label: 'New Item',    icon: <Package size={13} />,  color: 'bg-violet-500',  tab: 'ITEMS' as Tab },
             { label: 'Add Staff',   icon: <Users2 size={13} />,   color: 'bg-rose-500',    tab: 'HR' as Tab },
           ].map(a => (
@@ -1665,7 +1667,7 @@ const SinglePageAccounting: React.FC = () => {
           ))}
           <div className="ml-auto flex items-center gap-2">
             <Sticker label="System Healthy" variant="blue" />
-            <Sticker label="VAT Ready" variant="emerald" />
+            <Sticker label="VAT Ready" variant="indigo" />
           </div>
         </div>
 
@@ -1715,7 +1717,7 @@ const SinglePageAccounting: React.FC = () => {
             <div className="space-y-2">
               {companies.loading && (
                 <div className="flex items-center justify-center py-10">
-                  <RefreshCw size={18} className="animate-spin text-emerald-400" />
+                  <RefreshCw size={18} className="animate-spin text-[var(--pro-azure-light)]" />
                 </div>
               )}
               {!companies.loading && filteredRows.length === 0 && (
@@ -1730,16 +1732,16 @@ const SinglePageAccounting: React.FC = () => {
                   <div
                     className={`bg-white border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:shadow-sm ${
                       expandedCompany === company.id
-                        ? 'border-emerald-400 ring-2 ring-emerald-400/10'
-                        : 'border-emerald-100 hover:border-emerald-500/40'
+                        ? 'border-[var(--pro-azure)] ring-2 ring-[var(--pro-azure)]/10'
+                        : 'border-[var(--pro-azure-100)] hover:border-[var(--pro-azure)]/40'
                     }`}
                     onClick={() => setExpandedCompany(expandedCompany === company.id ? null : company.id)}
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <BlueIcon icon={<Building2 size={16} />} size="md" />
                       <div className="min-w-0">
-                        <p className="text-[13px] font-bold text-emerald-900 truncate">{company.name}</p>
-                        <p className="text-[10px] text-emerald-500 font-mono">
+                        <p className="text-[13px] font-bold text-[var(--pro-azure-dark)] truncate">{company.name}</p>
+                        <p className="text-[10px] text-[var(--pro-azure)] font-mono">
                           TIN: {company.tin || company.taxId || '—'} · {company.type || 'SMALL_BUSINESS'}
                         </p>
                       </div>
@@ -1750,7 +1752,7 @@ const SinglePageAccounting: React.FC = () => {
                         <div className="flex gap-1">
                           <button
                             onClick={e => { e.stopPropagation(); openEdit(company); }}
-                            className="p-1.5 rounded hover:bg-emerald-50 text-emerald-400 hover:text-emerald-600 transition-colors"
+                            className="p-1.5 rounded hover:bg-[var(--pro-azure-50)] text-[var(--pro-azure-light)] hover:text-[var(--pro-azure)] transition-colors"
                             title="Edit"
                           >
                             <Edit2 size={13} />
@@ -1766,7 +1768,7 @@ const SinglePageAccounting: React.FC = () => {
                       )}
                       <ChevronRight
                         size={15}
-                        className={`text-emerald-300 transition-transform duration-200 ${expandedCompany === company.id ? 'rotate-90' : ''}`}
+                        className={`text-green-300 transition-transform duration-200 ${expandedCompany === company.id ? 'rotate-90' : ''}`}
                       />
                     </div>
                   </div>
@@ -1804,7 +1806,7 @@ const SinglePageAccounting: React.FC = () => {
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => openEdit(row)}
-                            className="p-1.5 rounded hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                            className="p-1.5 rounded hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-950/30 text-[var(--pro-azure-light)] hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors"
                             title="Edit"
                           >
                             <Edit2 size={12} />

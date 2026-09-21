@@ -4,18 +4,20 @@
  * Shows current bank account balances.
  * CTA to connect bank accounts if none exist.
  */
+import { fmtCompact } from '@ovds/ui';
+import { Landmark, Plus, Link2, ArrowUpRight } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Landmark, Plus, Link2, ArrowUpRight } from 'lucide-react';
-import { useApiQuery } from '../../hooks/useApiQuery';
+
 import { useBusiness } from '../../context/businessContext';
-import { fmtCompact } from '@ovds/ui';
+import { useApiQuery } from '../../hooks/useApiQuery';
+
 
 interface Props {
   currency?: string;
 }
 
-const ACCOUNT_COLORS = ['bg-emerald-500', 'bg-sky-500', 'bg-violet-500', 'bg-amber-500', 'bg-rose-500'];
+const ACCOUNT_COLORS = ['bg-[var(--pro-azure-50)]0', 'bg-sky-500', 'bg-violet-500', 'bg-amber-500', 'bg-rose-500'];
 
 const AccountBalanceWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
   const { selectedCompanyId } = useBusiness();
@@ -31,14 +33,14 @@ const AccountBalanceWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
 
   return (
     <div className="ovds-widget-card overflow-hidden">
-      <div className="h-[3px] bg-emerald-600 rounded-t-[inherit]" />
+      <div className="h-[3px] bg-[var(--pro-azure)] rounded-t-[inherit]" />
       <div className="p-4">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center shrink-0">
-              <Landmark size={14} className="text-emerald-600 dark:text-emerald-400" />
+            <div className="w-7 h-7 rounded-xl bg-[var(--pro-azure-50)] dark:bg-green-950/30 flex items-center justify-center shrink-0">
+              <Landmark size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
             </div>
             <div>
               <h3 className="text-[13px] font-semibold text-slate-800 dark:text-slate-100 leading-tight">Account Balance</h3>
@@ -47,7 +49,7 @@ const AccountBalanceWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
           </div>
           <Link
             to="/banking/accounts"
-            className="flex items-center gap-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline shrink-0"
+            className="flex items-center gap-0.5 text-[10px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline shrink-0"
           >
             Manage <ArrowUpRight size={9} />
           </Link>
@@ -79,7 +81,7 @@ const AccountBalanceWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
             <div className="flex items-center gap-2">
               <Link
                 to="/banking/accounts"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-[11px] font-bold transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-lg text-[11px] font-bold transition-colors"
               >
                 <Plus size={11} /> New Account
               </Link>
@@ -94,9 +96,9 @@ const AccountBalanceWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
         ) : (
           <>
             {/* Total balance summary */}
-            <div className="flex items-center justify-between mb-3 px-3 py-2.5 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl border border-emerald-100 dark:border-emerald-900">
-              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wider">Total Balance</span>
-              <span className="text-[15px] font-extrabold text-emerald-700 dark:text-emerald-300 tabular-nums">
+            <div className="flex items-center justify-between mb-3 px-3 py-2.5 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl border border-[var(--pro-azure-100)] dark:border-green-900">
+              <span className="text-[10px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold uppercase tracking-wider">Total Balance</span>
+              <span className="text-[15px] font-extrabold text-[var(--pro-azure-dark)] dark:text-green-300 tabular-nums">
                 {fmtCompact(totalBalance, currency)}
               </span>
             </div>
@@ -124,7 +126,7 @@ const AccountBalanceWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
               {accounts.length > 4 && (
                 <Link
                   to="/banking/accounts"
-                  className="block text-center text-[10px] text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors pt-1"
+                  className="block text-center text-[10px] text-slate-400 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors pt-1"
                 >
                   +{accounts.length - 4} more accounts
                 </Link>
@@ -134,7 +136,7 @@ const AccountBalanceWidget: React.FC<Props> = ({ currency = 'ETB' }) => {
             {/* Connect more CTA */}
             <Link
               to="/banking/statement-import"
-              className="mt-3 flex items-center gap-1.5 text-[10px] font-semibold text-slate-400 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+              className="mt-3 flex items-center gap-1.5 text-[10px] font-semibold text-slate-400 dark:text-slate-500 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors"
             >
               <Link2 size={10} /> Connect more bank accounts
             </Link>

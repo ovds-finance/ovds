@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
   useMasterComplianceList,
   useMasterCompliance,
@@ -10,34 +9,35 @@ import {
   useMasterComplianceTemplate,
   useMasterComplianceSummary,
 } from '@ovds/features/eims';
-import toast from 'react-hot-toast';
 import {
   Shield, Plus, ChevronRight, ChevronLeft, Trash2, Search, Filter,
   ClipboardList, BarChart3, FileText, CheckCircle2, X, Save,
   RefreshCw,
 } from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
 const STATUS_COLORS: Record<string, string> = {
   DRAFT: 'text-slate-600 bg-slate-100',
   IN_PROGRESS: 'text-amber-600 bg-amber-50',
-  COMPLETED: 'text-emerald-600 bg-emerald-50',
+  COMPLETED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   PENDING: 'text-slate-500 bg-slate-100',
-  PASS: 'text-emerald-600 bg-emerald-50',
+  PASS: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   FAIL: 'text-rose-600 bg-rose-50',
   NOT_APPLICABLE: 'text-slate-400 bg-slate-50',
 };
 
 const SECTION_META: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
   general: { label: 'General Information', icon: <FileText size={14} />, color: 'bg-slate-50 border-slate-200' },
-  invoice_registration: { label: 'Invoice Registration', icon: <ClipboardList size={14} />, color: 'bg-blue-50 border-blue-200' },
-  receipt_registration: { label: 'Receipt Registration', icon: <ClipboardList size={14} />, color: 'bg-indigo-50 border-indigo-200' },
+  invoice_registration: { label: 'Invoice Registration', icon: <ClipboardList size={14} />, color: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' },
+  receipt_registration: { label: 'Receipt Registration', icon: <ClipboardList size={14} />, color: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' },
   credit_memo: { label: 'Credit Memo', icon: <FileText size={14} />, color: 'bg-purple-50 border-purple-200' },
   cancel_invoice: { label: 'Cancel Invoice', icon: <FileText size={14} />, color: 'bg-orange-50 border-orange-200' },
   debit_memo: { label: 'Debit Memo', icon: <FileText size={14} />, color: 'bg-pink-50 border-pink-200' },
   negative_tests: { label: 'Negative Tests', icon: <Shield size={14} />, color: 'bg-rose-50 border-rose-200' },
   notification_service: { label: 'Notification Service', icon: <FileText size={14} />, color: 'bg-teal-50 border-teal-200' },
   setup_configuration: { label: 'Setup and Configuration', icon: <FileText size={14} />, color: 'bg-cyan-50 border-cyan-200' },
-  printing_layout: { label: 'Printing Layout and Content', icon: <FileText size={14} />, color: 'bg-emerald-50 border-emerald-200' },
+  printing_layout: { label: 'Printing Layout and Content', icon: <FileText size={14} />, color: 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)]' },
   system_saas: { label: 'A. SaaS SP (Cloud-Based)', icon: <FileText size={14} />, color: 'bg-sky-50 border-sky-200' },
   system_onprem: { label: 'B. On-Premises S-POS', icon: <FileText size={14} />, color: 'bg-violet-50 border-violet-200' },
   system_aggregator: { label: 'C. Aggregator', icon: <FileText size={14} />, color: 'bg-fuchsia-50 border-fuchsia-200' },
@@ -65,9 +65,9 @@ const MasterComplianceChecklistPage: React.FC = () => {
 
   const { data: listData, isLoading: loadingList, refetch: refetchList } = useMasterComplianceList();
   const { data: detail } = useMasterCompliance(selectedId || '');
-  const { data: itemsData, refetch: refetchItems } = useMasterComplianceItems(selectedId || '');
+  const { data: itemsData, refetch: _refetchItems } = useMasterComplianceItems(selectedId || '');
   const { data: summaryData } = useMasterComplianceSummary();
-  const { data: templateData } = useMasterComplianceTemplate();
+  const { data: _templateData } = useMasterComplianceTemplate();
 
   const createChecklist = useCreateMasterCompliance();
   const updateChecklist = useUpdateMasterCompliance();
@@ -101,13 +101,13 @@ const MasterComplianceChecklistPage: React.FC = () => {
 
   const handleUpdateItem = async (itemId: string, patch: Record<string, unknown>) => {
     try {
-      await updateItem.mutateAsync({ id: itemId, data: patch });
+      await updateItem.mutateAsync({ checklistId: selectedId ?? '', itemId, data: patch });
     } catch (e: any) {
       toast.error(e.message);
     }
   };
 
-  const filteredChecklists = (listData?.data ?? []).filter((c: any) => {
+  const filteredChecklists = (listData ?? []).filter((c: any) => {
     if (filterStatus && c.status !== filterStatus) return false;
     if (searchQuery && !c.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return true;
@@ -142,17 +142,17 @@ const MasterComplianceChecklistPage: React.FC = () => {
           <p className="text-xs text-slate-500">Total Items</p>
           <p className="text-lg font-bold">{summaryData.totalItems}</p>
         </div>
-        <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
-          <p className="text-xs text-emerald-600">Passed</p>
-          <p className="text-lg font-bold text-emerald-700">{summaryData.passItems}</p>
+        <div className="p-3 bg-[var(--pro-azure-50)] rounded-xl border border-[var(--pro-azure-100)]">
+          <p className="text-xs text-[var(--pro-azure)]">Passed</p>
+          <p className="text-lg font-bold text-[var(--pro-azure-dark)]">{summaryData.passItems}</p>
         </div>
         <div className="p-3 bg-rose-50 rounded-xl border border-rose-200">
           <p className="text-xs text-rose-600">Failed</p>
           <p className="text-lg font-bold text-rose-700">{summaryData.failItems}</p>
         </div>
-        <div className="p-3 bg-blue-50 rounded-xl border border-blue-200 col-span-2 md:col-span-4">
-          <p className="text-xs text-blue-600">Compliance Score</p>
-          <p className="text-2xl font-bold text-blue-700">{summaryData.complianceScore}%</p>
+        <div className="p-3 bg-[var(--pro-azure-50)] rounded-xl border border-[var(--pro-azure-100)] col-span-2 md:col-span-4">
+          <p className="text-xs text-[var(--pro-azure)]">Compliance Score</p>
+          <p className="text-2xl font-bold text-[var(--pro-azure-dark)]">{summaryData.complianceScore}%</p>
         </div>
       </div>
     );
@@ -161,7 +161,7 @@ const MasterComplianceChecklistPage: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-4">
       <div className="flex items-center gap-3">
-        <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
+        <div className="p-2.5 rounded-xl bg-[var(--pro-azure-50)] text-[var(--pro-azure)]">
           <Shield size={22} />
         </div>
         <div>
@@ -192,7 +192,7 @@ const MasterComplianceChecklistPage: React.FC = () => {
                 <option value="COMPLETED">Completed</option>
               </select>
             </div>
-            <button type="button" onClick={() => setShowCreate(true)} className="px-3 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-1">
+            <button type="button" onClick={() => setShowCreate(true)} className="px-3 py-2 text-sm bg-[var(--pro-azure)] text-white rounded-lg hover:bg-[var(--pro-azure-dark)] flex items-center gap-1">
               <Plus size={14} /> New Checklist
             </button>
           </div>
@@ -217,7 +217,7 @@ const MasterComplianceChecklistPage: React.FC = () => {
                     <p className="text-[10px] text-slate-400 mt-1">{cl.systemType || 'N/A'} · {cl.systemName || 'N/A'} · Created: {new Date(cl.createdAt).toLocaleDateString()}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <button type="button" onClick={() => setSelectedId(cl.id)} className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg" title="View">
+                    <button type="button" onClick={() => setSelectedId(cl.id)} className="p-1.5 text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)] rounded-lg" title="View">
                       <ChevronRight size={14} />
                     </button>
                     <button type="button" onClick={() => handleDelete(cl.id)} className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg" title="Delete">
@@ -382,7 +382,7 @@ const MasterComplianceChecklistPage: React.FC = () => {
             </div>
             <div className="p-4 border-t flex justify-end gap-2">
               <button type="button" onClick={() => setShowCreate(false)} className="px-3 py-2 text-sm border rounded-lg hover:bg-slate-50">Cancel</button>
-              <button type="button" onClick={handleCreate} className="px-3 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Create Checklist</button>
+              <button type="button" onClick={handleCreate} className="px-3 py-2 text-sm bg-[var(--pro-azure)] text-white rounded-lg hover:bg-[var(--pro-azure-dark)]">Create Checklist</button>
             </div>
           </div>
         </div>

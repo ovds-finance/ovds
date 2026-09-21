@@ -52,11 +52,11 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
             className={cn(
               'h-4 w-4 rounded-full border-2 flex items-center justify-center transition-all shrink-0',
               value === option.value
-                ? 'border-aki-blue'
-                : 'border-slate-300 dark:border-slate-600 peer-focus-visible:ring-2 peer-focus-visible:ring-aki-blue/30 peer-focus-visible:ring-offset-2',
+                ? 'border-[var(--pro-azure)]'
+                : 'border-slate-300 dark:border-slate-600 peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--pro-azure)]/30 peer-focus-visible:ring-offset-2',
             )}
           >
-            {value === option.value && <div className="h-2 w-2 rounded-full bg-aki-blue" />}
+            {value === option.value && <div className="h-2 w-2 rounded-full bg-[var(--pro-azure)]" />}
           </div>
         </div>
         <span className={cn('text-[12px] font-medium', value === option.value ? 'text-slate-900 dark:text-slate-100' : 'text-slate-600 dark:text-slate-400')}>

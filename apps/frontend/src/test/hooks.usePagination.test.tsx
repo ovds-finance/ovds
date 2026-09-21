@@ -2,11 +2,11 @@
  * Tests for frontend/src/hooks/usePagination.ts
  * Note: .tsx extension required because we use JSX for the MemoryRouter wrapper.
  */
-import { describe, it, expect } from 'vitest';
+import { usePagination } from '@ovds/ui';
 import { renderHook, act } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import { usePagination } from '@ovds/ui';
+import { describe, it, expect } from 'vitest';
 
 function renderWithRouter(hook: () => ReturnType<typeof usePagination>) {
   return renderHook(hook, {

@@ -1,6 +1,6 @@
 export const MODULE_COLORS: Record<string, { bg: string; text: string; ring: string; dot: string }> = {
   dashboard:     { bg: 'bg-slate-100',    text: 'text-slate-400',   ring: 'ring-slate-200',   dot: 'bg-slate-400' },
-  sales:         { bg: 'bg-aka-emerald-50', text: 'text-aka-emerald-600', ring: 'ring-aka-emerald-200', dot: 'bg-aka-emerald-500' },
+  sales:         { bg: 'bg-aka-indigo-50', text: 'text-aka-indigo-600', ring: 'ring-aka-indigo-200', dot: 'bg-aka-indigo-500' },
   purchases:     { bg: 'bg-aka-sky-50',       text: 'text-aka-sky-600',     ring: 'ring-aka-sky-200',     dot: 'bg-aka-sky-500' },
   inventory:     { bg: 'bg-aka-amber-50',   text: 'text-aka-amber-600',   ring: 'ring-aka-amber-200',   dot: 'bg-aka-amber-500' },
   banking:       { bg: 'bg-aki-blue-50',    text: 'text-aki-blue',        ring: 'ring-aki-blue-100',    dot: 'bg-aki-blue' },
@@ -11,17 +11,17 @@ export const MODULE_COLORS: Record<string, { bg: string; text: string; ring: str
   system:        { bg: 'bg-slate-100',    text: 'text-slate-400',   ring: 'ring-slate-200',   dot: 'bg-slate-400' },
   ovds_module:   { bg: 'bg-aka-violet-50',  text: 'text-aka-violet-600', ring: 'ring-aka-violet-200', dot: 'bg-aka-violet-500' },
   disaster_fund: { bg: 'bg-aka-rose-50',    text: 'text-aka-rose-600',   ring: 'ring-aka-rose-200',   dot: 'bg-aka-rose-500' },
-  trade:         { bg: 'bg-aka-emerald-50', text: 'text-aka-emerald-600', ring: 'ring-aka-emerald-200', dot: 'bg-aka-emerald-500' },
+  trade:         { bg: 'bg-aka-indigo-50', text: 'text-aka-indigo-600', ring: 'ring-aka-indigo-200', dot: 'bg-aka-indigo-500' },
   device_control:{ bg: 'bg-slate-100',    text: 'text-slate-400',   ring: 'ring-slate-200',   dot: 'bg-slate-400' },
   ifrs_compliance: { bg: 'bg-aka-violet-50', text: 'text-aka-violet-600', ring: 'ring-aka-violet-200', dot: 'bg-aka-violet-500' },
   aabe_compliance: { bg: 'bg-aki-blue-50', text: 'text-aki-blue', ring: 'ring-aki-blue-100', dot: 'bg-aki-blue' },
   commercial_code: { bg: 'bg-slate-100', text: 'text-slate-600', ring: 'ring-slate-200', dot: 'bg-slate-500' },
-  regulatory_reporting: { bg: 'bg-aka-emerald-50', text: 'text-aka-emerald-600', ring: 'ring-aka-emerald-200', dot: 'bg-aka-emerald-500' },
+  regulatory_reporting: { bg: 'bg-aka-indigo-50', text: 'text-aka-indigo-600', ring: 'ring-aka-indigo-200', dot: 'bg-aka-indigo-500' },
 };
 
 export const ITEM_ACCENT: Record<string, string> = {
   dashboard:      'text-slate-600',
-  sales:          'text-aka-emerald-600',
+  sales:          'text-aka-indigo-600',
   purchases:      'text-sky-600',
   inventory:      'text-aka-amber-600',
   banking:        'text-aki-blue',
@@ -32,26 +32,26 @@ export const ITEM_ACCENT: Record<string, string> = {
   system:         'text-slate-600',
   ovds_module:    'text-aka-violet-600',
   disaster_fund:  'text-aka-rose-600',
-  trade:          'text-aka-emerald-600',
+  trade:          'text-aka-indigo-600',
   device_control: 'text-slate-600',
   ifrs_compliance: 'text-aka-violet-600',
   aabe_compliance: 'text-aki-blue',
   commercial_code: 'text-slate-600',
-  regulatory_reporting: 'text-aka-emerald-600',
+  regulatory_reporting: 'text-aka-indigo-600',
 };
 
 export const TYPE_BADGE_CLS: Record<string, { label: string; cls: string }> = {
   MANUFACTURING: { label: 'Manufacturing', cls: 'bg-sky-100 text-sky-700' },
   SERVICE:       { label: 'Service',       cls: 'bg-aka-violet-100 text-aka-violet-700' },
   TRADING:       { label: 'Trading',       cls: 'bg-aka-amber-100 text-aka-amber-700' },
-  RETAIL:        { label: 'Retail',        cls: 'bg-aka-emerald-100 text-aka-emerald-700' },
+  RETAIL:        { label: 'Retail',        cls: 'bg-aka-indigo-100 text-aka-indigo-700' },
   NGO:           { label: 'NGO',           cls: 'bg-aka-rose-100 text-aka-rose-700' },
   GOVERNMENT:    { label: 'Govt.',         cls: 'bg-slate-100 text-slate-600' },
 };
 
 export const COMPANY_GRADIENTS = [
   'from-aki-blue to-aki-blue-dark',
-  'from-aka-emerald-500 to-aka-teal-700',
+  'from-aka-indigo-500 to-aka-indigo-700',
   'from-aka-violet-500 to-aka-purple-700',
   'from-aka-amber-500 to-aka-orange-600',
   'from-aka-rose-500 to-aka-pink-700',
@@ -64,8 +64,8 @@ export const ROLE_BADGE: Record<string, { label: string; cls: string }> = {
   ADMIN:            { label: 'Admin',      cls: 'bg-aki-blue-100 text-aki-blue' },
   PROJECT_MANAGER:  { label: 'PM',         cls: 'bg-aka-sky-100 text-aka-sky-700' },
   HR:               { label: 'HR',         cls: 'bg-aka-violet-100 text-aka-violet-700' },
-  ovds:             { label: 'OVDS',       cls: 'bg-aka-emerald-100 text-aka-emerald-700' },
-  ACCOUNTING:       { label: 'Accounting', cls: 'bg-aka-emerald-100 text-aka-emerald-700' },
+  ovds:             { label: 'OVDS',       cls: 'bg-aka-indigo-100 text-aka-indigo-700' },
+  ACCOUNTING:       { label: 'Accounting', cls: 'bg-aka-indigo-100 text-aka-indigo-700' },
   EMPLOYEE:         { label: 'Employee',   cls: 'bg-slate-100 text-slate-600' },
   AUDITOR:          { label: 'Auditor',    cls: 'bg-aka-amber-100 text-aka-amber-700' },
   IFRS_OFFICER:     { label: 'IFRS',       cls: 'bg-aka-sky-100 text-aka-sky-700' },
@@ -77,7 +77,7 @@ export const ROLE_BADGE: Record<string, { label: string; cls: string }> = {
 };
 
 export const QUICK_CREATE_ACTIONS = [
-  { label: 'Invoice',       sub: 'Bill a customer',       icon: 'INVOICE' as const, to: '/sales/invoices',      permission: 'invoices:write' as const,       color: 'bg-aka-emerald-50',  iconColor: 'text-aka-emerald-600' },
+  { label: 'Invoice',       sub: 'Bill a customer',       icon: 'INVOICE' as const, to: '/sales/invoices',      permission: 'invoices:write' as const,       color: 'bg-aka-indigo-50',  iconColor: 'text-aka-indigo-600' },
   { label: 'Bill',          sub: 'Record a vendor bill',  icon: 'INVOICE' as const, to: '/purchases/bills',     permission: 'bills:write' as const,          color: 'bg-aka-sky-50',      iconColor: 'text-aka-sky-600' },
   { label: 'Expense',       sub: 'Log an expense',        icon: 'MONEY' as const,   to: '/purchases/expenses',  permission: 'expenses:write' as const,       color: 'bg-aka-amber-50',    iconColor: 'text-aka-amber-600' },
   { label: 'Employee',      sub: 'Add a team member',     icon: 'EMPLOYEE' as const, to: '/hr/employees',        permission: 'employees:write' as const,      color: 'bg-aka-teal-50',     iconColor: 'text-aka-teal-600' },

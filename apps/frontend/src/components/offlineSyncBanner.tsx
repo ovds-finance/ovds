@@ -1,4 +1,4 @@
-/**
+﻿/**
  * OfflineSyncBanner — shows a persistent top banner when there are
  * offline-queued actions waiting to sync.
  *
@@ -10,9 +10,9 @@
  *
  * Placement: inside Layout.tsx, below the offline banner, above page content.
  */
+import { RefreshCw, WifiOff, ChevronDown, ChevronUp, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { RefreshCw, WifiOff, CheckCircle2, ChevronDown, ChevronUp, X } from 'lucide-react';
-import toast from 'react-hot-toast';
+
 import { useOfflineQueue } from '../hooks/useOfflineQueue';
 import { getQueueStats, type QueuedActionType } from '../services/offlineQueue';
 

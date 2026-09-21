@@ -10,8 +10,6 @@
 
 OVDS supports a full range of payment methods — from cash and cheque to Telebirr, Chapa, CBE Pay, and Stripe for international billing. Once a gateway is configured, incoming payments auto-match to open invoices and post to the General Ledger without manual intervention.
 
----
-
 ## Supported Payment Methods
 
 | Method | Domestic / International | Auto-match | Setup Required |
@@ -53,7 +51,7 @@ Once live, incoming Telebirr payments are auto-matched to open invoices by amoun
    ```
    https://your-domain.com/api/webhooks/chapa
    ```
-5. Enable **Auto-post receipts** — OVDS will automatically mark invoices as Paid on a successful Chapa charge.
+5. Enable **Auto-post receipts** — Ovds will automatically mark invoices as Paid on a successful Chapa charge.
 
 ---
 
@@ -81,7 +79,7 @@ Stripe is suited for USD/EUR invoices sent to international clients. For domesti
    ```
    https://your-domain.com/api/webhooks/stripe
    ```
-5. Copy the **Webhook Signing Secret** from Stripe and paste it into OVDS Settings — this secures the webhook and prevents spoofed payment events.
+5. Copy the **Webhook Signing Secret** from Stripe and paste it into Ovds Settings — this secures the webhook and prevents spoofed payment events.
 
 ---
 
@@ -93,8 +91,8 @@ Once a gateway is active, customers see a **Pay Now** button on every invoice em
 2. Customer clicks → opens the Client Portal or a hosted payment page.
 3. Customer selects their payment method (Telebirr, Chapa, CBE Pay, Card).
 4. Payment is processed by the gateway.
-5. Gateway sends a webhook to OVDS confirming the payment.
-6. OVDS automatically:
+5. Gateway sends a webhook to Ovds confirming the payment.
+6. Ovds automatically:
    - Records the payment against the matching invoice
    - Updates the invoice status to **Paid** (or **Partial**)
    - Sends a payment confirmation email to the customer
@@ -126,7 +124,7 @@ For partial payments, repeat this process — each payment is recorded separatel
 Navigate to **Sales → Refunds** (`/refunds`) — requires `invoices:write`.
 
 ### Full Refund
-1. Open the paid invoice → click **More Actions → Issue Refund**.
+1. Open the paid invoice and click **More Actions → Issue Refund**.
 2. Select the refund method — can differ from the original payment method.
 3. Click **Confirm**:
    - A Credit Note is created and linked to the original invoice
@@ -134,7 +132,7 @@ Navigate to **Sales → Refunds** (`/refunds`) — requires `invoices:write`.
    - Invoice status reflects the refund
 
 ### Partial Refund
-1. Open the paid invoice → click **More Actions → Issue Refund**.
+1. Open the paid invoice and click **More Actions → Issue Refund**.
 2. Enter the partial amount.
 3. A Credit Note is created for that amount; the original invoice retains the remaining paid balance.
 

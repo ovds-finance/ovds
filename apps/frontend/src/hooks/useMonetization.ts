@@ -7,10 +7,11 @@
  *   const { isEntitled, requirePlan, trialBanner } = useMonetization();
  *   if (!isEntitled('feature:gl')) return <UpgradeWall featureKey="feature:gl" />;
  */
+import { FEATURE_KEYS } from '@ovds/ui';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { useEntitlement } from '../context/entitlementContext';
-import { FEATURE_KEYS } from '@ovds/ui';
 
 export { FEATURE_KEYS };
 

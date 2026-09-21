@@ -1,3 +1,5 @@
+import {CreateBankAccountDto} from '@ovds/dto';
+import type { BankTransaction } from '@ovds/features/banking';
 import {
   Account,
   BankAccount,
@@ -6,8 +8,6 @@ import {
   JournalLine,
   AccountBalancesResponse,
 } from '@ovds/shared';
-import {CreateBankAccountDto} from '@ovds/dto';
-import type { BankTransaction } from '@ovds/features/banking';
 
 export type {
   Account,

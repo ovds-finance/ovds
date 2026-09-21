@@ -1,16 +1,18 @@
-import React, { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { eimsApi } from '@ovds/features/eims';
-import toast from 'react-hot-toast';
-import { useBusiness } from '../../context/businessContext';
 import { useEimsRegistrations } from '@ovds/features/eims';
+import { useQuery } from '@tanstack/react-query';
 import { Search, Download, RefreshCw } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
+
+import { useBusiness } from '../../context/businessContext';
+
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING: 'text-amber-600 bg-amber-50',
-  REGISTERED: 'text-emerald-600 bg-emerald-50',
+  REGISTERED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   FAILED: 'text-rose-600 bg-rose-50',
-  COMPLETED: 'text-emerald-600 bg-emerald-50',
+  COMPLETED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   CANCELLED: 'text-slate-600 bg-slate-100',
 };
 

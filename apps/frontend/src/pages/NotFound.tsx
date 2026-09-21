@@ -1,13 +1,14 @@
-import React, { useState, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import {
   Home, ArrowLeft, LayoutDashboard, Banknote,
   BarChart3, Receipt, Search, ChevronRight, Clock,
   FileQuestion, Zap,
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../rbac/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { useNavTree } from '../hooks/useNavTree';
+import { useAuth } from '../rbac/AuthContext';
 
 const NotFound: React.FC = () => {
   const navigate = useNavigate();
@@ -89,7 +90,7 @@ const NotFound: React.FC = () => {
                 placeholder={t('not_found.search_placeholder')}
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 hover:border-gray-300 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 rounded-xl text-sm text-gray-800 placeholder-gray-400 outline-none transition-all"
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 hover:border-gray-300 focus:border-[var(--pro-azure)] focus:ring-2 focus:ring-[var(--pro-azure-100)] rounded-xl text-sm text-gray-800 placeholder-gray-400 outline-none transition-all"
               />
               {/* Search results dropdown */}
               {filteredResults.length > 0 && (
@@ -97,14 +98,14 @@ const NotFound: React.FC = () => {
                   {filteredResults.map(item => (
                     <Link key={item.to} to={item.to}
                       className="flex items-center gap-3 px-4 py-2.5 hover:bg-white transition-colors group">
-                      <div className="w-7 h-7 rounded-lg bg-gray-100 group-hover:bg-emerald-50 flex items-center justify-center text-gray-500 group-hover:text-emerald-600 transition-colors shrink-0">
+                      <div className="w-7 h-7 rounded-lg bg-gray-100 group-hover:bg-[var(--pro-azure-50)] flex items-center justify-center text-gray-500 group-hover:text-[var(--pro-azure)] transition-colors shrink-0">
                         {item.icon}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-semibold text-gray-700 group-hover:text-emerald-700 truncate">{item.label}</p>
+                        <p className="text-[13px] font-semibold text-gray-700 group-hover:text-[var(--pro-azure-dark)] truncate">{item.label}</p>
                         <p className="text-[10px] text-gray-400">{item.to}</p>
                       </div>
-                      <ChevronRight size={13} className="text-gray-300 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all shrink-0"/>
+                      <ChevronRight size={13} className="text-gray-300 group-hover:text-[var(--pro-azure-light)] group-hover:translate-x-0.5 transition-all shrink-0"/>
                     </Link>
                   ))}
                 </div>
@@ -122,8 +123,8 @@ const NotFound: React.FC = () => {
                     <div className="grid grid-cols-2 gap-2">
                       {recentPages.map(item => (
                         <Link key={item.to} to={item.to}
-                          className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-[12px] font-medium text-gray-600 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 transition-all group">
-                          <span className="text-gray-400 group-hover:text-emerald-500 shrink-0 transition-colors">{item.icon}</span>
+                          className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-[12px] font-medium text-gray-600 hover:border-[var(--pro-azure-light)] hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure-dark)] transition-all group">
+                          <span className="text-gray-400 group-hover:text-[var(--pro-azure)] shrink-0 transition-colors">{item.icon}</span>
                           <span className="truncate">{item.label}</span>
                         </Link>
                       ))}
@@ -135,8 +136,8 @@ const NotFound: React.FC = () => {
                 <div className="grid grid-cols-2 gap-2">
                   {quickLinks.map(link => (
                     <Link key={link.to} to={link.to}
-                      className="flex items-center gap-2.5 px-4 py-3 bg-white border border-gray-200 rounded-xl text-[13px] font-medium text-gray-600 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 hover:shadow-sm transition-all group">
-                      <span className="text-gray-400 group-hover:text-emerald-500 shrink-0 transition-colors">{link.icon}</span>
+                      className="flex items-center gap-2.5 px-4 py-3 bg-white border border-gray-200 rounded-xl text-[13px] font-medium text-gray-600 hover:border-[var(--pro-azure-light)] hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure-dark)] hover:shadow-sm transition-all group">
+                      <span className="text-gray-400 group-hover:text-[var(--pro-azure)] shrink-0 transition-colors">{link.icon}</span>
                       <span className="truncate">{link.label}</span>
                     </Link>
                   ))}
@@ -161,7 +162,7 @@ const NotFound: React.FC = () => {
 
         {/* Footer note */}
         <p className="text-center text-[11px] text-gray-400 mt-4 flex items-center justify-center gap-1.5">
-          <Zap size={10} className="text-emerald-400"/> OVDS AI ERP · Ethiopia 🇪🇹
+          <Zap size={10} className="text-[var(--pro-azure-light)]"/> OVDS AI ERP · Ethiopia 🇪🇹
         </p>
       </div>
     </div>

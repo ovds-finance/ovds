@@ -17,14 +17,15 @@
  *   <PaymentVerificationPanel invoiceId="inv_xxx" expectedAmount={4500} />
  */
 
-import React, { useState } from 'react';
 import {
   CheckCircle2, XCircle, Loader2, AlertCircle, ShieldCheck,
   Search, ChevronDown, RefreshCcw, Clock, BadgeCheck, Banknote,
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { useAuth } from '../../rbac/AuthContext';
 import api from '../../services/api';
 import { fmtCurrency } from '../../utils/fmt';
-import { useAuth } from '../../rbac/AuthContext';
 
 // -- Types ---------------------------------------------------------------------
 
@@ -60,8 +61,8 @@ const NETWORKS: {
   border: string;
   logo: string; // emoji stand-in; replace with real SVG if available
 }[] = [
-  { id: 'CBE_BIRR',     label: 'CBE Birr',     color: 'text-emerald-700', bg: 'bg-emerald-50',  border: 'border-emerald-200', logo: '🏦' },
-  { id: 'TELEBIRR',     label: 'Telebirr',     color: 'text-blue-700',    bg: 'bg-blue-50',     border: 'border-blue-200',    logo: '📱' },
+  { id: 'CBE_BIRR',     label: 'CBE Birr',     color: 'text-[var(--pro-azure-dark)]', bg: 'bg-[var(--pro-azure-50)]',  border: 'border-[var(--pro-azure-100)]', logo: '🏦' },
+  { id: 'TELEBIRR',     label: 'Telebirr',     color: 'text-[var(--pro-azure-dark)]',    bg: 'bg-[var(--pro-azure-50)]',     border: 'border-[var(--pro-azure-100)]',    logo: '📱' },
   { id: 'AWASH_BANK',   label: 'Awash Bank',   color: 'text-violet-700',  bg: 'bg-violet-50',   border: 'border-violet-200',  logo: '🏛' },
   { id: 'DASHEN_BANK',  label: 'Dashen Bank',  color: 'text-amber-700',   bg: 'bg-amber-50',    border: 'border-amber-200',   logo: '🏛' },
   { id: 'AMOLE',        label: 'Amole',        color: 'text-rose-700',    bg: 'bg-rose-50',     border: 'border-rose-200',    logo: '💳' },
@@ -72,7 +73,7 @@ const NETWORKS: {
 
 const SourceBadge: React.FC<{ source: VerificationResult['source'] }> = ({ source }) => {
   const cfg = {
-    live:    { cls: 'bg-emerald-100 text-emerald-700 border-emerald-200', label: 'Live',    dot: 'bg-emerald-500' },
+    live:    { cls: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]', label: 'Live',    dot: 'bg-[var(--pro-azure-50)]0' },
     cache:   { cls: 'bg-amber-100 text-amber-700 border-amber-200',       label: 'Cached',  dot: 'bg-amber-400'   },
     stub:    { cls: 'bg-slate-100 text-slate-600 border-slate-200',       label: 'Offline', dot: 'bg-slate-400'   },
   }[source];
@@ -90,7 +91,7 @@ const AmountMatch: React.FC<{ matches: boolean | null; confirmed: number | null;
     const fmt = (n: number) => fmtCurrency(n, currency);
     if (matches === true) {
       return (
-        <div className="flex items-center gap-1.5 text-emerald-700 text-xs font-semibold">
+        <div className="flex items-center gap-1.5 text-[var(--pro-azure-dark)] text-xs font-semibold">
           <BadgeCheck size={13} /> Amount confirmed: {fmt(confirmed)}
         </div>
       );
@@ -179,8 +180,8 @@ const PaymentVerificationPanel: React.FC<Props> = ({
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2.5">
-        <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
-          <ShieldCheck size={15} className="text-emerald-600" />
+        <div className="w-8 h-8 rounded-xl bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] flex items-center justify-center shrink-0">
+          <ShieldCheck size={15} className="text-[var(--pro-azure)]" />
         </div>
         <div>
           <h3 className="ovds-card-title leading-none">Payment Verification</h3>
@@ -243,7 +244,7 @@ const PaymentVerificationPanel: React.FC<Props> = ({
             type="button"
             onClick={handleVerify}
             disabled={!canVerify || loading || !reference.trim()}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:-translate-y-0.5 hover:shadow-md hover:shadow-emerald-200/60 active:translate-y-0"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:-translate-y-0.5 hover:shadow-md hover:shadow-green-200/60 active:translate-y-0"
             style={{ background: 'linear-gradient(135deg,#059669,#0d9488)' }}
           >
             {loading ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />}
@@ -270,20 +271,20 @@ const PaymentVerificationPanel: React.FC<Props> = ({
         <div className={[
           'rounded-2xl border overflow-hidden transition-all',
           result.verified
-            ? 'border-emerald-200 bg-emerald-50/60'
+            ? 'border-[var(--pro-azure-100)] bg-[var(--pro-azure-50)]/60'
             : result.source === 'stub'
             ? 'border-slate-200 bg-slate-50/60'
             : 'border-rose-200 bg-rose-50/60',
         ].join(' ')}>
           {/* Status stripe */}
-          <div className={`h-1 w-full ${result.verified ? 'bg-emerald-500' : result.source === 'stub' ? 'bg-slate-300' : 'bg-rose-400'}`} />
+          <div className={`h-1 w-full ${result.verified ? 'bg-[var(--pro-azure-50)]0' : result.source === 'stub' ? 'bg-slate-300' : 'bg-rose-400'}`} />
 
           <div className="px-4 py-3.5 space-y-3">
             {/* Status row */}
             <div className="flex items-center gap-2.5">
               {result.verified ? (
-                <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
-                  <CheckCircle2 size={16} className="text-emerald-600" />
+                <div className="w-8 h-8 rounded-xl bg-[var(--pro-azure-100)] flex items-center justify-center shrink-0">
+                  <CheckCircle2 size={16} className="text-[var(--pro-azure)]" />
                 </div>
               ) : (
                 <div className="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
@@ -291,7 +292,7 @@ const PaymentVerificationPanel: React.FC<Props> = ({
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className={`text-[13px] font-extrabold leading-none ${result.verified ? 'text-emerald-800' : result.source === 'stub' ? 'text-slate-600' : 'text-rose-700'}`}>
+                <p className={`text-[13px] font-extrabold leading-none ${result.verified ? 'text-[var(--pro-azure-dark)]' : result.source === 'stub' ? 'text-slate-600' : 'text-rose-700'}`}>
                   {result.verified
                     ? 'Payment Verified'
                     : result.source === 'stub'
@@ -355,7 +356,7 @@ const PaymentVerificationPanel: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={handleVerify}
-                className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+                className="flex items-center gap-1 text-[10px] font-semibold text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] transition-colors"
               >
                 <RefreshCcw size={9} /> Re-check
               </button>
@@ -384,7 +385,7 @@ const PaymentVerificationPanel: React.FC<Props> = ({
               {history.slice(1).map((h, i) => (
                 <div key={i} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white border border-slate-100">
                   {h.verified
-                    ? <CheckCircle2 size={12} className="text-emerald-500 shrink-0" />
+                    ? <CheckCircle2 size={12} className="text-[var(--pro-azure)] shrink-0" />
                     : <XCircle size={12} className="text-slate-400 shrink-0" />}
                   <span className="text-[11px] text-slate-600 font-medium truncate flex-1">{h.reference}</span>
                   <span className="text-[10px] text-slate-400 shrink-0">

@@ -5,9 +5,10 @@
  * Usage:
  *   <NotificationBell />
  */
-import React, { useRef, useState, useEffect } from 'react';
 import { Bell, Check, CheckCheck, Trash2, ExternalLink } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { useNotifications, type AppNotification } from '../hooks/useNotifications';
 import { useAuth } from '../rbac/AuthContext';
 
@@ -61,13 +62,13 @@ export const NotificationBell: React.FC = () => {
           width: 36, height: 36,
           borderRadius: 10,
           border: '1.5px solid var(--border, #e5e7eb)',
-          background: open ? 'var(--lv-dim, #eef2ff)' : '#fff',
+          background: open ? 'var(--lv-dim, #F0FDF4)' : '#fff',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: 'pointer',
           transition: 'all .15s',
         }}
       >
-        <Bell size={16} style={{ color: open ? 'var(--lv, #4f46e5)' : '#6b7280' }} />
+        <Bell size={16} style={{ color: open ? 'var(--lv, #4FBA6F)' : '#6b7280' }} />
         {unreadCount > 0 && (
           <span
             aria-hidden
@@ -116,8 +117,8 @@ export const NotificationBell: React.FC = () => {
               {unreadCount > 0 && (
                 <span style={{
                   marginLeft: 6, padding: '1px 7px', borderRadius: 999,
-                  background: 'var(--lv-dim, #eef2ff)',
-                  color: 'var(--lv, #4f46e5)',
+                  background: 'var(--lv-dim, #F0FDF4)',
+                  color: 'var(--lv, #4FBA6F)',
                   fontSize: '0.6875rem', fontWeight: 700,
                 }}>
                   {unreadCount} new
@@ -132,7 +133,7 @@ export const NotificationBell: React.FC = () => {
                 style={{
                   display: 'flex', alignItems: 'center', gap: 4,
                   fontSize: '0.75rem', fontWeight: 600,
-                  color: 'var(--lv, #4f46e5)',
+                  color: 'var(--lv, #4FBA6F)',
                   background: 'none', border: 'none', cursor: 'pointer',
                   padding: '2px 8px', borderRadius: 6,
                 }}
@@ -178,7 +179,7 @@ export const NotificationBell: React.FC = () => {
                   <div style={{ paddingTop: 5, flexShrink: 0 }}>
                     <div style={{
                       width: 7, height: 7, borderRadius: '50%',
-                      background: n.isRead ? '#d1d5db' : 'var(--lv, #4f46e5)',
+                      background: n.isRead ? '#d1d5db' : 'var(--lv, #4FBA6F)',
                       transition: 'background .2s',
                     }} />
                   </div>
@@ -255,7 +256,7 @@ export const NotificationBell: React.FC = () => {
               onClick={() => { navigate('/notifications'); setOpen(false); }}
               style={{
                 fontSize: '0.75rem', fontWeight: 600,
-                color: 'var(--lv, #4f46e5)',
+                color: 'var(--lv, #4FBA6F)',
                 background: 'none', border: 'none', cursor: 'pointer',
               }}
             >

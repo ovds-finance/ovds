@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+﻿import React, { useMemo } from 'react';
 
 export interface VatLineItemView {
   id: string;
@@ -21,7 +21,7 @@ export interface VatDeclarationView {
   lineItems: VatLineItemView[];
 }
 
-function toFixed4(value: string | number): string {
+function _toFixed4(value: string | number): number {
   const n = typeof value === 'string' ? parseFloat(value) : value;
   return Math.round(n * 10000) / 10000;
 }

@@ -140,7 +140,7 @@ export function DisclosureTabs({ tabs, defaultTab, className }: DisclosureTabsPr
             className={cn(
               'flex items-center gap-1.5 px-4 py-2.5 text-[12px] font-semibold whitespace-nowrap transition-all border-b-2',
               activeTab === tab.id
-                ? 'border-aki-blue text-aki-blue dark:text-blue-400 bg-white dark:bg-slate-950'
+                ? 'border-[var(--pro-azure)] text-[var(--pro-azure)] dark:text-blue-400 bg-white dark:bg-slate-950'
                 : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100/50 dark:hover:bg-slate-800/50',
             )}
           >

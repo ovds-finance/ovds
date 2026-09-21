@@ -1,4 +1,6 @@
-import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { useAppInstallations, moduleManagerApi } from '@ovds/features/appstore';
+import type { ModuleDownloadJob } from '@ovds/features/appstore';
+import { GridModuleCard, Modal, ModuleInstallationOverlay, SecuritySandbox } from '@ovds/ui';
 import {
   Store, Star, Download, CheckCircle, Search, X, RefreshCw,
   Shield, Globe, Package, ArrowUpRight, Clock, Users,
@@ -13,20 +15,27 @@ import {
   Bell, FileText, Filter, ChevronDown, ArrowRight,
   Sparkles, Star as StarFill, Package2, Puzzle,
   AlertCircle, SlidersHorizontal, Save,
+  Key, ServerCrash, CheckCircle2, Loader2, XCircle,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
+
+import { Can } from '../components/can';
+import { useBusiness } from '../context/businessContext';
+import { VatModuleProvider } from '../context/VatModuleContext';
 import { useApiQuery, invalidateQueryPrefix } from '../hooks/useApiQuery';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { useAuth } from '../rbac/AuthContext';
 import { apiPost } from '../services/api';
-import { Can } from '../components/can';
-import { GridModuleCard, Modal, ModuleInstallationOverlay, SecuritySandbox } from '@ovds/ui';
-import { useAppInstallations } from '@ovds/features/appstore';
-import { moduleManagerApi } from '@ovds/features/appstore';
-import { useBusiness } from '../context/businessContext';
+
+
+
+import VatModuleStoreEmbed   from './vat/VatModuleStore';
+
+
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-interface BackendApp {
+interface _BackendApp {
   id: string; name: string; slug: string; version: string;
   developer: string; description?: string; iconUrl?: string;
   downloadUrl: string; rating: number; downloads: number;
@@ -44,7 +53,7 @@ interface CatalogApp {
   releaseDate?: string;
 }
 
-type TabType = 'store' | 'my-apps' | 'updates' | 'modules' | 'guide';
+type TabType = 'store' | 'my-apps' | 'updates' | 'modules' | 'vat-modules' | 'guide';
 type SortType = 'trending' | 'free' | 'paid' | 'rating' | 'newest';
 type ViewMode = 'grid' | 'list';
 
@@ -77,7 +86,7 @@ const CATALOG_APPS: CatalogApp[] = [
   {
     id: '2fa', name: '2FA — Two-Factor Authentication',
     description: 'Protect financial data with TOTP authenticator support, SMS fallback, and sensitive route enforcement.',
-    category: 'Security', icon: <Lock size={20} />, iconBg: 'bg-blue-50 text-blue-700',
+    category: 'Security', icon: <Lock size={20} />, iconBg: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
     price: 'Free', rating: 4.9, installs: 5200, version: '2.0.0',
     developer: 'OVDS Security', tags: ['security', '2fa', 'mfa', 'authentication'],
     releaseDate: '2024-01-10',
@@ -86,7 +95,7 @@ const CATALOG_APPS: CatalogApp[] = [
   {
     id: 'address-finder', name: 'Address Finder',
     description: 'Auto-complete Ethiopian addresses on invoices and bills with Woreda/Kebele lookup.',
-    category: 'Utility', icon: <MapPin size={20} />, iconBg: 'bg-emerald-50 text-emerald-700',
+    category: 'Utility', icon: <MapPin size={20} />, iconBg: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
     price: 'Free', rating: 4.7, installs: 5200, version: '1.5.0',
     developer: 'OVDS Labs', tags: ['address', 'autocomplete', 'invoices', 'utility'],
     releaseDate: '2024-02-14',
@@ -113,7 +122,7 @@ const CATALOG_APPS: CatalogApp[] = [
   {
     id: 'telebirr-pay', name: 'Telebirr Payment Gateway',
     description: 'Accept Ethio Telecom telebirr payments directly on invoices with real-time QR confirmation.',
-    category: 'Payments', icon: <Smartphone size={20} />, iconBg: 'bg-emerald-50 text-emerald-700',
+    category: 'Payments', icon: <Smartphone size={20} />, iconBg: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
     price: 'Free', rating: 4.8, installs: 1240, version: '2.1.0',
     developer: 'Ethio Telecom', tags: ['payments', 'telebirr', 'qr'], trending: true,
     releaseDate: '2024-04-05',
@@ -122,7 +131,7 @@ const CATALOG_APPS: CatalogApp[] = [
   {
     id: 'cbe-reconcile', name: 'CBE Bank Reconciliation',
     description: 'Auto-import and reconcile Commercial Bank of Ethiopia statements using AI transaction matching.',
-    category: 'Accounting', icon: <Landmark size={20} />, iconBg: 'bg-blue-50 text-blue-700',
+    category: 'Accounting', icon: <Landmark size={20} />, iconBg: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
     price: 'Free', rating: 4.7, installs: 980, version: '1.4.2',
     developer: 'OVDS Labs', tags: ['banking', 'reconciliation', 'cbe'], trending: true,
     releaseDate: '2024-04-18',
@@ -140,7 +149,7 @@ const CATALOG_APPS: CatalogApp[] = [
   {
     id: 'payroll-pit', name: 'Advanced PIT Calculator',
     description: 'Ethiopian PIT brackets per Proclamation 1395/2025 with MAT, pension cap (ETB 15,000), and WHT.',
-    category: 'HR & Payroll', icon: <Calculator size={20} />, iconBg: 'bg-indigo-50 text-indigo-700',
+    category: 'HR & Payroll', icon: <Calculator size={20} />, iconBg: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
     price: 'Free', rating: 4.6, installs: 1560, version: '2.0.0',
     developer: 'OVDS Labs', tags: ['payroll', 'pit', 'pension', 'tax'],
     releaseDate: '2024-05-12',
@@ -194,7 +203,7 @@ const CATALOG_APPS: CatalogApp[] = [
   {
     id: 'crm-whatsapp', name: 'WhatsApp CRM Bridge',
     description: 'Send invoices, payment reminders, and receipts via WhatsApp Business API.',
-    category: 'CRM', icon: <Smartphone size={20} />, iconBg: 'bg-emerald-50 text-emerald-700',
+    category: 'CRM', icon: <Smartphone size={20} />, iconBg: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
     price: 'Pro', rating: 4.6, installs: 540, version: '2.0.0',
     developer: 'OVDS Labs', tags: ['whatsapp', 'crm', 'invoices'],
     isNew: true, releaseDate: '2025-02-15',
@@ -220,12 +229,12 @@ const CATALOG_APPS: CatalogApp[] = [
   },
   {
     id: 'theme-dark-pro', name: 'Dark Pro Theme',
-    description: 'High-contrast dark theme optimised for long bookkeeping sessions with deep-slate UI and emerald accents.',
+    description: 'High-contrast dark theme optimised for long bookkeeping sessions with deep-slate UI and indigo accents.',
     category: 'UI Themes', icon: <Layers size={20} />, iconBg: 'bg-slate-100 text-slate-800',
     price: 'Free', rating: 4.8, installs: 3400, version: '2.1.0',
     developer: 'OVDS Design', tags: ['theme', 'dark-mode', 'ui', 'accessibility'],
     releaseDate: '2024-03-10',
-    features: ['Deep-slate palette', 'Emerald accent system', 'Reduced eye strain', 'Persists across sessions'],
+    features: ['Deep-slate palette', 'indigo accent system', 'Reduced eye strain', 'Persists across sessions'],
   },
   {
     id: 'theme-compact', name: 'Compact Grid Theme',
@@ -248,7 +257,7 @@ const CATALOG_APPS: CatalogApp[] = [
   {
     id: 'open-source-sdk', name: 'Developer SDK & Module Starter',
     description: 'Scaffold new OVDS modules with the official React + TypeScript starter, @ovds/ui, and hot-reload dev server.',
-    category: 'UI Themes', icon: <Code size={20} />, iconBg: 'bg-emerald-50 text-emerald-700',
+    category: 'UI Themes', icon: <Code size={20} />, iconBg: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
     price: 'Free', rating: 4.7, installs: 980, version: '3.0.0',
     developer: 'OVDS Open Source', tags: ['open-source', 'sdk', 'react', 'typescript', 'module'],
     isNew: true, releaseDate: '2025-01-20',
@@ -303,7 +312,7 @@ const InstallBtn: React.FC<{
         className={`aki-btn aki-btn-secondary${compact ? ' sm' : ''}`}
         style={{ minWidth: compact ? 80 : 100 }}
       >
-        <Check size={compact ? 11 : 12} className="text-emerald-600" />
+        <Check size={compact ? 11 : 12} className="text-[var(--pro-azure)]" />
         Installed
       </button>
     );
@@ -322,6 +331,243 @@ const InstallBtn: React.FC<{
       )}
       {installing ? 'Installing…' : app.price === 'Free' ? 'Install' : `Get ${app.price}`}
     </button>
+  );
+};
+
+// ── Download Progress Banner ──────────────────────────────────────────────────
+/**
+ * Renders a sticky live-progress strip at the top of the store for every
+ * active download job. Each job shows a labelled progress bar, status text,
+ * and a cancel button (if still downloadable).
+ */
+const JOB_STATUS_META: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
+  PENDING:     { label: 'Pending',      color: 'bg-slate-300',                          icon: <Clock size={11} className="text-slate-400" /> },
+  DOWNLOADING: { label: 'Downloading',  color: 'bg-[var(--pro-azure)]',                icon: <Download size={11} className="text-[var(--pro-azure-light)] animate-bounce" /> },
+  EXTRACTING:  { label: 'Extracting',   color: 'bg-amber-400',                          icon: <Loader2 size={11} className="text-amber-600 animate-spin" /> },
+  ACTIVATING:  { label: 'Activating',   color: 'bg-violet-400',                         icon: <Zap size={11} className="text-violet-600 animate-pulse" /> },
+  DONE:        { label: 'Installed',    color: 'bg-[var(--pro-azure)]',                icon: <CheckCircle2 size={11} className="text-[var(--pro-azure)]" /> },
+  FAILED:      { label: 'Failed',       color: 'bg-rose-400',                           icon: <XCircle size={11} className="text-rose-500" /> },
+  CANCELLED:   { label: 'Cancelled',    color: 'bg-slate-300',                          icon: <X size={11} className="text-slate-400" /> },
+};
+
+const DownloadProgressBanner: React.FC<{
+  jobs: Map<string, ModuleDownloadJob>;
+  onCancel: (jobId: string) => void;
+  onDismiss: (alias: string) => void;
+}> = ({ jobs, onCancel, onDismiss }) => {
+  if (jobs.size === 0) return null;
+
+  return (
+    <div className="space-y-2 mb-4">
+      {Array.from(jobs.entries()).map(([alias, job]) => {
+        const meta = JOB_STATUS_META[job.status] ?? JOB_STATUS_META['PENDING'];
+        const isTerminal = ['DONE', 'FAILED', 'CANCELLED'].includes(job.status);
+        const isCancellable = ['PENDING', 'DOWNLOADING'].includes(job.status);
+
+        return (
+          <div
+            key={alias}
+            className={`aki-card flush ${job.status === 'FAILED' ? 'border-rose-200 dark:border-rose-800/40' : job.status === 'DONE' ? 'border-[var(--pro-azure-100)] dark:border-green-800/40' : 'border-slate-200 dark:border-slate-700'}`}
+            style={{ padding: '10px 14px' }}
+            role="status"
+            aria-live="polite"
+          >
+            <div className="flex items-center gap-3">
+              {/* Icon */}
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                job.status === 'DONE'   ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30' :
+                job.status === 'FAILED' ? 'bg-rose-50 dark:bg-rose-950/20' :
+                'bg-slate-50 dark:bg-slate-800'
+              }`}>
+                {meta.icon}
+              </div>
+
+              {/* Info + bar */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <span className="text-[12px] font-semibold text-slate-700 dark:text-slate-200 truncate">
+                    {alias}
+                  </span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`aki-badge pill sm ${
+                      job.status === 'DONE'   ? 'solid-success' :
+                      job.status === 'FAILED' ? 'solid-danger'  :
+                      job.deploymentType === 'ON_PREMISE' ? 'solid-info' : 'solid-purple'
+                    }`}>
+                      {job.deploymentType === 'ON_PREMISE' ? 'On-Premise' : 'Cloud'}
+                    </span>
+                    <span className="text-[11px] text-slate-400">{meta.label}</span>
+                    {!isTerminal && (
+                      <span className="text-[11px] font-bold text-slate-500 font-mono tabular-nums w-7 text-right">
+                        {job.progress}%
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Progress bar (hidden for terminal states) */}
+                {!isTerminal && (
+                  <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${meta.color}`}
+                      style={{ width: `${Math.max(3, job.progress)}%` }}
+                    />
+                  </div>
+                )}
+
+                {/* Status message */}
+                {job.message && (
+                  <p className={`text-[10px] mt-1 truncate ${
+                    job.status === 'FAILED' ? 'text-rose-500' :
+                    job.status === 'DONE'   ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' :
+                    'text-slate-400'
+                  }`}>
+                    {job.message}
+                    {job.targetPath && job.status === 'DONE' && (
+                      <span className="ml-1 font-mono opacity-70">→ {job.targetPath}</span>
+                    )}
+                  </p>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                {isCancellable && (
+                  <button
+                    onClick={() => onCancel(job.jobId)}
+                    className="aki-btn aki-btn-secondary icon-only sm"
+                    aria-label="Cancel download"
+                    title="Cancel download"
+                  >
+                    <X size={11} />
+                  </button>
+                )}
+                {isTerminal && (
+                  <button
+                    onClick={() => onDismiss(alias)}
+                    className="aki-btn aki-btn-secondary icon-only sm"
+                    aria-label="Dismiss"
+                    title="Dismiss"
+                  >
+                    <X size={11} />
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+// ── API Key Modal (on-premises installs) ──────────────────────────────────────
+/**
+ * On-premises installs require the user to supply their OVDS Marketplace
+ * API key. This modal collects it before the download begins.
+ */
+const ApiKeyModal: React.FC<{
+  app: CatalogApp;
+  onConfirm: (apiKey: string) => void;
+  onClose: () => void;
+}> = ({ app, onConfirm, onClose }) => {
+  const [apiKey, setApiKey] = useState('');
+  const [error, setError]   = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { inputRef.current?.focus(); }, []);
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!apiKey.trim()) { setError('API key is required'); return; }
+    onConfirm(apiKey.trim());
+    onClose();
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)' }}
+      onClick={onClose}
+    >
+      <div
+        className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md mx-4"
+        style={{ boxShadow: '0 24px 48px rgba(0,0,0,0.2)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-start gap-4 px-6 pt-6 pb-5 border-b border-slate-100 dark:border-slate-800">
+          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${app.iconBg}`}>
+            {app.icon}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-[15px] font-bold text-slate-800 dark:text-slate-100 leading-tight">
+              On-Premises Installation
+            </h2>
+            <p className="text-[12px] text-slate-400 mt-0.5">{app.name}</p>
+          </div>
+          <button onClick={onClose} className="aki-btn aki-btn-secondary icon-only sm shrink-0" aria-label="Close">
+            <X size={14} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <form onSubmit={handleSubmit} className="px-6 py-5 space-y-5">
+          {/* Info callout */}
+          <div className="flex gap-3 p-3.5 rounded-xl bg-[var(--pro-azure-50)] dark:bg-blue-950/20 border border-[var(--pro-azure-100)] dark:border-blue-800/40">
+            <ServerCrash size={15} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
+            <p className="text-[12px] text-[var(--pro-azure-dark)] dark:text-blue-200 leading-relaxed">
+              The OVDS backend will stream the module ZIP directly to your server and extract it to{' '}
+              <code className="font-mono text-[10px] bg-white dark:bg-slate-800 px-1 rounded">
+                OVDS_MODULES_PATH/{app.id}/
+              </code>
+              . No browser download required.
+            </p>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              <Key size={10} /> OVDS Marketplace API Key
+            </label>
+            <input
+              ref={inputRef}
+              type="password"
+              value={apiKey}
+              onChange={e => { setApiKey(e.target.value); setError(''); }}
+              placeholder="ovds_live_xxxxxxxxxxxxxxxxxxxxxxxx"
+              className="aki-input w-full font-mono text-[13px]"
+              autoComplete="off"
+            />
+            {error && <p className="text-[11px] text-rose-500">{error}</p>}
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              Get your key from{' '}
+              <a
+                href="https://marketplace.ovds.com.et/settings/api-keys"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--pro-azure)] hover:underline inline-flex items-center gap-0.5"
+              >
+                marketplace.ovds.com.et <ExternalLink size={9} />
+              </a>
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 pt-1">
+            <button type="button" onClick={onClose} className="aki-btn aki-btn-secondary flex-1">
+              Cancel
+            </button>
+            <button type="submit" className="aki-btn aki-btn-primary flex-1">
+              <Download size={13} /> Start Download
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 
@@ -555,7 +801,7 @@ const AppDetailDrawer: React.FC<{
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {app.features.map(f => (
                     <div key={f} className="flex items-start gap-2 text-[12px] text-slate-600 dark:text-slate-400">
-                      <Check size={13} className="text-emerald-500 mt-0.5 shrink-0" />
+                      <Check size={13} className="text-[var(--pro-azure)] mt-0.5 shrink-0" />
                       {f}
                     </div>
                   ))}
@@ -609,7 +855,7 @@ const AppDetailDrawer: React.FC<{
         <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3">
           {installed ? (
             <>
-              <div className="flex items-center gap-2 text-[13px] font-semibold text-emerald-600 dark:text-emerald-400">
+              <div className="flex items-center gap-2 text-[13px] font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                 <Check size={15} /> Installed
               </div>
               <button onClick={onUninstall}
@@ -666,7 +912,7 @@ const FeaturedStrip: React.FC<{
                   {app.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="ovds-card-title text-[13px] line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  <h4 className="ovds-card-title text-[13px] line-clamp-1 group-hover:text-[var(--pro-azure)] transition-colors">
                     {app.name}
                   </h4>
                   <div className="flex items-center gap-1 mt-0.5">
@@ -704,9 +950,9 @@ const FeaturedStrip: React.FC<{
 const StoreStats: React.FC<{ total: number; installed: number; free: number }> = ({ total, installed, free }) => (
   <div className="aki-stats-row" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
     {[
-      { label: 'Total Apps', value: total, icon: <Package2 size={14} className="text-blue-500" /> },
-      { label: 'Free', value: free, icon: <Tag size={14} className="text-emerald-500" /> },
-      { label: 'Installed', value: installed, icon: <Check size={14} className="text-blue-500" /> },
+      { label: 'Total Apps', value: total, icon: <Package2 size={14} className="text-[var(--pro-azure)]" /> },
+      { label: 'Free', value: free, icon: <Tag size={14} className="text-[var(--pro-azure)]" /> },
+      { label: 'Installed', value: installed, icon: <Check size={14} className="text-[var(--pro-azure)]" /> },
       { label: 'Categories', value: CATEGORIES.length - 1, icon: <Puzzle size={14} className="text-violet-500" /> },
     ].map(s => (
       <div key={s.label} className="flex items-center gap-3">
@@ -747,7 +993,7 @@ const CategorySidebar: React.FC<{
             className={[
               'w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-[12px] font-semibold transition-all text-left',
               isActive
-                ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400'
+                ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50',
             ].join(' ')}
           >
@@ -761,7 +1007,7 @@ const CategorySidebar: React.FC<{
             </span>
             <span className={[
               'text-[10px] font-bold rounded-full px-1.5 py-0.5 shrink-0',
-              isActive ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500',
+              isActive ? 'bg-[var(--pro-azure-50)] dark:bg-blue-900 text-[var(--pro-azure-dark)]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500',
             ].join(' ')}>
               {counts[cat] ?? 0}
             </span>
@@ -794,10 +1040,10 @@ const DeveloperGuide: React.FC<{
   return (
     <div className="space-y-8">
       {/* Hero */}
-      <div className="aki-card" style={{ background: 'linear-gradient(135deg, #EEF4FF 0%, #F5F3FF 100%)', borderColor: '#C7D2FE' }}>
+      <div className="aki-card" style={{ background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)', borderColor: '#BBF7D0' }}>
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-white border border-indigo-200 flex items-center justify-center shrink-0 shadow-sm">
-            <BookOpen size={20} className="text-indigo-600" />
+          <div className="w-12 h-12 rounded-2xl bg-white border border-[var(--pro-azure-100)] flex items-center justify-center shrink-0 shadow-sm">
+            <BookOpen size={20} className="text-[var(--pro-azure)]" />
           </div>
           <div>
             <h2 className="text-[16px] font-bold text-slate-800 dark:text-slate-100">Developer & Integration Guide</h2>
@@ -823,7 +1069,7 @@ const DeveloperGuide: React.FC<{
           {steps.map((s, i) => (
             <div key={i} className="aki-card" style={{ gap: 8 }}>
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center text-blue-600 shrink-0">
+                <div className="w-7 h-7 rounded-lg bg-[var(--pro-azure-50)] flex items-center justify-center text-[var(--pro-azure)] shrink-0">
                   {s.icon}
                 </div>
                 <span className="text-label">Step {i + 1}</span>
@@ -845,7 +1091,7 @@ const DeveloperGuide: React.FC<{
             return (
               <button key={cat}
                 onClick={() => { setCategory(cat); setTab('store'); }}
-                className="aki-card text-left group hover:border-blue-200 dark:hover:border-blue-900 transition-all"
+                className="aki-card text-left group hover:border-[var(--pro-azure-100)] dark:hover:border-blue-900 transition-all"
                 style={{ gap: 6, cursor: 'pointer' }}
               >
                 {meta && (
@@ -854,7 +1100,7 @@ const DeveloperGuide: React.FC<{
                     {meta.icon}
                   </span>
                 )}
-                <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-100 group-hover:text-[var(--pro-azure)] transition-colors">
                   {cat}
                 </p>
                 <p className="text-[11px] text-slate-400">{count} app{count !== 1 ? 's' : ''}</p>
@@ -886,7 +1132,7 @@ const DeveloperGuide: React.FC<{
           ))}
           <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
             <a href="/api/docs" target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+              className="flex items-center gap-1.5 text-[12px] font-semibold text-[var(--pro-azure)] hover:underline">
               <ExternalLink size={11} /> View full API documentation
             </a>
           </div>
@@ -898,16 +1144,16 @@ const DeveloperGuide: React.FC<{
         <p className="text-label mb-4">Open source & customization</p>
         <div className="aki-card" style={{ background: '#F0FDF4', borderColor: '#BBF7D0' }}>
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 border border-emerald-200 flex items-center justify-center shrink-0">
-              <Code size={18} className="text-emerald-700" />
+            <div className="w-10 h-10 rounded-xl bg-[var(--pro-azure-100)] border border-[var(--pro-azure-100)] flex items-center justify-center shrink-0">
+              <Code size={18} className="text-[var(--pro-azure-dark)]" />
             </div>
             <div>
               <p className="text-[14px] font-bold text-slate-800">React / TypeScript Module System</p>
               <p className="text-[12px] text-slate-600 mt-1 leading-relaxed max-w-lg">
                 OVDS is open-source. Every component, CSS variable, and page template lives in the public{' '}
-                <code className="px-1 py-0.5 bg-white rounded text-[11px] font-mono border border-emerald-200">@ovds/ui</code>
+                <code className="px-1 py-0.5 bg-white rounded text-[11px] font-mono border border-[var(--pro-azure-100)]">@ovds/ui</code>
                 {' '}and{' '}
-                <code className="px-1 py-0.5 bg-white rounded text-[11px] font-mono border border-emerald-200">@ovds/shared</code>
+                <code className="px-1 py-0.5 bg-white rounded text-[11px] font-mono border border-[var(--pro-azure-100)]">@ovds/shared</code>
                 {' '}packages — ready to fork, extend, or replace.
               </p>
             </div>
@@ -919,7 +1165,7 @@ const DeveloperGuide: React.FC<{
               { icon: <Rocket size={14} />, title: 'Module Starter Kit', desc: 'Use the Developer SDK app to scaffold a new module with routing, auth hooks, and hot-reload.' },
             ].map((item, i) => (
               <div key={i} className="aki-card" style={{ background: 'white', borderColor: '#BBF7D0', gap: 6 }}>
-                <span className="text-emerald-600">{item.icon}</span>
+                <span className="text-[var(--pro-azure)]">{item.icon}</span>
                 <p className="text-[12px] font-semibold text-slate-700">{item.title}</p>
                 <p className="text-[11px] text-slate-500 leading-relaxed">{item.desc}</p>
               </div>
@@ -974,6 +1220,11 @@ const AppStore: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [selectedApp, setSelectedApp] = useState<CatalogApp | null>(null);
   const [installing, setInstalling] = useState<string | null>(null);
+  const [_installError, setInstallError] = useState<string | undefined>(undefined);
+  // State for the on-premises API key modal
+  const [apiKeyTargetApp, setApiKeyTargetApp] = useState<CatalogApp | null>(null);
+  // Dismissed terminal job aliases (so the banner clears after user acknowledges)
+  const [dismissedJobs, setDismissedJobs] = useState<Set<string>>(new Set());
   const searchRef = useRef<HTMLInputElement>(null);
 
   // ── Real persisted installation state from backend ─────────────────────────
@@ -983,16 +1234,50 @@ const AppStore: React.FC = () => {
     refetch: refetchInstalled,
     install: doInstall,
     uninstall: doUninstall,
-    update: doUpdate,
+    activeJobs: allActiveJobs,
+    installing: installingIds,
   } = useAppInstallations({
     companyId: selectedCompanyId,
     enabled: !!selectedCompanyId,
   });
+  // Fetch backend apps
+  const { data: backendData, refetch } = useApiQuery<{ apps: { id: string; slug: string; name: string; version: string; avgRating?: number; rating: number; downloads: number }[]; total: number }>(
+    '/apps?take=50',
+    { staleTime: 60_000, suppressToast: true }
+  );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const backendApps = backendData?.apps ?? [];
+
+  // Use refetchInstalled in the banner dismiss to force a data sync
+  const handleForceRefresh = useCallback(() => { refetchInstalled(); refetch(); }, [refetchInstalled, refetch]);
+
+  // Filter out dismissed jobs from the banner
+  const activeJobs = useMemo(() => {
+    const m = new Map<string, ModuleDownloadJob>();
+    for (const [alias, job] of allActiveJobs.entries()) {
+      if (!dismissedJobs.has(alias)) m.set(alias, job);
+    }
+    return m;
+  }, [allActiveJobs, dismissedJobs]);
+
+  const handleDismissJob = useCallback((alias: string) => {
+    setDismissedJobs(prev => new Set([...prev, alias]));
+  }, []);
+
+  const handleCancelJob = useCallback(async (jobId: string) => {
+    try {
+      const { moduleDownloadApi } = await import('@ovds/features/appstore');
+      await moduleDownloadApi.cancelJob(jobId);
+      toast.success('Download cancelled');
+    } catch (e: any) {
+      toast.error(e?.message ?? 'Could not cancel download');
+    }
+  }, []);
 
   // ── System modules state ────────────────────────────────────────────────────
   const [modules, setModules] = useState<any[]>([]);
   const [loadingModules, setLoadingModules] = useState(false);
-  const [togglingModule, setTogglingModule] = useState<string | null>(null);
+  const [_togglingModule, setTogglingModule] = useState<string | null>(null);
   const [configuringModule, setConfiguringModule] = useState<any | null>(null);
   const [moduleSettings, setModuleSettings] = useState<Record<string, string>>({});
   const [moduleSettingsDefs, setModuleSettingsDefs] = useState<any[]>([]);
@@ -1082,13 +1367,6 @@ const AppStore: React.FC = () => {
     return () => document.removeEventListener('keydown', handler);
   }, []);
 
-  // Fetch backend apps
-  const { data: backendData, refetch } = useApiQuery<{ apps: { id: string; slug: string; name: string; version: string; avgRating?: number; rating: number; downloads: number }[]; total: number }>(
-    '/apps?take=50',
-    { staleTime: 60_000, suppressToast: true }
-  );
-  const backendApps = backendData?.apps ?? [];
-
   // Merge catalog with backend data
   const allApps = useMemo(() => {
     const merged = [...CATALOG_APPS];
@@ -1108,7 +1386,20 @@ const AppStore: React.FC = () => {
 
   // ── Install / Uninstall ───────────────────────────────────────────────────
 
-  const handleInstall = useCallback(async (id: string) => {
+  /** Determine the module alias from a catalog app ID */
+  const getModuleAlias = useCallback((catalogId: string): string => {
+    // catalog id IS the slug (e.g. "erca-etax", "telebirr-pay")
+    return catalogId;
+  }, []);
+
+  const isSaaS = import.meta.env.VITE_IS_SAAS === 'true';
+
+  /**
+   * Main install entry-point.
+   * SaaS  → calls useAppInstallations.install() which hits /modules/activate-saas
+   * On-premise → opens API key modal first, then calls .install() → /modules/download-local
+   */
+  const handleInstall = useCallback(async (catalogId: string, apiKey?: string) => {
     if (!selectedCompanyId) {
       toast.error('Select a company first');
       return;
@@ -1117,76 +1408,64 @@ const AppStore: React.FC = () => {
       toast.error('You need apps:write permission to install apps');
       return;
     }
-    setInstalling(id);
+
+    const app = allApps.find(a => a.id === catalogId);
+
+    // On-premise without an API key → show the modal
+    if (!isSaaS && !apiKey) {
+      setApiKeyTargetApp(app ?? null);
+      return;
+    }
+
+    setInstalling(catalogId);
+    // Clear any previous dismissal for this alias so the banner reappears
+    setDismissedJobs(prev => {
+      const next = new Set(prev);
+      next.delete(catalogId);
+      return next;
+    });
+
     try {
-      // Find the backend App record that matches this catalog id
-      const ba = backendApps.find(a => a.slug === id || a.id === id);
-      if (ba) {
-        const result = await doInstall(ba.id);
-        // On-premise: notify operator to download the package
-        if (result?.deploymentType === 'ON_PREMISE' && result?.downloadUrl) {
-          toast.success(
-            `Package ready — download from: ${result.downloadUrl}`,
-            { duration: 6000 },
-          );
-        } else {
-          toast.success('App installed');
-        }
+      await doInstall(catalogId, getModuleAlias(catalogId), apiKey);
+      if (isSaaS) {
+        toast.success('Module activated successfully');
       } else {
-        // App not yet in backend catalogue — record download only
-        toast.success('App installed');
+        toast.success('Download started — watch the progress banner above', { duration: 4000 });
       }
-      refetch();
-      refetchInstalled();
+      invalidateQueryPrefix('/apps');
     } catch (e: any) {
-      toast.error(e?.message ?? 'Install failed');
+      toast.error(e?.message ?? 'Installation failed');
     } finally {
       setInstalling(null);
     }
-  }, [backendApps, canWrite, doInstall, refetch, refetchInstalled, selectedCompanyId]);
+  }, [selectedCompanyId, canWrite, isSaaS, allApps, doInstall, getModuleAlias]);
 
-  const handleUninstall = useCallback(async (id: string) => {
+  const handleUninstall = useCallback(async (catalogId: string) => {
     if (!selectedCompanyId) return;
     try {
-      const ba = backendApps.find(a => a.slug === id || a.id === id);
-      if (ba) {
-        await doUninstall(ba.id);
-      }
+      await doUninstall(catalogId);
       toast.success('App uninstalled');
-      refetchInstalled();
+      invalidateQueryPrefix('/apps');
     } catch (e: any) {
       toast.error(e?.message ?? 'Uninstall failed');
     }
-  }, [backendApps, doUninstall, refetchInstalled, selectedCompanyId]);
+  }, [doUninstall, selectedCompanyId]);
 
-  const handleUpdate = useCallback(async (id: string) => {
-    if (!selectedCompanyId) return;
-    const ba = backendApps.find(a => a.slug === id || a.id === id);
-    if (!ba) { toast.error('App not found in catalogue'); return; }
-    try {
-      const result = await doUpdate(ba.id);
-      if (result?.deploymentType === 'ON_PREMISE' && result?.downloadUrl) {
-        toast.success(`Update package ready — download from: ${result.downloadUrl}`, { duration: 6000 });
-      } else if (result?.alreadyLatest) {
-        toast.success('Already on the latest version');
-      } else {
-        toast.success('App updated');
-      }
-      refetchInstalled();
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Update failed');
-    }
-  }, [backendApps, doUpdate, refetchInstalled, selectedCompanyId]);
+  const handleUpdate = useCallback(async (catalogId: string) => {
+    // For now, re-running install is the update path
+    return handleInstall(catalogId);
+  }, [handleInstall]);
 
   const handleUpdateAll = useCallback(async () => {
-    for (const inst of serverUpdates) {
-      const catalog = allApps.find(a => {
-        const ba = backendApps.find(b => b.id === inst.appId || b.slug === a.id);
-        return !!ba;
-      });
-      if (catalog) await handleUpdate(catalog.id);
+    const updates = allApps.filter(a => {
+      const ba = backendApps.find(b => b.slug === a.id || b.name === a.name);
+      if (!ba) return false;
+      return serverUpdates.some(u => u.appId === ba.id);
+    });
+    for (const app of updates) {
+      await handleInstall(app.id);
     }
-  }, [serverUpdates, allApps, backendApps, handleUpdate]);
+  }, [allApps, backendApps, serverUpdates, handleInstall]);
 
   const filtered = useMemo(() => {
     let apps = allApps;
@@ -1225,11 +1504,12 @@ const AppStore: React.FC = () => {
   ];
 
   const TABS: { id: TabType; label: string; badge?: number }[] = [
-    { id: 'store',   label: 'Marketplace' },
-    { id: 'my-apps', label: 'My Apps',  badge: myApps.length || undefined },
-    { id: 'updates', label: 'Updates',  badge: updatesAvailable.length || undefined },
-    { id: 'modules', label: 'Modules' },
-    { id: 'guide',   label: 'Guide' },
+    { id: 'store',       label: 'Marketplace' },
+    { id: 'my-apps',     label: 'My Apps',     badge: myApps.length || undefined },
+    { id: 'updates',     label: 'Updates',     badge: updatesAvailable.length || undefined },
+    { id: 'modules',     label: 'Modules' },
+    { id: 'vat-modules', label: 'VAT Modules' },
+    { id: 'guide',       label: 'Guide' },
   ];
 
   const showSidebar = tab === 'store' && !search;
@@ -1237,12 +1517,19 @@ const AppStore: React.FC = () => {
   return (
     <div className="space-y-0 pb-10">
 
+      {/* ── Download progress banner (visible whenever jobs are active) ── */}
+      <DownloadProgressBanner
+        jobs={activeJobs}
+        onCancel={handleCancelJob}
+        onDismiss={(alias) => { handleDismissJob(alias); handleForceRefresh(); }}
+      />
+
       {/* ── Page header ── */}
       <div className="ovds-panel mb-5">
         <div className="ovds-panel-header">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center shrink-0">
-              <Store size={16} className="text-blue-600 dark:text-blue-400" />
+            <div className="w-9 h-9 rounded-xl bg-[var(--pro-azure-50)] border border-[var(--pro-azure-50)]/50 flex items-center justify-center shrink-0">
+              <Store size={16} className="text-[var(--pro-azure)]" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -1253,8 +1540,8 @@ const AppStore: React.FC = () => {
               </div>
               <div className="flex items-center gap-3 text-[11px] text-slate-400 mt-1">
                 <span className="flex items-center gap-1"><Package2 size={10} /> {allApps.length} apps</span>
-                <span className="flex items-center gap-1"><Check size={10} className="text-emerald-500" /> All verified</span>
-                <span className="flex items-center gap-1"><Shield size={10} className="text-emerald-500" /> ERCA compliant</span>
+                <span className="flex items-center gap-1"><Check size={10} className="text-[var(--pro-azure)]" /> All verified</span>
+                <span className="flex items-center gap-1"><Shield size={10} className="text-[var(--pro-azure)]" /> ERCA compliant</span>
               </div>
             </div>
           </div>
@@ -1279,7 +1566,7 @@ const AppStore: React.FC = () => {
               className={`ovds-tab ${tab === t.id ? 'active' : ''}`}>
               {t.label}
               {t.badge ? (
-                <span className="ml-1 w-4 h-4 rounded-full bg-blue-500 text-white text-[9px] font-bold inline-flex items-center justify-center">
+                <span className="ml-1 w-4 h-4 rounded-full bg-[var(--pro-azure)] text-white text-[9px] font-bold inline-flex items-center justify-center">
                   {t.badge}
                 </span>
               ) : null}
@@ -1391,7 +1678,7 @@ const AppStore: React.FC = () => {
               <FeaturedStrip
                 apps={allApps}
                 installedIds={installedIds}
-                installing={installing}
+                installing={installing ?? (installingIds.size > 0 ? [...installingIds][0] : null)}
                 onSelect={setSelectedApp}
                 onInstall={handleInstall}
               />
@@ -1429,7 +1716,7 @@ const AppStore: React.FC = () => {
                     key={app.id}
                     app={app}
                     installed={installedIds.has(app.id)}
-                    installing={installing === app.id}
+                    installing={installing === app.id || installingIds.has(app.id)}
                     onSelect={() => setSelectedApp(app)}
                     onInstall={() => handleInstall(app.id)}
                     onUninstall={() => handleUninstall(app.id)}
@@ -1452,7 +1739,7 @@ const AppStore: React.FC = () => {
                     key={app.id}
                     app={app}
                     installed={installedIds.has(app.id)}
-                    installing={installing === app.id}
+                    installing={installing === app.id || installingIds.has(app.id)}
                     onSelect={() => setSelectedApp(app)}
                     onInstall={() => handleInstall(app.id)}
                     onUninstall={() => handleUninstall(app.id)}
@@ -1486,8 +1773,8 @@ const AppStore: React.FC = () => {
               <div className="aki-card" style={{ padding: '12px 16px', gap: 0 }}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center">
-                      <Check size={14} className="text-blue-600" />
+                    <div className="w-8 h-8 rounded-lg bg-[var(--pro-azure-50)] flex items-center justify-center">
+                      <Check size={14} className="text-[var(--pro-azure)]" />
                     </div>
                     <div>
                       <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-100">
@@ -1535,8 +1822,8 @@ const AppStore: React.FC = () => {
         <div className="space-y-4">
           {updatesAvailable.length === 0 ? (
             <div className="ovds-empty">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center mb-3">
-                <CheckCircle size={20} className="text-emerald-600" />
+              <div className="w-12 h-12 rounded-2xl bg-[var(--pro-azure-50)] dark:bg-green-950/30 flex items-center justify-center mb-3">
+                <CheckCircle size={20} className="text-[var(--pro-azure)]" />
               </div>
               <p className="ovds-card-title mb-1">All apps are up to date</p>
               <p className="ovds-body text-[12px]">
@@ -1587,7 +1874,7 @@ const AppStore: React.FC = () => {
                             href={serverInst.downloadUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[11px] text-blue-600 dark:text-blue-400 underline mt-1 inline-block"
+                            className="text-[11px] text-[var(--pro-azure)] underline mt-1 inline-block"
                           >
                             Download package ↗
                           </a>
@@ -1650,6 +1937,42 @@ const AppStore: React.FC = () => {
         </div>
       )}
 
+      {/* ── VAT MODULES TAB ── */}
+      {tab === 'vat-modules' && (
+        /*
+         * VatModuleProvider may already be mounted higher in the tree (it is,
+         * via AppModuleRegistry → VatModuleProvider in app.tsx).  Wrapping here
+         * is a safety net so the tab works correctly even if AppStore is ever
+         * rendered outside that provider tree (e.g. in Storybook or tests).
+         */
+        <VatModuleProvider>
+          <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
+            {/* Inlined header strip so it fits inside the existing AppStore card */}
+            <div className="px-5 py-3 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
+              <span className="text-lg" aria-hidden>🌍</span>
+              <div>
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-none">
+                  VAT Country Modules
+                </p>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Activate the jurisdictions your organisation files VAT returns in
+                </p>
+              </div>
+              <a
+                href="/tax/vat/store"
+                target="_self"
+                className="ml-auto text-xs font-semibold text-[var(--pro-azure)] hover:underline"
+              >
+                Open full store →
+              </a>
+            </div>
+
+            {/* The VatModuleStore component renders its own cards, filter bar, etc. */}
+            <VatModuleStoreEmbed />
+          </div>
+        </VatModuleProvider>
+      )}
+
       {/* ── GUIDE TAB ── */}
       {tab === 'guide' && (
         <DeveloperGuide allApps={allApps} setCategory={setCategory} setTab={setTab} />
@@ -1660,10 +1983,23 @@ const AppStore: React.FC = () => {
         <AppDetailDrawer
           app={selectedApp}
           installed={installedIds.has(selectedApp.id)}
-          installing={installing === selectedApp.id}
+          installing={installing === selectedApp.id || installingIds.has(selectedApp.id)}
           onClose={() => setSelectedApp(null)}
           onInstall={() => handleInstall(selectedApp.id)}
           onUninstall={() => handleUninstall(selectedApp.id)}
+        />
+      )}
+
+      {/* ── On-premises API key modal ── */}
+      {apiKeyTargetApp && (
+        <ApiKeyModal
+          app={apiKeyTargetApp}
+          onConfirm={(apiKey) => {
+            const id = apiKeyTargetApp.id;
+            setApiKeyTargetApp(null);
+            handleInstall(id, apiKey);
+          }}
+          onClose={() => setApiKeyTargetApp(null)}
         />
       )}
 
@@ -1711,7 +2047,7 @@ const AppStore: React.FC = () => {
                       role="switch"
                       aria-checked={moduleSettings[s.key] === 'true'}
                       onClick={() => setModuleSettings(prev => ({ ...prev, [s.key]: prev[s.key] === 'true' ? 'false' : 'true' }))}
-                      className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${moduleSettings[s.key] === 'true' ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}
+                      className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${moduleSettings[s.key] === 'true' ? 'bg-[var(--pro-azure)]' : 'bg-slate-200 dark:bg-slate-700'}`}
                     >
                       <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${moduleSettings[s.key] === 'true' ? 'translate-x-5' : 'translate-x-1'}`} />
                     </button>

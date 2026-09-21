@@ -9,17 +9,7 @@
  * troubleshooting tree, role/permission matrix, year-end close, and the
  * developer/API integration flow.
  */
-import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { usePageTitle } from '../hooks/usePageTitle';
-import {
-  AppPage,
-  Btn,
-  GridSection,
-  GridStatBar,
-  PipelineFlow,
-  Icon,
-} from '../components/ui';
+import type { StageStatus } from '@ovds/ui';
 import type { IconType } from '@ovds/ui';
 import {
   ArrowRight,
@@ -32,6 +22,18 @@ import {
   CircleDot,
   BookOpen,
 } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import {
+  AppPage,
+  Btn,
+  GridSection,
+  GridStatBar,
+  PipelineFlow,
+  Icon,
+} from '../components/ui';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -195,7 +197,7 @@ const ROLES = [
     role: 'Admin',
     desc: 'Full privileges across all bank accounts, setups and integrations.',
     perms: ['View balances', 'Manage transactions', 'Transfers', 'Run audits', 'Link / unlink banks', 'Billing settings'],
-    tone: 'emerald' as const,
+    tone: 'indigo' as const,
   },
   {
     role: 'Accountant',
@@ -227,7 +229,7 @@ const StageIcon: React.FC<{ name: IconType }> = ({ name }) => <Icon name={name} 
 const FlowCard: React.FC<{ step: FlowStep; onOpen: (to: string) => void }> = ({ step, onOpen }) => (
   <div className="ovds-widget-card p-4 flex flex-col gap-3">
     <div className="flex items-start gap-3">
-      <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+      <div className="w-9 h-9 rounded-xl bg-[var(--pro-azure-50)] text-[var(--pro-azure)] flex items-center justify-center shrink-0">
         <StageIcon name={step.icon} />
       </div>
       <div className="min-w-0">
@@ -251,7 +253,7 @@ const TreeBranch: React.FC<{ label: string; detail: string }> = ({ label, detail
   <div className="flex gap-3">
     <div className="flex flex-col items-center">
       <span className="w-px flex-1 bg-slate-200 dark:bg-slate-700" />
-      <CircleDot size={10} className="text-emerald-500 my-1" />
+      <CircleDot size={10} className="text-[var(--pro-azure)] my-1" />
       <span className="w-px flex-1 bg-slate-200 dark:bg-slate-700" />
     </div>
     <div className="pb-3">
@@ -280,7 +282,7 @@ export default function BankingWorkflow() {
         label: s.label,
         sublabel: s.sublabel,
         icon: s.icon,
-        status: s.key === activeLifecycle ? 'active' : 'completed',
+        status: (s.key === activeLifecycle ? 'active' : 'completed') as StageStatus,
         onClick: () => {
           setActiveLifecycle(s.key);
           navigate(s.to);
@@ -291,7 +293,7 @@ export default function BankingWorkflow() {
 
   const statCells = useMemo(
     () => [
-      { label: 'Accounts', value: 'Multi', sub: 'Bank · Card · Cash', accentCls: 'bg-emerald-500', onClick: () => navigate('/banking/accounts') },
+      { label: 'Accounts', value: 'Multi', sub: 'Bank · Card · Cash', accentCls: 'bg-[var(--pro-azure-50)]0', onClick: () => navigate('/banking/accounts') },
       { label: 'Import', value: '2 ways', sub: 'Feeds · OFX', accentCls: 'bg-sky-500', onClick: () => navigate('/banking/feeds') },
       { label: 'Reconcile', value: 'Zero', sub: 'Discrepancy target', accentCls: 'bg-violet-500', onClick: () => navigate('/banking/reconciliation') },
       { label: 'Reports', value: 'Real-time', sub: 'Cash flow · BS', accentCls: 'bg-amber-500', onClick: () => navigate('/banking/cash-flow') },
@@ -312,7 +314,7 @@ export default function BankingWorkflow() {
       title="Banking Workflow"
       subtitle="The complete cash & banking lifecycle — from account setup and feeds through reconciliation, reporting and year-end lock."
       icon={<BookOpen size={16} />}
-      iconBg="bg-emerald-500"
+      iconBg="bg-[var(--pro-azure-50)]0"
       actions={
         <div className="flex gap-2">
           <Btn size="sm" variant="ghost" onClick={() => navigate('/ovds/workflow')}>
@@ -414,7 +416,7 @@ export default function BankingWorkflow() {
               <ArrowRight size={12} className="text-slate-400" />
               <span className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 font-semibold">Input MFA OTP</span>
               <ArrowRight size={12} className="text-slate-400" />
-              <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">Sync Resumed</span>
+              <span className="px-2.5 py-1 rounded-lg bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)] font-semibold">Sync Resumed</span>
             </div>
             <p className="ovds-caption mt-2">
               Missed a multi-week window? Use the manual MT940/OFX Import to backfill history without creating duplicate ledger entries.
@@ -434,7 +436,7 @@ export default function BankingWorkflow() {
                 { t: 'Export Ledgers', d: 'Archive general ledger + banking summaries for tax filing and audits.' },
               ].map(item => (
                 <div key={item.t} className="ovds-widget-card p-4 flex gap-3">
-                  <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+                  <CheckCircle2 size={16} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
                   <div>
                     <h4 className="ovds-card-title">{item.t}</h4>
                     <p className="ovds-caption mt-0.5">{item.d}</p>
@@ -501,7 +503,7 @@ export default function BankingWorkflow() {
             <div className="ovds-widget-card overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
               {API_ENDPOINTS.map(e => (
                 <div key={e.path} className="flex items-center gap-3 px-4 py-2.5">
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0 w-28 text-center">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border border-[var(--pro-azure-100)] shrink-0 w-28 text-center">
                     {e.method}
                   </span>
                   <code className="text-[11px] font-mono text-slate-700 dark:text-slate-200">{e.path}</code>

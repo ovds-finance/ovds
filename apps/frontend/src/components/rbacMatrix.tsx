@@ -2,11 +2,13 @@
  * RBACMatrix — Visual RBAC permission matrix showing all roles vs domains.
  * Used in RolePermissions page and Dashboard for compliance visibility.
  */
-import React, { useState } from 'react';
-import { rbac, ROLE_METADATA, type AppRole } from '../rbac/rbac';
 import { Role } from '@ovds/ui';
-import { useBusiness } from '../context/businessContext';
 import { ChevronDown, ChevronUp, Shield, Eye, Edit, XCircle } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { useBusiness } from '../context/businessContext';
+import { rbac, ROLE_METADATA, type AppRole } from '../rbac/rbac';
+
 
 const ROLES: AppRole[] = [
   Role.SPURADMIN, Role.DEVELOPER, Role.ADMIN, Role.PROJECT_MANAGER,
@@ -31,8 +33,8 @@ const DOMAINS = [
 
 const LEVEL_CONFIG = {
   admin: { label: 'Admin', color: 'bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300', icon: <Shield size={10} /> },
-  write: { label: 'Write', color: 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 dark:text-emerald-300', icon: <Edit size={10} /> },
-  read:  { label: 'Read',  color: 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300', icon: <Eye size={10} /> },
+  write: { label: 'Write', color: 'bg-[var(--pro-azure-100)] dark:bg-green-950/40 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] dark:text-green-300', icon: <Edit size={10} /> },
+  read:  { label: 'Read',  color: 'bg-[var(--pro-azure-100)] dark:bg-green-950/40 text-[var(--pro-azure-dark)] dark:text-green-300', icon: <Eye size={10} /> },
   none:  { label: '—',     color: 'bg-white dark:bg-slate-800/50 text-slate-300 dark:text-slate-600', icon: <XCircle size={10} /> },
 };
 
@@ -58,7 +60,7 @@ const RBACMatrix: React.FC<RBACMatrixProps> = ({ compact = false, filterRole }) 
         className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-sm font-bold text-slate-600 dark:text-slate-300"
       >
         <span className="flex items-center gap-2">
-          <Shield size={14} className="text-emerald-600 dark:text-emerald-400" />
+          <Shield size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           RBAC Permission Matrix ({ROLES.length} roles × {DOMAINS.length} domains)
         </span>
         <ChevronDown size={14} className="text-slate-400" />
@@ -71,8 +73,8 @@ const RBACMatrix: React.FC<RBACMatrixProps> = ({ compact = false, filterRole }) 
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl flex items-center justify-center">
-            <Shield size={15} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="w-8 h-8 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl flex items-center justify-center">
+            <Shield size={15} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div>
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">RBAC Permission Matrix</p>
@@ -110,7 +112,7 @@ const RBACMatrix: React.FC<RBACMatrixProps> = ({ compact = false, filterRole }) 
                   <th
                     key={role}
                     className={`px-2 py-2.5 font-semibold text-center cursor-pointer transition-colors ${
-                      hoveredRole === role ? 'bg-emerald-50/50 dark:bg-emerald-950/10' : ''
+                      hoveredRole === role ? 'bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10' : ''
                     }`}
                     onMouseEnter={() => setHoveredRole(role)}
                     onMouseLeave={() => setHoveredRole(null)}
@@ -167,7 +169,7 @@ const RBACMatrix: React.FC<RBACMatrixProps> = ({ compact = false, filterRole }) 
         </p>
         <a
           href="/settings/roles"
-          className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+          className="text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline flex items-center gap-1"
         >
           Full Role Permissions <ChevronDown size={9} className="rotate-[-90deg]" />
         </a>

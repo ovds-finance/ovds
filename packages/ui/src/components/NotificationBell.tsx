@@ -36,7 +36,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
   const isUrgent   = urgent > 0;
   const badgeColor = isUrgent
     ? 'bg-rose-500 text-white'
-    : 'bg-emerald-500 text-white';
+    : 'bg-[var(--pro-azure)] text-white';
   const displayCount = count > 99 ? '99+' : String(count);
 
   return (
@@ -49,7 +49,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
         'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200',
         'hover:bg-slate-100 dark:hover:bg-slate-800',
         'transition-colors duration-150',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pro-azure)]/40',
         className,
       ].filter(Boolean).join(' ')}
       aria-label={`Notifications${count > 0 ? ` (${count} unread)` : ''}`}

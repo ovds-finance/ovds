@@ -14,6 +14,7 @@
  *   VITE_FIREBASE_VAPID_KEY
  */
 import { useEffect } from 'react';
+
 import api from '../services/api';
 
 const FIREBASE_CONFIG = {

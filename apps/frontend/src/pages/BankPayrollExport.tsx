@@ -3,12 +3,13 @@
  * Generate bulk salary transfer files for Ethiopian banks (CBE, Awash, Dashen, etc.)
  * Downloads ready-to-upload files in each bank's required format.
  */
-import React, { useState, useEffect, useCallback } from 'react';
-import { Building2, Download, RefreshCw, CheckCircle, Plus, Send } from 'lucide-react';
 import { AppPage, AppKpi } from '@ovds/ui';
+import { Building2, Download, RefreshCw, CheckCircle, Plus, Send } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
 import { useBusiness } from '../context/businessContext';
 import api from '../services/api';
-import toast from 'react-hot-toast';
 
 type BankFormat = 'CBE' | 'AWASH' | 'DASHEN' | 'ABYSSINIA' | 'BERHAN' | 'GENERIC';
 
@@ -36,9 +37,9 @@ const BANK_LABELS: Record<BankFormat, string> = {
 };
 
 const BANK_COLORS: Record<BankFormat, string> = {
-  CBE:       'bg-blue-100 text-blue-700',
+  CBE:       'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
   AWASH:     'bg-amber-100 text-amber-700',
-  DASHEN:    'bg-emerald-100 text-emerald-700',
+  DASHEN:    'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   ABYSSINIA: 'bg-violet-100 text-violet-700',
   BERHAN:    'bg-rose-100 text-rose-700',
   GENERIC:   'bg-slate-100 text-slate-600',
@@ -47,7 +48,7 @@ const BANK_COLORS: Record<BankFormat, string> = {
 const STATUS_COLOR: Record<string, string> = {
   GENERATED:  'bg-sky-100 text-sky-700',
   SENT:       'bg-amber-100 text-amber-700',
-  CONFIRMED:  'bg-emerald-100 text-emerald-700',
+  CONFIRMED:  'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   FAILED:     'bg-rose-100 text-rose-600',
 };
 
@@ -109,8 +110,8 @@ const BankPayrollExport: React.FC = () => {
 
   const kpiCells = [
     { label: 'Total Exports',    value: records.length.toString(),                                          accentCls: 'bg-sky-500' },
-    { label: 'Total Disbursed',  value: `ETB ${(totalGenerated / 1000).toFixed(0)}K`,                      accentCls: 'bg-emerald-500' },
-    { label: 'Confirmed',        value: records.filter(r => r.status === 'CONFIRMED').length.toString(),   accentCls: 'bg-emerald-500' },
+    { label: 'Total Disbursed',  value: `ETB ${(totalGenerated / 1000).toFixed(0)}K`,                      accentCls: 'bg-[var(--pro-azure-50)]0' },
+    { label: 'Confirmed',        value: records.filter(r => r.status === 'CONFIRMED').length.toString(),   accentCls: 'bg-[var(--pro-azure-50)]0' },
     { label: 'Pending Send',     value: records.filter(r => r.status === 'GENERATED').length.toString(),   accentCls: records.filter(r => r.status === 'GENERATED').length > 0 ? 'bg-amber-500' : 'bg-slate-300' },
   ];
 
@@ -128,7 +129,7 @@ const BankPayrollExport: React.FC = () => {
             {[2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
           </select>
           <button onClick={load} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
-            <RefreshCw size={16} className={loading ? 'animate-spin text-emerald-500' : 'text-slate-500'} />
+            <RefreshCw size={16} className={loading ? 'animate-spin text-[var(--pro-azure)]' : 'text-slate-500'} />
           </button>
         </div>
       }
@@ -162,7 +163,7 @@ const BankPayrollExport: React.FC = () => {
         <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
           {(Object.entries(BANK_LABELS) as [BankFormat, string][]).map(([k, v]) => (
             <div key={k} onClick={() => setGenBank(k)}
-              className={`flex items-center gap-2 p-2.5 rounded-xl border-2 cursor-pointer transition-all ${genBank === k ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'}`}>
+              className={`flex items-center gap-2 p-2.5 rounded-xl border-2 cursor-pointer transition-all ${genBank === k ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/20' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'}`}>
               <span className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase ${BANK_COLORS[k]}`}>{k}</span>
               <span className="ovds-caption truncate">{v}</span>
             </div>
@@ -201,7 +202,7 @@ const BankPayrollExport: React.FC = () => {
                       </span>
                     </td>
                     <td className="py-2.5 px-3 text-center ovds-number">{r.employeeCount}</td>
-                    <td className="py-2.5 px-3 ovds-number text-right font-bold text-emerald-700 dark:text-emerald-400">
+                    <td className="py-2.5 px-3 ovds-number text-right font-bold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
                       ETB {fmt(Number(r.totalAmount))}
                     </td>
                     <td className="py-2.5 px-3 font-mono text-xs text-slate-500 truncate max-w-[180px]">{r.fileName ?? '—'}</td>
@@ -225,7 +226,7 @@ const BankPayrollExport: React.FC = () => {
                         )}
                         {r.status === 'SENT' && (
                           <button onClick={() => markConfirmed(r.id)} title="Mark as confirmed by bank"
-                            className="p-1.5 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-lg text-emerald-600 transition-colors">
+                            className="p-1.5 hover:bg-[var(--pro-azure-100)] dark:hover:bg-green-900/30 rounded-lg text-[var(--pro-azure)] transition-colors">
                             <CheckCircle size={13} />
                           </button>
                         )}

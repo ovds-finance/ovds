@@ -1,0 +1,1 @@
+{"version":3,"file":"project-comment.dto.d.ts","sourceRoot":"","sources":["project-comment.dto.ts"],"names":[],"mappings":"AAEA,qBAAa,uBAAuB;IAElC,MAAM,EAAG,MAAM,CAAC;IAIhB,QAAQ,CAAC,EAAE,MAAM,CAAC;IAGlB,IAAI,EAAG,MAAM,CAAC;IAId,UAAU,CAAC,EAAE,MAAM,CAAC;IAIpB,QAAQ,CAAC,EAAE,MAAM,CAAC;CACnB;AAED,qBAAa,uBAAuB;IAGlC,IAAI,EAAG,MAAM,CAAC;IAId,QAAQ,CAAC,EAAE,MAAM,CAAC;CACnB"}

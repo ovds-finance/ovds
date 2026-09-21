@@ -1,6 +1,6 @@
 /**
  * Transaction and async helpers for domain services.
- * Import from @ovds/domains/infrastructure — never from app/common/.
+ * Import from @ovds/domains-infrastructure — never from app/common/.
  */
 import { Logger } from '@nestjs/common';
 

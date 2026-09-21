@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { useBusiness } from '../../context/businessContext';
-import { useEstimatesList, useCreateEstimate, useDeleteEstimate } from '@ovds/features/accounting';
-import toast from 'react-hot-toast';
+﻿import { useEstimatesList, useCreateEstimate, useDeleteEstimate } from '@ovds/features/accounting';
 import { Calculator, FileText, AlertTriangle, Plus, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+
+import { useBusiness } from '../../context/businessContext';
 
 const AccountingEstimatesPage: React.FC = () => {
   const { selectedCompanyId } = useBusiness();
@@ -20,7 +21,7 @@ const AccountingEstimatesPage: React.FC = () => {
       setNewKey('');
       setNewValue('');
       refetch();
-    } catch (e) {
+    } catch (_e) {
       toast.error('Failed to create estimate record');
     }
   };
@@ -30,7 +31,7 @@ const AccountingEstimatesPage: React.FC = () => {
       await deleteMutation.mutateAsync(key);
       toast.success('Estimate record deleted');
       refetch();
-    } catch (e) {
+    } catch (_e) {
       toast.error('Failed to delete estimate record');
     }
   };
@@ -65,7 +66,7 @@ const AccountingEstimatesPage: React.FC = () => {
           <p className="text-xs text-slate-500 mt-1">Significant judgment areas in financial reporting</p>
         </div>
         <div className="p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-          <Calculator className="w-5 h-5 text-blue-500 mb-2" />
+          <Calculator className="w-5 h-5 text-[var(--pro-azure)] mb-2" />
           <h3 className="font-semibold text-slate-800 dark:text-slate-100">Sensitivity Analysis</h3>
           <p className="text-xs text-slate-500 mt-1">Impact of changes in key assumptions</p>
         </div>

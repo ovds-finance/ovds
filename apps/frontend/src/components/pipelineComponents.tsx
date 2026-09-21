@@ -8,8 +8,9 @@
  *  - KanbanBoard: generic kanban column layout
  *  - PipelineViewToggle: list / kanban / funnel switcher
  */
+import {   STATUS_BADGE_VARIANTS, getStatusMetadata } from '@ovds/ui';
 import React from 'react';
-import { STATUS_BADGE_VARIANTS, getStatusMetadata } from '@ovds/ui';
+
 import { Icon } from './ui';
 
 // -- Types ---------------------------------------------------------------------
@@ -85,7 +86,7 @@ export const PipelineJourney: React.FC<{
               <div className={nodeClass}>
                 {NODE_ICONS[stage.status] ?? <Icon name="CIRCLE" size={14} />}
               </div>
-              <span className={`pipeline-step-label ${stage.status === 'active' ? 'text-slate-800' : stage.status === 'completed' ? 'text-emerald-600' : ''}`}>
+              <span className={`pipeline-step-label ${stage.status === 'active' ? 'text-slate-800' : stage.status === 'completed' ? 'text-[var(--pro-azure)]' : ''}`}>
                 {stage.label}
               </span>
               {(stage.count !== undefined || stage.amount) && (
@@ -114,7 +115,7 @@ export const PipelineFunnel: React.FC<{
   return (
     <div className={`bg-white dark:bg-ovds-muted-dark rounded-2xl border border-ovds-border dark:border-ovds-border-subtle shadow-sm overflow-hidden ${className}`}>
       {title && (
-        <div className="px-5 py-4 border-b border-emerald-500/5 dark:border-ovds-border-subtle/20">
+        <div className="px-5 py-4 border-b border-[var(--pro-azure)]/5 dark:border-ovds-border-subtle/20">
           <h3 className="text-[11px] font-black text-ovds-text-muted dark:text-ovds-text-subtle uppercase tracking-[0.15em]">{title}</h3>
         </div>
       )}
@@ -326,7 +327,7 @@ export const PipelineStageHeader: React.FC<{
             data-stage={st.key}
             className={`px-4 py-3 transition-colors cursor-pointer select-none ${
               st.active
-                ? 'bg-emerald-50 dark:bg-emerald-600/20'
+                ? 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure)]/20'
                 : 'hover:bg-slate-50/70 dark:hover:bg-slate-800/30'
             }`}
           >
@@ -380,7 +381,7 @@ export const PipelineCard: React.FC<{
         {/* Header */}
         <div className="flex items-start justify-between gap-2 mb-2.5">
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-ovds-text-main dark:text-ovds-text-subtle leading-snug line-clamp-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+            <p className="text-sm font-bold text-ovds-text-main dark:text-ovds-text-subtle leading-snug line-clamp-2 group-hover:text-[var(--pro-azure)] dark:group-hover:text-[var(--pro-azure-light)] transition-colors">
               {title}
             </p>
             {subtitle && (
@@ -471,7 +472,7 @@ const STATUS_ICON_BG: Record<string, string> = {
   PENDING:   'bg-amber-50 text-amber-600',
   SENT:      'bg-amber-50 text-amber-600',
   OVERDUE:   'bg-rose-50 text-rose-600',
-  PAID:      'bg-emerald-50 text-emerald-600',
+  PAID:      'bg-[var(--pro-azure-50)] text-[var(--pro-azure)]',
   CANCELLED: 'bg-slate-100 text-slate-400',
 };
 
@@ -541,7 +542,7 @@ export function DocumentStack<T extends DocStackItem>({
                     checked={isSelected}
                     onChange={(e) => { e.stopPropagation(); onSelect(item.id); }}
                     onClick={(e) => e.stopPropagation()}
-                    className="w-3.5 h-3.5 rounded border-slate-300 text-emerald-500 cursor-pointer"
+                    className="w-3.5 h-3.5 rounded border-slate-300 text-[var(--pro-azure)] cursor-pointer"
                     aria-label={`Select ${item.title}`}
                   />
                 )}

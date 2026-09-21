@@ -3,10 +3,33 @@
  */
 import { z } from 'zod';
 
+/**
+ * RoleSchema — kept in sync with packages/shared/src/types/roles.ts (canonical source).
+ * When adding a role, update BOTH files plus the Prisma schema enum.
+ */
 export const RoleSchema = z.enum([
-  'SPURADMIN', 'SUPERADMIN', 'ADMIN', 'HR', 'ovds', 'ACCOUNTING',
-  'AUDITOR', 'EMPLOYEE', 'CRM', 'IFRS_OFFICER', 'BANK_LIAISON',
-  'EXTERNAL_AUDITOR', 'DEVELOPER', 'CLIENT', 'PROJECT_MANAGER', 'PARTNER',
+  'SPURADMIN',
+  'SUPERADMIN',
+  'ADMIN',
+  'HR',
+  'OVDS',
+  'ACCOUNTING',
+  'AUDITOR',
+  'EMPLOYEE',
+  'CRM',
+  'IFRS_OFFICER',
+  'BANK_LIAISON',
+  'EXTERNAL_AUDITOR',
+  'DEVELOPER',
+  'CLIENT',
+  'PROJECT_MANAGER',
+  'PARTNER',
+  'FINANCE',
+  'SALES',
+  'PURCHASES',
+  'SECURITY',
+  'COMPLIANCE',
+  'DATA_CLERK',
 ]);
 export type Role = z.infer<typeof RoleSchema>;
 

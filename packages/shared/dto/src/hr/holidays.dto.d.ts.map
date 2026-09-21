@@ -1,0 +1,1 @@
+{"version":3,"file":"holidays.dto.d.ts","sourceRoot":"","sources":["holidays.dto.ts"],"names":[],"mappings":"AAGA,qBAAa,gBAAgB;IACD,IAAI,EAAE,MAAM,CAAC;IACG,IAAI,EAAE,IAAI,CAAC;IAC1B,QAAQ,CAAC,EAAE,OAAO,CAAC;CAC/C;AAED,qBAAa,gBAAgB;IACD,IAAI,CAAC,EAAE,MAAM,CAAC;IACE,IAAI,CAAC,EAAE,IAAI,CAAC;IAC3B,QAAQ,CAAC,EAAE,OAAO,CAAC;CAC/C"}

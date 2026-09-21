@@ -3,6 +3,7 @@
  * Covers all formatting utilities used across the app.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import {
   fmtNum,
   fmtCurrency,

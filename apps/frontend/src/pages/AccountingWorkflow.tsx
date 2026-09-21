@@ -6,8 +6,21 @@
  * Covers all Ethiopian tax types for all business sizes/types.
  * IFRS: IAS 1, 2, 7, 12, 15, 16, 19, 21; IFRS 9, 15, 16, 18
  */
-import React, { useState, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import type { BusinessModuleConfig, PeriodEndChecklistItem } from '@ovds/shared';
+import {
+  buildBusinessProfile, getWorkflowSteps,
+  type WorkflowModule, type WorkflowStep, type TaxObligation,
+} from '@ovds/shared';
+import {
+  PERIOD_END_TASKS,
+  getBusinessModuleConfig,
+  WORKFLOW_TASK_CATALOG,
+} from '@ovds/shared';
+import {
+  GridStatBar,
+  GridSection,
+} from '@ovds/ui';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   ShoppingCart, Users, Wallet, ShieldCheck, BarChart3,
   Settings, Code2, ChevronRight, CheckCircle2, AlertCircle,
@@ -15,28 +28,16 @@ import {
   Play, RotateCcw, RefreshCw, XCircle, AlertTriangle,
   Layers, ChevronDown,
 } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
+import { useNavigate } from 'react-router-dom';
+
 import {
   AppPage,
   Btn,
 } from '../components/ui';
-import {
-  GridStatBar,
-  GridSection,
-} from '@ovds/ui';
-import {
-  buildBusinessProfile, getWorkflowSteps,
-  type WorkflowModule, type WorkflowStep, type TaxObligation,
-} from '@ovds/shared';
-import type { BusinessModuleConfig, PeriodEndChecklistItem } from '@ovds/shared';
-import {
-  PERIOD_END_TASKS,
-  getBusinessModuleConfig,
-  WORKFLOW_TASK_CATALOG,
-} from '@ovds/shared';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { ovdsSummaryApi, periodCloseWorkflowApi } from '../services/ovdsApi';
 
 // ---------------------------------------------------------------------------
@@ -78,7 +79,7 @@ interface WorkflowRun {
 const MODULE_ORDER = ['CORE_OPERATIONS','PEOPLE','ovds','COMPLIANCE','REPORTING','ADMIN','DEVELOPER'] as const;
 
 const MODULE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  CORE_OPERATIONS: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+  CORE_OPERATIONS: { bg: 'bg-[var(--pro-azure-50)]', text: 'text-[var(--pro-azure-dark)]', border: 'border-[var(--pro-azure-100)]' },
   PEOPLE:          { bg: 'bg-sky-50',     text: 'text-sky-700',     border: 'border-sky-200' },
   ovds:         { bg: 'bg-violet-50',  text: 'text-violet-700',  border: 'border-violet-200' },
   COMPLIANCE:      { bg: 'bg-rose-50',    text: 'text-rose-700',    border: 'border-rose-200' },
@@ -90,7 +91,7 @@ const MODULE_COLORS: Record<string, { bg: string; text: string; border: string }
 const TASK_STATUS_CFG: Record<TaskStatus, { icon: React.ReactNode; rowCls: string }> = {
   PENDING:   { icon: <Clock size={12} className="text-slate-400" />,                             rowCls: 'bg-white border-slate-200' },
   RUNNING:   { icon: <RefreshCw size={12} className="text-amber-500 animate-spin" />,            rowCls: 'bg-amber-50/40 border-amber-200' },
-  COMPLETED: { icon: <CheckCircle2 size={12} className="text-emerald-500" />,                    rowCls: 'bg-emerald-50/40 border-emerald-200' },
+  COMPLETED: { icon: <CheckCircle2 size={12} className="text-[var(--pro-azure)]" />,                    rowCls: 'bg-[var(--pro-azure-50)]/40 border-[var(--pro-azure-100)]' },
   FAILED:    { icon: <XCircle size={12} className="text-rose-500" />,                            rowCls: 'bg-rose-50/40 border-rose-200' },
   SKIPPED:   { icon: <ChevronRight size={12} className="text-slate-400" />,                      rowCls: 'bg-slate-50/40 border-slate-100 opacity-70' },
   BLOCKED:   { icon: <AlertTriangle size={12} className="text-amber-400" />,                     rowCls: 'bg-amber-50/20 border-amber-100 opacity-80' },
@@ -99,7 +100,7 @@ const TASK_STATUS_CFG: Record<TaskStatus, { icon: React.ReactNode; rowCls: strin
 const RUN_STATUS_BADGE: Record<string, string> = {
   NOT_STARTED: 'bg-slate-100 text-slate-600 border-slate-200',
   IN_PROGRESS: 'bg-amber-50 text-amber-700 border-amber-200',
-  COMPLETED:   'bg-emerald-50 text-emerald-700 border-emerald-200',
+  COMPLETED:   'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
   FAILED:      'bg-rose-50 text-rose-700 border-rose-200',
   PARTIAL:     'bg-amber-50 text-amber-700 border-amber-200',
 };
@@ -198,6 +199,7 @@ const WorkflowTaskPanel: React.FC<{ companyId: string }> = ({ companyId }) => {
   const [retrying, setRetrying] = useState<string | null>(null);
 
   const period = `${selYear}-${String(selMonth).padStart(2, '0')}`;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const qKey   = ['workflow-run', companyId, period];
 
   const { data: run, isLoading } = useQuery<WorkflowRun>({
@@ -286,7 +288,7 @@ const WorkflowTaskPanel: React.FC<{ companyId: string }> = ({ companyId }) => {
           {run && summary && (
             <div className="hidden sm:flex items-center gap-2">
               <div className="w-24 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                <div className="h-full bg-[var(--pro-azure)] rounded-full transition-all duration-500"
                   style={{ width: `${progressPct}%` }} />
               </div>
               <span className="ovds-caption text-slate-400">
@@ -415,6 +417,7 @@ const WorkflowCatalogPanel: React.FC<{ companyId: string }> = ({ companyId }) =>
     staleTime: 60_000,
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const tasks = (data?.tasks ?? []) as CatalogTask[];
   const byModule = useMemo(() => {
     const map: Record<string, CatalogTask[]> = {};
@@ -510,8 +513,8 @@ const MODULE_META: Record<WorkflowModule, {
 }> = {
   CORE_OPERATIONS: {
     icon: ShoppingCart,
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
+    color: 'text-[var(--pro-azure-dark)]',
+    bg: 'bg-[var(--pro-azure-50)]',
     routes: [
       { label: 'Invoices', to: '/sales/invoices' },
       { label: 'Bills', to: '/purchases/bills' },
@@ -605,12 +608,13 @@ const MODULE_META: Record<WorkflowModule, {
 // Tax Type chip
 // ---------------------------------------------------------------------------
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TaxChip: React.FC<{ label: string; rate: string; active: boolean }> = ({
   label, rate, active,
 }) => (
   <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
     active
-      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]'
       : 'bg-slate-100 text-slate-400 border-slate-200 line-through opacity-60'
   }`}>
     {label} <span className="font-bold">{rate}</span>
@@ -634,9 +638,9 @@ const WorkflowCard: React.FC<{
       onClick={onClick}
       className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
         isActive
-          ? 'border-emerald-400 bg-emerald-50 shadow-md'
+          ? 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)] shadow-md'
           : step.applies
-            ? 'border-slate-200 bg-white hover:border-emerald-300 hover:shadow-sm'
+            ? 'border-slate-200 bg-white hover:border-[var(--pro-azure-light)] hover:shadow-sm'
             : 'border-slate-100 bg-white opacity-60'
       }`}
     >
@@ -648,12 +652,12 @@ const WorkflowCard: React.FC<{
           <div className="flex items-center gap-2">
             <span className="ovds-card-title">{step.name}</span>
             {step.applies
-              ? <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+              ? <CheckCircle2 size={13} className="text-[var(--pro-azure)] shrink-0" />
               : <AlertCircle size={13} className="text-slate-400 shrink-0" />}
           </div>
           <p className="ovds-caption mt-0.5 line-clamp-2">{step.description}</p>
         </div>
-        <ChevronRight size={14} className={`shrink-0 mt-1 ${isActive ? 'text-emerald-500' : 'text-slate-300'}`} />
+        <ChevronRight size={14} className={`shrink-0 mt-1 ${isActive ? 'text-[var(--pro-azure)]' : 'text-slate-300'}`} />
       </div>
     </button>
   );
@@ -707,7 +711,7 @@ const ModuleDetailPanel: React.FC<{
         <ul className="space-y-1.5">
           {step.autoActions.map((a) => (
             <li key={a} className="flex items-start gap-2">
-              <CheckCircle2 size={13} className="text-emerald-500 mt-0.5 shrink-0" />
+              <CheckCircle2 size={13} className="text-[var(--pro-azure)] mt-0.5 shrink-0" />
               <span className="ovds-body text-slate-600">{a}</span>
             </li>
           ))}
@@ -722,9 +726,9 @@ const ModuleDetailPanel: React.FC<{
             <button
               key={r.to}
               onClick={() => navigate(r.to)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-left transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-[var(--pro-azure-50)] border border-slate-200 hover:border-[var(--pro-azure-100)] text-left transition-colors"
             >
-              <ArrowRight size={11} className="text-emerald-500 shrink-0" />
+              <ArrowRight size={11} className="text-[var(--pro-azure)] shrink-0" />
               <span className="ovds-body text-slate-700 truncate">{r.label}</span>
             </button>
           ))}
@@ -739,7 +743,7 @@ const ModuleDetailPanel: React.FC<{
 // ---------------------------------------------------------------------------
 
 const ALL_TAX_TYPES = [
-  { key: 'VAT',           label: 'VAT',          rate: '15%',  detail: 'Turnover ≥ ETB 2M, monthly', color: 'emerald' },
+  { key: 'VAT',           label: 'VAT',          rate: '15%',  detail: 'Turnover ≥ ETB 2M, monthly', color: 'green' },
   { key: 'TOT_GOODS',     label: 'TOT Goods',    rate: '2%',   detail: 'Non-VAT, ETB 500K–2M', color: 'teal' },
   { key: 'TOT_SERVICES',  label: 'TOT Services', rate: '10%',  detail: 'Non-VAT service income', color: 'teal' },
   { key: 'CIT',           label: 'CIT',          rate: '30%',  detail: 'Corporate income tax', color: 'violet' },
@@ -851,7 +855,7 @@ export default function AccountingWorkflow() {
     {
       label: 'Taxpayer Category',
       value: profile ? `Category ${profile.ercaCategory}` : '—',
-      accentCls: 'bg-emerald-500',
+      accentCls: 'bg-[var(--pro-azure)]',
     },
     {
       label: 'Business Size',
@@ -866,7 +870,7 @@ export default function AccountingWorkflow() {
     {
       label: 'Period Close',
       value: periodCloseValue,
-      accentCls: periodCloseOk ? 'bg-emerald-500' : (wfSummary?.failedCount ? 'bg-rose-500' : 'bg-amber-500'),
+      accentCls: periodCloseOk ? 'bg-[var(--pro-azure)]' : (wfSummary?.failedCount ? 'bg-rose-500' : 'bg-amber-500'),
     },
   ];
 
@@ -967,13 +971,13 @@ export default function AccountingWorkflow() {
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="ovds-card-title">{tax.label}</span>
-                      <span className={`text-[11px] font-bold ${isActive ? 'text-emerald-600' : 'text-slate-400'}`}>
+                      <span className={`text-[11px] font-bold ${isActive ? 'text-[var(--pro-azure)]' : 'text-slate-400'}`}>
                         {tax.rate}
                       </span>
                     </div>
                     <p className="ovds-caption">{tax.detail}</p>
                     {isActive
-                      ? <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] text-emerald-600 font-medium">
+                      ? <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] text-[var(--pro-azure)] font-medium">
                           <CheckCircle2 size={10} /> Applies
                         </span>
                       : <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] text-slate-400">
@@ -1001,7 +1005,7 @@ export default function AccountingWorkflow() {
                   {(applicableObligations as TaxObligation[]).map((o: TaxObligation, i: number) => (
                     <tr key={o.taxType} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
                       <td className="px-3 py-2 font-semibold text-slate-800">{o.taxType}</td>
-                      <td className="px-3 py-2 text-emerald-700 font-bold">{(o.rate * 100).toFixed(1)}%</td>
+                      <td className="px-3 py-2 text-[var(--pro-azure)] font-bold">{(o.rate * 100).toFixed(1)}%</td>
                       <td className="px-3 py-2 ovds-caption">{o.period}</td>
                       <td className="px-3 py-2 ovds-caption">
                         {o.threshold ? `ETB ${o.threshold.toLocaleString()}` : '—'}
@@ -1040,8 +1044,8 @@ export default function AccountingWorkflow() {
                 { std: 'IAS 36', title: 'Impairment',            desc: 'Annual impairment test for goodwill and indefinite-life intangibles.',            status: 'pending' },
               ].map((item) => (
                 <div key={item.std} className="flex gap-3 p-3 rounded-xl bg-white border border-slate-200">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${item.status === 'done' ? 'bg-emerald-50' : 'bg-amber-50'}`}>
-                    {item.status === 'done' ? <CheckCircle2 size={16} className="text-emerald-500" /> : <Clock size={16} className="text-amber-500" />}
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${item.status === 'done' ? 'bg-[var(--pro-azure-50)]' : 'bg-amber-50'}`}>
+                    {item.status === 'done' ? <CheckCircle2 size={16} className="text-[var(--pro-azure)]" /> : <Clock size={16} className="text-amber-500" />}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
@@ -1082,8 +1086,8 @@ export default function AccountingWorkflow() {
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Required Modules</p>
                 <div className="space-y-1">
                   {(moduleConfig?.requiredModules ?? []).map((m: string) => (
-                    <div key={m} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200">
-                      <CheckCircle2 size={12} className="text-emerald-500 shrink-0" />
+                    <div key={m} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)]">
+                      <CheckCircle2 size={12} className="text-[var(--pro-azure)] shrink-0" />
                       <span className="ovds-body text-slate-700">{m.replace(/_/g, ' ')}</span>
                     </div>
                   ))}

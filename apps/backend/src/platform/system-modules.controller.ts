@@ -1,10 +1,13 @@
 import { Controller, Get, Post, Body, Param, Query, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+
+import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
 import { CompanyId } from '../common/decorators/company-id.decorator';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { PrismaService } from '../common/prisma.service';
+import { ModuleActivationService } from '../core/module-activation.service';
+import { ModuleBootstrapService } from '../core/module-bootstrap.service';
 
 const MODULE_META: Record<string, {
   name: string;
@@ -40,7 +43,11 @@ const MODULE_META: Record<string, {
 @Controller('system/modules')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class SystemModulesController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly moduleBootstrap: ModuleBootstrapService,
+    private readonly moduleActivation: ModuleActivationService,
+  ) {}
 
   @Get()
   @Roles('ADMIN', 'FINANCE', 'EMPLOYEE')
@@ -189,29 +196,30 @@ export class SystemModulesController {
     }
 
     if (enabled) {
-      const mergedSettings = { ...(settings ?? {}) };
-      const row = await this.prisma.companyModule.upsert({
-        where: { companyId_moduleKey: { companyId, moduleKey: moduleName } },
-        create: {
-          companyId,
-          moduleKey: moduleName,
-          isEnabled: true,
-          settings: JSON.stringify(mergedSettings),
-          activatedAt: new Date(),
-        },
-        update: {
-          isEnabled: true,
-          settings: JSON.stringify(mergedSettings),
-          activatedAt: new Date(),
-        },
+      const missingDeps = await this.moduleBootstrap.validateModuleDependencies(companyId, moduleName);
+      if (missingDeps.length > 0) {
+        return {
+          success: false,
+          message: `Cannot enable module [${moduleName}]. Missing dependencies: ${missingDeps.join(', ')}`,
+        };
+      }
+
+      await this.moduleActivation.activateModule({
+        companyId,
+        moduleKey: moduleName,
+        activatedBy: 'admin',
+        settings,
       });
-      return { success: true, data: row };
+
+      return { success: true, message: `Module [${moduleName}] enabled` };
     } else {
-      const row = await this.prisma.companyModule.update({
-        where: { companyId_moduleKey: { companyId, moduleKey: moduleName } },
-        data: { isEnabled: false, settings: null, activatedAt: null },
+      await this.moduleActivation.deactivateModule({
+        companyId,
+        moduleKey: moduleName,
+        deactivatedBy: 'admin',
       });
-      return { success: true, data: row };
+
+      return { success: true, message: `Module [${moduleName}] disabled` };
     }
   }
 

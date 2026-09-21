@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+
 import {
   AppPage, AppTable, AppTh, AppTd, AppTr,
   Btn, Icon, StatusBadge,
 } from '../components/ui';
 import { useBusiness } from '../context/businessContext';
 import api from '../services/api';
-import toast from 'react-hot-toast';
 
 interface TrialBalanceData {
   date: string;
@@ -183,10 +184,10 @@ const AccountingDashboard: React.FC = () => {
           {/* KPI Strip */}
           <div className="ovds-grid-layout cols-4 gap-sm">
             {[
-              { label: 'Total Assets', value: totalAssets, color: 'text-emerald-600' },
+              { label: 'Total Assets', value: totalAssets, color: 'text-[var(--pro-azure)]' },
               { label: 'Total Liabilities', value: totalLiabilities, color: 'text-rose-600' },
               { label: 'Total Equity', value: totalEquity, color: 'text-violet-600' },
-              { label: 'TB Balanced', value: tbBalanced ? 100 : 0, suffix: '%', color: tbBalanced ? 'text-emerald-600' : 'text-rose-600' },
+              { label: 'TB Balanced', value: tbBalanced ? 100 : 0, suffix: '%', color: tbBalanced ? 'text-[var(--pro-azure)]' : 'text-rose-600' },
             ].map((k, i) => (
               <div key={i} className="ovds-widget-card p-4">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">{k.label}</p>
@@ -210,7 +211,7 @@ const AccountingDashboard: React.FC = () => {
               <div className="p-4">
                 {tb ? (
                   <div className="space-y-2">
-                    <div className={`p-2 rounded-lg text-xs ${tbBalanced ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+                    <div className={`p-2 rounded-lg text-xs ${tbBalanced ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]' : 'bg-rose-50 text-rose-700'}`}>
                       {tbBalanced ? 'Balanced — Debits = Credits' : 'Imbalanced — Debits ≠ Credits'}
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-xs">
@@ -223,7 +224,7 @@ const AccountingDashboard: React.FC = () => {
                         <p className="font-bold tabular-nums">{fmt(tb.totals.credit)}</p>
                       </div>
                     </div>
-                    <Link to="/reports/trial-balance" className="text-xs text-blue-600 hover:underline">View full trial balance →</Link>
+                    <Link to="/reports/trial-balance" className="text-xs text-[var(--pro-azure)] hover:underline">View full trial balance →</Link>
                   </div>
                 ) : (
                   <div className="text-sm text-slate-400">No trial balance data.</div>
@@ -240,8 +241,8 @@ const AccountingDashboard: React.FC = () => {
                 {pl ? (
                   <div className="space-y-2">
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="p-2 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg">
-                        <p className="text-emerald-600">Revenue</p>
+                      <div className="p-2 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-lg">
+                        <p className="text-[var(--pro-azure)]">Revenue</p>
                         <p className="font-bold tabular-nums">{fmt(pl.income.total)}</p>
                       </div>
                       <div className="p-2 bg-rose-50 dark:bg-rose-950/20 rounded-lg">
@@ -249,10 +250,10 @@ const AccountingDashboard: React.FC = () => {
                         <p className="font-bold tabular-nums">{fmt(pl.expenses.total)}</p>
                       </div>
                     </div>
-                    <div className={`p-2 rounded-lg text-xs ${pl.subtotals.netProfit >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+                    <div className={`p-2 rounded-lg text-xs ${pl.subtotals.netProfit >= 0 ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]' : 'bg-rose-50 text-rose-700'}`}>
                       Net Profit: <span className="font-bold">{fmt(pl.subtotals.netProfit)}</span>
                     </div>
-                    <Link to="/reports/profit-loss" className="text-xs text-blue-600 hover:underline">View full P&L →</Link>
+                    <Link to="/reports/profit-loss" className="text-xs text-[var(--pro-azure)] hover:underline">View full P&L →</Link>
                   </div>
                 ) : (
                   <div className="text-sm text-slate-400">No P&L data.</div>
@@ -271,7 +272,7 @@ const AccountingDashboard: React.FC = () => {
                     <span className="font-semibold text-slate-600">Accounts Receivable</span>
                     <span className="tabular-nums font-bold">{fmt(arTotal)}</span>
                   </div>
-                  {ar?.buckets?.length > 0 ? (
+                  {ar?.buckets && ar.buckets.length > 0 ? (
                     <div className="space-y-1">
                       {ar.buckets.map((b, i) => (
                         <div key={i} className="flex justify-between text-[11px] text-slate-500">
@@ -289,7 +290,7 @@ const AccountingDashboard: React.FC = () => {
                     <span className="font-semibold text-slate-600">Accounts Payable</span>
                     <span className="tabular-nums font-bold">{fmt(apTotal)}</span>
                   </div>
-                  {ap?.buckets?.length > 0 ? (
+                  {ap?.buckets && ap.buckets.length > 0 ? (
                     <div className="space-y-1">
                       {ap.buckets.map((b, i) => (
                         <div key={i} className="flex justify-between text-[11px] text-slate-500">
@@ -303,8 +304,8 @@ const AccountingDashboard: React.FC = () => {
                   )}
                 </div>
                 <div className="flex gap-3">
-                  <Link to="/reports" className="text-xs text-blue-600 hover:underline">Full AR Aging →</Link>
-                  <Link to="/reports" className="text-xs text-blue-600 hover:underline">Full AP Aging →</Link>
+                  <Link to="/reports" className="text-xs text-[var(--pro-azure)] hover:underline">Full AR Aging →</Link>
+                  <Link to="/reports" className="text-xs text-[var(--pro-azure)] hover:underline">Full AP Aging →</Link>
                 </div>
               </div>
             </div>

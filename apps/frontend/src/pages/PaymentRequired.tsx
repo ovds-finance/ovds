@@ -2,12 +2,13 @@
  * PaymentRequired (HTTP 402)
  * Shown when the backend returns a 402 response or a gated route is navigated to.
  */
-import React from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   CreditCard, ArrowLeft, Zap, CheckCircle2, Clock,
   Sparkles, ArrowRight, Crown, Rocket, Lock,
 } from 'lucide-react';
+import React from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+
 import { useEntitlement } from '../context/entitlementContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 
@@ -59,8 +60,8 @@ const PaymentRequired: React.FC = () => {
               </div>
             )}
             {isActiveTrial && (
-              <div className="flex items-center gap-2.5 px-4 py-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700 text-[12px] font-semibold">
-                <Clock size={13} className="text-emerald-500 shrink-0"/>
+              <div className="flex items-center gap-2.5 px-4 py-2.5 bg-[var(--pro-azure-50)] border border-[var(--pro-azure-100)] rounded-xl text-[var(--pro-azure-dark)] text-[12px] font-semibold">
+                <Clock size={13} className="text-[var(--pro-azure)] shrink-0"/>
                 {trialDaysRemaining} day{trialDaysRemaining !== 1 ? 's' : ''} left in your free trial
               </div>
             )}
@@ -88,7 +89,7 @@ const PaymentRequired: React.FC = () => {
             {/* Plan cards */}
             <div className="grid grid-cols-2 gap-3">
               {/* Business */}
-              <div className="p-4 bg-white border border-gray-200 rounded-2xl space-y-2.5 hover:border-emerald-300 hover:shadow-sm transition-all">
+              <div className="p-4 bg-white border border-gray-200 rounded-2xl space-y-2.5 hover:border-[var(--pro-azure-light)] hover:shadow-sm transition-all">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center shrink-0">
                     <Rocket size={14} className="text-gray-500"/>
@@ -104,7 +105,7 @@ const PaymentRequired: React.FC = () => {
               </div>
 
               {/* Enterprise */}
-              <div className="p-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl space-y-2.5 relative overflow-hidden">
+              <div className="p-4 bg-[var(--pro-azure-50)] border-2 border-[var(--pro-azure-100)] rounded-2xl space-y-2.5 relative overflow-hidden">
                 <div className="absolute top-2 right-2">
                   <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full" style={{ background:'#55bc7e' }}>Popular</span>
                 </div>
@@ -112,7 +113,7 @@ const PaymentRequired: React.FC = () => {
                   <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background:'#55bc7e' }}>
                     <Crown size={14} className="text-white"/>
                   </div>
-                  <span className="text-[12px] font-extrabold text-emerald-700">Enterprise</span>
+                  <span className="text-[12px] font-extrabold text-[var(--pro-azure-dark)]">Enterprise</span>
                 </div>
                 <p className="text-[11px] text-gray-500 leading-snug">
                   Multi-company, audit, white-label, on-premise
@@ -162,7 +163,7 @@ const PaymentRequired: React.FC = () => {
         {/* Footer */}
         <p className="text-center text-[11px] text-gray-400">
           Questions?{' '}
-          <Link to="/helpdesk" className="text-emerald-600 hover:text-emerald-700 font-semibold hover:underline transition-colors">
+          <Link to="/helpdesk" className="text-[var(--pro-azure)] hover:text-[var(--pro-azure-dark)] font-semibold hover:underline transition-colors">
             Contact support
           </Link>
         </p>

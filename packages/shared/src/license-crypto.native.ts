@@ -5,11 +5,19 @@
  * Do NOT import this file in frontend code.
  */
 
-import * as crypto from 'crypto';
 import {
   SignedLicensePayload,
   LicenseVerificationResult,
 } from './license-crypto.types';
+
+// Node.js only — do not call from browser contexts
+async function getCrypto(): Promise<typeof import('crypto')> {
+  try {
+    return await import('crypto');
+  } catch {
+    throw new Error('LicenseCryptoNative: Node.js runtime required. Do not call from browser.');
+  }
+}
 
 export class LicenseCryptoNative {
   /**
@@ -17,13 +25,14 @@ export class LicenseCryptoNative {
    *
    * Format: `${companyId}:${issuedAt}:${expiresAt}:${version}:${signature}`
    */
-  static sign(
+  static async sign(
     secret: string,
     companyId: string,
     issuedAt: number,
     expiresAt: number,
     version: string,
-  ): string {
+  ): Promise<string> {
+    const crypto = await getCrypto();
     const payload = `${companyId}:${issuedAt}:${expiresAt}:${version}`;
     const hmac = crypto.createHmac('sha256', secret);
     hmac.update(payload);
@@ -38,11 +47,11 @@ export class LicenseCryptoNative {
    * Returns { payload, valid } where payload is the decoded data
    * or null if verification fails.
    */
-  static verify(
+  static async verify(
     secret: string,
     licenseKey: string,
     expectedCompanyId: string,
-  ): LicenseVerificationResult {
+  ): Promise<LicenseVerificationResult> {
     const segments = licenseKey.split(':');
 
     if (segments.length !== 5) {
@@ -67,6 +76,7 @@ export class LicenseCryptoNative {
       return { payload: null, valid: false };
     }
 
+    const crypto = await getCrypto();
     const payload = `${companyId}:${issuedAtStr}:${expiresAtStr}:${version}`;
     const hmac = crypto.createHmac('sha256', secret);
     hmac.update(payload);

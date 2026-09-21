@@ -7,9 +7,6 @@
  *
  * Route: /getting-started/client
  */
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { usePageTitle } from '../hooks/usePageTitle';
 import {
   ArrowLeft, ArrowRight, Download, Cloud, Server, Key,
   CheckCircle2, RefreshCw, Shield, Wifi, WifiOff, Copy,
@@ -17,7 +14,11 @@ import {
   ChevronDown, ChevronUp, ExternalLink, Plus, Trash2,
   Monitor, Loader2, Clock,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
+import { Link } from 'react-router-dom';
+
+import { usePageTitle } from '../hooks/usePageTitle';
 import {
   getClientManifest,
   listNodes,
@@ -43,7 +44,7 @@ const CodeBlock: React.FC<{ code: string; lang?: string }> = ({ code, lang = 'ba
           onClick={() => { navigator.clipboard.writeText(code); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
           className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 hover:text-white transition-colors"
         >
-          {copied ? <><Check size={10} className="text-emerald-400" /> Copied!</> : <><Copy size={10} /> Copy</>}
+          {copied ? <><Check size={10} className="text-[var(--pro-azure-light)]" /> Copied!</> : <><Copy size={10} /> Copy</>}
         </button>
       </div>
       <pre className="p-4 text-xs font-mono text-slate-200 overflow-x-auto leading-relaxed whitespace-pre">{code}</pre>
@@ -57,9 +58,9 @@ const Callout: React.FC<{
   children: React.ReactNode;
 }> = ({ type = 'info', title, children }) => {
   const cfg = {
-    info:    { bar: 'bg-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/20', border: 'border-emerald-200 dark:border-emerald-800/40', text: 'text-emerald-800 dark:text-emerald-200', icon: <Info size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" /> },
+    info:    { bar: 'bg-[var(--pro-azure-50)]0', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20', border: 'border-[var(--pro-azure-100)] dark:border-green-800/40', text: 'text-[var(--pro-azure-dark)] dark:text-green-200', icon: <Info size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5" /> },
     warning: { bar: 'bg-amber-400',  bg: 'bg-amber-50 dark:bg-amber-950/20',    border: 'border-amber-200 dark:border-amber-800/40',    text: 'text-amber-800 dark:text-amber-200',    icon: <AlertTriangle size={14} className="text-amber-500 shrink-0 mt-0.5" /> },
-    success: { bar: 'bg-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/20', border: 'border-emerald-200 dark:border-emerald-800/40', text: 'text-emerald-800 dark:text-emerald-200', icon: <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" /> },
+    success: { bar: 'bg-[var(--pro-azure-50)]0', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20', border: 'border-[var(--pro-azure-100)] dark:border-green-800/40', text: 'text-[var(--pro-azure-dark)] dark:text-green-200', icon: <CheckCircle2 size={14} className="text-[var(--pro-azure)] shrink-0 mt-0.5" /> },
     danger:  { bar: 'bg-rose-500',   bg: 'bg-rose-50 dark:bg-rose-950/20',      border: 'border-rose-200 dark:border-rose-900/40',      text: 'text-rose-800 dark:text-rose-200',      icon: <AlertTriangle size={14} className="text-rose-500 shrink-0 mt-0.5" /> },
   }[type];
   return (
@@ -83,7 +84,7 @@ const StepItem: React.FC<{
 }> = ({ n, title, badge, last, children }) => (
   <li className="flex gap-4">
     <div className="flex flex-col items-center">
-      <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-semibold shrink-0 z-10">
+      <div className="w-8 h-8 rounded-full bg-[var(--pro-azure)] text-white flex items-center justify-center text-xs font-semibold shrink-0 z-10">
         {n}
       </div>
       {!last && <div className="w-px flex-1 bg-slate-200 dark:bg-slate-700 mt-1" />}
@@ -165,7 +166,7 @@ const DownloadCard: React.FC<{
             title="Verify integrity"
             className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-colors ${
               showHash
-                ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400'
+                ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 border-[var(--pro-azure-light)] dark:border-green-700 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                 : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:border-slate-300'
             }`}
           >
@@ -176,7 +177,7 @@ const DownloadCard: React.FC<{
           <a
             href={downloadHref}
             download
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 dark:bg-slate-700 text-white rounded-lg text-[10px] font-bold hover:bg-emerald-600 dark:hover:bg-emerald-600 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 dark:bg-slate-700 text-white rounded-lg text-[10px] font-bold hover:bg-[var(--pro-azure-dark)] dark:hover:bg-[var(--pro-azure-dark)] transition-colors"
           >
             <Download size={10} /> Download
           </a>
@@ -187,7 +188,7 @@ const DownloadCard: React.FC<{
       {showHash && (
         <div className="border-t border-slate-100 dark:border-slate-800 px-3 py-3 bg-white dark:bg-slate-800/50">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-            <Shield size={9} className="text-emerald-500" /> SHA-256 Checksum
+            <Shield size={9} className="text-[var(--pro-azure)]" /> SHA-256 Checksum
           </p>
           {isPending ? (
             <p className="text-[10px] text-slate-400 italic">
@@ -201,7 +202,7 @@ const DownloadCard: React.FC<{
               </code>
               <button
                 onClick={copyHash}
-                className="flex items-center gap-1 px-2.5 py-2 bg-slate-900 dark:bg-slate-700 text-white rounded-lg text-[10px] font-bold hover:bg-emerald-600 transition-colors shrink-0"
+                className="flex items-center gap-1 px-2.5 py-2 bg-slate-900 dark:bg-slate-700 text-white rounded-lg text-[10px] font-bold hover:bg-[var(--pro-azure-dark)] transition-colors shrink-0"
               >
                 {hashCopied ? <><Check size={9} /> Copied!</> : <><Copy size={9} /> Copy</>}
               </button>
@@ -331,11 +332,11 @@ const ClientDownload: React.FC = () => {
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-slate-400">
-        <Link to="/start" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+        <Link to="/start" className="hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors flex items-center gap-1.5">
           <ArrowLeft size={12} /> Get Started
         </Link>
         <span className="text-slate-300">/</span>
-        <Link to="/getting-started/on-premise" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+        <Link to="/getting-started/on-premise" className="hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors">
           On-Premise
         </Link>
         <span className="text-slate-300">/</span>
@@ -343,13 +344,13 @@ const ClientDownload: React.FC = () => {
       </nav>
 
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-2xl bg-slate-900 px-7 py-10 text-white shadow-2xl shadow-emerald-900/20">
+      <div className="relative overflow-hidden rounded-2xl bg-slate-900 px-7 py-10 text-white shadow-2xl shadow-green-900/20">
         <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-400/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-[var(--pro-azure-light)]/10 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-amber-400/5 rounded-full blur-[80px] pointer-events-none" />
 
         <div className="relative flex flex-col lg:flex-row items-center gap-10">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-amber-400 to-emerald-600 flex items-center justify-center shrink-0 shadow-xl shadow-amber-400/20">
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-amber-400 to-indigo-600 flex items-center justify-center shrink-0 shadow-xl shadow-amber-400/20">
             <Download size={38} className="text-white" />
           </div>
           <div className="flex-1 text-center lg:text-left space-y-4">
@@ -385,17 +386,17 @@ const ClientDownload: React.FC = () => {
       <div className="ovds-widget-card p-2 shadow-sm max-w-3xl mx-auto overflow-hidden">
         <div className="grid grid-cols-3 gap-2">
           <Link to="/getting-started/cloud" className="flex items-center justify-center gap-2 p-5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group">
-            <Cloud size={20} className="text-slate-400 group-hover:text-emerald-600 transition-colors shrink-0" />
+            <Cloud size={20} className="text-slate-400 group-hover:text-[var(--pro-azure)] transition-colors shrink-0" />
             <div className="text-left">
               <p className="text-xs font-black uppercase tracking-widest text-slate-400 group-hover:text-slate-800 dark:group-hover:text-white transition-colors">Cloud</p>
-              <p className="text-[10px] text-slate-300 font-bold group-hover:text-emerald-500 transition-colors">SaaS</p>
+              <p className="text-[10px] text-slate-300 font-bold group-hover:text-[var(--pro-azure)] transition-colors">SaaS</p>
             </div>
           </Link>
           <Link to="/getting-started/on-premise" className="flex items-center justify-center gap-2 p-5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group">
-            <Server size={20} className="text-slate-400 group-hover:text-emerald-600 transition-colors shrink-0" />
+            <Server size={20} className="text-slate-400 group-hover:text-[var(--pro-azure)] transition-colors shrink-0" />
             <div className="text-left">
               <p className="text-xs font-black uppercase tracking-widest text-slate-400 group-hover:text-slate-800 dark:group-hover:text-white transition-colors">On-Premise</p>
-              <p className="text-[10px] text-slate-300 font-bold group-hover:text-emerald-500 transition-colors">Self-Hosted</p>
+              <p className="text-[10px] text-slate-300 font-bold group-hover:text-[var(--pro-azure)] transition-colors">Self-Hosted</p>
             </div>
           </Link>
           <div className="flex items-center justify-center gap-2 p-5 bg-amber-500 text-white rounded-xl shadow-xl shadow-amber-500/20">
@@ -420,10 +421,10 @@ const ClientDownload: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
           {[
             {
-              icon: <Cloud size={22} className="text-emerald-500" />,
+              icon: <Cloud size={22} className="text-[var(--pro-azure)]" />,
               title: 'Cloud Account',
               desc: 'Your active Enterprise subscription — holds templates, tax rules, compliance data and MoR credentials.',
-              color: 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/40',
+              color: 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-[var(--pro-azure-100)] dark:border-green-800/40',
             },
             {
               icon: <RefreshCw size={22} className="text-amber-500" />,
@@ -469,7 +470,7 @@ const ClientDownload: React.FC = () => {
             <p>
               Log in to your primary OVDS cloud accounting dashboard at{' '}
               <a href="https://ovds.com.et" target="_blank" rel="noopener noreferrer"
-                className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline inline-flex items-center gap-0.5">
+                className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold hover:underline inline-flex items-center gap-0.5">
                 ovds.com.et <ExternalLink size={10} />
               </a>.
               Navigate to <strong>Settings → Downloads &amp; Apps</strong> (or the <strong>Integrations &amp; API</strong> section in the sidebar).
@@ -494,7 +495,7 @@ const ClientDownload: React.FC = () => {
               <div className="space-y-2 mt-1">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                    Latest version: <span className="text-emerald-600 dark:text-emerald-400">v{manifest.version}</span>
+                    Latest version: <span className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">v{manifest.version}</span>
                     <span className="ml-2 text-slate-400">({manifest.releaseDate})</span>
                   </span>
                 </div>
@@ -575,7 +576,7 @@ const ClientDownload: React.FC = () => {
                 { label: 'Revocation', value: 'Remove the node from cloud settings at any time to instantly cut access' },
               ].map(r => (
                 <div key={r.label} className="flex items-start gap-2 p-2.5 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-xs">
-                  <CheckCircle2 size={11} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <CheckCircle2 size={11} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5" />
                   <span><strong className="text-slate-700 dark:text-slate-300">{r.label}</strong> — {r.value}</span>
                 </div>
               ))}
@@ -588,9 +589,9 @@ const ClientDownload: React.FC = () => {
               link the client to your active cloud subscription using <strong>one of the two methods</strong>:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
-              <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 rounded-xl space-y-2">
+              <div className="p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800/40 rounded-xl space-y-2">
                 <div className="flex items-center gap-2">
-                  <Key size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <Key size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0" />
                   <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Option A — API Key</p>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -637,14 +638,14 @@ const ClientDownload: React.FC = () => {
                     'Store all documents in local SQLite / MySQL',
                   ].map(i => (
                     <li key={i} className="flex items-start gap-2">
-                      <CheckCircle2 size={10} className="text-emerald-500 shrink-0 mt-0.5" /> {i}
+                      <CheckCircle2 size={10} className="text-[var(--pro-azure)] shrink-0 mt-0.5" /> {i}
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 rounded-xl space-y-2">
+              <div className="p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800/40 rounded-xl space-y-2">
                 <div className="flex items-center gap-2">
-                  <Wifi size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <Wifi size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0" />
                   <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Online sync (auto)</p>
                 </div>
                 <ul className="space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
@@ -656,7 +657,7 @@ const ClientDownload: React.FC = () => {
                     'Push audit trail entries to cloud ledger',
                   ].map(i => (
                     <li key={i} className="flex items-start gap-2">
-                      <CheckCircle2 size={10} className="text-emerald-500 shrink-0 mt-0.5" /> {i}
+                      <CheckCircle2 size={10} className="text-[var(--pro-azure)] shrink-0 mt-0.5" /> {i}
                     </li>
                   ))}
                 </ul>
@@ -760,12 +761,12 @@ const ClientDownload: React.FC = () => {
               onChange={e => setNewNodeName(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleRegister()}
               placeholder="e.g. Office Workstation 1"
-              className="flex-1 px-4 py-2.5 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 text-slate-800 dark:text-white placeholder:text-slate-400"
+              className="flex-1 px-4 py-2.5 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)] dark:focus:ring-[var(--pro-azure)] text-slate-800 dark:text-white placeholder:text-slate-400"
             />
             <select
               value={newNodeRole}
               onChange={e => setNewNodeRole(e.target.value as any)}
-              className="px-3 py-2.5 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-700 dark:text-slate-300"
+              className="px-3 py-2.5 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)] text-slate-700 dark:text-slate-300"
             >
               <option value="REMOTE_TERMINAL">Remote Terminal</option>
               <option value="PRIVATE_NODE">Private Node</option>
@@ -773,7 +774,7 @@ const ClientDownload: React.FC = () => {
             <button
               onClick={handleRegister}
               disabled={registerLoading || !newNodeName.trim()}
-              className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0 shadow-lg shadow-emerald-500/20"
+              className="flex items-center gap-2 px-5 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0 shadow-lg shadow-green-500/20"
             >
               {registerLoading ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
               Register
@@ -845,7 +846,7 @@ const ClientDownload: React.FC = () => {
                     </div>
                     {node.lastSeenAt && (
                       <div className="flex items-center gap-1 mt-0.5">
-                        <Clock size={9} className="text-emerald-500 shrink-0" />
+                        <Clock size={9} className="text-[var(--pro-azure)] shrink-0" />
                         <span className="text-[10px] text-slate-400">
                           Last sync: {new Date(node.lastSeenAt).toLocaleString()}
                         </span>
@@ -875,7 +876,7 @@ const ClientDownload: React.FC = () => {
           <ArrowLeft size={16} /> On-Premise Guide
         </Link>
         <div className="flex items-center gap-4">
-          <Link to="/getting-started/cloud" className="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">
+          <Link to="/getting-started/cloud" className="text-sm font-bold text-slate-500 hover:text-[var(--pro-azure)] transition-colors">
             Cloud Setup
           </Link>
           <Link to="/plans" className="flex items-center gap-2 px-8 py-4 bg-amber-500 text-white rounded-2xl text-sm font-bold hover:bg-amber-600 transition-all shadow-xl shadow-amber-500/20">

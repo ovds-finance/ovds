@@ -1,16 +1,18 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../rbac/AuthContext';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
 import {
   AlertCircle, CheckCircle, Download, Landmark,
   RefreshCw, Search, TrendingDown, TrendingUp, Trash2,
   Upload, X, XCircle, ShieldCheck, FileText, ScanLine,
   Eye, Edit2, Receipt, FileSpreadsheet, FileCode,
 } from 'lucide-react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { Link, useSearchParams } from 'react-router-dom';
+
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { normalizeOcrError } from '../utils';
 
 // -- Types ---------------------------------------------------------------------
 type TxType   = 'CREDIT' | 'DEBIT';
@@ -491,7 +493,7 @@ const BankStatementImport: React.FC = () => {
       setScanRows(parsedRows);
       setScanStep('review');
     } catch (err: any) {
-      const msg = err?.response?.data?.message ?? err?.message ?? 'OCR failed';
+      const msg = normalizeOcrError(err?.response?.data?.message ?? err?.message ?? 'OCR failed');
       toast.error(msg);
     } finally {
       setScanning(false);
@@ -532,7 +534,7 @@ const BankStatementImport: React.FC = () => {
           },
         });
         ok++;
-        setScanRows(prev => prev.map((r, i) =>
+        setScanRows(prev => prev.map((r, _i) =>
           r.rowIndex === row.rowIndex ? { ...r, _committed: true } : r,
         ));
       } catch (err: any) {
@@ -568,7 +570,7 @@ const BankStatementImport: React.FC = () => {
   // -- Confidence badge helper ------------------------------------------------
   const ConfidenceBadge = ({ v }: { v: number }) => {
     const pct = Math.round(v * 100);
-    const cls = pct >= 80 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
+    const cls = pct >= 80 ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/40 dark:text-[var(--pro-azure-light)]'
               : pct >= 50 ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
               : 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400';
     return (
@@ -635,9 +637,9 @@ const BankStatementImport: React.FC = () => {
             {(['upload', 'review', 'done'] as const).map((s, i) => (
               <React.Fragment key={s}>
                 <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold ${
-                  step === s ? 'bg-emerald-500 text-white'
+                  step === s ? 'bg-[var(--pro-azure)] text-white'
                   : (step === 'done' || (step === 'review' && s === 'upload'))
-                    ? 'bg-emerald-100 text-emerald-700'
+                    ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]'
                     : 'bg-slate-100 text-slate-400'
                 }`}>
                   <span>{i + 1}</span><span className="capitalize">{s}</span>
@@ -654,7 +656,7 @@ const BankStatementImport: React.FC = () => {
                 onDrop={handleCsvDrop}
                 onDragOver={e => e.preventDefault()}
                 onClick={() => fileRef.current?.click()}
-                className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-12 text-center cursor-pointer hover:border-emerald-600 hover:bg-emerald-50/30 transition-all"
+                className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-12 text-center cursor-pointer hover:border-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)]/30 transition-all"
               >
                 <Upload size={36} className="text-slate-300 mx-auto mb-3" />
                 <p className="font-bold text-slate-600 dark:text-slate-300">Drop CSV file here or click to browse</p>
@@ -697,8 +699,8 @@ const BankStatementImport: React.FC = () => {
               <div className="ovds-grid-layout cols-4">
                 {[
                   { label: 'Total Rows', value: rows.length, color: 'text-slate-700 dark:text-white' },
-                  { label: 'Selected',   value: selectedCount, color: 'text-emerald-600 dark:text-emerald-400' },
-                  { label: 'Credits',    value: '+' + totalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 }), color: 'text-emerald-600' },
+                  { label: 'Selected',   value: selectedCount, color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' },
+                  { label: 'Credits',    value: '+' + totalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 }), color: 'text-[var(--pro-azure)]' },
                   { label: 'Debits',     value: '-' + totalDebit.toLocaleString(undefined,  { minimumFractionDigits: 2 }), color: 'text-rose-600' },
                 ].map(s => (
                   <div key={s.label} className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl p-3 text-center">
@@ -717,7 +719,7 @@ const BankStatementImport: React.FC = () => {
                 <div className="flex items-center gap-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1">
                   {(['ALL', 'CREDIT', 'DEBIT'] as const).map(t => (
                     <button key={t} onClick={() => setTypeFilter(t)}
-                      className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${typeFilter === t ? 'bg-emerald-500 text-white' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700'}`}>
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${typeFilter === t ? 'bg-[var(--pro-azure)] text-white' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700'}`}>
                       {t}
                     </button>
                   ))}
@@ -733,7 +735,7 @@ const BankStatementImport: React.FC = () => {
                           <input type="checkbox"
                             checked={rows.filter(r => r.status !== 'error').every(r => r.selected)}
                             onChange={toggleAll}
-                            className="rounded border-slate-300 text-emerald-600 focus:ring-teal-400/20" />
+                            className="rounded border-slate-300 text-[var(--pro-azure)] focus:ring-teal-400/20" />
                         </th>
                         {['Date', 'Description', 'Type', 'Amount', 'Reference', 'Status', ''].map(h => (
                           <th key={h} className="px-4 py-3 text-left text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{h}</th>
@@ -746,13 +748,13 @@ const BankStatementImport: React.FC = () => {
                         return (
                           <tr key={i} className={`border-b border-slate-100 dark:border-slate-800/50 transition-colors ${
                             r.status === 'error'   ? 'bg-rose-50/40 dark:bg-rose-950/10'
-                            : r.status === 'matched' ? 'bg-emerald-50/40 dark:bg-emerald-950/10'
-                            : r.selected             ? 'bg-emerald-50/20 dark:bg-emerald-950/10' : ''
+                            : r.status === 'matched' ? 'bg-[var(--pro-azure-50)]/40 dark:bg-green-950/10'
+                            : r.selected             ? 'bg-[var(--pro-azure-50)]/20 dark:bg-green-950/10' : ''
                           }`}>
                             <td className="px-4 py-2.5">
                               {r.status !== 'error' && (
                                 <input type="checkbox" checked={r.selected} onChange={() => toggleRow(origIdx)}
-                                  className="rounded border-slate-300 text-emerald-600 focus:ring-teal-400/20" />
+                                  className="rounded border-slate-300 text-[var(--pro-azure)] focus:ring-teal-400/20" />
                               )}
                             </td>
                             <td className="px-4 py-2.5 text-xs text-slate-600 dark:text-slate-400 font-mono whitespace-nowrap">
@@ -764,7 +766,7 @@ const BankStatementImport: React.FC = () => {
                             <td className="px-4 py-2.5">
                               <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold ${
                                 r.type === 'CREDIT'
-                                  ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
+                                  ? 'bg-[var(--pro-azure-100)] dark:bg-green-950/40 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                                   : 'bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400'
                               }`}>
                                 {r.type === 'CREDIT' ? <TrendingUp size={9} /> : <TrendingDown size={9} />} {r.type}
@@ -772,7 +774,7 @@ const BankStatementImport: React.FC = () => {
                             </td>
                             <td className={`px-4 py-2.5 text-xs font-semibold tabular-nums ${
                               r.amount === 0 ? 'text-rose-500'
-                              : r.type === 'CREDIT' ? 'text-emerald-700 dark:text-emerald-400'
+                              : r.type === 'CREDIT' ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                               : 'text-rose-700 dark:text-rose-400'
                             }`}>
                               {r.type === 'CREDIT' ? '+' : '-'}{r.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -780,7 +782,7 @@ const BankStatementImport: React.FC = () => {
                             <td className="px-4 py-2.5 text-xs text-slate-400 dark:text-slate-500 font-mono">{r.reference ?? '—'}</td>
                             <td className="px-4 py-2.5">
                               {r.status === 'error'   && <span className="flex items-center gap-1 text-[10px] text-rose-600 font-bold"><XCircle size={11} /> {r.error}</span>}
-                              {r.status === 'matched' && <span className="flex items-center gap-1 text-[10px] text-emerald-600 font-bold"><CheckCircle size={11} /> Imported</span>}
+                              {r.status === 'matched' && <span className="flex items-center gap-1 text-[10px] text-[var(--pro-azure)] font-bold"><CheckCircle size={11} /> Imported</span>}
                               {r.status === 'pending' && <span className="ovds-caption">Ready</span>}
                             </td>
                             <td className="px-4 py-2.5">
@@ -804,7 +806,7 @@ const BankStatementImport: React.FC = () => {
                 </button>
                 <button onClick={handleCsvImport}
                   disabled={importing || selectedCount === 0 || !bankAccountId}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 disabled:opacity-50 transition-colors">
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] disabled:opacity-50 transition-colors">
                   {importing ? <RefreshCw size={14} className="animate-spin" /> : <Download size={14} />}
                   {importing ? 'Importing…' : `Import ${selectedCount} Transaction${selectedCount !== 1 ? 's' : ''}`}
                 </button>
@@ -816,12 +818,12 @@ const BankStatementImport: React.FC = () => {
           {step === 'done' && (
             <div className="flex flex-col items-center justify-center py-16 gap-6 text-center">
               <div className={`w-20 h-20 rounded-xl flex items-center justify-center shadow-lg ${
-                errors === 0 ? 'bg-emerald-100 dark:bg-emerald-950/40'
+                errors === 0 ? 'bg-[var(--pro-azure-100)] dark:bg-green-950/40'
                 : imported > 0 ? 'bg-amber-100 dark:bg-amber-950/40'
                 : 'bg-rose-100 dark:bg-rose-950/40'
               }`}>
                 {errors === 0
-                  ? <CheckCircle size={36} className="text-emerald-600 dark:text-emerald-400" />
+                  ? <CheckCircle size={36} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                   : imported > 0
                     ? <AlertCircle size={36} className="text-amber-600 dark:text-amber-400" />
                     : <XCircle size={36} className="text-rose-600 dark:text-rose-400" />}
@@ -831,7 +833,7 @@ const BankStatementImport: React.FC = () => {
                   {errors === 0 ? 'Import Complete' : imported > 0 ? 'Partially Imported' : 'Import Failed'}
                 </p>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
-                  {imported > 0 && <span className="text-emerald-600 font-bold">{imported} transaction{imported !== 1 ? 's' : ''} imported</span>}
+                  {imported > 0 && <span className="text-[var(--pro-azure)] font-bold">{imported} transaction{imported !== 1 ? 's' : ''} imported</span>}
                   {imported > 0 && errors > 0 && <span className="text-slate-400"> · </span>}
                   {errors > 0 && <span className="text-rose-600 font-bold">{errors} failed</span>}
                 </p>
@@ -842,7 +844,7 @@ const BankStatementImport: React.FC = () => {
                   <Upload size={14} /> Import Another File
                 </button>
                 <Link to="/banking/accounts"
-                  className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors">
+                  className="flex items-center gap-2 px-5 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-colors">
                   <Landmark size={14} /> View Bank Accounts
                 </Link>
                 <Link to="/accounting"
@@ -935,7 +937,7 @@ const BankStatementImport: React.FC = () => {
                 {[
                   { label: 'Total Rows', value: ofxRows.length, color: 'text-slate-700 dark:text-white' },
                   { label: 'Selected',   value: ofxRows.filter(r => r.selected && r.status !== 'error').length, color: 'text-sky-600 dark:text-sky-400' },
-                  { label: 'Credits',    value: '+' + ofxRows.filter(r => r.type === 'CREDIT' && r.selected).reduce((s, r) => s + r.amount, 0).toLocaleString(undefined, { minimumFractionDigits: 2 }), color: 'text-emerald-600' },
+                  { label: 'Credits',    value: '+' + ofxRows.filter(r => r.type === 'CREDIT' && r.selected).reduce((s, r) => s + r.amount, 0).toLocaleString(undefined, { minimumFractionDigits: 2 }), color: 'text-[var(--pro-azure)]' },
                   { label: 'Debits',     value: '-' + ofxRows.filter(r => r.type === 'DEBIT' && r.selected).reduce((s, r) => s + r.amount, 0).toLocaleString(undefined, { minimumFractionDigits: 2 }), color: 'text-rose-600' },
                 ].map(s => (
                   <div key={s.label} className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl p-3 text-center">
@@ -982,7 +984,7 @@ const BankStatementImport: React.FC = () => {
                           <td className="px-4 py-2.5">
                             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold ${
                               r.type === 'CREDIT'
-                                ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
+                                ? 'bg-[var(--pro-azure-100)] dark:bg-green-950/40 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                                 : 'bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400'
                             }`}>
                               {r.type === 'CREDIT' ? <TrendingUp size={9} /> : <TrendingDown size={9} />} {r.type}
@@ -990,7 +992,7 @@ const BankStatementImport: React.FC = () => {
                           </td>
                           <td className={`px-4 py-2.5 text-xs font-semibold tabular-nums ${
                             r.amount === 0 ? 'text-rose-500'
-                            : r.type === 'CREDIT' ? 'text-emerald-700 dark:text-emerald-400'
+                            : r.type === 'CREDIT' ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                             : 'text-rose-700 dark:text-rose-400'
                           }`}>
                             {r.type === 'CREDIT' ? '+' : '-'}{r.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -998,7 +1000,7 @@ const BankStatementImport: React.FC = () => {
                           <td className="px-4 py-2.5 text-xs text-slate-400 dark:text-slate-500 font-mono">{r.reference ?? '—'}</td>
                           <td className="px-4 py-2.5">
                             {r.status === 'error'   && <span className="flex items-center gap-1 text-[10px] text-rose-600 font-bold"><XCircle size={11} /> {r.error}</span>}
-                            {r.status === 'matched' && <span className="flex items-center gap-1 text-[10px] text-emerald-600 font-bold"><CheckCircle size={11} /> Imported</span>}
+                            {r.status === 'matched' && <span className="flex items-center gap-1 text-[10px] text-[var(--pro-azure)] font-bold"><CheckCircle size={11} /> Imported</span>}
                             {r.status === 'pending' && <span className="ovds-caption">Ready</span>}
                           </td>
                           <td className="px-4 py-2.5">
@@ -1195,7 +1197,7 @@ const BankStatementImport: React.FC = () => {
                 <div className="flex-1 space-y-3">
                   {scanRows.map((row, i) => (
                     <div key={i} className={`bg-white dark:bg-slate-800 border rounded-xl p-4 space-y-3 transition-all ${
-                      row._committed ? 'border-emerald-200 dark:border-emerald-800 opacity-60'
+                      row._committed ? 'border-[var(--pro-azure-100)] dark:border-green-800 opacity-60'
                       : row._error   ? 'border-rose-200 dark:border-rose-800'
                       : row.isDuplicate ? 'border-amber-200 dark:border-amber-800'
                       : 'border-slate-200 dark:border-slate-700'
@@ -1211,7 +1213,7 @@ const BankStatementImport: React.FC = () => {
                             </span>
                           )}
                           {row._committed && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/40 dark:text-[var(--pro-azure-light)]">
                               <CheckCircle size={10} /> Saved
                             </span>
                           )}

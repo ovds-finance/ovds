@@ -1,26 +1,35 @@
 /**
- * @ovds/design-system — Ovds-inspired tokens
+ * @ovds/design-system — Ovds token definitions
  *
  * Ovds UI characteristics:
  *  - Clean, minimal, flat design
- *  - Single primary blue: #0056D2 (financial SaaS standard)
+ *  - Brand primary: corporate green #4FBA6F / vibrant #2ED47A
  *  - Sans-serif Inter font
  *  - Tight 4px grid, small rounded corners (6-10px)
  *  - Subtle backgrounds, thin borders
  *  - Emphasis on data legibility via tabular numbers
- *  - Neutral chrome with blue-green-orange-red accent palette
+ *  - Neutral chrome with green-amber-rose-blue functional palette
+ *
+ * Color system (60-30-10):
+ *  60% Neutrals & Base    — #F8FAFC → #1E293B grayscale / cool slate
+ *  30% Supporting Accents — functional pastels (status, charts)
+ *  10% Primary Brand      — corporate green #4FBA6F / vibrant #2ED47A
  */
 
 export const colors = {
-  // ── Core brand (Ovds blue) ────────────────────────────────────────
-  primary: '#0056D2',
-  primaryRGB: [0, 86, 210],
-  primaryDark: '#0044A8',
-  primaryDarkRGB: [0, 68, 168],
-  primaryLight: '#3B82F6',
-  primaryLightRGB: [59, 130, 246],
-  primary50: '#EEF4FF',
-  primary100: '#DBEAFE',
+  // ── Core brand (Ovds corporate green) ─────────────────────────────
+  primary: '#4FBA6F',
+  primaryRGB: [79, 186, 111],
+  primaryDark: '#3B9957',
+  primaryDarkRGB: [59, 153, 87],
+  primaryLight: '#7DD49A',
+  primaryLightRGB: [125, 212, 154],
+  primary50: '#F0FDF4',
+  primary100: '#DCFCE7',
+  /** Vibrant actionable green — CTAs, save/submit buttons, nav markers */
+  vibrant: '#2ED47A',
+  vibrantDark: '#22A85F',
+  vibrantLight: '#6EE8A4',
 
   // ── Neutral chrome ──────────────────────────────────────────────────────
   white: '#FFFFFF',
@@ -53,14 +62,14 @@ export const colors = {
   borderSubtle: '#F1F5F9',
   borderDark: '#1E293B',
   borderSubtleDark: '#334155',
-  // 10% Accent: single primary blue, sparingly applied
-  accent: '#0056D2',
-  accentHover: '#0044A8',
-  accentLight: '#DBEAFE',
+  // 10% Accent: single primary green, sparingly applied
+  accent: '#4FBA6F',
+  accentHover: '#3B9957',
+  accentLight: '#DCFCE7',
   // Secondary accent (rare use)
-  accentEmerald: '#10B981',
-  accentEmeraldHover: '#059669',
-  accentEmeraldLight: '#D1FAE5',
+  accentGreen: '#10B981',
+  accentGreenHover: '#059669',
+  accentGreenLight: '#D1FAE5',
   accentAmber: '#F59E0B',
   accentAmberHover: '#D97706',
   accentAmberLight: '#FEF3C7',
@@ -79,11 +88,9 @@ export const colors = {
   accentSky: '#0EA5E9',
   accentSkyHover: '#0284C7',
   accentSkyLight: '#E0F2FE',
-  accentIndigo: '#6366F1',
-  accentIndigoHover: '#4F46E5',
+  accentIndigo: '#4FBA6F',
+  accentIndigoHover: '#3B9957',
   accentIndigoLight: '#E0E7FF',
-
-  // ── AI, validation, and trust surfaces ─────────────────────────────────────
   ai: {
     bg: '#F5F3FF',
     text: '#5B21B6',
@@ -174,8 +181,8 @@ export const surfaceTokens = {
 
 export const brandTokens = {
   primary: {
-    light: { bg: '#2563EB', text: '#FFFFFF', contrast: '7.2:1' },
-    dark:  { bg: '#3B82F6', text: '#0F172A', contrast: '7.5:1' },
+    light: { bg: '#4FBA6F', text: '#FFFFFF', contrast: '4.5:1' },
+    dark:  { bg: '#2ED47A', text: '#0F172A', contrast: '7.1:1' },
   },
   success: {
     light: { bg: '#ECFDF5', text: '#065F46', contrast: '8.1:1' },
@@ -388,13 +395,13 @@ export const darkColors = {
   surfaceAlt:      '#262626',
   border:          '#262626',
   borderSubtle:    '#1f1f1f',
-  primary:         '#0056D2',
-  primaryDark:     '#4F8FFF',
+  primary:         '#4FBA6F',
+  primaryDark:     '#2ED47A',
   textPrimary:     '#F5F5F5',
   textSecondary:   '#D1D5DB',
   textTertiary:    '#737373',
   textQuaternary:  '#525252',
-  accentEmerald:   '#10B981',
+  accentindigo:   '#10B981',
   accentAmber:     '#F59E0B',
   accentRose:      '#F43F5E',
   accentViolet:    '#8B5CF6',
@@ -468,20 +475,20 @@ export const statusColors = {
 
 // ── Chart Palette ────────────────────────────────────────────────────────
 export const chartColors = [
-  '#0056D2',
-  '#10B981',
-  '#F59E0B',
-  '#F43F5E',
-  '#8B5CF6',
-  '#0EA5E9',
-  '#6366F1',
-  '#14B8A6',
-  '#F97316',
-  '#EC4899',
+  '#4FBA6F',  /* brand green — primary series */
+  '#10B981',  /* emerald */
+  '#F59E0B',  /* amber */
+  '#F43F5E',  /* rose */
+  '#8B5CF6',  /* violet */
+  '#0EA5E9',  /* sky */
+  '#4FBA6F',  /* brand green (alias) */
+  '#14B8A6',  /* teal */
+  '#F97316',  /* orange */
+  '#EC4899',  /* pink */
 ] as const;
 
 export const chartGradients = {
-  revenue:  ['rgba(0, 86, 210, 0.15)', 'rgba(0, 86, 210, 0)'],
+  revenue:  ['rgba(79, 186, 111, 0.15)', 'rgba(79, 186, 111, 0)'],
   expenses: ['rgba(244, 63, 94, 0.12)', 'rgba(244, 63, 94, 0)'],
   profit:   ['rgba(16, 185, 129, 0.12)', 'rgba(16, 185, 129, 0)'],
   net:      ['rgba(139, 92, 246, 0.12)', 'rgba(139, 92, 246, 0)'],
@@ -524,7 +531,6 @@ export const legacyAliases = {
   ovdsAccent:           colors.primary,
   ovdsAccent400:        colors.primaryLight,
   ovdsAccent600:        colors.primaryDark,
-  ovdsBgSecondary:      colors.backgroundAlt,
   ovdsAiBg:             colors.ai.bg,
   ovdsAiText:           colors.ai.text,
   ovdsValidationBg:     colors.validation.bg,
@@ -560,8 +566,6 @@ export const legacyAliases = {
   financialWarning:     '#F59E0B',
   financialDanger:      '#F43F5E',
   financialInfo:        '#3B82F6',
-
-  akiAiBg:             colors.ai.bg,
   akiAiText:           colors.ai.text,
   akiAiBorder:         colors.ai.border,
   akiAiDot:            colors.ai.dot,
@@ -579,11 +583,11 @@ export const legacyAliases = {
   akiAuditBorder:      colors.audit.border,
   akiAuditDot:         colors.audit.dot,
 
-  akiIndigo:           'oklch(0.55 0.22 278)',
-  akiIndigoDim:        'oklch(0.94 0.04 278)',
-  akiIndigoDeep:       'oklch(0.38 0.20 278)',
-  akiIndigoLight:      'oklch(0.68 0.18 278)',
-  akiIndigoMid:        'oklch(0.88 0.09 278)',
+  akiIndigo:           'oklch(0.59 0.19 145)',
+  akiIndigoDim:        'oklch(0.97 0.04 145)',
+  akiIndigoDeep:       'oklch(0.40 0.18 145)',
+  akiIndigoLight:      'oklch(0.72 0.14 145)',
+  akiIndigoMid:        'oklch(0.88 0.09 145)',
   akiGreen:            'oklch(0.59 0.19 155)',
   akiGreenLight:       'oklch(0.74 0.14 155)',
   akiGreenDim:         'oklch(0.94 0.04 155)',

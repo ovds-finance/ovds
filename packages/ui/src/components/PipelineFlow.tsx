@@ -1,6 +1,6 @@
 /**
  * PipelineFlow — ovds-style pipeline/workflow visualization
- * Pure white · Emerald active · White-blue icons
+ * Pure white · green active · White-green icons
  * Used across: Invoices, Bills, Payroll, Tax, Banking, MasterData
  */
 import React from 'react';
@@ -12,14 +12,14 @@ const statusStyles: Record<
   { bg: string; text: string; border: string }
 > = {
   completed: {
-    bg: 'bg-emerald-50',
-    text: 'text-emerald-700',
-    border: 'border-emerald-200',
+    bg: 'bg-[var(--pro-azure-50)]',
+    text: 'text-[var(--pro-azure-dark)]',
+    border: 'border-[var(--pro-azure-100)]',
   },
   active: {
-    bg: 'bg-emerald-600',
+    bg: 'bg-[var(--pro-azure)]',
     text: 'text-white',
-    border: 'border-emerald-600',
+    border: 'border-[var(--pro-azure)]',
   },
   pending: {
     bg: 'bg-slate-100',
@@ -82,14 +82,14 @@ export const PipelineFlow: React.FC<{
 
   const statusCls: Record<StageStatus, string> = {
     completed: `${statusStyles.completed.bg} ${statusStyles.completed.text} ${statusStyles.completed.border}`,
-    active: `bg-emerald-600 text-white border-emerald-600 ring-4 ring-emerald-500-light/20`,
+    active: `bg-[var(--pro-azure)] text-white border-[var(--pro-azure-dark)] ring-4 ring-[var(--pro-azure)]/20`,
     pending: `${statusStyles.pending.bg} ${statusStyles.pending.text} ${statusStyles.pending.border}`,
     warning: `${statusStyles.warning.bg} ${statusStyles.warning.text} ${statusStyles.warning.border}`,
     error: `${statusStyles.error.bg} ${statusStyles.error.text} ${statusStyles.error.border}`,
   };
 
   const connectorCls = (from: FlowStage) =>
-    from.status === 'completed' ? 'bg-emerald-200' : 'bg-emerald-200/10';
+    from.status === 'completed' ? 'bg-[var(--pro-azure-200)]' : 'bg-[var(--pro-azure-200)]/10';
 
   return (
     <div className="flex items-center w-full overflow-x-auto scrollbar-none py-2">
@@ -111,20 +111,20 @@ export const PipelineFlow: React.FC<{
                   stage.status === 'active'
                     ? 'text-slate-800'
                     : stage.status === 'completed'
-                      ? 'text-emerald-600'
-                      : 'text-emerald-400'
+                      ? 'text-[var(--pro-azure-dark)]'
+                      : 'text-[var(--pro-azure-light)]'
                 }`}
               >
                 {stage.label}
               </p>
               {stage.sublabel && !compact && (
-                <p className="text-[9px] text-emerald-400 leading-tight">
+                <p className="text-[9px] text-[var(--pro-azure-light)] leading-tight">
                   {stage.sublabel}
                 </p>
               )}
               {stage.count !== undefined && (
                 <p
-                  className={`text-[9px] font-bold ${stage.status === 'active' ? 'text-emerald-600' : 'text-emerald-400'}`}
+                  className={`text-[9px] font-bold ${stage.status === 'active' ? 'text-[var(--pro-azure-dark)]' : 'text-[var(--pro-azure-light)]'}`}
                 >
                   {stage.count}
                 </p>
@@ -181,7 +181,7 @@ export function KanbanBoard<
       {columns.map((col) => (
         <div
           key={col.key}
-          className="flex-shrink-0 w-64 bg-emerald-500/5 border border-ovds-border rounded-xl overflow-hidden"
+          className="flex-shrink-0 w-64 bg-[var(--pro-azure)]/5 border border-ovds-border rounded-xl overflow-hidden"
         >
           <div className="px-3 py-2.5 bg-white border-b border-ovds-border flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -192,14 +192,14 @@ export function KanbanBoard<
             </div>
             <div className="flex items-center gap-1.5">
               {col.total !== undefined && (
-                <span className="text-[9px] font-bold text-emerald-600 tabular-nums">
+                <span className="text-[9px] font-bold text-[var(--pro-azure-dark)] tabular-nums">
                   ETB{' '}
                   {new Intl.NumberFormat('en-ET', {
                     notation: 'compact',
                   }).format(col.total)}
                 </span>
               )}
-              <span className="w-5 h-5 rounded-full bg-emerald-200/10 flex items-center justify-center text-[9px] font-bold text-emerald-600">
+              <span className="w-5 h-5 rounded-full bg-[var(--pro-azure-200)]/10 flex items-center justify-center text-[9px] font-bold text-[var(--pro-azure-dark)]">
                 {col.items.length}
               </span>
             </div>
@@ -217,13 +217,13 @@ export function KanbanBoard<
                   <button
                     key={item.id}
                     onClick={() => onCardClick?.(item)}
-                    className="w-full text-left bg-white border border-ovds-border rounded-lg p-3 hover:border-emerald-500/40 hover:shadow-sm transition-all group"
+                    className="w-full text-left bg-white border border-ovds-border rounded-lg p-3 hover:border-[var(--pro-azure)]/40 hover:shadow-sm transition-all group"
                   >
-                    <p className="text-[11px] font-semibold text-gray-900 truncate group-hover:text-emerald-600">
+                    <p className="text-[11px] font-semibold text-gray-900 truncate group-hover:text-[var(--pro-azure-dark)]">
                       {item.title ?? item.name ?? item.id}
                     </p>
                     {item.amount !== undefined && (
-                      <p className="text-[10px] font-bold text-emerald-600 tabular-nums mt-0.5">
+                      <p className="text-[10px] font-bold text-[var(--pro-azure-dark)] tabular-nums mt-0.5">
                         ETB{' '}
                         {new Intl.NumberFormat('en-ET', {
                           minimumFractionDigits: 2,
@@ -252,9 +252,9 @@ export const ProgressPipeline: React.FC<{
           <div
             className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border-2 transition-all ${
               step.done
-                ? 'bg-emerald-500 border-emerald-500 text-white'
+                ? 'bg-[var(--pro-azure)] border-[var(--pro-azure)] text-white'
                 : step.active
-                  ? 'bg-white border-emerald-500 text-slate-800 ring-2 ring-emerald-500-light/20'
+                  ? 'bg-white border-[var(--pro-azure)] text-slate-800 ring-2 ring-[var(--pro-azure)]-light/20'
                   : 'bg-white border-slate-200 text-slate-400'
             }`}
           >
@@ -263,7 +263,7 @@ export const ProgressPipeline: React.FC<{
           <span
             className={`text-[9px] font-semibold text-center leading-tight ${
               step.done
-                ? 'text-emerald-600'
+                ? 'text-[var(--pro-azure-dark)]'
                 : step.active
                   ? 'text-slate-800'
                   : 'text-slate-400'
@@ -274,7 +274,7 @@ export const ProgressPipeline: React.FC<{
         </div>
         {i < steps.length - 1 && (
           <div
-            className={`h-0.5 flex-1 -mt-4 transition-all ${step.done ? 'bg-emerald-200' : 'bg-emerald-200/10'}`}
+            className={`h-0.5 flex-1 -mt-4 transition-all ${step.done ? 'bg-[var(--pro-azure-200)]' : 'bg-[var(--pro-azure-200)]/10'}`}
           />
         )}
       </React.Fragment>
@@ -290,8 +290,8 @@ export const RouteIndicator: React.FC<{
   status?: 'active' | 'pending' | 'completed';
 }> = ({ from, to, via, status = 'active' }) => {
   const cls = {
-    active: 'text-slate-800 border-emerald-200/20 bg-emerald-200/10',
-    pending: 'text-emerald-600 border-emerald-200/10 bg-white',
+    active: 'text-slate-800 border-[var(--pro-azure-100)]/20 bg-[var(--pro-azure-200)]/10',
+    pending: 'text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]/10 bg-white',
     completed: 'text-sky-600 border-sky-200 bg-sky-50',
   }[status];
   return (

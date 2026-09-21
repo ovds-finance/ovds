@@ -7,6 +7,7 @@ export * from './kernel/event-helpers';
 export * from './kernel/module-bootstrap';
 export * from './kernel/module-auto-discovery';
 export * from './kernel/app-modules';
+export * from './kernel/pipeline-interceptor';
 export * from './events/event.interface';
 export * from './events/event.bus';
 export * from './events/event.dispatcher';
@@ -21,3 +22,21 @@ export * from './menu/menu.builder';
 export * from './constants';
 export { ModuleApp } from './module-app';
 export type { ModuleAppOptions, ModuleAppInterface, ModuleAppInfo, ModuleAppContainer, ModuleAppEventBus, ModuleAppLogger, ModuleAppRoute, ModuleAppMenuItem, ModuleAppSetting, ModuleAppPermission, ModuleAppHealth, ModuleInstallType } from './module-app';
+
+// ── VAT Declaration engine — re-exported for consumers that import from @ovds/core directly
+// Full subpath: @ovds/core/vat  and  @ovds/core/vat/report
+export type {
+  VatRateType, VatRate, VatContext, VatLineResult, VatResult,
+  FilingFrequency, VatFilingPeriod, ComplianceSeverity,
+  VatComplianceIssue, VatComplianceResult, VatReturnLine, VatReturnDraft,
+  ReportFormat, VatReportTemplate, VatJurisdictionInfo,
+  IVatRuleEngine,
+  AuthorityAuthMethod, FilingChannel, VatAuthoritySpec,
+  VatFilingFormSpec, VatLocale, VatModuleOptions,
+  VatModuleEntry, TenantActivation, VatModuleSummary,
+  VatRenderContext, VatRenderResult, IVatReportRenderer,
+} from './vat/index';
+export { AbstractVatRuleEngine }                                   from './vat/vat-rule-engine';
+export { VatModule }                                               from './vat/vat-module';
+export { VatModuleRegistry, getVatModuleRegistry, resetVatModuleRegistry } from './vat/vat-module-registry';
+export { VatReportEngine, getVatReportEngine, resetVatReportEngine }        from './vat/report/vat-report-engine';

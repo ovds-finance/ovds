@@ -16,14 +16,14 @@
  *      better ordering when the query is short / typo-prone (e.g. "infvoice" → invoice).
  *      Fuse.js never fetches extra data — it only re-sorts what the backend returned.
  */
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import DOMPurify from 'dompurify';
+import Fuse, { type IFuseOptions as FuseOptions } from 'fuse.js';
 import {
   Moon, Sun, Search, ChevronRight, ArrowLeft,
   BookOpen, Landmark, Tag, RefreshCw,
 } from 'lucide-react';
-import Fuse, { type IFuseOptions as FuseOptions } from 'fuse.js';
-import DOMPurify from 'dompurify';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -66,14 +66,14 @@ const CATEGORY_META: Record<string, { label: string; icon: string; color: string
   feature: {
     label: 'Features',
     icon: '⭐',
-    color: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
-    badge: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300',
+    color: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-green-300 border-[var(--pro-azure-100)] dark:border-green-800',
+    badge: 'bg-[var(--pro-azure-100)] dark:bg-green-900/40 text-[var(--pro-azure-dark)] dark:text-green-300',
   },
   tutorial: {
     label: 'Tutorials',
     icon: '📖',
-    color: 'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
-    badge: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
+    color: 'bg-[var(--pro-azure-50)] dark:bg-[var(--pro-azure-50)]/10 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] border-[var(--pro-azure-100)] dark:border-[var(--pro-azure)]/20',
+    badge: 'bg-[var(--pro-azure-100)] dark:bg-[var(--pro-azure-50)]/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
   },
   faq: {
     label: 'FAQ',
@@ -131,8 +131,8 @@ function mdToHtml(md: string): string {
       .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-extrabold mt-4 mb-4 text-slate-900 dark:text-white">$1</h1>')
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/`([^`\n]+)`/g, '<code class="font-mono text-sm bg-slate-100 dark:bg-slate-800 text-rose-600 dark:text-rose-400 px-1.5 py-0.5 rounded">$1</code>')
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-emerald-600 dark:text-emerald-400 underline hover:no-underline">$1</a>')
-      .replace(/^> (.+)$/gm, '<blockquote class="border-l-4 border-emerald-400 pl-4 italic text-slate-600 dark:text-slate-400 my-3">$1</blockquote>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] underline hover:no-underline">$1</a>')
+      .replace(/^> (.+)$/gm, '<blockquote class="border-l-4 border-[var(--pro-azure)] pl-4 italic text-slate-600 dark:text-slate-400 my-3">$1</blockquote>')
       .replace(/^---+$/gm, '<hr class="border-slate-200 dark:border-slate-700 my-6"/>')
       .replace(/^[-*] (.+)$/gm, '<li class="ml-5 list-disc text-sm text-slate-700 dark:text-slate-300 mb-1">$1</li>')
       .replace(/^\d+\. (.+)$/gm, '<li class="ml-5 list-decimal text-sm text-slate-700 dark:text-slate-300 mb-1">$1</li>')
@@ -196,7 +196,7 @@ const DocsNav: React.FC<{ dark: boolean; onToggleDark: () => void }> = ({ dark, 
     <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-3">
       {/* Brand */}
       <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="OVDS home">
-        <div className="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center">
+        <div className="w-7 h-7 rounded-lg bg-[var(--pro-azure)] flex items-center justify-center">
           <Landmark size={14} className="text-white" />
         </div>
         <span className="font-extrabold text-slate-900 dark:text-white text-sm">OVDS</span>
@@ -221,14 +221,14 @@ const DocsNav: React.FC<{ dark: boolean; onToggleDark: () => void }> = ({ dark, 
 
       <Link
         to="/login"
-        className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+        className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors"
       >
         Sign In →
       </Link>
 
       <Link
         to="/register"
-        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
+        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold bg-[var(--pro-azure)] hover:bg-[var(--pro-azure-dark)] text-white rounded-lg transition-colors"
       >
         Get Started
       </Link>
@@ -247,11 +247,11 @@ const ArticleCard: React.FC<{ article: ArticleSummary; onClick: () => void }> = 
   return (
     <button
       onClick={onClick}
-      className="group w-full text-left p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      className="group w-full text-left p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-[var(--pro-azure)] dark:hover:border-[var(--pro-azure)] hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]"
       aria-label={`Read: ${article.title}`}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
-        <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors leading-snug line-clamp-2">
+        <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-[var(--pro-azure)] dark:group-hover:text-[var(--pro-azure-light)] transition-colors leading-snug line-clamp-2">
           {article.title}
         </h3>
         <CategoryBadge cat={article.category} small />
@@ -301,7 +301,7 @@ const ArticleViewer: React.FC<{ slug: string; onBack: () => void }> = ({ slug, o
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64" aria-live="polite" role="status">
-        <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" aria-label="Loading article" />
+        <div className="w-6 h-6 border-2 border-[var(--pro-azure)] border-t-transparent rounded-full animate-spin" aria-label="Loading article" />
       </div>
     );
   }
@@ -310,7 +310,7 @@ const ArticleViewer: React.FC<{ slug: string; onBack: () => void }> = ({ slug, o
     return (
       <div role="alert" className="p-6 text-center">
         <p className="text-rose-500 text-sm mb-3">{error ?? 'Article not found.'}</p>
-        <button onClick={onBack} className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 mx-auto">
+        <button onClick={onBack} className="text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline flex items-center gap-1 mx-auto">
           <ArrowLeft size={12} /> Back to docs
         </button>
       </div>
@@ -325,7 +325,7 @@ const ArticleViewer: React.FC<{ slug: string; onBack: () => void }> = ({ slug, o
       {/* Back */}
       <button
         onClick={onBack}
-        className="flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 mb-6 transition-colors"
+        className="flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] mb-6 transition-colors"
         aria-label="Back to article list"
       >
         <ArrowLeft size={13} /> Back to docs
@@ -393,10 +393,10 @@ const ModuleBrowser: React.FC<{
                 <button
                   key={`${m.category}:${m.subcategory}`}
                   onClick={() => onSelect(cat as DocCategory, m.subcategory)}
-                  className="text-left p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-sm transition-all group"
+                  className="text-left p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-[var(--pro-azure)] dark:hover:border-[var(--pro-azure)] hover:shadow-sm transition-all group"
                   aria-label={`Browse ${m.subcategory}`}
                 >
-                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 leading-tight mb-1 line-clamp-2">
+                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-[var(--pro-azure)] dark:group-hover:text-[var(--pro-azure-light)] leading-tight mb-1 line-clamp-2">
                     {m.subcategory}
                   </p>
                   <p className="text-[10px] text-slate-400 dark:text-slate-500">
@@ -550,10 +550,10 @@ export default function DocsPortal() {
 
       {/* ── Hero banner ── */}
       {!selectedSlug && (
-        <div className="bg-gradient-to-br from-emerald-600 to-teal-700 text-white py-10 px-4">
+        <div className="bg-gradient-to-br from-[var(--pro-azure)] to-teal-700 text-white py-10 px-4">
           <div className="max-w-6xl mx-auto">
             <h1 className="text-2xl sm:text-3xl font-extrabold mb-2">OVDS Knowledge Base</h1>
-            <p className="text-emerald-100 text-sm max-w-lg mb-5">
+            <p className="text-green-100 text-sm max-w-lg mb-5">
               Guides, tutorials, API reference, and FAQs for the OVDS platform — Ethiopian business & tax compliance.
             </p>
             {/* Hero search */}
@@ -593,7 +593,7 @@ export default function DocsPortal() {
                       aria-pressed={active}
                       className={`w-full text-left flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold mb-0.5 transition-colors ${
                         active
-                          ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
+                          ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                           : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-200'
                       }`}
                     >
@@ -613,7 +613,7 @@ export default function DocsPortal() {
                       <button
                         onClick={() => selectCategory(cat as DocCategory)}
                         className={`flex items-center gap-1.5 text-[11px] font-bold mb-1 transition-colors ${
-                          category === cat ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-300 hover:text-emerald-600'
+                          category === cat ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-slate-600 dark:text-slate-300 hover:text-[var(--pro-azure)]'
                         }`}
                       >
                         {CATEGORY_META[cat]?.icon} {CATEGORY_META[cat]?.label ?? cat}
@@ -626,7 +626,7 @@ export default function DocsPortal() {
                           aria-pressed={activeSubcategory === sub && category === cat}
                           className={`w-full text-left text-[10px] pl-4 leading-5 truncate block transition-colors mb-px rounded ${
                             activeSubcategory === sub && category === cat
-                              ? 'text-emerald-600 dark:text-emerald-400 font-semibold'
+                              ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-semibold'
                               : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                           }`}
                         >
@@ -650,7 +650,7 @@ export default function DocsPortal() {
                         aria-pressed={activeTag === tag}
                         className={`text-[10px] px-2 py-0.5 rounded-full font-medium transition-colors ${
                           activeTag === tag
-                            ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-400'
+                            ? 'bg-[var(--pro-azure-100)] dark:bg-green-900/40 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] ring-1 ring-[var(--pro-azure)]'
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                         }`}
                       >
@@ -709,7 +709,7 @@ export default function DocsPortal() {
               {/* Loading */}
               {loading && (
                 <div className="flex justify-center items-center h-48" role="status" aria-label="Loading articles">
-                  <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-6 h-6 border-2 border-[var(--pro-azure)] border-t-transparent rounded-full animate-spin" />
                 </div>
               )}
 
@@ -731,7 +731,7 @@ export default function DocsPortal() {
                   {(debouncedSearch || activeTag || activeSubcategory) && (
                     <button
                       onClick={() => { setSearch(''); setActiveTag(''); setActiveSubcategory(''); }}
-                      className="text-xs text-emerald-600 dark:text-emerald-400 mt-2 hover:underline"
+                      className="text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] mt-2 hover:underline"
                     >
                       Clear filters
                     </button>
@@ -795,7 +795,7 @@ export default function DocsPortal() {
       {/* ── Footer ── */}
       <footer className="border-t border-slate-200 dark:border-slate-800 mt-16 py-8 text-center">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <div className="w-6 h-6 rounded-md bg-emerald-600 flex items-center justify-center">
+          <div className="w-6 h-6 rounded-md bg-[var(--pro-azure)] flex items-center justify-center">
             <Landmark size={12} className="text-white" />
           </div>
           <span className="text-xs font-bold text-slate-700 dark:text-slate-300">OVDS finClaudeOvds</span>
@@ -804,9 +804,9 @@ export default function DocsPortal() {
           Documentation · Knowledge Base · API Reference
         </p>
         <div className="flex justify-center gap-4 text-xs">
-          <Link to="/" className="text-emerald-600 dark:text-emerald-400 hover:underline">Home</Link>
-          <Link to="/login" className="text-emerald-600 dark:text-emerald-400 hover:underline">Sign In</Link>
-          <Link to="/register" className="text-emerald-600 dark:text-emerald-400 hover:underline">Get Started</Link>
+          <Link to="/" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">Home</Link>
+          <Link to="/login" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">Sign In</Link>
+          <Link to="/register" className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">Get Started</Link>
         </div>
       </footer>
     </div>

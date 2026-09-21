@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from '../common/prisma.service';
 import { PAGINATION_DEFAULT_LIMIT } from '@ovds/shared';
+
+import { PrismaService } from '../common/prisma.service';
 
 @Injectable()
 export class BankingService {
@@ -9,9 +10,12 @@ export class BankingService {
   async findAccounts(companyId: string | null, query: { page?: number; limit?: number }) {
     const page = query.page ?? 1;
     const limit = query.limit ?? PAGINATION_DEFAULT_LIMIT;
-    const skip = (page - 1) * limit;
 
-    const where = companyId ? { companyId } : {};
+    // Guard: never return all tenants' accounts when companyId is absent
+    if (!companyId) return { data: [], total: 0, page, limit, totalPages: 0 };
+
+    const skip = (page - 1) * limit;
+    const where = { companyId };
     const [data, total] = await Promise.all([
       this.prisma.bankAccount.findMany({ where, skip, take: limit, orderBy: { createdAt: 'desc' } }),
       this.prisma.bankAccount.count({ where }),
@@ -72,6 +76,27 @@ export class BankingService {
     return this.prisma.bankTransaction.create({ data: createData as any });
   }
 
+  async findTransaction(companyId: string | null, id: string) {
+    const where = companyId ? { id, companyId } : { id };
+    const txn = await this.prisma.bankTransaction.findFirst({ where });
+    if (!txn) throw new NotFoundException('Bank transaction not found');
+    return txn;
+  }
+
+  async updateTransaction(companyId: string | null, id: string, data: Record<string, unknown>) {
+    const where = companyId ? { id, companyId } : { id };
+    const existing = await this.prisma.bankTransaction.findFirst({ where });
+    if (!existing) throw new NotFoundException('Bank transaction not found');
+    return this.prisma.bankTransaction.update({ where: { id }, data: data as any });
+  }
+
+  async removeTransaction(companyId: string | null, id: string) {
+    const where = companyId ? { id, companyId } : { id };
+    const existing = await this.prisma.bankTransaction.findFirst({ where });
+    if (!existing) throw new NotFoundException('Bank transaction not found');
+    return this.prisma.bankTransaction.delete({ where: { id } });
+  }
+
   async findTransfers(companyId: string | null, query: { page?: number; limit?: number }) {
     const page = query.page ?? 1;
     const limit = query.limit ?? PAGINATION_DEFAULT_LIMIT;
@@ -89,5 +114,26 @@ export class BankingService {
   async createTransfer(companyId: string | null, data: Record<string, unknown>) {
     const createData: Record<string, unknown> = companyId ? { ...data, companyId } : data;
     return this.prisma.fundTransfer.create({ data: createData as any });
+  }
+
+  async findTransfer(companyId: string | null, id: string) {
+    const where = companyId ? { id, companyId } : { id };
+    const transfer = await this.prisma.fundTransfer.findFirst({ where });
+    if (!transfer) throw new NotFoundException('Fund transfer not found');
+    return transfer;
+  }
+
+  async updateTransfer(companyId: string | null, id: string, data: Record<string, unknown>) {
+    const where = companyId ? { id, companyId } : { id };
+    const existing = await this.prisma.fundTransfer.findFirst({ where });
+    if (!existing) throw new NotFoundException('Fund transfer not found');
+    return this.prisma.fundTransfer.update({ where: { id }, data: data as any });
+  }
+
+  async removeTransfer(companyId: string | null, id: string) {
+    const where = companyId ? { id, companyId } : { id };
+    const existing = await this.prisma.fundTransfer.findFirst({ where });
+    if (!existing) throw new NotFoundException('Fund transfer not found');
+    return this.prisma.fundTransfer.delete({ where: { id } });
   }
 }

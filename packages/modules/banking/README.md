@@ -1,14 +1,14 @@
-# Banking, Transactions & Reconciliation
+﻿# Banking, Transactions & Reconciliation
 
 Canonical OVDS module (`packages/modules/banking`).
 
-Akaunting-inspired, DDD-aligned module layout:
+Ovds SaaS DDD-aligned module layout:
 
 ```
 modules/banking/
   src/
     index.ts        # public barrel (domain types + namespaced web)
-    domain/         # centralized domain types & rules  (@ovds/domains/banking)
+    domain/         # centralized domain types & rules  (@ovds/domains-banking)
     dto/            # zod / class-validator contracts
     web/            # React pages & components           (@ovds/features/banking)
 ```

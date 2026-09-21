@@ -1,17 +1,21 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { AppPage, Btn } from '@ovds/ui';
-import { useAuth } from '../rbac/AuthContext';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useAuditLog } from '../hooks/useAuditLog';
-import IASBUpdateBanner from '../components/iasbUpdateBanner';
+﻿import { AppPage } from '@ovds/ui';
 import {
   AlertTriangle, ArrowDownRight, ArrowUpRight, BarChart3, Briefcase,
   Calculator, Calendar, CheckCircle2, ChevronDown, ChevronUp,
   Download, ExternalLink, FileText, Globe, Info, Lightbulb,
   Printer, Send, ShieldCheck, TrendingDown, TrendingUp,
 } from 'lucide-react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
+import IASBUpdateBanner from '../components/iasbUpdateBanner';
+import { useAuditLog } from '../hooks/useAuditLog';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+
+
+
 
 // -- Constants — Proclamation No. 1395/2025 -----------------------------------
 const INDIVIDUAL_BRACKETS = [
@@ -120,7 +124,7 @@ const VatBitBridge: React.FC<{ grossIncome: number }> = ({ grossIncome }) => {
     : null;
 
   return (
-    <div className="bg-gradient-to-r from-amber-50 to-emerald-50 dark:from-amber-950/20 dark:to-emerald-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-5 space-y-3">
+    <div className="bg-gradient-to-r from-amber-50 to-indigo-50 dark:from-amber-950/20 dark:to-indigo-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-5 space-y-3">
       <div className="flex items-center gap-2">
         <BarChart3 size={14} className="text-amber-600 dark:text-amber-400" />
         <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">VAT ↔ BIT Cross-Check</p>
@@ -128,9 +132,9 @@ const VatBitBridge: React.FC<{ grossIncome: number }> = ({ grossIncome }) => {
       </div>
       <div className="ovds-grid-layout cols-3">
         {[
-          { label: 'VAT Sales (ledger)',    value: vatRevenue,   color: 'text-emerald-700 dark:text-emerald-400'    },
+          { label: 'VAT Sales (ledger)',    value: vatRevenue,   color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'    },
           { label: 'BIT Gross Income',      value: grossIncome,  color: 'text-amber-700 dark:text-amber-400'  },
-          { label: 'Claimable Input VAT',   value: vatInput,     color: 'text-emerald-700 dark:text-emerald-400' },
+          { label: 'Claimable Input VAT',   value: vatInput,     color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' },
         ].map(r => (
           <div key={r.label} className="bg-white/70 dark:bg-slate-800/50 rounded-xl p-3">
             <div className="text-[10px] text-slate-500 dark:text-slate-400 mb-1">{r.label}</div>
@@ -142,7 +146,7 @@ const VatBitBridge: React.FC<{ grossIncome: number }> = ({ grossIncome }) => {
       </div>
       {match !== null && (
         <div className={`flex items-center gap-2 text-xs px-3 py-2 rounded-xl ${
-          match >= 90 ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
+          match >= 90 ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
           : match >= 70 ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300'
           : 'bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300'
         }`}>
@@ -218,14 +222,14 @@ const TaxCalendarTab: React.FC = () => {
   const daysLeft = (d: Date) => Math.ceil((d.getTime() - now.getTime()) / 86_400_000);
 
   const typeCls: Record<string, string> = {
-    VAT:  'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300',
+    VAT:  'bg-[var(--pro-azure-100)] dark:bg-green-950/40 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
     BIT:  'bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300',
     DRRF: 'bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300',
     WHT:  'bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300',
     TOT:  'bg-sky-100 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300',
   };
   const dotCls: Record<string, string> = {
-    VAT: 'bg-emerald-500', BIT: 'bg-amber-500', DRRF: 'bg-amber-500', WHT: 'bg-teal-500', TOT: 'bg-sky-500',
+    VAT: 'bg-[var(--pro-azure)]', BIT: 'bg-amber-500', DRRF: 'bg-amber-500', WHT: 'bg-teal-500', TOT: 'bg-sky-500',
   };
 
   return (
@@ -362,7 +366,7 @@ const IfrsTab: React.FC<{ taxableIncome: number }> = ({ taxableIncome }) => {
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500 dark:text-slate-400 pl-4">CR Current Tax Payable</span>
-              <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+              <span className="font-semibold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                 {taxableIncome > 0 ? `ETB ${fmt(currentTax)}` : '—'}
               </span>
             </div>
@@ -387,7 +391,7 @@ const IfrsTab: React.FC<{ taxableIncome: number }> = ({ taxableIncome }) => {
                 <div key={label} className="flex items-start gap-2">
                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 mt-0.5 ${
                     type === 'DTA'
-                      ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300'
+                      ? 'bg-[var(--pro-azure-100)] dark:bg-green-900/40 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                       : 'bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300'
                   }`}>{type}</span>
                   <div>
@@ -409,8 +413,8 @@ const IfrsTab: React.FC<{ taxableIncome: number }> = ({ taxableIncome }) => {
             { ref: 'IAS 12.81',  label: 'Deferred tax assets & liabilities', note: 'Nature and amount of temporary differences' },
             { ref: 'IAS 12.81e', label: 'Unrecognised deferred tax assets', note: 'Unused losses, expiry dates, reasons' },
           ].map(({ ref, label, note }) => (
-            <div key={ref} className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900 rounded-xl p-3">
-              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">{ref}</span>
+            <div key={ref} className="bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-900/50 rounded-xl p-3">
+              <span className="text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">{ref}</span>
               <p className="text-[10px] font-bold text-slate-700 dark:text-slate-200 mt-1">{label}</p>
               <p className="text-[9px] text-slate-400 dark:text-slate-500 mt-0.5">{note}</p>
             </div>
@@ -659,18 +663,18 @@ const BusinessIncomeTax: React.FC = () => {
       label: 'Total Deductions',
       value: totalExpenses > 0 ? `ETB ${fmtK(totalExpenses)}` : '—',
       sub: `${expenses.filter(e => parseFloat(e.amount) > 0).length} categories`,
-      color: 'text-emerald-700 dark:text-emerald-400',
-      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-      border: 'border-emerald-100 dark:border-emerald-800',
+      color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
+      bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
+      border: 'border-[var(--pro-azure-100)] dark:border-green-800',
       icon: <TrendingDown size={15} />,
     },
     {
       label: 'Taxable Income',
       value: taxableIncome > 0 ? `ETB ${fmtK(taxableIncome)}` : '—',
       sub: 'After deductions',
-      color: 'text-emerald-700 dark:text-emerald-400',
-      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-      border: 'border-emerald-100 dark:border-emerald-800',
+      color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
+      bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
+      border: 'border-[var(--pro-azure-100)] dark:border-green-800',
       icon: <Calculator size={15} />,
     },
     {
@@ -687,9 +691,9 @@ const BusinessIncomeTax: React.FC = () => {
       label: taxDue > 0 ? 'Net Tax Due' : 'Tax Refund',
       value: `ETB ${fmtK(Math.abs(taxDue))}`,
       sub: `Due ${FILING_DEADLINE}`,
-      color: taxDue > 0 ? 'text-rose-700 dark:text-rose-400' : 'text-emerald-700 dark:text-emerald-400',
-      bg: taxDue > 0 ? 'bg-rose-50 dark:bg-rose-950/30' : 'bg-emerald-50 dark:bg-emerald-950/30',
-      border: taxDue > 0 ? 'border-rose-100 dark:border-rose-800' : 'border-emerald-100 dark:border-emerald-800',
+      color: taxDue > 0 ? 'text-rose-700 dark:text-rose-400' : 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
+      bg: taxDue > 0 ? 'bg-rose-50 dark:bg-rose-950/30' : 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
+      border: taxDue > 0 ? 'border-rose-100 dark:border-rose-800' : 'border-[var(--pro-azure-100)] dark:border-green-800',
       icon: taxDue > 0 ? <ArrowUpRight size={15} /> : <ArrowDownRight size={15} />,
       highlight: taxDue > 0 && grossIncomeNum > 0,
     },
@@ -697,9 +701,9 @@ const BusinessIncomeTax: React.FC = () => {
       label: 'Compliance',
       value: `${checklistDone}/${CHECKLIST.length}`,
       sub: checklistDone === CHECKLIST.length ? 'Ready to file' : 'Items pending',
-      color: checklistDone === CHECKLIST.length ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400',
-      bg: checklistDone === CHECKLIST.length ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-amber-50 dark:bg-amber-950/30',
-      border: checklistDone === CHECKLIST.length ? 'border-emerald-100 dark:border-emerald-800' : 'border-amber-100 dark:border-amber-800',
+      color: checklistDone === CHECKLIST.length ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-amber-700 dark:text-amber-400',
+      bg: checklistDone === CHECKLIST.length ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30' : 'bg-amber-50 dark:bg-amber-950/30',
+      border: checklistDone === CHECKLIST.length ? 'border-[var(--pro-azure-100)] dark:border-green-800' : 'border-amber-100 dark:border-amber-800',
       icon: <CheckCircle2 size={15} />,
     },
   ];
@@ -753,11 +757,11 @@ const BusinessIncomeTax: React.FC = () => {
             sub: 'Trader, freelancer, sole owner',
             rate: '0–35%',
             rateLabel: 'Progressive Rate',
-            activeColor: 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 dark:border-emerald-600',
-            rateBg: 'bg-emerald-100 dark:bg-emerald-900/40',
-            rateText: 'text-emerald-700 dark:text-emerald-300',
+            activeColor: 'border-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/20 dark:border-[var(--pro-azure-light)]',
+            rateBg: 'bg-[var(--pro-azure-100)] dark:bg-green-900/40',
+            rateText: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
             icon: <FileText size={16} />,
-            iconActive: 'bg-emerald-500 dark:bg-emerald-500',
+            iconActive: 'bg-[var(--pro-azure)] dark:bg-[var(--pro-azure)]',
           },
         ] as const).map(opt => {
           const active = taxpayerType === opt.type;
@@ -777,7 +781,7 @@ const BusinessIncomeTax: React.FC = () => {
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{opt.title}</p>
                   <p className="text-[10px] text-slate-500 dark:text-slate-400">{opt.sub}</p>
                 </div>
-                {active && <CheckCircle2 size={16} className={active && opt.type === 'corporate' ? 'text-amber-500' : 'text-emerald-500'} />}
+                {active && <CheckCircle2 size={16} className={active && opt.type === 'corporate' ? 'text-amber-500' : 'text-[var(--pro-azure)]'} />}
               </div>
               <div className={`${opt.rateBg} rounded-xl p-3 text-center`}>
                 <p className={`text-2xl font-semibold ${opt.rateText}`}>{opt.rate}</p>
@@ -837,8 +841,8 @@ const BusinessIncomeTax: React.FC = () => {
               <div>
                 <label className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">
                   Gross Business Income (ETB)
-                  {apiLoading && <span className="ml-2 text-[9px] text-emerald-500 animate-pulse">Loading from accounting…</span>}
-                  {!apiLoading && grossIncomeNum > 0 && <span className="ml-2 text-[9px] text-emerald-500">✓ From accounting records</span>}
+                  {apiLoading && <span className="ml-2 text-[9px] text-[var(--pro-azure)] animate-pulse">Loading from accounting…</span>}
+                  {!apiLoading && grossIncomeNum > 0 && <span className="ml-2 text-[9px] text-[var(--pro-azure)]">✓ From accounting records</span>}
                 </label>
                 <input
                   type="number" min="0" step="0.01"
@@ -884,7 +888,7 @@ const BusinessIncomeTax: React.FC = () => {
                   {/* Waterfall rows */}
                   {[
                     { label: 'Gross Income',       value: grossIncomeNum, color: 'text-slate-800 dark:text-slate-100', sign: '' },
-                    { label: 'Total Deductions',   value: totalExpenses,  color: 'text-emerald-700 dark:text-emerald-400', sign: '−' },
+                    { label: 'Total Deductions',   value: totalExpenses,  color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]', sign: '−' },
                     { label: 'Taxable Income',     value: taxableIncome,  color: 'text-slate-800 dark:text-slate-100', sign: '=' },
                   ].map(row => (
                     <div key={row.label} className="flex items-center justify-between py-1.5 border-b border-slate-50 dark:border-slate-800/60">
@@ -949,13 +953,13 @@ const BusinessIncomeTax: React.FC = () => {
                       {whtCreditsNum > 0 && (
                         <div className="flex items-center justify-between py-1 border-b border-slate-50 dark:border-slate-800/60">
                           <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Less: WHT Credits</span>
-                          <span className="text-sm font-semibold font-mono text-emerald-700 dark:text-emerald-400">− ETB {fmt(whtCreditsNum)}</span>
+                          <span className="text-sm font-semibold font-mono text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">− ETB {fmt(whtCreditsNum)}</span>
                         </div>
                       )}
                       {provisionalPaidNum > 0 && (
                         <div className="flex items-center justify-between py-1 border-b border-slate-50 dark:border-slate-800/60">
                           <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Less: Provisional Tax Paid</span>
-                          <span className="text-sm font-semibold font-mono text-emerald-700 dark:text-emerald-400">− ETB {fmt(provisionalPaidNum)}</span>
+                          <span className="text-sm font-semibold font-mono text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">− ETB {fmt(provisionalPaidNum)}</span>
                         </div>
                       )}
                     </div>
@@ -1074,7 +1078,7 @@ const BusinessIncomeTax: React.FC = () => {
                           (() => {
                             const chg = ((effectiveTax - priorYearsData[0].taxDue) / priorYearsData[0].taxDue) * 100;
                             return (
-                              <span className={`flex items-center justify-end gap-0.5 text-[10px] font-semibold ${chg > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                              <span className={`flex items-center justify-end gap-0.5 text-[10px] font-semibold ${chg > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]'}`}>
                                 {chg > 0 ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
                                 {Math.abs(chg).toFixed(1)}%
                               </span>
@@ -1107,7 +1111,7 @@ const BusinessIncomeTax: React.FC = () => {
                         </td>
                         <td className="px-4 py-3 text-right">
                           {yoy !== null && (
-                            <span className={`flex items-center justify-end gap-0.5 text-[10px] font-semibold ${yoy > 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                            <span className={`flex items-center justify-end gap-0.5 text-[10px] font-semibold ${yoy > 0 ? 'text-rose-500' : 'text-[var(--pro-azure)]'}`}>
                               {yoy > 0 ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
                               {Math.abs(yoy).toFixed(1)}%
                             </span>
@@ -1210,7 +1214,7 @@ const BusinessIncomeTax: React.FC = () => {
             badge={
               <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                 checklistDone === CHECKLIST.length
-                  ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300'
+                  ? 'bg-[var(--pro-azure-100)] dark:bg-green-900/40 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'
                   : 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300'
               }`}>
                 {checklistDone}/{CHECKLIST.length}
@@ -1220,9 +1224,9 @@ const BusinessIncomeTax: React.FC = () => {
           >
             <div className="space-y-2">
               {CHECKLIST.map(item => (
-                <div key={item.id} className={`flex items-center gap-3 p-3 rounded-xl ${item.done ? 'bg-emerald-50 dark:bg-emerald-950/20' : 'bg-white dark:bg-slate-800/50'}`}>
-                  <CheckCircle2 size={16} className={item.done ? 'text-emerald-500' : 'text-slate-300 dark:text-slate-600'} />
-                  <span className={`text-xs font-semibold ${item.done ? 'text-emerald-700 dark:text-emerald-300' : 'text-slate-500 dark:text-slate-400'}`}>
+                <div key={item.id} className={`flex items-center gap-3 p-3 rounded-xl ${item.done ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20' : 'bg-white dark:bg-slate-800/50'}`}>
+                  <CheckCircle2 size={16} className={item.done ? 'text-[var(--pro-azure)]' : 'text-slate-300 dark:text-slate-600'} />
+                  <span className={`text-xs font-semibold ${item.done ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-slate-500 dark:text-slate-400'}`}>
                     {item.label}
                   </span>
                 </div>
@@ -1278,7 +1282,7 @@ const BusinessIncomeTax: React.FC = () => {
               </div>
               <div className="flex items-center gap-3 flex-wrap">
                 {submitted && (
-                  <span className="flex items-center gap-2 px-3 py-2 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-semibold">
+                  <span className="flex items-center gap-2 px-3 py-2 bg-[var(--pro-azure-100)] dark:bg-green-900/40 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] rounded-lg text-xs font-semibold">
                     <CheckCircle2 size={14} /> Submitted
                   </span>
                 )}
@@ -1344,9 +1348,9 @@ const BusinessIncomeTax: React.FC = () => {
           {/* Individual brackets */}
           <div className="ovds-widget-card overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
-              <FileText size={16} className="text-emerald-500" />
+              <FileText size={16} className="text-[var(--pro-azure)]" />
               <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Individual / Sole Proprietor — Progressive Brackets</span>
-              <span className="ml-auto text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">Proclamation 1395/2025</span>
+              <span className="ml-auto text-[10px] font-bold bg-[var(--pro-azure-100)] dark:bg-green-900/40 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] px-2 py-0.5 rounded-full">Proclamation 1395/2025</span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-xs ovds-table">
@@ -1362,14 +1366,14 @@ const BusinessIncomeTax: React.FC = () => {
                     const inBracket = taxableIncome > b.from && (taxableIncome <= b.to || b.to === Infinity);
                     const formula = b.rate === 0 ? 'Nil' : `Income × ${(b.rate * 100).toFixed(0)}% − ${fmt(b.deduction)}`;
                     return (
-                      <tr key={i} className={`border-b border-slate-50 dark:border-slate-800/60 ${inBracket ? 'bg-emerald-50 dark:bg-emerald-950/20' : 'hover:bg-slate-50/80 dark:hover:bg-slate-800/40'}`}>
+                      <tr key={i} className={`border-b border-slate-50 dark:border-slate-800/60 ${inBracket ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20' : 'hover:bg-slate-50/80 dark:hover:bg-slate-800/40'}`}>
                         <td className="px-5 py-3 font-mono text-slate-600 dark:text-slate-300">
                           {fmt(b.from + (i === 0 ? 0 : 1))} – {b.to === Infinity ? '∞' : fmt(b.to)}
                           {inBracket && (
-                            <span className="ml-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded">YOUR BRACKET</span>
+                            <span className="ml-2 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] bg-[var(--pro-azure-100)] dark:bg-green-900/40 px-1.5 py-0.5 rounded">YOUR BRACKET</span>
                           )}
                         </td>
-                        <td className="px-5 py-3 text-right font-semibold text-emerald-700 dark:text-emerald-400">{(b.rate * 100).toFixed(0)}%</td>
+                        <td className="px-5 py-3 text-right font-semibold text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">{(b.rate * 100).toFixed(0)}%</td>
                         <td className="px-5 py-3 text-right font-mono text-slate-500 dark:text-slate-400">{fmt(b.deduction)}</td>
                         <td className="px-5 py-3 text-right text-slate-500 dark:text-slate-400">{formula}</td>
                       </tr>
@@ -1378,8 +1382,8 @@ const BusinessIncomeTax: React.FC = () => {
                 </tbody>
               </table>
             </div>
-            <div className="px-5 py-3 bg-emerald-50 dark:bg-emerald-950/10 border-t border-emerald-100 dark:border-emerald-900">
-              <p className="text-[10px] text-emerald-600 dark:text-emerald-400">
+            <div className="px-5 py-3 bg-[var(--pro-azure-50)] dark:bg-green-950/10 border-t border-[var(--pro-azure-100)] dark:border-green-900/50">
+              <p className="text-[10px] text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
                 <strong>Example:</strong> Annual income of ETB 12,000 → bracket 30% → Tax = 12,000 × 30% − 1,350 = ETB 2,250
               </p>
             </div>
@@ -1393,7 +1397,7 @@ const BusinessIncomeTax: React.FC = () => {
       {activeTab === 'calendar' && (
         <SectionCard
           icon={<Calendar size={16} />}
-          iconColor="text-emerald-600 dark:text-emerald-400"
+          iconColor="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]"
           title={`Ethiopian Tax Calendar ${new Date().getFullYear()}`}
           badge={<span className="text-[10px] text-slate-400 dark:text-slate-500 ml-1">Upcoming deadlines</span>}
           noPad
@@ -1424,7 +1428,7 @@ const BusinessIncomeTax: React.FC = () => {
       {activeTab === 'ifrs' && canViewovds && (
         <SectionCard
           icon={<Globe size={16} />}
-          iconColor="text-emerald-600 dark:text-emerald-400"
+          iconColor="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]"
           title="IAS 12 — Income Taxes: IFRS Accounting Treatment"
           badge={<span className="text-[10px] text-slate-400 dark:text-slate-500 ml-1">How BIT flows through your financial statements</span>}
         >

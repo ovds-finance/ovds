@@ -5,10 +5,6 @@
  *   const { data, loading, error, refetch } = useApiQuery<Invoice[]>(url, { suppressToast: true });
  *   if (error) return <ApiErrorState error={error} onRetry={refetch} />;
  */
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-
-import { useNavigate } from 'react-router-dom';
 import {
   ShieldOff,
   ServerCrash,
@@ -24,6 +20,10 @@ import {
   Check,
   GitMerge,
 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
 import type { ApiQueryError } from '../hooks/useApiQuery';
 
 interface Props {
@@ -188,8 +188,8 @@ const ApiErrorState: React.FC<Props> = ({
             message !== 'An error occurred.'
               ? message
               : "This resource doesn't exist or was removed.",
-          iconBg: 'bg-emerald-50 dark:bg-emerald-950/30',
-          iconColor: 'text-emerald-400',
+          iconBg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
+          iconColor: 'text-[var(--pro-azure-light)]',
           action: onRetry
             ? {
                 label: 'Retry',
@@ -401,7 +401,7 @@ const ApiErrorState: React.FC<Props> = ({
           title="Copy request ID for support"
         >
           {copied ? (
-            <Check size={10} className="text-emerald-500" />
+            <Check size={10} className="text-[var(--pro-azure)]" />
           ) : (
             <Copy size={10} />
           )}
@@ -414,7 +414,7 @@ const ApiErrorState: React.FC<Props> = ({
           onClick={cfg.action.onClick}
           className={`mt-5 flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 ${
             cfg.action.variant === 'primary'
-              ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30'
+              ? 'bg-[var(--pro-azure)] text-white hover:bg-[var(--pro-azure-dark)] shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30'
               : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
           }`}
         >

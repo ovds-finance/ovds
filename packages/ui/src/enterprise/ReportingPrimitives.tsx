@@ -62,7 +62,7 @@ export function ReportHeader({
           {onExport && (
             <button
               onClick={onExport}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-aki-blue text-white text-[12px] font-semibold hover:bg-aki-blue-dark transition-all shadow-sm shadow-aki-blue/20"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--pro-azure)] text-white text-[12px] font-semibold hover:bg-[var(--pro-azure-dark)] transition-all shadow-sm shadow-[var(--pro-azure)]/20"
             >
               <Download size={13} />
               <span>Export</span>

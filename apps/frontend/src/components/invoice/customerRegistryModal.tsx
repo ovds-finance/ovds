@@ -1,14 +1,16 @@
-﻿import React, { useState, useCallback } from 'react';
 import {
   Plus, Users, X, Mail, Phone, MapPin, Edit2, Trash2,
   Search, BadgeCheck, FileDown, StickyNote, Building2,
   Percent, Wallet, Calendar, ChevronRight, Info, RefreshCw,
   Hash, ArrowLeft,
 } from 'lucide-react';
-import api from '../../services/api';
+import React, { useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
-import { downloadCSV } from '../../utils/download';
+
+import api from '../../services/api';
 import { confirm } from '../../utils/confirm';
+import { downloadCSV } from '../../utils/download';
 import CustomFieldRenderer, { type CustomFieldValuesMap } from '../CustomFieldRenderer';
 
 interface CustomerRegistryModalProps {
@@ -25,7 +27,7 @@ const inp = 'aki-input';
 const lbl = 'aki-label';
 
 const RISK_META: Record<string, { label: string; color: string; bg: string; dot: string; activeBg: string }> = {
-  LOW:     { label: 'Low Risk',    color: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800/30', dot: 'bg-emerald-500', activeBg: 'bg-emerald-100 text-emerald-700 border-emerald-400' },
+  LOW:     { label: 'Low Risk',    color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]', bg: 'bg-[var(--pro-azure-50)] dark:bg-green-900/20 border-[var(--pro-azure-100)] dark:border-green-800/30', dot: 'bg-[var(--pro-azure-50)]0', activeBg: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] border-[var(--pro-azure)]' },
   MEDIUM:  { label: 'Medium Risk', color: 'text-amber-700 dark:text-amber-400',    bg: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800/30',       dot: 'bg-amber-500',   activeBg: 'bg-amber-100 text-amber-700 border-amber-400' },
   HIGH:    { label: 'High Risk',   color: 'text-orange-700 dark:text-orange-400',  bg: 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800/30',   dot: 'bg-orange-500', activeBg: 'bg-orange-100 text-orange-700 border-orange-400' },
   BLOCKED: { label: 'Blocked',     color: 'text-rose-700 dark:text-rose-400',      bg: 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800/30',           dot: 'bg-rose-500',   activeBg: 'bg-rose-100 text-rose-700 border-rose-400' },
@@ -308,10 +310,10 @@ const CustomerRegistryModal: React.FC<CustomerRegistryModalProps> = ({
       };
       if (!editingCustomer && companyId) payload.companyId = companyId;
       if (editingCustomer) {
-        await api.patch(`/ovds/customers/${editingCustomer.id}`, payload);
+        await api.patch(`/ovds/customers/registry/${editingCustomer.id}`, payload);
         toast.success('Customer updated');
       } else {
-        await api.post('/ovds/customers', payload);
+        await api.post('/ovds/customers/registry', payload);
         toast.success('Customer added to registry');
       }
       onRefresh();
@@ -343,10 +345,10 @@ const CustomerRegistryModal: React.FC<CustomerRegistryModalProps> = ({
     return acc;
   }, {});
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200"
-      style={{ background: 'rgba(15,23,42,0.5)', backdropFilter: 'blur(4px)' }}
+      className="fixed top-0 bottom-0 right-0 z-[115] flex items-center justify-center p-4 animate-in fade-in duration-200"
+      style={{ left: 'var(--sidebar-w, 276px)', background: 'rgba(15,23,42,0.5)', backdropFilter: 'blur(4px)' }}
       role="dialog"
       aria-modal="true"
       aria-label="Customer Registry"
@@ -824,7 +826,8 @@ const CustomerRegistryModal: React.FC<CustomerRegistryModalProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 

@@ -1,0 +1,53 @@
+##############################################################################
+# docker-compose.onpremise.yml — OVDS On-Premise (single-tenant) deployment
+#
+# SECURITY REQUIREMENTS before running:
+#  1. Create a .env file (never commit it) with at minimum:
+#       JWT_SECRET (≥32 random chars)     — openssl rand -hex 32
+#       JWT_REFRESH_SECRET (≥32 random chars) — openssl rand -hex 32
+#       OFFLINE_PUBLIC_KEY            — provided by OVDS vendor
+#  2. The SQLite database file is stored in a named Docker volume.
+#     Back it up regularly from /var/data/local_ledger.db inside the container.
+#  3. Port 8080 is the only exposed port. Put Nginx or a firewall in front.
+##############################################################################
+version: '3.8'
+
+services:
+  # ── NestJS API (SQLite, single-tenant) ─────────────────────────────────────
+  onpremise-app:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    environment:
+      DATABASE_PROVIDER:    "sqlite"
+      DATABASE_URL:         "file:/var/data/local_ledger.db"
+      PRISMA_DATABASE_URL:  "file:/var/data/local_ledger.db"
+      DEPLOYMENT_MODE:      "ON_PREMISE_SINGLE"
+      NODE_ENV:             "production"
+      REDIS_ENABLED:        "false"
+      PORT:                 "3001"
+      # ── Required secrets — MUST be set in host .env ──────────────────────
+      JWT_SECRET:           "${JWT_SECRET}"           # required — no default
+      JWT_REFRESH_SECRET:   "${JWT_REFRESH_SECRET}"   # required — no default
+      OFFLINE_PUBLIC_KEY: "${OFFLINE_PUBLIC_KEY}"
+      # ── Security hardening ────────────────────────────────────────────────
+      SHOW_ERROR_DETAILS:   "false"
+      ENABLE_SWAGGER:       "false"
+      CORS_ORIGIN:          "${CORS_ORIGIN:-http://localhost:8080}"
+    volumes:
+      - onpremise_data:/var/data
+    ports:
+      - "8080:3001"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/health/live || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  onpremise_data:
+    driver: local

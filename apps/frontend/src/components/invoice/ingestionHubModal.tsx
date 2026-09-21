@@ -1,4 +1,3 @@
-﻿import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   X, 
   Upload, 
@@ -23,9 +22,13 @@ import {
   Camera,
   Ticket
 } from 'lucide-react';
-import api from '../../services/api';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
+
 import { useBusiness } from '../../context/businessContext';
+import api from '../../services/api';
+
 import { IngestionWorkflowOverview } from './ingestionWorkflowOverview';
 
 interface Props {
@@ -80,7 +83,7 @@ export const IngestionHubModal: React.FC<Props> = ({ onClose, onRefresh }) => {
         streamRef.current = stream;
         setIsCameraActive(true);
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error('Could not access camera');
     }
   };
@@ -153,7 +156,7 @@ export const IngestionHubModal: React.FC<Props> = ({ onClose, onRefresh }) => {
         ? '/ovds/ingestion/scan'
         : '/ovds/ingestion/jobs';
 
-      const res = await api.post(endpoint, {
+      const _res = await api.post(endpoint, {
         sourceType,
         targetType,
         companyId: selectedCompanyId,
@@ -209,11 +212,11 @@ export const IngestionHubModal: React.FC<Props> = ({ onClose, onRefresh }) => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'COMMITTED': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400';
+      case 'COMMITTED': return 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/30 dark:text-[var(--pro-azure-light)]';
       case 'FAILED': return 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400';
       case 'REVIEW': return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
       case 'PARSING':
-      case 'ENRICHING': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 animate-pulse';
+      case 'ENRICHING': return 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/30 dark:text-[var(--pro-azure-light)] animate-pulse';
       default: return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400';
     }
   };
@@ -224,7 +227,7 @@ export const IngestionHubModal: React.FC<Props> = ({ onClose, onRefresh }) => {
       setReviewRows(rows);
       setSelectedJob(job);
       setIsReviewing(true);
-    } catch (err) {
+    } catch (_err) {
       toast.error('Failed to load review data');
     }
   };
@@ -257,8 +260,8 @@ export const IngestionHubModal: React.FC<Props> = ({ onClose, onRefresh }) => {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(4px)' }}>
+  return createPortal(
+    <div className="fixed inset-0 z-[310] flex items-center justify-center p-4" style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(4px)' }}>
       <div className="aki-card w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden" style={{ borderRadius: '16px', boxShadow: 'var(--shadow)' }}>
         
         {/* Header */}
@@ -637,7 +640,7 @@ export const IngestionHubModal: React.FC<Props> = ({ onClose, onRefresh }) => {
 
         {/* Selected Job Modal (Review/Details) */}
         {selectedJob && (
-          <div className="fixed inset-0 z-[70] flex items-center justify-center p-8" style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}>
+          <div className="fixed inset-0 z-[320] flex items-center justify-center p-8" style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}>
             <div className="aki-card w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden" style={{ borderRadius: '16px', boxShadow: 'var(--shadow)' }}>
               <div className="flex items-center justify-between px-10 py-8" style={{ borderBottom: '1px solid var(--border-alt)', background: 'var(--surface-alt)' }}>
                 <div className="flex items-center gap-4">
@@ -721,7 +724,7 @@ export const IngestionHubModal: React.FC<Props> = ({ onClose, onRefresh }) => {
 
         {/* Review Ingestion Modal */}
         {isReviewing && selectedJob && (
-          <div className="fixed inset-0 z-[80] flex items-center justify-center p-4" style={{ background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(4px)' }}>
+          <div className="fixed inset-0 z-[330] flex items-center justify-center p-4" style={{ background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(4px)' }}>
             <div className="aki-card w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden" style={{ borderRadius: '16px', boxShadow: 'var(--shadow)' }}>
               <div className="flex items-center justify-between px-10 py-8" style={{ borderBottom: '1px solid var(--border-alt)', background: 'var(--surface-alt)' }}>
                 <div className="flex items-center gap-4">
@@ -826,7 +829,8 @@ export const IngestionHubModal: React.FC<Props> = ({ onClose, onRefresh }) => {
         )}
 
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 

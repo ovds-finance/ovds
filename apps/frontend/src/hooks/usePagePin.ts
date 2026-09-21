@@ -1,4 +1,4 @@
-/**
+﻿/**
  * usePagePin — Ovds-style star-to-favorites for any feature page.
  *
  * Reads from the same `sidebar_favorites_v2` localStorage key that the
@@ -12,8 +12,8 @@
  *     <StarIcon filled={pinned} />
  *   </button>
  */
-import { useCallback } from 'react';
 import { useLocalStorage } from '@ovds/ui';
+import { useCallback } from 'react';
 
 export interface PagePinItem {
   to: string;
@@ -21,7 +21,7 @@ export interface PagePinItem {
   icon?: string;
 }
 
-export function usePagePin(to: string, label: string, icon?: string) {
+export function usePagePin(to: string, _label: string, _icon?: string) {
   const [pinned, setPinned] = useLocalStorage<string[]>('sidebar_favorites_v2', []);
 
   const isPinned = pinned.includes(to);

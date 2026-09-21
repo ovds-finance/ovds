@@ -9,8 +9,6 @@ This section covers the full pre-billing workflow — from sending a quote, thro
 
 ---
 
-## Sales Cycle Overview
-
 ```
 ESTIMATE (Quote)
     │
@@ -62,7 +60,7 @@ An Estimate (quote) is a formal offer sent to a customer before work begins. It 
 
 Once the customer approves:
 
-1. Open the estimate → click **More Actions → Convert to Invoice**.
+1. Open the estimate and click **More Actions → Convert to Invoice**.
 2. All items, pricing, and customer details are copied into a new invoice template.
 3. Review and adjust if needed (e.g. update the invoice date or due date).
 4. Click **Save** or **Send**.
@@ -94,7 +92,7 @@ A proforma is **not** a legally binding invoice and does not post to the GL.
 
 Once goods are delivered or services rendered:
 
-1. Open the proforma → click **Convert to Invoice**.
+1. Open the proforma and click **Convert to Invoice**.
 2. The invoice is pre-filled with all proforma details — no re-entry needed.
 3. Adjust dates and any delivered quantities if partial.
 4. Click **Save** — the invoice is now live and posts to the GL when paid.
@@ -135,7 +133,7 @@ ESTIMATE ──► SALES ORDER ──► (Goods / Service Delivered) ──► I
 
 ### Converting a Sales Order to an Invoice
 
-1. Open the confirmed SO → click **Create Invoice**.
+1. Open the confirmed SO and click **Create Invoice**.
 2. The invoice is pre-filled with the customer details and all SO line items.
 3. If only partial delivery occurred, adjust the quantities to match what was actually delivered.
 4. Click **Save** and then **Send** to the customer.

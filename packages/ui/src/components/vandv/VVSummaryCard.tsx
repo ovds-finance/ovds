@@ -22,9 +22,9 @@ export interface VVSummaryCardProps {
 
 const TONE: Record<VVCardTone, { value: string; bg: string; badge?: string }> = {
   neutral: { value: 'text-slate-800 dark:text-slate-100', bg: 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700' },
-  success: { value: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-white dark:bg-slate-900 border-emerald-200 dark:border-emerald-800', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  success: { value: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]', bg: 'bg-white dark:bg-slate-900 border-[var(--pro-azure-100)] dark:border-green-800', badge: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]' },
   danger:  { value: 'text-rose-600 dark:text-rose-400', bg: 'bg-white dark:bg-slate-900 border-rose-200 dark:border-rose-800', badge: 'bg-rose-50 text-rose-700 border-rose-200' },
-  info:    { value: 'text-aki-blue dark:text-blue-400', bg: 'bg-white dark:bg-slate-900 border-aki-blue/30 dark:border-blue-800', badge: 'bg-sky-50 text-sky-700 border-sky-200' },
+  info:    { value: 'text-[var(--pro-azure)] dark:text-blue-400', bg: 'bg-white dark:bg-slate-900 border-[var(--pro-azure)]/30 dark:border-blue-800', badge: 'bg-sky-50 text-sky-700 border-sky-200' },
   credit:  { value: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50/40 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800' },
 };
 

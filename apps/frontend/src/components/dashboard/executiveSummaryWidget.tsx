@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import {
   TrendingUp, TrendingDown, Minus, ArrowRight,
   Banknote, Users, Receipt, Activity, Zap,
   AlertTriangle, CheckCircle2, BarChart3, Clock,
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+
+import { useAuth } from '../../rbac/AuthContext';
 import api from '../../services/api';
 import { fmtCompact } from '../../utils/fmt';
-import { useAuth } from '../../rbac/AuthContext';
 
 interface KPI {
   label: string;
@@ -32,7 +33,7 @@ interface ExecutiveSummaryWidgetProps {
 
 const TrendIcon: React.FC<{ trend?: number }> = ({ trend }) => {
   if (trend === undefined || trend === null) return null;
-  if (trend > 0) return <TrendingUp size={10} className="text-emerald-500" />;
+  if (trend > 0) return <TrendingUp size={10} className="text-[var(--pro-azure)]" />;
   if (trend < 0) return <TrendingDown size={10} className="text-rose-500" />;
   return <Minus size={10} className="text-slate-400" />;
 };
@@ -76,8 +77,8 @@ const ExecutiveSummaryWidget: React.FC<ExecutiveSummaryWidgetProps> = ({
       trend: mom(payrollCurrent?.totalNet ?? 0, payrollPrev?.totalNet ?? 0),
       trendLabel: 'vs last month',
       icon: <Banknote size={16} />,
-      color: 'text-emerald-700 dark:text-emerald-400',
-      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
+      color: 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]',
+      bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
       link: '/hr/payroll',
     },
     {
@@ -85,8 +86,8 @@ const ExecutiveSummaryWidget: React.FC<ExecutiveSummaryWidgetProps> = ({
       value: String(dashStats?.totalEmployees ?? 0),
       trend: undefined,
       icon: <Users size={16} />,
-      color: 'text-emerald-600 dark:text-emerald-400 dark:text-emerald-400',
-      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
+      color: 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
+      bg: 'bg-[var(--pro-azure-50)] dark:bg-green-950/30',
       link: '/hr/employees',
     },
     {
@@ -122,8 +123,8 @@ const ExecutiveSummaryWidget: React.FC<ExecutiveSummaryWidgetProps> = ({
       value: fmt(ovdsSummary?.netProfit ?? 0),
       trend: undefined,
       icon: <BarChart3 size={16} />,
-      color: (ovdsSummary?.netProfit ?? 0) >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400',
-      bg: (ovdsSummary?.netProfit ?? 0) >= 0 ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-rose-50 dark:bg-rose-950/30',
+      color: (ovdsSummary?.netProfit ?? 0) >= 0 ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-700 dark:text-rose-400',
+      bg: (ovdsSummary?.netProfit ?? 0) >= 0 ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/30' : 'bg-rose-50 dark:bg-rose-950/30',
       link: '/accounting',
     },
   ];
@@ -149,7 +150,7 @@ const ExecutiveSummaryWidget: React.FC<ExecutiveSummaryWidgetProps> = ({
   const SEVERITY_STYLES = {
     critical: 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400',
     warning:  'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400',
-    info:     'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 dark:text-emerald-400',
+    info:     'bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-[var(--pro-azure-100)] dark:border-green-800 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]',
   };
 
   return (
@@ -157,15 +158,15 @@ const ExecutiveSummaryWidget: React.FC<ExecutiveSummaryWidgetProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800/30 dark:to-slate-900">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl flex items-center justify-center">
-            <Zap size={15} className="text-emerald-600 dark:text-emerald-400" />
+          <div className="w-8 h-8 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl flex items-center justify-center">
+            <Zap size={15} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
           <div>
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Company Dashboard</p>
             <p className="ovds-caption">Live KPIs · {new Date().toLocaleDateString('en-ET', { month: 'long', year: 'numeric' })}</p>
           </div>
         </div>
-        <Link to="/reports" className="flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+        <Link to="/reports" className="flex items-center gap-1 text-xs font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
           Full Reports <ArrowRight size={11} />
         </Link>
       </div>
@@ -190,7 +191,7 @@ const ExecutiveSummaryWidget: React.FC<ExecutiveSummaryWidgetProps> = ({
                 {kpi.trend !== undefined && (
                   <div className="flex items-center gap-0.5 mb-0.5">
                     <TrendIcon trend={kpi.trend} />
-                    <span className={`text-[9px] font-bold ${kpi.trend > 0 ? 'text-emerald-500' : kpi.trend < 0 ? 'text-rose-500' : 'text-slate-400'}`}>
+                    <span className={`text-[9px] font-bold ${kpi.trend > 0 ? 'text-[var(--pro-azure)]' : kpi.trend < 0 ? 'text-rose-500' : 'text-slate-400'}`}>
                       {kpi.trend > 0 ? '+' : ''}{kpi.trend}%
                     </span>
                   </div>
@@ -219,11 +220,11 @@ const ExecutiveSummaryWidget: React.FC<ExecutiveSummaryWidgetProps> = ({
       {/* Footer */}
       <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link to="/accounting" className="text-[10px] font-bold text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors">Accounting</Link>
+          <Link to="/accounting" className="text-[10px] font-bold text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">Accounting</Link>
           <span className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-700" />
-          <Link to="/reports" className="text-[10px] font-bold text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors">Reports</Link>
+          <Link to="/reports" className="text-[10px] font-bold text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">Reports</Link>
           <span className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-700" />
-          <Link to="/reports/insights" className="text-[10px] font-bold text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors">Insights</Link>
+          <Link to="/reports/insights" className="text-[10px] font-bold text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">Insights</Link>
         </div>
         <span className="text-[9px] text-slate-300 dark:text-slate-600">
           {user?.role ?? 'ADMIN'} view

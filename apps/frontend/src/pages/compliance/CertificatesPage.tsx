@@ -1,25 +1,27 @@
-import React, { useState } from 'react';
 import {
   useEimsCertificates,
   useEimsCertificateExpiry,
   useGenerateCsr,
   useInstallCertificate,
 } from '@ovds/features/eims';
-import toast from 'react-hot-toast';
-import { useBusiness } from '../../context/businessContext';
-import { usePageTitle } from '../../hooks/usePageTitle';
+import { downloadBlob } from '@ovds/ui';
 import {
   Key, Upload, AlertTriangle, Plus, Trash2, Download, Mail, FileText, Shield,
 } from 'lucide-react';
-import { downloadBlob } from '@ovds/ui';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+
+import { useBusiness } from '../../context/businessContext';
+import { usePageTitle } from '../../hooks/usePageTitle';
+
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING: 'text-amber-600 bg-amber-50',
-  ISSUED: 'text-emerald-600 bg-emerald-50',
-  ACTIVE: 'text-emerald-600 bg-emerald-50',
+  ISSUED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
+  ACTIVE: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
   EXPIRED: 'text-rose-600 bg-rose-50',
   REVOKED: 'text-rose-600 bg-rose-50',
-  INSTALLED: 'text-emerald-600 bg-emerald-50',
+  INSTALLED: 'text-[var(--pro-azure)] bg-[var(--pro-azure-50)]',
 };
 
 const Badge: React.FC<{ status: string }> = ({ status }) => (

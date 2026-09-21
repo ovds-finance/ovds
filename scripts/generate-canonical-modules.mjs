@@ -1,4 +1,4 @@
-// Generates the canonical, DDD-aligned module packages under packages/modules/<domain>.
+﻿// Generates the canonical, DDD-aligned module packages under packages/modules/<domain>.
 // Each module owns its domain types (src/domain), DTOs (src/dto) and a web/UI slice
 // (src/web), and is exposed through a single barrel (src/index.ts). The barrels
 // centralize types and re-export the existing (scattered) feature/domain packages so
@@ -16,18 +16,18 @@ const modulesDir = join(root, 'packages', 'modules');
 const MODULES = [
   { dir: 'auth',      title: 'Authentication, Users & Access Control', domain: '@ovds/features/auth',  web: '@ovds/features/auth' },
   { dir: 'settings',  title: 'Company Profile, Currencies & Localization', domain: '@ovds/features/settings', web: '@ovds/features/settings' },
-  { dir: 'ledger',    title: 'General Ledger, Chart of Accounts & Double-Entry', domain: '@ovds/domains/accounting', web: '@ovds/features/accounting' },
-  { dir: 'tax',       title: 'Tax, VAT, WHT & Declarations', domain: '@ovds/domains/tax', web: '@ovds/features/tax' },
-  { dir: 'sales',     title: 'Sales, Invoicing, Customers & CRM', domain: '@ovds/domains/sales', web: '@ovds/features/sales' },
-  { dir: 'purchases', title: 'Purchases, Expenses, Bills & Vendors', domain: '@ovds/domains/purchases', web: '@ovds/features/purchases' },
-  { dir: 'banking',   title: 'Banking, Transactions & Reconciliation', domain: '@ovds/domains/banking', web: '@ovds/features/banking' },
-  { dir: 'items',     title: 'Items, Inventory & Manufacturing', domain: '@ovds/domains/items', web: '@ovds/features/items' },
-  { dir: 'hr',        title: 'HR, Payroll & Workforce', domain: '@ovds/domains/hr', web: '@ovds/features/hr' },
-  { dir: 'projects',  title: 'Project Accounting', domain: '@ovds/domains/projects', web: '@ovds/features/projects' },
-  { dir: 'compliance',title: 'Compliance, Audit & Governance', domain: '@ovds/domains/compliance', web: '@ovds/features/compliance' },
+  { dir: 'ledger',    title: 'General Ledger, Chart of Accounts & Double-Entry', domain: '@ovds/domains-accounting', web: '@ovds/features/accounting' },
+  { dir: 'tax',       title: 'Tax, VAT, WHT & Declarations', domain: '@ovds/domains-tax', web: '@ovds/features/tax' },
+  { dir: 'sales',     title: 'Sales, Invoicing, Customers & CRM', domain: '@ovds/domains-sales', web: '@ovds/features/sales' },
+  { dir: 'purchases', title: 'Purchases, Expenses, Bills & Vendors', domain: '@ovds/domains-purchases', web: '@ovds/features/purchases' },
+  { dir: 'banking',   title: 'Banking, Transactions & Reconciliation', domain: '@ovds/domains-banking', web: '@ovds/features/banking' },
+  { dir: 'items',     title: 'Items, Inventory & Manufacturing', domain: '@ovds/domains-items', web: '@ovds/features/items' },
+  { dir: 'hr',        title: 'HR, Payroll & Workforce', domain: '@ovds/domains-hr', web: '@ovds/features/hr' },
+  { dir: 'projects',  title: 'Project Accounting', domain: '@ovds/domains-projects', web: '@ovds/features/projects' },
+  { dir: 'compliance',title: 'Compliance, Audit & Governance', domain: '@ovds/domains-compliance', web: '@ovds/features/compliance' },
   { dir: 'security',  title: 'Security & Cyber Audit', domain: '@ovds/features/security', web: '@ovds/features/security' },
-  { dir: 'platform',  title: 'Platform, App Store & Releases', domain: '@ovds/domains/platform', web: '@ovds/features/platform' },
-  { dir: 'reports',   title: 'Reports & Analytics', domain: '@ovds/domains/reporting', web: '@ovds/features/reporting' },
+  { dir: 'platform',  title: 'Platform, App Store & Releases', domain: '@ovds/domains-platform', web: '@ovds/features/platform' },
+  { dir: 'reports',   title: 'Reports & Analytics', domain: '@ovds/domains-reporting', web: '@ovds/features/reporting' },
   { dir: 'common',    title: 'Common Cross-Cutting Utilities', domain: '@ovds/shared', web: '@ovds/ui' },
 ];
 
@@ -180,7 +180,7 @@ function readme(m) {
 
 Canonical OVDS module (\`packages/modules/${m.dir}\`).
 
-Akaunting-inspired, DDD-aligned module layout:
+Ovds SaaS DDD-aligned module layout:
 
 \`\`\`
 modules/${m.dir}/

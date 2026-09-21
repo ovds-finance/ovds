@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
 import {
   X, Calendar, Download, Clock, Mail, CheckCircle, Trash2,
   Plus, RefreshCw, FileText, Banknote, BarChart3, ShieldCheck,
 } from 'lucide-react';
-import { useLocalStorage } from '../hooks';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+
+import { useLocalStorage } from '../hooks';
+
 
 interface ScheduledExport {
   id: string;
@@ -109,7 +111,7 @@ const ScheduledExportModal: React.FC<Props> = ({ onClose }) => {
       <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150">
         {/* Header */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100 dark:border-slate-800">
-          <Calendar size={18} className="text-emerald-600 dark:text-emerald-400" />
+          <Calendar size={18} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           <h2 className="font-semibold text-slate-900 dark:text-white flex-1">Scheduled Exports</h2>
           <button onClick={onClose} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 transition-colors">
             <X size={16} />
@@ -128,7 +130,7 @@ const ScheduledExportModal: React.FC<Props> = ({ onClose }) => {
 
           {schedules.map(s => (
             <div key={s.id} className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${s.active ? 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800' : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 opacity-60'}`}>
-              <div className="w-9 h-9 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+              <div className="w-9 h-9 bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-xl flex items-center justify-center text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0">
                 {REPORT_TYPES.find(r => r.key === s.reportType)?.icon ?? <FileText size={14} />}
               </div>
               <div className="flex-1 min-w-0">
@@ -140,16 +142,16 @@ const ScheduledExportModal: React.FC<Props> = ({ onClose }) => {
                   <span className="text-[10px] text-slate-400 flex items-center gap-1">
                     <Clock size={9} /> Next: {nextRunLabel(s)}
                   </span>
-                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded uppercase tracking-wider ${s.format === 'csv' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded uppercase tracking-wider ${s.format === 'csv' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : 'bg-rose-100 text-rose-700'}`}>
                     {s.format.toUpperCase()}
                   </span>
                 </div>
               </div>
               <div className="flex items-center gap-1 shrink-0">
-                <button onClick={() => runNow(s)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-emerald-600 dark:text-emerald-400 transition-colors" title="Run now">
+                <button onClick={() => runNow(s)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors" title="Run now">
                   <RefreshCw size={13} />
                 </button>
-                <button onClick={() => toggleActive(s.id)} className={`p-1.5 rounded-lg transition-colors ${s.active ? 'text-emerald-500 hover:bg-emerald-50' : 'text-slate-400 hover:bg-slate-100'}`} title={s.active ? 'Pause' : 'Resume'}>
+                <button onClick={() => toggleActive(s.id)} className={`p-1.5 rounded-lg transition-colors ${s.active ? 'text-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)]' : 'text-slate-400 hover:bg-slate-100'}`} title={s.active ? 'Pause' : 'Resume'}>
                   <CheckCircle size={13} />
                 </button>
                 <button onClick={() => deleteSchedule(s.id)} className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-500 transition-colors" title="Delete">
@@ -161,7 +163,7 @@ const ScheduledExportModal: React.FC<Props> = ({ onClose }) => {
 
           {/* Add form */}
           {showForm && (
-            <div className="border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/10 rounded-xl p-5 space-y-4 animate-in fade-in duration-150">
+            <div className="border border-[var(--pro-azure-100)] dark:border-green-800 bg-[var(--pro-azure-50)]/50 dark:bg-green-950/10 rounded-xl p-5 space-y-4 animate-in fade-in duration-150">
               <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">New Scheduled Export</p>
 
               <div className="grid grid-cols-2 gap-3">
@@ -219,7 +221,7 @@ const ScheduledExportModal: React.FC<Props> = ({ onClose }) => {
 
               <div className="flex gap-2 pt-1">
                 <button onClick={handleSave} disabled={saving}
-                  className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg text-xs font-medium hover:bg-emerald-600 transition-all disabled:opacity-60">
+                  className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-lg text-xs font-medium hover:bg-[var(--pro-azure-dark)] transition-all disabled:opacity-60">
                   <Download size={13} /> {saving ? 'Saving…' : 'Create Schedule'}
                 </button>
                 <button onClick={() => setShowForm(false)} className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-medium hover:bg-slate-200 transition-all">
@@ -234,7 +236,7 @@ const ScheduledExportModal: React.FC<Props> = ({ onClose }) => {
         <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <p className="ovds-caption">{schedules.filter(s => s.active).length} active schedules</p>
           <button onClick={() => setShowForm(true)} disabled={showForm}
-            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 text-white rounded-lg text-xs font-medium hover:bg-emerald-600 transition-all disabled:opacity-50">
+            className="flex items-center gap-1.5 px-4 py-2 bg-[var(--pro-azure)] text-white rounded-lg text-xs font-medium hover:bg-[var(--pro-azure-dark)] transition-all disabled:opacity-50">
             <Plus size={13} /> New Schedule
           </button>
         </div>

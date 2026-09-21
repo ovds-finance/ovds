@@ -1,16 +1,17 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import api from '../../services/api';
-import toast from 'react-hot-toast';
+import { Skeleton } from '@ovds/ui';
 import {
   Landmark, Plus, ChevronDown, Trash2, Search, Download,
   TrendingUp, TrendingDown, CheckCircle2, Clock, X, Link2,
   RefreshCw, Repeat, FileText,
   AlertTriangle, Info, Zap, Eye, SplitSquareHorizontal, Activity,
 } from 'lucide-react';
-import { Skeleton } from '@ovds/ui';
-import { confirm } from '../../utils/confirm';
-import { downloadCSV } from '../../utils/download';
+import React, { useState, useMemo, useCallback } from 'react';
+import toast from 'react-hot-toast';
+
 import { useAuth } from '../../rbac/AuthContext';
+import api from '../../services/api';
+import { downloadCSV, normalizeOcrError } from '../../utils';
+import { confirm } from '../../utils/confirm';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('en-ET', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
@@ -37,8 +38,8 @@ const ACCOUNT_TYPE_LABELS: Record<string, string> = {
 };
 
 const ACCOUNT_TYPE_COLORS: Record<string, string> = {
-  CURRENT: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
-  SAVINGS: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
+  CURRENT: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/40 dark:text-[var(--pro-azure-light)]',
+  SAVINGS: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/40 dark:text-[var(--pro-azure-light)]',
   FIXED_DEPOSIT: 'bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400',
   FOREIGN: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400',
   CREDIT_CARD: 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400',
@@ -55,23 +56,23 @@ const INTERVAL_LABELS: Record<string, string> = {
 };
 
 const BANK_COLORS: Record<string, string> = {
-  'Commercial Bank of Ethiopia': 'bg-blue-600',
+  'Commercial Bank of Ethiopia': 'bg-[var(--pro-azure)]',
   'Dashen Bank': 'bg-red-600',
   'Awash Bank': 'bg-green-600',
   'Abyssinia Bank': 'bg-purple-600',
   'Nib Bank': 'bg-orange-600',
   'Cooperative Bank of Oromia': 'bg-teal-600',
   'Lion Bank': 'bg-yellow-600',
-  'United Bank': 'bg-indigo-600',
+  'United Bank': 'bg-[var(--pro-azure)]',
   'Bunna Bank': 'bg-pink-600',
   'Zemen Bank': 'bg-cyan-600',
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  ACTIVE: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
+  ACTIVE: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/40 dark:text-[var(--pro-azure-light)]',
   PENDING: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400',
-  PROCESSING: 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400',
-  COMPLETED: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
+  PROCESSING: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]',
+  COMPLETED: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/40 dark:text-[var(--pro-azure-light)]',
   FAILED: 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400',
   RECONCILED: 'bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400',
 };
@@ -139,7 +140,7 @@ const LinkTransactionModal: React.FC<{
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
           <div>
             <p className="font-semibold text-slate-800 dark:text-white flex items-center gap-2">
-              <Link2 size={15} className="text-emerald-600 dark:text-emerald-400" /> Connect to Invoice / Bill
+              <Link2 size={15} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" /> Connect to Invoice / Bill
             </p>
             <p className="text-xs text-slate-400 mt-0.5">
               {Number(txn.amount) >= 0 ? '+' : ''}{fmt(Number(txn.amount))} · {txn.description}
@@ -151,9 +152,9 @@ const LinkTransactionModal: React.FC<{
         </div>
 
         {/* IFRS note */}
-        <div className="px-5 py-2.5 bg-emerald-50 dark:bg-emerald-950/20 border-b border-emerald-100 dark:border-emerald-900/40 flex items-start gap-2">
-          <Info size={12} className="text-emerald-500 shrink-0 mt-0.5" />
-          <p className="text-[10px] text-emerald-700 dark:text-emerald-400">
+        <div className="px-5 py-2.5 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-b border-[var(--pro-azure-100)] dark:border-green-900/40 flex items-start gap-2">
+          <Info size={12} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
+          <p className="text-[10px] text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
             <strong>IAS 7 / IFRS 9:</strong> Linking reconciles the bank transaction against the corresponding AR/AP entry, completing the double-entry cycle and clearing the outstanding balance.
           </p>
         </div>
@@ -162,7 +163,7 @@ const LinkTransactionModal: React.FC<{
         <div className="flex gap-1 px-5 pt-3 shrink-0">
           {(['invoice', 'bill'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all capitalize ${tab === t ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all capitalize ${tab === t ? 'bg-[var(--pro-azure)] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
               {t === 'invoice' ? 'Invoices (AR)' : 'Bills (AP)'}
             </button>
           ))}
@@ -191,7 +192,7 @@ const LinkTransactionModal: React.FC<{
             const due = item.dueDate ? fmtDate(item.dueDate) : '—';
             const isOverdue = item.dueDate && new Date(item.dueDate) < new Date();
             return (
-              <div key={item.id} className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-emerald-500/40 dark:border-emerald-700 transition-colors">
+              <div key={item.id} className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-[var(--pro-azure)]/40 dark:border-green-700 transition-colors">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold text-slate-700 dark:text-white">{num}</span>
@@ -308,16 +309,16 @@ const SplitTransactionModal: React.FC<{
             </div>
           ))}
 
-          <button onClick={addSplit} className="w-full py-2 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-400 hover:border-emerald-600 hover:text-emerald-600 dark:text-emerald-400 transition-colors">
+          <button onClick={addSplit} className="w-full py-2 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-400 hover:border-[var(--pro-azure)] hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] transition-colors">
             + Add Split
           </button>
 
           {/* Balance indicator */}
-          <div className={`flex items-center justify-between p-3 rounded-xl ${isBalanced ? 'bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800' : 'bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800'}`}>
-            <span className={`text-xs font-bold ${isBalanced ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>
+          <div className={`flex items-center justify-between p-3 rounded-xl ${isBalanced ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800' : 'bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800'}`}>
+            <span className={`text-xs font-bold ${isBalanced ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-700 dark:text-rose-400'}`}>
               {isBalanced ? '✓ Balanced' : `Remaining: ETB ${fmt(Math.abs(remaining))}`}
             </span>
-            <span className={`text-sm font-semibold tabular-nums ${isBalanced ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>
+            <span className={`text-sm font-semibold tabular-nums ${isBalanced ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-700 dark:text-rose-400'}`}>
               {fmt(splits.reduce((s, sp) => s + (Number(sp.amount) || 0), 0))} / {fmt(totalAmount)}
             </span>
           </div>
@@ -381,7 +382,7 @@ const RecurringModal: React.FC<{
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
           <div>
             <p className="font-semibold text-slate-800 dark:text-white flex items-center gap-2">
-              <Repeat size={15} className="text-emerald-500" /> New Recurring Transaction
+              <Repeat size={15} className="text-[var(--pro-azure)]" /> New Recurring Transaction
             </p>
             <p className="text-xs text-slate-400 mt-0.5">{bankName}</p>
           </div>
@@ -389,9 +390,9 @@ const RecurringModal: React.FC<{
         </div>
 
         <div className="p-5 space-y-4">
-          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl flex items-start gap-2">
-            <Info size={12} className="text-emerald-600 shrink-0 mt-0.5" />
-            <p className="text-[10px] text-emerald-700 dark:text-emerald-400">
+          <div className="p-3 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl flex items-start gap-2">
+            <Info size={12} className="text-[var(--pro-azure)] shrink-0 mt-0.5" />
+            <p className="text-[10px] text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]">
               <strong>IAS 7:</strong> Recurring transactions (rent, subscriptions, loan repayments) are automatically scheduled. Each posting creates a bank transaction and updates the cash flow statement.
             </p>
           </div>
@@ -400,7 +401,7 @@ const RecurringModal: React.FC<{
           <div className="grid grid-cols-2 gap-2">
             {(['CREDIT', 'DEBIT'] as const).map(t => (
               <button key={t} type="button" onClick={() => setForm(f => ({ ...f, type: t }))}
-                className={`py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === t ? (t === 'CREDIT' ? 'bg-emerald-500 text-white' : 'bg-rose-600 text-white') : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
+                className={`py-2.5 rounded-lg text-sm font-medium transition-all ${form.type === t ? (t === 'CREDIT' ? 'bg-[var(--pro-azure)] text-white' : 'bg-rose-600 text-white') : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
                 {t === 'CREDIT' ? '+ Credit (In)' : '− Debit (Out)'}
               </button>
             ))}
@@ -503,7 +504,7 @@ const BankFeedsPanel: React.FC<{
       };
       reader.readAsDataURL(file);
     } catch (err: any) {
-      toast.error(err.response?.data?.message ?? 'OCR failed');
+      toast.error(normalizeOcrError(err.response?.data?.message ?? 'OCR failed'));
       setOcrLoading(false);
     }
   };
@@ -545,7 +546,7 @@ const BankFeedsPanel: React.FC<{
         <div className="flex gap-1 px-5 pt-3 shrink-0">
           {(['csv', 'ocr'] as const).map(t => (
             <button key={t} onClick={() => { setTab(t); setRows([]); setFile(null); }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${tab === t ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${tab === t ? 'bg-[var(--pro-azure)] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
               {t === 'csv' ? '📄 CSV Import' : '🔍 AI OCR (Image/PDF)'}
             </button>
           ))}
@@ -558,7 +559,7 @@ const BankFeedsPanel: React.FC<{
               onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}
               onDragOver={e => e.preventDefault()}
               onClick={() => fileRef.current?.click()}
-              className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-10 text-center cursor-pointer hover:border-emerald-600 hover:bg-emerald-50/20 dark:hover:bg-emerald-950/10 transition-all"
+              className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-10 text-center cursor-pointer hover:border-[var(--pro-azure)] hover:bg-[var(--pro-azure-50)]/20 dark:hover:bg-green-950/10 transition-all"
             >
               <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center mx-auto mb-3">
                 {tab === 'csv' ? <FileText size={22} className="text-slate-400" /> : <Eye size={22} className="text-slate-400" />}
@@ -599,7 +600,7 @@ const BankFeedsPanel: React.FC<{
                           <input type="checkbox"
                             checked={rows.filter(r => r.status !== 'error').every(r => r.selected)}
                             onChange={() => { const all = rows.filter(r => r.status !== 'error').every(r => r.selected); setRows(prev => prev.map(r => r.status === 'error' ? r : { ...r, selected: !all })); }}
-                            className="rounded border-slate-300 text-emerald-600 dark:text-emerald-400" />
+                            className="rounded border-slate-300 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
                         </th>
                         {['Date','Description','Type','Amount','Ref','Status'].map(h => (
                           <th key={h} className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{h}</th>
@@ -608,19 +609,19 @@ const BankFeedsPanel: React.FC<{
                     </thead>
                     <tbody>
                       {rows.map((r, i) => (
-                        <tr key={i} className={`border-b border-slate-50 dark:border-slate-700/50 ${r.status === 'error' ? 'bg-rose-50/40 dark:bg-rose-950/10' : r.selected ? 'bg-emerald-50/20 dark:bg-emerald-950/10' : ''}`}>
-                          <td className="px-3 py-2">{r.status !== 'error' && <input type="checkbox" checked={r.selected} onChange={() => setRows(prev => prev.map((row, idx) => idx === i ? { ...row, selected: !row.selected } : row))} className="rounded border-slate-300 text-emerald-600 dark:text-emerald-400" />}</td>
+                        <tr key={i} className={`border-b border-slate-50 dark:border-slate-700/50 ${r.status === 'error' ? 'bg-rose-50/40 dark:bg-rose-950/10' : r.selected ? 'bg-[var(--pro-azure-50)]/20 dark:bg-green-950/10' : ''}`}>
+                          <td className="px-3 py-2">{r.status !== 'error' && <input type="checkbox" checked={r.selected} onChange={() => setRows(prev => prev.map((row, idx) => idx === i ? { ...row, selected: !row.selected } : row))} className="rounded border-slate-300 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />}</td>
                           <td className="px-3 py-2 font-mono text-slate-500 whitespace-nowrap">{r.date || '—'}</td>
                           <td className="px-3 py-2 text-slate-700 dark:text-slate-300 max-w-[160px] truncate">{r.description || '—'}</td>
                           <td className="px-3 py-2">
-                            <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${r.type === 'CREDIT' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>{r.type}</span>
+                            <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${r.type === 'CREDIT' ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]' : 'bg-rose-100 text-rose-700'}`}>{r.type}</span>
                           </td>
-                          <td className={`px-3 py-2 font-semibold tabular-nums ${r.type === 'CREDIT' ? 'text-emerald-700' : 'text-rose-700'}`}>
+                          <td className={`px-3 py-2 font-semibold tabular-nums ${r.type === 'CREDIT' ? 'text-[var(--pro-azure-dark)]' : 'text-rose-700'}`}>
                             {r.type === 'CREDIT' ? '+' : '-'}{fmt(r.amount)}
                           </td>
                           <td className="px-3 py-2 font-mono text-slate-400 text-[10px]">{r.reference ?? '—'}</td>
                           <td className="px-3 py-2">
-                            {r.status === 'error' ? <span className="text-[9px] text-rose-600 font-bold">{r.error}</span> : <span className="text-[9px] text-emerald-600 font-bold">Ready</span>}
+                            {r.status === 'error' ? <span className="text-[9px] text-rose-600 font-bold">{r.error}</span> : <span className="text-[9px] text-[var(--pro-azure)] font-bold">Ready</span>}
                           </td>
                         </tr>
                       ))}
@@ -899,7 +900,7 @@ const BankAccountCard: React.FC<BankAccountCardProps> = ({
             <p className="text-xl font-semibold text-slate-800 dark:text-slate-100 tabular-nums">
               {(bank.currencyCode ?? 'ETB')} {fmt(displayBalance)}
             </p>
-            <div className={`flex items-center justify-end gap-1 mt-0.5 text-xs font-bold ${netChange >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+            <div className={`flex items-center justify-end gap-1 mt-0.5 text-xs font-bold ${netChange >= 0 ? 'text-[var(--pro-azure)]' : 'text-rose-600'}`}>
               {netChange >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
               {netChange >= 0 ? '+' : ''}{fmt(netChange)}
             </div>
@@ -931,12 +932,12 @@ const BankAccountCard: React.FC<BankAccountCardProps> = ({
             </span>
           )}
           {linkedCount > 0 && (
-            <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-1 rounded-full">
+            <span className="flex items-center gap-1 text-[10px] font-bold text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/20 px-2 py-1 rounded-full">
               <Link2 size={10} /> {linkedCount} linked
             </span>
           )}
           {recurringTemplates.length > 0 && (
-            <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-1 rounded-full">
+            <span className="flex items-center gap-1 text-[10px] font-bold text-[var(--pro-azure)] bg-[var(--pro-azure-50)] dark:bg-green-950/20 px-2 py-1 rounded-full">
               <Repeat size={10} /> {recurringTemplates.length} recurring
             </span>
           )}
@@ -971,7 +972,7 @@ const BankAccountCard: React.FC<BankAccountCardProps> = ({
             )}
             {pendingCount > 0 && (
               <button onClick={reconcileAll}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold hover:bg-emerald-100 dark:hover:bg-emerald-950/40 transition-colors">
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] rounded-xl text-xs font-bold hover:bg-[var(--pro-azure-100)] dark:hover:bg-green-950/40 transition-colors">
                 <CheckCircle2 size={12} /> Reconcile All
               </button>
             )}
@@ -996,7 +997,7 @@ const BankAccountCard: React.FC<BankAccountCardProps> = ({
           <div className="flex gap-1 px-5 pt-3">
             {(['transactions', 'recurring'] as const).map(t => (
               <button key={t} onClick={() => { setActiveTab(t); if (t === 'recurring') loadRecurring(); }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all capitalize ${activeTab === t ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all capitalize ${activeTab === t ? 'bg-[var(--pro-azure)] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
                 {t === 'transactions' ? `Transactions (${txns.length})` : `Recurring (${recurringTemplates.length})`}
               </button>
             ))}
@@ -1016,7 +1017,7 @@ const BankAccountCard: React.FC<BankAccountCardProps> = ({
                 <div className="flex gap-1">
                   {(['ALL', 'PENDING', 'RECONCILED'] as const).map(s => (
                     <button key={s} onClick={() => setStatusFilter(s)}
-                      className={`px-2.5 py-1.5 rounded-xl text-[10px] font-bold transition-all ${statusFilter === s ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
+                      className={`px-2.5 py-1.5 rounded-xl text-[10px] font-bold transition-all ${statusFilter === s ? 'bg-[var(--pro-azure)] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
                       {s}
                     </button>
                   ))}
@@ -1046,14 +1047,14 @@ const BankAccountCard: React.FC<BankAccountCardProps> = ({
                           const isLinked = t.reference?.startsWith('INV:') || t.reference?.startsWith('BILL:');
                           return (
                             <div key={t.id} className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group rounded-xl">
-                              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${isCredit ? 'bg-emerald-100 dark:bg-emerald-950/40' : 'bg-rose-100 dark:bg-rose-950/40'}`}>
-                                {isCredit ? <TrendingUp size={14} className="text-emerald-600" /> : <TrendingDown size={14} className="text-rose-600" />}
+                              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${isCredit ? 'bg-[var(--pro-azure-100)] dark:bg-green-950/40' : 'bg-rose-100 dark:bg-rose-950/40'}`}>
+                                {isCredit ? <TrendingUp size={14} className="text-[var(--pro-azure)]" /> : <TrendingDown size={14} className="text-rose-600" />}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
                                   <p className="text-sm font-bold text-slate-700 dark:text-white truncate">{t.description}</p>
-                                  {isLinked && <Link2 size={10} className="text-emerald-400 shrink-0" />}
-                                  {isReconciled && <CheckCircle2 size={10} className="text-emerald-500 shrink-0" />}
+                                  {isLinked && <Link2 size={10} className="text-[var(--pro-azure-light)] shrink-0" />}
+                                  {isReconciled && <CheckCircle2 size={10} className="text-[var(--pro-azure)] shrink-0" />}
                                 </div>
                                 <div className="flex items-center gap-2 mt-0.5">
                                   <span className="ovds-caption">{fmtDate(t.date)}</span>
@@ -1061,7 +1062,7 @@ const BankAccountCard: React.FC<BankAccountCardProps> = ({
                                 </div>
                               </div>
                               <div className="text-right shrink-0">
-                                <p className={`text-sm font-semibold tabular-nums ${isCredit ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>
+                                <p className={`text-sm font-semibold tabular-nums ${isCredit ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-700 dark:text-rose-400'}`}>
                                   {isCredit ? '+' : ''}{fmt(amount)}
                                 </p>
                                 <p className="text-[10px] text-slate-400 tabular-nums">{fmt(t.runningBalance)}</p>
@@ -1071,13 +1072,13 @@ const BankAccountCard: React.FC<BankAccountCardProps> = ({
                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                                   {!isReconciled && (
                                     <button onClick={() => reconcile(t.id)} title="Reconcile"
-                                      className="p-1.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-slate-300 hover:text-emerald-500 transition-colors">
+                                      className="p-1.5 rounded-lg hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-950/30 text-slate-300 hover:text-[var(--pro-azure)] transition-colors">
                                       <CheckCircle2 size={13} />
                                     </button>
                                   )}
                                   {!isLinked && (
                                     <button onClick={() => setShowLink(t)} title="Link to invoice/bill"
-                                      className="p-1.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-slate-300 hover:text-emerald-500 transition-colors">
+                                      className="p-1.5 rounded-lg hover:bg-[var(--pro-azure-50)] dark:hover:bg-green-950/30 text-slate-300 hover:text-[var(--pro-azure)] transition-colors">
                                       <Link2 size={13} />
                                     </button>
                                   )}
@@ -1136,12 +1137,12 @@ const BankAccountCard: React.FC<BankAccountCardProps> = ({
                 const isDue = r.nextDate && new Date(r.nextDate) <= new Date();
                 return (
                   <div key={r.id} className={`flex items-center gap-3 p-3 rounded-xl border ${isDue ? 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800' : 'bg-white dark:bg-slate-800/50 border-slate-100 dark:border-slate-700'}`}>
-                    <Repeat size={14} className={amount >= 0 ? 'text-emerald-600 shrink-0' : 'text-rose-600 shrink-0'} />
+                    <Repeat size={14} className={amount >= 0 ? 'text-[var(--pro-azure)] shrink-0' : 'text-rose-600 shrink-0'} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-slate-700 dark:text-white truncate">{r.description}</p>
                       <p className="ovds-caption">{INTERVAL_LABELS[r.interval] ?? r.interval} · Next: {r.nextDate ? fmtDate(r.nextDate) : '—'}</p>
                     </div>
-                    <span className={`text-sm font-semibold tabular-nums shrink-0 ${amount >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>
+                    <span className={`text-sm font-semibold tabular-nums shrink-0 ${amount >= 0 ? 'text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]' : 'text-rose-700 dark:text-rose-400'}`}>
                       {amount >= 0 ? '+' : ''}{fmt(amount)}
                     </span>
                     <div className="flex gap-1 shrink-0">

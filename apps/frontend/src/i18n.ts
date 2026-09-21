@@ -1,14 +1,16 @@
 import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import toastsData from './i18n/toasts.json';
-import ovdsData from './i18n/ovds.json';
-import hrData from './i18n/hr.json';
-import taxData from './i18n/tax.json';
-import navData from './i18n/nav.json';
-import commonData from './i18n/common.json';
-import ifrsData from './i18n/ifrs.json';
+import { initReactI18next } from 'react-i18next';
+
 import bizRegData from './i18n/business-registration.json';
+import commonData from './i18n/common.json';
+import gettingStartedData from './i18n/getting-started.json';
+import hrData from './i18n/hr.json';
+import ifrsData from './i18n/ifrs.json';
+import navData from './i18n/nav.json';
+import ovdsData from './i18n/ovds.json';
+import taxData from './i18n/tax.json';
+import toastsData from './i18n/toasts.json';
 
 // Base translation data — built from domain-specific files (no monolithic i18n.json)
 // Note: translationData is intentionally empty; all translations come from domain files below.
@@ -63,6 +65,9 @@ const enIfrs: Record<string, any> = deepMerge(ifrs, ifrs.en ?? {});
 const bizReg = bizRegData as any;
 const enBizReg: Record<string, any> = deepMerge(bizReg, bizReg.en ?? {});
 
+const gettingStarted = gettingStartedData as any;
+const enGettingStarted: Record<string, any> = deepMerge(gettingStarted, gettingStarted.en ?? {});
+
 // Build a merged English base that includes all domain files.
 // Called once eagerly — English is always needed.
 function buildEnBase(): Record<string, any> {
@@ -93,6 +98,8 @@ function buildEnBase(): Record<string, any> {
   base = deepMerge(base, { ifrs: enIfrs });
   // Merge business registration domain
   base = deepMerge(base, enBizReg);
+  // Merge getting-started domain
+  base = deepMerge(base, enGettingStarted);
   return base;
 }
 
@@ -127,6 +134,8 @@ function buildLangBase(langKey: string): Record<string, any> {
   base = deepMerge(base, { ifrs: langIfrs });
   const langBizReg = deepMerge(enBizReg, bizReg[langKey] ?? {});
   base = deepMerge(base, langBizReg);
+  const langGs = deepMerge(enGettingStarted, gettingStarted[langKey] ?? {});
+  base = deepMerge(base, langGs);
   return base;
 }
 

@@ -2,17 +2,18 @@
  * AuditLogs — ovds-style audit trail viewer
  * AppPage · AppKpi · AppTable · useApiCrud
  */
-import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { History, RefreshCw, Download, User, Clock, Search } from 'lucide-react';
-import api from '../services/api';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
+import { History, RefreshCw, Download, Clock } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   Btn, SearchBar, EmptyState, Pagination,
 } from '../components/ui';
-import toast from 'react-hot-toast';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import api from '../services/api';
 
 interface AuditLog {
   id: string;
@@ -27,7 +28,7 @@ interface AuditLog {
 type FilterTab = 'ALL' | 'CREATE' | 'UPDATE' | 'DELETE' | 'AUTH';
 
 const ACTION_COLOR: Record<string, string> = {
-  CREATE: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+  CREATE: 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
   UPDATE: 'bg-sky-50 text-sky-700 border-sky-100',
   DELETE: 'bg-rose-50 text-rose-700 border-rose-100',
   LOGIN:  'bg-violet-50 text-violet-700 border-violet-100',
@@ -78,7 +79,7 @@ const AuditLogs: React.FC = () => {
   }, [rows, tab, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total',   value: rows.length,                                                    color: 'emerald' as const },
+    { label: 'Total',   value: rows.length,                                                    color: 'green' as const },
     { label: 'Creates', value: rows.filter(l => getActionGroup(l.action) === 'CREATE').length, color: 'sky' as const },
     { label: 'Updates', value: rows.filter(l => getActionGroup(l.action) === 'UPDATE').length, color: 'amber' as const },
     { label: 'Deletes', value: rows.filter(l => getActionGroup(l.action) === 'DELETE').length, color: 'rose' as const },
@@ -153,7 +154,7 @@ const AuditLogs: React.FC = () => {
                 </AppTd>
                 <AppTd>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-[9px] font-bold shrink-0">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white text-[9px] font-bold shrink-0">
                       {(log.user?.username ?? log.userId).charAt(0).toUpperCase()}
                     </div>
                     <span className="text-[11px] text-slate-700">{log.user?.username ?? log.userId.slice(0, 8) + '…'}</span>

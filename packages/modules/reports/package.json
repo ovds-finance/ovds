@@ -2,9 +2,9 @@
   "name": "@ovds/modules-reports",
   "version": "1.0.0",
   "private": true,
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
   "source": "./src/index.ts",
   "exports": {
     ".": {
@@ -35,10 +35,10 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@ovds/core": "*",
-    "@ovds/domains/reporting": "*",
-    "@ovds/features-reporting": "*",
-    "@ovds/shared": "*",
+    "@ovds/core": "workspace:*",
+    "@ovds/domains-reporting": "workspace:*",
+    "@ovds/features-reporting": "workspace:*",
+    "@ovds/shared": "workspace:*",
     "lucide-react": "0.473.0",
     "react-hot-toast": "2.6.0"
   }

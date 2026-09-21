@@ -1,23 +1,13 @@
-/**
- * FilterBar — horizontal filter/search bar for list pages.
+﻿/**
+ * FilterBar — Ovds SaaS horizontal filter strip.
  *
- * Combines a search input, date range pickers, and arbitrary filter chips
- * into a consistent, accessible bar above data tables.
- *
- * Usage:
- *   <FilterBar
- *     search={search}
- *     onSearchChange={setSearch}
- *     filters={[
- *       { key: 'status', label: 'Status', options: statusOptions, value: statusFilter, onChange: setStatusFilter },
- *     ]}
- *     dateFrom={dateFrom}
- *     dateTo={dateTo}
- *     onDateFromChange={setDateFrom}
- *     onDateToChange={setDateTo}
- *     onReset={resetFilters}
- *     count={totalCount}
- *   />
+ * Design:
+ *  - Sits above data tables; light grey bg (var(--sys-bg-subtle)), 1px bottom border
+ *  - Search input: green focus ring, magnifier left icon
+ *  - Dropdown selects: consistent 12px font, green focus ring
+ *  - Date inputs: same style as selects
+ *  - Count badge: Ovds SaaS green pill
+ *  - Reset: rose-text ghost button
  */
 import React from 'react';
 import { X, Search, SlidersHorizontal } from 'lucide-react';
@@ -28,37 +18,54 @@ export interface FilterOption {
 }
 
 export interface FilterDef {
-  key:      string;
-  label:    string;
-  options:  FilterOption[];
-  value:    string;
+  key: string;
+  label: string;
+  options: FilterOption[];
+  value: string;
   onChange: (value: string) => void;
-  /** If true, include an "All" option as the first option */
   showAll?: boolean;
 }
 
 export interface FilterBarProps {
-  /** Search query */
-  search?:          string;
-  onSearchChange?:  (v: string) => void;
+  search?: string;
+  onSearchChange?: (v: string) => void;
   searchPlaceholder?: string;
-  /** Additional filter dropdowns */
-  filters?:         FilterDef[];
-  /** Date range */
-  dateFrom?:        string;
-  dateTo?:          string;
+  filters?: FilterDef[];
+  dateFrom?: string;
+  dateTo?: string;
   onDateFromChange?: (v: string) => void;
-  onDateToChange?:   (v: string) => void;
-  /** Reset all filters */
-  onReset?:         () => void;
-  /** Whether any filter is active (shows reset button) */
+  onDateToChange?: (v: string) => void;
+  onReset?: () => void;
   hasActiveFilters?: boolean;
-  /** Total count label */
-  count?:           number;
-  /** Extra actions (e.g. Export button) */
-  actions?:         React.ReactNode;
-  className?:       string;
+  count?: number;
+  actions?: React.ReactNode;
+  className?: string;
 }
+
+/* ── Shared input/select style ──────────────────────────────────── */
+const FIELD_BASE: React.CSSProperties = {
+  height: 32,
+  padding: '0 10px',
+  background: 'var(--surface)',
+  border: '1px solid var(--border)',
+  borderRadius: 6,
+  fontSize: 12,
+  fontWeight: 500,
+  color: 'var(--text)',
+  fontFamily: 'inherit',
+  outline: 'none',
+  transition: 'border-color 150ms, box-shadow 150ms',
+};
+
+const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+  e.currentTarget.style.borderColor = 'var(--pro-azure)';
+  e.currentTarget.style.boxShadow   = '0 0 0 3px rgba(79,186,111,0.18)';
+};
+
+const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+  e.currentTarget.style.borderColor = 'var(--border)';
+  e.currentTarget.style.boxShadow   = 'none';
+};
 
 export const FilterBar: React.FC<FilterBarProps> = ({
   search,
@@ -74,121 +81,134 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   count,
   actions,
   className = '',
-}) => {
-  const inputCls =
-    'px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 ' +
-    'rounded-lg text-[12px] text-slate-700 dark:text-slate-300 font-medium ' +
-    'focus:outline-none focus:ring-2 focus:ring-aki-blue/20 dark:focus:ring-aki-blue/30 ' +
-    'focus:border-aki-blue dark:focus:border-aki-blue transition-all ' +
-    'placeholder-slate-400 dark:placeholder-slate-600';
+}) => (
+  <div
+    className={`flex flex-wrap items-center gap-2 px-4 py-2.5 ${className}`}
+    style={{
+      background: 'var(--sys-bg-subtle)',
+      borderBottom: '1px solid var(--border-alt)',
+    }}
+    role="search"
+    aria-label="Filter controls"
+  >
+    {/* Icon */}
+    <SlidersHorizontal size={12} style={{ color: 'var(--text-4)', flexShrink: 0 }} />
 
-  return (
-    <div
-      className={`flex flex-wrap items-center gap-2 px-4 py-3 bg-slate-50/80 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800 ${className}`}
-      role="search"
-      aria-label="Filter controls"
-    >
-      {/* Filter icon */}
-      <SlidersHorizontal size={13} className="text-slate-400 dark:text-slate-500 shrink-0" />
+    {/* Search input */}
+    {onSearchChange !== undefined && (
+      <div className="relative flex-1 min-w-[140px] max-w-[220px]">
+        <Search
+          size={12}
+          className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+          style={{ color: 'var(--text-4)' }}
+        />
+        <input
+          type="search"
+          value={search ?? ''}
+          onChange={e => onSearchChange(e.target.value)}
+          placeholder={searchPlaceholder}
+          aria-label="Search"
+          style={{ ...FIELD_BASE, paddingLeft: 28, width: '100%' }}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+        />
+      </div>
+    )}
 
-      {/* Search */}
-      {onSearchChange !== undefined && (
-        <div className="relative flex-1 min-w-[140px] max-w-[220px]">
-          <Search
-            size={12}
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none"
-          />
-          <input
-            type="search"
-            value={search ?? ''}
-            onChange={e => onSearchChange(e.target.value)}
-            placeholder={searchPlaceholder}
-            aria-label="Search"
-            className={`${inputCls} pl-7 w-full`}
-          />
-        </div>
-      )}
-
-      {/* Dropdown filters */}
-      {filters.map(f => (
-        <div key={f.key} className="flex items-center gap-1">
-          <label
-            htmlFor={`filter-${f.key}`}
-            className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider whitespace-nowrap"
-          >
-            {f.label}
-          </label>
-          <select
-            id={`filter-${f.key}`}
-            value={f.value}
-            onChange={e => f.onChange(e.target.value)}
-            className={`${inputCls} pr-6 min-w-[100px]`}
-          >
-            {f.showAll !== false && <option value="">All</option>}
-            {f.options.map(o => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        </div>
-      ))}
-
-      {/* Date range */}
-      {onDateFromChange && (
-        <div className="flex items-center gap-1">
-          <label
-            htmlFor="filter-date-from"
-            className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider"
-          >
-            From
-          </label>
-          <input
-            id="filter-date-from"
-            type="date"
-            value={dateFrom ?? ''}
-            onChange={e => onDateFromChange(e.target.value)}
-            className={inputCls}
-          />
-        </div>
-      )}
-      {onDateToChange && (
-        <div className="flex items-center gap-1">
-          <label
-            htmlFor="filter-date-to"
-            className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider"
-          >
-            To
-          </label>
-          <input
-            id="filter-date-to"
-            type="date"
-            value={dateTo ?? ''}
-            onChange={e => onDateToChange(e.target.value)}
-            className={inputCls}
-          />
-        </div>
-      )}
-
-      {/* Count badge */}
-      {count !== undefined && (
-        <span className="ml-auto text-[11px] font-semibold text-slate-400 dark:text-slate-500 whitespace-nowrap">
-          {count.toLocaleString()} result{count !== 1 ? 's' : ''}
-        </span>
-      )}
-
-      {/* Extra actions */}
-      {actions && <div className="flex items-center gap-1.5">{actions}</div>}
-
-      {/* Reset */}
-      {hasActiveFilters && onReset && (
-        <button
-          onClick={onReset}
-          className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-md transition-all"
-          aria-label="Reset all filters"
+    {/* Dropdown filters */}
+    {filters.map(f => (
+      <div key={f.key} className="flex items-center gap-1.5">
+        <label
+          htmlFor={`filter-${f.key}`}
+          className="text-[9px] font-black uppercase tracking-widest whitespace-nowrap"
+          style={{ color: 'var(--text-5)' }}
         >
-          <X size={10} />
-          Clear
-        </button>
-      )}
-    </div>
-  );
-};
+          {f.label}
+        </label>
+        <select
+          id={`filter-${f.key}`}
+          value={f.value}
+          onChange={e => f.onChange(e.target.value)}
+          style={{ ...FIELD_BASE, paddingRight: 28, minWidth: 100 }}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+        >
+          {f.showAll !== false && <option value="">All</option>}
+          {f.options.map(o => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+      </div>
+    ))}
+
+    {/* Date range */}
+    {onDateFromChange && (
+      <div className="flex items-center gap-1.5">
+        <label
+          htmlFor="filter-date-from"
+          className="text-[9px] font-black uppercase tracking-widest"
+          style={{ color: 'var(--text-5)' }}
+        >
+          From
+        </label>
+        <input
+          id="filter-date-from"
+          type="date"
+          value={dateFrom ?? ''}
+          onChange={e => onDateFromChange(e.target.value)}
+          style={FIELD_BASE}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+        />
+      </div>
+    )}
+    {onDateToChange && (
+      <div className="flex items-center gap-1.5">
+        <label
+          htmlFor="filter-date-to"
+          className="text-[9px] font-black uppercase tracking-widest"
+          style={{ color: 'var(--text-5)' }}
+        >
+          To
+        </label>
+        <input
+          id="filter-date-to"
+          type="date"
+          value={dateTo ?? ''}
+          onChange={e => onDateToChange(e.target.value)}
+          style={FIELD_BASE}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+        />
+      </div>
+    )}
+
+    {/* Count */}
+    {count !== undefined && (
+      <span
+        className="ml-auto text-[11px] font-semibold whitespace-nowrap tabular-nums"
+        style={{ color: 'var(--text-4)' }}
+      >
+        {count.toLocaleString()} result{count !== 1 ? 's' : ''}
+      </span>
+    )}
+
+    {/* Extra actions */}
+    {actions && <div className="flex items-center gap-1.5">{actions}</div>}
+
+    {/* Reset */}
+    {hasActiveFilters && onReset && (
+      <button
+        onClick={onReset}
+        className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold transition-colors"
+        style={{ color: '#9F1239' }}
+        onMouseEnter={e => (e.currentTarget.style.background = '#FFF1F2')}
+        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+        aria-label="Reset all filters"
+      >
+        <X size={10} />
+        Clear
+      </button>
+    )}
+  </div>
+);

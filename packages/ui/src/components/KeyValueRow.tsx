@@ -86,7 +86,7 @@ export const KeyValueRow: React.FC<KeyValueRowProps> = ({
               aria-label={`Copy ${label}`}
             >
               {copied
-                ? <Check size={11} className="text-emerald-500" />
+                ? <Check size={11} className="text-[var(--pro-azure)]" />
                 : <Copy size={11} className="text-slate-400" />
               }
             </button>

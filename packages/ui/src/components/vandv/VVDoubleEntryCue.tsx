@@ -29,11 +29,11 @@ export const VVDoubleEntryCue: React.FC<VVDoubleEntryCueProps> = ({
     <div className={cn('rounded-oki border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900', className)}>
       <div className="grid grid-cols-2 divide-x divide-slate-100 dark:divide-slate-800">
         {/* Debit — inflow (green) */}
-        <div className="bg-emerald-50/50 dark:bg-emerald-950/20 px-4 py-3">
-          <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+        <div className="bg-[var(--pro-azure-50)]/50 dark:bg-green-950/20 px-4 py-3">
+          <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
             <ArrowDownLeft size={12} /> Debit · Inflow
           </div>
-          <p className="text-lg font-black tabular-nums text-emerald-700 dark:text-emerald-300 mt-1">
+          <p className="text-lg font-black tabular-nums text-[var(--pro-azure-dark)] dark:text-green-300 mt-1">
             {fmtVV(debit, currency)}
           </p>
         </div>
@@ -52,7 +52,7 @@ export const VVDoubleEntryCue: React.FC<VVDoubleEntryCueProps> = ({
         className={cn(
           'flex items-center justify-between px-4 py-2 border-t text-[11px] font-semibold',
           balanced
-            ? 'bg-emerald-50 border-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:border-emerald-900'
+            ? 'bg-[var(--pro-azure-50)] border-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:border-green-900'
             : 'bg-amber-50 border-amber-100 text-amber-700 dark:bg-amber-950/30 dark:border-amber-900',
         )}
       >

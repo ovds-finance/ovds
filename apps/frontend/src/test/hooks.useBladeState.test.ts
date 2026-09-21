@@ -1,13 +1,14 @@
-/**
- * Tests for useBladeState — Akaunting-style deterministic async state machine.
+﻿/**
+ * Tests for useBladeState — Ovds SaaS style deterministic async state machine.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+
 import { useBladeState } from '../hooks/useBladeState';
 
 describe('useBladeState()', () => {
-  beforeEach(() => { vi.useFakeTimers(); });
-  afterEach(() => { vi.useRealTimers(); });
+  // NOTE: fake timers are not used here since async act() + fake timers
+  // can deadlock in React 19 / jsdom environments.
 
   it('starts in idle state with initial data', () => {
     const { result } = renderHook(() => useBladeState<string>('initial'));
@@ -26,25 +27,22 @@ describe('useBladeState()', () => {
   });
 
   it('transitions to loading when run is called', async () => {
-    const promise = new Promise<string>((resolve) => {
-      setTimeout(() => resolve('data'), 100);
-    });
     const { result } = renderHook(() => useBladeState<string>(null));
 
-    const runPromise = result.current.run(promise);
+    let resolve!: (v: string) => void;
+    const promise = new Promise<string>((res) => { resolve = res; });
 
-    await act(async () => {
-      await vi.advanceTimersByTime(0);
-    });
+    let runPromise: Promise<string | null>;
+    act(() => { runPromise = result.current.run(promise); });
 
+    // After run() is called, state should be loading
     expect(result.current.state.status).toBe('loading');
     expect(result.current.isLoading).toBe(true);
-    expect(result.current.isSuccess).toBe(false);
-    expect(result.current.isError).toBe(false);
 
+    // Resolve and flush
     await act(async () => {
-      await vi.advanceTimersByTime(100);
-      await runPromise;
+      resolve('data');
+      await runPromise!;
     });
 
     expect(result.current.state.status).toBe('success');
@@ -53,26 +51,19 @@ describe('useBladeState()', () => {
   });
 
   it('transitions to error on rejection', async () => {
-    const promise = new Promise<string>((_, reject) => {
-      setTimeout(() => reject(new Error('fetch failed')), 50);
-    });
     const { result } = renderHook(() => useBladeState<string>(null));
 
-    const runPromise = result.current.run(promise);
+    let reject!: (e: Error) => void;
+    const promise = new Promise<string>((_, rej) => { reject = rej; });
 
-    await act(async () => {
-      await vi.advanceTimersByTime(0);
-    });
+    let runPromise: Promise<string | null>;
+    act(() => { runPromise = result.current.run(promise); });
 
     expect(result.current.state.status).toBe('loading');
 
     await act(async () => {
-      await vi.advanceTimersByTime(50);
-      try {
-        await runPromise;
-      } catch {
-        // expected
-      }
+      reject(new Error('fetch failed'));
+      try { await runPromise!; } catch { /* expected */ }
     });
 
     expect(result.current.state.status).toBe('error');

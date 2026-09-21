@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
 import { Copy, Eye, EyeOff, Key, Plus, RefreshCw, Trash2, CheckCircle2, Info, AlertTriangle, Shield, ExternalLink, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+
 import api from '../../services/api';
 import { confirm } from '../../utils/confirm';
 
@@ -42,7 +43,7 @@ const ApiKeysTab: React.FC<Props> = ({ canWrite }) => {
   const [showKey, setShowKey] = useState(false);
   const [form, setForm] = useState({ name: '', description: '', scopes: [] as string[], expiresIn: '90' });
   const [creating, setCreating] = useState(false);
-  const [revealedKeys, setRevealedKeys] = useState<Set<string>>(new Set());
+  const [_revealedKeys, _setRevealedKeys] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -130,44 +131,44 @@ const ApiKeysTab: React.FC<Props> = ({ canWrite }) => {
   return (
     <div className="space-y-5">
       {/* Info banner */}
-      <div className="flex items-start gap-3 p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl">
-        <Info size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+      <div className="flex items-start gap-3 p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border border-[var(--pro-azure-100)] dark:border-green-800 rounded-xl">
+        <Info size={14} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] shrink-0 mt-0.5" />
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 mb-0.5">API Keys for external integrations</p>
-          <p className="text-xs text-emerald-600 dark:text-emerald-400">
+          <p className="text-xs font-semibold text-[var(--pro-azure-dark)] dark:text-green-300 mb-0.5">API Keys for external integrations</p>
+          <p className="text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">
             Each key is scoped to specific permissions and shown <strong>only once</strong> at creation.
             Store keys in a secrets manager — never in source code or plain text files.
           </p>
         </div>
         <a href="https://ovds.com.et/docs/api" target="_blank" rel="noopener noreferrer"
-          className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline shrink-0">
+          className="flex items-center gap-1 text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline shrink-0">
           Docs <ExternalLink size={9} />
         </a>
       </div>
 
       {/* New key revealed */}
       {newKey && (
-        <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border-2 border-emerald-400 dark:border-emerald-600 rounded-xl space-y-3">
+        <div className="p-4 bg-[var(--pro-azure-50)] dark:bg-green-950/20 border-2 border-[var(--pro-azure)] dark:border-[var(--pro-azure-light)] rounded-xl space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400" />
-              <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Your new API key — copy it now</p>
+              <CheckCircle2 size={16} className="text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
+              <p className="text-sm font-semibold text-[var(--pro-azure-dark)] dark:text-green-300">Your new API key — copy it now</p>
             </div>
             <span className="text-[10px] font-bold px-2 py-0.5 bg-rose-100 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-full border border-rose-200 dark:border-rose-800">
               Won't be shown again
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <code className={`flex-1 px-3 py-2.5 bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-700 rounded-lg text-xs font-mono text-slate-800 dark:text-slate-200 overflow-x-auto transition-all ${showKey ? '' : 'blur-sm select-none'}`}>
+            <code className={`flex-1 px-3 py-2.5 bg-white dark:bg-slate-900 border border-[var(--pro-azure-light)] dark:border-green-700 rounded-lg text-xs font-mono text-slate-800 dark:text-slate-200 overflow-x-auto transition-all ${showKey ? '' : 'blur-sm select-none'}`}>
               {newKey}
             </code>
             <button onClick={() => setShowKey(v => !v)}
-              className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors shrink-0"
+              className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-[var(--pro-azure)] dark:hover:text-[var(--pro-azure-light)] transition-colors shrink-0"
               title={showKey ? 'Hide key' : 'Reveal key'}>
               {showKey ? <EyeOff size={14} /> : <Eye size={14} />}
             </button>
             <button onClick={() => copyToClipboard(newKey)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition-colors shrink-0">
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[var(--pro-azure)] text-white text-xs font-bold hover:bg-[var(--pro-azure-dark)] transition-colors shrink-0">
               {copied ? <CheckCircle2 size={13} /> : <Copy size={13} />}
               {copied ? 'Copied!' : 'Copy'}
             </button>
@@ -185,12 +186,12 @@ const ApiKeysTab: React.FC<Props> = ({ canWrite }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-1 h-4 rounded-full bg-emerald-500 shrink-0" />
+          <div className="w-1 h-4 rounded-full bg-[var(--pro-azure-50)]0 shrink-0" />
           <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{keys.length} API Key{keys.length !== 1 ? 's' : ''}</p>
         </div>
         {canWrite && (
           <button onClick={() => setShowForm(v => !v)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-[10px] font-semibold hover:bg-emerald-600 transition-colors">
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--pro-azure)] text-white rounded-lg text-[10px] font-semibold hover:bg-[var(--pro-azure-dark)] transition-colors">
             <Plus size={11} /> New API Key
           </button>
         )}
@@ -200,7 +201,7 @@ const ApiKeysTab: React.FC<Props> = ({ canWrite }) => {
       {showForm && (
         <div className="p-5 bg-white dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-700 space-y-4">
           <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-2.5">
-            <span className="w-1 h-4 rounded-full bg-emerald-500 shrink-0 inline-block" />New API Key
+            <span className="w-1 h-4 rounded-full bg-[var(--pro-azure-50)]0 shrink-0 inline-block" />New API Key
           </p>
           <div className="ovds-grid-layout cols-2">
             <div className="space-y-1.5">
@@ -224,7 +225,7 @@ const ApiKeysTab: React.FC<Props> = ({ canWrite }) => {
             <div className="flex items-center justify-between">
               <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Scopes <span className="text-rose-400">*</span></label>
               <button type="button" onClick={() => setForm(f => ({ ...f, scopes: f.scopes.length === SCOPES.length ? [] : SCOPES.map(s => s.id) }))}
-                className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                className="text-[10px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
                 {form.scopes.length === SCOPES.length ? 'Deselect all' : 'Select all'}
               </button>
             </div>
@@ -237,14 +238,14 @@ const ApiKeysTab: React.FC<Props> = ({ canWrite }) => {
                     <div className="flex items-center justify-between">
                       <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{group}</p>
                       <button type="button" onClick={() => toggleGroupScopes(group)}
-                        className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                        className="text-[9px] font-bold text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:underline">
                         {allGroupSelected ? 'None' : 'All'}
                       </button>
                     </div>
                     {scopes.map(s => (
                       <label key={s.id} className="flex items-start gap-2 cursor-pointer group">
                         <div onClick={() => toggleScope(s.id)}
-                          className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all shrink-0 mt-0.5 ${form.scopes.includes(s.id) ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300 dark:border-slate-600 group-hover:border-emerald-400'}`}>
+                          className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all shrink-0 mt-0.5 ${form.scopes.includes(s.id) ? 'bg-[var(--pro-azure-50)]0 border-[var(--pro-azure)]' : 'border-slate-300 dark:border-slate-600 group-hover:border-[var(--pro-azure)]'}`}>
                           {form.scopes.includes(s.id) && <CheckCircle2 size={10} className="text-white" />}
                         </div>
                         <div>
@@ -260,7 +261,7 @@ const ApiKeysTab: React.FC<Props> = ({ canWrite }) => {
           </div>
           <div className="flex gap-2 pt-2">
             <button onClick={handleCreate} disabled={creating}
-              className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 text-white rounded-lg text-xs font-medium hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20 dark:shadow-emerald-500/10/30 disabled:opacity-50">
+              className="flex items-center gap-2 px-5 py-2.5 bg-[var(--pro-azure)] text-white rounded-lg text-xs font-medium hover:bg-[var(--pro-azure-dark)] transition-colors shadow-lg shadow-green-500/20 dark:shadow-green-500/10/30 disabled:opacity-50">
               {creating ? <RefreshCw size={13} className="animate-spin" /> : <Key size={13} />}
               {creating ? 'Creating...' : 'Create Key'}
             </button>
@@ -278,7 +279,7 @@ const ApiKeysTab: React.FC<Props> = ({ canWrite }) => {
         <div className="ovds-empty">
           <Key size={32} strokeWidth={1.5} className="mx-auto mb-3 opacity-30" />
           <p className="text-sm">No API keys yet</p>
-          {canWrite && <button onClick={() => setShowForm(true)} className="mt-2 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">Create your first key</button>}
+          {canWrite && <button onClick={() => setShowForm(true)} className="mt-2 text-xs text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] font-bold hover:underline">Create your first key</button>}
         </div>
       ) : (
         <div className="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
@@ -286,13 +287,13 @@ const ApiKeysTab: React.FC<Props> = ({ canWrite }) => {
             const expiry = expiryBadge(k.expiresAt);
             return (
               <div key={k.id} className={`flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/40 ${!k.isActive ? 'opacity-50' : ''}`}>
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${k.isActive ? 'bg-emerald-50 dark:bg-emerald-950/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
-                  <Key size={15} className={k.isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'} />
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${k.isActive ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                  <Key size={15} className={k.isActive ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-slate-400'} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">{k.name}</p>
-                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${k.isActive ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
+                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${k.isActive ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] dark:bg-green-950/30 dark:text-[var(--pro-azure-light)]' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
                       {k.isActive ? 'Active' : 'Revoked'}
                     </span>
                     {expiry && (
@@ -306,7 +307,7 @@ const ApiKeysTab: React.FC<Props> = ({ canWrite }) => {
                     {k.scopes?.length > 0 && (
                       <div className="flex gap-1 flex-wrap">
                         {k.scopes.slice(0, 3).map(s => (
-                          <span key={s} className="text-[9px] font-semibold px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-full border border-emerald-100 dark:border-emerald-900">{s}</span>
+                          <span key={s} className="text-[9px] font-semibold px-1.5 py-0.5 bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] rounded-full border border-[var(--pro-azure-100)] dark:border-green-900">{s}</span>
                         ))}
                         {k.scopes.length > 3 && (
                           <span className="text-[9px] font-semibold px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded-full">+{k.scopes.length - 3} more</span>
@@ -342,7 +343,7 @@ const ApiKeysTab: React.FC<Props> = ({ canWrite }) => {
             <Copy size={10} /> Copy
           </button>
         </div>
-        <pre className="p-4 text-[11px] font-mono text-emerald-400 overflow-x-auto leading-relaxed">{`# List invoices
+        <pre className="p-4 text-[11px] font-mono text-[var(--pro-azure-light)] overflow-x-auto leading-relaxed">{`# List invoices
 curl -H "Authorization: Bearer YOUR_API_KEY" \\
   https://ovds.com.et/api/invoices?companyId=YOUR_COMPANY_ID
 

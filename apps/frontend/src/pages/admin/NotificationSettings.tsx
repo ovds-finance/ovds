@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
  
 import {
   notificationsConfigApi,
+  notificationTemplatesApi,
+  notificationCampaignsApi,
   type IntegrationConfig,
   type NotificationTemplate,
   type NotificationCampaign,
   type NotificationChannel,
 } from '@ovds/features/notifications';
 import { Save, Send, Bell, Mail, MessageSquare, Loader2, FileText, Users, Edit, Trash2, Plus, Calendar, Tag, X, FileText as FileTextIcon, List } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -185,8 +187,8 @@ const NotificationSettings: React.FC = () => {
   const getStatusBadge = (status: string) => {
     const colors = {
       DRAFT: 'bg-yellow-100 text-yellow-800',
-      SCHEDULED: 'bg-emerald-100 text-emerald-800',
-      SENT: 'bg-emerald-100 text-emerald-800',
+      SCHEDULED: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
+      SENT: 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
       FAILED: 'bg-rose-100 text-rose-800'
     };
     return colors[status as keyof typeof colors] || 'bg-slate-100 text-slate-700';
@@ -195,7 +197,7 @@ const NotificationSettings: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-emerald-600 dark:text-emerald-400" />
+        <Loader2 className="w-8 h-8 animate-spin text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
       </div>
     );
   }
@@ -203,7 +205,7 @@ const NotificationSettings: React.FC = () => {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <div className="flex items-center gap-3 mb-8">
-        <Bell className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+        <Bell className="w-8 h-8 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">Notification Settings</h1>
           <p className="text-slate-600 mt-1">Configure integrations, templates, and campaigns</p>
@@ -226,11 +228,11 @@ const NotificationSettings: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex-1 flex flex-col items-center gap-1 py-3 px-4 text-sm font-semibold rounded-t-xl transition-all ${
                     activeTab === tab.id
-                      ? 'text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-600 bg-emerald-50/50'
+                      ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border-b-2 border-[var(--pro-azure)] bg-[var(--pro-azure-50)]/50'
                       : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
                   }`}
                 >
-                  <span className={activeTab === tab.id ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}>{tab.icon}</span>
+                  <span className={activeTab === tab.id ? 'text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]' : 'text-slate-400'}>{tab.icon}</span>
                   {tab.label}
                 </button>
               ))}
@@ -247,14 +249,14 @@ const NotificationSettings: React.FC = () => {
                             ...prev,
                             email: { ...prev.email, active: e.target.checked }
                           }))}
-                          className="w-5 h-5 text-emerald-600 dark:text-emerald-400 border-slate-300 rounded focus:ring-teal-400"
+                          className="w-5 h-5 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border-slate-300 rounded focus:ring-teal-400"
                         />
                         <span className="text-sm text-slate-900 font-medium">Send notifications via SMTP</span>
                       </label>
                     </div>
 
                     {config.email?.active && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-emerald-50/50 rounded-2xl border border-emerald-200 dark:border-emerald-800">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-[var(--pro-azure-50)]/50 rounded-2xl border border-[var(--pro-azure-100)] dark:border-green-800">
                         <div>
                           <label className="block text-sm font-semibold text-slate-900 mb-2">SMTP Host</label>
                           <input
@@ -326,7 +328,7 @@ const NotificationSettings: React.FC = () => {
                       <button
                         onClick={() => handleTest('email')}
                         disabled={!config.email?.active || testing.email}
-                        className="flex items-center gap-2 px-6 py-3 bg-emerald-700 hover:bg-emerald-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 px-6 py-3 bg-[var(--pro-azure-dark)] hover:bg-[var(--pro-azure-dark)] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {testing.email ? (
                           <>
@@ -357,7 +359,7 @@ const NotificationSettings: React.FC = () => {
                             ...prev,
                             slack: { ...(prev.slack || { webhookUrl: '', active: false }), active: e.target.checked }
                           }))}
-                          className="w-5 h-5 text-emerald-600 dark:text-emerald-400 border-slate-300 rounded focus:ring-teal-400"
+                          className="w-5 h-5 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] border-slate-300 rounded focus:ring-teal-400"
                         />
                         <span className="text-sm text-slate-900 font-medium">Send notifications to Slack</span>
                       </label>
@@ -404,7 +406,7 @@ const NotificationSettings: React.FC = () => {
                       <button
                         onClick={() => handleTest('slack')}
                         disabled={!config.slack?.active || testing.slack}
-                        className="flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 px-6 py-3 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {testing.slack ? (
                           <>
@@ -518,7 +520,7 @@ const NotificationSettings: React.FC = () => {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex-1 px-6 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-6 py-4 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? (
               <>
@@ -545,7 +547,7 @@ const NotificationSettings: React.FC = () => {
       <div className="bg-white rounded-xl shadow-xl border border-slate-200/50 p-6 mb-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <FileText className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+            <FileText className="w-6 h-6 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
             <h2 className="text-xl font-semibold text-slate-900">Notification Templates ({templates.length})</h2>
           </div>
           <button
@@ -554,7 +556,7 @@ const NotificationSettings: React.FC = () => {
               setTemplateForm({ name: '', type: 'email', subject: '', body: '', variables: [] });
               setShowTemplateModal(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white font-semibold rounded-xl hover:bg-emerald-600 transition-all"
+            className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white font-semibold rounded-xl hover:bg-[var(--pro-azure-dark)] transition-all"
           >
             <Plus className="w-4 h-4" />
             New Template
@@ -562,7 +564,7 @@ const NotificationSettings: React.FC = () => {
         </div>
         {loadingTemplates ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-emerald-600 dark:text-emerald-400" />
+            <Loader2 className="w-8 h-8 animate-spin text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
         ) : templates.length === 0 ? (
           <div className="text-center py-12">
@@ -571,7 +573,7 @@ const NotificationSettings: React.FC = () => {
             <p className="text-slate-500 mb-4">Create your first notification template</p>
             <button
               onClick={() => setShowTemplateModal(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-emerald-500 text-white font-semibold rounded-xl hover:bg-emerald-600 transition-all mx-auto"
+              className="flex items-center gap-2 px-6 py-3 bg-[var(--pro-azure)] text-white font-semibold rounded-xl hover:bg-[var(--pro-azure-dark)] transition-all mx-auto"
             >
               <Plus className="w-4 h-4" />
               Create Template
@@ -583,17 +585,17 @@ const NotificationSettings: React.FC = () => {
               <div key={template.id} className="bg-white p-6 rounded-xl border border-slate-200 hover:shadow-md transition-all group">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${template.isActive ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'}`}>
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${template.isActive ? 'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)] dark:bg-green-900/30 dark:text-green-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'}`}>
                       {template.isActive ? 'Active' : 'Inactive'}
                     </span>
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${template.type === 'email' ? 'bg-sky-100 dark:bg-sky-950/30 text-sky-800 dark:text-sky-300' : template.type === 'slack' ? 'bg-violet-100 dark:bg-violet-950/30 text-violet-800 dark:text-violet-300' : 'bg-indigo-100 dark:bg-indigo-950/30 text-indigo-800 dark:text-indigo-300'}`}>
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${template.type === 'email' ? 'bg-sky-100 dark:bg-sky-950/30 text-sky-800 dark:text-sky-300' : template.type === 'slack' ? 'bg-violet-100 dark:bg-violet-950/30 text-violet-800 dark:text-violet-300' : 'bg-[var(--pro-azure-100)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-green-300'}`}>
                       {template.type.toUpperCase()}
                     </span>
                   </div>
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
                     <button
                       onClick={() => editTemplate(template)}
-                      className="p-1.5 text-slate-500 hover:text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:bg-emerald-950/20 rounded-lg transition-all"
+                      className="p-1.5 text-slate-500 hover:text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)] hover:bg-[var(--pro-azure-50)] dark:bg-green-950/20 rounded-lg transition-all"
                       title="Edit"
                     >
                       <Edit className="w-3.5 h-3.5" />
@@ -632,12 +634,12 @@ const NotificationSettings: React.FC = () => {
       <div className="bg-white rounded-xl shadow-xl border border-slate-200/50 p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <Users className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+            <Users className="w-6 h-6 text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
             <h2 className="text-xl font-semibold text-slate-900">Notification Campaigns ({campaigns.length})</h2>
           </div>
           <button
             onClick={() => setShowCampaignModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white font-semibold rounded-xl hover:bg-emerald-600 transition-all"
+            className="flex items-center gap-2 px-4 py-2 bg-[var(--pro-azure)] text-white font-semibold rounded-xl hover:bg-[var(--pro-azure-dark)] transition-all"
           >
             <Plus className="w-4 h-4" />
             New Campaign
@@ -645,7 +647,7 @@ const NotificationSettings: React.FC = () => {
         </div>
         {loadingCampaigns ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-emerald-600 dark:text-emerald-400" />
+            <Loader2 className="w-8 h-8 animate-spin text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]" />
           </div>
         ) : campaigns.length === 0 ? (
           <div className="text-center py-12">
@@ -654,7 +656,7 @@ const NotificationSettings: React.FC = () => {
             <p className="text-slate-500 mb-4">Create bulk notification campaigns</p>
             <button
               onClick={() => setShowCampaignModal(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-emerald-500 text-white font-semibold rounded-xl hover:bg-emerald-600 transition-all mx-auto"
+              className="flex items-center gap-2 px-6 py-3 bg-[var(--pro-azure)] text-white font-semibold rounded-xl hover:bg-[var(--pro-azure-dark)] transition-all mx-auto"
             >
               <Plus className="w-4 h-4" />
               Create Campaign
@@ -678,7 +680,7 @@ const NotificationSettings: React.FC = () => {
                   <tr key={campaign.id} className="border-b border-slate-100 hover:bg-slate-50">
                     <td className="py-4 px-3 font-medium text-slate-900">{campaign.name}</td>
                     <td className="py-4 px-3">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${campaign.type === 'email' ? 'bg-sky-100 dark:bg-sky-950/30 text-sky-800 dark:text-sky-300' : campaign.type === 'slack' ? 'bg-violet-100 dark:bg-violet-950/30 text-violet-800 dark:text-violet-300' : 'bg-indigo-100 dark:bg-indigo-950/30 text-indigo-800 dark:text-indigo-300'}`}>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${campaign.type === 'email' ? 'bg-sky-100 dark:bg-sky-950/30 text-sky-800 dark:text-sky-300' : campaign.type === 'slack' ? 'bg-violet-100 dark:bg-violet-950/30 text-violet-800 dark:text-violet-300' : 'bg-[var(--pro-azure-100)] dark:bg-green-950/30 text-[var(--pro-azure-dark)] dark:text-green-300'}`}>
                         {campaign.type.toUpperCase()}
                       </span>
                     </td>
@@ -695,7 +697,7 @@ const NotificationSettings: React.FC = () => {
                       {campaign.status === 'DRAFT' && (
                         <button
                           onClick={() => handleSendCampaign(campaign.id)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-emerald-700 transition-all"
+                          className="flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-[var(--pro-azure-dark)] transition-all"
                         >
                           <Send className="w-3 h-3" />
                           Send
@@ -817,7 +819,7 @@ const NotificationSettings: React.FC = () => {
                     }
                   }}
                   disabled={!templateForm.name || !templateForm.body}
-                  className="flex-1 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 justify-center"
+                  className="flex-1 px-6 py-3 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 justify-center"
                 >
                   <Save className="w-4 h-4" />
                   {editingTemplate ? 'Update Template' : 'Create Template'}
@@ -901,7 +903,7 @@ const NotificationSettings: React.FC = () => {
                 <button
                   onClick={handleCreateCampaign}
                   disabled={!newCampaign.name || !newCampaign.targets}
-                  className="flex-1 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 flex items-center gap-2 justify-center"
+                  className="flex-1 px-6 py-3 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 flex items-center gap-2 justify-center"
                 >
                   <Calendar className="w-4 h-4" />
                   Create Campaign

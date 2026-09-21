@@ -1,20 +1,21 @@
 /**
  * Sales Debit Notes (DBN) — MoR EIMS debit memos linked to original invoices
  */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useRegisterInvoiceEims } from '@ovds/features/eims';
 import { FilePlus, Plus, RefreshCw, Shield, ExternalLink, Search } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { invoicesApi } from '../services/ovdsApi';
-import { useRegisterInvoiceEims } from '@ovds/features/eims';
+
 import {
   AppPage, AppTabs, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input,
   EmptyState, Pagination, Amount,
 } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { invoicesApi } from '../services/ovdsApi';
 
 interface DebitNoteRow {
   id: string;
@@ -31,7 +32,7 @@ interface DebitNoteRow {
 type FilterTab = 'ALL' | 'DRAFT' | 'PENDING' | 'PAID' | 'CANCELLED';
 
 const EIMS_BADGE: Record<string, string> = {
-  REGISTERED: 'text-emerald-700 bg-emerald-50',
+  REGISTERED: 'text-[var(--pro-azure-dark)] bg-[var(--pro-azure-50)]',
   PENDING: 'text-amber-700 bg-amber-50',
   FAILED: 'text-rose-700 bg-rose-50',
 };

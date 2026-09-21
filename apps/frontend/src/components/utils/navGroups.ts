@@ -1,5 +1,6 @@
-import type React from 'react';
 import type { IconType } from '@ovds/ui';
+import type React from 'react';
+
 import type { Permission } from '../../rbac/rbac';
 
 export interface NavItem {

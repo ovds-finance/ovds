@@ -1,5 +1,5 @@
 /**
- * @ovds/domains/ifrs
+ * @ovds/domains-ifrs
  * IFRS 15 / 16 / IAS 38 / IFRS 10 compliance domain library.
  * Revenue recognition, leases, intangible assets, consolidation, AABE disclosure.
  */

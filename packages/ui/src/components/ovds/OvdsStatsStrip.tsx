@@ -16,9 +16,9 @@ export interface StripStat {
   value: string;
   sub?: string;
   icon: React.ReactNode;
-  /** Tailwind bg class e.g. "bg-emerald-50" */
+  /** Tailwind bg class e.g. "bg-[var(--pro-azure-50)]" */
   iconBg: string;
-  /** Tailwind text class e.g. "text-emerald-600" */
+  /** Tailwind text class e.g. "text-[var(--pro-azure-dark)]" */
   iconColor: string;
   /** Override value text color e.g. "text-rose-600" */
   valueColor?: string;
@@ -82,7 +82,7 @@ export const OvdsStatsStrip: React.FC<ovdsStatsStripProps> = ({
           className={[
             'ovds-widget-card p-4',
             stat.onClick
-              ? 'cursor-pointer hover:shadow-[0_4px_12px_0_rgb(0_0_0/0.08)] hover:-translate-y-0.5 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-emerald-500/30'
+              ? 'cursor-pointer hover:shadow-[0_4px_12px_0_rgb(0_0_0/0.08)] hover:-translate-y-0.5 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--pro-azure)]/30'
               : '',
           ].filter(Boolean).join(' ')}
         >
@@ -115,7 +115,7 @@ export const OvdsStatsStrip: React.FC<ovdsStatsStripProps> = ({
             {stat.trend !== undefined && stat.trend !== 0 && (
               <div className={`flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
                 stat.trend > 0
-                  ? 'bg-emerald-50 text-emerald-600'
+                  ? 'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)]'
                   : 'bg-rose-50 text-rose-500'
               }`}>
                 {stat.trend > 0 ? <TrendingUp size={9} /> : <TrendingDown size={9} />}

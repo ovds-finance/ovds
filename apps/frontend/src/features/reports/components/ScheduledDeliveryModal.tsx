@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
 import { AppPage, Btn } from '@ovds/ui';
 import {
   Calendar, Mail, Plus, Trash2, CheckCircle, PauseCircle, PlayCircle,
 } from 'lucide-react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+
 import { useLocalStorage } from '../../../hooks';
 import { ALL_TEMPLATES } from '../reportRegistry';
 import type { ScheduleEntry, ExportFormat, ScheduleFrequency } from '../types';
-import toast from 'react-hot-toast';
 
 interface Props {
   onBack: () => void;
@@ -95,7 +96,7 @@ export default function ScheduledDeliveryModal({ onBack }: Props) {
       title="Scheduled Exports"
       subtitle="Schedule reports to be generated and emailed automatically on a recurring basis."
       icon={<Calendar size={16} className="text-white" />}
-      iconBg="bg-emerald-600"
+      iconBg="bg-[var(--pro-azure)]"
       crumbs={[
         { label: 'Reports', to: '/reports-dashboard' },
         { label: 'Scheduled Exports' },
@@ -196,7 +197,7 @@ export default function ScheduledDeliveryModal({ onBack }: Props) {
                   className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <CheckCircle size={16} className={s.active ? 'text-emerald-500' : 'text-slate-400'} />
+                    <CheckCircle size={16} className={s.active ? 'text-[var(--pro-azure)]' : 'text-slate-400'} />
                     <div className="min-w-0">
                       <div className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
                         {s.name}

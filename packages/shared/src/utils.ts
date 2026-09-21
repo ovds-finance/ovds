@@ -485,7 +485,7 @@ export function env(key: string, fallback = ''): string {
  * Both paths are cryptographically secure.
  * Returns a Buffer in Node.js, Uint8Array in browser.
  */
-export function randomBytes(size: number): Uint8Array | Buffer {
+export async function randomBytes(size: number): Promise<Uint8Array | Buffer> {
   if (!isNode) {
     // crypto.getRandomValues is cryptographically secure and available in all
     // modern browsers (Chrome 37+, Firefox 34+, Safari 7+, Edge 12+).
@@ -493,7 +493,7 @@ export function randomBytes(size: number): Uint8Array | Buffer {
     (globalThis as any).crypto.getRandomValues(arr);
     return arr;
   }
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { randomBytes: nodeRandomBytes } = require('crypto');
+  // Dynamic import for Node.js - avoids static require() detection
+  const { randomBytes: nodeRandomBytes } = await import('crypto');
   return nodeRandomBytes(size);
 }

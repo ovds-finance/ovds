@@ -6,7 +6,6 @@
  *   - ERCA customs clearance supporting document
  *   - Valid 180 days from issue date
  */
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   Plus, RefreshCw, FileText, X, Download, Search,
   Clock, CheckCircle2, AlertTriangle, Info, Edit2,
@@ -15,16 +14,19 @@ import {
   Package, Globe, DollarSign, Calendar, Ship, Minus,
   MoreHorizontal, CheckSquare, Square, ArrowUpRight,
 } from 'lucide-react';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useBusiness } from '../context/businessContext';
-import { useAuth } from '../rbac/AuthContext';
-import { useDebounce } from '../hooks';
-import { fmtCurrency } from '../utils/fmt';
-import { proformasApi } from '../services/tradeApi';
-import api from '../services/api';
-import { confirm } from '../utils/confirm';
-import { Can } from '../components/can';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
+
+import { Can } from '../components/can';
+import { useBusiness } from '../context/businessContext';
+import { useDebounce } from '../hooks';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import api from '../services/api';
+import { proformasApi } from '../services/tradeApi';
+import { confirm } from '../utils/confirm';
+import { fmtCurrency } from '../utils/fmt';
+
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const MS_PER_DAY = 86_400_000;
@@ -86,7 +88,7 @@ type SortDir = 'asc' | 'desc';
 const STATUS_CFG: Record<string, { label: string; cls: string; dot: string; icon: React.ReactNode }> = {
   DRAFT:     { label: 'Draft',     cls: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700',         dot: 'bg-slate-400',    icon: <FileText size={9} /> },
   SUBMITTED: { label: 'Submitted', cls: 'bg-sky-50 dark:bg-sky-900/20 text-sky-700 dark:text-sky-400 border-sky-200 dark:border-sky-800',                  dot: 'bg-sky-500',      icon: <Send size={9} /> },
-  APPROVED:  { label: 'Approved',  cls: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', dot: 'bg-emerald-500', icon: <CheckCircle2 size={9} /> },
+  APPROVED:  { label: 'Approved',  cls: 'bg-[var(--pro-azure-50)] dark:bg-green-900/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] border-[var(--pro-azure-100)] dark:border-green-800', dot: 'bg-[var(--pro-azure-50)]0', icon: <CheckCircle2 size={9} /> },
   REJECTED:  { label: 'Rejected',  cls: 'bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800',             dot: 'bg-rose-400',     icon: <X size={9} /> },
   EXPIRED:   { label: 'Expired',   cls: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',       dot: 'bg-amber-500',    icon: <Clock size={9} /> },
 };
@@ -493,7 +495,7 @@ const ProformaModal: React.FC<{
           {/* Footer */}
           <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-slate-100 dark:border-slate-800 shrink-0">
             <div className="flex gap-2">
-              {TABS.map((t, idx) => (
+              {TABS.map((t, _idx) => (
                 <button key={t.key} type="button" onClick={() => setTab(t.key)}
                   className={`w-2 h-2 rounded-full transition-colors ${tab === t.key ? 'bg-sky-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
               ))}
@@ -526,7 +528,7 @@ const DetailDrawer: React.FC<{
   canWrite: boolean;
 }> = ({ proforma: p, onClose, onEdit, onStatusChange, onDelete, canWrite }) => {
   const days = daysUntilExpiry(p);
-  const st = STATUS_CFG[p.status] ?? STATUS_CFG.DRAFT;
+  const _st = STATUS_CFG[p.status] ?? STATUS_CFG.DRAFT;
 
   const detailRow = (label: string, value: React.ReactNode) => (
     <div className="flex justify-between items-start gap-4 py-2.5 border-b border-slate-50 dark:border-slate-800 last:border-0">
@@ -555,7 +557,7 @@ const DetailDrawer: React.FC<{
 
         {/* Validity bar */}
         {p.validUntil && (
-          <div className={`px-5 py-2.5 text-xs font-semibold flex items-center justify-between shrink-0 ${days !== null && days < 0 ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400' : days !== null && days <= 14 ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400' : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'}`}>
+          <div className={`px-5 py-2.5 text-xs font-semibold flex items-center justify-between shrink-0 ${days !== null && days < 0 ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400' : days !== null && days <= 14 ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400' : 'bg-[var(--pro-azure-50)] dark:bg-green-900/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)]'}`}>
             <div className="flex items-center gap-2">
               <Clock size={12} />
               {days !== null && days < 0 ? `Expired ${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} ago` :
@@ -653,7 +655,7 @@ const DetailDrawer: React.FC<{
             {p.status === 'SUBMITTED' && (
               <div className="grid grid-cols-2 gap-2">
                 <button onClick={() => onStatusChange(p.id, 'APPROVED')}
-                  className="flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-semibold transition-colors">
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 bg-[var(--pro-azure-50)]0 hover:bg-[var(--pro-azure-dark)] text-white rounded-xl text-xs font-semibold transition-colors">
                   <CheckCircle2 size={12} /> Approve
                 </button>
                 <button onClick={() => onStatusChange(p.id, 'REJECTED')}
@@ -940,7 +942,7 @@ const ProformaInvoices: React.FC = () => {
           { label: 'Total',     value: stats.total,    color: 'from-slate-50 to-slate-100 dark:from-slate-800/40 dark:to-slate-800/20 border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-200', accent: 'bg-slate-400', icon: <FileText size={14} /> },
           { label: 'Draft',     value: tabCounts.DRAFT,     color: 'from-slate-50 to-slate-100 dark:from-slate-800/40 dark:to-slate-800/20 border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-200', accent: 'bg-slate-400', icon: <FileText size={14} /> },
           { label: 'Submitted', value: tabCounts.SUBMITTED, color: 'from-sky-50 to-sky-100 dark:from-sky-900/20 dark:to-sky-900/10 border-sky-200 dark:border-sky-800',           text: 'text-sky-700 dark:text-sky-300',   accent: 'bg-sky-500',   icon: <Send size={14} /> },
-          { label: 'Approved',  value: tabCounts.APPROVED,  color: 'from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-900/10 border-emerald-200 dark:border-emerald-800', text: 'text-emerald-700 dark:text-emerald-300', accent: 'bg-emerald-500', icon: <CheckCircle2 size={14} /> },
+          { label: 'Approved',  value: tabCounts.APPROVED,  color: 'from-[var(--pro-azure-50)] to-[var(--pro-azure-100)] dark:from-green-900/20 dark:to-green-900/10 border-[var(--pro-azure-100)] dark:border-green-800', text: 'text-[var(--pro-azure-dark)] dark:text-green-300', accent: 'bg-[var(--pro-azure-50)]0', icon: <CheckCircle2 size={14} /> },
           { label: 'Forex Req', value: stats.forexRequired, color: 'from-violet-50 to-violet-100 dark:from-violet-900/20 dark:to-violet-900/10 border-violet-200 dark:border-violet-800', text: 'text-violet-700 dark:text-violet-300', accent: 'bg-violet-500', icon: <DollarSign size={14} /> },
           { label: 'Expiring',  value: stats.expiring,      color: stats.expiring > 0 ? 'from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/10 border-amber-200 dark:border-amber-800' : 'from-slate-50 to-slate-100 dark:from-slate-800/40 dark:to-slate-800/20 border-slate-200 dark:border-slate-700', text: stats.expiring > 0 ? 'text-amber-700 dark:text-amber-300' : 'text-slate-500 dark:text-slate-400', accent: stats.expiring > 0 ? 'bg-amber-500' : 'bg-slate-300', icon: <Clock size={14} /> },
         ].map(k => (
@@ -1093,7 +1095,7 @@ const ProformaInvoices: React.FC = () => {
                   </td>
                 </tr>
               ) : filtered.map(p => {
-                const st = STATUS_CFG[p.status] ?? STATUS_CFG.DRAFT;
+                const _st = STATUS_CFG[p.status] ?? STATUS_CFG.DRAFT;
                 const daysValid = daysUntilExpiry(p);
                 const isExpiring = daysValid !== null && daysValid >= 0 && daysValid <= 14;
                 const isExpired  = daysValid !== null && daysValid < 0;
@@ -1218,13 +1220,13 @@ const ProformaInvoices: React.FC = () => {
             <p className="text-[10px] text-sky-500 dark:text-sky-500 mt-1">Proformas ≥ USD 1,000</p>
           </div>
           {/* Approved & ready */}
-          <div className="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/10 p-4">
+          <div className="rounded-xl border border-[var(--pro-azure-100)] dark:border-green-800 bg-[var(--pro-azure-50)] dark:bg-green-900/10 p-4">
             <div className="flex items-center gap-2 mb-3">
-              <CheckCircle2 size={14} className="text-emerald-500" />
-              <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Approved & Ready</p>
+              <CheckCircle2 size={14} className="text-[var(--pro-azure)]" />
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--pro-azure)] dark:text-[var(--pro-azure-light)]">Approved & Ready</p>
             </div>
-            <p className="text-2xl font-black text-emerald-700 dark:text-emerald-300 tabular-nums">{tabCounts.APPROVED}</p>
-            <p className="text-[10px] text-emerald-500 mt-1">Available for customs clearance</p>
+            <p className="text-2xl font-black text-[var(--pro-azure-dark)] dark:text-green-300 tabular-nums">{tabCounts.APPROVED}</p>
+            <p className="text-[10px] text-[var(--pro-azure)] mt-1">Available for customs clearance</p>
           </div>
           {/* Validity status */}
           <div className={`rounded-xl border p-4 ${stats.expiring > 0 ? 'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/10' : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30'}`}>

@@ -3,10 +3,19 @@
  * Tabs: Overview · Devices · Telemetry · Alerts · OTA Updates · Smart Billing
  */
 import React, { useState, useEffect, useMemo } from 'react';
+import toast from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
+
+import IotAlertsTab from '../components/iot/IotAlertsTab';
+import IotBillingTab from '../components/iot/IotBillingTab';
+import IotDevicesTab from '../components/iot/IotDevicesTab';
+import IotOtaTab from '../components/iot/IotOtaTab';
+import IotTaxPipelineTab from '../components/iot/IotTaxPipelineTab';
+import IotTelemetryTab from '../components/iot/IotTelemetryTab';
+import { AppPage, AppStat, AppTabs, Btn, Icon, Amount } from '../components/ui';
+import { useBusiness } from '../context/businessContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useAuth } from '../rbac/AuthContext';
-import { useBusiness } from '../context/businessContext';
 import {
   useIotDashboard,
   useIotDevices,
@@ -20,15 +29,7 @@ import {
   type OtaUpdateJob,
   type IotBillingTrigger,
 } from '../services/iotApi';
-import { AppPage, AppStat, AppTabs, Btn, Icon, StatusBadge, Amount } from '../components/ui';
-import toast from 'react-hot-toast';
-import { fmtDate, fmtCurrency } from '../utils/fmt';
-import IotDevicesTab from '../components/iot/IotDevicesTab';
-import IotTelemetryTab from '../components/iot/IotTelemetryTab';
-import IotAlertsTab from '../components/iot/IotAlertsTab';
-import IotOtaTab from '../components/iot/IotOtaTab';
-import IotBillingTab from '../components/iot/IotBillingTab';
-import IotTaxPipelineTab from '../components/iot/IotTaxPipelineTab';
+import { fmtDate } from '../utils/fmt';
 
 const SEVERITY_COLOR: Record<string, string> = {
   CRITICAL: 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300',
@@ -37,7 +38,7 @@ const SEVERITY_COLOR: Record<string, string> = {
 };
 
 const STATUS_COLOR: Record<string, string> = {
-  ACTIVE:          'bg-emerald-100 text-emerald-700',
+  ACTIVE:          'bg-[var(--pro-azure-100)] text-[var(--pro-azure-dark)]',
   OFFLINE:         'bg-rose-100 text-rose-700',
   MAINTENANCE:     'bg-amber-100 text-amber-700',
   INACTIVE:        'bg-slate-100 text-slate-500',
@@ -66,6 +67,7 @@ const IotHub: React.FC = () => {
   useEffect(() => {
     const tab = pathToTab[location.pathname] ?? 'overview';
     setActiveTab(tab);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   const { data: summary, isLoading: loadingSummary } = useIotDashboard({ enabled: !!selectedCompanyId } as any);
@@ -128,7 +130,7 @@ const IotHub: React.FC = () => {
           label="Online"
           value={loadingSummary ? '—' : (summary?.activeDevices ?? 0)}
           icon={<Icon name="ACTIVITY" size={16} />}
-          color="emerald"
+          color="indigo"
         />
         <AppStat
           label="Offline"
@@ -140,7 +142,7 @@ const IotHub: React.FC = () => {
           label="Uptime %"
           value={loadingSummary ? '—' : `${summary?.uptimePct ?? 0}%`}
           icon={<Icon name="GAUGE" size={16} />}
-          color={Number(summary?.uptimePct ?? 0) >= 95 ? 'emerald' : 'amber'}
+          color={Number(summary?.uptimePct ?? 0) >= 95 ? 'indigo' : 'amber'}
         />
         <AppStat
           label="Open Alerts"
@@ -218,7 +220,7 @@ const IotOverviewTab: React.FC<OverviewProps> = ({
     <section className="ovds-card">
       <div className="flex items-center justify-between mb-4">
         <h3 className="ovds-card-title flex items-center gap-2">
-          <Icon name="MONITOR" size={15} className="text-emerald-500" /> Device Status
+          <Icon name="MONITOR" size={15} className="text-[var(--pro-azure)]" /> Device Status
         </h3>
         <Btn variant="ghost" size="sm" onClick={() => onTabSwitch('devices')}>View all →</Btn>
       </div>
@@ -232,14 +234,14 @@ const IotOverviewTab: React.FC<OverviewProps> = ({
         <div className="space-y-2">
           {devices.map(d => (
             <div key={d.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-              <span className={`w-2 h-2 rounded-full shrink-0 ${d.status === 'ACTIVE' ? 'bg-emerald-500' : d.status === 'OFFLINE' ? 'bg-rose-500' : 'bg-amber-500'}`} />
+              <span className={`w-2 h-2 rounded-full shrink-0 ${d.status === 'ACTIVE' ? 'bg-[var(--pro-azure-50)]0' : d.status === 'OFFLINE' ? 'bg-rose-500' : 'bg-amber-500'}`} />
               <div className="flex-1 min-w-0">
                 <p className="text-[12px] font-semibold text-slate-800 dark:text-slate-100 truncate">{d.name}</p>
                 <p className="text-[10px] text-slate-400 truncate">{d.deviceType} · {d.location ?? '—'}</p>
               </div>
               {d.batteryLevel != null && (
                 <div className="flex items-center gap-1 shrink-0">
-                  <span className={d.batteryLevel < 20 ? 'text-rose-500' : 'text-emerald-500'}>⚡</span>
+                  <span className={d.batteryLevel < 20 ? 'text-rose-500' : 'text-[var(--pro-azure)]'}>⚡</span>
                   <span className="text-[10px] font-bold">{d.batteryLevel}%</span>
                 </div>
               )}
@@ -267,7 +269,7 @@ const IotOverviewTab: React.FC<OverviewProps> = ({
       </div>
       {alerts.length === 0 ? (
         <div className="py-8 text-center">
-          <Icon name="CHECK_CIRCLE" size={24} className="mx-auto text-emerald-500 mb-2" />
+          <Icon name="CHECK_CIRCLE" size={24} className="mx-auto text-[var(--pro-azure)] mb-2" />
           <p className="text-[12px] font-semibold text-slate-800 dark:text-slate-100">All clear</p>
           <p className="text-[11px] text-slate-400 mt-0.5">No open alerts</p>
         </div>
@@ -292,7 +294,7 @@ const IotOverviewTab: React.FC<OverviewProps> = ({
                 </button>
                 <button
                   onClick={() => onResolve(a.id)}
-                  className="text-[10px] font-bold text-emerald-600 hover:underline"
+                  className="text-[10px] font-bold text-[var(--pro-azure)] hover:underline"
                   title="Resolve"
                 >
                   Resolve

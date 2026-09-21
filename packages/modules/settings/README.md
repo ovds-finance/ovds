@@ -1,8 +1,8 @@
-# Company Profile, Currencies & Localization
+﻿# Company Profile, Currencies & Localization
 
 Canonical OVDS module (`packages/modules/settings`).
 
-Akaunting-inspired, DDD-aligned module layout:
+Ovds SaaS DDD-aligned module layout:
 
 ```
 modules/settings/

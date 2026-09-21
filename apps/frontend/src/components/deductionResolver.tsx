@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { collectionsApi } from '../services/collectionsApi';
 import { X, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+
+import { collectionsApi } from '../services/collectionsApi';
 
 interface DeductionResolverProps {
   deduction: any;
@@ -77,7 +78,7 @@ export const DeductionResolver: React.FC<DeductionResolverProps> = ({ deduction,
             <button
               onClick={() => updateMutation.mutate({ status, resolvedAt: new Date().toISOString(), resolution })}
               disabled={updateMutation.isPending}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[var(--pro-azure)] text-white rounded-xl text-sm font-bold hover:bg-[var(--pro-azure-dark)] transition-colors disabled:opacity-50"
             >
               <CheckCircle2 size={15} />
               {updateMutation.isPending ? 'Saving…' : 'Resolve'}

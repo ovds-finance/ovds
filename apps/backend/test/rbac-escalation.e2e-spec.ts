@@ -1,9 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Role } from '@ovds/database';
 import request from 'supertest';
+
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/common/prisma.service';
-import { Role } from '@ovds/database';
+
 
 describe('RBAC Permission Escalation (E2E)', () => {
   let app: INestApplication;

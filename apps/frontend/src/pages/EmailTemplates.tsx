@@ -2,20 +2,21 @@
  * EmailTemplates — ovds-style email template management
  * AppPage · AppKpi · AppTable · useApiCrud
  */
-import React, { useState, useMemo, useCallback } from 'react';
 import {
   Mail, Plus, Edit2, Trash2, RefreshCw, Copy,
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../rbac/AuthContext';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { useApiCrud } from '../hooks/useApiCrud';
-import { confirm } from '../utils/confirm';
+
 import {
   AppPage, AppTabs, AppKpi, AppTable, AppTh, AppTd, AppTr,
   StatusBadge, Btn, Modal, FormField, Input, Select, Textarea,
   SearchBar, EmptyState, Pagination,
 } from '../components/ui';
+import { useApiCrud } from '../hooks/useApiCrud';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../rbac/AuthContext';
+import { confirm } from '../utils/confirm';
 
 interface EmailTemplate {
   id: string;
@@ -67,7 +68,7 @@ const TemplateForm: React.FC<{ data: Partial<EmailTemplate>; onChange: (d: Parti
         </FormField>
         <div className="flex items-end pb-1">
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" checked={data.isActive !== false} onChange={e => set('isActive', e.target.checked)} className="accent-emerald-600" />
+            <input type="checkbox" checked={data.isActive !== false} onChange={e => set('isActive', e.target.checked)} className="accent-indigo-600" />
             <span className="text-[12px] font-semibold text-slate-700">Active</span>
           </label>
         </div>
@@ -85,7 +86,7 @@ const TemplateForm: React.FC<{ data: Partial<EmailTemplate>; onChange: (d: Parti
                 key={v}
                 type="button"
                 onClick={() => set('body', (data.body ?? '') + v)}
-                className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[10px] font-mono text-emerald-700 hover:bg-emerald-50 hover:border-emerald-200 transition-all"
+                className="px-2 py-0.5 bg-white border border-slate-200 rounded text-[10px] font-mono text-[var(--pro-azure-dark)] hover:bg-[var(--pro-azure-50)] hover:border-[var(--pro-azure-100)] transition-all"
               >
                 {v}
               </button>
@@ -126,7 +127,7 @@ const EmailTemplates: React.FC = () => {
   }, [rows, tab, search]);
 
   const kpiCells = useMemo(() => [
-    { label: 'Total',    value: rows.length,                                          color: 'emerald' as const },
+    { label: 'Total',    value: rows.length,                                          color: 'green' as const },
     { label: 'Active',   value: rows.filter(t => t.isActive !== false).length,        color: 'sky' as const },
     { label: 'Invoice',  value: rows.filter(t => ['INVOICE','PAYMENT_REMINDER'].includes(t.type)).length, color: 'violet' as const },
     { label: 'Payroll',  value: rows.filter(t => t.type === 'PAYROLL').length,        color: 'amber' as const },
@@ -146,7 +147,7 @@ const EmailTemplates: React.FC = () => {
   };
 
   const TYPE_CLS: Record<string, string> = {
-    INVOICE:          'bg-emerald-50 text-emerald-700 border-emerald-100',
+    INVOICE:          'bg-[var(--pro-azure-50)] text-[var(--pro-azure-dark)] border-[var(--pro-azure-100)]',
     PAYMENT_REMINDER: 'bg-amber-50 text-amber-700 border-amber-100',
     PAYROLL:          'bg-violet-50 text-violet-700 border-violet-100',
     TAX_FILING:       'bg-sky-50 text-sky-700 border-sky-100',
@@ -230,7 +231,7 @@ const EmailTemplates: React.FC = () => {
                   <button onClick={() => handleDuplicate(t)} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-sky-50 hover:text-sky-600 transition-all" title="Duplicate"><Copy size={11} /></button>
                   {can('notifications:config') && (
                     <>
-                      <button onClick={() => setModal({ open: true, data: { ...t } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Edit"><Edit2 size={11} /></button>
+                      <button onClick={() => setModal({ open: true, data: { ...t } })} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-[var(--pro-azure-50)] hover:text-[var(--pro-azure)] transition-all" title="Edit"><Edit2 size={11} /></button>
                       <button onClick={async () => { if (await confirm({ title: `Delete "${t.name}"?`, variant: 'danger' })) remove(t.id); }} className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Delete"><Trash2 size={11} /></button>
                     </>
                   )}

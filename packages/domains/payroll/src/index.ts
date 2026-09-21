@@ -1,7 +1,12 @@
 /**
- * Re-export shim — this module has moved to @ovds/domains/hr.
+ * @deprecated — this package is a backward-compat re-export shim.
  *
- * All existing imports continue to work.
- * New code should import from the canonical path directly.
+ * `@ovds/domains-payroll` has been consolidated into `@ovds/domains-hr`.
+ * Migrate all imports to the canonical path:
+ *
+ *   import { ... } from '@ovds/domains-hr';
+ *
+ * This shim will be removed in a future cleanup pass once all consumers
+ * have been updated.
  */
-export * from '@ovds/domains/hr';
+export * from '@ovds/domains-hr';

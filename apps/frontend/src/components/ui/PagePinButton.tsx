@@ -15,9 +15,11 @@
  *   >
  */
 import React from 'react';
-import { usePagePin } from '../../hooks/usePagePin';
-import { Icon } from './index';
 import toast from 'react-hot-toast';
+
+import { usePagePin } from '../../hooks/usePagePin';
+
+import { Icon } from './index';
 
 interface PagePinButtonProps {
   to: string;

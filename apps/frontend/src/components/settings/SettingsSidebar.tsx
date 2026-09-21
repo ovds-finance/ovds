@@ -1,12 +1,12 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
 import {
   Building2, Globe, DollarSign, Receipt, Layers,
   FileText, Mail, Settings as SettingsIcon, Wallet, UserCog,
-  Code, Server, Shield,
+  Code, Server, Shield, Lock,
 } from 'lucide-react';
+import React from 'react';
+import { NavLink } from 'react-router-dom';
 
-type Section = 'profile' | 'localization' | 'financial' | 'invoice' | 'currency' | 'email' | 'taxes' | 'modules' | 'defaults' | 'users' | 'developers' | 'security';
+type Section = 'profile' | 'localization' | 'financial' | 'invoice' | 'currency' | 'email' | 'taxes' | 'modules' | 'defaults' | 'users' | 'developers' | 'security' | 'roles';
 
 interface SettingsSidebarProps {
   activeTab: Section;
@@ -26,6 +26,7 @@ const ADVANCED_TABS: { id: Section; label: string; icon: React.ReactNode; descri
   { id: 'email',        label: 'Email & SMTP',  icon: <Mail size={14} />,         description: 'Outgoing mail & SMTP' },
   { id: 'taxes',        label: 'Taxes',         icon: <Receipt size={14} />,      description: 'VAT, TOT, WHT & BIT toggles' },
   { id: 'users',        label: 'Users & Access', icon: <UserCog size={14} />,    description: 'Roles, portals & security' },
+  { id: 'roles',        label: 'Roles & Permissions', icon: <Lock size={14} />, description: 'Manage roles & feature access' },
   { id: 'security',     label: 'Security',      icon: <Shield size={14} />,       description: 'OWASP ZAP / ASVS controls' },
 ];
 
@@ -85,7 +86,7 @@ function SectionGroup({ title, items, activeTab, onTabChange }: {
               className={({ isActive }) =>
                 `w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all text-left ${
                   isActive || activeTab === tab.id
-                    ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 font-semibold'
+                    ? 'bg-[var(--pro-azure-50)] dark:bg-green-950/20 text-[var(--pro-azure-dark)] dark:text-[var(--pro-azure-light)] font-semibold'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`
               }
