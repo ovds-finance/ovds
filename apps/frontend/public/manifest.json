@@ -1,0 +1,51 @@
+{
+  "name": "Ovds — Online Business & Accounting Platform",
+  "short_name": "Ovds",
+  "description": "Online accounting software designed for all business types — from small businesses to large enterprises and freelancers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2980b9",
+  "orientation": "portrait-primary",
+  "categories": ["business", "productivity", "ovds"],
+  "icons": [
+    {
+      "src": "/assets/logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon",
+      "purpose": "any"
+    }
+  ],
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Go to your Ovds dashboard",
+      "url": "/dashboard",
+      "icons": [{ "src": "/assets/logo.jpg", "sizes": "96x96", "type": "image/jpeg" }]
+    },
+    {
+      "name": "Invoices",
+      "short_name": "Invoices",
+      "description": "Manage your invoices",
+      "url": "/sales/invoices",
+      "icons": [{ "src": "/assets/logo.jpg", "sizes": "96x96", "type": "image/jpeg" }]
+    }
+  ]
+}

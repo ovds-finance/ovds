@@ -1,0 +1,109 @@
+# k8s/base/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ovds-secrets-reader
+  namespace: ovds
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: ["ovds-secrets"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ovds-backend-secrets
+  namespace: ovds
+subjects:
+- kind: ServiceAccount
+  name: ovds-backend
+  namespace: ovds
+roleRef:
+  kind: Role
+  name: ovds-secrets-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ovds-cloud-api-secrets
+  namespace: ovds
+subjects:
+- kind: ServiceAccount
+  name: ovds-cloud-api
+  namespace: ovds
+roleRef:
+  kind: Role
+  name: ovds-secrets-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ovds-sync-secrets
+  namespace: ovds
+subjects:
+- kind: ServiceAccount
+  name: ovds-sync
+  namespace: ovds
+roleRef:
+  kind: Role
+  name: ovds-secrets-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ovds-frontend-secrets
+  namespace: ovds
+subjects:
+- kind: ServiceAccount
+  name: ovds-frontend
+  namespace: ovds
+roleRef:
+  kind: Role
+  name: ovds-secrets-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ovds-portal-secrets
+  namespace: ovds
+subjects:
+- kind: ServiceAccount
+  name: ovds-portal
+  namespace: ovds
+roleRef:
+  kind: Role
+  name: ovds-secrets-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ovds-mor-secrets
+  namespace: ovds
+subjects:
+- kind: ServiceAccount
+  name: ovds-mor
+  namespace: ovds
+roleRef:
+  kind: Role
+  name: ovds-secrets-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ovds-authority-secrets
+  namespace: ovds
+subjects:
+- kind: ServiceAccount
+  name: ovds-authority
+  namespace: ovds
+roleRef:
+  kind: Role
+  name: ovds-secrets-reader
+  apiGroup: rbac.authorization.k8s.io

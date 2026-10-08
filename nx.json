@@ -1,289 +1,70 @@
 {
-  "$schema": "https://cdn.nx.dev/schemas/nx-schema.json",
-  "analytics": false,
-  "defaultBase": "main",
-  "useDaemonProcess": true,
-  "namedInputs": {
-    "default": [
-      "{projectRoot}/**/*",
-      "sharedGlobals"
-    ],
-    "production": [
-      "default",
-      "!{projectRoot}/**/*.spec.ts",
-      "!{projectRoot}/**/*.test.ts",
-      "!{projectRoot}/**/*.spec.tsx",
-      "!{projectRoot}/**/*.test.tsx",
-      "!{projectRoot}/jest.config.*",
-      "!{projectRoot}/vitest.config.*",
-      "!{projectRoot}/.eslintrc.*",
-      "!{projectRoot}/eslint.config.*",
-      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
-      "!{projectRoot}/tsconfig.spec.json"
-    ],
-    "sharedGlobals": [
-      "{workspaceRoot}/packages/design-system/src/index.ts",
-      "{workspaceRoot}/packages/design-tokens/src/index.ts",
-      "{workspaceRoot}/packages/core/src/index.ts",
-      "{workspaceRoot}/packages/ui/src/index.ts",
-      "{workspaceRoot}/packages/shared/src/index.ts",
-      "{workspaceRoot}/packages/database/prisma/schema.prisma",
-      "{workspaceRoot}/packages/database/prisma.config.js",
-      "{workspaceRoot}/tsconfig.base.json"
-    ]
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "npmScope": "ovds",
+  "affected": {
+    "defaultBase": "main"
   },
-  "parallel": 8,
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": ["default", "!{projectRoot}/**/*.spec.ts"],
+    "sharedGlobals": []
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": ["build", "lint", "test", "e2e", "typecheck"]
+      }
+    }
+  },
   "targetDefaults": {
-    "bundle-analyze": {
-      "executor": "nx:run-commands",
-      "cache": false,
-      "options": {
-        "command": "node scripts/bundle-analyze.mjs --output .reports/bundle",
-        "cwd": "{workspaceRoot}"
-      }
-    },
-    "dep-check": {
-      "executor": "nx:run-commands",
-      "cache": false,
-      "options": {
-        "command": "node scripts/dep-check.mjs --output .reports/deps",
-        "cwd": "{workspaceRoot}"
-      }
-    },
-    "size-check": {
-      "executor": "nx:run-commands",
-      "cache": false,
-      "options": {
-        "command": "node scripts/size-check.mjs --output .reports/bundle",
-        "cwd": "{workspaceRoot}"
-      }
-    },
-    "optimize": {
-      "executor": "nx:run-commands",
-      "cache": false,
-      "options": {
-        "command": "node scripts/bundle-analyze.mjs --output .reports/bundle && node scripts/size-check.mjs --output .reports/bundle && node scripts/dep-check.mjs --output .reports/deps && node scripts/optimize-report.mjs --output .reports",
-        "cwd": "{workspaceRoot}"
-      }
-    },
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "production",
-        "^production"
-      ],
-      "cache": true
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "budgets": [
+          {
+            "type": "initial",
+            "maximumWarning": "500kb",
+            "maximumError": "1mb"
+          },
+          {
+            "type": "anyComponentStyle",
+            "maximumWarning": "4kb",
+            "maximumError": "10kb"
+          }
+        ]
+      }
     },
     "typecheck": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "default",
-        "^production"
-      ],
-      "cache": true
-    },
-    "test": {
-      "inputs": [
-        "default",
-        "^production"
-      ],
-      "cache": true
-    },
-    "test:coverage": {
-      "inputs": [
-        "default",
-        "^production"
-      ],
-      "cache": false
-    },
-    "test:integration": {
-      "inputs": [
-        "default",
-        "^production"
-      ],
-      "cache": false
-    },
-    "test:e2e": {
-      "inputs": [
-        "default",
-        "^production"
-      ],
-      "cache": false
-    },
-    "lint": {
-      "inputs": [
-        "default"
-      ],
-      "cache": true
-    },
-    "dev": {
-      "cache": false
-    },
-    "generate": {
-      "cache": false
-    },
-    "db:push": {
-      "cache": false
-    },
-    "migrate:deploy": {
-      "cache": false
-    },
-    "db:studio": {
-      "cache": false
-    },
-    "seed": {
-      "cache": false
+      "dependsOn": ["^build"]
     }
   },
-  "lint": {
-    "lintFilePatterns": [
-      "apps/**/*.ts",
-      "apps/**/*.tsx",
-      "packages/**/*.ts",
-      "packages/**/*.tsx"
-    ],
-    "rules": {
-      "@nx/enforce-module-boundaries": [
-        "error",
-        {
-          "enforceBuildableLibDependency": true,
-          "allow": [],
-          "depConstraints": [
-            {
-              "sourceTag": "scope:app",
-              "onlyDependOnLibsWithTags": [
-                "scope:app",
-                "type:module",
-                "type:feature",
-                "type:ui",
-                "type:tokens",
-                "type:lib",
-                "type:core",
-                "type:domain",
-                "scope:shared"
-              ]
-            },
-            {
-              "sourceTag": "type:module",
-              "onlyDependOnLibsWithTags": [
-                "type:core",
-                "type:lib",
-                "scope:shared",
-                "type:tokens",
-                "type:domain"
-              ],
-              "notDependOnLibsWithTags": [
-                "type:ui",
-                "type:feature",
-                "type:module",
-                "scope:frontend"
-              ]
-            },
-            {
-              "sourceTag": "type:domain",
-              "onlyDependOnLibsWithTags": [
-                "type:core",
-                "type:lib",
-                "scope:shared",
-                "type:tokens"
-              ],
-              "notDependOnLibsWithTags": [
-                "type:ui",
-                "type:feature",
-                "type:module",
-                "scope:frontend"
-              ]
-            },
-            {
-              "sourceTag": "type:feature",
-              "onlyDependOnLibsWithTags": [
-                "type:module",
-                "type:ui",
-                "type:tokens",
-                "type:lib",
-                "scope:shared"
-              ],
-              "notDependOnLibsWithTags": [
-                "type:domain",
-                "type:feature",
-                "scope:backend"
-              ]
-            },
-            {
-              "sourceTag": "type:ui",
-              "onlyDependOnLibsWithTags": [
-                "type:tokens",
-                "scope:shared",
-                "type:lib"
-              ],
-              "notDependOnLibsWithTags": [
-                "type:feature",
-                "type:domain",
-                "type:module",
-                "scope:backend"
-              ]
-            },
-            {
-              "sourceTag": "type:core",
-              "onlyDependOnLibsWithTags": [
-                "type:tokens",
-                "scope:shared",
-                "type:lib"
-              ]
-            },
-            {
-              "sourceTag": "scope:shared",
-              "onlyDependOnLibsWithTags": [
-                "scope:shared",
-                "type:tokens",
-                "type:lib"
-              ]
-            },
-            {
-              "sourceTag": "type:tokens",
-              "onlyDependOnLibsWithTags": []
-            }
-          ]
-        }
-      ]
-    }
-  },
-  "release": {
-    "projects": [
-      "packages/*",
-      "packages/domains/*",
-      "packages/features/*",
-      "packages/modules/*"
-    ],
-    "version": {
-      "conventionalCommits": true
-    },
-    "changelog": {
-      "workspaceChangelog": {
-        "createRelease": false
-      }
-    }
-  },
-  "generators": {
-    "@nx/react": {
-      "application": {
-        "babel": false,
-        "bundler": "vite",
-        "unitTestRunner": "vitest",
-        "style": "tailwind"
-      },
-      "library": {
-        "unitTestRunner": "vitest",
-        "style": "tailwind"
-      }
-    },
-    "@nx/nest": {
-      "application": {
-        "unitTestRunner": "jest"
+  "pluginsConfig": {
+    "@nx/eslint-plugin": {
+      "compilerOptions": {
+        "boundaryRules": [
+          {
+            "sourceTag": "scope:portal",
+            "onlyDependOnpackagesWithTags": ["scope:ui", "scope:shared-utils", "scope:auth"]
+          },
+          {
+            "sourceTag": "scope:authority",
+            "onlyDependOnpackagesWithTags": ["scope:ui", "scope:shared-utils", "scope:auth"]
+          },
+          {
+            "sourceTag": "scope:bank",
+            "onlyDependOnpackagesWithTags": ["scope:ui", "scope:shared-utils", "scope:auth"]
+          },
+          {
+            "sourceTag": "scope:backend",
+            "onlyDependOnpackagesWithTags": ["scope:accounting", "scope:declaration", "scope:integration", "scope:audit-trail", "scope:shared-database", "scope:shared-auth", "scope:shared-metrics"]
+          },
+          {
+            "sourceTag": "scope:shared-database",
+            "onlyDependOnpackagesWithTags": ["scope:immutable-schemas"]
+          }
+        ]
       }
     }
   }

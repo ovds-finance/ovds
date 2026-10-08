@@ -1,0 +1,35 @@
+# docker-compose.dev.yml
+version: '3.8'
+services:
+  frontend-dev:
+    image: node:20-alpine
+    working_dir: /workspace
+    command: pnpm run start:cloud
+    volumes: [.:/workspace, /workspace/node_modules]
+    ports: ['3000:3000']
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_URL=postgresql://cloud_user:secure_pwd@local-dev-db:5432/ovds_dev
+      - REDIS_URL=redis://local-dev-redis:6379
+    depends_on: [local-dev-db, local-dev-redis]
+    networks: [ovds-dev-network]
+
+  local-dev-db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=cloud_user
+      - POSTGRES_PASSWORD=secure_pwd
+      - POSTGRES_DB=ovds_dev
+    ports: ['5432:5432']
+    volumes: [pg-dev-data:/var/lib/postgresql/data]
+    networks: [ovds-dev-network]
+
+  local-dev-redis:
+    image: redis:7-alpine
+    ports: ['6379:6379']
+    networks: [ovds-dev-network]
+
+volumes: { pg-dev-data: }
+networks: { ovds-dev-network: { driver: bridge } }

@@ -1,0 +1,24 @@
+# config/monitoring/prometheus.yml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'ovds-cloud-infrastructure'
+    metrics_path: /v1/infra/metrics
+    scheme: http
+    bearer_token: 'secure_platform_monitoring_handshake_token'
+    static_configs:
+      - targets: ['frontend-service.production.svc.cluster.local:80']
+        labels:
+          environment: 'production'
+          region: 'us-east-1'
+          cluster_node: 'master-pool-01'
+  - job_name: 'ovds-onpremise-nodes'
+    metrics_path: /api/v1/infra/metrics
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['localhost:8080']
+        labels:
+          environment: 'onpremise-edge'
+          node_type: 'isolated-node'

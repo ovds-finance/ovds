@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ovds-config
+  namespace: ovds
+data:
+  database-provider: "sqlite"

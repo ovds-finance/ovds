@@ -1,0 +1,23 @@
+# k8s/redis-cluster-statefulset.yml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-lock-mesh
+  namespace: production
+spec:
+  serviceName: "redis-lock-service"
+  replicas: 3
+  selector: { matchLabels: { app: redis-lock } }
+  template:
+    metadata: { labels: { app: redis-lock } }
+    spec:
+      containers:
+      - name: redis-engine
+        image: redis:7.2-alpine
+        command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no"]
+        ports: [{ containerPort: 6379, name: redisport }]
+        resources: { requests: { memory: "256Mi", cpu: "200m" }, limits: { memory: "512Mi", cpu: "500m" } }
+        volumeMounts: [{ name: redis-append-volume, mountPath: /data }]
+  volumeClaimTemplates:
+  - metadata: { name: redis-append-volume }
+    spec: { accessModes: ["ReadWriteOnce"], resources: { requests: { storage: 10Gi } } }

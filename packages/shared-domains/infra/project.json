@@ -1,0 +1,38 @@
+{
+  "name": "shared-domains-infra",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/shared-domains/infra/src",
+  "projectType": "library",
+  "tags": ["type:lib", "scope:shared"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "main": "packages/shared-domains/infra/src/index.ts",
+        "tsConfig": "packages/shared-domains/infra/tsconfig.lib.json",
+        "outputPath": "dist/packages/shared-domains/infra"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["packages/shared-domains/infra/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{projectRoot}/coverage"],
+      "options": {
+        "jestConfig": "packages/shared-domains/infra/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p packages/shared-domains/infra/tsconfig.lib.json"
+      }
+    }
+  }
+}

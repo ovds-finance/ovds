@@ -1,0 +1,97 @@
+# k8s/base/cloud-api-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ovds-cloud-api
+  namespace: ovds
+  labels:
+    app: ovds-cloud-api
+    component: api
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: ovds-cloud-api
+  template:
+    metadata:
+      labels:
+        app: ovds-cloud-api
+        component: api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3001"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: ovds-cloud-api
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+      - name: cloud-api
+        image: ghcr.io/your-org/ovds/cloud-api:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 3001
+          protocol: TCP
+        envFrom:
+        - secretRef:
+            name: ovds-secrets
+        - configMapRef:
+            name: ovds-config
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 20
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - ovds-cloud-api
+              topologyKey: kubernetes.io/hostname
+---
+# k8s/base/cloud-api-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ovds-cloud-api
+  namespace: ovds
+  labels:
+    app: ovds-cloud-api
+    component: api
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 3001
+    targetPort: 3001
+    protocol: TCP
+  selector:
+    app: ovds-cloud-api

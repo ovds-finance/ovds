@@ -1,0 +1,2824 @@
+{
+  "generatedAt": "2026-09-11T14:32:08.235Z",
+  "buildDir": "apps\\public\\assets",
+  "thresholdKb": 500,
+  "summary": {
+    "totalChunks": 351,
+    "jsChunks": 350,
+    "cssChunks": 1,
+    "totalSizeKb": 9523.2,
+    "jsSizeKb": 9235.3,
+    "cssSizeKb": 287.9,
+    "warnCount": 1
+  },
+  "chunks": [
+    {
+      "name": "index-AawsOnHA.js",
+      "path": "apps\\public\\assets\\index-AawsOnHA.js",
+      "sizeBytes": 687418,
+      "sizeKb": 671.3,
+      "type": "app",
+      "warn": true
+    },
+    {
+      "name": "vendor-charts-CEDJFOvy.js",
+      "path": "apps\\public\\assets\\vendor-charts-CEDJFOvy.js",
+      "sizeBytes": 434975,
+      "sizeKb": 424.8,
+      "type": "vendor/charts",
+      "warn": false
+    },
+    {
+      "name": "Dashboard-Et5JEqjs.js",
+      "path": "apps\\public\\assets\\Dashboard-Et5JEqjs.js",
+      "sizeBytes": 332299,
+      "sizeKb": 324.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "index-DCt8hEVJ.css",
+      "path": "apps\\public\\assets\\index-DCt8hEVJ.css",
+      "sizeBytes": 294803,
+      "sizeKb": 287.9,
+      "type": "style",
+      "warn": false
+    },
+    {
+      "name": "vendor-react-DtPnMfsV.js",
+      "path": "apps\\public\\assets\\vendor-react-DtPnMfsV.js",
+      "sizeBytes": 289660,
+      "sizeKb": 282.9,
+      "type": "vendor/react",
+      "warn": false
+    },
+    {
+      "name": "DisasterFund-D3CpcU02.js",
+      "path": "apps\\public\\assets\\DisasterFund-D3CpcU02.js",
+      "sizeBytes": 242725,
+      "sizeKb": 237,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Reports-BGzKVY6k.js",
+      "path": "apps\\public\\assets\\Reports-BGzKVY6k.js",
+      "sizeBytes": 235117,
+      "sizeKb": 229.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "RolePermissions-B5dbL6ep.js",
+      "path": "apps\\public\\assets\\RolePermissions-B5dbL6ep.js",
+      "sizeBytes": 230552,
+      "sizeKb": 225.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Developers-qMkzS3wv.js",
+      "path": "apps\\public\\assets\\Developers-qMkzS3wv.js",
+      "sizeBytes": 195909,
+      "sizeKb": 191.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "periodManager-ChrVSdyY.js",
+      "path": "apps\\public\\assets\\periodManager-ChrVSdyY.js",
+      "sizeBytes": 186585,
+      "sizeKb": 182.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "PayrollAdministration-DaN_VUAU.js",
+      "path": "apps\\public\\assets\\PayrollAdministration-DaN_VUAU.js",
+      "sizeBytes": 130696,
+      "sizeKb": 127.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AuditOutsourcing-BWeRxoJg.js",
+      "path": "apps\\public\\assets\\AuditOutsourcing-BWeRxoJg.js",
+      "sizeBytes": 127697,
+      "sizeKb": 124.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "IfsDashboard-G1MfyZYw.js",
+      "path": "apps\\public\\assets\\IfsDashboard-G1MfyZYw.js",
+      "sizeBytes": 124163,
+      "sizeKb": 121.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "vendor-refine-CnuNGdqH.js",
+      "path": "apps\\public\\assets\\vendor-refine-CnuNGdqH.js",
+      "sizeBytes": 116519,
+      "sizeKb": 113.8,
+      "type": "vendor/refine",
+      "warn": false
+    },
+    {
+      "name": "vendor-icons-C_Ra_4VK.js",
+      "path": "apps\\public\\assets\\vendor-icons-C_Ra_4VK.js",
+      "sizeBytes": 113732,
+      "sizeKb": 111.1,
+      "type": "vendor/icons",
+      "warn": false
+    },
+    {
+      "name": "CRM-B-VL1ayB.js",
+      "path": "apps\\public\\assets\\CRM-B-VL1ayB.js",
+      "sizeBytes": 99841,
+      "sizeKb": 97.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Invoices-DtDEVLYz.js",
+      "path": "apps\\public\\assets\\Invoices-DtDEVLYz.js",
+      "sizeBytes": 95214,
+      "sizeKb": 93,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "vendor-http-BfAg-4X3.js",
+      "path": "apps\\public\\assets\\vendor-http-BfAg-4X3.js",
+      "sizeBytes": 93242,
+      "sizeKb": 91.1,
+      "type": "vendor/http",
+      "warn": false
+    },
+    {
+      "name": "invoiceCaptureModal-5E5Fk-Gf.js",
+      "path": "apps\\public\\assets\\invoiceCaptureModal-5E5Fk-Gf.js",
+      "sizeBytes": 87475,
+      "sizeKb": 85.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "LevyCollectionPanel-DObKDBy9.js",
+      "path": "apps\\public\\assets\\LevyCollectionPanel-DObKDBy9.js",
+      "sizeBytes": 81267,
+      "sizeKb": 79.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SinglePageAccounting-C2A0sUEO.js",
+      "path": "apps\\public\\assets\\SinglePageAccounting-C2A0sUEO.js",
+      "sizeBytes": 75212,
+      "sizeKb": 73.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AppStore-D58cnYxX.js",
+      "path": "apps\\public\\assets\\AppStore-D58cnYxX.js",
+      "sizeBytes": 73469,
+      "sizeKb": 71.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AccountingWorkflow-tD-x6aU4.js",
+      "path": "apps\\public\\assets\\AccountingWorkflow-tD-x6aU4.js",
+      "sizeBytes": 72668,
+      "sizeKb": 71,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SetupOnPremise-CoEaAkfz.js",
+      "path": "apps\\public\\assets\\SetupOnPremise-CoEaAkfz.js",
+      "sizeBytes": 71725,
+      "sizeKb": 70,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "addInvoiceModal-IGBN7upf.js",
+      "path": "apps\\public\\assets\\addInvoiceModal-IGBN7upf.js",
+      "sizeBytes": 69933,
+      "sizeKb": 68.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "bankTransactionModal-D6g2LXfX.js",
+      "path": "apps\\public\\assets\\bankTransactionModal-D6g2LXfX.js",
+      "sizeBytes": 69928,
+      "sizeKb": 68.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "bankList-C2HBYRxq.js",
+      "path": "apps\\public\\assets\\bankList-C2HBYRxq.js",
+      "sizeBytes": 67078,
+      "sizeKb": 65.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "GettingStarted-C6Z1u9u-.js",
+      "path": "apps\\public\\assets\\GettingStarted-C6Z1u9u-.js",
+      "sizeBytes": 65035,
+      "sizeKb": 63.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "EimsSettings-31KOwXOg.js",
+      "path": "apps\\public\\assets\\EimsSettings-31KOwXOg.js",
+      "sizeBytes": 62969,
+      "sizeKb": 61.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "IotHub-DPSpAkxI.js",
+      "path": "apps\\public\\assets\\IotHub-DPSpAkxI.js",
+      "sizeBytes": 62720,
+      "sizeKb": 61.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "vendor-i18n-D3dHiJHI.js",
+      "path": "apps\\public\\assets\\vendor-i18n-D3dHiJHI.js",
+      "sizeBytes": 60664,
+      "sizeKb": 59.2,
+      "type": "vendor/i18n",
+      "warn": false
+    },
+    {
+      "name": "Register-DzIwdADY.js",
+      "path": "apps\\public\\assets\\Register-DzIwdADY.js",
+      "sizeBytes": 60335,
+      "sizeKb": 58.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Landing-q8oL4Hf9.js",
+      "path": "apps\\public\\assets\\Landing-q8oL4Hf9.js",
+      "sizeBytes": 59922,
+      "sizeKb": 58.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CentralControlPanelContent-B6kqRUcB.js",
+      "path": "apps\\public\\assets\\CentralControlPanelContent-B6kqRUcB.js",
+      "sizeBytes": 59491,
+      "sizeKb": 58.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AccountingCollections-D1XUFQS0.js",
+      "path": "apps\\public\\assets\\AccountingCollections-D1XUFQS0.js",
+      "sizeBytes": 58600,
+      "sizeKb": 57.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BusinessIncomeTax-Tx2QPx7Q.js",
+      "path": "apps\\public\\assets\\BusinessIncomeTax-Tx2QPx7Q.js",
+      "sizeBytes": 58165,
+      "sizeKb": 56.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SalesOrders-BhdH_P17.js",
+      "path": "apps\\public\\assets\\SalesOrders-BhdH_P17.js",
+      "sizeBytes": 57175,
+      "sizeKb": 55.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ComplianceAuditor-BMBfCYE_.js",
+      "path": "apps\\public\\assets\\ComplianceAuditor-BMBfCYE_.js",
+      "sizeBytes": 56823,
+      "sizeKb": 55.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Projects-9Oj8c5Fn.js",
+      "path": "apps\\public\\assets\\Projects-9Oj8c5Fn.js",
+      "sizeBytes": 56237,
+      "sizeKb": 54.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ScannedBills-GjUgkkNv.js",
+      "path": "apps\\public\\assets\\ScannedBills-GjUgkkNv.js",
+      "sizeBytes": 51952,
+      "sizeKb": 50.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Inventory-BCunbs8O.js",
+      "path": "apps\\public\\assets\\Inventory-BCunbs8O.js",
+      "sizeBytes": 51319,
+      "sizeKb": 50.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BusinessRegistration-Bo6P3B1e.js",
+      "path": "apps\\public\\assets\\BusinessRegistration-Bo6P3B1e.js",
+      "sizeBytes": 50823,
+      "sizeKb": 49.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ProformaInvoices-wYqOmNwC.js",
+      "path": "apps\\public\\assets\\ProformaInvoices-wYqOmNwC.js",
+      "sizeBytes": 49276,
+      "sizeKb": 48.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "FinancialStatements-mwOK81Zs.js",
+      "path": "apps\\public\\assets\\FinancialStatements-mwOK81Zs.js",
+      "sizeBytes": 49012,
+      "sizeKb": 47.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "VatAdministration-CrupHF_h.js",
+      "path": "apps\\public\\assets\\VatAdministration-CrupHF_h.js",
+      "sizeBytes": 48911,
+      "sizeKb": 47.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Releases-DcYr3Ye0.js",
+      "path": "apps\\public\\assets\\Releases-DcYr3Ye0.js",
+      "sizeBytes": 48383,
+      "sizeKb": 47.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "DocsPortal-DbnQMUWy.js",
+      "path": "apps\\public\\assets\\DocsPortal-DbnQMUWy.js",
+      "sizeBytes": 48373,
+      "sizeKb": 47.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "VandvCompliance-C9YrzIwm.js",
+      "path": "apps\\public\\assets\\VandvCompliance-C9YrzIwm.js",
+      "sizeBytes": 48111,
+      "sizeKb": 47,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "vendor-parsers-BnQGg9o3.js",
+      "path": "apps\\public\\assets\\vendor-parsers-BnQGg9o3.js",
+      "sizeBytes": 48085,
+      "sizeKb": 47,
+      "type": "vendor/parsers",
+      "warn": false
+    },
+    {
+      "name": "TaxFiling-BObwSJiI.js",
+      "path": "apps\\public\\assets\\TaxFiling-BObwSJiI.js",
+      "sizeBytes": 47697,
+      "sizeKb": 46.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CRMPipeline-Cdgd4cO7.js",
+      "path": "apps\\public\\assets\\CRMPipeline-Cdgd4cO7.js",
+      "sizeBytes": 47095,
+      "sizeKb": 46,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Accounting-DLziSHfS.js",
+      "path": "apps\\public\\assets\\Accounting-DLziSHfS.js",
+      "sizeBytes": 45947,
+      "sizeKb": 44.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "vendor-dnd-Q3cGct10.js",
+      "path": "apps\\public\\assets\\vendor-dnd-Q3cGct10.js",
+      "sizeBytes": 45935,
+      "sizeKb": 44.9,
+      "type": "vendor/dnd",
+      "warn": false
+    },
+    {
+      "name": "UnifiedControlNode-BvhvIqev.js",
+      "path": "apps\\public\\assets\\UnifiedControlNode-BvhvIqev.js",
+      "sizeBytes": 45221,
+      "sizeKb": 44.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "MoRReport-DjJIDJCn.js",
+      "path": "apps\\public\\assets\\MoRReport-DjJIDJCn.js",
+      "sizeBytes": 45203,
+      "sizeKb": 44.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "OnboardingAdmin-ClngIyQT.js",
+      "path": "apps\\public\\assets\\OnboardingAdmin-ClngIyQT.js",
+      "sizeBytes": 44251,
+      "sizeKb": 43.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "UniversalTaxConfig-BR-mHiW_.js",
+      "path": "apps\\public\\assets\\UniversalTaxConfig-BR-mHiW_.js",
+      "sizeBytes": 44218,
+      "sizeKb": 43.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Banking-CsX26qdN.js",
+      "path": "apps\\public\\assets\\Banking-CsX26qdN.js",
+      "sizeBytes": 43454,
+      "sizeKb": 42.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BankStatementImport-BzVEWGJV.js",
+      "path": "apps\\public\\assets\\BankStatementImport-BzVEWGJV.js",
+      "sizeBytes": 43438,
+      "sizeKb": 42.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Onboarding-CiU9ZluO.js",
+      "path": "apps\\public\\assets\\Onboarding-CiU9ZluO.js",
+      "sizeBytes": 42876,
+      "sizeKb": 41.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "GettingStartedPublic-BkDwkYg5.js",
+      "path": "apps\\public\\assets\\GettingStartedPublic-BkDwkYg5.js",
+      "sizeBytes": 41587,
+      "sizeKb": 40.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SystemAdministrationSetup-P0nHOss2.js",
+      "path": "apps\\public\\assets\\SystemAdministrationSetup-P0nHOss2.js",
+      "sizeBytes": 39354,
+      "sizeKb": 38.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "TaxDashboard-DqqgJkJS.js",
+      "path": "apps\\public\\assets\\TaxDashboard-DqqgJkJS.js",
+      "sizeBytes": 39336,
+      "sizeKb": 38.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "vendor-query-3Xz-t3dX.js",
+      "path": "apps\\public\\assets\\vendor-query-3Xz-t3dX.js",
+      "sizeBytes": 39298,
+      "sizeKb": 38.4,
+      "type": "vendor/query",
+      "warn": false
+    },
+    {
+      "name": "ClientDownload-MsxvteD1.js",
+      "path": "apps\\public\\assets\\ClientDownload-MsxvteD1.js",
+      "sizeBytes": 38697,
+      "sizeKb": 37.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "MasterData-JG1LJmo7.js",
+      "path": "apps\\public\\assets\\MasterData-JG1LJmo7.js",
+      "sizeBytes": 37859,
+      "sizeKb": 37,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ScheduleDTax-CQdHiMw_.js",
+      "path": "apps\\public\\assets\\ScheduleDTax-CQdHiMw_.js",
+      "sizeBytes": 35979,
+      "sizeKb": 35.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BusinessInsights-BReolh2p.js",
+      "path": "apps\\public\\assets\\BusinessInsights-BReolh2p.js",
+      "sizeBytes": 35566,
+      "sizeKb": 34.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "tax-calc-BYLXJ8zn.js",
+      "path": "apps\\public\\assets\\tax-calc-BYLXJ8zn.js",
+      "sizeBytes": 35410,
+      "sizeKb": 34.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "FxRates-B_yg7d5q.js",
+      "path": "apps\\public\\assets\\FxRates-B_yg7d5q.js",
+      "sizeBytes": 35378,
+      "sizeKb": 34.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BankingVerification-CWnJqZPG.js",
+      "path": "apps\\public\\assets\\BankingVerification-CWnJqZPG.js",
+      "sizeBytes": 34539,
+      "sizeKb": 33.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Trade-DrzC6zCH.js",
+      "path": "apps\\public\\assets\\Trade-DrzC6zCH.js",
+      "sizeBytes": 34026,
+      "sizeKb": 33.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Estimates-BWS51NPx.js",
+      "path": "apps\\public\\assets\\Estimates-BWS51NPx.js",
+      "sizeBytes": 33177,
+      "sizeKb": 32.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ClientPortal-B6E-1X7y.js",
+      "path": "apps\\public\\assets\\ClientPortal-B6E-1X7y.js",
+      "sizeBytes": 32947,
+      "sizeKb": 32.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ReportsDashboard-CMrY1rpk.js",
+      "path": "apps\\public\\assets\\ReportsDashboard-CMrY1rpk.js",
+      "sizeBytes": 32402,
+      "sizeKb": 31.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "invoiceDrawer-C7PcGYs6.js",
+      "path": "apps\\public\\assets\\invoiceDrawer-C7PcGYs6.js",
+      "sizeBytes": 32035,
+      "sizeKb": 31.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SecurityEvaluator-BNMN1Lj2.js",
+      "path": "apps\\public\\assets\\SecurityEvaluator-BNMN1Lj2.js",
+      "sizeBytes": 31637,
+      "sizeKb": 30.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "FixedAssets-CpKMlJyS.js",
+      "path": "apps\\public\\assets\\FixedAssets-CpKMlJyS.js",
+      "sizeBytes": 31223,
+      "sizeKb": 30.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Bills-BTSSFNGx.js",
+      "path": "apps\\public\\assets\\Bills-BTSSFNGx.js",
+      "sizeBytes": 31164,
+      "sizeKb": 30.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "NotificationSettings-0E5_EqCT.js",
+      "path": "apps\\public\\assets\\NotificationSettings-0E5_EqCT.js",
+      "sizeBytes": 30996,
+      "sizeKb": 30.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "DoubleEntry-DZ2o60-V.js",
+      "path": "apps\\public\\assets\\DoubleEntry-DZ2o60-V.js",
+      "sizeBytes": 30797,
+      "sizeKb": 30.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "InvoiceModuleDownload-CuaueXi3.js",
+      "path": "apps\\public\\assets\\InvoiceModuleDownload-CuaueXi3.js",
+      "sizeBytes": 30771,
+      "sizeKb": 30,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "VatReportsPanel-P82LmvMF.js",
+      "path": "apps\\public\\assets\\VatReportsPanel-P82LmvMF.js",
+      "sizeBytes": 30561,
+      "sizeKb": 29.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "DeferredTax-CPc8pohp.js",
+      "path": "apps\\public\\assets\\DeferredTax-CPc8pohp.js",
+      "sizeBytes": 30039,
+      "sizeKb": 29.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Plans-zxEQDTsR.js",
+      "path": "apps\\public\\assets\\Plans-zxEQDTsR.js",
+      "sizeBytes": 30027,
+      "sizeKb": 29.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Users-D2m92zVk.js",
+      "path": "apps\\public\\assets\\Users-D2m92zVk.js",
+      "sizeBytes": 29887,
+      "sizeKb": 29.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CustomerSummary-CYdJkg9g.js",
+      "path": "apps\\public\\assets\\CustomerSummary-CYdJkg9g.js",
+      "sizeBytes": 29357,
+      "sizeKb": 28.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BusinessLoans-DFyYZCnn.js",
+      "path": "apps\\public\\assets\\BusinessLoans-DFyYZCnn.js",
+      "sizeBytes": 27864,
+      "sizeKb": 27.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "recordPaymentModal-CpA0cr9j.js",
+      "path": "apps\\public\\assets\\recordPaymentModal-CpA0cr9j.js",
+      "sizeBytes": 27578,
+      "sizeKb": 26.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "customerRegistryModal-DcSs3VD4.js",
+      "path": "apps\\public\\assets\\customerRegistryModal-DcSs3VD4.js",
+      "sizeBytes": 26989,
+      "sizeKb": 26.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "vendor-auth-lzbB9-BL.js",
+      "path": "apps\\public\\assets\\vendor-auth-lzbB9-BL.js",
+      "sizeBytes": 26401,
+      "sizeKb": 25.8,
+      "type": "vendor/auth",
+      "warn": false
+    },
+    {
+      "name": "Login-c6rWlfZJ.js",
+      "path": "apps\\public\\assets\\Login-c6rWlfZJ.js",
+      "sizeBytes": 25903,
+      "sizeKb": 25.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ingestionHubModal-CrD8xfPq.js",
+      "path": "apps\\public\\assets\\ingestionHubModal-CrD8xfPq.js",
+      "sizeBytes": 25817,
+      "sizeKb": 25.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AccreditationChecklistPage-BwPGmZ2q.js",
+      "path": "apps\\public\\assets\\AccreditationChecklistPage-BwPGmZ2q.js",
+      "sizeBytes": 25723,
+      "sizeKb": 25.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "invoiceModals-Bwo1BjIO.js",
+      "path": "apps\\public\\assets\\invoiceModals-Bwo1BjIO.js",
+      "sizeBytes": 25068,
+      "sizeKb": 24.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BillDetail-ftBFFXnc.js",
+      "path": "apps\\public\\assets\\BillDetail-ftBFFXnc.js",
+      "sizeBytes": 24474,
+      "sizeKb": 23.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CostAccounting-VD29A29C.js",
+      "path": "apps\\public\\assets\\CostAccounting-VD29A29C.js",
+      "sizeBytes": 24019,
+      "sizeKb": 23.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "InventoryDashboard-CYHg1gBD.js",
+      "path": "apps\\public\\assets\\InventoryDashboard-CYHg1gBD.js",
+      "sizeBytes": 23994,
+      "sizeKb": 23.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "estimateModal-CdbXW2p9.js",
+      "path": "apps\\public\\assets\\estimateModal-CdbXW2p9.js",
+      "sizeBytes": 23765,
+      "sizeKb": 23.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "itemLifecycleTracker-D5bHkKei.js",
+      "path": "apps\\public\\assets\\itemLifecycleTracker-D5bHkKei.js",
+      "sizeBytes": 23681,
+      "sizeKb": 23.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ModularSettings-Dq3s0OSn.js",
+      "path": "apps\\public\\assets\\ModularSettings-Dq3s0OSn.js",
+      "sizeBytes": 23402,
+      "sizeKb": 22.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "previewModal-CNrhZLOQ.js",
+      "path": "apps\\public\\assets\\previewModal-CNrhZLOQ.js",
+      "sizeBytes": 23222,
+      "sizeKb": 22.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "PropertyTax-vJnQhmsm.js",
+      "path": "apps\\public\\assets\\PropertyTax-vJnQhmsm.js",
+      "sizeBytes": 22267,
+      "sizeKb": 21.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Taxes-BBRAlo_S.js",
+      "path": "apps\\public\\assets\\Taxes-BBRAlo_S.js",
+      "sizeBytes": 22181,
+      "sizeKb": 21.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "iasbUpdateBanner-C9AmnMFA.js",
+      "path": "apps\\public\\assets\\iasbUpdateBanner-C9AmnMFA.js",
+      "sizeBytes": 21579,
+      "sizeKb": 21.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ETaxDeclaration-DsJjLGEs.js",
+      "path": "apps\\public\\assets\\ETaxDeclaration-DsJjLGEs.js",
+      "sizeBytes": 21546,
+      "sizeKb": 21,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Expenses-BOwzuwCs.js",
+      "path": "apps\\public\\assets\\Expenses-BOwzuwCs.js",
+      "sizeBytes": 21110,
+      "sizeKb": 20.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ethiopianComplianceGuide-DIxbIGld.js",
+      "path": "apps\\public\\assets\\ethiopianComplianceGuide-DIxbIGld.js",
+      "sizeBytes": 20688,
+      "sizeKb": 20.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "EntryPortal-5ME29Na-.js",
+      "path": "apps\\public\\assets\\EntryPortal-5ME29Na-.js",
+      "sizeBytes": 20364,
+      "sizeKb": 19.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Enrollment-DLJ27O4L.js",
+      "path": "apps\\public\\assets\\Enrollment-DLJ27O4L.js",
+      "sizeBytes": 20220,
+      "sizeKb": 19.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BudgetVariance-CQGDbBwD.js",
+      "path": "apps\\public\\assets\\BudgetVariance-CQGDbBwD.js",
+      "sizeBytes": 20025,
+      "sizeKb": 19.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Leases-BUvEGn8b.js",
+      "path": "apps\\public\\assets\\Leases-BUvEGn8b.js",
+      "sizeBytes": 19926,
+      "sizeKb": 19.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "vendor-dates-CXOLuJqM.js",
+      "path": "apps\\public\\assets\\vendor-dates-CXOLuJqM.js",
+      "sizeBytes": 19821,
+      "sizeKb": 19.4,
+      "type": "vendor/dates",
+      "warn": false
+    },
+    {
+      "name": "ApiDocs-WikqwiPP.js",
+      "path": "apps\\public\\assets\\ApiDocs-WikqwiPP.js",
+      "sizeBytes": 19389,
+      "sizeKb": 18.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ConsolidatedStatements-CxXjyzot.js",
+      "path": "apps\\public\\assets\\ConsolidatedStatements-CxXjyzot.js",
+      "sizeBytes": 19249,
+      "sizeKb": 18.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "TreasuryForecast-CR-1CufV.js",
+      "path": "apps\\public\\assets\\TreasuryForecast-CR-1CufV.js",
+      "sizeBytes": 19143,
+      "sizeKb": 18.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "OvdsHub-BNMmK4QJ.js",
+      "path": "apps\\public\\assets\\OvdsHub-BNMmK4QJ.js",
+      "sizeBytes": 19125,
+      "sizeKb": 18.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BankReconciliation-D2aHpxeL.js",
+      "path": "apps\\public\\assets\\BankReconciliation-D2aHpxeL.js",
+      "sizeBytes": 18987,
+      "sizeKb": 18.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SubLedger-6PDdnwM7.js",
+      "path": "apps\\public\\assets\\SubLedger-6PDdnwM7.js",
+      "sizeBytes": 18877,
+      "sizeKb": 18.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "accountingChainWidget-CPOza6ef.js",
+      "path": "apps\\public\\assets\\accountingChainWidget-CPOza6ef.js",
+      "sizeBytes": 18792,
+      "sizeKb": 18.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ExciseTax-DNYarEP4.js",
+      "path": "apps\\public\\assets\\ExciseTax-DNYarEP4.js",
+      "sizeBytes": 18692,
+      "sizeKb": 18.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "GratuityCalculator-BpTN43ZH.js",
+      "path": "apps\\public\\assets\\GratuityCalculator-BpTN43ZH.js",
+      "sizeBytes": 18421,
+      "sizeKb": 18,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AabeAuditReadiness-B8qnGuTr.js",
+      "path": "apps\\public\\assets\\AabeAuditReadiness-B8qnGuTr.js",
+      "sizeBytes": 18375,
+      "sizeKb": 17.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Sales-Dw8Nr3cS.js",
+      "path": "apps\\public\\assets\\Sales-Dw8Nr3cS.js",
+      "sizeBytes": 18119,
+      "sizeKb": 17.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Provisions-BmS8b2Jy.js",
+      "path": "apps\\public\\assets\\Provisions-BmS8b2Jy.js",
+      "sizeBytes": 18070,
+      "sizeKb": 17.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "PeriodClose-C6igcomP.js",
+      "path": "apps\\public\\assets\\PeriodClose-C6igcomP.js",
+      "sizeBytes": 17880,
+      "sizeKb": 17.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CyberAuditChecklistPage-C1BHiQ6v.js",
+      "path": "apps\\public\\assets\\CyberAuditChecklistPage-C1BHiQ6v.js",
+      "sizeBytes": 17862,
+      "sizeKb": 17.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Transactions-CNhKjSvk.js",
+      "path": "apps\\public\\assets\\Transactions-CNhKjSvk.js",
+      "sizeBytes": 17398,
+      "sizeKb": 17,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SampleInvoice-KmJ2agAc.js",
+      "path": "apps\\public\\assets\\SampleInvoice-KmJ2agAc.js",
+      "sizeBytes": 17293,
+      "sizeKb": 16.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CompanyNew-C-FjIudD.js",
+      "path": "apps\\public\\assets\\CompanyNew-C-FjIudD.js",
+      "sizeBytes": 17185,
+      "sizeKb": 16.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "MasterComplianceChecklistPage-DW-cf6YY.js",
+      "path": "apps\\public\\assets\\MasterComplianceChecklistPage-DW-cf6YY.js",
+      "sizeBytes": 16671,
+      "sizeKb": 16.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "WhtCertificates-DpOd83pl.js",
+      "path": "apps\\public\\assets\\WhtCertificates-DpOd83pl.js",
+      "sizeBytes": 16249,
+      "sizeKb": 15.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "GoodsReceivedNotes-1mI_Nb62.js",
+      "path": "apps\\public\\assets\\GoodsReceivedNotes-1mI_Nb62.js",
+      "sizeBytes": 16096,
+      "sizeKb": 15.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CertificatesPage-CqR6w2nR.js",
+      "path": "apps\\public\\assets\\CertificatesPage-CqR6w2nR.js",
+      "sizeBytes": 15686,
+      "sizeKb": 15.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Helpdesk-BDyNX5xz.js",
+      "path": "apps\\public\\assets\\Helpdesk-BDyNX5xz.js",
+      "sizeBytes": 15594,
+      "sizeKb": 15.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ImportCenter-DtLYcTCJ.js",
+      "path": "apps\\public\\assets\\ImportCenter-DtLYcTCJ.js",
+      "sizeBytes": 15570,
+      "sizeKb": 15.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Budgets-BfmRnsIk.js",
+      "path": "apps\\public\\assets\\Budgets-BfmRnsIk.js",
+      "sizeBytes": 15555,
+      "sizeKb": 15.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ExpenseClaims-BmiG9xI7.js",
+      "path": "apps\\public\\assets\\ExpenseClaims-BmiG9xI7.js",
+      "sizeBytes": 15535,
+      "sizeKb": 15.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BankingWorkflow-DCw3_FJd.js",
+      "path": "apps\\public\\assets\\BankingWorkflow-DCw3_FJd.js",
+      "sizeBytes": 15329,
+      "sizeKb": 15,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Items-BtV2thvS.js",
+      "path": "apps\\public\\assets\\Items-BtV2thvS.js",
+      "sizeBytes": 15271,
+      "sizeKb": 14.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "PettyCash-Bi2cdHZ8.js",
+      "path": "apps\\public\\assets\\PettyCash-Bi2cdHZ8.js",
+      "sizeBytes": 15259,
+      "sizeKb": 14.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "TotFiling-r_h6I0Fg.js",
+      "path": "apps\\public\\assets\\TotFiling-r_h6I0Fg.js",
+      "sizeBytes": 15165,
+      "sizeKb": 14.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "MaintainingTechnology-BwfmKCpi.js",
+      "path": "apps\\public\\assets\\MaintainingTechnology-BwfmKCpi.js",
+      "sizeBytes": 14839,
+      "sizeKb": 14.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Payments-BTq9PNHH.js",
+      "path": "apps\\public\\assets\\Payments-BTq9PNHH.js",
+      "sizeBytes": 14773,
+      "sizeKb": 14.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SupplierPaymentRun-DzJG1tNM.js",
+      "path": "apps\\public\\assets\\SupplierPaymentRun-DzJG1tNM.js",
+      "sizeBytes": 14734,
+      "sizeKb": 14.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "PaymentGateway-CLO3_ovB.js",
+      "path": "apps\\public\\assets\\PaymentGateway-CLO3_ovB.js",
+      "sizeBytes": 14476,
+      "sizeKb": 14.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Consolidation-D0MzPesV.js",
+      "path": "apps\\public\\assets\\Consolidation-D0MzPesV.js",
+      "sizeBytes": 14276,
+      "sizeKb": 13.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "PayeDeclarations-Cae7XV8L.js",
+      "path": "apps\\public\\assets\\PayeDeclarations-Cae7XV8L.js",
+      "sizeBytes": 14275,
+      "sizeKb": 13.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BankingRules-DIZ66J8u.js",
+      "path": "apps\\public\\assets\\BankingRules-DIZ66J8u.js",
+      "sizeBytes": 14104,
+      "sizeKb": 13.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Adjustments-Rjh7kouZ.js",
+      "path": "apps\\public\\assets\\Adjustments-Rjh7kouZ.js",
+      "sizeBytes": 13993,
+      "sizeKb": 13.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CustomerStatement-BP6hpJs_.js",
+      "path": "apps\\public\\assets\\CustomerStatement-BP6hpJs_.js",
+      "sizeBytes": 13976,
+      "sizeKb": 13.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "whtCertificateModal-qLmLIyTP.js",
+      "path": "apps\\public\\assets\\whtCertificateModal-qLmLIyTP.js",
+      "sizeBytes": 13975,
+      "sizeKb": 13.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "EclProvision-BFKHc2zl.js",
+      "path": "apps\\public\\assets\\EclProvision-BFKHc2zl.js",
+      "sizeBytes": 13875,
+      "sizeKb": 13.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SettingsCatalog-DJ6UFmUQ.js",
+      "path": "apps\\public\\assets\\SettingsCatalog-DJ6UFmUQ.js",
+      "sizeBytes": 13848,
+      "sizeKb": 13.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AccrualsPrepayments-BwRzPiQA.js",
+      "path": "apps\\public\\assets\\AccrualsPrepayments-BwRzPiQA.js",
+      "sizeBytes": 13760,
+      "sizeKb": 13.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CostCenters-zUhJQMMA.js",
+      "path": "apps\\public\\assets\\CostCenters-zUhJQMMA.js",
+      "sizeBytes": 13732,
+      "sizeKb": 13.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ErcaPenaltyCalculator-CVeG6nWz.js",
+      "path": "apps\\public\\assets\\ErcaPenaltyCalculator-CVeG6nWz.js",
+      "sizeBytes": 13722,
+      "sizeKb": 13.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "TaxAcknowledgementVault-C61z1sF8.js",
+      "path": "apps\\public\\assets\\TaxAcknowledgementVault-C61z1sF8.js",
+      "sizeBytes": 13696,
+      "sizeKb": 13.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "LetterOfCredit-DiVc0nOj.js",
+      "path": "apps\\public\\assets\\LetterOfCredit-DiVc0nOj.js",
+      "sizeBytes": 13690,
+      "sizeKb": 13.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "OpeningBalances-CfK0bkrz.js",
+      "path": "apps\\public\\assets\\OpeningBalances-CfK0bkrz.js",
+      "sizeBytes": 13583,
+      "sizeKb": 13.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "LicenseManager-BCNI2EBh.js",
+      "path": "apps\\public\\assets\\LicenseManager-BCNI2EBh.js",
+      "sizeBytes": 13427,
+      "sizeKb": 13.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Vendors-CejTbk3R.js",
+      "path": "apps\\public\\assets\\Vendors-CejTbk3R.js",
+      "sizeBytes": 13422,
+      "sizeKb": 13.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BaseComponents-DuIGxbwD.js",
+      "path": "apps\\public\\assets\\BaseComponents-DuIGxbwD.js",
+      "sizeBytes": 13260,
+      "sizeKb": 12.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BankingYearEnd-BxjewbMW.js",
+      "path": "apps\\public\\assets\\BankingYearEnd-BxjewbMW.js",
+      "sizeBytes": 13207,
+      "sizeKb": 12.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Employees-pG7SvHWQ.js",
+      "path": "apps\\public\\assets\\Employees-pG7SvHWQ.js",
+      "sizeBytes": 13204,
+      "sizeKb": 12.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "PurchaseOrders-BmKXIDPw.js",
+      "path": "apps\\public\\assets\\PurchaseOrders-BmKXIDPw.js",
+      "sizeBytes": 13072,
+      "sizeKb": 12.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SMEs-CL2N7J4u.js",
+      "path": "apps\\public\\assets\\SMEs-CL2N7J4u.js",
+      "sizeBytes": 13020,
+      "sizeKb": 12.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "IntercompanyEliminations-BmlX5iR3.js",
+      "path": "apps\\public\\assets\\IntercompanyEliminations-BmlX5iR3.js",
+      "sizeBytes": 12907,
+      "sizeKb": 12.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "PurchasesDashboard-BEyUlsDJ.js",
+      "path": "apps\\public\\assets\\PurchasesDashboard-BEyUlsDJ.js",
+      "sizeBytes": 12762,
+      "sizeKb": 12.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SalesCollections-eF-hz8Ds.js",
+      "path": "apps\\public\\assets\\SalesCollections-eF-hz8Ds.js",
+      "sizeBytes": 12585,
+      "sizeKb": 12.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "EmployeeBenefits-fu1HyNln.js",
+      "path": "apps\\public\\assets\\EmployeeBenefits-fu1HyNln.js",
+      "sizeBytes": 12536,
+      "sizeKb": 12.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "LandedCost-BSw0HWrW.js",
+      "path": "apps\\public\\assets\\LandedCost-BSw0HWrW.js",
+      "sizeBytes": 12426,
+      "sizeKb": 12.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Customers-hbQzBdQq.js",
+      "path": "apps\\public\\assets\\Customers-hbQzBdQq.js",
+      "sizeBytes": 12252,
+      "sizeKb": 12,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ImportShipments-Civ4upYX.js",
+      "path": "apps\\public\\assets\\ImportShipments-Civ4upYX.js",
+      "sizeBytes": 12132,
+      "sizeKb": 11.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Calendar-B4QCaZ4R.js",
+      "path": "apps\\public\\assets\\Calendar-B4QCaZ4R.js",
+      "sizeBytes": 12045,
+      "sizeKb": 11.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AccountingDashboard-Cn9lDv4M.js",
+      "path": "apps\\public\\assets\\AccountingDashboard-Cn9lDv4M.js",
+      "sizeBytes": 12017,
+      "sizeKb": 11.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "vendor-ui-utils-DsrlyVEI.js",
+      "path": "apps\\public\\assets\\vendor-ui-utils-DsrlyVEI.js",
+      "sizeBytes": 11913,
+      "sizeKb": 11.6,
+      "type": "vendor/other",
+      "warn": false
+    },
+    {
+      "name": "DeviceControl-CxbUwmNu.js",
+      "path": "apps\\public\\assets\\DeviceControl-CxbUwmNu.js",
+      "sizeBytes": 11786,
+      "sizeKb": 11.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "PurchaseReceipts-CGHT8RpY.js",
+      "path": "apps\\public\\assets\\PurchaseReceipts-CGHT8RpY.js",
+      "sizeBytes": 11057,
+      "sizeKb": 10.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BankFeeds--6yP6qTM.js",
+      "path": "apps\\public\\assets\\BankFeeds--6yP6qTM.js",
+      "sizeBytes": 10975,
+      "sizeKb": 10.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Investments-nhJ2EIam.js",
+      "path": "apps\\public\\assets\\Investments-nhJ2EIam.js",
+      "sizeBytes": 10910,
+      "sizeKb": 10.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Manufacturing-CoRn8fkM.js",
+      "path": "apps\\public\\assets\\Manufacturing-CoRn8fkM.js",
+      "sizeBytes": 10907,
+      "sizeKb": 10.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Payroll-DtpieAdB.js",
+      "path": "apps\\public\\assets\\Payroll-DtpieAdB.js",
+      "sizeBytes": 10873,
+      "sizeKb": 10.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "VendorLedger-BziX_5Kb.js",
+      "path": "apps\\public\\assets\\VendorLedger-BziX_5Kb.js",
+      "sizeBytes": 10698,
+      "sizeKb": 10.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "TaxPaymentReference-DvqaXdOs.js",
+      "path": "apps\\public\\assets\\TaxPaymentReference-DvqaXdOs.js",
+      "sizeBytes": 10663,
+      "sizeKb": 10.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Confirm-2qoMQvba.js",
+      "path": "apps\\public\\assets\\Confirm-2qoMQvba.js",
+      "sizeBytes": 10602,
+      "sizeKb": 10.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Leaves-DXSyT6Jd.js",
+      "path": "apps\\public\\assets\\Leaves-DXSyT6Jd.js",
+      "sizeBytes": 10494,
+      "sizeKb": 10.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "PensionSubmission-3N53eCPH.js",
+      "path": "apps\\public\\assets\\PensionSubmission-3N53eCPH.js",
+      "sizeBytes": 10377,
+      "sizeKb": 10.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "StampDuty-Cw8IffXD.js",
+      "path": "apps\\public\\assets\\StampDuty-Cw8IffXD.js",
+      "sizeBytes": 10273,
+      "sizeKb": 10,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Refunds-CsukzEmd.js",
+      "path": "apps\\public\\assets\\Refunds-CsukzEmd.js",
+      "sizeBytes": 10259,
+      "sizeKb": 10,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Partnerships-DMI5I6Zh.js",
+      "path": "apps\\public\\assets\\Partnerships-DMI5I6Zh.js",
+      "sizeBytes": 10227,
+      "sizeKb": 10,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "EmailTemplates-B3ZFySkM.js",
+      "path": "apps\\public\\assets\\EmailTemplates-B3ZFySkM.js",
+      "sizeBytes": 10212,
+      "sizeKb": 10,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "paymentVerificationPanel-DX8cygkL.js",
+      "path": "apps\\public\\assets\\paymentVerificationPanel-DX8cygkL.js",
+      "sizeBytes": 9866,
+      "sizeKb": 9.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "OvdsPipelineConsole-CKETRjuH.js",
+      "path": "apps\\public\\assets\\OvdsPipelineConsole-CKETRjuH.js",
+      "sizeBytes": 9827,
+      "sizeKb": 9.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "FundTransfers-BKbXuIq1.js",
+      "path": "apps\\public\\assets\\FundTransfers-BKbXuIq1.js",
+      "sizeBytes": 9580,
+      "sizeKb": 9.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "EquityStatement-BUaiTHcT.js",
+      "path": "apps\\public\\assets\\EquityStatement-BUaiTHcT.js",
+      "sizeBytes": 9241,
+      "sizeKb": 9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Holidays-CREllKq7.js",
+      "path": "apps\\public\\assets\\Holidays-CREllKq7.js",
+      "sizeBytes": 9193,
+      "sizeKb": 9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "index-CEKYXVcM.js",
+      "path": "apps\\public\\assets\\index-CEKYXVcM.js",
+      "sizeBytes": 9071,
+      "sizeKb": 8.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "pipelineComponents-V3KYtRnC.js",
+      "path": "apps\\public\\assets\\pipelineComponents-V3KYtRnC.js",
+      "sizeBytes": 9052,
+      "sizeKb": 8.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "DebitNotes-x6twia7x.js",
+      "path": "apps\\public\\assets\\DebitNotes-x6twia7x.js",
+      "sizeBytes": 8956,
+      "sizeKb": 8.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "StatsCard-BKZmpNOp.js",
+      "path": "apps\\public\\assets\\StatsCard-BKZmpNOp.js",
+      "sizeBytes": 8932,
+      "sizeKb": 8.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "GeneralLedgerCompliance-D-b66jfQ.js",
+      "path": "apps\\public\\assets\\GeneralLedgerCompliance-D-b66jfQ.js",
+      "sizeBytes": 8922,
+      "sizeKb": 8.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SourceSystemsPage-DHDSvDvo.js",
+      "path": "apps\\public\\assets\\SourceSystemsPage-DHDSvDvo.js",
+      "sizeBytes": 8779,
+      "sizeKb": 8.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BankPayrollExport-x-FzpAgI.js",
+      "path": "apps\\public\\assets\\BankPayrollExport-x-FzpAgI.js",
+      "sizeBytes": 8696,
+      "sizeKb": 8.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CustomerGrowth-NH4GGTtC.js",
+      "path": "apps\\public\\assets\\CustomerGrowth-NH4GGTtC.js",
+      "sizeBytes": 8666,
+      "sizeKb": 8.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SetupCloud-B9AR-cq3.js",
+      "path": "apps\\public\\assets\\SetupCloud-B9AR-cq3.js",
+      "sizeBytes": 8653,
+      "sizeKb": 8.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "JournalEntries-BRq24rul.js",
+      "path": "apps\\public\\assets\\JournalEntries-BRq24rul.js",
+      "sizeBytes": 8586,
+      "sizeKb": 8.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SalesRevenueRecognition-DR9wB8Dt.js",
+      "path": "apps\\public\\assets\\SalesRevenueRecognition-DR9wB8Dt.js",
+      "sizeBytes": 8525,
+      "sizeKb": 8.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "PaymentTracker-DBjhfkit.js",
+      "path": "apps\\public\\assets\\PaymentTracker-DBjhfkit.js",
+      "sizeBytes": 8474,
+      "sizeKb": 8.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "TaxSummary-0h5YhQDL.js",
+      "path": "apps\\public\\assets\\TaxSummary-0h5YhQDL.js",
+      "sizeBytes": 8313,
+      "sizeKb": 8.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SalesDebitNotes-DpDFAOK-.js",
+      "path": "apps\\public\\assets\\SalesDebitNotes-DpDFAOK-.js",
+      "sizeBytes": 8191,
+      "sizeKb": 8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "EmailSettings-AfviHP3l.js",
+      "path": "apps\\public\\assets\\EmailSettings-AfviHP3l.js",
+      "sizeBytes": 8184,
+      "sizeKb": 8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Companies-B2nsvIS3.js",
+      "path": "apps\\public\\assets\\Companies-B2nsvIS3.js",
+      "sizeBytes": 8152,
+      "sizeKb": 8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "SecuritySettings-ClMB73fh.js",
+      "path": "apps\\public\\assets\\SecuritySettings-ClMB73fh.js",
+      "sizeBytes": 8133,
+      "sizeKb": 7.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CreditNotes-BodVubzL.js",
+      "path": "apps\\public\\assets\\CreditNotes-BodVubzL.js",
+      "sizeBytes": 8129,
+      "sizeKb": 7.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ChecklistsPage-DhbqFmpW.js",
+      "path": "apps\\public\\assets\\ChecklistsPage-DhbqFmpW.js",
+      "sizeBytes": 8082,
+      "sizeKb": 7.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Departments-DGnNr8hn.js",
+      "path": "apps\\public\\assets\\Departments-DGnNr8hn.js",
+      "sizeBytes": 7958,
+      "sizeKb": 7.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "TaxLiabilityEstimator-CiTJzuyl.js",
+      "path": "apps\\public\\assets\\TaxLiabilityEstimator-CiTJzuyl.js",
+      "sizeBytes": 7928,
+      "sizeKb": 7.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "invoiceBatchModal-CykFt26h.js",
+      "path": "apps\\public\\assets\\invoiceBatchModal-CykFt26h.js",
+      "sizeBytes": 7919,
+      "sizeKb": 7.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ReportLines--ZqM-xpN.js",
+      "path": "apps\\public\\assets\\ReportLines--ZqM-xpN.js",
+      "sizeBytes": 7795,
+      "sizeKb": 7.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "OfflineResilience-CjvcDnWc.js",
+      "path": "apps\\public\\assets\\OfflineResilience-CjvcDnWc.js",
+      "sizeBytes": 7775,
+      "sizeKb": 7.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Shifts-xKk7OQU2.js",
+      "path": "apps\\public\\assets\\Shifts-xKk7OQU2.js",
+      "sizeBytes": 7762,
+      "sizeKb": 7.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BalanceSheet-Cue-xLoI.js",
+      "path": "apps\\public\\assets\\BalanceSheet-Cue-xLoI.js",
+      "sizeBytes": 7538,
+      "sizeKb": 7.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ComplianceDashboardPage-Bg_fqBa0.js",
+      "path": "apps\\public\\assets\\ComplianceDashboardPage-Bg_fqBa0.js",
+      "sizeBytes": 7485,
+      "sizeKb": 7.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BulkOperationsPage-BZRDivVs.js",
+      "path": "apps\\public\\assets\\BulkOperationsPage-BZRDivVs.js",
+      "sizeBytes": 7312,
+      "sizeKb": 7.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ProfitAndLoss-Bv_OsBUh.js",
+      "path": "apps\\public\\assets\\ProfitAndLoss-Bv_OsBUh.js",
+      "sizeBytes": 7308,
+      "sizeKb": 7.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CashFlowStatement-evfoEDiy.js",
+      "path": "apps\\public\\assets\\CashFlowStatement-evfoEDiy.js",
+      "sizeBytes": 7307,
+      "sizeKb": 7.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "TransactionCategories-DNRBspTD.js",
+      "path": "apps\\public\\assets\\TransactionCategories-DNRBspTD.js",
+      "sizeBytes": 7255,
+      "sizeKb": 7.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ConnectedNodes-CRKhQS1f.js",
+      "path": "apps\\public\\assets\\ConnectedNodes-CRKhQS1f.js",
+      "sizeBytes": 7139,
+      "sizeKb": 7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "BankingCashFlow-Cs9BypMA.js",
+      "path": "apps\\public\\assets\\BankingCashFlow-Cs9BypMA.js",
+      "sizeBytes": 7134,
+      "sizeKb": 7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "InventoryValuation-DdfLAMHM.js",
+      "path": "apps\\public\\assets\\InventoryValuation-DdfLAMHM.js",
+      "sizeBytes": 6980,
+      "sizeKb": 6.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "MultiCompanyAdmin-BfGOU2aI.js",
+      "path": "apps\\public\\assets\\MultiCompanyAdmin-BfGOU2aI.js",
+      "sizeBytes": 6955,
+      "sizeKb": 6.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "PaymentRequired-BjS09paf.js",
+      "path": "apps\\public\\assets\\PaymentRequired-BjS09paf.js",
+      "sizeBytes": 6934,
+      "sizeKb": 6.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "NotFound-DgxZIH15.js",
+      "path": "apps\\public\\assets\\NotFound-DgxZIH15.js",
+      "sizeBytes": 6717,
+      "sizeKb": 6.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "DigitalPayments-BynhKTi6.js",
+      "path": "apps\\public\\assets\\DigitalPayments-BynhKTi6.js",
+      "sizeBytes": 6713,
+      "sizeKb": 6.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Attendance-bgdI-Qbx.js",
+      "path": "apps\\public\\assets\\Attendance-bgdI-Qbx.js",
+      "sizeBytes": 6638,
+      "sizeKb": 6.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "TrialBalance-B6WZRDjX.js",
+      "path": "apps\\public\\assets\\TrialBalance-B6WZRDjX.js",
+      "sizeBytes": 6626,
+      "sizeKb": 6.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "GridHero-DwMk0axj.js",
+      "path": "apps\\public\\assets\\GridHero-DwMk0axj.js",
+      "sizeBytes": 6526,
+      "sizeKb": 6.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CurrencySettings-zz3_jn4I.js",
+      "path": "apps\\public\\assets\\CurrencySettings-zz3_jn4I.js",
+      "sizeBytes": 6444,
+      "sizeKb": 6.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "LoyaltyDashboard-BleQc1mk.js",
+      "path": "apps\\public\\assets\\LoyaltyDashboard-BleQc1mk.js",
+      "sizeBytes": 6421,
+      "sizeKb": 6.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ItemVariants-DGT3E0LL.js",
+      "path": "apps\\public\\assets\\ItemVariants-DGT3E0LL.js",
+      "sizeBytes": 6415,
+      "sizeKb": 6.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ovdsApi-DgdbBPMf.js",
+      "path": "apps\\public\\assets\\ovdsApi-DgdbBPMf.js",
+      "sizeBytes": 6378,
+      "sizeKb": 6.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AgedPayables-D9V_4wp-.js",
+      "path": "apps\\public\\assets\\AgedPayables-D9V_4wp-.js",
+      "sizeBytes": 6364,
+      "sizeKb": 6.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ReportDefinitions-BvDoy1M0.js",
+      "path": "apps\\public\\assets\\ReportDefinitions-BvDoy1M0.js",
+      "sizeBytes": 6359,
+      "sizeKb": 6.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "select-BD4v_l_z.js",
+      "path": "apps\\public\\assets\\select-BD4v_l_z.js",
+      "sizeBytes": 6290,
+      "sizeKb": 6.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "taxApi-BQSVoIXd.js",
+      "path": "apps\\public\\assets\\taxApi-BQSVoIXd.js",
+      "sizeBytes": 6103,
+      "sizeKb": 6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "TranslationReserves-D_y3xSL4.js",
+      "path": "apps\\public\\assets\\TranslationReserves-D_y3xSL4.js",
+      "sizeBytes": 6036,
+      "sizeKb": 5.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "TaxReportsPage-vW9Auhee.js",
+      "path": "apps\\public\\assets\\TaxReportsPage-vW9Auhee.js",
+      "sizeBytes": 6032,
+      "sizeKb": 5.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CustomerInteraction-DoovJ6Qj.js",
+      "path": "apps\\public\\assets\\CustomerInteraction-DoovJ6Qj.js",
+      "sizeBytes": 6025,
+      "sizeKb": 5.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "WithholdingPage-D4vnb7UK.js",
+      "path": "apps\\public\\assets\\WithholdingPage-D4vnb7UK.js",
+      "sizeBytes": 5957,
+      "sizeKb": 5.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "EimsDashboardPage-Cis16vBX.js",
+      "path": "apps\\public\\assets\\EimsDashboardPage-Cis16vBX.js",
+      "sizeBytes": 5928,
+      "sizeKb": 5.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Receipts-B6ZlbpbB.js",
+      "path": "apps\\public\\assets\\Receipts-B6ZlbpbB.js",
+      "sizeBytes": 5894,
+      "sizeKb": 5.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AuditLogs-H4zaqYWa.js",
+      "path": "apps\\public\\assets\\AuditLogs-H4zaqYWa.js",
+      "sizeBytes": 5877,
+      "sizeKb": 5.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Reconciliation-CUyaK5r7.js",
+      "path": "apps\\public\\assets\\Reconciliation-CUyaK5r7.js",
+      "sizeBytes": 5835,
+      "sizeKb": 5.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "workbox-window.prod.es5-BBnX5xw4.js",
+      "path": "apps\\public\\assets\\workbox-window.prod.es5-BBnX5xw4.js",
+      "sizeBytes": 5748,
+      "sizeKb": 5.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Forbidden-Dj31Hfzb.js",
+      "path": "apps\\public\\assets\\Forbidden-Dj31Hfzb.js",
+      "sizeBytes": 5723,
+      "sizeKb": 5.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "constants-vOpEu2Bv.js",
+      "path": "apps\\public\\assets\\constants-vOpEu2Bv.js",
+      "sizeBytes": 5702,
+      "sizeKb": 5.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ingestionWorkflowOverview-DzCClUYg.js",
+      "path": "apps\\public\\assets\\ingestionWorkflowOverview-DzCClUYg.js",
+      "sizeBytes": 5668,
+      "sizeKb": 5.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "EimsInvoicesPage-BdvCE0cA.js",
+      "path": "apps\\public\\assets\\EimsInvoicesPage-BdvCE0cA.js",
+      "sizeBytes": 5628,
+      "sizeKb": 5.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Notifications-BrQfvYN3.js",
+      "path": "apps\\public\\assets\\Notifications-BrQfvYN3.js",
+      "sizeBytes": 5443,
+      "sizeKb": 5.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "EimsReceiptsPage-CtFQj-S3.js",
+      "path": "apps\\public\\assets\\EimsReceiptsPage-CtFQj-S3.js",
+      "sizeBytes": 5345,
+      "sizeKb": 5.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ServiceUnavailable-Bew2hvmu.js",
+      "path": "apps\\public\\assets\\ServiceUnavailable-Bew2hvmu.js",
+      "sizeBytes": 5299,
+      "sizeKb": 5.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "EntityGroups-CxnNZjur.js",
+      "path": "apps\\public\\assets\\EntityGroups-CxnNZjur.js",
+      "sizeBytes": 5208,
+      "sizeKb": 5.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "EmptyState-C48jcxoD.js",
+      "path": "apps\\public\\assets\\EmptyState-C48jcxoD.js",
+      "sizeBytes": 5159,
+      "sizeKb": 5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CustomFieldRenderer-DnW3G4HS.js",
+      "path": "apps\\public\\assets\\CustomFieldRenderer-DnW3G4HS.js",
+      "sizeBytes": 5033,
+      "sizeKb": 4.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "GoogleCallback-DgXitWwn.js",
+      "path": "apps\\public\\assets\\GoogleCallback-DgXitWwn.js",
+      "sizeBytes": 5007,
+      "sizeKb": 4.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "inventoryApi-CJjFkhm1.js",
+      "path": "apps\\public\\assets\\inventoryApi-CJjFkhm1.js",
+      "sizeBytes": 5003,
+      "sizeKb": 4.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AccountingEstimatesPage-ClLNRolw.js",
+      "path": "apps\\public\\assets\\AccountingEstimatesPage-ClLNRolw.js",
+      "sizeBytes": 4792,
+      "sizeKb": 4.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AGMPage-DEBSC1gi.js",
+      "path": "apps\\public\\assets\\AGMPage-DEBSC1gi.js",
+      "sizeBytes": 4770,
+      "sizeKb": 4.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "GovernancePage-B1XuJ-1G.js",
+      "path": "apps\\public\\assets\\GovernancePage-B1XuJ-1G.js",
+      "sizeBytes": 4766,
+      "sizeKb": 4.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Pagination-OlPofjyv.js",
+      "path": "apps\\public\\assets\\Pagination-OlPofjyv.js",
+      "sizeBytes": 4724,
+      "sizeKb": 4.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "eimsApi-RV8lxjkY.js",
+      "path": "apps\\public\\assets\\eimsApi-RV8lxjkY.js",
+      "sizeBytes": 4574,
+      "sizeKb": 4.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "newTaxApi-B9Xh3orX.js",
+      "path": "apps\\public\\assets\\newTaxApi-B9Xh3orX.js",
+      "sizeBytes": 4323,
+      "sizeKb": 4.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "NotificationBanner-7Rz3dSme.js",
+      "path": "apps\\public\\assets\\NotificationBanner-7Rz3dSme.js",
+      "sizeBytes": 4262,
+      "sizeKb": 4.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "pipeline-BbCHqK-2.js",
+      "path": "apps\\public\\assets\\pipeline-BbCHqK-2.js",
+      "sizeBytes": 4236,
+      "sizeKb": 4.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "iotApi-CuWBZVxJ.js",
+      "path": "apps\\public\\assets\\iotApi-CuWBZVxJ.js",
+      "sizeBytes": 4205,
+      "sizeKb": 4.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "vatApi-C9qKmbjM.js",
+      "path": "apps\\public\\assets\\vatApi-C9qKmbjM.js",
+      "sizeBytes": 4105,
+      "sizeKb": 4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "tokens-DFXLTatZ.js",
+      "path": "apps\\public\\assets\\tokens-DFXLTatZ.js",
+      "sizeBytes": 4040,
+      "sizeKb": 3.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "settingsApi-KlgV7ejk.js",
+      "path": "apps\\public\\assets\\settingsApi-KlgV7ejk.js",
+      "sizeBytes": 3866,
+      "sizeKb": 3.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "MetricCard-BS1t9FMJ.js",
+      "path": "apps\\public\\assets\\MetricCard-BS1t9FMJ.js",
+      "sizeBytes": 3671,
+      "sizeKb": 3.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "NotesToFinancials-DB8FRhlx.js",
+      "path": "apps\\public\\assets\\NotesToFinancials-DB8FRhlx.js",
+      "sizeBytes": 3201,
+      "sizeKb": 3.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "button-BkKYf1nL.js",
+      "path": "apps\\public\\assets\\button-BkKYf1nL.js",
+      "sizeBytes": 3120,
+      "sizeKb": 3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "OvdsEmptyState-B2SDujvs.js",
+      "path": "apps\\public\\assets\\OvdsEmptyState-B2SDujvs.js",
+      "sizeBytes": 2991,
+      "sizeKb": 2.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "OvdsStatsStrip-CVNWHxxR.js",
+      "path": "apps\\public\\assets\\OvdsStatsStrip-CVNWHxxR.js",
+      "sizeBytes": 2967,
+      "sizeKb": 2.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AppTable-4U_7T7ez.js",
+      "path": "apps\\public\\assets\\AppTable-4U_7T7ez.js",
+      "sizeBytes": 2947,
+      "sizeKb": 2.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "vendor-radix-DgIVFmtV.js",
+      "path": "apps\\public\\assets\\vendor-radix-DgIVFmtV.js",
+      "sizeBytes": 2929,
+      "sizeKb": 2.9,
+      "type": "vendor/radix",
+      "warn": false
+    },
+    {
+      "name": "AppKpi-DDtEvet8.js",
+      "path": "apps\\public\\assets\\AppKpi-DDtEvet8.js",
+      "sizeBytes": 2874,
+      "sizeKb": 2.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "hrApi-BQSUmEnX.js",
+      "path": "apps\\public\\assets\\hrApi-BQSUmEnX.js",
+      "sizeBytes": 2800,
+      "sizeKb": 2.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AppPage-H6njtb47.js",
+      "path": "apps\\public\\assets\\AppPage-H6njtb47.js",
+      "sizeBytes": 2581,
+      "sizeKb": 2.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "collectionsApi-BB1nthkb.js",
+      "path": "apps\\public\\assets\\collectionsApi-BB1nthkb.js",
+      "sizeBytes": 2543,
+      "sizeKb": 2.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Procurement-B6gznDI1.js",
+      "path": "apps\\public\\assets\\Procurement-B6gznDI1.js",
+      "sizeBytes": 2485,
+      "sizeKb": 2.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "PipelineFlow-BcA-3D9T.js",
+      "path": "apps\\public\\assets\\PipelineFlow-BcA-3D9T.js",
+      "sizeBytes": 2473,
+      "sizeKb": 2.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "OvdsPageHeader-jxlWDfdy.js",
+      "path": "apps\\public\\assets\\OvdsPageHeader-jxlWDfdy.js",
+      "sizeBytes": 2448,
+      "sizeKb": 2.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "input-B2sb5-P_.js",
+      "path": "apps\\public\\assets\\input-B2sb5-P_.js",
+      "sizeBytes": 2429,
+      "sizeKb": 2.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AppTabs-DMJKIO7l.js",
+      "path": "apps\\public\\assets\\AppTabs-DMJKIO7l.js",
+      "sizeBytes": 2410,
+      "sizeKb": 2.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "useApiCrud-DAlXb5YZ.js",
+      "path": "apps\\public\\assets\\useApiCrud-DAlXb5YZ.js",
+      "sizeBytes": 2409,
+      "sizeKb": 2.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "badge-DgUOzjSK.js",
+      "path": "apps\\public\\assets\\badge-DgUOzjSK.js",
+      "sizeBytes": 2362,
+      "sizeKb": 2.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "fmt-CiLKk45m.js",
+      "path": "apps\\public\\assets\\fmt-CiLKk45m.js",
+      "sizeBytes": 2361,
+      "sizeKb": 2.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "appstoreApi-CtqF_y5z.js",
+      "path": "apps\\public\\assets\\appstoreApi-CtqF_y5z.js",
+      "sizeBytes": 2283,
+      "sizeKb": 2.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "can-DoYAlGkh.js",
+      "path": "apps\\public\\assets\\can-DoYAlGkh.js",
+      "sizeBytes": 2252,
+      "sizeKb": 2.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Skeleton-BJtQqdDp.js",
+      "path": "apps\\public\\assets\\Skeleton-BJtQqdDp.js",
+      "sizeBytes": 2228,
+      "sizeKb": 2.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "DashboardPrimitives-9b-rbWjV.js",
+      "path": "apps\\public\\assets\\DashboardPrimitives-9b-rbWjV.js",
+      "sizeBytes": 2130,
+      "sizeKb": 2.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "reportsApi-jfzYKlAX.js",
+      "path": "apps\\public\\assets\\reportsApi-jfzYKlAX.js",
+      "sizeBytes": 2123,
+      "sizeKb": 2.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AppStat-CuaiwuwG.js",
+      "path": "apps\\public\\assets\\AppStat-CuaiwuwG.js",
+      "sizeBytes": 2064,
+      "sizeKb": 2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "useRbac-CeSO5pa8.js",
+      "path": "apps\\public\\assets\\useRbac-CeSO5pa8.js",
+      "sizeBytes": 1905,
+      "sizeKb": 1.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "deviceControlApi-Bbzqb8_l.js",
+      "path": "apps\\public\\assets\\deviceControlApi-Bbzqb8_l.js",
+      "sizeBytes": 1881,
+      "sizeKb": 1.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "textarea-BZRyEk74.js",
+      "path": "apps\\public\\assets\\textarea-BZRyEk74.js",
+      "sizeBytes": 1825,
+      "sizeKb": 1.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "roleBadge-BIrUQ2Dp.js",
+      "path": "apps\\public\\assets\\roleBadge-BIrUQ2Dp.js",
+      "sizeBytes": 1676,
+      "sizeKb": 1.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "DashboardTrendChart-DOOrFtGq.js",
+      "path": "apps\\public\\assets\\DashboardTrendChart-DOOrFtGq.js",
+      "sizeBytes": 1670,
+      "sizeKb": 1.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ContextualInsight-DKZ1Nx0l.js",
+      "path": "apps\\public\\assets\\ContextualInsight-DKZ1Nx0l.js",
+      "sizeBytes": 1427,
+      "sizeKb": 1.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "tradeApi-CxW2X5pu.js",
+      "path": "apps\\public\\assets\\tradeApi-CxW2X5pu.js",
+      "sizeBytes": 1359,
+      "sizeKb": 1.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ifrsApi-B2VxllSA.js",
+      "path": "apps\\public\\assets\\ifrsApi-B2VxllSA.js",
+      "sizeBytes": 1344,
+      "sizeKb": 1.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "index-CBtgF-ki.js",
+      "path": "apps\\public\\assets\\index-CBtgF-ki.js",
+      "sizeBytes": 1265,
+      "sizeKb": 1.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "useAgmGovernance-CGAJmeBm.js",
+      "path": "apps\\public\\assets\\useAgmGovernance-CGAJmeBm.js",
+      "sizeBytes": 1245,
+      "sizeKb": 1.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "usePagination-DuobAV99.js",
+      "path": "apps\\public\\assets\\usePagination-DuobAV99.js",
+      "sizeBytes": 1205,
+      "sizeKb": 1.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "missingFeaturesApi-DNESFPC0.js",
+      "path": "apps\\public\\assets\\missingFeaturesApi-DNESFPC0.js",
+      "sizeBytes": 1167,
+      "sizeKb": 1.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "useSecurity-MBB_AQP0.js",
+      "path": "apps\\public\\assets\\useSecurity-MBB_AQP0.js",
+      "sizeBytes": 1161,
+      "sizeKb": 1.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "StatusBadge-Boubgnpb.js",
+      "path": "apps\\public\\assets\\StatusBadge-Boubgnpb.js",
+      "sizeBytes": 1035,
+      "sizeKb": 1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ModulesPage-Dfk8nzFr.js",
+      "path": "apps\\public\\assets\\ModulesPage-Dfk8nzFr.js",
+      "sizeBytes": 1029,
+      "sizeKb": 1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "UsersAccessPage-SEi1buET.js",
+      "path": "apps\\public\\assets\\UsersAccessPage-SEi1buET.js",
+      "sizeBytes": 1027,
+      "sizeKb": 1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Settings-D30qfiRW.js",
+      "path": "apps\\public\\assets\\Settings-D30qfiRW.js",
+      "sizeBytes": 1004,
+      "sizeKb": 1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ocr-BEPuHaqQ.js",
+      "path": "apps\\public\\assets\\ocr-BEPuHaqQ.js",
+      "sizeBytes": 972,
+      "sizeKb": 0.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CompanyProfile-BSoulM6v.js",
+      "path": "apps\\public\\assets\\CompanyProfile-BSoulM6v.js",
+      "sizeBytes": 918,
+      "sizeKb": 0.9,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "clientApi-DWMbsmjl.js",
+      "path": "apps\\public\\assets\\clientApi-DWMbsmjl.js",
+      "sizeBytes": 786,
+      "sizeKb": 0.8,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "index-CDtMaPst.js",
+      "path": "apps\\public\\assets\\index-CDtMaPst.js",
+      "sizeBytes": 707,
+      "sizeKb": 0.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "auth0TokenRefresh-Dg0B6D1C.js",
+      "path": "apps\\public\\assets\\auth0TokenRefresh-Dg0B6D1C.js",
+      "sizeBytes": 695,
+      "sizeKb": 0.7,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "useAuditLog-1DriF6AS.js",
+      "path": "apps\\public\\assets\\useAuditLog-1DriF6AS.js",
+      "sizeBytes": 614,
+      "sizeKb": 0.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "useLastRefreshed-UTWB8sE_.js",
+      "path": "apps\\public\\assets\\useLastRefreshed-UTWB8sE_.js",
+      "sizeBytes": 589,
+      "sizeKb": 0.6,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "useSetupComplianceSync-BXNmPNJV.js",
+      "path": "apps\\public\\assets\\useSetupComplianceSync-BXNmPNJV.js",
+      "sizeBytes": 562,
+      "sizeKb": 0.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "releaseApi-Bu73IZ0v.js",
+      "path": "apps\\public\\assets\\releaseApi-Bu73IZ0v.js",
+      "sizeBytes": 541,
+      "sizeKb": 0.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "Auth0Callback-GUh2B8sY.js",
+      "path": "apps\\public\\assets\\Auth0Callback-GUh2B8sY.js",
+      "sizeBytes": 502,
+      "sizeKb": 0.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "fmt-C_bqHfL3.js",
+      "path": "apps\\public\\assets\\fmt-C_bqHfL3.js",
+      "sizeBytes": 491,
+      "sizeKb": 0.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "useGlCompliance-CDN67Ha8.js",
+      "path": "apps\\public\\assets\\useGlCompliance-CDN67Ha8.js",
+      "sizeBytes": 461,
+      "sizeKb": 0.5,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CrmDashboardPage-CS1opp6b.js",
+      "path": "apps\\public\\assets\\CrmDashboardPage-CS1opp6b.js",
+      "sizeBytes": 361,
+      "sizeKb": 0.4,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "AssetsPage-C2yrtnAq.js",
+      "path": "apps\\public\\assets\\AssetsPage-C2yrtnAq.js",
+      "sizeBytes": 352,
+      "sizeKb": 0.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "WhiteLabelPage-CPvbFvTo.js",
+      "path": "apps\\public\\assets\\WhiteLabelPage-CPvbFvTo.js",
+      "sizeBytes": 352,
+      "sizeKb": 0.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CrmActivitiesPage-CnSMyKvr.js",
+      "path": "apps\\public\\assets\\CrmActivitiesPage-CnSMyKvr.js",
+      "sizeBytes": 346,
+      "sizeKb": 0.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "DealsPage-B-3o4cKr.js",
+      "path": "apps\\public\\assets\\DealsPage-B-3o4cKr.js",
+      "sizeBytes": 345,
+      "sizeKb": 0.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "EmployeesPage-BW_P0D05.js",
+      "path": "apps\\public\\assets\\EmployeesPage-BW_P0D05.js",
+      "sizeBytes": 345,
+      "sizeKb": 0.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ImportProPage-DQeS5NMT.js",
+      "path": "apps\\public\\assets\\ImportProPage-DQeS5NMT.js",
+      "sizeBytes": 344,
+      "sizeKb": 0.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "CrmContactsPage-CdSRStjA.js",
+      "path": "apps\\public\\assets\\CrmContactsPage-CdSRStjA.js",
+      "sizeBytes": 343,
+      "sizeKb": 0.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "PayrollPage-iDH-YcGk.js",
+      "path": "apps\\public\\assets\\PayrollPage-iDH-YcGk.js",
+      "sizeBytes": 340,
+      "sizeKb": 0.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "download-CSq-PDAD.js",
+      "path": "apps\\public\\assets\\download-CSq-PDAD.js",
+      "sizeBytes": 332,
+      "sizeKb": 0.3,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "useEscapeKey-C8wVI57n.js",
+      "path": "apps\\public\\assets\\useEscapeKey-C8wVI57n.js",
+      "sizeBytes": 242,
+      "sizeKb": 0.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "useFetchQuery-B2bw9tnH.js",
+      "path": "apps\\public\\assets\\useFetchQuery-B2bw9tnH.js",
+      "sizeBytes": 230,
+      "sizeKb": 0.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "usePageTitle-B2VpUe2V.js",
+      "path": "apps\\public\\assets\\usePageTitle-B2VpUe2V.js",
+      "sizeBytes": 221,
+      "sizeKb": 0.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "useDebounce-LLZcQCnW.js",
+      "path": "apps\\public\\assets\\useDebounce-LLZcQCnW.js",
+      "sizeBytes": 199,
+      "sizeKb": 0.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "ethiopianTax-BDNePDrc.js",
+      "path": "apps\\public\\assets\\ethiopianTax-BDNePDrc.js",
+      "sizeBytes": 193,
+      "sizeKb": 0.2,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "locale-DBaQQAC7.js",
+      "path": "apps\\public\\assets\\locale-DBaQQAC7.js",
+      "sizeBytes": 125,
+      "sizeKb": 0.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "index-BNLxmwct.js",
+      "path": "apps\\public\\assets\\index-BNLxmwct.js",
+      "sizeBytes": 96,
+      "sizeKb": 0.1,
+      "type": "app",
+      "warn": false
+    },
+    {
+      "name": "receiptViewer-BG12Xitd.js",
+      "path": "apps\\public\\assets\\receiptViewer-BG12Xitd.js",
+      "sizeBytes": 39,
+      "sizeKb": 0,
+      "type": "app",
+      "warn": false
+    }
+  ]
+}

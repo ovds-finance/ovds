@@ -1,0 +1,39 @@
+{
+  "name": "ovds-sync",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "root": "apps/ovds-sync",
+  "sourceRoot": "apps/ovds-sync/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/apps/ovds-sync/dist"],
+      "options": {
+        "command": "node ../../scripts/bin-run.mjs typescript/bin/tsc -p tsconfig.build.json",
+        "cwd": "apps/ovds-sync"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node ../../scripts/bin-run.mjs typescript/bin/tsc --noEmit",
+        "cwd": "apps/ovds-sync"
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node ../../scripts/bin-run.mjs @nestjs/cli/bin/nest start --watch",
+        "cwd": "apps/ovds-sync"
+      }
+    },
+    "start:prod": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node dist/main.js",
+        "cwd": "apps/ovds-sync"
+      }
+    }
+  },
+  "tags": ["scope:sync", "type:app"]
+}

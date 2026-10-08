@@ -1,0 +1,29 @@
+# k8s/db-statefulset.yml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cloud-db-cluster
+  namespace: production
+spec:
+  serviceName: "postgres-cluster-service"
+  replicas: 1
+  selector: { matchLabels: { app: cloud-db } }
+  template:
+    metadata: { labels: { app: cloud-db } }
+    spec:
+      containers:
+      - name: postgresql-engine
+        image: postgres:15-alpine
+        ports: [{ containerPort: 5432, name: dbport }]
+        env:
+        - name: POSTGRES_USER
+          valueFrom: { secretKeyRef: { name: db-credentials, key: username } }
+        - name: POSTGRES_PASSWORD
+          valueFrom: { secretKeyRef: { name: db-credentials, key: password } }
+        - name: POSTGRES_DB
+          value: ovds_production
+        resources: { requests: { memory: "2Gi", cpu: "1000m" }, limits: { memory: "4Gi", cpu: "2000m" } }
+        volumeMounts: [{ name: pg-storage-volume, mountPath: /var/lib/postgresql/data }]
+  volumeClaimTemplates:
+  - metadata: { name: pg-storage-volume }
+    spec: { accessModes: ["ReadWriteOnce"], resources: { requests: { storage: 50Gi } } }

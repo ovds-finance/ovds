@@ -1,0 +1,24 @@
+# docker-compose.shards.yml
+version: '3.8'
+services:
+  shard-node-01:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=shard_operator
+      - POSTGRES_PASSWORD=shard_secure_pass
+      - POSTGRES_DB=ovds_shard_01
+    ports: ['5433:5432']
+    volumes: [pg-shard-01-data:/var/lib/postgresql/data]
+    networks: [ovds-federated-network]
+  shard-node-02:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=shard_operator
+      - POSTGRES_PASSWORD=shard_secure_pass
+      - POSTGRES_DB=ovds_shard_02
+    ports: ['5434:5432']
+    volumes: [pg-shard-02-data:/var/lib/postgresql/data]
+    networks: [ovds-federated-network]
+
+volumes: { pg-shard-01-data:, pg-shard-02-data: }
+networks: { ovds-federated-network: { driver: bridge } }

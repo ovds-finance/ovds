@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-09-07T03:46:10.107Z",
+  "reportsDir": "security-reports",
+  "zapScans": {
+    "baseline": {
+      "file": "security-reports\\zap-baseline-report.json",
+      "CRITICAL": 0,
+      "HIGH": 1,
+      "MEDIUM": 0,
+      "LOW": 0,
+      "INFO": 0
+    }
+  },
+  "totalZapFindings": 1,
+  "manualSuites": [
+    {
+      "suite": "phase6-zap-test-input-validation",
+      "total": 2,
+      "passed": 1,
+      "failed": 1,
+      "file": "security-reports\\phase6-zap-test-input-validation.json"
+    }
+  ]
+}

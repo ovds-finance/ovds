@@ -1,0 +1,57 @@
+name: CD - On-Premise Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/portal/**'
+      - 'packages/shared-domains/**'
+      - 'packages/database/prisma/**'
+      - 'docker-compose.onpremise.yml'
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9.4.0'
+
+jobs:
+  build-and-push:
+    name: Build & Push Portal
+    runs-on: ubuntu-latest
+    environment: onpremise
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:portal
+
+      - name: Build Docker image
+        run: |
+          docker build -t ovds/portal:${{ github.sha }} -f apps/portal/Dockerfile .
+          docker tag ovds/portal:${{ github.sha }} ovds/portal:latest
+
+      - name: Push to registry
+        run: |
+          docker push ovds/portal:${{ github.sha }}
+          docker push ovds/portal:latest
+        env:
+          DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
+          DOCKER_REGISTRY_PASS: ${{ secrets.DOCKER_REGISTRY_PASS }}
+
+  deploy:
+    name: Deploy On-Premise
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: onpremise
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy via docker-compose
+        run: |
+          ssh ${{ secrets.ONPREMISE_SSH_TARGET }} "cd /opt/ovds && docker pull ovds/portal:${{ github.sha }} && docker-compose -f docker-compose.onpremise.yml up -d portal"
+        env:
+          ONPREMISE_SSH_KEY: ${{ secrets.ONPREMISE_SSH_KEY }}

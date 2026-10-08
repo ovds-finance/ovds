@@ -1,0 +1,234 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
+enum JournalEntryStatus {
+  DRAFT
+  POSTED
+  REVERSED
+  VOIDED
+}
+
+enum ModuleCode {
+  TAX_COMPLIANCE
+  INVOICING
+  REPORTING
+  AUDIT_TRAIL
+  MULTI_CURRENCY
+  BANK_RECONCILIATION
+  FIXED_ASSETS
+  PAYROLL
+}
+
+enum TenantStatus {
+  ACTIVE
+  SUSPENDED
+  TRIAL
+  EXPIRED
+}
+
+model Tenant {
+  id                String       @id @default(cuid())
+  name              String       @db.VarChar(255)
+  subdomain         String       @unique @db.VarChar(100)
+  status            TenantStatus @default(ACTIVE)
+  databaseProvider  String       @default("mysql") @db.VarChar(50)
+  databaseUrl       String?      @db.Text
+  licenseKey        String?      @db.Text
+  licenseExpiresAt  DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  accounts          Account[]
+  journalEntries    JournalEntry[]
+  journalLines      JournalLine[]
+  activeModules     TenantModule[]
+  settings          GlobalSetting[]
+  bankAccounts      BankAccount[]
+  users             User[]
+
+  @@index([subdomain])
+  @@index([status])
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @db.VarChar(255)
+  passwordHash String   @db.VarChar(255)
+  name         String   @db.VarChar(255)
+  tenantId     String   @db.VarChar(100)
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  roles        Json
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+}
+
+model Account {
+  id           String       @id @default(cuid())
+  code         String       @db.VarChar(50)
+  name         String       @db.VarChar(255)
+  type         AccountType
+  parentId     String?      @db.VarChar(100)
+  parent       Account?     @relation("AccountHierarchy", fields: [parentId], references: [id])
+  children     Account[]    @relation("AccountHierarchy")
+  tenantId     String       @db.VarChar(100)
+  tenant       Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  currency     String       @default("ETB") @db.VarChar(3)
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  journalLines JournalLine[]
+  bankAccounts BankAccount[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId, type])
+  @@index([tenantId, parentId])
+}
+
+model JournalEntry {
+  id          String              @id @default(cuid())
+  entryNumber String              @db.VarChar(50)
+  date        DateTime            @db.Date
+  description String              @db.Text
+  reference   String?             @db.VarChar(255)
+  status      JournalEntryStatus  @default(DRAFT)
+  tenantId    String              @db.VarChar(100)
+  tenant      Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  lines       JournalLine[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  postedAt    DateTime?
+  postedBy    String?             @db.VarChar(100)
+  reversedAt  DateTime?
+  reversedBy  String?             @db.VarChar(100)
+
+  @@unique([tenantId, entryNumber])
+  @@index([tenantId, date])
+  @@index([tenantId, status])
+  @@index([tenantId, postedAt])
+}
+
+model JournalLine {
+  id            String       @id @default(cuid())
+  journalEntryId String      @db.VarChar(100)
+  journalEntry  JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  accountId     String       @db.VarChar(100)
+  account       Account      @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  tenantId      String       @db.VarChar(100)
+  tenant        Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  debit         Decimal      @default(0) @db.Decimal(19, 4)
+  credit        Decimal      @default(0) @db.Decimal(19, 4)
+  description   String?      @db.Text
+  sortOrder     Int          @default(0)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([tenantId, accountId])
+  @@index([journalEntryId])
+}
+
+model TenantModule {
+  id        String      @id @default(cuid())
+  tenantId  String      @db.VarChar(100)
+  tenant    Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  moduleCode ModuleCode
+  enabled   Boolean     @default(true)
+  config    Json?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@unique([tenantId, moduleCode])
+}
+
+model GlobalSetting {
+  id        String   @id @default(cuid())
+  key       String   @db.VarChar(100)
+  value     Json
+  tenantId  String?  @db.VarChar(100)
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([key, tenantId])
+  @@index([tenantId])
+}
+
+model TenantRegistry {
+  id            String   @id @default(cuid())
+  subdomain     String   @unique @db.VarChar(100)
+  databaseUrl   String   @db.Text
+  databaseProvider String @db.VarChar(50)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([subdomain])
+  @@index([isActive])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  tenantId    String   @db.VarChar(100)
+  userId      String?  @db.VarChar(100)
+  action      String   @db.VarChar(100)
+  entityType  String   @db.VarChar(100)
+  entityId    String?  @db.VarChar(100)
+  oldValues   Json?
+  newValues   Json?
+  ipAddress   String?  @db.VarChar(45)
+  userAgent   String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId, createdAt])
+  @@index([entityType, entityId])
+}
+
+model CurrencyRate {
+  id        String   @id @default(cuid())
+  fromCurrency String @db.VarChar(3)
+  toCurrency   String @db.VarChar(3)
+  rate        Decimal @db.Decimal(19, 8)
+  date        DateTime @db.Date
+  source      String  @default("NBE") @db.VarChar(50)
+  createdAt   DateTime @default(now())
+
+  @@unique([fromCurrency, toCurrency, date])
+  @@index([date])
+}
+
+model BankAccount {
+  id          String   @id @default(cuid())
+  tenantId    String   @db.VarChar(100)
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  accountId   String   @db.VarChar(100)
+  account     Account  @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  bankName    String   @db.VarChar(255)
+  accountNumber String @db.VarChar(100)
+  branch      String?  @db.VarChar(255)
+  swiftCode   String?  @db.VarChar(11)
+  currency    String   @default("ETB") @db.VarChar(3)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([accountId])
+}

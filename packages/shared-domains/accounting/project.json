@@ -1,0 +1,38 @@
+{
+  "name": "shared-domains-accounting",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/shared-domains/accounting/src",
+  "projectType": "library",
+  "tags": ["type:lib", "scope:shared"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "main": "packages/shared-domains/accounting/src/index.ts",
+        "tsConfig": "packages/shared-domains/accounting/tsconfig.lib.json",
+        "outputPath": "dist/packages/shared-domains/accounting"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["packages/shared-domains/accounting/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{projectRoot}/coverage"],
+      "options": {
+        "jestConfig": "packages/shared-domains/accounting/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p packages/shared-domains/accounting/tsconfig.lib.json"
+      }
+    }
+  }
+}

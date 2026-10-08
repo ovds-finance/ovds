@@ -1,0 +1,24 @@
+{
+  "_comment": "Sample retest input file for scripts/zap-retest.ps1",
+  "_usage": "pwsh scripts/zap-retest.ps1 -FindingsFile security-reports/retest-input.json",
+  "findings": [
+    {
+      "findingId": "ZAP-001",
+      "category": "injection",
+      "title": "SQL Injection in /api/invoices?search",
+      "description": "User-supplied search parameter was reflected in raw SQL query"
+    },
+    {
+      "findingId": "ZAP-002",
+      "category": "session",
+      "title": "Cookie missing HttpOnly flag",
+      "description": "Authentication cookie is reachable from JavaScript"
+    },
+    {
+      "findingId": "ZAP-003",
+      "category": "idor",
+      "title": "Cross-tenant access via x-company-id",
+      "description": "Lower-privileged user could read another tenant's data by changing x-company-id"
+    }
+  ]
+}

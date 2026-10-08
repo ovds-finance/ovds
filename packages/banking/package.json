@@ -1,0 +1,36 @@
+{
+  "name": "@ovds/banking",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OVDS payment gateway & banking processing (NestJS shared package)",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "source": "./src/index.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "node ../../scripts/bin-run.mjs typescript/bin/tsc",
+    "build:clean": "node ../../scripts/bin-run.mjs typescript/bin/tsc --build --clean && node ../../scripts/bin-run.mjs typescript/bin/tsc",
+    "typecheck": "node ../../scripts/bin-run.mjs typescript/bin/tsc --noEmit"
+  },
+  "dependencies": {
+    "@ovds/database": "workspace:*",
+    "@ovds/ledger": "workspace:*",
+    "@ovds/shared": "workspace:*",
+    "@nestjs/common": "12.0.2",
+    "decimal.js": "^10.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "typescript": "5.9.3"
+  }
+}

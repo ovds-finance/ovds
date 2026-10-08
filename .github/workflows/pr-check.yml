@@ -1,0 +1,84 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8'
+
+jobs:
+  changed-files:
+    name: Detect Changed Files
+    runs-on: ubuntu-latest
+    outputs:
+      infra: ${{ steps.filter.outputs.infra }}
+      accounting: ${{ steps.filter.outputs.accounting }}
+      auth: ${{ steps.filter.outputs.auth }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      cloud-api: ${{ steps.filter.outputs.cloud-api }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            infra: 'packages/shared-domains/infra/**'
+            accounting: 'packages/shared-domains/accounting/**'
+            auth: 'packages/shared-domains/auth/**'
+            frontend: 'apps/frontend/**'
+            cloud-api: 'apps/cloud-api/**'
+
+  lint:
+    name: Lint
+    needs: changed-files
+    if: always() && (needs.changed-files.outputs.infra == 'true' || needs.changed-files.outputs.accounting == 'true' || needs.changed-files.outputs.auth == 'true' || needs.changed-files.outputs.frontend == 'true' || needs.changed-files.outputs.cloud-api == 'true')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+
+  typecheck:
+    name: Typecheck
+    needs: changed-files
+    if: always() && (needs.changed-files.outputs.infra == 'true' || needs.changed-files.outputs.accounting == 'true' || needs.changed-files.outputs.auth == 'true' || needs.changed-files.outputs.frontend == 'true' || needs.changed-files.outputs.cloud-api == 'true')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+
+  test:
+    name: Test
+    needs: changed-files
+    if: always() && (needs.changed-files.outputs.infra == 'true' || needs.changed-files.outputs.accounting == 'true' || needs.changed-files.outputs.auth == 'true' || needs.changed-files.outputs.frontend == 'true' || needs.changed-files.outputs.cloud-api == 'true')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
