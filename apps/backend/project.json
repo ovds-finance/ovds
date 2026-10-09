@@ -1,129 +1,49 @@
 {
   "name": "backend",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "root": "apps/backend",
   "sourceRoot": "apps/backend/src",
   "projectType": "application",
+  "tags": ["scope:backend", "type:app"],
   "targets": {
     "build": {
-      "executor": "nx:run-commands",
-      "outputs": ["{workspaceRoot}/apps/backend/dist"],
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
       "options": {
-        "command": "node ../../scripts/bin-run.mjs @nestjs/cli/bin/nest build --builder swc",
-        "cwd": "apps/backend"
+        "outputPath": "dist/apps/backend",
+        "main": "apps/backend/src/main.ts",
+        "tsConfig": "apps/backend/tsconfig.app.json",
+        "platform": "node",
+        "externalDependencies": [
+          "@prisma/client",
+          "@grpc/proto-loader",
+          "@grpc/grpc-js",
+          "kafkajs",
+          "mqtt",
+          "nats",
+          "amqplib",
+          "amqp-connection-manager"
+        ]
       },
-      "configurations": {
-        "production": {
-          "command": "cp .swcrc.production .swcrc.build && node ../../scripts/bin-run.mjs @nestjs/cli/bin/nest build --builder swc --config .swcrc.build && node -e \"const fs=require('fs'),path=require('path'),walk=d=>{fs.readdirSync(d,{withFileTypes:true}).forEach(e=>{const p=path.join(d,e.name);e.isDirectory()?walk(p):e.name.endsWith('.map')&&fs.unlinkSync(p)})};walk('dist')\" && rm -f .swcrc.build"
-        }
+      "dependsOn": ["database:build"]
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "options": {
+        "buildTarget": "backend:build",
+        "runBuildTargetDependencies": true
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["apps/backend/**/*.ts"]
       }
     },
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node ../../scripts/bin-run.mjs --max-old-space-size=4096 typescript/bin/tsc --noEmit -p tsconfig.json",
-        "cwd": "apps/backend"
-      },
-      "inputs": [
-        "default",
-        "^production"
-      ],
-      "cache": true
-    },
-    "lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node ../../scripts/bin-run.mjs eslint/bin/eslint . --fix --report-unused-disable-directives",
-        "cwd": "apps/backend"
-      },
-      "inputs": [
-        "default"
-      ],
-      "cache": true
-    },
-    "test": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node ../../scripts/bin-run.mjs vitest/vitest.mjs --run --config vitest.config.ts",
-        "cwd": "apps/backend"
-      },
-      "inputs": [
-        "default",
-        "^production"
-      ],
-      "cache": true
-    },
-    "dev": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node ../../scripts/bin-run.mjs @nestjs/cli/bin/nest start --watch --builder swc",
-        "cwd": "apps/backend",
-        "env": {
-          "NODE_OPTIONS": "--max-old-space-size=2048"
-        }
-      }
-    },
-    "db:push": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node ../../scripts/bin-run.mjs prisma/build/index.js db push",
-        "cwd": "apps/backend"
-      }
-    },
-    "migrate:deploy": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node ../../scripts/bin-run.mjs prisma/build/index.js migrate deploy",
-        "cwd": "apps/backend"
-      }
-    },
-    "db:studio": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node ../../scripts/bin-run.mjs prisma/build/index.js studio",
-        "cwd": "apps/backend"
-      }
-    },
-    "seed": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node ../../scripts/bin-run.mjs prisma/build/index.js db seed",
-        "cwd": "apps/backend"
-      }
-    },
-    "bundle-analyze": {
-      "executor": "nx:run-commands",
-      "cache": false,
-      "options": {
-        "command": "node scripts/bundle-analyze.mjs --output .reports/bundle",
-        "cwd": "{workspaceRoot}"
-      }
-    },
-    "dep-check": {
-      "executor": "nx:run-commands",
-      "cache": false,
-      "options": {
-        "command": "node scripts/dep-check.mjs --output .reports/deps",
-        "cwd": "{workspaceRoot}"
-      }
-    },
-    "size-check": {
-      "executor": "nx:run-commands",
-      "cache": false,
-      "options": {
-        "command": "node scripts/size-check.mjs --output .reports/bundle",
-        "cwd": "{workspaceRoot}"
-      }
-    },
-    "optimize": {
-      "executor": "nx:run-commands",
-      "cache": false,
-      "options": {
-        "command": "node scripts/bundle-analyze.mjs --output .reports/bundle && node scripts/size-check.mjs --output .reports/bundle && node scripts/dep-check.mjs --output .reports/deps && node scripts/optimize-report.mjs --output .reports",
-        "cwd": "{workspaceRoot}"
+        "command": "node --max-old-space-size=4096 ./node_modules/typescript/bin/tsc --noEmit -p apps/backend/tsconfig.app.json"
       }
     }
-  },
-  "tags": ["scope:backend", "type:app"]
+  }
 }
-
